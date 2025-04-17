@@ -1,0 +1,56 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Bands
+{% endblock title %}
+{% block content %}
+  <h4>Bands</h4>
+  <div class="table-responsive">
+    <table class="table table display nowrap" id="table">
+      <thead>
+        <tr class="header">
+          <th scope="col">Name</th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
+          <th scope="col">Appearances</th>
+          <th scope="col">Bruce's Band?</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for band in bands %}
+          <tr>
+            <td>
+              <a href="{% url "databruce:band_details" id=band.id %}">{{ band.name }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:event_details" event=band.first.id %}">{{ band.first.event_date|get_date:band.first.id }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:event_details" event=band.last.id %}">{{ band.last.event_date|get_date:band.last.id }}</a>
+            </td>
+            <td>{{ band.appearances }}</td>
+            <td>
+              {% if band.springsteen_band %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+  // remove SearchBuilder
+  layout.topEnd.features[1].buttons.pop();
+
+  $(document).ready(function () {
+    $('#table').dataTable({
+      layout: layout,
+    });
+  });
+  </script>
+{% endblock content %}

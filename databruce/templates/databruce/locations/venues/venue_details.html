@@ -1,0 +1,53 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Venues &gt; {{ venue_info.formatted_loc }}
+{% endblock title %}
+{% block content %}
+  <h4>Venues &gt; {{ venue_info.formatted_loc }}</h4>
+  <hr />
+  {% include "databruce/event_info.html" with events=events %}
+  <div class="table-responsive">
+    <table class="table table display nowrap" id="eventTable">
+      <thead>
+        <tr class="custom">
+          <th>Date</th>
+          <th>Band</th>
+          <th>Tour</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td>
+              <a href="{% url 'databruce:event_details' event=event.id %}">{{ event.event_date|get_date:event.id }} {{ event.early_late|default_if_none:'' }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+            </td>
+            <td>
+              {% if event.tour %}
+                <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.tour_name }}</a>
+              {% endif %}
+            </td>
+            <td>{{ event.event_title|default_if_none:'' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+  <script>
+    layout.topEnd.features[1].buttons[1].config.columns = [1, 2]
+    
+    $(document).ready(function () {
+      // initializes all tables
+      $('table.display').dataTable({
+        layout: layout,
+      });
+    })
+  </script>
+{% endblock content %}

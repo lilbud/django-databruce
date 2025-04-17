@@ -1,0 +1,49 @@
+{% extends "databruce/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}
+  Setlist Searching
+{% endblock title %}
+{% block content %}
+  <h4>Setlist Search</h4>
+  <h6>Note: still being tested</h6>
+  <hr />
+  <div class="row align-items-center">
+    <div class="input-group mb-3">
+      <form action="{% url 'databruce:setlist_search_results' %}"
+            method="get"
+            name="advSearch"
+            id="advSearch">
+        {{ form|crispy }}
+        <button class="btn btn-primary" type="submit" value="Submit" id="submit">Go</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    var selectOptions = {
+      theme: 'bootstrap-5',
+      selectionCssClass: 'form-control form-control-sm',
+      dropdownCssClass: 'select2--small',
+      minimumInputLength: 3,
+      dropdownPosition: 'below'
+    }
+
+    $(document).ready(function () {
+      $('#songSelect').select2(selectOptions)
+    })
+
+    document.addEventListener("DOMContentLoaded", function() {
+      $('#positionSelect').change(function(){
+          var val = $(this).val();
+          
+          if (val === 'followed_by') {
+            console.log(val);
+            document.getElementById("div_id_song2").style.visibility = "visible";
+          } else {
+            document.getElementById("div_id_song2").style.visibility = "hidden";
+          }
+          
+          $('#song2Select').select2(selectOptions)
+      })
+    });
+  </script>
+{% endblock content %}

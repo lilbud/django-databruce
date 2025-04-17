@@ -1,0 +1,21 @@
+{% load filters %}
+<div class="col-xs-6 col-lg-12 mb-4">
+    <div class="d-flex flex-row">
+        <div class="pe-2">Events:</div>
+        <div>{{ events|length }}</div>
+    </div>
+    {% with first=events.first last=events.last %}
+        <div class="d-flex flex-row">
+            <div class="pe-2">First:</div>
+            <div>
+                <a href="{% url 'databruce:event_details' event=first.event.id %}">{{ first.event.event_date|get_date:first.event.id }} - {{ first.event.venue.name }}</a>
+            </div>
+        </div>
+        <div class="d-flex flex-row">
+            <div class="pe-2">Last:</div>
+            <div>
+                <a href="{% url 'databruce:event_details' event=last.event.id %}">{{ last.event.event_date|get_date:last.event.id }} - {{ last.event.venue.name }}</a>
+            </div>
+        </div>
+    {% endwith %}
+</div>

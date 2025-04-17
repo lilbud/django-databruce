@@ -1,0 +1,53 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Countries
+{% endblock title %}
+{% block content %}
+  <h4>Countries</h4>
+  <h6>Countries that Bruce has played in</h6>
+  <div class="table-responsive">
+    <table class="table table" id="countryTable">
+      <thead>
+        <tr>
+          <th scope="col" class="all">Name</th>
+          <th scope="col" class="all">First</th>
+          <th scope="col" class="all">Last</th>
+          <th scope="col" class="all">Num Events</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for country in countries %}
+          <tr>
+            <td>
+              <a href="{% url "databruce:country_details" id=country.id %}">{{ country.name }}</a>
+            </td>
+            <td>
+              {% with first=country.first %}
+                <a href="{% url "databruce:event_details" event=first.id %}">{{ first.event_date|get_date:first.id }}</a>
+              {% endwith %}
+            </td>
+            <td>
+              {% with last=country.last %}
+                <a href="{% url "databruce:event_details" event=last.id %}">{{ last.event_date|get_date:last.id }}</a>
+              {% endwith %}
+            </td>
+            <td>{{ country.num_events }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+    // custom searchBuilder columns definition
+    layout.topEnd.features[1].buttons[1].config.columns = [3];
+
+    $(document).ready(function () {
+      $('#countryTable').dataTable({
+        layout: layout,
+      })
+    })
+  </script>
+{% endblock content %}

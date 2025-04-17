@@ -1,0 +1,33 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Test
+{% endblock title %}
+{% block content %}
+  <h4>Bands</h4>
+  <div class="table-responsive">
+    <table id="table"
+           class="table table display nowrap"
+           data-server-side="true"
+           data-ajax="/api/bands/?format=datatables">
+      <thead>
+        <tr>
+          <th data-data="name">Name</th>
+          <th data-data="first">First</th>
+          <th data-data="last">Last</th>
+          <th data-data="appearances">Appearances</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+    layout.topEnd.features[1].buttons.pop()
+    
+    $(document).ready(function() {
+        $('#table').DataTable({
+          layout: layout,
+        });
+    });
+  </script>
+{% endblock content %}

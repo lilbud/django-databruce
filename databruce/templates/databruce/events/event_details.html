@@ -1,0 +1,133 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  {{ event.event_date|get_date:event.id }} {{ event.artist.name }}
+{% endblock title %}
+{% block content %}
+  <div class="event-header">
+    <h4>
+      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event.event_date|get_date:event.id }}</a> &gt; {{ event.artist.name }} &gt; <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+    </h4>
+  </div>
+  <div class="setlist mt-2">
+    {% if setlist %}
+      {% regroup setlist by set_name as event_setlist %}
+      {% for set in event_setlist %}
+        <p>
+          <b class="setlist-set-name">{{ set.grouper }}:</b>
+          {% for song in set.list %}
+            <span class="setlist-song{% if "unidentified" in song.song_id.brucebase_url %}-unknown{% endif %}">
+              {% spaceless %}
+                <a href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.song_name }}</a>
+                {% if notes %}{{ notes|notes:song.id|safe }}{% endif %}
+                {% if not forloop.last %}
+                  {% if song.segue %}
+                    &gt;
+                  {% else %}
+                    ,
+                  {% endif %}
+                {% endif %}
+              {% endspaceless %}
+            </span>
+          {% endfor %}
+        </p>
+      {% endfor %}
+    {% else %}
+      <p>No Set Details Known</p>
+    {% endif %}
+  </div>
+  <div class="details">
+    {% if event.event_title %}
+      <div class="row mb-2">
+        <div class="col-auto pe-0">
+          <b>Title:</b>
+        </div>
+        <div class="col">{{ event.event_title }}</div>
+      </div>
+    {% endif %}
+    {% if notes %}
+      <div class="row">
+        <b class="note-header">Footnotes:</b>
+      </div>
+      <div class="row">
+        {% for note in notes|event_notes_filter %}
+          <span>
+            &emsp;
+            <b>[{{ note.num }}]</b>
+            {{ note.note|mdlink|safe }}
+            {% if note.last != '' %}
+            , Last Time Played <a href="{% url 'databruce:event_details' event=note.last %}">{{ note.last_date }}</a> ({{ note.gap }} events)</span>
+          {% endif %}
+          <br>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+  <div class="buttons">
+    {% if last_event %}
+      <a class="btn btn-sm btn-secondary"
+         href="{% url 'databruce:event_details' event=last_event %}">&lt; Previous Event</a>
+    {% endif %}
+    {% if next_event %}
+      <a class="btn btn-sm btn-secondary"
+         href="{% url 'databruce:event_details' event=next_event %}">Next Event &gt;</a>
+    {% endif %}
+    {% if event.event_url %}<a class="btn btn-sm btn-secondary" href="{{ event.event_url }}">Brucebase</a>{% endif %}
+  </div>
+  <div class="row info-blocks">
+    <div class="col-md-6">
+      <!-- column 1 -->
+      {% if event.nugs_url or event.archive_url %}
+        <div class="releases">
+          <div class="card">
+            <div class="card-header">Releases</div>
+            <ul class="list-group list-group-flush">
+              {% if event.nugs_url %}
+                <li class="list-group-item">
+                  <a target="_blank" href="{{ event.nugs_url }}"><i class="bi bi-play-circle-fill mr-2"></i>{{ event.nugs_name }}</a>
+                </li>
+              {% endif %}
+              {% if event.archive_url %}
+                <li class="list-group-item">
+                  <a target="_blank" href="{{ event.archive_url }}"><i class="bi bi-play-circle-fill mr-2"></i><span class="mr-2">archive.org</span></a>(Radio Nowhere)
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+      {% if album_tally %}
+        <div class="tally">
+          <div class="card">
+            <div class="card-header">Count by Album</div>
+            <ul class="list-group list-group-flush">
+              {% for album in album_tally %}
+                <li class="list-group-item">
+                  {{ album.name }}<span class="badge text-bg-primary rounded-pill">{{ album.count }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <!-- column 2 -->
+      {% if relations %}
+        <div class="onstage">
+          <div class="card">
+            <div class="card-header">On Stage</div>
+            <ul class="list-group list-group-flush">
+              {% for rel in relations %}
+                <li class="list-group-item">
+                  <a href="{% url "databruce:relation_details" id=rel.relation.id %}">{{ rel.relation.name }}</a> ({{ rel.instruments|default_if_none:'Musician' }})
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <!-- row blocks -->
+{% endblock content %}

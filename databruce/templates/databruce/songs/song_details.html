@@ -1,0 +1,152 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  {{ song_info.song_name }}
+{% endblock title %}
+{% block content %}
+  <h4>
+    Databruce &gt; <a href="{% url 'databruce:songs' %}">Songs</a> &gt; {{ song_info.song_name }}
+  </h4>
+  <hr />
+  <div class="song-info mb-4">
+    {% if song_info.original_artist != 'Bruce Springsteen' %}
+      <div class="row fs-5">
+        <div class="col-auto pe-0">
+          <b>{{ song_info.song_name }}</b> was originally performed by {{ song_info.original_artist }}
+        </div>
+      </div>
+    {% endif %}
+    <div class="row fs-5">
+      <div class="col-auto pe-0">
+        <b>Public Performances:</b>
+      </div>
+      <div class="col">{{ song_info.num_plays_public }} time(s)</div>
+    </div>
+    <div class="row fs-5">
+      <div class="col-auto pe-0">
+        <b>Private Performances:</b>
+      </div>
+      <div class="col">{{ song_info.num_plays_private }} time(s)</div>
+    </div>
+    <div class="row fs-5">
+      <div class="col-auto pe-0">
+        <b>Frequency:</b>
+      </div>
+      <div class="col">{{ frequency }}% of show(s)</div>
+    </div>
+    <div class="row fs-5">
+      <div class="col-auto pe-0">
+        <b>Opener:</b>
+      </div>
+      <div class="col">{{ song_info.opener }}</div>
+    </div>
+    <div class="row fs-5">
+      <div class="col-auto pe-0">
+        <b>Closer:</b>
+      </div>
+      <div class="col">{{ song_info.closer }}</div>
+    </div>
+  </div>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a href="#shows" class="nav-link active" data-bs-toggle="tab">Shows</a>
+    </li>
+    {% if snippets %}
+      <li class="nav-item">
+        <a href="#snippets" class="nav-link" data-bs-toggle="tab">Times as Snippet</a>
+      </li>
+    {% endif %}
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="shows">
+      <div class="table-responsive">
+        <table class="table table display nowrap" id="songTable">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Venue</th>
+              <th scope="col">Gap</th>
+              <th scope="col">Set</th>
+              <th scope="col">Prev</th>
+              <th scope="col">Next</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for song in songs %}
+              <tr>
+                <td>
+                  <a href="{% url "databruce:event_details" event=song.current.event.id %}">{{ song.current.event.event_date|get_date:song.current.event.id }} {{ song.current.event.early_late|default_if_none:"" }}</a>
+                </td>
+                {% with venue=song.current.event.venue %}
+                  <td>
+                    <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue|venue }}</a>
+                  </td>
+                {% endwith %}
+                <td>{{ song.current.last|default_if_none:"" }}</td>
+                <td>{{ song.current.set_name }}</td>
+                <td>
+                  {% if song.prev %}
+                    <a href="{% url "databruce:song_details" id=song.prev.song.id %}">{{ song.prev.song.song_name }}</a>
+                  {% else %}
+                    <em>***</em>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if song.next %}
+                    <a href="{% url "databruce:song_details" id=song.next.song.id %}">{{ song.next.song.song_name }}</a>
+                  {% else %}
+                    <em>***</em>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="snippets">
+      <div class="table-responsive">
+        <table class="table table display nowrap" id="snippetTable">
+          {% comment %} event_date, set, base_song, position {% endcomment %}
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Set</th>
+              <th scope="col">Base Song</th>
+              <th scope="col">Position</th>
+              <th scope="col">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in snippets %}
+              <tr>
+                <td>
+                  <a href="{% url "databruce:event_details" event=s.event.id %}">{{ s.event.event_date|date:'Y-m-d [D]' }}</a>
+                </td>
+                <td>{{ s.setlist.set_name }}</td>
+                <td>
+                  <a href="{% url "databruce:song_details" id=s.setlist.song.id %}">{{ s.setlist.song.song_name }}</a>
+                </td>
+                <td>{{ s.position }}</td>
+                <td>{{ s.snippet_note|default_if_none:"" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop();
+
+    $(document).ready(function () {
+      $('table.display').dataTable({
+        layout: layout,
+      });
+    });
+  </script>
+  <script src="{% static 'databruce/js/dt_tab_reload.js' %}"></script>
+{% endblock content %}

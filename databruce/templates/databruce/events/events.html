@@ -1,0 +1,99 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Events &gt; {{ year }}
+{% endblock title %}
+{% block content %}
+  <div class="col-sm-6 col-lg-1">
+    <h4>Events</h4>
+    <div class="row">
+      <div class="col-auto">
+        <b>Year:</b>
+      </div>
+      <div class="col-auto">
+        <select class="form-select form-select-sm" id="year_select">
+          <option selected disabled hidden>{{ year }}</option>
+          {% for i in years %}
+            <option value="{% url "databruce:events_year" year=i %}">{{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="table-responsive">
+      <table class="table table display nowrap" id="table">
+        <thead>
+          <tr class="custom">
+            <th>Date</th>
+            <th>Band</th>
+            <th>Venue</th>
+            <th>Location</th>
+            <th>Tour</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in event_info %}
+            <tr>
+              <td>
+                <a href="{% url 'databruce:event_details' event=event.id %}">{{ event.event_date|date:'Y-m-d [D]' }} {{ event.early_late|default_if_none:'' }}</a>
+              </td>
+              <td>
+                <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+              </td>
+              <td>
+                <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+              </td>
+              <td>
+                {% if event.venue.id != 1964 %}
+                  <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                    {{ event.venue.city.name }},
+                    {% if event.venue.state %}
+                      <a href="{% url 'databruce:state_details' id=event.venue.state.id %}">{{ event.venue.state.state_abbrev }}</a>
+                    {% else %}
+                      <a href="{% url 'databruce:country_details' id=event.venue.country.id %}">{{ event.venue.country.name }}</a>
+                    {% endif %}
+                  </a>
+                {% endif %}
+              </td>
+              <td>{{ event.tour.tour_name }}</td>
+              <td>{{ event.event_title|default_if_none:'' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+  <script>
+    // searchBuilder custom columns
+    layout.topEnd.features[1].buttons[1].config.columns = [2, 3, 4, 5]
+
+    $(document).ready(function () {
+      $('#table').dataTable({
+        layout: layout,
+        columnDefs: [
+          { width: '150px', targets: 0 },
+          { width: '275px', targets: [1, 2] },
+          { width: '200px', targets: 3 },
+          { width: '250px', targets: 5 },
+        ]
+      });
+
+      $(function(){
+        // bind change event to select
+        $('#year_select').on('change', function () {
+            var url = $(this).val() // get selected value
+            console.log(url);
+            if (url) { // require a URL
+                window.location = url; // redirect
+            }
+            return false;
+        });
+      });
+    });
+  </script>
+{% endblock content %}

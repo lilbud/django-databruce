@@ -1,0 +1,69 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Countries &gt; {{ info.name }}
+{% endblock title %}
+{% block content %}
+  <h4>
+    <a href="{% url "databruce:countries" %}">Countries</a> &gt; {{ info.name }}
+  </h4>
+  <hr />
+  {% include "databruce/event_info.html" with events=events %}
+  <div class="table-responsive">
+    <table class="table table display nowrap" id="tourTable">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Artist</th>
+          <th scope="col">Venue</th>
+          <th scope="col">City</th>
+          <th scope="col">State</th>
+          <th scope="col">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td>
+              <a href="{% url "databruce:event_details" event=event.id %}">{{ event.event_date|date:"Y-m-d [D]" }} {{ event.early_late|default_if_none:"" }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
+            </td>
+            <td>
+              {% if event.venue.state %}
+                <a href="{% url "databruce:state_details" id=event.venue.state.id %}">
+                  {% if event.venue.country.name == "United States" %}
+                    {{ event.venue.state.state_abbrev }}
+                  {% else %}
+                    {{ event.venue.state.name }}
+                  {% endif %}
+                </a>
+              {% endif %}
+            </td>
+            <td>{{ event.event_title|default_if_none:event.event_type }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+  // custom searchBuilder columns definition
+  layout.topEnd.features[1].buttons[1].config.columns = [1, 2, 3, 4];
+
+  $(document).ready(function () {
+      // initializes all tables
+      $('table.display').dataTable({
+        layout: layout,
+      });
+  })
+  </script>
+{% endblock content %}

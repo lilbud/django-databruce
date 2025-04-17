@@ -1,0 +1,27 @@
+[lint]
+select = ["ALL"]
+
+ignore = [
+    "T201",    # ignore printing
+    "FA102",   # future-required-type-annotation
+    "PERF203", # try-except-in-loop
+    "D100",    # missing docstring
+    "F401",    # missing imports
+    "ANN101",  # missing-type-self
+    "RUF001",  # ambiguous-unicode-character-string
+    "N813",    # imports not as camelcase
+    # "E501", # line too long
+    "DTZ002", # timezone
+    "ANN201",
+    "D103",
+    "DTZ005",
+    "A001",
+    "D101",
+    "D102",
+    "DTZ007", #stop bugging me about timezones
+    "D106",
+    "DJ008",
+    "D105",
+    "E501",
+    "RUF012",
+]

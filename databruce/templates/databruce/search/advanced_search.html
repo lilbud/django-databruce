@@ -1,0 +1,20 @@
+{% extends "databruce/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}
+  Events &gt; Search
+{% endblock title %}
+{% block content %}
+  <div class="row align-items-center">
+    <div class="input-group mb-3">
+      <form action="{% url 'databruce:adv_search_results' %}"
+            method="get"
+            name="advSearch"
+            id="advSearch">
+        {{ form|crispy }}
+        <button class="btn btn-primary" type="submit" value="Submit" id="submit">Go</button>
+      </form>
+    </div>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/advanced_search.js' %}"></script>
+{% endblock content %}

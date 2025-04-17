@@ -1,0 +1,93 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Home
+{% endblock title %}
+{% load static %}
+{% block content %}
+  {% regroup events by artist as events_list %}
+  <div class="row mt-2">
+    <div class="col-lg-12">
+      <div class="row mb-2">
+        <h1>Welcome to Databruce</h1>
+      </div>
+      <div class="row">
+        <div class="col-xl-6 col-lg-12 my-2">
+          <h4>Recent Events</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Band</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in recent %}
+                <tr>
+                  <td>
+                    <a href="{% url 'databruce:event_details' event=event.id %}">
+                      {{ event.event_date|date:'Y-m-d [D]' }}
+                      {% if event.early_late %}{{ event.early_late }}{% endif %}
+                    </a>
+                  </td>
+                  <td>
+                    {% if event.venue.id != 1964 %}
+                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                        {{ event.venue.city.name }},
+                        {% if event.venue.state %}
+                          {{ event.venue.state.state_abbrev }}
+                        {% else %}
+                          {{ event.venue.country.name }}
+                        {% endif %}
+                      </a>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist.name }}</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="col-xl-6 col-lg-12 my-2">
+          <h4>On This Day ({{ date|date:"F d" }})</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Band</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in events %}
+                <tr>
+                  <td>
+                    <a href="{% url 'databruce:event_details' event=event.id %}">
+                      {{ event.event_date|date:'Y-m-d [D]' }}
+                      {% if event.early_late %}{{ event.early_late }}{% endif %}
+                    </a>
+                  </td>
+                  <td>
+                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                      {{ event.venue.city.name }},
+                      {% if event.venue.state %}
+                        {{ event.venue.state.state_abbrev }}
+                      {% else %}
+                        {{ event.venue.country.name }}
+                      {% endif %}
+                    </a>
+                  </td>
+                  <td>
+                    <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist.name }}</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,54 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Releases
+{% endblock title %}
+{% block content %}
+  <h4>Releases</h4>
+  <h6>Various retail releases that Bruce appears on.</h6>
+  <div class="table-responsive">
+    <table class="table table" id="releasesTable">
+      <thead>
+        <tr class="header">
+          <th class="all" scope="col">Name</th>
+          <th class="all" scope="col">Release Date</th>
+          <th class="all" scope="col">Release Type</th>
+          <th class="all" scope="col">Links</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for release in releases %}
+          <tr>
+            <td>
+              <a href="{% url "databruce:release_details" id=release.id %}">{{ release.name }}</a>
+            </td>
+            <td>{{ release.date|date:'Y-m-d' }}</td>
+            <td>{{ release.type }}</td>
+            <td>
+              {% if release.mbid %}
+                <button class="btn btn-sm btn-primary"
+                        data-toggle="tooltip"
+                        title="Musicbrainz"
+                        type="button"
+                        href="https://musicbrainz.org/release/{{ release.mbid }}">
+                  <i class="bi bi-file-earmark-music"></i>
+                </button>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop()
+    
+    $(document).ready(function () {
+      $('#releasesTable').dataTable({
+        layout: layout
+      });
+    });
+  </script>
+{% endblock content %}

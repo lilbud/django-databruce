@@ -1,0 +1,60 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Search
+{% endblock title %}
+{% block content %}
+  <h4>Event Search</h4>
+  <h6>Event Date: {{ request.GET.event_date }}</h6>
+  <div class="table-responsive">
+    <table class="table table display nowrap" id="eventTable">
+      <thead>
+        <tr class="custom">
+          <th>Date</th>
+          <th>Band</th>
+          <th>Venue</th>
+          <th>Location</th>
+          <th>Tour</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td>
+              <a href="{% url 'databruce:event_details' event=event.id %}">{{ event.event_date|date:'Y-m-d [D]' }} {{ event.early_late|default_if_none:'' }}</a>
+            </td>
+            <td>
+              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+            </td>
+            <td>
+              <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+            </td>
+            <td>
+              {% if event.venue.id != 1964 %}
+                <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                  {{ event.venue.city.name }},
+                  {% if event.venue.state %}
+                    <a href="{% url 'databruce:state_details' id=event.venue.state.id %}">{{ event.venue.state.state_abbrev }}</a>
+                  {% else %}
+                    <a href="{% url 'databruce:country_details' id=event.venue.country.id %}">{{ event.venue.country.name }}</a>
+                  {% endif %}
+                </a>
+              {% endif %}
+            </td>
+            <td>{{ event.tour.tour_name }}</td>
+            <td>{{ event.event_title|default_if_none:'' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <script>
+      $(document).ready(function () {
+        $('#eventTable').dataTable({
+          layout: layout,
+        })
+      })
+  </script>
+{% endblock content %}

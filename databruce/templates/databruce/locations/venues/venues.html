@@ -1,0 +1,108 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Venues
+{% endblock title %}
+{% block content %}
+  <h4>Venues</h4>
+  <h6>Venues that Bruce has played at</h6>
+  <div class="table-responsive">
+    <table class="table table display nowrap" id="venueTable">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">City</th>
+          <th scope="col">State</th>
+          <th scope="col">Country</th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
+          <th scope="col">Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for venue in venues %}
+          <tr>
+            <td>
+              <a href="{% url "databruce:venue_details" id=venue.id %}">
+                {{ venue.name|add:", "|add:venue.detail|default:venue.name }}
+              </a>
+            </td>
+            <td>
+              {% if venue.city %}
+                <a href="{% url "databruce:city_details" id=venue.city.id %}">{{ venue.city.name }}</a>
+              {% endif %}
+            </td>
+            <td>
+              {% if venue.state %}
+                <a href="{% url "databruce:state_details" id=venue.state.id %}">
+                  {% if venue.country.alpha_3 != "USA" %}
+                    {{ venue.state.name }}
+                  {% else %}
+                    {{ venue.state.state_abbrev }}
+                  {% endif %}
+                </a>
+              {% endif %}
+            </td>
+            <td>
+              {% if venue.country %}
+                <a href="{% url "databruce:country_details" id=venue.country.id %}">
+                  {% if venue.country.alpha_3 != "USA" %}
+                    {{ venue.country.name }}
+                  {% else %}
+                    {{ venue.country.alpha_3 }}
+                  {% endif %}
+                </a>
+              {% endif %}
+            </td>
+            <td>
+              {% with first=venue.first %}
+                <a href="{% url "databruce:event_details" event=first.id %}">{{ first.event_date|date:"Y-m-d [D]" }}</a>
+              {% endwith %}
+            </td>
+            <td>
+              {% with last=venue.last %}
+                <a href="{% url "databruce:event_details" event=last.id %}">{{ last.event_date|date:"Y-m-d [D]" }}</a>
+              {% endwith %}
+            </td>
+            <td>{{ venue.num_events }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% load static %}
+  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  {% comment %} <script>
+    // custom searchBuilder columns definition
+    layout.topEnd.features[1].buttons[1].config = {columns: [1, 2, 3]};
+
+    $(document).ready(function () {
+      $('#venueTable').dataTable({
+        layout: layout,
+        processing: true,
+        ajax: "{% url 'databruce:api:venues' %}",
+        columns: [
+          { data: 'name'},
+          { data: 'city' },
+          { data: 'state' },
+          { data: 'country' },
+          { data: 'first'},
+          { data: 'last'},
+          { data: 'num_events' }
+        ]
+      })
+    })
+  </script> {% endcomment %}
+  <script>
+    // custom searchBuilder columns definition
+    layout.topEnd.features[1].buttons[1].config.columns = [1, 2, 3];
+    
+    $(document).ready(function () {
+      $('#venueTable').dataTable({
+        layout: layout,
+        columnDefs: [
+          { width: '250px', targets: 0 }
+        ]
+      })
+    })
+  </script>
+{% endblock content %}
