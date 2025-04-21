@@ -1,21 +1,8 @@
-from datetime import datetime
-
-from django import forms
 from django.contrib import admin
-from nonrelated_inlines.admin import NonrelatedTabularInline
 
 from . import models
 
-
-@admin.register(models.ArchiveLinks)
-class ArchiveLinksAdmin(admin.ModelAdmin):
-    list_display = ["event_id", "event_date_view", "archive_url"]
-
-    @admin.display(empty_value="unknown")
-    def event_date_view(self, obj):
-        return datetime.strftime(obj.event_id.event_date, "%Y-%m-%d")
-
-
+admin.site.register(models.ArchiveLinks)
 admin.site.register(models.Bands)
 admin.site.register(models.Bootlegs)
 admin.site.register(models.Cities)
