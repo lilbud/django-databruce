@@ -1,69 +1,71 @@
 {% extends "databruce/base.html" %}
 {% load filters %}
 {% block title %}
-  {{ event.event_date|get_date:event.id }} {{ event.artist.name }}
+  {{ event }} {{ event.artist.name }}
 {% endblock title %}
 {% block content %}
-  <div class="event-header">
+  <div class="mt-2" id="event_header">
     <h4>
-      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event.event_date|get_date:event.id }}</a> &gt; {{ event.artist.name }} &gt; <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+      {{ event }} &gt; {{ event.artist.name }} &gt; <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
     </h4>
   </div>
-  <div class="setlist mt-2">
+  <div id="setlist" class="my-3">
     {% if setlist %}
       {% regroup setlist by set_name as event_setlist %}
       {% for set in event_setlist %}
-        <p>
-          <b class="setlist-set-name">{{ set.grouper }}:</b>
+        <div class="my-2">
+          <b class="pe-2">{{ set.grouper }}:</b>
           {% for song in set.list %}
-            <span class="setlist-song{% if "unidentified" in song.song_id.brucebase_url %}-unknown{% endif %}">
+            <span>
               {% spaceless %}
                 <a href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.song_name }}</a>
-                {% if notes %}{{ notes|notes:song.id|safe }}{% endif %}
-                {% if not forloop.last %}
-                  {% if song.segue %}
-                    &gt;
-                  {% else %}
-                    ,
+                {% for note in notes %}
+                  {% if note.id.id == song.id %}
+                    <sup data-bs-toggle="tooltip" data-bs-title="{{ note.note }}">[{{ note.num }}]</sup>
                   {% endif %}
-                {% endif %}
+                {% endfor %}
+                {% if not forloop.last %}{{ song.separator }}{% endif %}
               {% endspaceless %}
             </span>
           {% endfor %}
-        </p>
+        </div>
       {% endfor %}
     {% else %}
       <p>No Set Details Known</p>
     {% endif %}
   </div>
-  <div class="details">
-    {% if event.event_title %}
-      <div class="row mb-2">
-        <div class="col-auto pe-0">
-          <b>Title:</b>
+  <div class="details my-3">
+    <div class="title my-3">
+      {% if event.event_title %}
+        <div class="d-flex flex-row">
+          <div class="pe-2 fw-bolder">Event Title:</div>
+          <div>{{ event.event_title }}</div>
         </div>
-        <div class="col">{{ event.event_title }}</div>
-      </div>
-    {% endif %}
-    {% if notes %}
-      <div class="row">
-        <b class="note-header">Footnotes:</b>
-      </div>
-      <div class="row">
-        {% for note in notes|event_notes_filter %}
-          <span>
-            &emsp;
-            <b>[{{ note.num }}]</b>
-            {{ note.note|mdlink|safe }}
-            {% if note.last != '' %}
-            , Last Time Played <a href="{% url 'databruce:event_details' event=note.last %}">{{ note.last_date }}</a> ({{ note.gap }} events)</span>
-          {% endif %}
-          <br>
-        {% endfor %}
-      </div>
-    {% endif %}
+      {% endif %}
+    </div>
+    <div class="notes my-3">
+      {% if notes %}
+        <div class="d-flex flex-row">
+          <div class="pe-2 fw-bolder">Footnotes:</div>
+        </div>
+        <div class="d-flex flex-row">
+          <div>
+            {% for note in notes|event_notes_filter %}
+              <span class="ps-4">
+                <b>[{{ note.num }}]</b>
+                {{ note.note|mdlink|safe }}
+                {% if note.last != '' %}
+                  , Last Time Played <a href="{% url 'databruce:event_details' event=note.last %}">{{ note.last_date }}</a> ({{ note.gap }} events)
+                {% endif %}
+              </span>
+              <br>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
   </div>
-  <div class="buttons">
+  <div class="buttons my-4">
     {% if last_event %}
       <a class="btn btn-sm btn-secondary"
          href="{% url 'databruce:event_details' event=last_event %}">&lt; Previous Event</a>
@@ -72,9 +74,12 @@
       <a class="btn btn-sm btn-secondary"
          href="{% url 'databruce:event_details' event=next_event %}">Next Event &gt;</a>
     {% endif %}
-    {% if event.event_url %}<a class="btn btn-sm btn-secondary" href="{{ event.event_url }}">Brucebase</a>{% endif %}
+    {% if event.brucebase_url %}
+      <a class="btn btn-sm btn-secondary"
+         href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
+    {% endif %}
   </div>
-  <div class="row info-blocks">
+  {% comment %} <div class="row info-blocks">
     <div class="col-md-6">
       <!-- column 1 -->
       {% if event.nugs_url or event.archive_url %}
@@ -129,5 +134,12 @@
       {% endif %}
     </div>
   </div>
-  <!-- row blocks -->
+  <!-- row blocks --> {% endcomment %}
+  <script>
+    $(document).ready(function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    });
+    
+  </script>
 {% endblock content %}

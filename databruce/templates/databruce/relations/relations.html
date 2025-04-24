@@ -19,17 +19,13 @@
         {% for relation in relations %}
           <tr>
             <td>
-              <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation.name }}</a>
+              <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation }}</a>
             </td>
             <td>
-              {% if relation.first %}
-                <a href="">{{ relation.first.event_date|date:'Y-m-d [D]' }} {{ relation.first.early_late|default_if_none:" " }}</a>
-              {% endif %}
+              {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}
             </td>
             <td>
-              {% if relation.last %}
-                <a href="">{{ relation.last.event_date|date:'Y-m-d [D]' }} {{ relation.last.early_late|default_if_none:"" }}</a>
-              {% endif %}
+              {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
             </td>
             <td>{{ relation.appearances }}</td>
           </tr>

@@ -36,12 +36,12 @@
             </td>
             <td>
               {% with first=city.first %}
-                <a href="{% url "databruce:event_details" event=first.id %}">{{ first.event_date|get_date:first.id }}</a>
+                <a href="{% url "databruce:event_details" event=first.id %}">{{ first }}</a>
               {% endwith %}
             </td>
             <td>
               {% with last=city.last %}
-                <a href="{% url "databruce:event_details" event=last.id %}">{{ last.event_date|get_date:last.id }}</a>
+                <a href="{% url "databruce:event_details" event=last.id %}">{{ last }}</a>
               {% endwith %}
             </td>
             <td>{{ city.num_events }}</td>

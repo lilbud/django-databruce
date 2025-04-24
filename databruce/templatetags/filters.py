@@ -4,7 +4,7 @@ from datetime import datetime
 import markdown
 from django import template
 
-from databruce.models import SetlistsBySetAndDate, Venues, VenuesText
+from databruce.models import SetlistNotes, SetlistsBySetAndDate, Venues, VenuesText
 
 register = template.Library()
 
@@ -23,14 +23,16 @@ def color(value):
 
 
 @register.filter(name="notes")
-def notes(value, songid):
-    note = []
+def setlist_notes(setlist_id):
+    return SetlistNotes.objects.filter(id=setlist_id).order_by("num")
 
-    for n in value:
-        if n.id.id == songid:
-            note.append(f"<sup title='{n.note.replace("'", '"')}'>[{n.num}]</sup>")
+    # note = []
 
-    return "".join(note).strip()
+    # for n in value:
+    #     if n.id.id == songid:
+    #         note.append(f"<sup title='{n.note.replace("'", '"')}'>[{n.num}]</sup>")
+
+    # return "".join(note).strip()
 
 
 @register.filter(name="event_notes_filter")
@@ -80,22 +82,6 @@ def get_venue(venue):
     return f"{venue.name}, {venue.city.name}, {venue.country.name}"
 
     # return VenuesText.objects.get(id=venue_id).formatted_loc
-
-
-@register.filter(name="get_setlist")
-def get_setlist(event: str):
-    qs = (
-        SetlistsBySetAndDate.objects.filter(event=event)
-        .values("set_name", "setlist_no_note")
-        .order_by("min")
-    )
-
-    setlist = []
-
-    for i in qs:
-        setlist.append(f"{i['set_name']}: {i['setlist_no_note']}")
-
-    return "<br>".join(setlist)
 
 
 @register.filter(name="get_date")

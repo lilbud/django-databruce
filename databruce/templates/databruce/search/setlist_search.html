@@ -9,41 +9,34 @@
   <hr />
   <div class="row align-items-center">
     <div class="input-group mb-3">
-      <form action="{% url 'databruce:setlist_search_results' %}"
-            method="get"
-            name="advSearch"
-            id="advSearch">
-        {{ form|crispy }}
-        <button class="btn btn-primary" type="submit" value="Submit" id="submit">Go</button>
+      <form action="{% url 'databruce:setlist_search_results' %}">
+        {% crispy form %}
       </form>
     </div>
   </div>
   <script>
     var selectOptions = {
       theme: 'bootstrap-5',
-      selectionCssClass: 'form-control form-control-sm',
-      dropdownCssClass: 'select2--small',
+      selectionCssClass: 'form-select',
+      dropdownCssClass: 'form-control',
       minimumInputLength: 3,
       dropdownPosition: 'below'
-    }
+    };
 
     $(document).ready(function () {
-      $('#songSelect').select2(selectOptions)
-    })
+      $('#songSelect').select2(selectOptions);
+      $("#div_id_song2").hide();
+    });
 
     document.addEventListener("DOMContentLoaded", function() {
       $('#positionSelect').change(function(){
-          var val = $(this).val();
-          
-          if (val === 'followed_by') {
-            console.log(val);
-            document.getElementById("div_id_song2").style.visibility = "visible";
+          if (this.value == 'followed_by') {
+            $("#div_id_song2").show();
+            $('#song2Select').select2(selectOptions);
           } else {
-            document.getElementById("div_id_song2").style.visibility = "hidden";
-          }
-          
-          $('#song2Select').select2(selectOptions)
-      })
-    });
+            $("#div_id_song2").hide();
+          };
+        })
+      });
   </script>
 {% endblock content %}

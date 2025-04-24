@@ -22,9 +22,7 @@
         {% for venue in venues %}
           <tr>
             <td>
-              <a href="{% url "databruce:venue_details" id=venue.id %}">
-                {{ venue.name|add:", "|add:venue.detail|default:venue.name }}
-              </a>
+              <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue }}</a>
             </td>
             <td>
               {% if venue.city %}
@@ -33,36 +31,16 @@
             </td>
             <td>
               {% if venue.state %}
-                <a href="{% url "databruce:state_details" id=venue.state.id %}">
-                  {% if venue.country.alpha_3 != "USA" %}
-                    {{ venue.state.name }}
-                  {% else %}
-                    {{ venue.state.state_abbrev }}
-                  {% endif %}
-                </a>
+                <a href="{% url "databruce:state_details" id=venue.state.id %}">{{ venue.state.name }}</a>
               {% endif %}
             </td>
             <td>
               {% if venue.country %}
-                <a href="{% url "databruce:country_details" id=venue.country.id %}">
-                  {% if venue.country.alpha_3 != "USA" %}
-                    {{ venue.country.name }}
-                  {% else %}
-                    {{ venue.country.alpha_3 }}
-                  {% endif %}
-                </a>
+                <a href="{% url "databruce:country_details" id=venue.country.id %}">{{ venue.country.name }}</a>
               {% endif %}
             </td>
-            <td>
-              {% with first=venue.first %}
-                <a href="{% url "databruce:event_details" event=first.id %}">{{ first.event_date|date:"Y-m-d [D]" }}</a>
-              {% endwith %}
-            </td>
-            <td>
-              {% with last=venue.last %}
-                <a href="{% url "databruce:event_details" event=last.id %}">{{ last.event_date|date:"Y-m-d [D]" }}</a>
-              {% endwith %}
-            </td>
+            <td>{{ first }}</td>
+            <td>{{ last }}</td>
             <td>{{ venue.num_events }}</td>
           </tr>
         {% endfor %}

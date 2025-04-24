@@ -1,9 +1,10 @@
 import calendar
 import datetime
-import re
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Reset, Submit
 from django import forms
-from django.forms import ModelChoiceField
+from django.urls import reverse_lazy
 from django.utils.dates import MONTHS
 
 from . import models
@@ -11,35 +12,15 @@ from . import models
 DATE = datetime.datetime.today()
 
 
-class VenueModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.formatted_loc
-
-
-class MyModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return obj.name
-
-
-def get_bands():
-    return models.Bands.objects.filter(springsteen_band=True).order_by("name")
-
-
-class yearDropdown(forms.Form):
-    year = forms.ChoiceField(
-        choices=[(i, i) for i in range(1965, DATE.year + 1)],
-        widget=forms.Select(
-            attrs={
-                "onchange": "form.submit();",
-                "class": "form-control form-control-sm",
-            },
-        ),
-        required=False,
-        label="All Events from",
-    )
-
-
 class AdvancedEventSearch(forms.Form):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, D107
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "get"
+
+        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
+        self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
+
     def get_months():
         months = [("", "")]
         months.extend([(i, calendar.month_name[i]) for i in range(1, 13)])
@@ -116,7 +97,6 @@ class AdvancedEventSearch(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
                 "id": "start_date",
                 "type": "search",
                 "name": "start_date",
@@ -131,7 +111,6 @@ class AdvancedEventSearch(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
                 "id": "end_date",
                 "type": "search",
                 "name": "end_date",
@@ -196,16 +175,6 @@ class AdvancedEventSearch(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "form-select", "id": "bandSelect"}),
     )
-
-    def form_display(self):
-        form = {}
-
-        form["start_date"] = {
-            "label": "Start Date:",
-            "data": self.cleaned_data["first_date"],
-        }
-
-        return form
 
     def clean_first_date(self):
         # found on stackoverflow, probably not the "best" way to do this
@@ -294,17 +263,28 @@ class AdvancedEventSearch(forms.Form):
 
 
 class SetlistSearch(forms.Form):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, D107
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "get"
+
+        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
+        self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
+
     songs = [("", "")]
 
-    for s in models.Songs.objects.filter(num_plays_public__gte=1).order_by("song_name"):
-        songs.append((s.id, s.song_name))
+    songs.extend(
+        models.Songs.objects.filter(num_plays_public__gte=1)
+        .order_by("song_name")
+        .values_list("id", "song_name"),
+    )
 
     song = forms.ChoiceField(
         label="Song:",
         choices=songs,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "songSelect"},
+            attrs={"class": "form-select", "id": "songSelect"},
         ),
     )
 
@@ -313,7 +293,7 @@ class SetlistSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "isNotSelect"},
+            attrs={"class": "form-select", "id": "isNotSelect"},
         ),
     )
 
@@ -327,23 +307,36 @@ class SetlistSearch(forms.Form):
             ("main_set_closer", "Main Set Closer"),
             ("encore_opener", "Encore Opener"),
             ("show_closer", "Show Closer"),
-            # ("followed_by", "Followed By"),
+            ("followed_by", "Followed By"),
         ],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "positionSelect"},
+            attrs={"class": "form-select", "id": "positionSelect"},
         ),
     )
 
-    # song2 = forms.ChoiceField(
-    #     label="",
-    #     choices=songs,
-    #     required=False,
-    #     widget=forms.Select(
-    #         attrs={
-    #             "class": "form-select form-select-sm",
-    #             "id": "song2Select",
-    #             "style": "visibility: hidden;",
-    #         },
-    #     ),
-    # )
+    song2 = forms.ChoiceField(
+        label="",
+        choices=songs,
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "form-select",
+                "id": "song2Select",
+            },
+        ),
+    )
+
+    def clean_position(self):
+        positions = {
+            "anywhere": "Anywhere",
+            "show_opener": "Show Opener",
+            "set_one_closer": "Set 1 Closer",
+            "set_two_opener": "Set 2 Opener",
+            "main_set_closer": "Main Set Closer",
+            "encore_opener": "Encore Opener",
+            "show_closer": "Show Closer",
+            "followed_by": "Followed By",
+        }
+
+        return positions.get(self.cleaned_data["position"])

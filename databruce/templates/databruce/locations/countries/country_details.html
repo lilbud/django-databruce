@@ -8,7 +8,24 @@
     <a href="{% url "databruce:countries" %}">Countries</a> &gt; {{ info.name }}
   </h4>
   <hr />
-  {% include "databruce/event_info.html" with events=events %}
+  <div class="col-xs-6 col-lg-12 mb-4">
+    <div class="d-flex flex-row">
+      <div class="pe-2">Events:</div>
+      <div>{{ events|length }}</div>
+    </div>
+    <div class="d-flex flex-row">
+      <div class="pe-2">First:</div>
+      <div>
+        <a href="{% url 'databruce:event_details' event=info.first.id %}">{{ info.first }} - {{ info.first.venue }}</a>
+      </div>
+    </div>
+    <div class="d-flex flex-row">
+      <div class="pe-2">Last:</div>
+      <div>
+        <a href="{% url 'databruce:event_details' event=info.last.id %}">{{ info.last }} - {{ info.last.venue }}</a>
+      </div>
+    </div>
+  </div>
   <div class="table-responsive p-0">
     <table class="table table display nowrap" id="tourTable">
       <thead>
@@ -16,8 +33,8 @@
           <th scope="col">Date</th>
           <th scope="col">Artist</th>
           <th scope="col">Venue</th>
-          <th scope="col">City</th>
-          <th scope="col">State</th>
+          <th scope="col">Location</th>
+          <th scope="col">Tour</th>
           <th scope="col">Note</th>
         </tr>
       </thead>
@@ -34,17 +51,11 @@
               <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
             </td>
             <td>
-              <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
+              <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
             </td>
             <td>
-              {% if event.venue.state %}
-                <a href="{% url "databruce:state_details" id=event.venue.state.id %}">
-                  {% if event.venue.country.name == "United States" %}
-                    {{ event.venue.state.state_abbrev }}
-                  {% else %}
-                    {{ event.venue.state.name }}
-                  {% endif %}
-                </a>
+              {% if event.tour %}
+                <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
               {% endif %}
             </td>
             <td>{{ event.event_title|default_if_none:event.event_type }}</td>

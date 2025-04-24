@@ -23,10 +23,10 @@
               <a href="{% url "databruce:band_details" id=band.id %}">{{ band.name }}</a>
             </td>
             <td>
-              <a href="{% url "databruce:event_details" event=band.first.id %}">{{ band.first.event_date|get_date:band.first.id }}</a>
+              <a href="{% url "databruce:event_details" event=band.first.id %}">{{ band.first }}</a>
             </td>
             <td>
-              <a href="{% url "databruce:event_details" event=band.last.id %}">{{ band.last.event_date|get_date:band.last.id }}</a>
+              <a href="{% url "databruce:event_details" event=band.last.id %}">{{ band.last }}</a>
             </td>
             <td>{{ band.appearances }}</td>
             <td>
@@ -50,6 +50,38 @@
   $(document).ready(function () {
     $('#table').dataTable({
       layout: layout,
+      columnDefs: [
+        {
+          target: -1,
+          visible: false
+        }
+      ],
+      initComplete: function () {
+        this.api()
+          .columns([-1])
+          .every(function () {
+              var column = this;
+
+              $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="artist">Category:</label></div><div class="col" id="artist-select"></div></div>').appendTo($('#dropdown-container'));
+
+              // this appears to be the only way to add a select filter
+              // without going through ajax calls. I originally had a pre-made dropdown in
+              // another file and included it like above, however, I had to use an ajax call
+              // otherwise it would appear but not work
+              var select = $('<select id="artist" class="custom-select form-select form-select-sm"></select>')
+                .appendTo($('#artist-select'))
+                .on('change', function () {
+                    column
+                      .search($(this).val(), {regex: true})
+                      .draw();
+                });
+              
+              
+              select.append('<option value=".*">All</option>');
+              select.append('<option value="Yes">Bruce as member</option>');
+              select.append('<option value="No">Bruce as guest</option>');
+          });
+      },
     });
   });
   </script>

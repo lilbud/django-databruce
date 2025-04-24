@@ -133,6 +133,9 @@ class Bands(models.Model):
         db_table = "bands"
         verbose_name_plural = db_table
 
+    def __str__(self):
+        return self.name
+
 
 class Bootlegs(models.Model):
     id = models.AutoField(primary_key=True)
@@ -240,6 +243,16 @@ class Cities(models.Model):
         verbose_name_plural = db_table
         unique_together = (("name", "state"),)
 
+    def __str__(self):
+        try:
+            state = f"{self.name}, {self.state}"
+        except Cities.state.RelatedObjectDoesNotExist:
+            state = f"{self.name}, {self.country}"
+        except Cities.country.RelatedObjectDoesNotExist:
+            state = self.name
+
+        return state
+
 
 class Continents(models.Model):
     id = models.AutoField(primary_key=True)
@@ -254,6 +267,9 @@ class Continents(models.Model):
 
         db_table = "continents"
         verbose_name_plural = db_table
+
+    def __str__(self):
+        return self.name
 
 
 class Countries(models.Model):
@@ -299,6 +315,9 @@ class Countries(models.Model):
         managed = False
         db_table = "countries"
         verbose_name_plural = db_table
+
+    def __str__(self):
+        return self.name
 
 
 class Covers(models.Model):
@@ -445,6 +464,14 @@ class Venues(models.Model):
         db_table = "venues"
         verbose_name_plural = db_table
 
+    def __str__(self):
+        venue = self.name
+
+        if self.detail:
+            venue += f", {self.detail}"
+
+        return venue
+
 
 class SetlistsByDate(models.Model):
     event = models.OneToOneField(
@@ -537,6 +564,16 @@ class Events(models.Model):
         db_table = "events"
         verbose_name_plural = db_table
         unique_together = (("id", "event_date", "brucebase_url"),)
+
+    def __str__(self):
+        try:
+            event = self.event_date.strftime("%Y-%m-%d [%a]")
+            if self.early_late:
+                event += f" {self.early_late}"
+        except AttributeError:
+            event = f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
+
+        return event
 
 
 class EventsWithInfo(models.Model):
@@ -698,6 +735,9 @@ class Relations(models.Model):
         db_table = "relations"
         verbose_name_plural = db_table
 
+    def __str__(self):
+        return self.name
+
 
 class Onstage(models.Model):
     id = models.AutoField(primary_key=True)
@@ -792,6 +832,9 @@ class Releases(models.Model):
         db_table = "releases"
         verbose_name_plural = db_table
 
+    def __str__(self):
+        return self.name
+
 
 class SetlistNotes(models.Model):
     id = models.OneToOneField(
@@ -869,6 +912,9 @@ class Songs(models.Model):
         managed = False
         db_table = "songs"
         verbose_name_plural = db_table
+
+    def __str__(self):
+        return self.song_name
 
 
 class Setlists(models.Model):
@@ -1034,6 +1080,14 @@ class States(models.Model):
         managed = False
         db_table = "states"
         verbose_name_plural = db_table
+
+    def __str__(self):
+        if self.country.name != "United States":
+            state = f"{self.name}, {self.country.name}"
+        else:
+            state = self.name
+
+        return state
 
 
 class Tags(models.Model):

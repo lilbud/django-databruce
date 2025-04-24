@@ -26,17 +26,13 @@
         {% for song in songs %}
           <tr>
             <td>
-              <a href="{% url 'databruce:song_details' id=song.id %}">{{ song.song_name }}</a>
+              <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
             </td>
             <td>
-              {% if song.first %}
-                <a href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first.event_date|get_date:song.first.id }} {{ song.first.early_late|default_if_none:"" }}</a>
-              {% endif %}
+              <a href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
             </td>
             <td>
-              {% if song.last %}
-                <a href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last.event_date|get_date:song.last.id }} {{ song.last.early_late|default_if_none:"" }}</a>
-              {% endif %}
+              <a href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
             </td>
             <td>{{ song.opener }}</td>
             <td>{{ song.closer }}</td>

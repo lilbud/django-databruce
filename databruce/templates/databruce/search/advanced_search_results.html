@@ -2,10 +2,10 @@
 {% load search_filters %}
 {% load filters %}
 {% block title %}
-  Events &gt; Search &gt; Results
+  Event Search Results
 {% endblock title %}
 {% block content %}
-  <div class="col-sm-6 col-lg-1 mb-4">
+  <div class="col-sm-6 mb-4">
     <h4>Event Search</h4>
     <div id="row">
       <div class="col">
@@ -22,7 +22,7 @@
           {% if request.GET.day %}
             {% include "./result_row.html" with label="Day:" data=request.GET.day|get_ordinal %}
           {% endif %}
-          {% if request.GET.day %}
+          {% if request.GET.day_of_week %}
             {% include "./result_row.html" with label="Day of Week:" data=request.GET.day_of_week|get_day %}
           {% endif %}
           {% if request.GET.city %}
@@ -51,6 +51,7 @@
           <tr>
             <th>Date</th>
             <th>Band</th>
+            <th>Venue</th>
             <th>Location</th>
             <th>Tour</th>
           </tr>
@@ -59,19 +60,26 @@
           {% for event in events %}
             <tr>
               <td>
-                <a href="{% url 'databruce:event_details' event=event.id %}">
-                  {{ event.event_date|get_date:event.id }}
-                  {% if event.early_late %}{{ event.early_late }}{% endif %}
+                <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+              </td>
+              <td>
+                <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+              </td>
+              <td>
+                <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue }}</a>
+              </td>
+              <td>
+                <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                  {{ event.venue.city.name }},
+                  {% if event.venue.state %}
+                    {{ event.venue.state.state_abbrev }}
+                  {% else %}
+                    {{ event.venue.country.name }}
+                  {% endif %}
                 </a>
               </td>
-              <td>{{ event.artist.name }}</td>
               <td>
-                <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-              </td>
-              <td>
-                {% if event.tour %}
-                  <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.tour_name }}</a>
-                {% endif %}
+                <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
               </td>
             </tr>
           {% endfor %}

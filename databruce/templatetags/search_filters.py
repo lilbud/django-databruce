@@ -1,6 +1,7 @@
 import calendar
 
 from django import template
+from django.db.models import Count
 
 from databruce import models
 
@@ -90,16 +91,3 @@ def make_ordinal(n: int):
     else:
         suffix = ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]
     return str(n) + suffix
-
-
-@register.filter(name="get_setlist")
-def get_setlist(event: str):
-    qs = (
-        models.SetlistsBySetAndDate.objects.filter(event=event)
-        .values("set_name", "setlist_no_note")
-        .order_by("min")
-    )
-
-    setlist = [f"{i['set_name']}: {i['setlist_no_note']}" for i in qs]
-
-    return "<br>".join(setlist)
