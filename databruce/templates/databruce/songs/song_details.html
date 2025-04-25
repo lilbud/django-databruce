@@ -79,7 +79,7 @@
                 </td>
                 {% with venue=song.current.event.venue %}
                   <td>
-                    <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue|venue }}</a>
+                    <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue }}</a>
                   </td>
                 {% endwith %}
                 <td>{{ song.current.last|default_if_none:"" }}</td>
@@ -140,7 +140,7 @@
   <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop();
+    layout.topEnd.features[1].buttons[1].config.columns = [1, 3]
 
     $(document).ready(function () {
       $('table.display').dataTable({

@@ -531,6 +531,14 @@ class Events(models.Model):
         db_column="tour_leg",
     )
 
+    run = models.ForeignKey(
+        to="Runs",
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        default="",
+        db_column="run",
+    )
+
     event_type = models.TextField(blank=True, default="")
     event_title = models.TextField(blank=True, default="")
     event_certainty = models.TextField(blank=True, default="")
@@ -855,7 +863,16 @@ class SetlistNotes(models.Model):
     num = models.TextField(blank=True, default="")
     note = models.TextField(blank=True, default="")
     gap = models.TextField(blank=True, default="")
-    last = models.TextField(blank=True, default="")
+
+    # last = models.TextField(blank=True, default="")
+
+    last = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        related_name="notes_last_event",
+        db_column="last",
+    )
+
     last_date = models.TextField(blank=True, default="")
 
     class Meta:
@@ -946,7 +963,16 @@ class Setlists(models.Model):
     position = models.TextField(blank=True, default="")
     last = models.TextField(blank=True, default="")
     next = models.TextField(blank=True, default="")
-    last_time_played = models.TextField(blank=True, default="")
+
+    ltp = models.ForeignKey(
+        to=Events,
+        on_delete=models.DO_NOTHING,
+        db_column="last_time_played",
+        related_name="ltp_event",
+        blank=True,
+        default="",
+    )
+
     band_premiere = models.BooleanField()
     sign_request = models.BooleanField()
 
@@ -1251,6 +1277,7 @@ class TourLegs(models.Model):
         managed = False
         db_table = "tour_legs"
         verbose_name_plural = db_table
+        verbose_name_plural = db_table
 
 
 class SongsPageNew(models.Model):
@@ -1292,3 +1319,37 @@ class SongsPageNew(models.Model):
         managed = False
         db_table = "songs_page_new"
         verbose_name_plural = db_table
+
+
+class Runs(models.Model):
+    band = models.ForeignKey(
+        "Bands",
+        models.DO_NOTHING,
+        db_column="band",
+        blank=True,
+        null=True,
+    )
+    name = models.TextField()
+    num_shows = models.IntegerField(blank=True, null=True)
+    num_songs = models.IntegerField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField()
+    first_event = models.ForeignKey(
+        "Events",
+        models.DO_NOTHING,
+        db_column="first_event",
+        blank=True,
+        null=True,
+    )
+    last_event = models.ForeignKey(
+        "Events",
+        models.DO_NOTHING,
+        db_column="last_event",
+        related_name="runs_last_event_set",
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        managed = False
+        db_table = "runs"

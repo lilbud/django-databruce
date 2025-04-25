@@ -79,10 +79,16 @@ def event_details(request: HttpRequest, event: str):
     on_stage = (
         models.Onstage.objects.filter(event__id=event)
         .select_related("relation")
-        .order_by("band_id", "relation")
+        .order_by("band_id", "relation__name")
     )
 
     notes = models.SetlistNotes.objects.filter(event__id=event).order_by("event", "num")
+
+    footnotes = (
+        models.SetlistNotes.objects.filter(event__id=event)
+        .distinct("num")
+        .order_by("num")
+    )
 
     try:
         prev_event = (
@@ -103,6 +109,7 @@ def event_details(request: HttpRequest, event: str):
         "eventid": event,
         "setlist": setlist,
         "notes": notes,
+        "footnotes": footnotes,
         "relations": on_stage,
         "last_event": prev_event,
         "next_event": next_event,

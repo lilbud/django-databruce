@@ -6,9 +6,9 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
     <title>
-      Databruce &gt;
       {% block title %}
       {% endblock title %}
+      - Databruce
     </title>
     <!--JQuery-->
     <link rel="stylesheet"
@@ -159,16 +159,10 @@
       </div>
     </nav>
     <div class="padded-body">
-      <div class="container-fluid">
-        <div class="px-lg-5 py-4">
-          <div class="row">
-            <div class="col"></div>
-            <div class="col-md-9">
-              {% block content %}
-              {% endblock content %}
-            </div>
-            <div class="col"></div>
-          </div>
+      <div class="container">
+        <div class="row">
+          {% block content %}
+          {% endblock content %}
         </div>
       </div>
     </div>

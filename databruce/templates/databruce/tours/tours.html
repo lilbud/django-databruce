@@ -28,10 +28,10 @@
               <a href="{% url "databruce:band_details" id=tour.band.id %}">{{ tour.band.name }}</a>
             </td>
             <td>
-              <a href="{% url 'databruce:event_details' event=tour.first.id %}">{{ tour.first.event_date|get_date:tour.first.id }} {{ tour.first.early_late|default_if_none:"" }}</a>
+              <a href="{% url 'databruce:event_details' event=tour.first.id %}">{{ tour.first }} {{ tour.first.early_late|default_if_none:"" }}</a>
             </td>
             <td>
-              <a href="{% url 'databruce:event_details' event=tour.last.id %}">{{ tour.last.event_date|get_date:tour.last.id }} {{ tour.last.early_late|default_if_none:"" }}</a>
+              <a href="{% url 'databruce:event_details' event=tour.last.id %}">{{ tour.last }} {{ tour.last.early_late|default_if_none:"" }}</a>
             </td>
             <td>{{ tour.num_shows }}</td>
             <td>{{ tour.num_songs }}</td>
