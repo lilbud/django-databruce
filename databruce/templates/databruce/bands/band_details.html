@@ -5,7 +5,7 @@
 {% endblock title %}
 {% block content %}
   <h4>
-    Databruce &gt; <a href="{% url 'databruce:bands' %}">Bands</a> &gt; {{ info.name }}
+    <a href="{% url 'databruce:bands' %}">Bands</a> &gt; {{ info.name }}
   </h4>
   <hr />
   <div class="col-xs-6 col-lg-12 mb-4">
@@ -121,7 +121,7 @@
   <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[1].config.columns = [1, 2, 3, 4]
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
     
     $(document).ready(function () {
       // initializes all tables

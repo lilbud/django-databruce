@@ -3,35 +3,47 @@
   Relations
 {% endblock title %}
 {% block content %}
-  <h4>Relations</h4>
-  <h6>People who have shared a stage or appeared at an event with Bruce.</h6>
-  <div class="table-responsive p-0">
-    <table class="table table" id="relationsTable">
-      <thead>
-        <tr class="header">
-          <th scope="col">Name</th>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Num Events</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for relation in relations %}
-          <tr>
-            <td>
-              <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation }}</a>
-            </td>
-            <td>
-              {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}
-            </td>
-            <td>
-              {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
-            </td>
-            <td>{{ relation.appearances }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row mb-4">
+    <div class="col">
+      <h4>Relations</h4>
+      <h6>People who have shared a stage or appeared at an event with Bruce.</h6>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="relationsTable">
+              <thead>
+                <tr class="header">
+                  <th scope="col">Name</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                  <th scope="col">Num Events</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for relation in relations %}
+                  <tr>
+                    <td>
+                      <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation }}</a>
+                    </td>
+                    <td>
+                      {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}
+                    </td>
+                    <td>
+                      {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
+                    </td>
+                    <td>{{ relation.appearances }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/datatables.js' %}"></script>

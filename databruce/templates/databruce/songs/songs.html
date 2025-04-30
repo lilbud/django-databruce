@@ -4,63 +4,68 @@
   Songs
 {% endblock title %}
 {% block content %}
-  <h4>Songs</h4>
-  <h6>Songs that Bruce has played live</h6>
-  <div class="table-responsive p-0">
-    <table class="table table display nowrap" id="songsTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Opener</th>
-          <th>Closer</th>
-          <th>Public</th>
-          <th>Private</th>
-          <th>Snippet</th>
-          <th>Original Artist</th>
-          <th>Original?</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for song in songs %}
-          <tr>
-            <td>
-              <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
-            </td>
-            <td>
-              <a href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
-            </td>
-            <td>
-              <a href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
-            </td>
-            <td>{{ song.opener }}</td>
-            <td>{{ song.closer }}</td>
-            <td>{{ song.num_plays_public }}</td>
-            <td>{{ song.num_plays_private }}</td>
-            <td>{{ song.num_plays_snippet }}</td>
-            <td>{{ song.original_artist }}</td>
-            <td>
-              {% if song.original_artist == 'Bruce Springsteen' %}
-                Original
-              {% else %}
-                Cover
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row mb-4">
+    <div class="col">
+      <h4>Songs</h4>
+      <h6>Songs that Bruce has played live</h6>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="songsTable">
+              <thead>
+                <tr>
+                  <th class="col">Name</th>
+                  <th class="col">First</th>
+                  <th class="col">Last</th>
+                  <th class="col">Plays</th>
+                  <th class="col">Original Artist</th>
+                  <th class="col">Original?</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for song in songs %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
+                    </td>
+                    <td class="text-center">{{ song.num_plays_public }}</td>
+                    <td>{{ song.original_artist }}</td>
+                    <td>
+                      {% if song.original_artist == 'Bruce Springsteen' %}
+                        Original
+                      {% else %}
+                        Cover
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/datatables.js' %}"></script>
-  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   <script>
-    layout.topEnd.features[1].buttons[1].config.columns = [3, 4, 5, 6, 7, 8, 9]
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop();
 
     $(document).ready(function () {
       $('#songsTable').dataTable({
         layout: layout,
+        pageLength: 100,
         columnDefs: [
           {
             target: -1,

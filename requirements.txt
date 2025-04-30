@@ -1,0 +1,8 @@
+Django==5.1.7
+django_crispy_forms==2.3
+djangorestframework==3.15.2
+djangorestframework_datatables==0.7.2
+Markdown==3.7
+python-dotenv==1.1.0
+django-debug-toolbar==5.1.0
+django-filter==24.3

@@ -54,7 +54,7 @@
   {% load static %}
   <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
-    layout.topEnd.features[1].buttons[1].config.columns = [1, 2, 3, 4]
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
 
     $(document).ready(function () {
       $('#songTable').dataTable({

@@ -4,8 +4,10 @@ import datetime
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Reset, Submit
 from django import forms
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.utils.dates import MONTHS
+from django_select2 import forms as s2forms
 
 from . import models
 
@@ -102,6 +104,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "start_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
+                "class": "form-control",
             },
         ),
     )
@@ -116,6 +119,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "end_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
+                "class": "form-control",
             },
         ),
     )
@@ -190,7 +194,12 @@ class AdvancedEventSearch(forms.Form):
         except ValueError:
             pass
 
-        return models.Events.objects.all().order_by("event_date").first().event_date
+        return (
+            models.Events.objects.filter(date__isnull=False)
+            .order_by("date")
+            .first()
+            .date
+        )
 
     def clean_last_date(self):
         # found on stackoverflow, probably not the "best" way to do this
@@ -207,67 +216,54 @@ class AdvancedEventSearch(forms.Form):
             pass
 
         return (
-            models.Events.objects.filter(event_date__isnull=False)
-            .order_by("-event_date")
+            models.Events.objects.filter(date__isnull=False)
+            .order_by("-date")
             .first()
-            .event_date
+            .date
         )
 
     def clean_month(self):
-        month = self.cleaned_data["month"]
-
-        if month:
-            return [month]
+        if self.cleaned_data["month"]:
+            return [self.cleaned_data["month"]]
 
         return list(range(1, 13))
 
     def clean_day(self):
-        day = self.cleaned_data["day"]
-
-        if day:
-            return [day]
+        if self.cleaned_data["day"]:
+            return [self.cleaned_data["day"]]
 
         return list(range(1, 32))
 
     def clean_band(self):
-        band = self.cleaned_data["band"]
-
-        if band:
-            return [band]
+        if self.cleaned_data["band"]:
+            return [self.cleaned_data["band"]]
 
         return models.Bands.objects.all().values_list("id")
 
     def clean_city(self):
-        city = self.cleaned_data["city"]
-
-        if city:
-            return [city]
+        if self.cleaned_data["city"]:
+            return [self.cleaned_data["city"]]
 
         return models.Cities.objects.all().values_list("id")
 
     def clean_country(self):
-        country = self.cleaned_data["country"]
-
-        if country:
-            return [country]
+        if self.cleaned_data["country"]:
+            return [self.cleaned_data["country"]]
 
         return models.Countries.objects.all().values_list("id")
 
     def clean_musician(self):
-        musician = self.cleaned_data["musician"]
-
-        if musician:
-            return [musician]
+        if self.cleaned_data["musician"]:
+            return [self.cleaned_data["musician"]]
 
         return models.Relations.objects.all().values_list("id")
 
 
 class SetlistSearch(forms.Form):
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, D107
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "get"
-
         self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
         self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
 
@@ -275,8 +271,8 @@ class SetlistSearch(forms.Form):
 
     songs.extend(
         models.Songs.objects.filter(num_plays_public__gte=1)
-        .order_by("song_name")
-        .values_list("id", "song_name"),
+        .order_by("name")
+        .values_list("id", "name"),
     )
 
     song = forms.ChoiceField(

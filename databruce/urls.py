@@ -43,39 +43,4 @@ urlpatterns = [
     path("states/<int:id>", views.state_details, name="state_details"),
     path("countries/", views.countries, name="countries"),
     path("countries/<int:id>", views.country_details, name="country_details"),
-    # path(
-    #     "iommi-table-test/",
-    #     Table(
-    #         auto__model=models.Venues,
-    #         columns__name=Column.link(
-    #             cell__url=lambda row, **_: f"/venues/{row.id}",
-    #         ),
-    #         columns__city=Column.link(
-    #             attr="city__name",
-    #             cell__url=lambda row, **_: f"/cities/{row.city.id}",
-    #         ),
-    #         columns__state=Column.link(
-    #             attr="state__name",
-    #             cell__url=lambda row, **_: f"/state/{row.country.id}",
-    #         ),
-    #         columns__country=Column.link(
-    #             attr="country__name",
-    #             cell__url=lambda row, **_: f"/country/{row.country.id}",
-    #         ),
-    #         columns__first=Column(attr="first__event_date"),
-    #         columns__last=Column(attr="last__event_date"),
-    #         # auto__include=[
-    #         #     "first__event_date",
-    #         #     "last__event_date",
-    #         # ],
-    #         auto__exclude=[
-    #             "brucebase_url",
-    #             "continent",
-    #             "updated_at",
-    #             "created_at",
-    #             "aliases",
-    #             "mb_id",
-    #         ],
-    #     ).as_view(),
-    # ),
 ]

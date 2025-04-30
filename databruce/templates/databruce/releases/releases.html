@@ -10,9 +10,8 @@
       <thead>
         <tr class="header">
           <th class="all" scope="col">Name</th>
-          <th class="all" scope="col">Release Date</th>
-          <th class="all" scope="col">Release Type</th>
-          <th class="all" scope="col">Links</th>
+          <th class="all" scope="col">Date</th>
+          <th class="all" scope="col">Type</th>
         </tr>
       </thead>
       <tbody>
@@ -23,17 +22,6 @@
             </td>
             <td>{{ release.date|date:'Y-m-d' }}</td>
             <td>{{ release.type }}</td>
-            <td>
-              {% if release.mbid %}
-                <button class="btn btn-sm btn-primary"
-                        data-toggle="tooltip"
-                        title="Musicbrainz"
-                        type="button"
-                        href="https://musicbrainz.org/release/{{ release.mbid }}">
-                  <i class="bi bi-file-earmark-music"></i>
-                </button>
-              {% endif %}
-            </td>
           </tr>
         {% endfor %}
       </tbody>
@@ -44,10 +32,41 @@
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons.pop()
-    
+
     $(document).ready(function () {
       $('#releasesTable').dataTable({
-        layout: layout
+        layout: layout,
+        initComplete: function () {
+          this.api()
+          .columns([-1])
+          .every(function () {
+            var column = this;
+
+            $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="dropdown">Category:</label></div><div class="col" id="dropdown-select"></div></div>').appendTo($('#dropdown-container'));
+
+            // this appears to be the only way to add a select filter
+            // without going through ajax calls. I originally had a pre-made dropdown in
+            // another file and included it like above, however, I had to use an ajax call
+            // otherwise it would appear but not work
+            var select = $('<select id="dropdown" class="custom-select form-select form-select-sm"></select>')
+              .appendTo($('#dropdown-select'))
+              .on('change', function () {
+                  column
+                    .search($(this).val(), {regex: true})
+                    .draw();
+              });
+            
+            select.append('<option value=".*">All</option>');
+
+            column
+              .data()
+              .unique()
+              .sort()
+              .each(function (d, j) {
+                  select.append(new Option(d));
+              });
+          });
+        },
       });
     });
   </script>

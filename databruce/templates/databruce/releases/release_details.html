@@ -5,7 +5,7 @@
 {% endblock title %}
 {% block content %}
   <h4>
-    Databruce &gt; <a href="{% url 'databruce:releases' %}">Releases</a> &gt; {{ info.name }}
+    <a href="{% url 'databruce:releases' %}">Releases</a> &gt; {{ info.name }}
   </h4>
   <hr>
   <div class="release-info mb-4">
@@ -31,26 +31,24 @@
           <th class="all" scope="col">Num Plays</th>
           <th class="all" scope="col">First</th>
           <th class="all" scope="col">Last</th>
-          <th class="all" scope="col">Event</th>
         </tr>
       </thead>
       <tbody>
         {% for track in tracks %}
           <tr>
-            <td>{{ track.track_num }}</td>
+            <td>{{ track.track }}</td>
             <td>
-              <a href="{% url "databruce:song_details" id=track.song.id %}">{{ track.song.song_name }}</a>
+              <a href="{% url "databruce:song_details" id=track.song.id %}">{{ track.song.name }}</a>
             </td>
             <td>{{ track.song.num_plays_public }}</td>
             <td>
-              <a href="{% url "databruce:event_details" event=track.song.first.id %}">{{ track.song.first.event_date|date:"Y-m-d [D]" }}</a>
+              {% if track.song.first %}
+                <a href="{% url "databruce:event_details" event=track.song.first.id %}">{{ track.song.first }}</a>
+              {% endif %}
             </td>
             <td>
-              <a href="{% url "databruce:event_details" event=track.song.last.id %}">{{ track.song.last.event_date|date:"Y-m-d [D]" }}</a>
-            </td>
-            <td>
-              {% if track.event.id %}
-                <a href="{% url "databruce:event_details" event=track.event.id %}">{{ track.event.event_date|date:"Y-m-d [D]" }} - {{ track.event.venue_id|venue }}</a>
+              {% if track.song.last %}
+                <a href="{% url "databruce:event_details" event=track.song.last.id %}">{{ track.song.last }}</a>
               {% endif %}
             </td>
           </tr>
@@ -68,9 +66,9 @@
     $('#tracksTable').dataTable({
       layout: layout,
       columnDefs: [
-        { width: '5%', targets: [0] },
-        { width: '25%', targets: [1] },
-        { width: '10%', targets: [2] }
+        { width: '15px', targets: [0, 2] },
+        { width: '250px', targets: [1] },
+        { width: '175px', targets: [3, 4] }
       ]
     });
   })

@@ -157,7 +157,7 @@ class OnstageViewSet(viewsets.ModelViewSet):
 class ReleaseTracksViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.ReleaseTracks.objects.all().order_by("track_num")
+    queryset = models.ReleaseTracks.objects.all().order_by("track")
     serializer_class = serializers.ReleaseTracksSerializer
     permission_classes = permission_classes
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -232,12 +232,12 @@ def event_search(request: HttpRequest):
         q = request.GET.get("term", "")
 
         search_qs = (
-            models.Events.objects.filter(event_date__startswith=q)
-            .order_by("event_date")
-            .distinct("event_date")
+            models.Events.objects.filter(date__startswith=q)
+            .order_by("date")
+            .distinct("date")
         )
 
-        results = [r.event_date.strftime("%Y-%m-%d") for r in search_qs]
+        results = [r.date.strftime("%Y-%m-%d") for r in search_qs]
 
         data = json.dumps(results)
 

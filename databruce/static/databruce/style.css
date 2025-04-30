@@ -3,30 +3,48 @@
     --nj-blue: #186eb1;
 }
 
-/* body {
+body {
     font-family: "Inter", sans-serif !important;
-} */
+}
+
+.navbar {
+    border: #dee2e6 1px;
+}
+
+.nj {
+    color: var(--nj-blue) !important;
+}
 
 body,
-.list-group-item,
-table>tbody>tr>td {
+table td {
     background-color: var(--main-bg-color) !important;
+}
+
+table td {
+    background-color: none !important;
 }
 
 .navbar,
 .card-header,
-table>thead>tr>th {
+table th {
     background-color: var(--nj-blue) !important;
 }
 
-table>tbody>tr.custom>td {
-    background-color: var(--nj-blue) !important;
+table>tbody>tr>td {
+    font-size: .75rem;
+    line-height: .6rem;
+    background-color: var(--bs-dark-bg-subtle) !important;
 }
 
-.navbar-brand>img {
-    color: white;
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+    visibility: hidden;
 }
 
+.select2.select2-container.select2-container--bootstrap-5 {
+    width: auto !important;
+}
 
 a:link {
     text-decoration: none !important;
@@ -34,6 +52,10 @@ a:link {
 
 a:hover {
     text-decoration: underline !important;
+}
+
+.invisible {
+    visibility: hidden !important;
 }
 
 .dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
@@ -112,4 +134,45 @@ div.ui-menu-item-wrapper:hover {
 #info-box.row {
     display: flex;
     flex-wrap: wrap;
+}
+
+/* Remove default content */
+table.dataTable thead .dt-column-order::before,
+table.dataTable thead .dt-column-order::after {
+    content: "" !important;
+    font-family: "bootstrap-icons";
+    line-height: 0px !important;
+}
+
+/* up arrow */
+table.dataTable thead .dt-column-order::before {
+    content: "\F148" !important;
+}
+
+/* down arrow */
+table.dataTable thead .dt-column-order::after {
+    content: "\F128" !important;
+}
+
+.dt-orderable-asc span.dt-column-order:before,
+.dt-orderable-asc span.dt-column-order:after,
+.dt-orderable-desc span.dt-column-order:before,
+.dt-orderable-desc span.dt-column-order:after {
+    opacity: 0 !important;
+}
+
+.dt-ordering-asc span.dt-column-order:before,
+.dt-ordering-desc span.dt-column-order:after {
+    opacity: 1 !important;
+}
+
+.dt-container label,
+.dt-info {
+    font-size: .9rem;
+}
+
+tr td,
+tr th {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
 }

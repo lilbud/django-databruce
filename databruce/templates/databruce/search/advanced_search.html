@@ -4,15 +4,54 @@
   Events &gt; Search
 {% endblock title %}
 {% block content %}
-  <div class="row">
-    <div class="input-group mb-3">
-      <form action="{% url 'databruce:adv_search_results' %}"
-            method="get"
-            name="advSearch"
-            id="advSearch">
-        {% crispy form %}
-      </form>
-    </div>
+  <div class="col-8">
+    <form action="{% url 'databruce:adv_search_results' %}"
+          method="get"
+          name="advSearch"
+          id="advSearch">
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.first_date.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.first_date }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.last_date.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.last_date }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.month.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.month }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.day.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.day }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.day_of_week.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.day_of_week }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.city.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.city }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.state.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.state }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.country.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.country }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.musician.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.musician }}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4 col-md-3 col-form-label text-sm-right">{{ form.band.label_tag }}</div>
+        <div class="col-8 col-md-4">{{ form.band }}</div>
+      </div>
+      <input type="submit" name="submit" value="Go" class="btn btn-primary">
+      <input type="reset" name="reset" value="Clear" class="btn btn-secondary">
+    </form>
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/advanced_search.js' %}"></script>

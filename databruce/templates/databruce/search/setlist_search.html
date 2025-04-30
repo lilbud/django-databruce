@@ -1,4 +1,5 @@
 {% extends "databruce/base.html" %}
+{% load filters %}
 {% load crispy_forms_tags %}
 {% block title %}
   Setlist Searching
@@ -7,36 +8,36 @@
   <h4>Setlist Search</h4>
   <h6>Note: still being tested</h6>
   <hr />
-  <div class="row align-items-center">
-    <div class="input-group mb-3">
-      <form action="{% url 'databruce:setlist_search_results' %}">
-        {% crispy form %}
+  <div class="row">
+    <div class="input-group">
+      <div class="col-12">
+        <form id="form-container"
+              action="{% url 'databruce:setlist_search_results' %}">
+          {% include "./setlist_form.html" with form=form %}
+          <div class="btn-group mt-4" role="group">
+            <input type="submit" name="submit" value="Go" class="btn btn-primary">
+            <input type="reset"
+                   id="reset"
+                   name="reset"
+                   value="Clear"
+                   class="btn btn-secondary">
+          </div>
+        </div>
       </form>
     </div>
+    <div class="row invisible">
+      <div class="col-3 col-md-2 col-form-label text-sm-right">Song:</div>
+      <div class="col-8 col-md-4">{{ form.song }}</div>
+      <div class="col-4 col-md-1 offset-3 offset-md-0 p-md-0">{{ form.choice }}</div>
+      <div class="col-8 col-md-2 offset-3 offset-md-0">{{ form.position }}</div>
+      <div class="col-8 col-md-3 offset-3 offset-md-0 p-md-0" id="song2">{{ form.song2 }}</div>
+    </div>
   </div>
-  <script>
-    var selectOptions = {
-      theme: 'bootstrap-5',
-      selectionCssClass: 'form-select',
-      dropdownCssClass: 'form-control',
-      minimumInputLength: 3,
-      dropdownPosition: 'below'
-    };
-
+  {% load static %}
+  <script src="{% static 'databruce/js/setlist_search.js' %}"></script>
+  <script type='text/javascript'>
     $(document).ready(function () {
-      $('#songSelect').select2(selectOptions);
-      $("#div_id_song2").hide();
+      select2();
     });
-
-    document.addEventListener("DOMContentLoaded", function() {
-      $('#positionSelect').change(function(){
-          if (this.value == 'followed_by') {
-            $("#div_id_song2").show();
-            $('#song2Select').select2(selectOptions);
-          } else {
-            $("#div_id_song2").hide();
-          };
-        })
-      });
   </script>
 {% endblock content %}

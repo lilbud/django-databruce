@@ -4,75 +4,137 @@
   States &gt; {{ info }}
 {% endblock title %}
 {% block content %}
-  <h4>States &gt; {{ info }}</h4>
-  <hr />
-  <div class="col-xs-6 col-lg-12 mb-4">
-    <div class="d-flex flex-row">
-      <div class="pe-2">Events:</div>
-      <div>{{ info.num_events }}</div>
-    </div>
-    <div class="d-flex flex-row">
-      <div class="pe-2">First:</div>
-      <div>
-        <a href="{% url 'databruce:event_details' event=info.first.id %}">{{ info.first }} - {{ info.first.venue }}</a>
-      </div>
-    </div>
-    <div class="d-flex flex-row">
-      <div class="pe-2">Last:</div>
-      <div>
-        <a href="{% url 'databruce:event_details' event=info.last.id %}">{{ info.last }} - {{ info.last.venue }}</a>
+  <div class="row mb-4">
+    <h4>States &gt; {{ info }}</h4>
+  </div>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5>Events</h5>
+        <div class="table-responsive p-0">
+          <table class="table table display nowrap" id="eventTable">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Artist</th>
+                <th scope="col">Venue</th>
+                <th scope="col">City</th>
+                <th scope="col">Tour</th>
+                <th scope="col">Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in events %}
+                <tr>
+                  <td>
+                    <a href="{% url "databruce:event_details" event=event.id %}">{{ event }}</a>
+                  </td>
+                  <td>
+                    <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                  </td>
+                  <td>
+                    <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+                  </td>
+                  <td>
+                    <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
+                  </td>
+                  <td>
+                    {% if event.tour %}
+                      <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                    {% endif %}
+                  </td>
+                  <td>{{ event.title|default_if_none:event.type }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-  <div class="table-responsive p-0">
-    <table class="table table display nowrap" id="tourTable">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Artist</th>
-          <th scope="col">Venue</th>
-          <th scope="col">City</th>
-          <th scope="col">Tour</th>
-          <th scope="col">Note</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for event in events %}
-          <tr>
-            <td>
-              <a href="{% url "databruce:event_details" event=event.id %}">{{ event.event_date|get_date:event.id }} {{ event.early_late|default_if_none:"" }}</a>
-            </td>
-            <td>
-              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-            </td>
-            <td>
-              <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
-            </td>
-            <td>
-              <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
-            </td>
-            <td>
-              {% if event.tour %}
-                <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-              {% endif %}
-            </td>
-            <td>{{ event.event_title|default_if_none:event.event_type }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row mb-4 row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5>Songs</h5>
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="songTable">
+              <thead>
+                <tr>
+                  <th>Song</th>
+                  <th class="text-center">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% regroup songs by song as songs_list %}
+                {% for song, events in songs_list %}
+                  <tr>
+                    <td>
+                      <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
+                    </td>
+                    <td class="text-center">{{ events|length }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5>Venues</h5>
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="venueTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th class="text-center">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for venue in venues %}
+                  <tr>
+                    <td>
+                      <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue.name }}</a>
+                    </td>
+                    <td class="text-center">{{ venue.num_events }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
-  // custom searchBuilder columns definition
-  layout.topEnd.features[1].buttons[1].config.columns = [2, 3];
-
   $(document).ready(function () {
-      // initializes all tables
-      $('table.display').dataTable({
-        layout: layout,
-      });
+    // custom searchBuilder columns definition
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
+
+    $('#eventTable').dataTable({
+      layout: layout,
+      order: [[0, 'asc']],
+    });
+
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop();
+
+    $('#songTable').dataTable({
+      layout: layout,
+      searching: false,
+      order: [[1, 'desc']],
+    });
+
+    $('#venueTable').dataTable({
+      layout: layout,
+      searching: false,
+      order: [[1, 'desc']],
+    });
   })
   </script>
 {% endblock content %}

@@ -4,67 +4,70 @@
   Events &gt; {{ year }}
 {% endblock title %}
 {% block content %}
-  <div class="col-sm-6 col-lg-1">
-    <h4>Events</h4>
-    <div class="row">
-      <div class="col-auto">
-        <b>Year:</b>
-      </div>
-      <div class="col-auto">
-        <select class="form-select form-select-sm" id="year_select">
-          <option selected disabled hidden>{{ year }}</option>
-          {% for i in years %}
-            <option value="{% url "databruce:events_year" year=i %}">{{ i }}</option>
-          {% endfor %}
-        </select>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h4>Events</h4>
+    </div>
+    <div class="col-3">
+      <select class="form-select form-select-sm" id="year_select">
+        <option selected disabled hidden>{{ year }}</option>
+        {% for i in years %}
+          <option value="{% url "databruce:events_year" year=i %}">{{ i }}</option>
+        {% endfor %}
+      </select>
     </div>
   </div>
   <div class="row">
-    <div class="table-responsive p-0">
-      <table class="table table display nowrap" id="table">
-        <thead>
-          <tr class="custom">
-            <th>Date</th>
-            <th>Band</th>
-            <th>Venue</th>
-            <th>Location</th>
-            <th>Tour</th>
-            <th>Detail</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for event in event_info %}
-            <tr>
-              <td>
-                <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-              </td>
-              <td>
-                <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-              </td>
-              <td>
-                <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-              </td>
-              <td>
-                {% if event.venue.id != 1964 %}
-                  <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                    {{ event.venue.city.name }},
-                    {% if event.venue.state %}
-                      {{ event.venue.state.state_abbrev }}
-                    {% else %}
-                      {{ event.venue.country.name }}
-                    {% endif %}
-                  {% endif %}
-                </a>
-              </td>
-              <td>
-                <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-              </td>
-              <td>{{ event.event_title|default_if_none:'' }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="card">
+      <div class="card-body px-0">
+        <div class="table-responsive p-0">
+          <table class="table table display nowrap" id="table">
+            <thead>
+              <tr class="custom">
+                <th scope="col">Date</th>
+                <th scope="col">Band</th>
+                <th scope="col">Venue</th>
+                <th scope="col">Location</th>
+                <th scope="col">Tour</th>
+                <th scope="col">Detail</th>
+                <th scope="col">Public</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in event_info %}
+                <tr>
+                  <td scope="row">
+                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                  </td>
+                  <td>
+                    <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                  </td>
+                  <td>
+                    <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                  </td>
+                  <td>
+                    {% if event.venue.id != 1964 %}
+                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                        {{ event.venue.city.name }},
+                        {% if event.venue.state %}
+                          {{ event.venue.state.state_abbrev }}
+                        {% else %}
+                          {{ event.venue.country.name }}
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </td>
+                  <td>
+                    <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                  </td>
+                  <td>{{ event.event_title|default_if_none:'' }}</td>
+                  <td>{{ event.public|default_if_none:'' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
   {% load static %}
@@ -72,14 +75,46 @@
   <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   <script>
     // searchBuilder custom columns
-    layout.topEnd.features[1].buttons[1].config.columns = [2, 3, 4, 5]
+    layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
+
+    // remove item count at bottom
+    layout.bottomStart = null;
 
     $(document).ready(function () {
       $('#table').dataTable({
         layout: layout,
+        paging: false,
+        order: [[0, 'asc']],
         columnDefs: [
-          { width: '175px', targets: 0 }
-        ]
+          { width: '150px', targets: 0 },
+          { target: -1, visible: false }
+        ],
+        initComplete: function () {
+          this.api()
+            .columns([-1])
+            .every(function () {
+                var column = this;
+
+                $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="select">Publicity:</label></div><div class="col" id="select"></div></div>').appendTo($('#dropdown-container'));
+  
+                // this appears to be the only way to add a select filter
+                // without going through ajax calls. I originally had a pre-made dropdown in
+                // another file and included it like above, however, I had to use an ajax call
+                // otherwise it would appear but not work
+                var select = $('<select id="type" class="custom-select form-select form-select-sm"></select>')
+                  .appendTo($('#select'))
+                  .on('change', function () {
+                      column
+                        .search($(this).val(), {regex: true})
+                        .draw();
+                  });
+                
+                
+                select.append('<option value=".*">All</option>');
+                select.append('<option value="True">Public</option>');
+                select.append('<option value="False">Private</option>');
+            });
+        },
       });
 
       $(function(){

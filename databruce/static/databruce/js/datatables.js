@@ -6,7 +6,7 @@ var layout = {
             { div: { id: "dropdown-container", className: "mr-6 d-none d-lg-inline" } },
             {
                 search: true,
-                buttons: [{ extend: 'csv', text: '', className: 'btn-sm bi bi-download mb-1 mr-2 d-none d-lg-inline' }, {
+                buttons: [{
                     extend: 'searchBuilder',
                     action: function (e, dt, node, config) {
                         this.popover(config._searchBuilder.getNode(), {
@@ -44,7 +44,7 @@ $.extend(true, DataTable.defaults, {
     //         type: 'none',
     //     }
     // },
-    pageLength: 100,
+    // pageLength: 100,
     lengthMenu: [25, 100, { label: 'All', value: -1 }],
     language: {
         searchBuilder: {

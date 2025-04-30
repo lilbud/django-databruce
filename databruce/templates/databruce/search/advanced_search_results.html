@@ -69,14 +69,7 @@
                 <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue }}</a>
               </td>
               <td>
-                <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                  {{ event.venue.city.name }},
-                  {% if event.venue.state %}
-                    {{ event.venue.state.state_abbrev }}
-                  {% else %}
-                    {{ event.venue.country.name }}
-                  {% endif %}
-                </a>
+                <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
               </td>
               <td>
                 <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>

@@ -25,10 +25,7 @@
               {% for event in recent %}
                 <tr>
                   <td>
-                    <a href="{% url 'databruce:event_details' event=event.id %}">
-                      {{ event.event_date|date:'Y-m-d [D]' }}
-                      {% if event.early_late %}{{ event.early_late }}{% endif %}
-                    </a>
+                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                   </td>
                   <td>
                     {% if event.venue.id != 1964 %}
@@ -64,10 +61,7 @@
               {% for event in events %}
                 <tr>
                   <td>
-                    <a href="{% url 'databruce:event_details' event=event.id %}">
-                      {{ event.event_date|date:'Y-m-d [D]' }}
-                      {% if event.early_late %}{{ event.early_late }}{% endif %}
-                    </a>
+                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                   </td>
                   <td>
                     <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">

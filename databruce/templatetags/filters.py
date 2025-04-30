@@ -4,6 +4,7 @@ from datetime import datetime
 import markdown
 from django import template
 
+from databruce import models
 from databruce.models import SetlistNotes, SetlistsBySetAndDate, Venues, VenuesText
 
 register = template.Library()
@@ -45,3 +46,8 @@ def get_date(date: datetime = None, event: str = ""):
         return date.strftime("%Y-%m-%d")
 
     return f"{event[0:4]}-{event[4:6]}-{event[6:8]}"
+
+
+@register.filter()
+def setlist_note(event):
+    return models.SetlistNotes.objects.filter(event__id=event).values_list("id")

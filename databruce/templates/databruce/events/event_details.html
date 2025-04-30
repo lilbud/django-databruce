@@ -4,27 +4,65 @@
   {{ event.event_date|get_date:event.id }} {{ event.artist }}
 {% endblock title %}
 {% block content %}
-  <div class="row mt-4">
+  <div class="row">
     <div class="col-12 col-lg-4">
       <div class="card mb-4">
+        <div class="card-header">Show Info</div>
         <div class="card-body">
-          <h5 class="card-title mb-3 text-body-secondary">Show Info</h5>
-          <h4 class="card-title">{{ event }}</h4>
-          <h6 class="card-subtitle mb-2 text-body-secondary">{{ event.artist.name }}</h6>
-          <hr>
-          <h4 class="card-title">{{ event.venue.name }}</h4>
-          <h6 class="card-subtitle mb-2 text-body-secondary">{{ event.venue.city }}</h6>
-          <br>
+          <div class="row">
+            <h4 class="mb-1">{{ event }}</h4>
+            <p>
+              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist }}</a>
+            </p>
+          </div>
+          <div class="row">
+            <strong>Venue:</strong>
+            <p>
+              <a class="text-body-secondary"
+                 href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+            </p>
+          </div>
+          <div class="row">
+            <strong>City:</strong>
+            <p>
+              <a class="text-body-secondary"
+                 href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+            </p>
+          </div>
+          <div class="row">
+            <strong>Tour / Leg:</strong>
+            <p class="text-body-secondary">
+              <a class="text-body-secondary"
+                 href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+              {% if event.leg %}/ {{ event.leg.name }}{% endif %}
+            </p>
+          </div>
+          {% if event.run %}
+            <div class="row">
+              <strong>Run:</strong>
+              <p class="text-body-secondary">
+                <a class="text-body-secondary" href="">{{ event.run.name }}</a>
+              </p>
+            </div>
+          {% endif %}
           <div class="row justify-content-center">
             <div class="btn-group" role="group" aria-label="Basic example">
-              {% if last_event %}
-                <a class="btn btn-secondary"
-                   href="{% url 'databruce:event_details' event=last_event %}">&lt; Previous Event</a>
-              {% endif %}
-              {% if next_event %}
-                <a class="btn btn-secondary"
-                   href="{% url 'databruce:event_details' event=next_event %}">Next Event &gt;</a>
-              {% endif %}
+              <a class="btn btn-secondary"
+                 role="button"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-html="true"
+                 data-bs-custom-class="custom-tooltip"
+                 data-bs-title="{{ last_event }}<br>{{ last_event.venue }}"
+                 href="{% url 'databruce:event_details' event=last_event.id %}">&lt; Last Show</a>
+              <a class="btn btn-secondary"
+                 role="button"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-html="true"
+                 data-bs-custom-class="custom-tooltip"
+                 data-bs-title="{{ next_event }}<br>{{ next_event.venue }}"
+                 href="{% url 'databruce:event_details' event=next_event.id %}">Next Show &gt;</a>
             </div>
           </div>
         </div>
@@ -32,165 +70,79 @@
     </div>
     <div class="col-12 col-lg-8">
       <div class="card mb-4">
+        <div class="card-header">Setlist</div>
         <div class="card-body">
-          <h5 class="card-title mb-3 text-body-secondary">Setlist</h5>
           {% if setlist %}
+            {% regroup notes by id as notes_list %}
             {% regroup setlist by set_name as event_setlist %}
             {% for set in event_setlist %}
               <h6 class="card-subtitle mb-2 text-body-secondary-emphasis">{{ set.grouper }}</h6>
               <p class="card-text">
                 {% for song in set.list %}
                   <span class="text-nowrap">
-                    {% spaceless %}
-                      <a class="pe-0"
-                         href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.song_name }}</a>
-                      {% for note in notes %}
-                        {% if note.id.id == song.id %}
-                          <sup>
-                            <span class="badge text-bg-secondary"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-title="{{ note.note }}">{{ note.num }}</span>
-                          </sup>
-                        {% endif %}
-                      {% endfor %}
-                      {% if not forloop.last %}{{ song.separator }}{% endif %}
-                    {% endspaceless %}
+                    <a class="pe-0"
+                       href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                    {% for item in notes_list %}
+                      {% if item.grouper.id == song.id %}
+                        {% for note in item.list %}
+                          <span class="badge text-bg-light font-monospace"
+                                data-bs-toggle="tooltip"
+                                data-bs-html="true"
+                                data-bs-title="{{ note.note|mdlink }}">{{ note.num }}</span>
+                        {% endfor %}
+                      {% endif %}
+                    {% endfor %}
+                    {% if not forloop.last %}{{ song.separator }}{% endif %}
                   </span>
                 {% endfor %}
               </p>
             {% endfor %}
           {% else %}
-            <h5 class="card-title">No Set Details Available</h5>
+            <h6>No Set Details Available</h6>
           {% endif %}
         </div>
       </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title mb-3 text-body-secondary">Setlist Notes</h5>
-          <p class="card-text">
-            {% for note in footnotes %}
-              <div class="row">
-                <span>
-                  <span class="badge text-bg-secondary me-2 ">{{ note.num }}</span>
-                  {% if note.last %}
-                    {{ note.note }}, LTP <a href="{% url 'databruce:event_details' event=note.last.id %}">{{ note.last }}</a> ({{ note.gap }} events)
-                  {% else %}
-                    {{ note.note }}
-                  {% endif %}
-                </span>
-              </div>
-            {% endfor %}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% comment %} <div class="row mt-4">
-    <h4>
-      {{ event }} &gt; {{ event.artist.name }} &gt; <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-    </h4>
-  </div>
-  <div class="row mt-2">
-    {% if setlist %}
-      {% regroup setlist by set_name as event_setlist %}
-      {% for set in event_setlist %}
-        <div class="row mt-2">
-          <div class="col">
-            <strong class="pe-2">{{ set.grouper }}:</strong>
-            {% for song in set.list %}
-              <span class="text-nowrap">
-                {% spaceless %}
-                  <a class="pe-0" href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.song_name }}</a>
-                  {% for note in notes %}
-                    {% if note.id.id == song.id %}
-                      <sup data-bs-toggle="tooltip" data-bs-title="{{ note.note }}">[{{ note.num }}]</sup>
+      {% if notes %}
+        <div class="card mb-4">
+          <div class="card-header">Setlist Notes</div>
+          <div class="card-body">
+            {% regroup notes by num as notes_list %}
+            {% for item in notes_list %}
+              {% with note=item.list|first %}
+                <div class="row">
+                  <span>
+                    <span class="badge text-bg-light me-2 font-monospace">{{ note.num }}</span>
+                    {% if note.last %}
+                      {{ note.note|mdlink|safe }}, LTP <a href="{% url 'databruce:event_details' event=note.last.id %}">{{ note.last }}</a> ({{ note.gap }} events)
+                    {% else %}
+                      {{ note.note|mdlink|safe }}
                     {% endif %}
-                  {% endfor %}
-                  {% if not forloop.last %}{{ song.separator }}{% endif %}
-                {% endspaceless %}
-              </span>
+                  </span>
+                </div>
+              {% endwith %}
             {% endfor %}
           </div>
         </div>
-      {% endfor %}
-    {% else %}
-      <div class="row mt-2">
-        <h5>No Set Details Known</h5>
-      </div>
-    {% endif %}
-    {% if notes %}
-      <div class="row mt-2" id="footnotes">
-        <div class="row">
-          <strong>Footnotes:</strong>
-        </div>
-        <div class="row">
-          {% for note in footnotes %}
-            <div class="row ms-2">
-              <span>
-                [{{ note.num }}]
-                {% if note.last %}
-                  {{ note.note }}, LTP <a href="{% url 'databruce:event_details' event=note.last.id %}">{{ note.last }}</a> ({{ note.gap }} events)
-                {% else %}
-                  {{ note.note }}
+      {% endif %}
+      {% if onstage %}
+        <div class="card mb-4">
+          <div class="card-header">Onstage</div>
+          <ul class="list-group list-group-flush">
+            {% for member in onstage %}
+              <li class="list-group-item">
+                <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                {% if member.band %}
+                  {% if member.band.springsteen_band %}
+                    <span class="badge rounded-pill ms-2 position-absolute text-bg-primary">{{ member.band.name }}</span>
+                  {% else %}
+                    <span class="badge rounded-pill ms-2 position-absolute text-bg-secondary">{{ member.band.name }}</span>
+                  {% endif %}
                 {% endif %}
-              </span>
-            </div>
-          {% endfor %}
+              </li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
-    {% endif %}
-  </div>
-  <div class="row mt-2" id="info-box">
-    {% if event.run %}
-      <div class="row mt-2">
-        <div class="col-sm-2">
-          <strong>Run:</strong>
-        </div>
-        <div class="col-10">{{ event.run.name }}</div>
-      </div>
-    {% endif %}
-    {% if event.tour %}
-      <div class="row mt-2">
-        <div class="col-sm-2">
-          <strong>Tour:</strong>
-        </div>
-        <div class="col-10">
-          <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-        </div>
-      </div>
-    {% endif %}
-    {% if event.event_title %}
-      <div class="row mt-2">
-        <div class="col-sm-2">
-          <strong>Event Title:</strong>
-        </div>
-        <div class="col-10">{{ event.event_title }}</div>
-      </div>
-    {% endif %}
-    {% if event.event_type %}
-      <div class="row mt-2">
-        <div class="col-sm-2">
-          <strong>Event Type:</strong>
-        </div>
-        <div class="col-10">{{ event.event_type }}</div>
-      </div>
-    {% endif %}
-  </div>
-  <div class="buttons my-4">
-    {% if last_event %}
-      <a class="btn btn-sm btn-secondary" href="{% url 'databruce:event_details' event=last_event %}">&lt; Previous Event</a>
-    {% endif %}
-    {% if next_event %}
-      <a class="btn btn-sm btn-secondary" href="{% url 'databruce:event_details' event=next_event %}">Next Event &gt;</a>
-    {% endif %}
-    {% if event.brucebase_url %}
-      <a class="btn btn-sm btn-secondary" href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
-    {% endif %}
-  </div> {% endcomment %}
-  <script>
-    $(document).ready(function () {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    });
-  </script>
+    </div>
+  {% endif %}
 {% endblock content %}

@@ -7,7 +7,8 @@ $(document).ready(function () {
         selectionCssClass: "form-select",
         dropdownCssClass: "form-control",
         minimumInputLength: 3,
-        dropdownPosition: 'below'
+        dropdownPosition: 'below',
+        width: 'resolve' // need to override the changed default
     };
 
     $('#citySelect').select2(selectOptions);
