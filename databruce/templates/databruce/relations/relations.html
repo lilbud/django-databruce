@@ -20,7 +20,7 @@
                   <th scope="col">Name</th>
                   <th scope="col">First</th>
                   <th scope="col">Last</th>
-                  <th scope="col">Num Events</th>
+                  <th class="text-center" scope="col">#</th>
                 </tr>
               </thead>
               <tbody>
@@ -35,7 +35,7 @@
                     <td>
                       {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
                     </td>
-                    <td>{{ relation.appearances }}</td>
+                    <td class="text-center">{{ relation.appearances }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -45,9 +45,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
-  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons.pop();
@@ -55,6 +52,8 @@
     $(document).ready(function () {
       $('#relationsTable').dataTable({
         layout: layout,
+        order: [[0, 'asc']],
+        pageLength: 25,
       });
     });
   </script>

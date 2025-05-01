@@ -1,37 +1,13 @@
-import contextlib
 import datetime
-import re
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import (
-    Avg,
     Case,
-    CharField,
-    Count,
-    F,
-    IntegerField,
-    OuterRef,
     Q,
-    RowRange,
-    Subquery,
-    Sum,
     Value,
     When,
-    Window,
-)
-from django.db.models.functions import (
-    Coalesce,
-    Lag,
-    Lead,
-)
-from django.forms import (
-    BaseFormSet,
-    IntegerField,
-    formset_factory,
-    modelformset_factory,
 )
 from django.http import HttpRequest
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
 from . import forms, models
 
@@ -52,7 +28,7 @@ def index(request: HttpRequest):
             "venue__country",
         )
         .order_by("-id")
-    )
+    )[:10]
 
     recent_events = (
         models.Events.objects.filter(date__lte=DATE)
@@ -66,10 +42,27 @@ def index(request: HttpRequest):
         )
     )[:10]
 
+    upcoming_events = (
+        models.Events.objects.filter(date__gte=DATE)
+        .order_by("date")
+        .select_related(
+            "artist",
+            "venue",
+            "venue__city",
+            "venue__state",
+            "venue__country",
+        )
+    )[:10]
+
     return render(
         request,
         "databruce/index.html",
-        {"events": events, "recent": recent_events, "date": DATE},
+        {
+            "events": events,
+            "recent": recent_events,
+            "date": DATE,
+            "upcoming": upcoming_events,
+        },
     )
 
 
@@ -455,9 +448,7 @@ def setlist_search_results(request: HttpRequest):
 
 
 def relations(request: HttpRequest):
-    relations = (
-        models.Relations.objects.all().select_related("first", "last").order_by("name")
-    )
+    relations = models.Relations.objects.all().select_related("first", "last")
 
     return render(
         request,
@@ -471,8 +462,9 @@ def bands(request: HttpRequest):
         models.Bands.objects.filter().select_related("first", "last").order_by("name")
     ).annotate(
         bruce_band=Case(
-            When(springsteen_band=True, then=Value("Yes")), default=Value("No")
-        )
+            When(springsteen_band=True, then=Value("Yes")),
+            default=Value("No"),
+        ),
     )
 
     return render(
@@ -512,31 +504,30 @@ def band_details(request: HttpRequest, id: int):
 
     members = (
         models.Onstage.objects.filter(band=id)
-        .distinct("relation")
         .select_related("relation", "relation__first", "relation__last")
         .order_by("relation")
     )
 
     events = (
-        models.Onstage.objects.filter(band=id)
-        .distinct("event")
-        .select_related(
-            "event__venue",
-            "event__artist",
-            "event__venue__city",
-            "event__venue__state",
-            "event__venue__country",
-            "event__tour",
+        models.Events.objects.filter(id__in=members.values_list("event"))
+        .order_by(
+            "id",
         )
-        .order_by("event")
+        .select_related(
+            "venue",
+            "tour",
+            "artist",
+            "venue__city",
+            "venue__city__state",
+            "venue__city__state__country",
+            "venue__city__country",
+        )
     )
-
-    print(len(events))
 
     return render(
         request,
         "databruce/bands/band_details.html",
-        {"members": members, "info": band_info, "events": events},
+        {"members": members.distinct("relation"), "info": band_info, "events": events},
     )
 
 
@@ -546,7 +537,9 @@ def releases(request: HttpRequest):
     return render(
         request,
         "databruce/releases/releases.html",
-        {"releases": releases},
+        {
+            "releases": releases,
+        },
     )
 
 
@@ -571,7 +564,8 @@ def release_details(request: HttpRequest, id: int):
 def cities(request: HttpRequest):
     cities = (
         models.Cities.objects.all()
-        .select_related("state", "country", "first", "last")
+        .prefetch_related("state")
+        .select_related("country", "first", "last")
         .order_by("name")
     )
 

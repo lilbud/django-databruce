@@ -106,8 +106,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons[0].config.columns = [1, 3]
@@ -144,5 +142,4 @@
       });
     });
   </script>
-  <script src="{% static 'databruce/js/dt_tab_reload.js' %}"></script>
 {% endblock content %}

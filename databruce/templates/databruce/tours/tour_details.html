@@ -114,9 +114,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
-  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   <script>
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
 
@@ -143,5 +140,4 @@
     });
 
   </script>
-  <script src="{% static 'databruce/js/dt_tab_reload.js' %}"></script>
 {% endblock content %}

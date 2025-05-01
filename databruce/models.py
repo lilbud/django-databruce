@@ -245,13 +245,12 @@ class Cities(models.Model):
 
     def __str__(self):
         try:
-            state = f"{self.name}, {self.state}"
-        except Cities.state.RelatedObjectDoesNotExist:
-            state = f"{self.name}, {self.country}"
-        except Cities.country.RelatedObjectDoesNotExist:
-            state = self.name
+            if self.country.name == "United States":
+                return f"{self.name}, {self.state.state_abbrev}"
 
-        return state
+            return f"{self.name}, {self.state}"
+        except:
+            return f"{self.name}, {self.country}"
 
 
 class Continents(models.Model):

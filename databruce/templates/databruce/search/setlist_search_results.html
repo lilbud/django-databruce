@@ -5,54 +5,71 @@
   Setlist Search
 {% endblock title %}
 {% block content %}
-  <h4>Setlist Search</h4>
-  <h6>{{ result }}</h6>
-  <hr>
-  <div class="table-responsive p-0">
-    <table class="table table display nowrap" id="songTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Band</th>
-          <th>Venue</th>
-          <th>Location</th>
-          <th>Tour</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for event in events %}
-          <tr>
-            <td>
-              <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-            </td>
-            <td>
-              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-            </td>
-            <td>
-              <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-            </td>
-            <td>
-              {% if event.venue.id != 1964 %}
-                <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                  {{ event.venue.city.name }},
-                  {% if event.venue.state %}
-                    <a href="{% url 'databruce:state_details' id=event.venue.state.id %}">{{ event.venue.state.state_abbrev }}</a>
-                  {% else %}
-                    <a href="{% url 'databruce:country_details' id=event.venue.country.id %}">{{ event.venue.country.name }}</a>
-                  {% endif %}
-                </a>
-              {% endif %}
-            </td>
-            <td>
-              <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row mb-4">
+    <div class="col">
+      <h4>Setlist Search</h4>
+    </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="col">
+          <h6>{{ result }}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="col">
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="songTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Band</th>
+                  <th>Venue</th>
+                  <th>Location</th>
+                  <th>Tour</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for event in events %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                    </td>
+                    <td>
+                      {% if event.venue.id != 1964 %}
+                        <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+                          {{ event.venue.city.name }},
+                          {% if event.venue.state %}
+                            <a href="{% url 'databruce:state_details' id=event.venue.state.id %}">{{ event.venue.state.state_abbrev }}</a>
+                          {% else %}
+                            <a href="{% url 'databruce:country_details' id=event.venue.country.id %}">{{ event.venue.country.name }}</a>
+                          {% endif %}
+                        </a>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
 

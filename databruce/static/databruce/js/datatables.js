@@ -45,7 +45,7 @@ $.extend(true, DataTable.defaults, {
     //     }
     // },
     // pageLength: 100,
-    lengthMenu: [25, 100, { label: 'All', value: -1 }],
+    lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],
     language: {
         searchBuilder: {
             button: ''

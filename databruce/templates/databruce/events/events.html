@@ -70,9 +70,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
-  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   <script>
     // searchBuilder custom columns
     layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
@@ -83,7 +80,7 @@
     $(document).ready(function () {
       $('#table').dataTable({
         layout: layout,
-        paging: false,
+        pageLength: 25,
         order: [[0, 'asc']],
         columnDefs: [
           { width: '150px', targets: 0 },

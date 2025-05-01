@@ -4,60 +4,73 @@
   Releases &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <h4>
-    <a href="{% url 'databruce:releases' %}">Releases</a> &gt; {{ info.name }}
-  </h4>
-  <hr>
-  <div class="release-info mb-4">
-    <div class="row fs-5">
-      <div class="col-auto pe-0">
-        <b>Release Date:</b>
-      </div>
-      <div class="col">{{ info.date }}</div>
-    </div>
-    <div class="row fs-5">
-      <div class="col-auto pe-0">
-        <b>Type:</b>
-      </div>
-      <div class="col">{{ info.type }}</div>
+  <div class="row mb-4">
+    <div class="col">
+      <h4>
+        <a href="{% url 'databruce:releases' %}">Releases</a> &gt; {{ info.name }}
+      </h4>
     </div>
   </div>
-  <div class="table-responsive p-0">
-    <table class="table table" id="tracksTable">
-      <thead>
-        <tr class="header">
-          <th class="all" scope="col">#</th>
-          <th class="all" scope="col">Song</th>
-          <th class="all" scope="col">Num Plays</th>
-          <th class="all" scope="col">First</th>
-          <th class="all" scope="col">Last</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for track in tracks %}
-          <tr>
-            <td>{{ track.track }}</td>
-            <td>
-              <a href="{% url "databruce:song_details" id=track.song.id %}">{{ track.song.name }}</a>
-            </td>
-            <td>{{ track.song.num_plays_public }}</td>
-            <td>
-              {% if track.song.first %}
-                <a href="{% url "databruce:event_details" event=track.song.first.id %}">{{ track.song.first }}</a>
-              {% endif %}
-            </td>
-            <td>
-              {% if track.song.last %}
-                <a href="{% url "databruce:event_details" event=track.song.last.id %}">{{ track.song.last }}</a>
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="col">
+          <h5>Song Info</h5>
+          <div class="row justify-content-start">
+            <div class="col-auto pe-0 fs-6 fw-semibold">Release Date:</div>
+            <div class="col">{{ info.date }}</div>
+          </div>
+          <div class="row justify-content-start">
+            <div class="col-auto pe-0 fs-6 fw-semibold">Type:</div>
+            <div class="col">{{ info.type }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h5>Songs</h5>
+        <div class="col">
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="tracksTable">
+              <thead>
+                <tr class="header">
+                  <th scope="col">#</th>
+                  <th scope="col">Song</th>
+                  <th class="text-center" scope="col">Public</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for track in tracks %}
+                  <tr>
+                    <td>{{ track.track }}</td>
+                    <td>
+                      <a href="{% url "databruce:song_details" id=track.song.id %}">{{ track.song.name }}</a>
+                    </td>
+                    <td class="text-center">{{ track.song.num_plays_public }}</td>
+                    <td>
+                      {% if track.song.first %}
+                        <a href="{% url "databruce:event_details" event=track.song.first.id %}">{{ track.song.first }}</a>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if track.song.last %}
+                        <a href="{% url "databruce:event_details" event=track.song.last.id %}">{{ track.song.last }}</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
   // removes searchBuilder button, not needed for this.
   layout.topEnd.features[1].buttons.pop()
@@ -65,12 +78,15 @@
   $(document).ready(function () {
     $('#tracksTable').dataTable({
       layout: layout,
-      columnDefs: [
-        { width: '15px', targets: [0, 2] },
-        { width: '250px', targets: [1] },
-        { width: '175px', targets: [3, 4] }
-      ]
+      searching: false,
+      paging: false,
+      info: false,
+      order: [[0, 'asc']],
+
     });
-  })
+
+    // hides the empty search row when no search bar is enabled
+    $(".dt-container .row:first-child").hide()
+  });
   </script>
 {% endblock content %}

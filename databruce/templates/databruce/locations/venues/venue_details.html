@@ -53,7 +53,7 @@
             <thead>
               <tr>
                 <th>Song</th>
-                <th>Count</th>
+                <th class="text-center" scope="col">#</th>
               </tr>
             </thead>
             <tbody>
@@ -63,7 +63,7 @@
                   <td>
                     <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
                   </td>
-                  <td>{{ events|length }}</td>
+                  <td class="text-center">{{ events|length }}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -72,9 +72,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
-  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   <script>
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2]
     
@@ -82,10 +79,12 @@
 
       $('#eventTable').dataTable({
         layout: layout,
+        order: [[0, 'asc']],
       });
 
       $('#songTable').dataTable({
         layout: layout,
+        order: [[0, 'asc']],
       });
     })
   </script>

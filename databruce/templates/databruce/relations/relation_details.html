@@ -60,7 +60,7 @@
                     </td>
                     <td>
                       {% if event.venue.city %}
-                        <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
+                        <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
                       {% endif %}
                     </td>
                     <td>
@@ -78,8 +78,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
     // searchBuilder custom columns
     layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
@@ -87,8 +85,8 @@
     $(document).ready(function () {
       $('#eventTable').dataTable({
         layout: layout,
+        order: [[0, 'asc']],
       });
     });
   </script>
-  <script src="{% static 'databruce/js/dt_tab_reload.js' %}"></script>
 {% endblock content %}

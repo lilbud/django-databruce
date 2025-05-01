@@ -5,76 +5,100 @@
 {% load static %}
 {% block content %}
   {% regroup events by artist as events_list %}
-  <div class="row mt-2">
-    <div class="col-lg-12">
-      <div class="row mb-2">
-        <h1>Welcome to Databruce</h1>
+  <div class="row mb-4">
+    <div class="col">
+      <h1>Welcome to Databruce</h1>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card">
+        {% comment %} <div class="card-body"> {% endcomment %}
+        {% load static %}
+        <img class="img-fluid object-fit-cover rounded"
+             id="headimg"
+             src="{% static 'databruce/img/header-crop.jpg' %}"
+             alt=""
+             height="auto"
+             width="auto">
+        {% comment %} </div> {% endcomment %}
       </div>
-      <div class="row">
-        <div class="col-xl-6 col-lg-12 my-2">
-          <h4>Recent Events</h4>
-          <table class="table">
+    </div>
+  </div>
+  <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="mb-4">Recent Events</h4>
+          <table class="table table display nowrap" id="recentTable">
             <thead>
               <tr>
                 <th>Date</th>
                 <th>Location</th>
-                <th>Band</th>
               </tr>
             </thead>
             <tbody>
               {% for event in recent %}
                 <tr>
-                  <td>
+                  <td class="nowrap">
                     <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                   </td>
-                  <td>
-                    {% if event.venue.id != 1964 %}
-                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                        {{ event.venue.city.name }},
-                        {% if event.venue.state %}
-                          {{ event.venue.state.state_abbrev }}
-                        {% else %}
-                          {{ event.venue.country.name }}
-                        {% endif %}
-                      </a>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist.name }}</a>
+                  <td class="nowrap">
+                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
                   </td>
                 </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-        <div class="col-xl-6 col-lg-12 my-2">
-          <h4>On This Day ({{ date|date:"F d" }})</h4>
-          <table class="table">
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="mb-4">Upcoming Events</h4>
+          <table class="table table display nowrap" id="upcomingTable">
             <thead>
               <tr>
                 <th>Date</th>
                 <th>Location</th>
-                <th>Band</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in upcoming %}
+                <tr>
+                  <td class="nowrap">
+                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                  </td>
+                  <td class="nowrap">
+                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="mb-4">On This Day ({{ date|date:"F d" }})</h4>
+          <table class="table table display nowrap" id="otdTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Location</th>
               </tr>
             </thead>
             <tbody>
               {% for event in events %}
                 <tr>
-                  <td>
+                  <td class="nowrap">
                     <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                   </td>
-                  <td>
-                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                      {{ event.venue.city.name }},
-                      {% if event.venue.state %}
-                        {{ event.venue.state.state_abbrev }}
-                      {% else %}
-                        {{ event.venue.country.name }}
-                      {% endif %}
-                    </a>
-                  </td>
-                  <td>
-                    <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist.name }}</a>
+                  <td class="nowrap">
+                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
                   </td>
                 </tr>
               {% endfor %}
@@ -84,4 +108,18 @@
       </div>
     </div>
   </div>
+  <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop()
+    
+    $(document).ready(function () {
+      $('table.display').dataTable({
+        layout: layout,
+        searching: false,
+        ordering: false,
+        info: false,
+        paging: false
+      })
+    })
+  </script>
 {% endblock content %}

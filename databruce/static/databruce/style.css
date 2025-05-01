@@ -31,8 +31,8 @@ table th {
 }
 
 table>tbody>tr>td {
-    font-size: .75rem;
-    line-height: .6rem;
+    font-size: .8rem;
+    line-height: .65rem;
     background-color: var(--bs-dark-bg-subtle) !important;
 }
 
@@ -175,4 +175,19 @@ tr td,
 tr th {
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
+}
+
+.dt-orderable-none span.dt-column-order {
+    display: none;
+}
+
+.headimg {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
+}
+
+.dt-container>div:nth-child(1) {
+    margin-top: 0px !important;
+    display: none !important;
 }

@@ -18,7 +18,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">First</th>
                 <th scope="col">Last</th>
-                <th scope="col" class="text-center">Events</th>
+                <th class="text-center" scope="col">#</th>
               </tr>
             </thead>
             <tbody>
@@ -46,8 +46,6 @@
       </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
     // custom searchBuilder columns definition
     layout.topEnd.features[1].buttons[0].config.columns = [3];
@@ -55,6 +53,8 @@
     $(document).ready(function () {
       $('#countryTable').dataTable({
         layout: layout,
+        order: [[0, 'asc']],
+        pageLength: 25,
       })
     })
   </script>

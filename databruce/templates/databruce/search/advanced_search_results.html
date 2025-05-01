@@ -5,83 +5,95 @@
   Event Search Results
 {% endblock title %}
 {% block content %}
-  <div class="col-sm-6 mb-4">
-    <h4>Event Search</h4>
-    <div id="row">
-      <div class="col">
-        <div class="d-flex flex-column">
-          {% if request.GET.first_date %}
-            {% include "./result_row.html" with label="Start Date:" data=request.GET.first_date %}
-          {% endif %}
-          {% if request.GET.last_date %}
-            {% include "./result_row.html" with label="End Date:" data=request.GET.last_date %}
-          {% endif %}
-          {% if request.GET.month %}
-            {% include "./result_row.html" with label="Month:" data=request.GET.month|get_month %}
-          {% endif %}
-          {% if request.GET.day %}
-            {% include "./result_row.html" with label="Day:" data=request.GET.day|get_ordinal %}
-          {% endif %}
-          {% if request.GET.day_of_week %}
-            {% include "./result_row.html" with label="Day of Week:" data=request.GET.day_of_week|get_day %}
-          {% endif %}
-          {% if request.GET.city %}
-            {% include "./result_row.html" with label="City:" data=request.GET.city %}
-          {% endif %}
-          {% if request.GET.state %}
-            {% include "./result_row.html" with label="State:" data=request.GET.state|get_state %}
-          {% endif %}
-          {% if request.GET.country %}
-            {% include "./result_row.html" with label="Country:" data=request.GET.country %}
-          {% endif %}
-          {% if request.GET.musician %}
-            {% include "./result_row.html" with label="Musician:" data=request.GET.musician|get_relation %}
-          {% endif %}
-          {% if request.GET.band %}
-            {% include "./result_row.html" with label="Band:" data=request.GET.band|get_band %}
-          {% endif %}
+  <div class="row mb-4">
+    <div class="col">
+      <h4>Event Search</h4>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="col">
+          <div id="row">
+            <div class="d-flex flex-column">
+              {% if request.GET.first_date %}
+                {% include "./result_row.html" with label="Start Date:" data=request.GET.first_date %}
+              {% endif %}
+              {% if request.GET.last_date %}
+                {% include "./result_row.html" with label="End Date:" data=request.GET.last_date %}
+              {% endif %}
+              {% if request.GET.month %}
+                {% include "./result_row.html" with label="Month:" data=request.GET.month|get_month %}
+              {% endif %}
+              {% if request.GET.day %}
+                {% include "./result_row.html" with label="Day:" data=request.GET.day|get_ordinal %}
+              {% endif %}
+              {% if request.GET.day_of_week %}
+                {% include "./result_row.html" with label="Day of Week:" data=request.GET.day_of_week|get_day %}
+              {% endif %}
+              {% if request.GET.city %}
+                {% include "./result_row.html" with label="City:" data=request.GET.city %}
+              {% endif %}
+              {% if request.GET.state %}
+                {% include "./result_row.html" with label="State:" data=request.GET.state|get_state %}
+              {% endif %}
+              {% if request.GET.country %}
+                {% include "./result_row.html" with label="Country:" data=request.GET.country %}
+              {% endif %}
+              {% if request.GET.musician %}
+                {% include "./result_row.html" with label="Musician:" data=request.GET.musician|get_relation %}
+              {% endif %}
+              {% if request.GET.band %}
+                {% include "./result_row.html" with label="Band:" data=request.GET.band|get_band %}
+              {% endif %}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="table-responsive p-0">
-      <table class="table table display nowrap" id="venueTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Band</th>
-            <th>Venue</th>
-            <th>Location</th>
-            <th>Tour</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for event in events %}
-            <tr>
-              <td>
-                <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-              </td>
-              <td>
-                <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-              </td>
-              <td>
-                <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue }}</a>
-              </td>
-              <td>
-                <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-              </td>
-              <td>
-                <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <div class="row mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="col">
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="venueTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Band</th>
+                  <th>Venue</th>
+                  <th>Location</th>
+                  <th>Tour</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for event in events %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  {% load static %}
-  <script src="{% static 'databruce/js/datatables.js' %}"></script>
   <script>
     $(document).ready(function () {
       $('#venueTable').dataTable({

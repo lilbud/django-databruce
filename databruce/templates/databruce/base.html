@@ -45,6 +45,8 @@
     <script src="https://unpkg.com/htmx.org@2.0.4"
             integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
             crossorigin="anonymous"></script>
+    <script src="{% static 'databruce/js/datatables.js' %}"></script>
+    <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
@@ -148,7 +150,7 @@
                 action="{% url 'databruce:search' %}">
             <div class="input-group">
               <input id="eventSearch"
-                     class="form-control"
+                     class="form-control "
                      type="search"
                      name="event_date"
                      placeholder="YYYY-MM-DD"
