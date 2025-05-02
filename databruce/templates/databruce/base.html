@@ -150,7 +150,7 @@
                 action="{% url 'databruce:search' %}">
             <div class="input-group">
               <input id="eventSearch"
-                     class="form-control "
+                     class="form-control"
                      type="search"
                      name="event_date"
                      placeholder="YYYY-MM-DD"
@@ -171,27 +171,27 @@
         </div>
       </div>
     </div>
-  </body>
-  <script>
-    $(document).ready(function () {
-      $("#eventSearch").autocomplete({
-          autoFocus: true,
-          source: "{% url 'databruce:api:events_auto' %}",
-          minLength: 7,
-          select: function (event, ui) {
-              window.location.href = "/search/results?event_date=" + ui.item.value;
-          }
+    <script>
+      $(document).ready(function () {
+        $("#eventSearch").autocomplete({
+            autoFocus: true,
+            source: "{% url 'databruce:api:events_auto' %}",
+            minLength: 7,
+            select: function (event, ui) {
+                window.location.href = "/search/results?event_date=" + ui.item.value;
+            }
+        });
+        $('#eventSearch').mask('0000-00-00');
       });
-      $('#eventSearch').mask('0000-00-00');
-    });
-  </script>
-  <script>
-    $(document).ready(function () {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
-          crossorigin="anonymous"></script>
+    </script>
+    <script>
+      $(document).ready(function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+            crossorigin="anonymous"></script>
+  </body>
 </html>

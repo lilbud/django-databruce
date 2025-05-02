@@ -187,7 +187,7 @@ tr th {
     object-fit: cover;
 }
 
-.dt-container>div:nth-child(1) {
-    margin-top: 0px !important;
+/* Hides the empty search/buttons row when there is none */
+.dt-container>div.row:has(.d-md-flex:empty) {
     display: none !important;
 }

@@ -38,13 +38,6 @@ $.extend(true, DataTable.defaults, {
     searching: true,
     fixedHeader: true,
     scrollX: true,
-    // responsive: {
-    //     details: {
-    //         display: $.fn.dataTable.Responsive.display.childRowImmediate,
-    //         type: 'none',
-    //     }
-    // },
-    // pageLength: 100,
     lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],
     language: {
         searchBuilder: {

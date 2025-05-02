@@ -13,7 +13,6 @@
   <div class="row mb-4">
     <div class="col">
       <div class="card">
-        {% comment %} <div class="card-body"> {% endcomment %}
         {% load static %}
         <img class="img-fluid object-fit-cover rounded"
              id="headimg"
@@ -21,7 +20,6 @@
              alt=""
              height="auto"
              width="auto">
-        {% comment %} </div> {% endcomment %}
       </div>
     </div>
   </div>
@@ -29,7 +27,7 @@
     <div class="col">
       <div class="card h-100">
         <div class="card-body">
-          <h4 class="mb-4">Recent Events</h4>
+          <h4 class="mb-2">Recent Events</h4>
           <table class="table table display nowrap" id="recentTable">
             <thead>
               <tr>
@@ -56,7 +54,7 @@
     <div class="col">
       <div class="card h-100">
         <div class="card-body">
-          <h4 class="mb-4">Upcoming Events</h4>
+          <h4 class="mb-2">Upcoming Events</h4>
           <table class="table table display nowrap" id="upcomingTable">
             <thead>
               <tr>
@@ -83,7 +81,7 @@
     <div class="col">
       <div class="card h-100">
         <div class="card-body">
-          <h4 class="mb-4">On This Day ({{ date|date:"F d" }})</h4>
+          <h4 class="mb-2">On This Day ({{ date|date:"F d" }})</h4>
           <table class="table table display nowrap" id="otdTable">
             <thead>
               <tr>
@@ -118,7 +116,7 @@
         searching: false,
         ordering: false,
         info: false,
-        paging: false
+        paging: false,
       })
     })
   </script>

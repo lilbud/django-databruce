@@ -50,7 +50,7 @@
     $(document).ready(function () {
       $('#releasesTable').dataTable({
         layout: layout,
-
+        pageLength: 25,
         initComplete: function () {
           this.api()
           .columns([-2])
