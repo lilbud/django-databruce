@@ -17,7 +17,7 @@
         <h5>Events</h5>
         <div class="col">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="eventsTable">
+            <table class="table table display nowrap" id="eventTable">
               <thead>
                 <tr class="custom">
                   <th>Date</th>
@@ -66,14 +66,10 @@
         <h5>Members</h5>
         <div class="col">
           <div class="table-responsive p-0">
-            <table class="table table display" id="membersTable">
+            <table class="table table display" id="memberTable">
               <thead>
                 <tr>
                   <th scope="col">Name</th>
-                  <th scope="col">Instruments</th>
-                  <th scope="col">First</th>
-                  <th scope="col">Last</th>
-                  <th class="text-center">Count</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,14 +78,6 @@
                     <td>
                       <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                     </td>
-                    <td>{{ member.relation.instruments|default_if_none:"" }}</td>
-                    <td>
-                      <a href="{% url "databruce:event_details" event=member.relation.first.id %}">{{ member.relation.first }}</a>
-                    </td>
-                    <td>
-                      <a href="{% url "databruce:event_details" event=member.relation.last.id %}">{{ member.relation.last }}</a>
-                    </td>
-                    <td class="text-center">{{ member.relation.appearances }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -101,19 +89,15 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
     
     $(document).ready(function () {
-      // initializes all tables
-      $('#eventsTable').dataTable({
+      new DataTable('#eventTable', {
+        searching: false,
         layout: layout,
       });
+      new DataTable('#memberTable', {
 
-      // removes searchBuilder button, not needed for this.
-      layout.topEnd.features[1].buttons.pop();
-
-      $('#membersTable').dataTable({
-        layout: layout,
       });
     });
   </script>

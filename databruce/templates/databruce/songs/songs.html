@@ -61,9 +61,8 @@
     layout.topEnd.features[1].buttons.pop();
 
     $(document).ready(function () {
-      $('#songsTable').dataTable({
+      new DataTable('#songsTable', {
         layout: layout,
-        pageLength: 100,
         columnDefs: [
           {
             target: -1,

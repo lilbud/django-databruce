@@ -1,39 +1,67 @@
 :root {
-    --main-bg-color: #27272a;
-    --nj-blue: #186eb1;
+    --denim-50: #f1f8ff;
+    --denim-100: #e2f1ff;
+    --denim-200: #c1e3ff;
+    --denim-300: #8ecdff;
+    --denim-400: #4fb3ff;
+    --denim-500: #309ff9;
+    --denim-600: #0e81d3;
+    --denim-700: #186eb1;
+    --denim-800: #11568d;
+    --denim-900: #1a4870;
+    --denim-950: #0b2e4b;
+
+    --dove-gray-50: #fafafa;
+    --dove-gray-100: #f5f5f5;
+    --dove-gray-200: #e5e5e5;
+    --dove-gray-300: #d4d4d4;
+    --dove-gray-400: #a1a1a1;
+    --dove-gray-500: #737373;
+    --dove-gray-600: #525252;
+    --dove-gray-700: #404040;
+    --dove-gray-800: #262626;
+    --dove-gray-850: #1e1e1e;
+    --dove-gray-900: #171717;
+    --dove-gray-950: #0a0a0a;
+
+    --font-heading: "Cabin", sans-serif;
+    --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
 
 body {
-    font-family: "Inter", sans-serif !important;
+    font-family: var(--font-body)
+}
+
+.card-header,
+.dt-column-title {
+    font-family: var(--font-heading);
 }
 
 .navbar {
     border: #dee2e6 1px;
 }
 
-.nj {
-    color: var(--nj-blue) !important;
-}
-
-body,
-table td {
-    background-color: var(--main-bg-color) !important;
-}
-
-table td {
-    background-color: none !important;
+body {
+    background-color: var(--dove-gray-900) !important;
 }
 
 .navbar,
 .card-header,
-table th {
-    background-color: var(--nj-blue) !important;
+table th,
+.select2-results__option--highlighted,
+.select2-results__option--selected,
+div.ui-menu-item-wrapper:hover {
+    background-color: var(--denim-700) !important;
+}
+
+.card,
+table>tbody>tr>td {
+    background-color: var(--dove-gray-850) !important;
 }
 
 table>tbody>tr>td {
     font-size: .8rem;
-    line-height: .65rem;
-    background-color: var(--bs-dark-bg-subtle) !important;
+    line-height: .8rem;
 }
 
 .dataTables_wrapper .dataTables_filter {
@@ -111,7 +139,6 @@ html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .se
 
 .select2-results__option--highlighted,
 .select2-results__option--selected {
-    background-color: var(--nj-blue) !important;
     color: var(--bs-body-color) !important;
 }
 
@@ -127,7 +154,6 @@ div.ui-menu-item-wrapper {
 }
 
 div.ui-menu-item-wrapper:hover {
-    background-color: var(--nj-blue) !important;
     border: 1px solid var(--bs-border-color) !important;
 }
 
@@ -168,7 +194,7 @@ table.dataTable thead .dt-column-order::after {
 
 .dt-container label,
 .dt-info {
-    font-size: .9rem;
+    font-size: .85rem;
 }
 
 tr td,
@@ -190,4 +216,16 @@ tr th {
 /* Hides the empty search/buttons row when there is none */
 .dt-container>div.row:has(.d-md-flex:empty) {
     display: none !important;
+}
+
+
+@media only screen and (max-width: 992px) {
+    .dt-container>div.row>.d-md-flex>.dt-buttons {
+        display: none !important;
+    }
+}
+
+.dt-layout-full {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }

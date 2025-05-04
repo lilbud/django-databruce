@@ -43,4 +43,5 @@ urlpatterns = [
     path("states/<int:id>", views.state_details, name="state_details"),
     path("countries/", views.countries, name="countries"),
     path("countries/<int:id>", views.country_details, name="country_details"),
+    path("events/runs", views.event_runs, name="runs"),
 ]

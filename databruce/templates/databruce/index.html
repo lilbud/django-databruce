@@ -28,26 +28,28 @@
       <div class="card h-100">
         <div class="card-body">
           <h4 class="mb-2">Recent Events</h4>
-          <table class="table table display nowrap" id="recentTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Location</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for event in recent %}
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="recentTable">
+              <thead>
                 <tr>
-                  <td class="nowrap">
-                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-                  </td>
-                  <td class="nowrap">
-                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                  </td>
+                  <th>Date</th>
+                  <th>Location</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for event in recent %}
+                  <tr>
+                    <td class="nowrap">
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td class="nowrap">
+                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -55,26 +57,28 @@
       <div class="card h-100">
         <div class="card-body">
           <h4 class="mb-2">Upcoming Events</h4>
-          <table class="table table display nowrap" id="upcomingTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Location</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for event in upcoming %}
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="upcomingTable">
+              <thead>
                 <tr>
-                  <td class="nowrap">
-                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-                  </td>
-                  <td class="nowrap">
-                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                  </td>
+                  <th>Date</th>
+                  <th>Location</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for event in upcoming %}
+                  <tr>
+                    <td class="nowrap">
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td class="nowrap">
+                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -82,26 +86,28 @@
       <div class="card h-100">
         <div class="card-body">
           <h4 class="mb-2">On This Day ({{ date|date:"F d" }})</h4>
-          <table class="table table display nowrap" id="otdTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Location</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for event in events %}
+          <div class="table-responsive p-0">
+            <table class="table table display nowrap" id="otdTable">
+              <thead>
                 <tr>
-                  <td class="nowrap">
-                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-                  </td>
-                  <td class="nowrap">
-                    <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                  </td>
+                  <th>Date</th>
+                  <th>Location</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for event in events %}
+                  <tr>
+                    <td class="nowrap">
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td class="nowrap">
+                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -112,7 +118,7 @@
     
     $(document).ready(function () {
       $('table.display').dataTable({
-        layout: layout,
+        
         searching: false,
         ordering: false,
         info: false,

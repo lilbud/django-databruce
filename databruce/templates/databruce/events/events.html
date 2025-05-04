@@ -75,12 +75,11 @@
     layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
 
     // remove item count at bottom
-    layout.bottomStart = null;
+    {% comment %} layout.bottomStart = null; {% endcomment %}
 
     $(document).ready(function () {
-      $('#table').dataTable({
+      new DataTable('#table', {
         layout: layout,
-        pageLength: 25,
         order: [[0, 'asc']],
         columnDefs: [
           { width: '150px', targets: 0 },

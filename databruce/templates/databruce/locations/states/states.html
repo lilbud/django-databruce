@@ -54,10 +54,9 @@
     layout.topEnd.features[1].buttons[0].config.columns = [1];
 
     $(document).ready(function () {
-      $('#stateTable').dataTable({
+      new DataTable('#stateTable', {
         layout: layout,
-        pageLength: 25,
-      })
+      });
     })
   </script>
 {% endblock content %}

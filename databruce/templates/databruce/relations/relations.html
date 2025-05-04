@@ -50,10 +50,9 @@
     layout.topEnd.features[1].buttons.pop();
 
     $(document).ready(function () {
-      $('#relationsTable').dataTable({
+      new DataTable('#relationsTable', {
         layout: layout,
         order: [[0, 'asc']],
-        pageLength: 25,
       });
     });
   </script>

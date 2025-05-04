@@ -30,7 +30,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Sans+Hebrew:wght@100;200;300;400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           rel="stylesheet">
     <!--Static-->
     {% load static %}
@@ -51,7 +51,6 @@
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-3">
-        {% load static %}
         <a class="navbar-brand pt-0" href="{% url 'databruce:index' %}">
           <img height="16px"
                width="auto"
@@ -81,6 +80,9 @@
                 </li>
                 <li>
                   <a class="dropdown-item" href="{% url 'databruce:tours' %}">Events By Tour</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'databruce:runs' %}">Events By Run</a>
                 </li>
               </ul>
             </li>
@@ -162,9 +164,9 @@
       </div>
     </nav>
     <div class="padded-body">
-      <div class="container-sm">
-        <div class="row mt-4 justify-content-between">
-          <div class="col px-4">
+      <div class="container-fluid px-4 py-4">
+        <div class="row">
+          <div class="col">
             {% block content %}
             {% endblock content %}
           </div>

@@ -122,7 +122,7 @@
       // custom searchBuilder columns definition
       layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
       
-      $('#eventTable').dataTable({
+      new DataTable('#eventTable', {
         layout: layout,
         order: [[0, 'asc']],
       });
@@ -130,13 +130,13 @@
       // removes searchBuilder button, not needed for this.
       layout.topEnd.features[1].buttons.pop();
 
-      $('#songTable').dataTable({
+      new DataTable('#songTable', {
         layout: layout,
         searching: false,
         order: [[1, 'desc']],
       });
 
-      $('#venueTable').dataTable({
+      new DataTable('#venueTable', {
         layout: layout,
         searching: false,
         order: [[2, 'desc']],

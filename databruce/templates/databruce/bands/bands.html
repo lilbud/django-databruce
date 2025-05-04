@@ -53,9 +53,8 @@
   layout.topEnd.features[1].buttons.pop();
 
   $(document).ready(function () {
-    $('#table').dataTable({
+    new DataTable('#table', {
       layout: layout,
-      pageLength: 25,
       columnDefs: [
         {
           target: -1,
@@ -81,7 +80,6 @@
                       .search($(this).val(), {regex: true})
                       .draw();
                 });
-              
               
               select.append('<option value=".*">All</option>');
               select.append('<option value="Yes">Bruce as member</option>');

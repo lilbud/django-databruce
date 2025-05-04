@@ -74,15 +74,9 @@
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
 
     $(document).ready(function () {
-      $('#songTable').dataTable({
+      new DataTable('#songTable',{
         layout: layout,
-        columnDefs: [
-          { width: '150px', targets: 0 },
-          { width: '275px', targets: [1, 2] },
-          { width: '200px', targets: 3 },
-          { width: '250px', targets: 4 },
-        ]
-      })
+      });
     })
   </script>
 {% endblock content %}

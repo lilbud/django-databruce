@@ -76,17 +76,13 @@
   layout.topEnd.features[1].buttons.pop()
   
   $(document).ready(function () {
-    $('#tracksTable').dataTable({
+    new DataTable('#tracksTable', {
       layout: layout,
       searching: false,
       paging: false,
       info: false,
       order: [[0, 'asc']],
-
     });
-
-    // hides the empty search row when no search bar is enabled
-    $(".dt-container .row:first-child").hide()
   });
   </script>
 {% endblock content %}

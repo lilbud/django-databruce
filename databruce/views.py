@@ -508,6 +508,8 @@ def band_details(request: HttpRequest, id: int):
         .order_by("relation")
     )
 
+    print(members.query)
+
     events = (
         models.Events.objects.filter(id__in=members.values_list("event"))
         .order_by(
@@ -709,4 +711,18 @@ def country_details(request: HttpRequest, id: int):
             "songs": songs,
             "venues": venues,
         },
+    )
+
+
+def event_runs(request: HttpRequest):
+    runs = (
+        models.Runs.objects.all()
+        .select_related("first", "last", "band", "first__venue")
+        .order_by("first")
+    )
+
+    return render(
+        request,
+        "databruce/events/runs.html",
+        {"runs": runs},
     )

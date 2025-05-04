@@ -15,7 +15,7 @@
         <div class="card-body">
           <h4>Events</h4>
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="eventsTable">
+            <table class="table table display nowrap" id="tourEvents">
               <thead>
                 <tr class="custom">
                   <th>Date</th>
@@ -118,24 +118,22 @@
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
 
     $(document).ready(function () {
-      $('#eventsTable').dataTable({
+      new DataTable('#tourEvents', {
         layout: layout,
-
       });
 
       // removes searchBuilder button, not needed for this.
       layout.topEnd.features[1].buttons.pop();
-      
-      $('#tourSongs').dataTable({
+
+      new DataTable('#tourLegs', {
         layout: layout,
         searching: false,
       });
 
-      $('#tourLegs').dataTable({
+      new DataTable('#tourSongs', {
         layout: layout,
-        paging: false,
-        info: false,
         searching: false,
+        pageLength: 10,
       });
     });
 

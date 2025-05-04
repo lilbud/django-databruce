@@ -1,5 +1,3 @@
-
-
 var layout = {
     topEnd: {
         features: [
@@ -34,14 +32,15 @@ var layout = {
 };
 
 $.extend(true, DataTable.defaults, {
-    order: [],
     searching: true,
     fixedHeader: true,
     scrollX: true,
+    pageLength: 25,
+    responsive: true,
     lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],
     language: {
         searchBuilder: {
-            button: ''
+            button: 'Filter'
         }
     },
 });

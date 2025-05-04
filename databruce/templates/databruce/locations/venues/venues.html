@@ -64,10 +64,9 @@
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3];
     
     $(document).ready(function () {
-      $('#venueTable').dataTable({
+      new DataTable('#venueTable', {
         layout: layout,
         order: [[0, 'asc']],
-        pageLength: 25,
       })
     })
   </script>

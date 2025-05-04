@@ -83,7 +83,7 @@
     layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
 
     $(document).ready(function () {
-      $('#eventTable').dataTable({
+      new DataTable('#eventTable', {
         layout: layout,
         order: [[0, 'asc']],
       });

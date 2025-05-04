@@ -18,9 +18,9 @@
                 <th scope="col">Act</th>
                 <th scope="col">First</th>
                 <th scope="col">Last</th>
-                <th scope="col">Shows</th>
-                <th scope="col">Songs</th>
-                <th scope="col">Legs</th>
+                <th scope="col" class="text-center">Shows</th>
+                <th scope="col" class="text-center">Songs</th>
+                <th scope="col" class="text-center">Legs</th>
               </tr>
             </thead>
             <tbody>
@@ -57,15 +57,9 @@
     layout.bottomStart = null;
 
     $(document).ready(function () {
-      $('#tourTable').dataTable({
+      new DataTable('#tourTable', {
         layout: layout,
-        paging: false,
-        info: false,
         order: [[3, 'desc']],
-        columnDefs: [
-          { width: '300px', targets: 0 },
-          { width: '175px', targets: [2, 3] },
-        ]
       });
     });
   </script>

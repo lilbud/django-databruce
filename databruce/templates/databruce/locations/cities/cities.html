@@ -60,12 +60,11 @@
   </div>
   <script>
     // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, -1];
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2];
 
     $(document).ready(function () {
-      $('#cityTable').dataTable({
+      new DataTable('#cityTable', {
         layout: layout,
-        pageLength: 25,
       });
     });
   </script>

@@ -1311,3 +1311,48 @@ class Runs(models.Model):
         managed = False
         db_table = "runs"
         verbose_name_plural = db_table
+
+
+class Sessions(models.Model):
+    band = models.ForeignKey(
+        "Bands",
+        models.DO_NOTHING,
+        db_column="band",
+        blank=True,
+        null=True,
+    )
+    name = models.TextField()
+    num_events = models.IntegerField(blank=True, null=True)
+    num_songs = models.IntegerField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField()
+
+    first = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        db_column="session_first_event",
+        blank=True,
+        null=True,
+    )
+
+    last = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        db_column="last_event",
+        related_name="session_last_event",
+        blank=True,
+        null=True,
+    )
+
+    release = models.ForeignKey(
+        Releases,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        db_column="album",
+    )
+
+    class Meta:
+        managed = False
+        db_table = "runs"
+        verbose_name_plural = db_table

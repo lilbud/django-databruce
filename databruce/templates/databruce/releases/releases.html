@@ -48,9 +48,8 @@
     layout.topEnd.features[1].buttons.pop()
 
     $(document).ready(function () {
-      $('#releasesTable').dataTable({
+      new DataTable('#releasesTable', {
         layout: layout,
-        pageLength: 25,
         initComplete: function () {
           this.api()
           .columns([-2])
