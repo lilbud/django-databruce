@@ -10,16 +10,12 @@
         <div class="card-header">Show Info</div>
         <div class="card-body">
           <div class="row">
-            <h4 class="mb-1">{{ event }}</h4>
+            <h4 class="mb-1">
+              {{ event }} - <a class="text-body-secondary"
+    href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+            </h4>
             <p>
               <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist }}</a>
-            </p>
-          </div>
-          <div class="row">
-            <strong>Venue:</strong>
-            <p>
-              <a class="text-body-secondary"
-                 href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
             </p>
           </div>
           <div class="row">

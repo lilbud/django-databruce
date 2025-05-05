@@ -74,7 +74,7 @@ def songs(request: HttpRequest):
     songs = (
         models.Songs.objects.all()
         .filter(Q(num_plays_public__gte=1) | Q(num_plays_snippet__gte=1))
-        .select_related("first", "last")
+        .select_related("first", "last", "first__venue", "last__venue")
         .order_by("name")
     )
 
@@ -717,7 +717,7 @@ def country_details(request: HttpRequest, id: int):
 def event_runs(request: HttpRequest):
     runs = (
         models.Runs.objects.all()
-        .select_related("first", "last", "band", "first__venue")
+        .select_related("first", "last", "band", "first__venue", "last__venue")
         .order_by("first")
     )
 

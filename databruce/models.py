@@ -464,12 +464,10 @@ class Venues(models.Model):
         verbose_name_plural = db_table
 
     def __str__(self):
-        venue = self.name
-
         if self.detail:
-            venue += f", {self.detail}"
+            return f"{self.name}, {self.detail}"
 
-        return venue
+        return self.name
 
 
 class SetlistsByDate(models.Model):
@@ -918,11 +916,15 @@ class Songs(models.Model):
     closer = models.IntegerField(default=0)
     cover = models.IntegerField(default=0)
     sniponly = models.IntegerField(default=0)
+
     original_artist = models.TextField(
         blank=True,
         default=None,
         verbose_name="Original Artist",
     )
+
+    original = models.BooleanField(default=False)
+
     aliases = models.TextField(blank=True, default=None)
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)

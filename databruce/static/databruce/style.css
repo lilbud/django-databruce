@@ -24,6 +24,9 @@
     --dove-gray-900: #171717;
     --dove-gray-950: #0a0a0a;
 
+    --card: #18181b;
+    --background: #0e0e11;
+
     --font-heading: "Cabin", sans-serif;
     --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
@@ -31,6 +34,7 @@
 body {
     font-family: var(--font-body)
 }
+
 
 .card-header,
 .dt-column-title {
@@ -42,7 +46,7 @@ body {
 }
 
 body {
-    background-color: var(--dove-gray-900) !important;
+    background-color: var(--background) !important;
 }
 
 .navbar,
@@ -56,7 +60,11 @@ div.ui-menu-item-wrapper:hover {
 
 .card,
 table>tbody>tr>td {
-    background-color: var(--dove-gray-850) !important;
+    background-color: var(--card) !important;
+}
+
+.card {
+    border-radius: 20px !important;
 }
 
 table>tbody>tr>td {
@@ -88,7 +96,7 @@ a:hover {
 
 .dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
     width: 700px !important;
-    transform: translateX(-8%) !important;
+    transform: translateX(-2%) !important;
 }
 
 /* Select 2 bootstrap-5 theme override */
@@ -207,6 +215,10 @@ tr th {
     display: none;
 }
 
+.img-fluid {
+    border-radius: inherit !important;
+}
+
 .headimg {
     width: 100%;
     height: 15vw;
@@ -228,4 +240,8 @@ tr th {
 .dt-layout-full {
     padding-left: 0 !important;
     padding-right: 0 !important;
+}
+
+.button>span {
+    padding-left: 8px
 }

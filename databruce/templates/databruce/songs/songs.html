@@ -21,7 +21,7 @@
                   <th class="col">Name</th>
                   <th class="col">First</th>
                   <th class="col">Last</th>
-                  <th class="col">Plays</th>
+                  <th class="col text-center">Plays</th>
                   <th class="col">Original Artist</th>
                   <th class="col">Original?</th>
                 </tr>
@@ -33,15 +33,25 @@
                       <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
                     </td>
                     <td>
-                      <a href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
+                      <a data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-html="true"
+                         data-bs-title="<div>{{ song.first }}<br>{{ song.first.venue }}</div>"
+                         href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
                     </td>
                     <td>
-                      <a href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
+                      <a data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-html="true"
+                         data-bs-title="<div>{{ song.last }}<br>{{ song.last.venue }}</div>"
+                         href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
                     </td>
                     <td class="text-center">{{ song.num_plays_public }}</td>
-                    <td>{{ song.original_artist }}</td>
                     <td>
-                      {% if song.original_artist == 'Bruce Springsteen' %}
+                      {% if not song.original %}{{ song.original_artist }}{% endif %}
+                    </td>
+                    <td>
+                      {% if song.original %}
                         Original
                       {% else %}
                         Cover

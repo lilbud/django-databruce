@@ -33,10 +33,18 @@
                     <a href="{% url "databruce:band_details" id=tour.band.id %}">{{ tour.band.name }}</a>
                   </td>
                   <td>
-                    <a href="{% url 'databruce:event_details' event=tour.first.id %}">{{ tour.first }}</a>
+                    <a data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-html="true"
+                       data-bs-title="<div>{{ tour.first }}<br>{{ tour.first.venue }}</div>"
+                       href="{% url 'databruce:event_details' event=tour.first.id %}">{{ tour.first }}</a>
                   </td>
                   <td>
-                    <a href="{% url 'databruce:event_details' event=tour.last.id %}">{{ tour.last }}</a>
+                    <a data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-html="true"
+                       data-bs-title="<div>{{ tour.last }}<br>{{ tour.last.venue }}</div>"
+                       href="{% url 'databruce:event_details' event=tour.last.id %}">{{ tour.last }}</a>
                   </td>
                   <td class="text-center">{{ tour.num_shows }}</td>
                   <td class="text-center">{{ tour.num_songs }}</td>
@@ -52,9 +60,6 @@
   <script>
     // searchBuilder custom columns
     layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6]
-
-    // remove item count at bottom
-    layout.bottomStart = null;
 
     $(document).ready(function () {
       new DataTable('#tourTable', {

@@ -78,7 +78,7 @@
                     </td>
                     {% with venue=song.current.event.venue %}
                       <td>
-                        <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue }}</a>
+                        <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue.name }}</a>
                       </td>
                     {% endwith %}
                     <td>{{ song.current.last|default_if_none:"" }}</td>

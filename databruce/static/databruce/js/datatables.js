@@ -35,12 +35,16 @@ $.extend(true, DataTable.defaults, {
     searching: true,
     fixedHeader: true,
     scrollX: true,
+    info: true,
     pageLength: 25,
     responsive: true,
     lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],
     language: {
         searchBuilder: {
-            button: 'Filter'
+            button: '&nbspFilter'
         }
+    },
+    drawCallback: function (settings) {
+        $('[data-bs-toggle="tooltip"]').tooltip();
     },
 });

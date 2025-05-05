@@ -20,7 +20,7 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Band</th>
                                     <th scope="col">Venue</th>
-                                    <th scope="col"class="text-center"># Shows</th>
+                                    <th scope="col"class="text-center">Events</th>
                                     <th scope="col">First</th>
                                     <th scope="col">Last</th>
                                 </tr>
@@ -37,10 +37,18 @@
                                         </td>
                                         <td class="text-center">{{ run.num_shows }}</td>
                                         <td>
-                                            <a href="{% url "databruce:event_details" event=run.first.id %}">{{ run.first }}</a>
+                                            <a data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-html="true"
+                                               data-bs-title="<div>{{ run.last }}<br>{{ run.last.venue }}</div>"
+                                               href="{% url "databruce:event_details" event=run.first.id %}">{{ run.first }}</a>
                                         </td>
                                         <td>
-                                            <a href="{% url "databruce:event_details" event=run.last.id %}">{{ run.last }}</a>
+                                            <a data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-html="true"
+                                               data-bs-title="<div>{{ run.last }}<br>{{ run.last.venue }}</div>"
+                                               href="{% url "databruce:event_details" event=run.last.id %}">{{ run.last }}</a>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -58,6 +66,7 @@
         $(document).ready(function () {
             new DataTable('#table', {
                 layout: layout,
+                order: [[4, 'asc']],
             });
         });
     </script>
