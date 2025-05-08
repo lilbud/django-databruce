@@ -1,7 +1,13 @@
-<div class="row">
-    <div class="col-3 col-md-2 col-form-label text-sm-right">Song:</div>
-    <div class="col-8 col-md-4">{{ form.song }}</div>
-    <div class="col-4 col-md-1 offset-3 offset-md-0 p-md-0">{{ form.choice }}</div>
-    <div class="col-8 col-md-2 offset-3 offset-md-0">{{ form.position }}</div>
-    <div class="col-8 col-md-3 offset-3 offset-md-0 p-md-0" id="song2">{{ form.song2 }}</div>
-</div>
+<label class="col-3 col-md-2 col-form-label text-sm-right">
+    Song:
+    <button class="btn ml-2 p-0"
+            type="reset"
+            id="remove-form-btn"
+            onclick="removeForm(this)">
+        <i class="bi bi-x-circle-fill text-danger"></i>
+    </button>
+</label>
+<div class="col-8 col-md-4">{{ form.song1 }}</div>
+<div class="col-4 col-md-1 offset-3 offset-md-0 p-md-0">{{ form.choice }}</div>
+<div class="col-8 col-md-2 offset-3 offset-md-0">{{ form.position }}</div>
+<div class="col-8 col-md-3 offset-3 offset-md-0 p-md-0">{{ form.song2 }}</div>

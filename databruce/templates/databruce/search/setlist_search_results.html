@@ -14,7 +14,10 @@
     <div class="card">
       <div class="card-body">
         <div class="col">
-          <h6>{{ result }}</h6>
+          {% for result in results %}
+            <h6>{{ result }}</h6>
+            {% if not forloop.last %}<h6>AND</h6>{% endif %}
+          {% endfor %}
         </div>
       </div>
     </div>

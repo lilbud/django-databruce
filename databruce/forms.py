@@ -3,9 +3,10 @@ import datetime
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Reset, Submit
+from dal import autocomplete
 from django import forms
 from django.db.models import Q
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.dates import MONTHS
 from django_select2 import forms as s2forms
 
@@ -18,7 +19,7 @@ class AdvancedEventSearch(forms.Form):
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, D107
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = "get"
+        self.helper.form_method = "post"
 
         self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
         self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
@@ -42,6 +43,13 @@ class AdvancedEventSearch(forms.Form):
         ("5", "Thursday"),
         ("6", "Friday"),
         ("7", "Saturday"),
+        ("8", "Not Sunday"),
+        ("9", "Not Monday"),
+        ("10", "Not Tuesday"),
+        ("11", "Not Wednesday"),
+        ("12", "Not Thursday"),
+        ("13", "Not Friday"),
+        ("14", "Not Saturday"),
     ]
 
     def get_states():
@@ -58,9 +66,16 @@ class AdvancedEventSearch(forms.Form):
 
     def get_cities():
         cities = [("", "")]
+
         cities.extend(
-            models.Cities.objects.all().order_by("name").values_list("id", "name"),
+            [
+                (item.id, item)
+                for item in models.Cities.objects.all()
+                .select_related("state", "country")
+                .order_by("name")
+            ],
         )
+
         return cities
 
     def get_countries():
@@ -147,37 +162,43 @@ class AdvancedEventSearch(forms.Form):
 
     city = forms.ChoiceField(
         label="City:",
-        choices=get_cities(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "citySelect"}),
+        choices=get_cities(),
+        widget=forms.Select(attrs={"class": "form-select select2", "id": "citySelect"}),
     )
 
     state = forms.ChoiceField(
         label="State:",
         choices=get_states(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "stateSelect"}),
+        widget=forms.Select(
+            attrs={"class": "form-select select2", "id": "stateSelect"},
+        ),
     )
 
     country = forms.ChoiceField(
         label="Country:",
         choices=get_countries(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "countrySelect"}),
+        widget=forms.Select(
+            attrs={"class": "form-select select2", "id": "countrySelect"},
+        ),
     )
 
     musician = forms.ChoiceField(
         label="Musician:",
         choices=get_musicians(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "musicianSelect"}),
+        widget=forms.Select(
+            attrs={"class": "form-select select2", "id": "musicianSelect"},
+        ),
     )
 
     band = forms.ChoiceField(
         label="Band:",
         choices=get_bands(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "bandSelect"}),
+        widget=forms.Select(attrs={"class": "form-select select2", "id": "bandSelect"}),
     )
 
     def clean_first_date(self):
@@ -234,36 +255,42 @@ class AdvancedEventSearch(forms.Form):
 
         return list(range(1, 32))
 
+    def clean_day_of_week(self):
+        if self.cleaned_data["day_of_week"]:
+            return [self.cleaned_data["day_of_week"]]
+
+        return list(range(1, 8))
+
     def clean_band(self):
         if self.cleaned_data["band"]:
             return [self.cleaned_data["band"]]
 
-        return models.Bands.objects.all().values_list("id")
+        return models.Bands.objects.all().values_list("id", flat=True)
 
     def clean_city(self):
         if self.cleaned_data["city"]:
             return [self.cleaned_data["city"]]
 
-        return models.Cities.objects.all().values_list("id")
+        return models.Cities.objects.all().values_list("id", flat=True)
 
     def clean_country(self):
         if self.cleaned_data["country"]:
             return [self.cleaned_data["country"]]
 
-        return models.Countries.objects.all().values_list("id")
+        return models.Countries.objects.all().values_list("id", flat=True)
 
     def clean_musician(self):
         if self.cleaned_data["musician"]:
             return [self.cleaned_data["musician"]]
 
-        return models.Relations.objects.all().values_list("id")
+        return models.Relations.objects.all().values_list("id", flat=True)
 
 
 class SetlistSearch(forms.Form):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = "get"
+        self.helper.form_method = "post"
         self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
         self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
 
@@ -275,12 +302,12 @@ class SetlistSearch(forms.Form):
         .values_list("id", "name"),
     )
 
-    song = forms.ChoiceField(
+    song1 = forms.ChoiceField(
         label="Song:",
         choices=songs,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select", "id": "songSelect"},
+            attrs={"class": "form-select song1"},
         ),
     )
 
@@ -289,7 +316,7 @@ class SetlistSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select", "id": "isNotSelect"},
+            attrs={"class": "form-select choice"},
         ),
     )
 
@@ -297,17 +324,26 @@ class SetlistSearch(forms.Form):
         label=None,
         choices=[
             ("anywhere", "Anywhere"),
+            ("followed_by", "Followed By"),
             ("show_opener", "Show Opener"),
+            ("in_show", "in Main Set"),
+            ("in_set_one", "in Set 1"),
+            ("set_one_opener", "Set 1 Opener"),
             ("set_one_closer", "Set 1 Closer"),
+            ("in_set_two", "in Set 2"),
             ("set_two_opener", "Set 2 Opener"),
+            ("set_two_closer", "Set 2 Closer"),
             ("main_set_closer", "Main Set Closer"),
             ("encore_opener", "Encore Opener"),
+            ("in_encore", "Encore"),
+            ("in_preshow", "Pre-Show"),
+            ("in_recording", "Recording"),
+            ("in_soundcheck", "Soundcheck"),
             ("show_closer", "Show Closer"),
-            ("followed_by", "Followed By"),
         ],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select", "id": "positionSelect"},
+            attrs={"class": "form-select position"},
         ),
     )
 
@@ -317,8 +353,7 @@ class SetlistSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select",
-                "id": "song2Select",
+                "class": "form-select song2",
             },
         ),
     )
@@ -326,13 +361,22 @@ class SetlistSearch(forms.Form):
     def clean_position(self):
         positions = {
             "anywhere": "Anywhere",
+            "followed_by": "Followed By",
             "show_opener": "Show Opener",
+            "in_show": "Show",
+            "in_set_one": "Set 1",
+            "set_one_opener": "Set 1 Opener",
             "set_one_closer": "Set 1 Closer",
+            "in_set_two": "Set 2",
             "set_two_opener": "Set 2 Opener",
+            "set_two_closer": "Set 2 Closer",
             "main_set_closer": "Main Set Closer",
             "encore_opener": "Encore Opener",
+            "in_encore": "Encore",
+            "in_preshow": "Pre-Show",
+            "in_recording": "Recording",
+            "in_soundcheck": "Soundcheck",
             "show_closer": "Show Closer",
-            "followed_by": "Followed By",
         }
 
         return positions.get(self.cleaned_data["position"])

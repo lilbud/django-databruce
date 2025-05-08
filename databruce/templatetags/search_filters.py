@@ -28,6 +28,13 @@ def get_day_from_num(num: int):
         5: "Thursday",
         6: "Friday",
         7: "Saturday",
+        8: "Not Sunday",
+        9: "Not Monday",
+        10: "Not Tuesday",
+        11: "Not Wednesday",
+        12: "Not Thursday",
+        13: "Not Friday",
+        14: "Not Saturday",
     }
 
     return days.get(int(num))
@@ -61,19 +68,6 @@ def get_relation(relation: int):
 @register.filter(name="get_band")
 def get_band(band: int):
     return models.Bands.objects.get(id=band).name
-
-
-@register.simple_tag
-def weekdays():
-    return {
-        1: "Sunday",
-        2: "Monday",
-        3: "Tuesday",
-        4: "Wednesday",
-        5: "Thursday",
-        6: "Friday",
-        7: "Saturday",
-    }
 
 
 @register.filter(name="get_ordinal")

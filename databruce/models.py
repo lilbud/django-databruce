@@ -773,6 +773,7 @@ class Onstage(models.Model):
 
     note = models.TextField(blank=True, default=None)
     instruments = models.TextField(blank=True, default=None)
+    guest = models.BooleanField(default=False)
 
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)

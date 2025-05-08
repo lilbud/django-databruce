@@ -1,0 +1,6 @@
+<a data-bs-toggle="tooltip"
+   role="button"
+   data-bs-placement="top"
+   data-bs-html="true"
+   data-bs-title="<div>{{ event }}<br>{{ event.artist }}<br>{{ event.venue }}</div>"
+   href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>

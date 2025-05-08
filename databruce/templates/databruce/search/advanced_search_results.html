@@ -16,36 +16,40 @@
         <div class="col">
           <div id="row">
             <div class="d-flex flex-column">
-              {% if request.GET.first_date %}
-                {% include "./result_row.html" with label="Start Date:" data=request.GET.first_date %}
+              {% if request.POST.first_date %}
+                {% include "./result_row.html" with label="Start Date:" data=request.POST.first_date %}
               {% endif %}
-              {% if request.GET.last_date %}
-                {% include "./result_row.html" with label="End Date:" data=request.GET.last_date %}
+              {% if request.POST.last_date %}
+                {% include "./result_row.html" with label="End Date:" data=request.POST.last_date %}
               {% endif %}
-              {% if request.GET.month %}
-                {% include "./result_row.html" with label="Month:" data=request.GET.month|get_month %}
+              {% if request.POST.month %}
+                {% include "./result_row.html" with label="Month:" data=request.POST.month|get_month %}
               {% endif %}
-              {% if request.GET.day %}
-                {% include "./result_row.html" with label="Day:" data=request.GET.day|get_ordinal %}
+              {% if request.POST.day %}
+                {% include "./result_row.html" with label="Day:" data=request.POST.day|get_ordinal %}
               {% endif %}
-              {% if request.GET.day_of_week %}
-                {% include "./result_row.html" with label="Day of Week:" data=request.GET.day_of_week|get_day %}
+              {% if request.POST.day_of_week %}
+                {% include "./result_row.html" with label="Day of Week:" data=request.POST.day_of_week|get_day %}
               {% endif %}
-              {% if request.GET.city %}
-                {% include "./result_row.html" with label="City:" data=request.GET.city %}
+              {% if request.POST.city %}
+                {% include "./result_row.html" with label="City:" data=request.POST.city|get_city %}
               {% endif %}
-              {% if request.GET.state %}
-                {% include "./result_row.html" with label="State:" data=request.GET.state|get_state %}
+              {% if request.POST.state %}
+                {% include "./result_row.html" with label="State:" data=request.POST.state|get_state %}
               {% endif %}
-              {% if request.GET.country %}
-                {% include "./result_row.html" with label="Country:" data=request.GET.country %}
+              {% if request.POST.country %}
+                {% include "./result_row.html" with label="Country:" data=request.POST.country|get_country %}
               {% endif %}
-              {% if request.GET.musician %}
-                {% include "./result_row.html" with label="Musician:" data=request.GET.musician|get_relation %}
+              {% if request.POST.musician %}
+                {% include "./result_row.html" with label="Musician:" data=request.POST.musician|get_relation %}
               {% endif %}
-              {% if request.GET.band %}
-                {% include "./result_row.html" with label="Band:" data=request.GET.band|get_band %}
+              {% if request.POST.band %}
+                {% include "./result_row.html" with label="Band:" data=request.POST.band|get_band %}
               {% endif %}
+              {% for result in results %}
+                <h6>{{ result }}</h6>
+                {% if not forloop.last %}<h6>AND</h6>{% endif %}
+              {% endfor %}
             </div>
           </div>
         </div>

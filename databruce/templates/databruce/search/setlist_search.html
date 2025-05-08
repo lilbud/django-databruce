@@ -11,33 +11,28 @@
   <div class="row">
     <div class="input-group">
       <div class="col-12">
-        <form id="form-container"
-              action="{% url 'databruce:setlist_search_results' %}">
-          {% include "./setlist_form.html" with form=form %}
-          <div class="btn-group mt-4" role="group">
-            <input type="submit" name="submit" value="Go" class="btn btn-primary">
-            <input type="reset"
-                   id="reset"
-                   name="reset"
-                   value="Clear"
-                   class="btn btn-secondary">
-          </div>
+        <form id="search-form"
+              action="{% url 'databruce:setlist_search_results' %}"
+              method="post">
+          {% csrf_token %}
+          {{ formset.management_form.as_p }}
+          {% for form in formset.forms %}
+            <div class="row mb-2" id="song_row-{{ forloop.counter0 }}">
+              {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
+            </div>
+          {% endfor %}
+          <button id="submit-button"
+                  type="submit"
+                  name="submit"
+                  class="btn btn-primary">Go</button>
+          <button id="add-form-btn" type="button" name="add" class="btn btn-secondary">Add Row</button>
         </div>
       </form>
     </div>
-    <div class="row invisible">
-      <div class="col-3 col-md-2 col-form-label text-sm-right">Song:</div>
-      <div class="col-8 col-md-4">{{ form.song }}</div>
-      <div class="col-4 col-md-1 offset-3 offset-md-0 p-md-0">{{ form.choice }}</div>
-      <div class="col-8 col-md-2 offset-3 offset-md-0">{{ form.position }}</div>
-      <div class="col-8 col-md-3 offset-3 offset-md-0 p-md-0" id="song2">{{ form.song2 }}</div>
-    </div>
+  </div>
+  <div id="new_row" class="row invisible mb-2">
+    {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/setlist_search.js' %}"></script>
-  <script type='text/javascript'>
-    $(document).ready(function () {
-      select2();
-    });
-  </script>
 {% endblock content %}

@@ -8,12 +8,12 @@ $(document).ready(function () {
         dropdownCssClass: "form-control",
         minimumInputLength: 3,
         dropdownPosition: 'below',
+        allowClear: true,
+        placeholder: '',
         width: 'resolve' // need to override the changed default
     };
 
-    $('#citySelect').select2(selectOptions);
-    $('#stateSelect').select2(selectOptions);
-    $('#countrySelect').select2(selectOptions);
-    $('#musicianSelect').select2(selectOptions);
-    $('#bandSelect').select2(selectOptions);
+    document.querySelectorAll(".select2").forEach(element => {
+        $(`#${element.id}`).select2(selectOptions);
+    });
 });

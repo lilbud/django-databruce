@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "crispy-bootstrap5>=2025.4",
     "django==5.1.7",
+    "django-autocomplete-light>=3.12.1",
     "django-crispy-forms==2.3",
     "django-debug-toolbar==5.1.0",
     "django-filter==24.3",

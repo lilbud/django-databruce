@@ -37,7 +37,6 @@ $.extend(true, DataTable.defaults, {
     scrollX: true,
     info: true,
     pageLength: 25,
-    responsive: true,
     lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],
     language: {
         searchBuilder: {

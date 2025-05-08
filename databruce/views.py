@@ -6,6 +6,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.forms import formset_factory
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 
@@ -28,7 +29,7 @@ def index(request: HttpRequest):
             "venue__country",
         )
         .order_by("-id")
-    )[:10]
+    )[:5]
 
     recent_events = (
         models.Events.objects.filter(date__lte=DATE)
@@ -40,7 +41,7 @@ def index(request: HttpRequest):
             "venue__state",
             "venue__country",
         )
-    )[:10]
+    )[:5]
 
     upcoming_events = (
         models.Events.objects.filter(date__gte=DATE)
@@ -52,7 +53,7 @@ def index(request: HttpRequest):
             "venue__state",
             "venue__country",
         )
-    )[:10]
+    )[:5]
 
     return render(
         request,
@@ -86,7 +87,18 @@ def songs(request: HttpRequest):
 
 
 def event_details(request: HttpRequest, event: str):
-    event_info = models.Events.objects.filter(id=event).first()
+    event_info = (
+        models.Events.objects.filter(id=event)
+        .select_related(
+            "venue",
+            "artist",
+            "tour",
+            "venue__city",
+            "venue__state",
+            "venue__country",
+        )
+        .first()
+    )
 
     setlist = (
         models.Setlists.objects.filter(event__id=event)
@@ -101,18 +113,33 @@ def event_details(request: HttpRequest, event: str):
         .order_by("band_id", "relation__name")
     )
 
+    guests = (
+        models.Onstage.objects.filter(event__id=event, guest=True)
+        .select_related("relation")
+        .order_by("band_id", "relation__name")
+    )
+
     notes = models.SetlistNotes.objects.filter(event__id=event).order_by("num")
     footnotes = notes.distinct("num")
 
-    try:
-        prev_event = models.Events.objects.filter(id__lt=event).order_by("id").last()
-    except AttributeError:  # if this is the first event, loop to most recent
-        prev_event = models.Events.objects.order_by("id").last()
+    events = models.Events.objects.order_by("id").select_related(
+        "venue",
+        "artist",
+        "tour",
+        "venue__city",
+        "venue__state",
+        "venue__country",
+    )
 
-    try:
-        next_event = models.Events.objects.filter(id__gt=event).order_by("id").first()
-    except AttributeError:  # if this is the most recent event, loop to first event
-        next_event = models.Events.objects.order_by("id").first()
+    prev_event = events.filter(id__lt=event).last()
+
+    next_event = events.filter(id__gt=event).first()
+
+    if prev_event is None:
+        prev_event = events.last()
+
+    if next_event is None:
+        next_event = events.first()
 
     context = {
         "event": event_info,
@@ -121,6 +148,7 @@ def event_details(request: HttpRequest, event: str):
         "notes": notes,
         "footnotes": footnotes,
         "onstage": on_stage,
+        "guests": guests,
         "last_event": prev_event,
         "next_event": next_event,
     }
@@ -184,8 +212,7 @@ def venue(request: HttpRequest, id: int):  # noqa: A002
 
     songs = (
         models.Setlists.objects.filter(
-            event__venue__city__id=id,
-            set_name__in=["Show", "Set 1", "Set 2", "Pre-Show", "Encore", "Post-Show"],
+            event__venue__id=id,
         )
         .order_by("song", "event")
         .select_related("song", "event")
@@ -237,65 +264,6 @@ def song(request: HttpRequest, id: int):  # noqa: A002
     return render(request, "databruce/songs/song_details.html", context)
 
 
-def advanced_search_results(request: HttpRequest):
-    form = forms.AdvancedEventSearch(request.GET)
-
-    if form.is_valid():
-        if len(form.cleaned_data["musician"]) == 1:
-            events = models.Onstage.objects.filter(
-                relation__in=form.cleaned_data["musician"],
-            ).values_list("event")
-
-            result = models.Events.objects.filter(
-                Q(id__in=events)
-                & Q(date__gte=form.cleaned_data["first_date"])
-                & Q(date__lte=form.cleaned_data["last_date"])
-                & Q(date__month__in=form.cleaned_data["month"])
-                & Q(date__day__in=form.cleaned_data["day"])
-                & Q(venue__city__id__in=form.cleaned_data["city"])
-                & Q(venue__country__id__in=form.cleaned_data["country"]),
-            )
-
-        elif len(form.cleaned_data["band"]) == 1:
-            events = models.Onstage.objects.filter(
-                band__in=form.cleaned_data["band"],
-            ).values_list("event")
-
-            result = models.Events.objects.filter(
-                Q(id__in=events)
-                & Q(date__gte=form.cleaned_data["first_date"])
-                & Q(date__lte=form.cleaned_data["last_date"])
-                & Q(date__month__in=form.cleaned_data["month"])
-                & Q(date__day__in=form.cleaned_data["day"])
-                & Q(venue__city__id__in=form.cleaned_data["city"])
-                & Q(venue__country__id__in=form.cleaned_data["country"]),
-            )
-        else:
-            result = models.Events.objects.filter(
-                Q(date__gte=form.cleaned_data["first_date"])
-                & Q(date__lte=form.cleaned_data["last_date"])
-                & Q(date__month__in=form.cleaned_data["month"])
-                & Q(date__day__in=form.cleaned_data["day"])
-                & Q(venue__city__id__in=form.cleaned_data["city"])
-                & Q(venue__country__id__in=form.cleaned_data["country"]),
-            )
-
-        result = result.select_related(
-            "artist",
-            "venue",
-            "tour",
-            "venue__city",
-            "venue__state",
-            "venue__country",
-        )
-
-    return render(
-        request,
-        "databruce/search/advanced_search_results.html",
-        {"events": result.order_by("id"), "fields": form},
-    )
-
-
 def event_search(request: HttpRequest):
     query = request.GET.get("event_date")
 
@@ -305,12 +273,6 @@ def event_search(request: HttpRequest):
         return redirect(f"/events/{result.first().id}")
 
     return render(request, "databruce/search/search.html", {"events": result})
-
-
-def advanced_search(request: HttpRequest):
-    form = forms.AdvancedEventSearch(request.GET)
-
-    return render(request, "databruce/search/advanced_search.html", {"form": form})
 
 
 def tours(request: HttpRequest):
@@ -362,22 +324,239 @@ def tour_details(request: HttpRequest, id: int):
     )
 
 
+def advanced_search(request: HttpRequest):
+    form = forms.AdvancedEventSearch(request.POST)
+    SetlistFormSet = formset_factory(forms.SetlistSearch)
+    data = {
+        "form-TOTAL_FORMS": "1",
+        "form-INITIAL_FORMS": "0",
+    }
+
+    setlist_formset = SetlistFormSet(data)
+
+    return render(
+        request,
+        "databruce/search/advanced_search.html",
+        {"form": form, "formset": setlist_formset},
+    )
+
+
+def advanced_search_results(request: HttpRequest):
+    form = forms.AdvancedEventSearch(request.POST)
+    SetlistFormSet = formset_factory(forms.SetlistSearch)
+
+    data = {
+        "song1": "",
+        "choice": "is",
+        "position": "anywhere",
+        "song2": "",
+    }
+
+    formset = SetlistFormSet(data=request.POST)
+
+    if form.is_valid():
+        event_filter = (
+            Q(date__gte=form.cleaned_data["first_date"])
+            & Q(date__lte=form.cleaned_data["last_date"])
+            & Q(date__month__in=form.cleaned_data["month"])
+            & Q(date__day__in=form.cleaned_data["day"])
+            & Q(venue__city__id__in=form.cleaned_data["city"])
+            & Q(venue__country__id__in=form.cleaned_data["country"])
+        )
+
+        if len(form.cleaned_data["day_of_week"]) == 1:
+            if int(form.cleaned_data["day_of_week"][0]) > 7:
+                event_filter.add(
+                    ~Q(
+                        date__week_day__in=[
+                            int(form.cleaned_data["day_of_week"][0]) - 7,
+                        ],
+                    ),
+                    Q.AND,
+                )
+            else:
+                event_filter.add(
+                    Q(date__week_day__in=form.cleaned_data["day_of_week"]),
+                    Q.AND,
+                )
+
+        if form.cleaned_data["band"]:
+            events = (
+                models.Onstage.objects.filter(
+                    Q(band__in=form.cleaned_data["band"]),
+                )
+                .distinct("event")
+                .values_list("event")
+            )
+
+            event_filter.add(Q(id__in=events), Q.AND)
+
+        if form.cleaned_data["musician"]:
+            events = (
+                models.Onstage.objects.filter(
+                    Q(relation__in=form.cleaned_data["musician"]),
+                )
+                .distinct("event")
+                .values_list("event")
+            )
+
+            event_filter.add(Q(id__in=events), Q.AND)
+
+    results = []
+    event_results = []
+
+    if formset.is_valid():
+        for form in formset.cleaned_data:
+            try:
+                song = models.Songs.objects.get(id=form["song1"]).name
+
+                if form["position"] != "Followed By":
+                    position_filter = Q(current__position=form["position"])
+
+                    if form["position"] == "Anywhere":
+                        position_filter = Q(current__set_name__isnull=False)
+
+                    if form["choice"] == "is":
+                        setlist_filter = (
+                            Q(current__song__id=form["song1"]) & position_filter
+                        )
+
+                    elif form["choice"] == "not":
+                        setlist_filter = (
+                            Q(current__song__id=form["song1"]) & ~position_filter
+                        )
+
+                    qs = models.SongsPage.objects.filter(
+                        setlist_filter,
+                        current__set_name__in=[
+                            "Show",
+                            "Set 1",
+                            "Set 2",
+                            "Encore",
+                            "Pre-Show",
+                            "Post-Show",
+                        ],
+                    )
+                    events_list = qs.values_list("current__event", flat=True)
+                    results.append(
+                        f"Song: {song} ({form['choice']} {form['position']})",
+                    )
+                else:
+                    song2 = models.Songs.objects.get(id=form["song2"]).name
+
+                    if form["choice"] == "is":
+                        setlist_filter = Q(current__song__id=form["song1"]) & Q(
+                            next__song__id=form["song2"],
+                        )
+
+                    elif form["choice"] == "not":
+                        setlist_filter = Q(current__song__id=form["song1"]) & ~Q(
+                            next__song__id=form["song2"],
+                        )
+
+                    qs = models.SongsPage.objects.filter(
+                        setlist_filter,
+                        current__set_name__in=[
+                            "Show",
+                            "Set 1",
+                            "Set 2",
+                            "Encore",
+                            "Pre-Show",
+                            "Post-Show",
+                        ],
+                    )
+                    events_list = qs.values_list("current__event", flat=True)
+                    results.append(
+                        f"Song: {song} ({form['choice']} followed by) {song2}",
+                    )
+
+                event_results.append(list(events_list))
+            except ValueError:
+                continue
+
+        if event_results:
+            event_filter.add(
+                Q(id__in=list(set.intersection(*map(set, event_results)))),
+                Q.AND,
+            )
+
+    result = models.Events.objects.filter(
+        event_filter,
+    ).select_related(
+        "venue",
+        "artist",
+        "venue__city",
+        "venue__city__state",
+        "venue__city__country",
+        "venue__city__state__country",
+        "venue__state",
+        "venue__country",
+        "tour",
+    )
+
+    return render(
+        request,
+        "databruce/search/advanced_search_results.html",
+        {"events": result.order_by("id"), "results": results},
+    )
+
+
 def setlist_search(request: HttpRequest):
-    form = forms.SetlistSearch(request.GET)
-    return render(request, "databruce/search/setlist_search.html", {"form": form})
+    SetlistFormSet = formset_factory(forms.SetlistSearch)
+    setlist_formset = SetlistFormSet()
+
+    return render(
+        request,
+        "databruce/search/setlist_search.html",
+        {"formset": setlist_formset},
+    )
 
 
 def setlist_search_results(request: HttpRequest):
-    form = forms.SetlistSearch(request.GET)
+    SetlistFormSet = formset_factory(forms.SetlistSearch)
+    formset = SetlistFormSet(request.POST)
+    results = []
+    event_results = []
 
-    if form.is_valid():
-        song = models.Songs.objects.get(id=form.cleaned_data["song"]).name
+    if formset.is_valid():
+        for form in formset.cleaned_data:
+            song = models.Songs.objects.get(id=form["song1"]).name
 
-        if form.cleaned_data["position"] != "Followed By":
-            position_filter = Q(position=form.cleaned_data["position"])
-            if form.cleaned_data["position"] == "Anywhere":
-                position_filter = Q(
-                    set_name__in=[
+            if form["position"] != "Followed By":
+                position_filter = Q(current__position=form["position"])
+
+                if form["position"] == "Anywhere":
+                    position_filter = Q(current__set_name__isnull=False)
+
+                if form["choice"] == "is":
+                    setlist_filter = (
+                        Q(current__song__id=form["song1"]) & position_filter
+                    )
+
+                elif form["choice"] == "not":
+                    setlist_filter = (
+                        Q(current__song__id=form["song1"]) & ~position_filter
+                    )
+
+                qs = models.SongsPage.objects.filter(setlist_filter)
+                events_list = qs.values_list("current__event", flat=True)
+                results.append(f"{song} ({form['choice']} {form['position']})")
+            else:
+                song2 = models.Songs.objects.get(id=form["song2"]).name
+
+                if form["choice"] == "is":
+                    setlist_filter = Q(current__song__id=form["song1"]) & Q(
+                        next__song__id=form["song2"],
+                    )
+
+                elif form["choice"] == "not":
+                    setlist_filter = Q(current__song__id=form["song1"]) & ~Q(
+                        next__song__id=form["song2"],
+                    )
+
+                qs = models.SongsPage.objects.filter(
+                    setlist_filter,
+                    current__set_name__in=[
                         "Show",
                         "Set 1",
                         "Set 2",
@@ -386,59 +565,27 @@ def setlist_search_results(request: HttpRequest):
                         "Post-Show",
                     ],
                 )
+                events_list = qs.values_list("current__event", flat=True)
+                results.append(f"{song} ({form['choice']} followed by) {song2}")
 
-            if form.cleaned_data["choice"] == "is":
-                results = models.Setlists.objects.filter(
-                    Q(song=form.cleaned_data["song"]) & position_filter,
-                ).order_by("id")
+            event_results.append(list(events_list))
 
-            elif form.cleaned_data["choice"] == "not":
-                results = models.Setlists.objects.exclude(
-                    Q(song=form.cleaned_data["song"]) & position_filter,
-                ).order_by("id")
-
-            events = models.Events.objects.filter(
-                id__in=results.values_list("event"),
-            ).order_by("id")
-
-            result = f"{song} ({form.cleaned_data['choice']} {form.cleaned_data['position']})"
-
-        else:
-            song2 = models.Songs.objects.get(id=form.cleaned_data["song2"]).name
-
-            if form.cleaned_data["choice"] == "is":
-                setlist_filter = Q(current__song__id=form.cleaned_data["song"]) & Q(
-                    next__song__id=form.cleaned_data["song2"],
-                )
-
-            elif form.cleaned_data["choice"] == "not":
-                setlist_filter = Q(current__song__id=form.cleaned_data["song"]) & ~Q(
-                    next__song__id=form.cleaned_data["song2"],
-                )
-
-            results = models.SongsPage.objects.filter(
-                setlist_filter,
+        events = (
+            models.Events.objects.filter(
+                id__in=list(set.intersection(*map(set, event_results))),
             )
+            .order_by("id")
+            .select_related(
+                "venue",
+                "artist",
+                "venue__city",
+                "venue__state",
+                "venue__country",
+                "tour",
+            )
+        )
 
-            events = models.Events.objects.filter(
-                id__in=results.values_list("current__event"),
-            ).order_by("id")
-
-            result = f"{song} ({form.cleaned_data['choice']} followed by) {song2}"
-
-    events = events.select_related(
-        "venue",
-        "venue__city",
-        "venue__state",
-        "venue__country",
-        "artist",
-        "tour",
-    )
-
-    context = {
-        "events": events,
-        "result": result,
-    }
+        context = {"results": results, "events": events}
 
     return render(
         request,

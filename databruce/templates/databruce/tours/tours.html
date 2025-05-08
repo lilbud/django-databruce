@@ -32,20 +32,8 @@
                   <td>
                     <a href="{% url "databruce:band_details" id=tour.band.id %}">{{ tour.band.name }}</a>
                   </td>
-                  <td>
-                    <a data-bs-toggle="tooltip"
-                       data-bs-placement="top"
-                       data-bs-html="true"
-                       data-bs-title="<div>{{ tour.first }}<br>{{ tour.first.venue }}</div>"
-                       href="{% url 'databruce:event_details' event=tour.first.id %}">{{ tour.first }}</a>
-                  </td>
-                  <td>
-                    <a data-bs-toggle="tooltip"
-                       data-bs-placement="top"
-                       data-bs-html="true"
-                       data-bs-title="<div>{{ tour.last }}<br>{{ tour.last.venue }}</div>"
-                       href="{% url 'databruce:event_details' event=tour.last.id %}">{{ tour.last }}</a>
-                  </td>
+                  <td data-sort="{{ tour.first.id }}">{% include "../partials/event_tooltip.html" with event=tour.first %}</td>
+                  <td data-sort="{{ tour.last.id }}">{% include "../partials/event_tooltip.html" with event=tour.last %}</td>
                   <td class="text-center">{{ tour.num_shows }}</td>
                   <td class="text-center">{{ tour.num_songs }}</td>
                   <td class="text-center">{{ tour.num_legs }}</td>

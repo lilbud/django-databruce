@@ -43,4 +43,9 @@ router.register(r"tour_legs", views.TourLegsViewSet, basename="tour_leg")
 urlpatterns = [
     path("api/", include(router.urls)),
     path("event_autocomplete", views.event_search, name="events_auto"),
+    path(
+        "city_autocomplete/",
+        views.CityAutocomplete.as_view(),
+        name="city-autocomplete",
+    ),
 ]
