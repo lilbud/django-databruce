@@ -1,59 +1,53 @@
-{% extends "databruce/base.html" %}
-{% load filters %}
+{% extends "databruce/category.html" %}
 {% block title %}
   Tours
 {% endblock title %}
-{% block content %}
-  <div class="row mb-4">
-    <h4>Tours</h4>
-  </div>
-  <div class="row">
-    <div class="card">
-      <div class="card-body px-0">
-        <div class="table-responsive p-0">
-          <table class="table table display nowrap" id="tourTable">
-            <thead>
-              <tr class="header">
-                <th scope="col">Name</th>
-                <th scope="col">Act</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col" class="text-center">Shows</th>
-                <th scope="col" class="text-center">Songs</th>
-                <th scope="col" class="text-center">Legs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for tour in tours %}
-                <tr>
-                  <td>
-                    <a href="{% url "databruce:tour_details" id=tour.id %}">{{ tour.name }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url "databruce:band_details" id=tour.band.id %}">{{ tour.band.name }}</a>
-                  </td>
-                  <td data-sort="{{ tour.first.id }}">{% include "../partials/event_tooltip.html" with event=tour.first %}</td>
-                  <td data-sort="{{ tour.last.id }}">{% include "../partials/event_tooltip.html" with event=tour.last %}</td>
-                  <td class="text-center">{{ tour.num_shows }}</td>
-                  <td class="text-center">{{ tour.num_songs }}</td>
-                  <td class="text-center">{{ tour.num_legs }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+{% block info_row %}
+  <h4>Tours</h4>
+{% endblock info_row %}
+{% block table_id %}
+  tourTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr class="header">
+      <th class="all" scope="col">Name</th>
+      <th class="min-tablet" scope="col">First</th>
+      <th class="min-tablet" scope="col">Last</th>
+      <th scope="col" class="text-center all">Shows</th>
+      <th scope="col" class="text-center min-tablet">Songs</th>
+      <th scope="col" class="text-center min-tablet">Legs</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for tour in tours %}
+      <tr>
+        <td class="wrap">
+          <a href="{% url "databruce:tour_details" id=tour.id %}">{{ tour.name }}</a>
+        </td>
+        <td>
+          <a href="{% url 'databruce:event_details' event=tour.first.id %}">{{ tour.first }}</a>
+        </td>
+        <td>
+          <a href="{% url 'databruce:event_details' event=tour.last.id %}">{{ tour.last }}</a>
+        </td>
+        <td class="text-center">{{ tour.num_shows }}</td>
+        <td class="text-center">{{ tour.num_songs }}</td>
+        <td class="text-center">{{ tour.num_legs }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
   <script>
-    // searchBuilder custom columns
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6]
+  // searchBuilder custom columns
+  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6]
 
-    $(document).ready(function () {
-      new DataTable('#tourTable', {
-        layout: layout,
-        order: [[3, 'desc']],
-      });
+  $(document).ready(function () {
+    new DataTable('#tourTable', {
+      layout: layout,
+      order: [[3, 'desc']],
     });
+  });
   </script>
-{% endblock content %}
+{% endblock scripts %}

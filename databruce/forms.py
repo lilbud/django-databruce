@@ -57,6 +57,7 @@ class AdvancedEventSearch(forms.Form):
 
         states.extend(
             models.States.objects.all()
+            .prefetch_related("country")
             .distinct("name")
             .order_by("name")
             .values_list("id", "name"),
@@ -110,7 +111,8 @@ class AdvancedEventSearch(forms.Form):
         return bands
 
     first_date = forms.CharField(
-        label="Start Date:",
+        label="Start Date",
+        label_suffix=":",
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -125,7 +127,8 @@ class AdvancedEventSearch(forms.Form):
     )
 
     last_date = forms.CharField(
-        label="Last Date:",
+        label="Last Date",
+        label_suffix=":",
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -140,35 +143,40 @@ class AdvancedEventSearch(forms.Form):
     )
 
     month = forms.ChoiceField(
-        label="Month:",
+        label="Month",
+        label_suffix=":",
         choices=get_months(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     day = forms.ChoiceField(
-        label="Day:",
+        label="Day",
+        label_suffix=":",
         choices=get_days(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     day_of_week = forms.ChoiceField(
-        label="Day of Week:",
+        label="Day of Week",
+        label_suffix=":",
         choices=days_of_week,
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     city = forms.ChoiceField(
-        label="City:",
+        label="City",
+        label_suffix=":",
         required=False,
         choices=get_cities(),
         widget=forms.Select(attrs={"class": "form-select select2", "id": "citySelect"}),
     )
 
     state = forms.ChoiceField(
-        label="State:",
+        label="State",
+        label_suffix=":",
         choices=get_states(),
         required=False,
         widget=forms.Select(
@@ -177,7 +185,8 @@ class AdvancedEventSearch(forms.Form):
     )
 
     country = forms.ChoiceField(
-        label="Country:",
+        label="Country",
+        label_suffix=":",
         choices=get_countries(),
         required=False,
         widget=forms.Select(
@@ -186,7 +195,8 @@ class AdvancedEventSearch(forms.Form):
     )
 
     musician = forms.ChoiceField(
-        label="Musician:",
+        label="Musician",
+        label_suffix=":",
         choices=get_musicians(),
         required=False,
         widget=forms.Select(
@@ -195,10 +205,21 @@ class AdvancedEventSearch(forms.Form):
     )
 
     band = forms.ChoiceField(
-        label="Band:",
+        label="Band",
+        label_suffix=":",
         choices=get_bands(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select select2", "id": "bandSelect"}),
+    )
+
+    conjunction = forms.ChoiceField(
+        label="Conjunction",
+        label_suffix=":",
+        choices=[("and", "AND"), ("or", "OR")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select", "id": "conjunctionSelect"},
+        ),
     )
 
     def clean_first_date(self):
@@ -380,3 +401,26 @@ class SetlistSearch(forms.Form):
         }
 
         return positions.get(self.cleaned_data["position"])
+
+
+class EventSearch(forms.Form):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
+
+    date = forms.CharField(
+        label="",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "id": "eventSearch",
+                "type": "search",
+                "name": "date",
+                "placeholder": "YYYY-MM-DD",
+                "maxlength": 10,
+                "class": "form-control",
+            },
+        ),
+    )

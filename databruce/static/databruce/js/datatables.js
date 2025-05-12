@@ -34,7 +34,12 @@ var layout = {
 $.extend(true, DataTable.defaults, {
     searching: true,
     fixedHeader: true,
-    scrollX: true,
+    responsive: {
+        details: {
+            type: 'inline',
+            target: 'tr'
+        }
+    },
     info: true,
     pageLength: 25,
     lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],

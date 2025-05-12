@@ -9,7 +9,7 @@
       <a href="{% url 'databruce:songs' %}">Songs</a> &gt; {{ song_info.name }}
     </h4>
   </div>
-  <div class="row mb-4 row-cols-1 row-cols-md-2 g-4">
+  <div class="row mb-4 row-cols-1 row-cols-md-2 g-4 mt-0">
     <div class="col">
       <div class="card h-100">
         <div class="card-body">
@@ -78,7 +78,9 @@
                       {% if song.current.event.tour %}{{ song.current.event.tour }}{% endif %}
                     </td>
                     <td>
-                      {% if song.current.position %}{{ song.current.position }}{% endif %}
+                      {% if song.current.position and song.current.position != song.current.set_name %}
+                        {{ song.current.position }}
+                      {% endif %}
                     </td>
                     {% with venue=song.current.event.venue %}
                       <td>
@@ -119,7 +121,7 @@
         layout: layout,
         initComplete: function () {
           this.api()
-          .columns([4])
+          .columns([5])
             .every(function () {
               var column = this;
 

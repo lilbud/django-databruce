@@ -1,0 +1,29 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+{% endblock title %}
+{% block content %}
+  <div class="row mb-4">
+    <div class="col">
+      {% block info_row %}
+      {% endblock info_row %}
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body px-0">
+          <div class="table-responsive p-0">
+            <table class="table display"
+                   id="{% spaceless %}{% block table_id %}{% endblock table_id %}{% endspaceless %}">
+              {% block table %}
+              {% endblock table %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% block scripts %}
+  {% endblock scripts %}
+{% endblock content %}

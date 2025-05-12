@@ -1,50 +1,41 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/category.html" %}
 {% block title %}
   Relations
 {% endblock title %}
-{% block content %}
-  <div class="row mb-4">
-    <div class="col">
-      <h4>Relations</h4>
-      <h6>People who have shared a stage or appeared at an event with Bruce.</h6>
-    </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="relationsTable">
-              <thead>
-                <tr class="header">
-                  <th scope="col">Name</th>
-                  <th scope="col">First</th>
-                  <th scope="col">Last</th>
-                  <th class="text-center" scope="col">Events</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for relation in relations %}
-                  <tr>
-                    <td>
-                      <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation }}</a>
-                    </td>
-                    <td>
-                      {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}
-                    </td>
-                    <td>
-                      {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
-                    </td>
-                    <td class="text-center">{{ relation.appearances }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+{% block info_row %}
+  <h4>Relations</h4>
+  <h6>People who have shared a stage or appeared at an event with Bruce.</h6>
+{% endblock info_row %}
+{% block table_id %}
+  relationsTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr class="header">
+      <th scope="col">Name</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th class="text-center" scope="col">Events</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for relation in relations %}
+      <tr>
+        <td>
+          <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation }}</a>
+        </td>
+        <td>
+          {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}
+        </td>
+        <td>
+          {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
+        </td>
+        <td class="text-center">{{ relation.appearances }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons.pop();
@@ -56,4 +47,4 @@
       });
     });
   </script>
-{% endblock content %}
+{% endblock scripts %}

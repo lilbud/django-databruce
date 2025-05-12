@@ -1,129 +1,117 @@
-{% extends "databruce/base.html" %}
-{% load filters %}
+{% extends "databruce/category.html" %}
 {% block title %}
-  Events &gt; {{ year }}
+  Events
 {% endblock title %}
-{% block content %}
-  <div class="row mb-4">
-    <div class="col">
-      <h4>Events</h4>
-    </div>
-    <div class="col-3">
-      <select class="form-select form-select-sm" id="year_select">
-        <option selected disabled hidden>{{ year }}</option>
-        {% for i in years %}
-          <option value="{% url "databruce:events_year" year=i %}">{{ i }}</option>
-        {% endfor %}
-      </select>
-    </div>
+{% block info_row %}
+  <h4>Events</h4>
+  <div class="col-3 col-md-1">
+    <select class="form-select form-select-sm" id="year_select">
+      <option selected disabled hidden>{{ year }}</option>
+      {% for i in years %}
+        <option value="{% url "databruce:events_year" year=i %}">{{ i }}</option>
+      {% endfor %}
+    </select>
   </div>
-  <div class="row">
-    <div class="card">
-      <div class="card-body px-0">
-        <div class="table-responsive p-0">
-          <table class="table table display nowrap" id="table">
-            <thead>
-              <tr class="custom">
-                <th class="all" scope="col">Date</th>
-                <th class="min-tablet" scope="col">Band</th>
-                <th class="min-tablet" scope="col">Venue</th>
-                <th class="all" scope="col">Location</th>
-                <th class="min-tablet" scope="col">Tour</th>
-                <th class="min-tablet" scope="col">Detail</th>
-                <th class="min-tablet" scope="col">Public</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for event in event_info %}
-                <tr>
-                  <td scope="row">
-                    <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-                  </td>
-                  <td>
-                    {% if event.venue.id != 1964 %}
-                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                        {{ event.venue.city.name }},
-                        {% if event.venue.state %}
-                          {{ event.venue.state.state_abbrev }}
-                        {% else %}
-                          {{ event.venue.country.name }}
-                        {% endif %}
-                      {% endif %}
-                    </a>
-                  </td>
-                  <td>
-                    <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                  </td>
-                  <td>{{ event.event_title|default_if_none:'' }}</td>
-                  <td>{{ event.public|default_if_none:'' }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+{% endblock info_row %}
+{% block table_id %}
+  eventTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr class="custom">
+      <th class="all" scope="col">Date</th>
+      <th class="min-tablet-l" scope="col">Band</th>
+      <th class="all" scope="col">Venue</th>
+      <th class="min-tablet-l" scope="col">Tour</th>
+      <th class="min-tablet-l" scope="col">Detail</th>
+      <th class="min-tablet-l" scope="col">Public</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in event_info %}
+      <tr>
+        <td scope="row" class="text-nowrap">
+          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+        </td>
+        <td>
+          {% if event.artist %}
+            <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+          {% endif %}
+        </td>
+        <td>
+          <div class="row">
+            <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+          </div>
+          <div class="row">
+            <span>
+              {% if event.venue.city %}
+                <a class="text-secondary"
+                   href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+              {% endif %}
+            </span>
+          </div>
+        </td>
+        <td>
+          {% if event.tour %}
+            <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+          {% endif %}
+        </td>
+        <td>{{ event.event_title|default_if_none:'' }}</td>
+        <td>{{ event.public|default_if_none:'' }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
   <script>
-    // searchBuilder custom columns
-    layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
+  //searchBuilder custom columns
+  layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
 
-    // remove item count at bottom
-    {% comment %} layout.bottomStart = null; {% endcomment %}
+  $(document).ready(function () {
+    new DataTable('#eventTable', {
+      layout: layout,
+      order: [[0, 'asc']],
+      columnDefs: [
+        { target: -1, visible: false }
+      ],
+      initComplete: function () {
+        this.api()
+          .columns([-1])
+          .every(function () {
+              var column = this;
 
-    $(document).ready(function () {
-      new DataTable('#table', {
-        layout: layout,
-        order: [[0, 'asc']],
-        columnDefs: [
-          { width: '150px', targets: 0 },
-          { target: -1, visible: false }
-        ],
-        initComplete: function () {
-          this.api()
-            .columns([-1])
-            .every(function () {
-                var column = this;
+              $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="select">Publicity:</label></div><div class="col" id="select"></div></div>').appendTo($('#dropdown-container'));
 
-                $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="select">Publicity:</label></div><div class="col" id="select"></div></div>').appendTo($('#dropdown-container'));
-  
-                // this appears to be the only way to add a select filter
-                // without going through ajax calls. I originally had a pre-made dropdown in
-                // another file and included it like above, however, I had to use an ajax call
-                // otherwise it would appear but not work
-                var select = $('<select id="type" class="custom-select form-select form-select-sm"></select>')
-                  .appendTo($('#select'))
-                  .on('change', function () {
-                      column
-                        .search($(this).val(), {regex: true})
-                        .draw();
-                  });
-                
-                
-                select.append('<option value=".*">All</option>');
-                select.append('<option value="True">Public</option>');
-                select.append('<option value="False">Private</option>');
-            });
-        },
-      });
+              // this appears to be the only way to add a select filter
+              // without going through ajax calls. I originally had a pre-made dropdown in
+              // another file and included it like above, however, I had to use an ajax call
+              // otherwise it would appear but not work
+              var select = $('<select id="type" class="form-select form-select-sm"></select>')
+                .appendTo($('#select'))
+                .on('change', function () {
+                    column
+                      .search($(this).val(), {regex: true})
+                      .draw();
+                });
+              
+              select.append('<option value=".*">All</option>');
+              select.append('<option value="True">Public</option>');
+              select.append('<option value="False">Private</option>');
+          });
+      },
+    });
 
-      $(function(){
-        // bind change event to select
-        $('#year_select').on('change', function () {
-            var url = $(this).val() // get selected value
-            console.log(url);
-            if (url) { // require a URL
-                window.location = url; // redirect
-            }
-            return false;
-        });
+    $(function(){
+      // bind change event to select
+      $('#year_select').on('change', function () {
+          var url = $(this).val() // get selected value
+          console.log(url);
+          if (url) { // require a URL
+              window.location = url; // redirect
+          }
+          return false;
       });
     });
+  });
   </script>
-{% endblock content %}
+{% endblock scripts %}

@@ -231,21 +231,23 @@ def event_search(request: HttpRequest):
 
     if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
         q = request.GET.get("term", "")
+        results = []
 
-        search_qs = (
-            models.Events.objects.filter(date__startswith=q)
-            .order_by("date")
-            .distinct("date")
-        )
+        search_qs = models.Events.objects.filter(date__startswith=q).order_by("date")
 
-        results = [
-            {
+        for r in search_qs:
+            result = {
                 "id": r.id,
                 "value": f"{r.date.strftime('%Y-%m-%d [%a]')} - {r.venue.city}",
                 "date": r.date.strftime("%Y-%m-%d"),
             }
-            for r in search_qs
-        ]
+
+            if r.early_late:
+                result["value"] = (
+                    f"{r.date.strftime('%Y-%m-%d [%a]')} {r.early_late} - {r.venue.city}"
+                )
+
+            results.append(result)
 
         data = json.dumps(results)
         print(data)

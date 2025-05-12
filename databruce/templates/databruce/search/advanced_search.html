@@ -10,48 +10,52 @@
           id="search-form">
       {% csrf_token %}
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.first_date.label_tag }}</div>
+        {{ form.first_date.label_tag }}
         <div class="col-5 col-md-2">{{ form.first_date }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.last_date.label_tag }}</div>
+        {{ form.last_date.label_tag }}
         <div class="col-5 col-md-2">{{ form.last_date }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.month.label_tag }}</div>
-        <div class="col-5 col-md-2">{{ form.month }}</div>
+        {{ form.month.label_tag }}
+        <div class="col-5 col-md-1">{{ form.month }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.day.label_tag }}</div>
+        {{ form.day.label_tag }}
         <div class="col-3 col-md-1">{{ form.day }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.day_of_week.label_tag }}</div>
-        <div class="col-5 col-md-2">{{ form.day_of_week }}</div>
+        {{ form.day_of_week.label_tag }}
+        <div class="col-6 col-md-2">{{ form.day_of_week }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.city.label_tag }}</div>
+        {{ form.city.label_tag }}
         <div class="col-8 col-md-3">{{ form.city }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.state.label_tag }}</div>
+        {{ form.state.label_tag }}
         <div class="col-8 col-md-3">{{ form.state }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.country.label_tag }}</div>
+        {{ form.country.label_tag }}
         <div class="col-8 col-md-3">{{ form.country }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.musician.label_tag }}</div>
+        {{ form.musician.label_tag }}
         <div class="col-8 col-md-3">{{ form.musician }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col-4 col-md-2 col-form-label text-sm-right">{{ form.band.label_tag }}</div>
+        {{ form.band.label_tag }}
         <div class="col-8 col-md-3">{{ form.band }}</div>
+      </div>
+      <div class="row mb-3">
+        {{ form.conjunction.label_tag }}
+        <div class="col-3 col-md-1">{{ form.conjunction }}</div>
       </div>
       {{ formset.management_form.as_p }}
       {% for form in formset.forms %}
-        <div class="row mb-2" id="song_row-{{ forloop.counter0 }}">
+        <div class="row mb-4" id="song_row-{{ forloop.counter0 }}">
           {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
         </div>
       {% endfor %}
@@ -61,11 +65,19 @@
               class="btn btn-primary">Go</button>
       <button id="add-form-btn" type="button" name="add" class="btn btn-secondary">Add Row</button>
     </form>
-    <div id="new_row" class="row invisible mb-2">
+    <div id="new_row" class="row invisible mb-4">
       {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
     </div>
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/advanced_search.js' %}"></script>
   <script src="{% static 'databruce/js/setlist_search.js' %}"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      document.querySelectorAll("label").forEach(element => {
+        element.classList.add("col-3","col-md-2","form-label","text-sm-end")
+      });
+    });
+
+  </script>
 {% endblock content %}

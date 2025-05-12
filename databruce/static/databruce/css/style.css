@@ -1,37 +1,4 @@
-:root {
-    --denim-50: #f1f8ff;
-    --denim-100: #e2f1ff;
-    --denim-200: #c1e3ff;
-    --denim-300: #8ecdff;
-    --denim-400: #4fb3ff;
-    --denim-500: #309ff9;
-    --denim-600: #0e81d3;
-    --denim-700: #186eb1;
-    --denim-800: #11568d;
-    --denim-900: #1a4870;
-    --denim-950: #0b2e4b;
-
-
-
-    --dove-gray-50: #fafafa;
-    --dove-gray-100: #f5f5f5;
-    --dove-gray-200: #e5e5e5;
-    --dove-gray-300: #d4d4d4;
-    --dove-gray-400: #a1a1a1;
-    --dove-gray-500: #737373;
-    --dove-gray-600: #525252;
-    --dove-gray-700: #404040;
-    --dove-gray-800: #262626;
-    --dove-gray-850: #1e1e1e;
-    --dove-gray-900: #171717;
-    --dove-gray-950: #0a0a0a;
-
-    --card: #18181b;
-    --background: #0e0e11;
-
-    --font-heading: "Cabin", sans-serif;
-    --font-body: "IBM Plex Sans Hebrew", sans-serif;
-}
+@import './colors.css';
 
 body {
     font-family: var(--font-body)
@@ -53,21 +20,27 @@ body {
 }
 
 body {
-    background-color: var(--dove-gray-950) !important;
+    background-color: var(--zinc-950) !important;
 }
 
 .navbar,
 table th,
 .select2-results__option--highlighted,
 .select2-results__option--selected,
-div.ui-menu-item-wrapper:hover {
-    background-color: var(--denim-700) !important;
+div.ui-menu-item-wrapper:hover,
+.btn-primary {
+    background-color: var(--sky-700) !important;
 }
+
 
 .card,
 table>tbody>tr>td,
 .list-group-item {
-    background-color: var(--dove-gray-900) !important;
+    background-color: var(--zinc-900) !important;
+}
+
+.card {
+    border: 1px solid var(--zinc-800) !important;
 }
 
 .list-group-item,
@@ -83,7 +56,6 @@ table>tbody>tr>td,
     border-top-left-radius: inherit !important;
     border-top-right-radius: inherit !important;
 }
-
 
 table>tbody>tr>td {
     font-size: 0.875rem;
@@ -242,14 +214,13 @@ tr th {
     object-fit: cover;
 }
 
-/* Hides the empty search/buttons row when there is none */
-.dt-container>div.row:has(.d-md-flex:empty) {
-    display: none !important;
-}
-
-
 @media only screen and (max-width: 992px) {
     .dt-container>div.row>.d-md-flex>.dt-buttons {
+        display: none !important;
+    }
+
+    /* Hides the empty search/buttons row when there is none */
+    .dt-container>div.row:has(.d-md-flex:empty) {
         display: none !important;
     }
 }
@@ -261,4 +232,8 @@ tr th {
 
 .button>span {
     padding-left: 8px
+}
+
+.text-sm-right {
+    text-align: right !important;
 }

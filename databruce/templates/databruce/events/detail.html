@@ -180,21 +180,6 @@
                       </div>
                     {% endif %}
                   {% endfor %}
-                  {% comment %}
-                  {% for member in onstage %}
-                    {% if member.relation.id != 255 and not member.guest %}
-                      <li class="list-group-item">
-                        <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                        {% if member.band %}
-                          {% if member.band.springsteen_band %}
-                            <span class="badge rounded-pill text-bg-primary">{{ member.band.name }}</span>
-                          {% else %}
-                            <span class="badge rounded-pill text-bg-secondary">{{ member.band.name }}</span>
-                          {% endif %}
-                        {% endif %}
-                      </li>
-                    {% endif %}
-                  {% endfor %} {% endcomment %}
                 </ul>
               </div>
             </div>

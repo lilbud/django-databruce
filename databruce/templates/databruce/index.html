@@ -25,8 +25,8 @@
       <div class="row row-cols-1 row-cols-md-1 g-4 mb-4">
         <div class="col">
           <div class="card h-100">
-            <div class="card-body">
-              <h4 class="mb-2">Recent Events</h4>
+            <div class="card-body px-0">
+              <h4 class="mx-3">Recent Events</h4>
               <div class="table-responsive p-0">
                 <table class="table table display nowrap" id="recentTable">
                   <thead>
@@ -58,8 +58,8 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <div class="card-body">
-              <h4 class="mb-2">Upcoming Events</h4>
+            <div class="card-body px-0">
+              <h4 class="mx-3">Upcoming Events</h4>
               <div class="table-responsive p-0">
                 <table class="table table display nowrap" id="upcomingTable">
                   <thead>
@@ -91,10 +91,12 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <div class="card-body">
-              <h4 class="mb-2">
-                On This Day ({{ date|date:"F d" }})  <span class="text-reset"><a href="{% url "databruce:adv_search_results" %}?month={{ date|date:"n" }}&day={{ date|date:"j" }}&submit=Go">see more</a></span>
+            <div class="card-body px-0">
+              <h4 class="mx-3">
+                On This Day ({{ date|date:"F d" }})
+                <a href="{% url 'databruce:adv_search_results' %}">see more</a>
               </h4>
+              <h6 class="mx-3 text-secondary">Click link above to go to event search</h6>
               <div class="table-responsive p-0">
                 <table class="table table display nowrap" id="otdTable">
                   <thead>

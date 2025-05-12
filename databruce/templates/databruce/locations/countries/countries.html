@@ -1,51 +1,45 @@
-{% extends "databruce/base.html" %}
-{% load filters %}
+{% extends "databruce/category.html" %}
 {% block title %}
   Countries
 {% endblock title %}
-{% block content %}
-  <div class="row mb-4">
-    <h4>Countries</h4>
-    <h6>Countries that Bruce has played in</h6>
-  </div>
-  <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="table-responsive p-0">
-          <table class="table table" id="countryTable">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th class="text-center" scope="col">Events</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for country in countries %}
-                <tr>
-                  <td>
-                    <a href="{% url "databruce:country_details" id=country.id %}">{{ country }}</a>
-                  </td>
-                  <td>
-                    {% if country.first %}
-                      <a href="{% url "databruce:event_details" event=country.first.id %}">{{ country.first }}</a>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if country.last %}
-                      <a href="{% url "databruce:event_details" event=country.last.id %}">{{ country.last }}</a>
-                    {% endif %}
-                  </td>
-                  <td class="text-center">{{ country.num_events }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+{% block info_row %}
+  <h4>Countries</h4>
+  <h6>Countries that Bruce has played in</h6>
+{% endblock info_row %}
+{% block table_id %}
+  countryTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th class="text-center" scope="col">Events</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for country in countries %}
+      <tr>
+        <td>
+          <a href="{% url "databruce:country_details" id=country.id %}">{{ country }}</a>
+        </td>
+        <td>
+          {% if country.first %}
+            <a href="{% url "databruce:event_details" event=country.first.id %}">{{ country.first }}</a>
+          {% endif %}
+        </td>
+        <td>
+          {% if country.last %}
+            <a href="{% url "databruce:event_details" event=country.last.id %}">{{ country.last }}</a>
+          {% endif %}
+        </td>
+        <td class="text-center">{{ country.num_events }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
   <script>
     // custom searchBuilder columns definition
     layout.topEnd.features[1].buttons[0].config.columns = [3];
@@ -57,4 +51,4 @@
       })
     })
   </script>
-{% endblock content %}
+{% endblock scripts %}

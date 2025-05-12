@@ -249,6 +249,7 @@ class Cities(models.Model):
                 return f"{self.name}, {self.state.state_abbrev}"
 
             return f"{self.name}, {self.state}"
+
         except:
             return f"{self.name}, {self.country}"
 
@@ -464,10 +465,13 @@ class Venues(models.Model):
         verbose_name_plural = db_table
 
     def __str__(self):
-        if self.detail:
-            return f"{self.name}, {self.detail}"
+        try:
+            if self.detail:
+                return f"{self.name}, {self.detail}"
 
-        return self.name
+            return self.name
+        except TypeError:
+            return "Name"
 
 
 class SetlistsByDate(models.Model):
@@ -710,7 +714,7 @@ class PremiereDebut(models.Model):
 class Relations(models.Model):
     id = models.AutoField(primary_key=True)
     brucebase_url = models.TextField(unique=True, blank=True, default=None)
-    name = models.TextField(blank=True, default=None, db_column="relation_name")
+    name = models.TextField(blank=True, default=None)
     appearances = models.IntegerField(default=0)
     first = models.ForeignKey(
         Events,
@@ -1113,8 +1117,8 @@ class States(models.Model):
         verbose_name_plural = db_table
 
     def __str__(self):
-        if self.country.name not in ["United States", "Australia", "Canada"]:
-            state = f"{self.name}, {self.country.name}"
+        if self.country not in [2, 6, 37]:
+            state = f"{self.name}, {self.country}"
         else:
             state = self.name
 

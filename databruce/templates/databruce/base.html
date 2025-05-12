@@ -34,7 +34,7 @@
           rel="stylesheet">
     <!--Static-->
     {% load static %}
-    <link rel="stylesheet" href="{% static 'databruce/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
     <!--Select2-->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{% static 'databruce/js/select2-dropdown.js' %}"></script>
@@ -145,15 +145,12 @@
           </ul>
           <form class="d-flex"
                 role="search"
-                method="get"
+                method="post"
                 action="{% url 'databruce:search' %}">
+            {% csrf_token %}
             <div class="input-group">
-              <input id="eventSearch"
-                     class="form-control"
-                     type="search"
-                     name="event_date"
-                     placeholder="YYYY-MM-DD"
-                     aria-label="event_date">
+              {{ my_form }}
+              {% comment %} <input id="eventSearch" class="form-control" type="search" name="event_date" placeholder="YYYY-MM-DD" aria-label="event_date"> {% endcomment %}
               <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
             </div>
           </form>
@@ -170,15 +167,6 @@
     </div>
     <script>
       $(document).ready(function () {
-        $("#eventSearch").autocomplete({
-            autoFocus: true,
-            position: { my : "right top", at: "right bottom" },
-            source: "{% url 'databruce:api:events_auto' %}",
-            minLength: 7,
-            select: function (event, ui) {
-                window.location.href = "/search/results?event_date=" + ui.item.date;
-            }
-        });
         $('#eventSearch').mask('0000-00-00');
       });
     </script>

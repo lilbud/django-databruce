@@ -1,111 +1,97 @@
-{% extends "databruce/base.html" %}'
-{% load filters %}
+{% extends "databruce/category.html" %}
 {% block title %}
   Songs
 {% endblock title %}
-{% block content %}
-  <div class="row mb-4">
-    <div class="col">
-      <h4>Songs</h4>
-      <h6>Songs that Bruce has played live</h6>
-    </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="songsTable">
-              <thead>
-                <tr>
-                  <th class="col">Name</th>
-                  <th class="col">First</th>
-                  <th class="col">Last</th>
-                  <th class="col text-center">Plays</th>
-                  <th class="col">Original Artist</th>
-                  <th class="col">Original?</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for song in songs %}
-                  <tr>
-                    <td>
-                      <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
-                    </td>
-                    <td>
-                      <a data-bs-toggle="tooltip"
-                         data-bs-placement="top"
-                         data-bs-html="true"
-                         data-bs-title="<div>{{ song.first }}<br>{{ song.first.venue }}</div>"
-                         href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
-                    </td>
-                    <td>
-                      <a data-bs-toggle="tooltip"
-                         data-bs-placement="top"
-                         data-bs-html="true"
-                         data-bs-title="<div>{{ song.last }}<br>{{ song.last.venue }}</div>"
-                         href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
-                    </td>
-                    <td class="text-center">{{ song.num_plays_public }}</td>
-                    <td>
-                      {% if not song.original %}{{ song.original_artist }}{% endif %}
-                    </td>
-                    <td>
-                      {% if song.original %}
-                        Original
-                      {% else %}
-                        Cover
-                      {% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+{% block info_row %}
+  <h4>Songs</h4>
+  <h6>Songs that Bruce has played live</h6>
+{% endblock info_row %}
+{% block table_id %}
+  songsTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr>
+      <th class="all" scope="col">Name</th>
+      <th class="min-tablet-l" scope="col">First</th>
+      <th class="min-tablet-l" scope="col">Last</th>
+      <th class="all text-center" scope="col">Plays</th>
+      <th class="min-tablet-l" scope="col">Original Artist</th>
+      <th class="all" scope="col">Original?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for song in songs %}
+      <tr>
+        <td class="text-wrap">
+          <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
+        </td>
+        <td>
+          {% if song.first %}
+            <a href="{% url 'databruce:event_details' event=song.first.id %}">{{ song.first }}</a>
+          {% endif %}
+        </td>
+        <td>
+          {% if song.last %}
+            <a href="{% url 'databruce:event_details' event=song.last.id %}">{{ song.last }}</a>
+          {% endif %}
+        </td>
+        <td class="text-center">{{ song.num_plays_public }}</td>
+        <td>
+          {% if not song.original %}
+            {{ song.original_artist|default_if_none:"" }}
+          {% else %}
+            Bruce Springsteen
+          {% endif %}
+        </td>
+        <td>
+          {% if song.original %}
+            Original
+          {% else %}
+            Cover
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
   <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop();
+  // removes searchBuilder button, not needed for this.
+  layout.topEnd.features[1].buttons.pop();
 
-    $(document).ready(function () {
-      new DataTable('#songsTable', {
-        layout: layout,
-        columnDefs: [
-          {
-            target: -1,
-            visible: false
-          }
-        ],
-        initComplete: function () {
-          this.api()
-            .columns([-1])
-            .every(function () {
-                var column = this;
+  $(document).ready(function () {
+    new DataTable('#songsTable', {
+      layout: layout,
+      columnDefs: [
+        {
+          target: -1,
+          visible: false
+        }
+      ],
+      initComplete: function () {
+        this.api()
+          .columns([-1])
+          .every(function () {
+            var column = this;
 
-                $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="artist">Category:</label></div><div class="col" id="artist-select"></div></div>').appendTo($('#dropdown-container'));
-  
-                // this appears to be the only way to add a select filter
-                // without going through ajax calls. I originally had a pre-made dropdown in
-                // another file and included it like above, however, I had to use an ajax call
-                // otherwise it would appear but not work
-                var select = $('<select id="artist" class="custom-select form-select form-select-sm"></select>')
-                  .appendTo($('#artist-select'))
-                  .on('change', function () {
-                      column
-                        .search($(this).val(), {regex: true})
-                        .draw();
-                  });
-                
-                
-                select.append('<option value=".*">All</option>');
-                select.append('<option value="Original">Originals</option>');
-                select.append('<option value="Cover">Covers</option>');
-            });
-        },
-      });
-     });
+            $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="artist">Category:</label></div><div class="col" id="artist-select"></div></div>').appendTo($('#dropdown-container'));
+
+            var select = $('<select id="artist" class="custom-select form-select form-select-sm"></select>')
+              .appendTo($('#artist-select'))
+              .on('change', function () {
+                column
+                  .search($(this).val(), { regex: true })
+                  .draw();
+              });
+
+
+            select.append('<option value=".*">All</option>');
+            select.append('<option value="Original">Originals</option>');
+            select.append('<option value="Cover">Covers</option>');
+          });
+      },
+    });
+  });
   </script>
-{% endblock content %}
+{% endblock scripts %}
