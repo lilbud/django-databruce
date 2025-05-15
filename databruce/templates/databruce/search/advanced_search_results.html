@@ -11,9 +11,9 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="col">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
           <div id="row">
             <div class="d-flex flex-column">
               {% if request.POST.first_date %}
@@ -48,7 +48,7 @@
               {% endif %}
               {% for result in results %}
                 <h6>{{ result }}</h6>
-                {% if not forloop.last %}<h6>AND</h6>{% endif %}
+                {% if not forloop.last %}<h6 class="text-uppercase">{{ request.POST.conjunction }}</h6>{% endif %}
               {% endfor %}
             </div>
           </div>
@@ -57,9 +57,9 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="col">
+    <div class="col">
+      <div class="card">
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
             <table class="table table display nowrap" id="table">
               <thead>
@@ -99,6 +99,9 @@
     </div>
   </div>
   <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
+
     $(document).ready(function () {
       new DataTable('#table', {
         layout: layout,

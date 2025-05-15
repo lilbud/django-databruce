@@ -5,28 +5,31 @@
 {% endblock title %}
 {% block content %}
   <div class="row mb-4">
-    <h4>Cities &gt; {{ info }}</h4>
+    <h4>
+      <a href="{% url "databruce:cities" %}">Cities</a>
+      &gt; {{ info }}
+    </h4>
   </div>
   <div class="row mb-4">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <h5>Events</h5>
+    <div class="col-12 col-md-8">
+      <div class="card mb-4">
+        <h5 class="card-header">Events</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="eventTable">
+            <table class="table table display" id="eventTable">
               <thead>
-                <tr class="custom">
-                  <th>Date</th>
-                  <th>Band</th>
-                  <th>Venue</th>
-                  <th>Tour</th>
-                  <th>Detail</th>
+                <tr>
+                  <th class="all">Date</th>
+                  <th class="all">Band</th>
+                  <th class="min-tablet-l">Venue</th>
+                  <th class="min-tablet-l">Tour</th>
+                  <th class="min-tablet-l">Detail</th>
                 </tr>
               </thead>
               <tbody>
                 {% for event in events %}
                   <tr>
-                    <td>
+                    <td class="text-nowrap">
                       <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                     </td>
                     <td>
@@ -40,7 +43,7 @@
                         <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                       {% endif %}
                     </td>
-                    <td>{{ event.event_title|default_if_none:'' }}</td>
+                    <td>{{ event.title|default_if_none:'' }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -49,17 +52,15 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4 row-cols-1 row-cols-md-2 g-4">
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5>Songs</h5>
+    <div class="col-12 col-md-4">
+      <div class="card mb-4">
+        <h5 class="card-header">Songs</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="songTable">
+            <table class="table table display" id="songTable">
               <thead>
                 <tr>
-                  <th>Song</th>
+                  <th class="text-wrap">Song</th>
                   <th class="text-center">Count</th>
                 </tr>
               </thead>
@@ -78,16 +79,14 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5>Venues</h5>
+      <div class="card mb-4">
+        <h5 class="card-header">Venues</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="venueTable">
+            <table class="table table display" id="venueTable">
               <thead>
                 <tr>
-                  <th>Name</th>
+                  <th class="text-wrap">Name</th>
                   <th class="text-center" scope="col">#</th>
                 </tr>
               </thead>

@@ -36,8 +36,7 @@ $.extend(true, DataTable.defaults, {
     fixedHeader: true,
     responsive: {
         details: {
-            type: 'inline',
-            target: 'tr'
+            display: $.fn.dataTable.Responsive.display.childRowImmediate,
         }
     },
     info: true,

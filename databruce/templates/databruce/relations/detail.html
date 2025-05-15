@@ -12,18 +12,20 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="col">
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Appeared With:</div>
-            <div class="col">
-              {% spaceless %}
-                {% for band in bands %}
-                  <a href="{% url "databruce:band_details" id=band.band.id %}">{{ band.band.name }}</a>
-                  {% if not forloop.last %},{% endif %}
-                {% endfor %}
-              {% endspaceless %}
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <div class="col">
+            <div class="row justify-content-start">
+              <div class="col-auto pe-0 fs-6 fw-semibold">Appeared With:</div>
+              <div class="col">
+                {% spaceless %}
+                  {% for band in bands %}
+                    <a href="{% url "databruce:band_details" id=band.band.id %}">{{ band.band.name }}</a>
+                    {% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                {% endspaceless %}
+              </div>
             </div>
           </div>
         </div>
@@ -31,48 +33,54 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="col">
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="eventTable">
-              <thead>
-                <tr class="custom">
-                  <th>Date</th>
-                  <th>Band</th>
-                  <th>Venue</th>
-                  <th>Location</th>
-                  <th>Tour</th>
-                  <th>Detail</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for event in events %}
-                  <tr>
-                    <td>
-                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
-                    </td>
-                    <td>
-                      <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-                    </td>
-                    <td>
-                      <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-                    </td>
-                    <td>
-                      {% if event.venue.city %}
-                        <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if event.tour %}
-                        <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                      {% endif %}
-                    </td>
-                    <td>{{ event.title|default_if_none:event.type }}</td>
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <div class="col">
+            <div class="table-responsive p-0">
+              <table class="table table display nowrap" id="eventTable">
+                <thead>
+                  <tr class="custom">
+                    <th>Date</th>
+                    <th>Band</th>
+                    <th>Venue</th>
+                    <th>Tour</th>
+                    <th>Detail</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {% for event in events %}
+                    <tr>
+                      <td>
+                        <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                      </td>
+                      <td>
+                        <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                      </td>
+                      <td>
+                        <div class="row">
+                          <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                        </div>
+                        <div class="row">
+                          <span>
+                            {% if event.venue.city %}
+                              <a class="text-secondary"
+                                 href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                            {% endif %}
+                          </span>
+                        </div>
+                      </td>
+                      <td>
+                        {% if event.tour %}
+                          <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                        {% endif %}
+                      </td>
+                      <td>{{ event.title|default_if_none:'' }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@
 {% endblock title %}
 {% block content %}
   <div class="col">
-    <form action="{% url 'databruce:adv_search_results' %}"
+    <form action="{% url 'databruce:adv_search' %}"
           method="post"
           id="search-form">
       {% csrf_token %}
@@ -54,18 +54,20 @@
         <div class="col-3 col-md-1">{{ form.conjunction }}</div>
       </div>
       {{ formset.management_form.as_p }}
-      {% for form in formset.forms %}
-        <div class="row mb-4" id="song_row-{{ forloop.counter0 }}">
-          {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
-        </div>
-      {% endfor %}
+      <div id="setlist-search">
+        {% for form in formset.forms %}
+          <div class="row mb-2" id="song_row-{{ forloop.counter0 }}">
+            {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
+          </div>
+        {% endfor %}
+      </div>
       <button id="submit-button"
               type="submit"
               name="submit"
               class="btn btn-primary">Go</button>
       <button id="add-form-btn" type="button" name="add" class="btn btn-secondary">Add Row</button>
     </form>
-    <div id="new_row" class="row invisible mb-4">
+    <div id="new_row" class="row invisible mb-2">
       {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
     </div>
   </div>

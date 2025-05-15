@@ -10,10 +10,12 @@ function select2(e) {
     $(e).select2(selectOptions);
 }
 
-const wrapFormEl = document.getElementById("search-form");
+const wrapFormEl = document.getElementById("setlist-search");
 const submitBtn = document.getElementById("submit-button");
 const totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
+const conjunctionSelect = document.getElementById("conjunctionSelect");
 
+// shows or hides the song2 select based on the value of position
 function song2(e) {
     const song2 = $(e).parent().parent().find("[class*=song2]")
 
@@ -25,6 +27,7 @@ function song2(e) {
     }
 }
 
+// adds form when add row button is clicked
 function addForm() {
     const totalFormsValue = totalFormsInput.value;
 
@@ -55,6 +58,13 @@ function addForm() {
         $(this).hide();
     });
 
+    const conjunction = document.createElement("div");
+    conjunction.innerHTML = `<div class="col-8 offset-2" id="conjunctionText">${conjunctionSelect.value.toUpperCase()}</div>`;
+    conjunction.classList.add("row", "mb-2", "conjunctionDiv");
+    console.log(conjunction);
+
+    wrapFormEl.appendChild(conjunction);
+
     $(submitBtn).before(clonedDiv);
     totalFormsInput.value++;
 
@@ -68,22 +78,57 @@ addFormBtn.addEventListener('click', addForm);
 
 function removeForm(e) {
     if (totalFormsInput.value > 0) {
-        const removeDiv = document.getElementById(e.closest("[id^=song_row]").id);
-        wrapFormEl.removeChild(removeDiv);
+        $(e).parent().parent().remove();
+
+
+        // removes a conjunction div if it is first or last
+        if ($(wrapFormEl).find("div:first").hasClass('conjunctionDiv')) {
+            console.log($(wrapFormEl).find("div:first"));
+            $(wrapFormEl).find("div:first").remove();
+        };
+
+        if ($(wrapFormEl).find("div:last").hasClass('conjunctionDiv')) {
+            $(wrapFormEl).find("div:last").remove();
+        };
+
+        $(wrapFormEl).find("[id^=song_row]").each(function () {
+            var next_row = $(this).next();
+            if (next_row.hasClass('conjunctionDiv')) {
+                var row_after_next = next_row.next()
+                if (row_after_next.hasClass('conjunctionDiv')) {
+                    //two conjunctions in a row so remove
+                    row_after_next.remove()
+                }
+            } else if (next_row.hasClass('song-row')) {
+                //song row with no conjunction between
+                $(this).after($('.conjunctionDiv').html())
+            }
+        });
+
         totalFormsInput.value--;
     }
 }
 
 $(document).ready(function () {
+    // hide all song2 selects by default
     $("[class*=song2]").each(function () {
         $(`#${this.id}`).parent().hide();
     });
 
+    // apply select2 to the first song select
     $("#id_form-0-song1").each(function () {
         select2(this);
     });
 
+    // apply select2 to song2 when position = followed by
     $("[class*=position]").change(function () {
         song2(this);
+    });
+
+    // changes the conjunction between setlist search rows when select changed
+    $("[id=conjunctionSelect]").change(function () {
+        document.querySelectorAll('#conjunctionText').forEach(element => {
+            element.innerHTML = this.value.toUpperCase();
+        });
     });
 });

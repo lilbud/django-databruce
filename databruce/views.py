@@ -29,7 +29,7 @@ class Index(TemplateView):
     )
     date = datetime.datetime.today()
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["date"] = self.date
         context["events"] = self.queryset.filter(
@@ -42,19 +42,19 @@ class Index(TemplateView):
         ).order_by("-id")[:5]
 
         context["upcoming"] = self.queryset.filter(
-            date__gte=self.date,
+            date__gt=self.date,
         ).order_by("id")[:5]
 
         return context
 
 
-class Songs(TemplateView):
+class Song(TemplateView):
     template_name = "databruce/songs/songs.html"
     queryset = (
         models.Songs.objects.all().prefetch_related("first", "last").order_by("name")
     )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["songs"] = self.queryset
         return context
@@ -71,9 +71,9 @@ class EventDetail(TemplateView):
         "venue__country",
     )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        self.event = get_object_or_404(models.Events, id=self.kwargs["event"])
+        self.event = get_object_or_404(self.queryset, id=self.kwargs["event"])
         context["event"] = self.queryset.filter(id=self.event.id).first()
 
         context["setlist"] = (
@@ -85,13 +85,16 @@ class EventDetail(TemplateView):
             .order_by("song_num")
         )
 
-        context["onstage"] = (
+        self.onstage = (
             models.Onstage.objects.filter(event__id=self.event.id)
+            .exclude(relation__id=255)
             .select_related("relation")
             .order_by("band_id", "relation__name")
         )
 
-        context["guests"] = context["onstage"].filter(guest=True)
+        context["onstage"] = self.onstage.filter(guest=False)
+
+        context["guests"] = self.onstage.filter(guest=True)
 
         context["notes"] = models.SetlistNotes.objects.filter(
             event__id=self.event.id,
@@ -110,7 +113,7 @@ class EventDetail(TemplateView):
         return context
 
 
-class Events(TemplateView):
+class Event(TemplateView):
     template_name = "databruce/events/events.html"
     queryset = models.Events.objects.all().select_related(
         "venue",
@@ -124,7 +127,7 @@ class Events(TemplateView):
     )
     date = datetime.datetime.today()
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
         try:
@@ -139,7 +142,7 @@ class Events(TemplateView):
         return context
 
 
-class Venues(TemplateView):
+class Venue(TemplateView):
     template_name = "databruce/locations/venues/venues.html"
     queryset = (
         models.Venues.objects.all()
@@ -155,7 +158,7 @@ class Venues(TemplateView):
         )
     )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["venues"] = self.queryset
         return context
@@ -164,7 +167,7 @@ class Venues(TemplateView):
 class VenueDetail(TemplateView):
     template_name = "databruce/locations/venues/detail.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         self.venue = self.kwargs["id"]
 
@@ -195,7 +198,7 @@ class SongDetail(TemplateView):
     template_name = "databruce/songs/detail.html"
     model = models.Songs
 
-    def get_context_data(self, **kwargs: dict):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         self.song = get_object_or_404(self.model, id=self.kwargs["id"])
         context["song_info"] = self.song
@@ -207,6 +210,10 @@ class SongDetail(TemplateView):
             "current__event",
             "current__song",
             "current__event__venue",
+            "current__event__venue__city",
+            "current__event__venue__city__state",
+            "current__event__venue__city__country",
+            "current__event__artist",
             "current__event__tour",
             "next",
             "next__song",
@@ -229,7 +236,7 @@ class SongDetail(TemplateView):
             2,
         )
 
-        context["first_release"] = (
+        context["release"] = (
             models.ReleaseTracks.objects.filter(song__id=self.song.id)
             .order_by("release__date")
             .first()
@@ -250,7 +257,7 @@ class EventSearch(TemplateView):
         "tour",
     )
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form(request.POST)
 
         if form.is_valid():
@@ -271,7 +278,7 @@ class EventSearch(TemplateView):
         return None
 
 
-class Tours(TemplateView):
+class Tour(TemplateView):
     template_name = "databruce/tours/tours.html"
     queryset = (
         models.Tours.objects.all()
@@ -285,7 +292,7 @@ class Tours(TemplateView):
         )
     )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["tours"] = self.queryset
 
@@ -295,7 +302,7 @@ class Tours(TemplateView):
 class TourDetail(TemplateView):
     template_name = "databruce/tours/detail.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         self.tour = models.Tours.objects.get(id=self.kwargs["id"])
         context["tour"] = self.tour
@@ -307,6 +314,8 @@ class TourDetail(TemplateView):
                 "tour",
                 "artist",
                 "venue__city",
+                "venue__city__state",
+                "venue__city__country",
                 "venue__state",
                 "venue__country",
             )
@@ -339,12 +348,23 @@ class TourDetail(TemplateView):
 
 class AdvancedSearch(View):
     form_class = forms.AdvancedEventSearch
-    initial = {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "0"}
     formset_class = formset_factory(forms.SetlistSearch)
+    date = datetime.datetime.today()
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class(initial={"month": "5", "day": "10"})
-        setlist_formset = self.formset_class(self.initial)
+    def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        form = self.form_class()
+
+        if request.GET.get("current", None):
+            form = self.form_class(
+                initial={
+                    "month": self.date.month,
+                    "day": self.date.day,
+                },
+            )
+
+        setlist_formset = self.formset_class(
+            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "0"},
+        )
 
         return render(
             request,
@@ -352,12 +372,12 @@ class AdvancedSearch(View):
             context={"form": form, "formset": setlist_formset},
         )
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, initial={"month": "5", "day": "10"})
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        event_form = self.form_class(request.POST, initial={"month": "5", "day": "10"})
         formset = self.formset_class(data=request.POST)
 
-        if form.is_valid():
-            print(form.cleaned_data)
+        if event_form.is_valid():
+            form = event_form
             event_filter = (
                 Q(date__gte=form.cleaned_data["first_date"])
                 & Q(date__lte=form.cleaned_data["last_date"])
@@ -375,7 +395,7 @@ class AdvancedSearch(View):
                     date__week_day__in=form.cleaned_data["day_of_week"],
                 )
 
-                if int(form.cleaned_data["day_of_week"][0]) > 7:
+                if int(form.cleaned_data["day_of_week"][0]) > 7:  # noqa: PLR2004
                     day_filter = (
                         ~Q(
                             date__week_day__in=[
@@ -401,75 +421,11 @@ class AdvancedSearch(View):
 
         results = []
         event_results = []
+        setlist_event_filter = Q()
 
         if formset.is_valid():
             for form in formset.cleaned_data:
-                try:
-                    song = models.Songs.objects.get(id=form["song1"]).name
-
-                    if form["position"] != "Followed By":
-                        setlist_filter = Q(current__song__id=form["song1"])
-
-                        if form["position"] != "Anywhere":
-                            position_filter = Q(current__position=form["position"])
-
-                        if form["choice"] == "not":
-                            position_filter = ~Q(current__position=form["position"])
-
-                        setlist_filter.add(position_filter, Q.AND)
-
-                        qs = models.SongsPage.objects.filter(
-                            setlist_filter,
-                            current__set_name__in=[
-                                "Show",
-                                "Set 1",
-                                "Set 2",
-                                "Encore",
-                                "Pre-Show",
-                                "Post-Show",
-                            ],
-                        )
-                        events_list = qs.values_list("current__event", flat=True)
-                        results.append(
-                            f"Song: {song} ({form['choice']} {form['position']})",
-                        )
-                    else:
-                        song2 = models.Songs.objects.get(id=form["song2"]).name
-
-                        setlist_filter = Q(current__song__id=form["song1"])
-
-                        if form["choice"] == "not":
-                            setlist_filter.add(~Q(next__song__id=form["song2"]), Q.AND)
-
-                        qs = models.SongsPage.objects.filter(
-                            setlist_filter,
-                            current__set_name__in=[
-                                "Show",
-                                "Set 1",
-                                "Set 2",
-                                "Encore",
-                                "Pre-Show",
-                                "Post-Show",
-                            ],
-                        )
-                        events_list = qs.values_list("current__event", flat=True)
-                        results.append(
-                            f"Song: {song} ({form['choice']} followed by) {song2}",
-                        )
-
-                    event_results.append(list(events_list))
-
-                # ran into an issue where if the setlist form was empty, the page would error
-                # this fixes it, not sure if it's correct
-                except ValueError:
-                    break
-                else:
-                    # adds the current list of events on each loop of the form
-                    # only adds those that intersect with the previous loops results
-                    event_filter.add(
-                        Q(id__in=list(set.intersection(*map(set, event_results)))),
-                        Q.AND,
-                    )
+                print(form)
 
         result = (
             models.Events.objects.filter(
@@ -497,10 +453,10 @@ class AdvancedSearch(View):
         )
 
 
-class Relations(TemplateView):
+class Relation(TemplateView):
     template_name = "databruce/relations/relations.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["relations"] = models.Relations.objects.all().select_related(
             "first",
@@ -509,10 +465,10 @@ class Relations(TemplateView):
         return context
 
 
-class Bands(TemplateView):
+class Band(TemplateView):
     template_name = "databruce/bands/bands.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["bands"] = (
             models.Bands.objects.filter()
@@ -525,7 +481,7 @@ class Bands(TemplateView):
 class RelationDetail(TemplateView):
     template_name = "databruce/relations/detail.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
         context["info"] = models.Relations.objects.get(id=self.kwargs["id"])
@@ -544,7 +500,6 @@ class RelationDetail(TemplateView):
                 "venue__city",
                 "venue__country",
                 "venue__city__state",
-                "venue__city__state__country",
                 "venue__city__country",
                 "tour",
             )
@@ -557,7 +512,7 @@ class RelationDetail(TemplateView):
 class BandDetail(TemplateView):
     template_name = "databruce/bands/detail.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
         context["info"] = get_object_or_404(models.Bands, id=self.kwargs["id"])
@@ -565,11 +520,20 @@ class BandDetail(TemplateView):
         context["members"] = (
             models.Onstage.objects.filter(band=self.kwargs["id"])
             .select_related("relation", "relation__first", "relation__last")
+            .distinct("relation")
+            .order_by("relation")
+        )
+
+        self.onstage_events = (
+            models.Onstage.objects.filter(band=self.kwargs["id"])
+            .select_related("relation", "relation__first", "relation__last")
             .order_by("relation")
         )
 
         context["events"] = (
-            models.Events.objects.filter(id__in=context["members"].values_list("event"))
+            models.Events.objects.filter(
+                id__in=self.onstage_events.values_list("event"),
+            )
             .order_by(
                 "id",
             )
@@ -587,10 +551,10 @@ class BandDetail(TemplateView):
         return context
 
 
-class Releases(TemplateView):
+class Release(TemplateView):
     template_name = "databruce/releases/releases.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["releases"] = models.Releases.objects.all().order_by("date")
         return context
@@ -599,7 +563,7 @@ class Releases(TemplateView):
 class ReleaseDetail(TemplateView):
     template_name = "databruce/releases/detail.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["info"] = get_object_or_404(models.Releases, id=self.kwargs["id"])
 
@@ -613,171 +577,165 @@ class ReleaseDetail(TemplateView):
         return context
 
 
-def cities(request: HttpRequest):
-    cities = (
+class City(TemplateView):
+    template_name = "databruce/locations/cities/cities.html"
+    queryset = (
         models.Cities.objects.all()
         .prefetch_related("state")
         .select_related("country", "first", "last")
         .order_by("name")
     )
 
-    return render(
-        request,
-        "databruce/locations/cities/cities.html",
-        context={"cities": cities},
-    )
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["cities"] = self.queryset
+        return context
 
 
-def city_details(request: HttpRequest, id: int):
-    city_info = (
-        models.Cities.objects.filter(id=id)
-        .select_related(
-            "country",
-            "first",
-            "last",
+class CityDetail(TemplateView):
+    template_name = "databruce/locations/cities/detail.html"
+    queryset = models.Cities.objects.all().select_related("country", "first", "last")
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        self.city = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["info"] = self.city
+        context["songs"] = (
+            models.Setlists.objects.filter(
+                event__venue__city__id=self.city.id,
+                set_name__in=[
+                    "Show",
+                    "Set 1",
+                    "Set 2",
+                    "Pre-Show",
+                    "Encore",
+                    "Post-Show",
+                ],
+            )
+            .order_by("song", "event")
+            .select_related("song", "event")
         )
-        .first()
-    )
-
-    events = (
-        models.Events.objects.filter(venue__city=id)
-        .select_related("venue__city", "venue__state", "artist", "tour")
-        .order_by("id")
-    )
-
-    songs = (
-        models.Setlists.objects.filter(
-            event__venue__city__id=id,
-            set_name__in=["Show", "Set 1", "Set 2", "Pre-Show", "Encore", "Post-Show"],
+        context["events"] = (
+            models.Events.objects.filter(venue__city=self.city.id)
+            .select_related("venue__city", "venue__state", "artist", "tour")
+            .order_by("id")
         )
-        .order_by("song", "event")
-        .select_related("song", "event")
-    )
+        context["venues"] = models.Venues.objects.filter(city__id=self.city.id)
 
-    venues = models.Venues.objects.filter(city__id=id)
-
-    return render(
-        request,
-        "databruce/locations/cities/detail.html",
-        context={"info": city_info, "events": events, "songs": songs, "venues": venues},
-    )
+        return context
 
 
-def states(request: HttpRequest):
-    states = (
-        models.States.objects.all()
-        .select_related("country", "first", "last")
-        .order_by("name")
-    )
+class State(TemplateView):
+    template_name = "databruce/locations/states/states.html"
 
-    return render(
-        request,
-        "databruce/locations/states/states.html",
-        context={"states": states},
-    )
-
-
-def state_details(request: HttpRequest, id: int):
-    state_info = (
-        models.States.objects.filter(id=id)
-        .select_related(
-            "country",
-            "first__venue",
-            "last__venue",
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["states"] = (
+            models.States.objects.all()
+            .select_related("country", "first", "last")
+            .order_by("name")
         )
-        .first()
+        return context
+
+
+class StateDetail(TemplateView):
+    template_name = "databruce/locations/states/detail.html"
+    queryset = models.States.objects.select_related(
+        "country",
+        "first__venue",
+        "last__venue",
     )
 
-    events = models.Events.objects.filter(venue__state=id).select_related(
-        "venue__city",
-        "venue__country",
-        "artist",
-        "tour",
-    )
-
-    songs = (
-        models.Setlists.objects.filter(
-            event__venue__state__id=id,
-            set_name__in=["Show", "Set 1", "Set 2", "Pre-Show", "Encore", "Post-Show"],
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        self.state = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["info"] = self.state
+        context["events"] = models.Events.objects.filter(
+            venue__state=self.state.id,
+        ).select_related(
+            "venue__city",
+            "venue__country",
+            "artist",
+            "tour",
         )
-        .order_by("song", "event")
-        .select_related("song", "event")
-    )
 
-    venues = models.Venues.objects.filter(state__id=id)
-
-    return render(
-        request,
-        "databruce/locations/states/detail.html",
-        context={
-            "info": state_info,
-            "events": events,
-            "songs": songs,
-            "venues": venues,
-        },
-    )
-
-
-def countries(request: HttpRequest):
-    countries = (
-        models.Countries.objects.all().select_related("first", "last").order_by("name")
-    )
-
-    return render(
-        request,
-        "databruce/locations/countries/countries.html",
-        context={"countries": countries},
-    )
-
-
-def country_details(request: HttpRequest, id: int):
-    country_info = (
-        models.Countries.objects.filter(id=id)
-        .select_related(
-            "first",
-            "last",
+        context["songs"] = (
+            models.Setlists.objects.filter(
+                event__venue__state__id=self.state.id,
+                set_name__in=[
+                    "Show",
+                    "Set 1",
+                    "Set 2",
+                    "Pre-Show",
+                    "Encore",
+                    "Post-Show",
+                ],
+            )
+            .order_by("song", "event")
+            .select_related("song", "event")
         )
-        .first()
-    )
 
-    events = (
-        models.Events.objects.filter(venue__country=id)
-        .select_related("venue__state", "artist", "venue__city")
-        .order_by("id")
-    )
+        context["venues"] = models.Venues.objects.filter(state__id=self.state.id)
 
-    songs = (
-        models.Setlists.objects.filter(
-            event__venue__country__id=id,
-            set_name__in=["Show", "Set 1", "Set 2", "Pre-Show", "Encore", "Post-Show"],
+        return context
+
+
+class Country(TemplateView):
+    template_name = "databruce/locations/countries/countries.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["countries"] = (
+            models.Countries.objects.all()
+            .select_related("first", "last")
+            .order_by("name")
         )
-        .order_by("song", "event")
-        .select_related("song", "event")
+        return context
+
+
+class CountryDetail(TemplateView):
+    template_name = "databruce/locations/countries/detail.html"
+    queryset = models.Countries.objects.select_related(
+        "first",
+        "last",
     )
 
-    venues = models.Venues.objects.filter(country__id=id)
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        self.country = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["info"] = self.country
+        context["events"] = (
+            models.Events.objects.filter(venue__country=self.country.id)
+            .select_related("venue__state", "artist", "venue__city")
+            .order_by("id")
+        )
+        context["songs"] = (
+            models.Setlists.objects.filter(
+                event__venue__country__id=self.country.id,
+                set_name__in=[
+                    "Show",
+                    "Set 1",
+                    "Set 2",
+                    "Pre-Show",
+                    "Encore",
+                    "Post-Show",
+                ],
+            )
+            .order_by("song", "event")
+            .select_related("song", "event")
+        )
+        context["venues"] = models.Venues.objects.filter(country__id=self.country.id)
+        return context
 
-    return render(
-        request,
-        "databruce/locations/countries/detail.html",
-        context={
-            "info": country_info,
-            "events": events,
-            "songs": songs,
-            "venues": venues,
-        },
-    )
 
+class EventRun(TemplateView):
+    template_name = "databruce/events/runs.html"
 
-def event_runs(request: HttpRequest):
-    runs = (
-        models.Runs.objects.all()
-        .select_related("first", "last", "band", "first__venue", "last__venue")
-        .order_by("first")
-    )
-
-    return render(
-        request,
-        "databruce/events/runs.html",
-        context={"runs": runs},
-    )
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["runs"] = (
+            models.Runs.objects.all()
+            .select_related("first", "last", "band", "first__venue", "last__venue")
+            .order_by("first")
+        )
+        return context

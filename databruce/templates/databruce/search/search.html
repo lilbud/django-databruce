@@ -49,7 +49,7 @@
             <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
           {% endif %}
         </td>
-        <td>{{ event.event_title|default_if_none:'' }}</td>
+        <td>{{ event.title|default_if_none:'' }}</td>
         <td>{{ event.public|default_if_none:'' }}</td>
       </tr>
     {% endfor %}

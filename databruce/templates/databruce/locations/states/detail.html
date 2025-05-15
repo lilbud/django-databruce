@@ -5,63 +5,64 @@
 {% endblock title %}
 {% block content %}
   <div class="row mb-4">
-    <h4>States &gt; {{ info }}</h4>
+    <h4>
+      <a href="{% url "databruce:states" %}">States</a>
+      &gt; {{ info }}
+    </h4>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h5>Events</h5>
-        <div class="table-responsive p-0">
-          <table class="table table display nowrap" id="eventTable">
-            <thead>
-              <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Artist</th>
-                <th scope="col">Venue</th>
-                <th scope="col">City</th>
-                <th scope="col">Tour</th>
-                <th scope="col">Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for event in events %}
+    <div class="col-12 col-md-8">
+      <div class="card mb-4">
+        <h5 class="card-header">Events</h5>
+        <div class="card-body px-0">
+          <div class="table-responsive p-0">
+            <table class="table table display" id="eventTable">
+              <thead>
                 <tr>
-                  <td>
-                    <a href="{% url "databruce:event_details" event=event.id %}">{{ event }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
-                  </td>
-                  <td>
-                    {% if event.tour %}
-                      <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                    {% endif %}
-                  </td>
-                  <td>{{ event.title|default_if_none:event.type }}</td>
+                  <th class="all" scope="col">Date</th>
+                  <th class="all" scope="col">Band</th>
+                  <th class="min-tablet-l" scope="col">Venue</th>
+                  <th class="min-tablet-l" scope="col">City</th>
+                  <th class="min-tablet-l" scope="col">Tour</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for event in events %}
+                  <tr>
+                    <td class="text-nowrap">
+                      <a href="{% url "databruce:event_details" event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city.name }}</a>
+                    </td>
+                    <td>
+                      {% if event.tour %}
+                        <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4 row-cols-1 row-cols-md-2 g-4">
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5>Songs</h5>
+    <div class="col-12 col-md-4">
+      <div class="card mb-4">
+        <h5 class="card-header">Songs</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="songTable">
+            <table class="table table display" id="songTable">
               <thead>
                 <tr>
-                  <th>Song</th>
+                  <th class="text-wrap">Song</th>
                   <th class="text-center" scope="col">Events</th>
                 </tr>
               </thead>
@@ -80,16 +81,14 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5>Venues</h5>
+      <div class="card mb-4">
+        <h5 class="card-header">Venues</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="venueTable">
+            <table class="table table display" id="venueTable">
               <thead>
                 <tr>
-                  <th>Name</th>
+                  <th class="text-wrap">Name</th>
                   <th class="text-center" scope="col">Events</th>
                 </tr>
               </thead>
@@ -125,12 +124,14 @@
     new DataTable('#songTable', {
       layout: layout,
       searching: false,
+      pageLength: 10,
       order: [[1, 'desc']],
     });
 
     new DataTable('#venueTable', {
       layout: layout,
       searching: false,
+      pageLength: 10,
       order: [[1, 'desc']],
     });
   })

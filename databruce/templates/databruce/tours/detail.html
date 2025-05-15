@@ -10,10 +10,10 @@
     </h4>
   </div>
   <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <h4>Events</h4>
+    <div class="col-12 col-md-8">
+      <div class="card mb-4">
+        <h5 class="card-header">Events</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
             <table class="table table display nowrap" id="tourEvents">
               <thead>
@@ -38,18 +38,11 @@
                       <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
                     </td>
                     <td>
-                      {% if event.venue.id != 1964 %}
-                        <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
-                          {{ event.venue.city.name }},
-                          {% if event.venue.state %}
-                            {{ event.venue.state.state_abbrev }}
-                          {% else %}
-                            {{ event.venue.country.name }}
-                          {% endif %}
-                        </a>
+                      {% if event.venue.city %}
+                        <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
                       {% endif %}
                     </td>
-                    <td>{{ event.event_title|default_if_none:'' }}</td>
+                    <td>{{ event.title|default_if_none:'' }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -58,60 +51,60 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-6">
-      <div class="card mb-4">
-        <div class="card-body">
-          <h4>Tour Legs</h4>
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="tourLegs">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Shows</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for leg in tour_legs %}
+    <div class="col-12 col-md-4">
+      {% if tour_legs %}
+        <div class="card mb-4">
+          <h5 class="card-header">Tour Legs</h5>
+          <div class="card-body px-0">
+            <div class="table-responsive p-0">
+              <table class="table table display" id="tourLegs">
+                <thead>
                   <tr>
-                    <td>{{ leg.name }}</td>
-                    <td>{{ leg.num_shows }}</td>
+                    <th scope="col">Name</th>
+                    <th scope="col">Shows</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {% for leg in tour_legs %}
+                    <tr>
+                      <td class="text-wrap">{{ leg.name }}</td>
+                      <td>{{ leg.num_shows }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card mb-4">
-        <div class="card-body">
-          <h4>Songs</h4>
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="tourSongs">
-              <thead>
-                <tr>
-                  <th scope="col">Song</th>
-                  <th scope="col">Plays</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% regroup songs by song as songs_list %}
-                {% for song, events in songs_list %}
+      {% endif %}
+      {% if songs %}
+        <div class="card mb-4">
+          <h5 class="card-header">Songs</h5>
+          <div class="card-body px-0">
+            <div class="table-responsive p-0">
+              <table class="table table display" id="tourSongs">
+                <thead>
                   <tr>
-                    <td>
-                      <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
-                    </td>
-                    <td>{{ events|length }}</td>
+                    <th scope="col">Song</th>
+                    <th scope="col">Plays</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {% regroup songs by song as songs_list %}
+                  {% for song, events in songs_list %}
+                    <tr>
+                      <td class="text-wrap">
+                        <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
+                      </td>
+                      <td>{{ events|length }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      {% endif %}
     </div>
   </div>
   <script>
@@ -133,7 +126,6 @@
       new DataTable('#tourSongs', {
         layout: layout,
         searching: false,
-        pageLength: 10,
       });
     });
 

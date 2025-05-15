@@ -4,7 +4,7 @@
   {{ song_info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row mb-4">
+  <div class="row mb-2">
     <h4>
       <a href="{% url 'databruce:songs' %}">Songs</a> &gt; {{ song_info.name }}
     </h4>
@@ -12,11 +12,11 @@
   <div class="row mb-4 row-cols-1 row-cols-md-2 g-4 mt-0">
     <div class="col">
       <div class="card h-100">
+        <h5 class="card-header">Song Info</h5>
         <div class="card-body">
-          <h5>Song Info</h5>
           <div class="row justify-content-start">
             <div class="col-auto pe-0 fs-6 fw-semibold">Original Artist:</div>
-            <div class="col">{{ song_info.original_artist }}</div>
+            <div class="col">{{ song_info.original_artist|default_if_none:"Bruce Springsteen" }}</div>
           </div>
           {% if release %}
             <div class="row justify-content-start">
@@ -31,8 +31,8 @@
     </div>
     <div class="col">
       <div class="card h-100">
+        <h5 class="card-header">Song Stats</h5>
         <div class="card-body">
-          <h5>Song Stats</h5>
           <div class="row justify-content-start">
             <div class="col-auto pe-0 fs-6 fw-semibold">Public:</div>
             <div class="col">{{ song_info.num_plays_public }}</div>
@@ -52,27 +52,32 @@
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
-        <div class="card-body">
-          <h5>Performances</h5>
+        <h5 class="card-header">Performances</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="songTable">
+            <table class="table table display" id="songTable">
               <thead>
                 <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Tour</th>
-                  <th scope="col">Position</th>
-                  <th scope="col">Venue</th>
-                  <th scope="col">Gap</th>
-                  <th scope="col">Set</th>
-                  <th scope="col">Prev</th>
-                  <th scope="col">Next</th>
+                  <th class="all" scope="col">Date</th>
+                  <th class="all" scope="col">Act</th>
+                  <th class="min-tablet-l" scope="col">Tour</th>
+                  <th class="min-tablet-l" scope="col">Position</th>
+                  <th class="min-tablet-l" scope="col">Venue</th>
+                  <th class="min-tablet-l" scope="col">Gap</th>
+                  <th class="min-tablet-l" scope="col">Set</th>
+                  <th class="min-tablet-l" scope="col">Prev</th>
+                  <th class="min-tablet-l" scope="col">Next</th>
+                  <th class="min-tablet-l" scope="col">Note</th>
                 </tr>
               </thead>
               <tbody>
                 {% for song in songs %}
                   <tr>
-                    <td>
+                    <td class="text-nowrap">
                       <a href="{% url "databruce:event_details" event=song.current.event.id %}">{{ song.current.event }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "databruce:band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
                     </td>
                     <td>
                       {% if song.current.event.tour %}{{ song.current.event.tour }}{% endif %}
@@ -82,27 +87,42 @@
                         {{ song.current.position }}
                       {% endif %}
                     </td>
-                    {% with venue=song.current.event.venue %}
-                      <td>
-                        <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue.name }}</a>
-                      </td>
-                    {% endwith %}
-                    <td>{{ song.current.last|default_if_none:"" }}</td>
+                    <td>
+                      {% with venue=song.current.event.venue %}
+                        <a href="{% url 'databruce:venue_details' id=venue.id %}">
+                          {% spaceless %}
+                            {% if venue.city %}
+                              {{ venue.name }}, {{ venue.city }}
+                            {% else %}
+                              {{ venue.name }}
+                            {% endif %}
+                          {% endspaceless %}
+                        </a>
+                      {% endwith %}
+                    </td>
+                    <td>
+                      {% if song.current.premiere %}
+                        first
+                      {% else %}
+                        {{ song.current.last|default_if_none:"" }}
+                      {% endif %}
+                    </td>
                     <td>{{ song.current.set_name }}</td>
-                    <td>
+                    <td class="text-wrap">
                       {% if song.prev %}
-                        <a href="{% url "databruce:song_details" id=song.prev.song.id %}">{{ song.prev.song.name }}</a>
+                        <a href="{% url "databruce:song_details" id=song.prev.song.id %}">{{ song.prev.song.short_name|default_if_none:song.prev.song.name }}</a>
                       {% else %}
                         <em>***</em>
                       {% endif %}
                     </td>
-                    <td>
+                    <td class="text-wrap">
                       {% if song.next %}
-                        <a href="{% url "databruce:song_details" id=song.next.song.id %}">{{ song.next.song.name }}</a>
+                        <a href="{% url "databruce:song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
                       {% else %}
                         <em>***</em>
                       {% endif %}
                     </td>
+                    <td class="text-wrap">{{ song.current.song_note|default_if_none:"" }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -114,7 +134,7 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 6, 7]
+    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 6, 7, 8]
 
     $(document).ready(function () {
       new DataTable('#songTable', {

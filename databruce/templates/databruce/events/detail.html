@@ -13,7 +13,9 @@
             <div class="row">
               <h5 class="mb-1">{{ event }}</h5>
               <p>
-                <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                {% if event.artist %}
+                  <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                {% endif %}
               </p>
             </div>
             <div class="row">
@@ -47,14 +49,14 @@
             {% endif %}
             <div class="row justify-content-center">
               <div class="btn-group" role="group" aria-label="Basic example">
-                {% if last_event %}
+                {% if prev_event %}
                   <a class="btn btn-secondary"
                      role="button"
                      data-bs-toggle="tooltip"
                      data-bs-placement="top"
                      data-bs-html="true"
-                     data-bs-title="<div>{{ last_event }}<br>{{ last_event.artist }}<br>{{ last_event.venue }}</div>"
-                     href="{% url 'databruce:event_details' event=last_event.id %}">&lt; Prev</a>
+                     data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
+                     href="{% url 'databruce:event_details' event=prev_event.id %}">&lt; Prev</a>
                 {% endif %}
                 <button type="button" class="btn btn-secondary" disabled>Events</button>
                 {% if next_event %}
@@ -137,16 +139,18 @@
               <div class="card">
                 <div class="card-header fs-5 fw-bold">Onstage</div>
                 <ul class="list-group list-group-flush">
-                  {% for member in onstage %}
-                    {% if member.relation.id == 255 %}
-                      <li class="list-group-item">
-                        <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                      </li>
-                    {% endif %}
-                  {% endfor %}
+                  <li class="list-group-item">
+                    <a href="{% url "databruce:relation_details" id=255 %}">Bruce Springsteen</a>
+                  </li>
                   {% regroup onstage by band as onstage_list %}
                   {% for band in onstage_list %}
-                    {% if band.grouper %}
+                    {% if not band.grouper %}
+                      {% for member in band.list %}
+                        <li class="list-group-item">
+                          <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                        </li>
+                      {% endfor %}
+                    {% else %}
                       <a class="list-group-item dropdown-toggle"
                          data-bs-toggle="collapse"
                          href="#{{ band.grouper.id }}"
@@ -155,31 +159,28 @@
                          aria-controls="collapseExample">{{ band.grouper.name }}</a>
                       <div class="collapse" id="{{ band.grouper.id }}">
                         {% for member in band.list %}
-                          {% if member.relation.id != 255 %}
-                            <li class="list-group-item">
-                              <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                            </li>
-                          {% endif %}
-                        {% endfor %}
-                      </div>
-                    {% elif band.list|length > 1 and band.list.0.relation.id != 255 %}
-                      <a class="list-group-item dropdown-toggle"
-                         data-bs-toggle="collapse"
-                         href="#guests"
-                         role="button"
-                         aria-expanded="false"
-                         aria-controls="collapseExample">Guests</a>
-                      <div class="collapse" id="guests">
-                        {% for member in band.list %}
-                          {% if member.relation.id != 255 and member.guest %}
-                            <li class="list-group-item">
-                              <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                            </li>
-                          {% endif %}
+                          <li class="list-group-item">
+                            <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                          </li>
                         {% endfor %}
                       </div>
                     {% endif %}
                   {% endfor %}
+                  {% if guests %}
+                    <a class="list-group-item dropdown-toggle"
+                       data-bs-toggle="collapse"
+                       href="#guests"
+                       role="button"
+                       aria-expanded="false"
+                       aria-controls="collapseExample">Guests</a>
+                    <div class="collapse" id="guests">
+                      {% for member in guests %}
+                        <li class="list-group-item">
+                          <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </ul>
               </div>
             </div>

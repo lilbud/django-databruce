@@ -22,6 +22,7 @@
       <th class="all" scope="col">Date</th>
       <th class="min-tablet-l" scope="col">Band</th>
       <th class="all" scope="col">Venue</th>
+      <th class="min-tablet-l" scope="col">Location</th>
       <th class="min-tablet-l" scope="col">Tour</th>
       <th class="min-tablet-l" scope="col">Detail</th>
       <th class="min-tablet-l" scope="col">Public</th>
@@ -39,24 +40,19 @@
           {% endif %}
         </td>
         <td>
-          <div class="row">
-            <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-          </div>
-          <div class="row">
-            <span>
-              {% if event.venue.city %}
-                <a class="text-secondary"
-                   href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-              {% endif %}
-            </span>
-          </div>
+          <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+        </td>
+        <td>
+          {% if event.venue.city %}
+            <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+          {% endif %}
         </td>
         <td>
           {% if event.tour %}
             <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
           {% endif %}
         </td>
-        <td>{{ event.event_title|default_if_none:'' }}</td>
+        <td>{{ event.title|default_if_none:'' }}</td>
         <td>{{ event.public|default_if_none:'' }}</td>
       </tr>
     {% endfor %}

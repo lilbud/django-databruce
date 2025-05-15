@@ -12,14 +12,22 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="col">
-          <h5>Song Info</h5>
+    <div class="col">
+      <div class="card">
+        <h5 class="card-header">Release Info</h5>
+        <div class="card-body">
           <div class="row justify-content-start">
             <div class="col-auto pe-0 fs-6 fw-semibold">Release Date:</div>
             <div class="col">{{ info.date }}</div>
           </div>
+          {% if info.event %}
+            <div class="row justify-content-start">
+              <div class="col-auto pe-0 fs-6 fw-semibold">Event Date:</div>
+              <div class="col">
+                <a href="{% url "databruce:event_details" event=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
+              </div>
+            </div>
+          {% endif %}
           <div class="row justify-content-start">
             <div class="col-auto pe-0 fs-6 fw-semibold">Type:</div>
             <div class="col">{{ info.type }}</div>
@@ -29,19 +37,18 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h5>Songs</h5>
-        <div class="col">
+    <div class="col">
+      <div class="card">
+        <h5 class="card-header">Songs</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
             <table class="table table display nowrap" id="tracksTable">
               <thead>
                 <tr class="header">
                   <th scope="col">#</th>
                   <th scope="col">Song</th>
-                  <th class="text-center" scope="col">Public</th>
-                  <th scope="col">First</th>
-                  <th scope="col">Last</th>
+                  <th scope="col">Plays</th>
+                  <th scope="col">Event Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -51,15 +58,10 @@
                     <td>
                       <a href="{% url "databruce:song_details" id=track.song.id %}">{{ track.song.name }}</a>
                     </td>
-                    <td class="text-center">{{ track.song.num_plays_public }}</td>
+                    <td>{{ track.song.num_plays_public }}</td>
                     <td>
-                      {% if track.song.first %}
-                        <a href="{% url "databruce:event_details" event=track.song.first.id %}">{{ track.song.first }}</a>
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if track.song.last %}
-                        <a href="{% url "databruce:event_details" event=track.song.last.id %}">{{ track.song.last }}</a>
+                      {% if track.event %}
+                        <a href="{% url "databruce:event_details" event=track.event.id %}">{{ track.event }}</a>
                       {% endif %}
                     </td>
                   </tr>
@@ -79,8 +81,6 @@
     new DataTable('#tracksTable', {
       layout: layout,
       searching: false,
-      paging: false,
-      info: false,
       order: [[0, 'asc']],
     });
   });

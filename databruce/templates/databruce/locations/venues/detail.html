@@ -5,27 +5,30 @@
 {% endblock title %}
 {% block content %}
   <div class="row mb-4">
-    <h4>Venues &gt; {{ venue_info }}, {{ venue_info.city }}</h4>
+    <h4>
+      <a href="{% url "databruce:venues" %}">Venues</a>
+      &gt; {{ venue_info }}, {{ venue_info.city }}
+    </h4>
   </div>
-  <div class="row row-cols-1 row-cols-md-1 g-4 mt-0">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <h5>Events</h5>
+  <div class="row mb-4">
+    <div class="col-12 col-md-8">
+      <div class="card mb-4">
+        <h5 class="card-header">Events</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="eventTable">
+            <table class="table table display" id="eventTable">
               <thead>
                 <tr class="custom">
-                  <th>Date</th>
-                  <th>Band</th>
-                  <th>Tour</th>
-                  <th>Detail</th>
+                  <th class="all">Date</th>
+                  <th class="all">Band</th>
+                  <th class="min-tablet-l">Tour</th>
+                  <th class="min-tablet-l">Detail</th>
                 </tr>
               </thead>
               <tbody>
                 {% for event in events %}
                   <tr>
-                    <td>
+                    <td class="text-nowrap">
                       <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                     </td>
                     <td>
@@ -36,7 +39,7 @@
                         <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                       {% endif %}
                     </td>
-                    <td>{{ event.event_title|default_if_none:'' }}</td>
+                    <td>{{ event.title|default_if_none:'' }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -45,12 +48,12 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-12 col-md-4">
       <div class="card">
-        <div class="card-body">
-          <h5>Songs</h5>
+        <h5 class="card-header">Songs</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="songTable">
+            <table class="table table display" id="songTable">
               <thead>
                 <tr>
                   <th>Song</th>
@@ -61,7 +64,7 @@
                 {% regroup songs by song as songs_list %}
                 {% for song, events in songs_list %}
                   <tr>
-                    <td>
+                    <td class="text-wrap">
                       <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
                     </td>
                     <td class="text-center">{{ events|length }}</td>

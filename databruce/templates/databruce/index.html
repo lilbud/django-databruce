@@ -25,10 +25,10 @@
       <div class="row row-cols-1 row-cols-md-1 g-4 mb-4">
         <div class="col">
           <div class="card h-100">
-            <div class="card-body px-0">
-              <h4 class="mx-3">Recent Events</h4>
-              <div class="table-responsive p-0">
-                <table class="table table display nowrap" id="recentTable">
+            <h4 class="card-header">Recent Events</h4>
+            <div class="card-body p-0">
+              <div class="table-responsive p-0 index">
+                <table class="table table display" id="recentTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
@@ -38,15 +38,17 @@
                   <tbody>
                     {% for event in recent %}
                       <tr>
-                        <td class="nowrap">
+                        <td class="text-nowrap">
                           <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                         </td>
-                        <td class="nowrap">
-                          <a data-bs-toggle="tooltip"
-                             data-bs-placement="top"
-                             data-bs-html="true"
-                             data-bs-title="<div>{{ event.venue }}</div>"
-                             href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                        <td class="text-wrap">
+                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">
+                            {% if event.venue.city %}
+                              {{ event.venue }}, {{ event.venue.city }}
+                            {% else %}
+                              {{ event.venue }}
+                            {% endif %}
+                          </a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -58,10 +60,10 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <div class="card-body px-0">
-              <h4 class="mx-3">Upcoming Events</h4>
-              <div class="table-responsive p-0">
-                <table class="table table display nowrap" id="upcomingTable">
+            <h4 class="card-header">Upcoming Events</h4>
+            <div class="card-body p-0">
+              <div class="table-responsive p-0 index">
+                <table class="table table display" id="upcomingTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
@@ -71,15 +73,17 @@
                   <tbody>
                     {% for event in upcoming %}
                       <tr>
-                        <td class="nowrap">
+                        <td class="text-nowrap">
                           <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                         </td>
-                        <td class="nowrap">
-                          <a data-bs-toggle="tooltip"
-                             data-bs-placement="top"
-                             data-bs-html="true"
-                             data-bs-title="<div>{{ event.venue }}</div>"
-                             href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                        <td class="text-wrap">
+                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">
+                            {% if event.venue.city %}
+                              {{ event.venue }}, {{ event.venue.city }}
+                            {% else %}
+                              {{ event.venue }}
+                            {% endif %}
+                          </a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -91,14 +95,13 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <div class="card-body px-0">
-              <h4 class="mx-3">
-                On This Day ({{ date|date:"F d" }})
-                <a href="{% url 'databruce:adv_search_results' %}">see more</a>
-              </h4>
-              <h6 class="mx-3 text-secondary">Click link above to go to event search</h6>
-              <div class="table-responsive p-0">
-                <table class="table table display nowrap" id="otdTable">
+            <h4 class="card-header">
+              On This Day ({{ date|date:"F d" }})
+              <a href="{% url 'databruce:adv_search' %}?current=true">see more</a>
+            </h4>
+            <div class="card-body p-0">
+              <div class="table-responsive p-0 index">
+                <table class="table table display" id="otdTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
@@ -108,15 +111,17 @@
                   <tbody>
                     {% for event in events %}
                       <tr>
-                        <td class="nowrap">
+                        <td class="text-nowrap">
                           <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                         </td>
-                        <td class="nowrap">
-                          <a data-bs-toggle="tooltip"
-                             data-bs-placement="top"
-                             data-bs-html="true"
-                             data-bs-title="<div>{{ event.venue }}</div>"
-                             href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                        <td class="text-wrap">
+                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">
+                            {% if event.venue.city %}
+                              {{ event.venue }}, {{ event.venue.city }}
+                            {% else %}
+                              {{ event.venue }}
+                            {% endif %}
+                          </a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -129,23 +134,15 @@
       </div>
     </div>
   </div>
-  {% comment %} <div class="row mb-4">
-    <div class="col">
-      <div class="card">
-        {% load static %}
-        <img class="img-fluid object-fit-cover rounded" id="headimg" src="{% static 'databruce/img/header.jpg' %}" alt="" height="auto" width="auto">
-      </div>
-    </div>
-  </div>
-  
-  </div> {% endcomment %}
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons.pop()
     
     $(document).ready(function () {
       $('table.display').dataTable({
-        
+        columnDefs: [
+        {'width': '200px', 'target': 0}
+        ],
         searching: false,
         ordering: false,
         info: false,

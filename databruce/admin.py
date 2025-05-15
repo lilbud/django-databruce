@@ -1,6 +1,36 @@
 from django.contrib import admin
+from django.forms import BaseInlineFormSet
 
 from . import models
+
+
+class SetlistInlineFormset(BaseInlineFormSet):
+    model = models.Setlists
+    fields = [
+        "event",
+        "set_name",
+        "song_num",
+        "song",
+        "segue",
+        "song_note",
+    ]  # Specify the fields you want to include
+
+
+class SetlistInline(admin.TabularInline):
+    model = models.Setlists
+    autocomplete_fields = ["song"]
+    fields = [
+        "event",
+        "set_name",
+        "song_num",
+        "song",
+        "segue",
+        "song_note",
+        "premiere",
+        "debut",
+    ]  # Specify the fields you want to include
+    fk_name = "event"
+    extra = 1
 
 
 @admin.register(models.ArchiveLinks)
@@ -67,9 +97,11 @@ class NugsAdmin(admin.ModelAdmin):
 @admin.register(models.Events)
 class EventAdmin(admin.ModelAdmin):
     search_fields = ["id"]
+    autocomplete_fields = ["venue", "artist", "tour", "run", "leg"]
     list_select_related = ["venue"]
     list_display = ["id", "date", "venue"]
     list_display_links = ["id", "venue"]
+    inlines = [SetlistInline]
 
 
 @admin.register(models.Songs)
@@ -191,6 +223,7 @@ class VenueAdmin(admin.ModelAdmin):
 @admin.register(models.Runs)
 class RunAdmin(admin.ModelAdmin):
     search_fields = ["name"]
+    autocomplete_fields = ["band"]
     list_select_related = ["band", "first", "last"]
     list_display = ["id", "name", "band", "num_shows", "first", "last"]
     list_display_links = ["id", "band", "first", "last"]

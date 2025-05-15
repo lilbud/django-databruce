@@ -496,7 +496,18 @@ class Events(models.Model):
     num = models.IntegerField(db_column="event_num")
     id = models.TextField(primary_key=True, db_column="event_id")
     date = models.DateField(blank=True, default=None, db_column="event_date")
-    early_late = models.TextField(blank=True, default=None)
+
+    early_late_choices = [
+        ("Evening", "Evening"),
+        ("Late", "Late"),
+        ("Third", "Third"),
+        ("Early", "Early"),
+        ("Afternoon", "Afternoon"),
+        ("Morning", "Morning"),
+    ]
+
+    early_late = models.CharField(blank=True, choices=early_late_choices, default=None)
+
     public = models.BooleanField(blank=True, default=False)
 
     artist = models.ForeignKey(
@@ -540,10 +551,63 @@ class Events(models.Model):
         db_column="run",
     )
 
-    type = models.TextField(blank=True, default=None, db_column="event_type")
+    types = (
+        ("Anniversary", "Anniversary"),
+        ("Award Ceremony", "Award Ceremony"),
+        ("Benefit Concert", "Benefit Concert"),
+        ("Birthday", "Birthday"),
+        ("Cancelled", "Cancelled"),
+        ("Celebration", "Celebration"),
+        ("Concert", "Concert"),
+        ("Concert for TV Broadcast", "Concert for TV Broadcast"),
+        ("Filmshoot", "Filmshoot"),
+        ("Funeral", "Funeral"),
+        ("Interview", "Interview"),
+        ("Jam Session", "Jam Session"),
+        ("Keynote Speech", "Keynote Speech"),
+        ("Memorial", "Memorial"),
+        ("Music Festival", "Music Festival"),
+        ("No Gig", "No Gig"),
+        ("Politics", "Politics"),
+        ("Recording", "Recording"),
+        ("Rehearsal", "Rehearsal"),
+        ("Relocated", "Relocated"),
+        ("Rescheduled", "Rescheduled"),
+        ("Wedding", "Wedding"),
+    )
+
+    type = models.CharField(
+        blank=True,
+        default=None,
+        choices=types,
+        db_column="event_type",
+    )
+
     title = models.TextField(blank=True, default=None, db_column="event_title")
-    event_certainty = models.TextField(blank=True, default=None)
-    setlist_certainty = models.TextField(blank=True, default=None)
+
+    event_certainty_choices = (
+        ("Unknown Date", "Unknown Date"),
+        ("Confirmed", "Confirmed"),
+        ("Unknown Location", "Unknown Location"),
+    )
+
+    setlist_certainty_choices = (
+        ("Unknown", "Unknown"),
+        ("Confirmed", "Confirmed"),
+        ("Probable", "Probable"),
+    )
+
+    event_certainty = models.CharField(
+        blank=True,
+        choices=event_certainty_choices,
+        default=None,
+    )
+    setlist_certainty = models.CharField(
+        blank=True,
+        choices=setlist_certainty_choices,
+        default=None,
+    )
+
     event_date_note = models.TextField(blank=True, default=None)
     bootleg = models.BooleanField(blank=True, default=False)
     official = models.BooleanField(blank=True, default=False)
@@ -835,7 +899,12 @@ class Releases(models.Model):
     thumb = models.TextField(blank=True, default=None)
     mbid = models.TextField(blank=True, default=None)
     fts = models.TextField(blank=True, default=None)  # This field type is a guess.
-
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        related_name="release_event",
+        db_column="event_id",
+    )
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
@@ -954,7 +1023,21 @@ class Setlists(models.Model):
         default=None,
     )
 
-    set_name = models.TextField(blank=True, default=None)
+    sets = (
+        ("Soundcheck", "Soundcheck"),
+        ("Interview", "Interview"),
+        ("Post-Show", "Post-Show"),
+        ("Set 1", "Set 1"),
+        ("Set 2", "Set 2"),
+        ("Encore", "Encore"),
+        ("Pre-Show", "Pre-Show"),
+        ("Show", "Show"),
+        ("Recording", "Recording"),
+        ("Rehearsal", "Rehearsal"),
+    )
+
+    set_name = models.CharField(blank=True, default="Show", choices=sets)
+
     song_num = models.IntegerField(default=1)
 
     song = models.ForeignKey(
@@ -1243,6 +1326,9 @@ class TourLegs(models.Model):
         db_table = "tour_legs"
         verbose_name_plural = db_table
 
+    def __str__(self):
+        return self.name
+
 
 class SongsPage(models.Model):
     id = models.OneToOneField(
@@ -1318,6 +1404,9 @@ class Runs(models.Model):
         managed = False
         db_table = "runs"
         verbose_name_plural = db_table
+
+    def __str__(self):
+        return self.name
 
 
 class Sessions(models.Model):

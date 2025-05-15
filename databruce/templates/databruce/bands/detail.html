@@ -12,10 +12,10 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h5>Events</h5>
-        <div class="col">
+    <div class="col-12 col-md-8">
+      <div class="card mb-4">
+        <h5 class="card-header">Events</h5>
+        <div class="card-body px-0">
           <div class="table-responsive p-0">
             <table class="table table display nowrap" id="eventTable">
               <thead>
@@ -23,7 +23,6 @@
                   <th>Date</th>
                   <th>Band</th>
                   <th>Venue</th>
-                  <th>Location</th>
                   <th>Tour</th>
                   <th>Detail</th>
                 </tr>
@@ -32,17 +31,22 @@
                 {% for event in events %}
                   <tr>
                     <td>
-                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event.event_date|get_date:event.id }} {{ event.early_late|default_if_none:'' }}</a>
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
                     </td>
                     <td>
                       <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
                     </td>
                     <td>
-                      <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-                    </td>
-                    <td>
+                      <div class="row">
+                        <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                      </div>
                       {% if event.venue.city %}
-                        <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                        <div class="row">
+                          <span>
+                            <a class="text-secondary-emphasis"
+                               href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                          </span>
+                        </div>
                       {% endif %}
                     </td>
                     <td>
@@ -50,7 +54,7 @@
                         <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                       {% endif %}
                     </td>
-                    <td>{{ event.event_title|default_if_none:'' }}</td>
+                    <td>{{ event.title|default_if_none:'' }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -59,12 +63,10 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h5>Members</h5>
-        <div class="col">
+    <div class="col-12 col-md-4">
+      <div class="card">
+        <h5 class="card-header">Members</h5>
+        <div class="card-body">
           <div class="table-responsive p-0">
             <table class="table table display" id="memberTable">
               <thead>
@@ -96,8 +98,13 @@
         searching: false,
         layout: layout,
       });
-      new DataTable('#memberTable', {
 
+      // removes searchBuilder button, not needed for this.
+      layout.topEnd.features[1].buttons.pop();
+
+      new DataTable('#memberTable',{
+        layout: layout,
+        searching: false
       });
     });
   </script>

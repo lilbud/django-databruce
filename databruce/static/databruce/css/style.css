@@ -11,7 +11,7 @@ body {
 
 .card-header {
     background-color: var(--dove-gray-800) !important;
-    color: var(--denim-500) !important;
+    /* color: var(--denim-500) !important; */
     border: none;
 }
 
@@ -225,6 +225,12 @@ tr th {
     }
 }
 
+@media only screen and (max-width: 768px) {
+    .dt-layout-full {
+        margin-top: 0px !important;
+    }
+}
+
 .dt-layout-full {
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -234,6 +240,24 @@ tr th {
     padding-left: 8px
 }
 
+.dt-buttons>button {
+    margin-bottom: 0px !important;
+}
+
 .text-sm-right {
     text-align: right !important;
+}
+
+div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-start:empty),
+div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
+    display: none !important;
+    margin-top: 0px !important;
+}
+
+/* .dt-layout-table {
+    margin-top: 0px !important;
+} */
+
+.index .dt-layout-table {
+    margin-top: 0px !important;
 }
