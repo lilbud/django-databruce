@@ -4,82 +4,120 @@
   Events &gt; Search
 {% endblock title %}
 {% block content %}
-  <div class="col">
-    <form action="{% url 'databruce:adv_search' %}"
-          method="post"
-          id="search-form">
-      {% csrf_token %}
-      <div class="row mb-3">
-        {{ form.first_date.label_tag }}
-        <div class="col-5 col-md-2">{{ form.first_date }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.last_date.label_tag }}
-        <div class="col-5 col-md-2">{{ form.last_date }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.month.label_tag }}
-        <div class="col-5 col-md-1">{{ form.month }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.day.label_tag }}
-        <div class="col-3 col-md-1">{{ form.day }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.day_of_week.label_tag }}
-        <div class="col-6 col-md-2">{{ form.day_of_week }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.city.label_tag }}
-        <div class="col-8 col-md-3">{{ form.city }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.state.label_tag }}
-        <div class="col-8 col-md-3">{{ form.state }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.country.label_tag }}
-        <div class="col-8 col-md-3">{{ form.country }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.musician.label_tag }}
-        <div class="col-8 col-md-3">{{ form.musician }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.band.label_tag }}
-        <div class="col-8 col-md-3">{{ form.band }}</div>
-      </div>
-      <div class="row mb-3">
-        {{ form.conjunction.label_tag }}
-        <div class="col-3 col-md-1">{{ form.conjunction }}</div>
-      </div>
-      {{ formset.management_form.as_p }}
-      <div id="setlist-search">
-        {% for form in formset.forms %}
-          <div class="row mb-2" id="song_row-{{ forloop.counter0 }}">
-            {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
+  <div class="row mb-4">
+    <div class="col offset-1">
+      <h4>Advanced Event Search</h4>
+      <h6>
+        Search for events based on a number of parameters like month/day, who was onstage, and even what songs were played.
+      </h6>
+      <h6>
+        This search was entirely based on the advanced search created by the folks over at <a href="https://jerrybase.com">Jerrybase</a>. I largely copied the basic functionality/layout, but the backend is handled differently due to differences in framework.
+      </h6>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col offset-1">
+      <form action="{% url 'databruce:adv_search' %}"
+            method="post"
+            id="search-form">
+        {% csrf_token %}
+        <div class="row mb-3">
+          <div class="form-label">{{ form.first_date.label }}</div>
+          <div class="col-5 col-md-2">{{ form.first_date }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.last_date.label }}</div>
+          <div class="col-5 col-md-2">{{ form.last_date }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.month.label }}</div>
+          <div class="col-5 col-md-2">{{ form.month }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.day.label }}</div>
+          <div class="col-3 col-md-1">{{ form.day }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.day_of_week.label }}</div>
+          <div class="col-6 col-md-2">{{ form.day_of_week }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.city.label }}</div>
+          <div class="col-8 col-md-4">{{ form.city }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.state.label }}</div>
+          <div class="col-8 col-md-4">{{ form.state }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.country.label }}</div>
+          <div class="col-8 col-md-4">{{ form.country }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.musician.label }}</div>
+          <div class="col-8 col-md-4">{{ form.musician }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.band.label }}</div>
+          <div class="col-8 col-md-4">{{ form.band }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.conjunction.label }}</div>
+          <div class="col-3 col-md-1">{{ form.conjunction }}</div>
+        </div>
+        {{ formset.management_form.as_p }}
+        <div id="setlist-search" class="mb-5">
+          {% for form in formset.forms %}
+            <div class="row mb-2" id="song_row-{{ forloop.counter0 }}">
+              {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="row" id="form-buttons">
+          <div class="col">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button id="submit-button"
+                      type="submit"
+                      name="submit"
+                      class="btn btn-success">Go</button>
+              <button id="reset-button"
+                      type="reset"
+                      name="reset"
+                      onclick="resetForm()"
+                      class="btn btn-danger">Reset</button>
+              <button id="add-form-btn"
+                      type="button"
+                      name="add"
+                      onclick="addForm()"
+                      class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="16"
+                     height="16"
+                     fill="currentColor"
+                     class="bi bi-plus-circle-fill"
+                     viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z">
+                  </path>
+                </svg>
+                Add Row
+              </button>
+            </div>
           </div>
-        {% endfor %}
+        </div>
+      </form>
+      <div id="new_row" class="row invisible mb-2">
+        {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
       </div>
-      <button id="submit-button"
-              type="submit"
-              name="submit"
-              class="btn btn-primary">Go</button>
-      <button id="add-form-btn" type="button" name="add" class="btn btn-secondary">Add Row</button>
-    </form>
-    <div id="new_row" class="row invisible mb-2">
-      {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
     </div>
   </div>
   {% load static %}
   <script src="{% static 'databruce/js/advanced_search.js' %}"></script>
   <script src="{% static 'databruce/js/setlist_search.js' %}"></script>
-  <script type="text/javascript">
+  {% comment %} <script type="text/javascript">
     $(document).ready(function () {
       document.querySelectorAll("label").forEach(element => {
-        element.classList.add("col-3","col-md-2","form-label","text-sm-end")
+        element.classList.add("col-3", "col-md-1", "form-label","text-sm-end")
       });
     });
-
-  </script>
+  </script> {% endcomment %}
 {% endblock content %}

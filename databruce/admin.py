@@ -4,18 +4,6 @@ from django.forms import BaseInlineFormSet
 from . import models
 
 
-class SetlistInlineFormset(BaseInlineFormSet):
-    model = models.Setlists
-    fields = [
-        "event",
-        "set_name",
-        "song_num",
-        "song",
-        "segue",
-        "song_note",
-    ]  # Specify the fields you want to include
-
-
 class SetlistInline(admin.TabularInline):
     model = models.Setlists
     autocomplete_fields = ["song"]
@@ -50,7 +38,7 @@ class BandAdmin(admin.ModelAdmin):
 
 @admin.register(models.Bootlegs)
 class BootlegAdmin(admin.ModelAdmin):
-    search_fields = ["id"]
+    search_fields = ["event", "title", "label", "source"]
     list_select_related = ["event"]
     list_display = ["id", "event", "title", "label", "source"]
     list_display_links = ["id", "event"]
@@ -96,7 +84,15 @@ class NugsAdmin(admin.ModelAdmin):
 
 @admin.register(models.Events)
 class EventAdmin(admin.ModelAdmin):
-    search_fields = ["id"]
+    search_fields = [
+        "id",
+        "date",
+        "venue__name",
+        "artist__name",
+        "tour__name",
+        "run__name",
+        "leg__name",
+    ]
     autocomplete_fields = ["venue", "artist", "tour", "run", "leg"]
     list_select_related = ["venue"]
     list_display = ["id", "date", "venue"]
@@ -106,7 +102,7 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(models.Songs)
 class SongAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["name", "original_artist"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
 
@@ -114,7 +110,7 @@ class SongAdmin(admin.ModelAdmin):
 @admin.register(models.Setlists)
 class SetlistAdmin(admin.ModelAdmin):
     autocomplete_fields = ["event", "song"]
-    search_fields = ["song"]
+    search_fields = ["song", "event"]
     list_select_related = ["event", "song"]
     list_display = ["id", "event", "set_name", "song_num", "song"]
     list_display_links = ["id", "event", "song"]
@@ -122,7 +118,7 @@ class SetlistAdmin(admin.ModelAdmin):
 
 @admin.register(models.Onstage)
 class OnstageAdmin(admin.ModelAdmin):
-    search_fields = ["relation__name"]
+    search_fields = ["relation__name", "band__name"]
     list_select_related = ["relation", "band"]
     list_display = ["id", "event", "relation__name", "band__name"]
     list_display_links = ["id", "event", "relation__name", "band__name"]
@@ -137,15 +133,15 @@ class RelationAdmin(admin.ModelAdmin):
 
 @admin.register(models.ReleaseTracks)
 class ReleaseTrackAdmin(admin.ModelAdmin):
-    search_fields = ["release__name"]
+    search_fields = ["release__name", "song_name"]
     list_select_related = ["release", "song"]
-    list_display = ["id", "release__name", "track", "song"]
+    list_display = ["id", "release__name", "track", "song", "song__name"]
     list_display_links = ["id", "release__name", "song"]
 
 
 @admin.register(models.Releases)
 class ReleaseAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["name", "type"]
     list_display = ["id", "name", "type", "date"]
     list_display_links = ["id"]
 
@@ -173,7 +169,7 @@ class SnippetAdmin(admin.ModelAdmin):
 
 @admin.register(models.States)
 class StateAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["name", "state_abbrev", "country", "first", "last"]
     list_select_related = ["country", "first", "last"]
     list_display = ["id", "name", "state_abbrev", "country", "first", "last"]
     list_display_links = ["id", "country", "first", "last"]
@@ -181,7 +177,7 @@ class StateAdmin(admin.ModelAdmin):
 
 @admin.register(models.Tours)
 class TourAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["name", "band"]
     list_select_related = ["first", "band", "last"]
     list_display = ["id", "name", "band", "first", "last"]
     list_display_links = ["id", "band", "first", "last"]
@@ -222,7 +218,7 @@ class VenueAdmin(admin.ModelAdmin):
 
 @admin.register(models.Runs)
 class RunAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["name", "band"]
     autocomplete_fields = ["band"]
     list_select_related = ["band", "first", "last"]
     list_display = ["id", "name", "band", "num_shows", "first", "last"]
@@ -231,7 +227,7 @@ class RunAdmin(admin.ModelAdmin):
 
 @admin.register(models.Tags)
 class TagAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["event"]
     list_select_related = ["id", "event"]
     list_display = ["id", "event", "tags"]
     list_display_links = ["id", "event"]

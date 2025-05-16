@@ -261,3 +261,7 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 .index .dt-layout-table {
     margin-top: 0px !important;
 }
+
+.button {
+    text-shadow: none !important;
+}

@@ -1,19 +1,18 @@
-function select2(e) {
-    var selectOptions = {
-        theme: "bootstrap-5",
-        selectionCssClass: "form-select",
-        dropdownCssClass: "form-control",
-        minimumInputLength: 3,
-        dropdownPosition: 'below'
-    };
-
-    $(e).select2(selectOptions);
-}
+var selectOptions = {
+    theme: "bootstrap-5",
+    selectionCssClass: "form-select",
+    dropdownCssClass: "form-control",
+    minimumInputLength: 3,
+    dropdownPosition: 'below',
+    allowClear: true,
+    placeholder: '',
+    width: 'resolve' // need to override the changed default
+};
 
 const wrapFormEl = document.getElementById("setlist-search");
 const submitBtn = document.getElementById("submit-button");
 const totalFormsInput = document.getElementById("id_form-TOTAL_FORMS");
-const conjunctionSelect = document.getElementById("conjunctionSelect");
+const addFormBtn = document.getElementById("add-form-btn");
 
 // shows or hides the song2 select based on the value of position
 function song2(e) {
@@ -21,7 +20,7 @@ function song2(e) {
 
     if (e.value == "followed_by") {
         song2.parent().show();
-        select2(song2);
+        song2.select2(selectOptions);
     } else {
         song2.parent().hide();
     }
@@ -44,7 +43,7 @@ function addForm() {
     clonedDiv.find('[class*=song1]').each(function () {
         $(this).attr("id", "id_form-" + totalFormsValue + "-song1");
         $(this).attr("name", "form-" + totalFormsValue + "-song1");
-        select2(this);
+        $(this).select2(selectOptions);
     });
 
     clonedDiv.find('[class*=position]').each(function () {
@@ -55,17 +54,10 @@ function addForm() {
     clonedDiv.find('[class*=song2]').each(function () {
         $(this).attr("id", "id_form-" + totalFormsValue + "-song2");
         $(this).attr("name", "form-" + totalFormsValue + "-song2");
-        $(this).hide();
+        $(this).parent().hide();
     });
 
-    const conjunction = document.createElement("div");
-    conjunction.innerHTML = `<div class="col-8 offset-2" id="conjunctionText">${conjunctionSelect.value.toUpperCase()}</div>`;
-    conjunction.classList.add("row", "mb-2", "conjunctionDiv");
-    console.log(conjunction);
-
-    wrapFormEl.appendChild(conjunction);
-
-    $(submitBtn).before(clonedDiv);
+    $(wrapFormEl).append(clonedDiv);
     totalFormsInput.value++;
 
     clonedDiv.find('[class*=position]').change(function () {
@@ -73,38 +65,13 @@ function addForm() {
     });
 };
 
-const addFormBtn = document.getElementById("add-form-btn");
-addFormBtn.addEventListener('click', addForm);
+function resetForm() {
+    location.reload();
+}
 
 function removeForm(e) {
     if (totalFormsInput.value > 0) {
         $(e).parent().parent().remove();
-
-
-        // removes a conjunction div if it is first or last
-        if ($(wrapFormEl).find("div:first").hasClass('conjunctionDiv')) {
-            console.log($(wrapFormEl).find("div:first"));
-            $(wrapFormEl).find("div:first").remove();
-        };
-
-        if ($(wrapFormEl).find("div:last").hasClass('conjunctionDiv')) {
-            $(wrapFormEl).find("div:last").remove();
-        };
-
-        $(wrapFormEl).find("[id^=song_row]").each(function () {
-            var next_row = $(this).next();
-            if (next_row.hasClass('conjunctionDiv')) {
-                var row_after_next = next_row.next()
-                if (row_after_next.hasClass('conjunctionDiv')) {
-                    //two conjunctions in a row so remove
-                    row_after_next.remove()
-                }
-            } else if (next_row.hasClass('song-row')) {
-                //song row with no conjunction between
-                $(this).after($('.conjunctionDiv').html())
-            }
-        });
-
         totalFormsInput.value--;
     }
 }
@@ -117,7 +84,7 @@ $(document).ready(function () {
 
     // apply select2 to the first song select
     $("#id_form-0-song1").each(function () {
-        select2(this);
+        $(this).select2(selectOptions);
     });
 
     // apply select2 to song2 when position = followed by

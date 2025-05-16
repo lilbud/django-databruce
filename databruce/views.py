@@ -136,7 +136,7 @@ class Event(TemplateView):
             self.year = self.date.year
 
         context["year"] = self.year
-        context["years"] = list(range(1965, self.year + 1))
+        context["years"] = list(range(1965, self.date.year + 1))
         context["event_info"] = self.queryset.filter(id__startswith=self.year)
 
         return context

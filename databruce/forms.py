@@ -147,7 +147,7 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=get_months(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select"}),
+        widget=forms.Select(attrs={"class": "form-select", "id": "month"}),
     )
 
     day = forms.ChoiceField(
@@ -155,7 +155,7 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=get_days(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select"}),
+        widget=forms.Select(attrs={"class": "form-select", "id": "day"}),
     )
 
     day_of_week = forms.ChoiceField(
@@ -163,7 +163,7 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=days_of_week,
         required=False,
-        widget=forms.Select(attrs={"class": "form-select"}),
+        widget=forms.Select(attrs={"class": "form-select", "id": "day-of-week"}),
     )
 
     city = forms.ChoiceField(
@@ -210,16 +210,6 @@ class AdvancedEventSearch(forms.Form):
         choices=get_bands(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select select2", "id": "bandSelect"}),
-    )
-
-    conjunction = forms.ChoiceField(
-        label="Conjunction",
-        label_suffix=":",
-        choices=[("and", "AND"), ("or", "OR")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select", "id": "conjunctionSelect"},
-        ),
     )
 
     def clean_first_date(self):
@@ -328,7 +318,7 @@ class SetlistSearch(forms.Form):
         choices=songs,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select song1"},
+            attrs={"class": "form-select song1 select2"},
         ),
     )
 
@@ -374,8 +364,18 @@ class SetlistSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select song2",
+                "class": "form-select song2 select2",
             },
+        ),
+    )
+
+    conjunction = forms.ChoiceField(
+        label="Conjunction",
+        label_suffix=":",
+        choices=[("and", "AND"), ("or", "OR")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select", "id": "conjunctionSelect"},
         ),
     )
 
