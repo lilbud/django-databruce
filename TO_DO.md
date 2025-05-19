@@ -1,26 +1,25 @@
 # Pages to add:
-- Songs played as snippets
-- Events by Run
+- Event Run Details
+  - events, songs
+- Tour Legs
+- Tour Leg Details?
+  - events, songs
+- Setlist Notes Search
 - Radio Nowhere Archive page
 
 # Features?
-<!-- - Event search by date? -->
+- Event page layout improvements
+  - clean up setlist notes. Some events (like 2016-01-16) have a ridiculous number of notes, all of which are debut/premiere/bustout. Find another way to display this info. Could maybe do a table like Dripfield, but that doesn't quite work on mobile. They use tooltips with links to indicate last show, which jump to that event when tapped on mobile.
 
-- advanced event search - DONE
-  - every field has a default of all values so if they're left empty it will still work.
-
-- Clean up setlist search
-  - cleaned up the form, "followed by" properly added and hides when not needed
-  - still limited to a single song, but might be able to expand
-
-- Combine setlist search and event search
-  - event search first to whittle down the list of events, then pass that filtered list to the setlist search. So, it only looks from that filtered list instead of everything.
-
-<!-- - Song Page: add toggle to hide private events like soundcheck/rehearsal/recording -->
+- Songs page additions? likely dropdowns or maybe incorporate the sidebar filter that dripfield does?
+  - Songs only played as snippets (if snip_only is true)
+  - Songs never played live (all num columns == 0)
 
 # Other
+- move tours to a dropdown on navbar? tours/legs
 - Clean up release tracks page, add musicbrainz links and art
-- style pages to use cards like setlist page
-- finish setlist page, add venue/city links and show info like title/type/run/tour. Also add nugs/release links/archive
+<!-- - style pages to use cards like setlist page -->
+<!-- - finish setlist page, add venue/city links and show info like title/type/run/tour.  -->
+Also add nugs/release links/archive to events
 <!-- figure out a logo -->
 Better styling

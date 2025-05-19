@@ -110,6 +110,15 @@ class AdvancedEventSearch(forms.Form):
 
         return bands
 
+    def get_tours():
+        tours = [("", "")]
+
+        tours.extend(
+            models.Tours.objects.all().order_by("name").values_list("id", "name"),
+        )
+
+        return tours
+
     first_date = forms.CharField(
         label="Start Date",
         label_suffix=":",
@@ -194,6 +203,16 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
+    tour = forms.ChoiceField(
+        label="Tour",
+        label_suffix=":",
+        choices=get_tours(),
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select select2", "id": "tourSelect"},
+        ),
+    )
+
     musician = forms.ChoiceField(
         label="Musician",
         label_suffix=":",
@@ -210,6 +229,16 @@ class AdvancedEventSearch(forms.Form):
         choices=get_bands(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select select2", "id": "bandSelect"}),
+    )
+
+    conjunction = forms.ChoiceField(
+        label="Conjunction",
+        label_suffix=":",
+        choices=[("and", "AND"), ("or", "OR")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select", "id": "conjunctionSelect"},
+        ),
     )
 
     def clean_first_date(self):
@@ -254,47 +283,53 @@ class AdvancedEventSearch(forms.Form):
             .date
         )
 
-    def clean_month(self):
-        if self.cleaned_data["month"]:
-            return [self.cleaned_data["month"]]
+    # def clean_month(self):
+    #     if self.cleaned_data["month"]:
+    #         return [self.cleaned_data["month"]]
 
-        return list(range(1, 13))
+    #     return list(range(1, 13))
 
-    def clean_day(self):
-        if self.cleaned_data["day"]:
-            return [self.cleaned_data["day"]]
+    # def clean_day(self):
+    #     if self.cleaned_data["day"]:
+    #         return [self.cleaned_data["day"]]
 
-        return list(range(1, 32))
+    #     return list(range(1, 32))
 
-    def clean_day_of_week(self):
-        if self.cleaned_data["day_of_week"]:
-            return [self.cleaned_data["day_of_week"]]
+    # def clean_day_of_week(self):
+    #     if self.cleaned_data["day_of_week"]:
+    #         return [self.cleaned_data["day_of_week"]]
 
-        return list(range(1, 8))
+    #     return list(range(1, 8))
 
-    def clean_band(self):
-        if self.cleaned_data["band"]:
-            return [self.cleaned_data["band"]]
+    # def clean_band(self):
+    #     if self.cleaned_data["band"]:
+    #         return [self.cleaned_data["band"]]
 
-        return models.Bands.objects.all().values_list("id", flat=True)
+    #     return models.Bands.objects.all().values_list("id", flat=True)
 
-    def clean_city(self):
-        if self.cleaned_data["city"]:
-            return [self.cleaned_data["city"]]
+    # def clean_city(self):
+    #     if self.cleaned_data["city"]:
+    #         return [self.cleaned_data["city"]]
 
-        return models.Cities.objects.all().values_list("id", flat=True)
+    #     return models.Cities.objects.all().values_list("id", flat=True)
 
-    def clean_country(self):
-        if self.cleaned_data["country"]:
-            return [self.cleaned_data["country"]]
+    # def clean_country(self):
+    #     if self.cleaned_data["country"]:
+    #         return [self.cleaned_data["country"]]
 
-        return models.Countries.objects.all().values_list("id", flat=True)
+    #     return models.Countries.objects.all().values_list("id", flat=True)
 
-    def clean_musician(self):
-        if self.cleaned_data["musician"]:
-            return [self.cleaned_data["musician"]]
+    # def clean_musician(self):
+    #     if self.cleaned_data["musician"]:
+    #         return [self.cleaned_data["musician"]]
 
-        return models.Relations.objects.all().values_list("id", flat=True)
+    #     return models.Relations.objects.all().values_list("id", flat=True)
+
+    # def clean_tour(self):
+    #     if self.cleaned_data["tour"]:
+    #         return [self.cleaned_data["tour"]]
+
+    #     return models.Tours.objects.all().values_list("id", flat=True)
 
 
 class SetlistSearch(forms.Form):
@@ -366,16 +401,6 @@ class SetlistSearch(forms.Form):
             attrs={
                 "class": "form-select song2 select2",
             },
-        ),
-    )
-
-    conjunction = forms.ChoiceField(
-        label="Conjunction",
-        label_suffix=":",
-        choices=[("and", "AND"), ("or", "OR")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select", "id": "conjunctionSelect"},
         ),
     )
 

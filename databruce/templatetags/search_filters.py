@@ -70,6 +70,11 @@ def get_band(band: int):
     return models.Bands.objects.get(id=band).name
 
 
+@register.filter(name="get_tour")
+def get_tour(tour: int):
+    return models.Tours.objects.get(id=tour).name
+
+
 @register.filter(name="get_ordinal")
 def make_ordinal(n: int):
     """Convert an integer into its ordinal representation::.

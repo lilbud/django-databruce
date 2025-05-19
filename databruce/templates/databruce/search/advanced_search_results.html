@@ -40,16 +40,28 @@
               {% if request.POST.country %}
                 {% include "./result_row.html" with label="Country:" data=request.POST.country|get_country %}
               {% endif %}
+              {% if request.POST.tour %}
+                {% include "./result_row.html" with label="Tour:" data=request.POST.tour|get_tour %}
+              {% endif %}
               {% if request.POST.musician %}
                 {% include "./result_row.html" with label="Musician:" data=request.POST.musician|get_relation %}
               {% endif %}
               {% if request.POST.band %}
                 {% include "./result_row.html" with label="Band:" data=request.POST.band|get_band %}
               {% endif %}
-              {% for result in results %}
-                <h6>{{ result }}</h6>
-                {% if not forloop.last %}<h6 class="text-uppercase">{{ request.POST.conjunction }}</h6>{% endif %}
-              {% endfor %}
+              {% if results %}
+                <span>
+                  <div class="d-flex flex-row">
+                    <div class="pe-2">Songs:</div>
+                    <div>
+                      {% for result in results %}
+                        {{ result }}
+                        {% if not forloop.last %}<span class="text-uppercase">{{ request.POST.conjunction }}</span>{% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </span>
+              {% endif %}
             </div>
           </div>
         </div>

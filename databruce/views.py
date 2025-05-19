@@ -375,31 +375,48 @@ class AdvancedSearch(View):
     def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         event_form = self.form_class(request.POST, initial={"month": "5", "day": "10"})
         formset = self.formset_class(data=request.POST)
+        results = []
 
         if event_form.is_valid():
             form = event_form
-            event_filter = (
-                Q(date__gte=form.cleaned_data["first_date"])
-                & Q(date__lte=form.cleaned_data["last_date"])
-                & Q(date__month__in=form.cleaned_data["month"])
-                & Q(date__day__in=form.cleaned_data["day"])
-                & Q(venue__city__id__in=form.cleaned_data["city"])
-                & Q(venue__country__id__in=form.cleaned_data["country"])
+            event_filter = Q(date__gte=form.cleaned_data["first_date"]) & Q(
+                date__lte=form.cleaned_data["last_date"],
             )
+            onstage_filter = Q()
 
-            onstage_band_filter = Q(band__in=form.cleaned_data["band"])
-            onstage_relation_filter = Q(relation__in=form.cleaned_data["musician"])
+            if form.cleaned_data["month"]:
+                event_filter.add(Q(date__month__in=form.cleaned_data["month"]), Q.AND)
+            if form.cleaned_data["day"]:
+                event_filter.add(Q(date__day__in=form.cleaned_data["day"]), Q.AND)
+            if form.cleaned_data["city"]:
+                event_filter.add(
+                    Q(venue__city__id__in=form.cleaned_data["city"]),
+                    Q.AND,
+                )
+            if form.cleaned_data["state"]:
+                event_filter.add(Q(date__day__in=form.cleaned_data["day"]), Q.AND)
+            if form.cleaned_data["country"]:
+                event_filter.add(
+                    Q(venue__country__id__in=form.cleaned_data["country"]),
+                    Q.AND,
+                )
+            if form.cleaned_data["tour"]:
+                event_filter.add(Q(tour__id__in=form.cleaned_data["tour"]), Q.AND)
+            if form.cleaned_data["band"]:
+                onstage_filter.add(Q(band__in=form.cleaned_data["band"]), Q.AND)
+            if form.cleaned_data["musician"]:
+                onstage_filter.add(Q(relation__in=form.cleaned_data["musician"]), Q.AND)
 
-            if len(form.cleaned_data["day_of_week"]) == 1:
+            if form.cleaned_data["day_of_week"]:
                 day_filter = Q(
                     date__week_day__in=form.cleaned_data["day_of_week"],
                 )
 
-                if int(form.cleaned_data["day_of_week"][0]) > 7:  # noqa: PLR2004
+                if int(form.cleaned_data["day_of_week"]) > 7:  # noqa: PLR2004
                     day_filter = (
                         ~Q(
                             date__week_day__in=[
-                                int(form.cleaned_data["day_of_week"][0]) - 7,
+                                int(form.cleaned_data["day_of_week"]) - 7,
                             ],
                         ),
                     )
@@ -411,7 +428,7 @@ class AdvancedSearch(View):
 
             events = (
                 models.Onstage.objects.filter(
-                    onstage_relation_filter & onstage_band_filter,
+                    onstage_filter,
                 )
                 .distinct("event")
                 .values_list("event")
@@ -419,17 +436,70 @@ class AdvancedSearch(View):
 
             event_filter.add(Q(id__in=events), Q.AND)
 
-        results = []
         event_results = []
         setlist_event_filter = Q()
 
         if formset.is_valid():
             for form in formset.cleaned_data:
-                print(form)
+                try:
+                    song1 = models.Songs.objects.get(id=form["song1"])
+                    setlist_filter = Q(current__song__id=song1.id)
+
+                    if form["position"] == "Followed By":
+                        song2 = models.Songs.objects.get(id=form["song2"])
+
+                        followed_filter = Q(next__song__id=song2.id)
+
+                        if form["choice"] == "is":
+                            setlist_filter.add(followed_filter, Q.AND)
+                        else:
+                            setlist_filter.add(~followed_filter, Q.AND)
+
+                        results.append(
+                            f"{song1} ({form['choice']} followed by) {song2}",
+                        )
+
+                    elif form["position"] != "Anywhere":
+                        # all others except anywhere and followed by
+                        position_filter = Q(current__position=form["position"])
+
+                        if form["choice"] == "is":
+                            setlist_filter.add(position_filter, Q.AND)
+                        else:
+                            setlist_filter.add(~position_filter, Q.AND)
+
+                        results.append(
+                            f"{song1} ({form['choice']} {form['position']})",
+                        )
+                    else:
+                        results.append(
+                            f"{song1} ({form['choice']} anywhere)",
+                        )
+
+                    qs = models.SongsPage.objects.filter(
+                        setlist_filter,
+                    )
+
+                    events_list = qs.values_list("current__event", flat=True)
+
+                    event_results.append(list(events_list))
+
+                    if event_form.cleaned_data["conjunction"] == "and":
+                        setlist_event_filter.add(
+                            Q(id__in=list(set.intersection(*map(set, event_results)))),
+                            Q.AND,
+                        )
+                    else:
+                        setlist_event_filter.add(
+                            Q(id__in=list(set.union(*map(set, event_results)))),
+                            Q.OR,
+                        )
+                except ValueError:
+                    break
 
         result = (
             models.Events.objects.filter(
-                event_filter,
+                event_filter & setlist_event_filter,
             )
             .select_related(
                 "venue",
@@ -449,7 +519,10 @@ class AdvancedSearch(View):
         return render(
             request,
             "databruce/search/advanced_search_results.html",
-            context={"events": result.order_by("id"), "results": results},
+            context={
+                "events": result.order_by("id"),
+                "results": results,
+            },
         )
 
 

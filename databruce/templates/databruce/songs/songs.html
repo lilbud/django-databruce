@@ -15,7 +15,9 @@
       <th class="all" scope="col">Name</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
-      <th class="all text-center" scope="col">Plays</th>
+      <th class="all text-center" scope="col">Public</th>
+      <th class="all text-center" scope="col">Private</th>
+      <th class="all text-center" scope="col">Snippet</th>
       <th class="min-tablet-l" scope="col">Original Artist</th>
       <th class="all" scope="col">Original?</th>
     </tr>
@@ -24,7 +26,7 @@
     {% for song in songs %}
       <tr>
         <td class="text-wrap">
-          <a href="{% url 'databruce:song_details' id=song.id %}">{{ song }}</a>
+          <a href="{% url 'databruce:song_details' id=song.id %}">{{ song.name }}</a>
         </td>
         <td>
           {% if song.first %}
@@ -37,6 +39,8 @@
           {% endif %}
         </td>
         <td class="text-center">{{ song.num_plays_public }}</td>
+        <td class="text-center">{{ song.num_plays_private }}</td>
+        <td class="text-center">{{ song.num_plays_snippet }}</td>
         <td>
           {% if not song.original %}
             {{ song.original_artist|default_if_none:"" }}
@@ -58,7 +62,7 @@
 {% block scripts %}
   <script>
   // removes searchBuilder button, not needed for this.
-  layout.topEnd.features[1].buttons.pop();
+  layout.topEnd.features[1].buttons[0].config.columns = [4, 5, 6]
 
   $(document).ready(function () {
     new DataTable('#songsTable', {

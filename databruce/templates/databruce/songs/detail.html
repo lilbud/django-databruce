@@ -60,9 +60,9 @@
                 <tr>
                   <th class="all" scope="col">Date</th>
                   <th class="all" scope="col">Act</th>
+                  <th class="min-tablet-l" scope="col">Venue</th>
                   <th class="min-tablet-l" scope="col">Tour</th>
                   <th class="min-tablet-l" scope="col">Position</th>
-                  <th class="min-tablet-l" scope="col">Venue</th>
                   <th class="min-tablet-l" scope="col">Gap</th>
                   <th class="min-tablet-l" scope="col">Set</th>
                   <th class="min-tablet-l" scope="col">Prev</th>
@@ -76,18 +76,10 @@
                     <td class="text-nowrap">
                       <a href="{% url "databruce:event_details" event=song.current.event.id %}">{{ song.current.event }}</a>
                     </td>
-                    <td>
+                    <td class="text-nowrap">
                       <a href="{% url "databruce:band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
                     </td>
-                    <td>
-                      {% if song.current.event.tour %}{{ song.current.event.tour }}{% endif %}
-                    </td>
-                    <td>
-                      {% if song.current.position and song.current.position != song.current.set_name %}
-                        {{ song.current.position }}
-                      {% endif %}
-                    </td>
-                    <td>
+                    <td class="text-nowrap">
                       {% with venue=song.current.event.venue %}
                         <a href="{% url 'databruce:venue_details' id=venue.id %}">
                           {% spaceless %}
@@ -99,6 +91,14 @@
                           {% endspaceless %}
                         </a>
                       {% endwith %}
+                    </td>
+                    <td class="text-nowrap">
+                      {% if song.current.event.tour %}{{ song.current.event.tour }}{% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                      {% if song.current.position and song.current.position != song.current.set_name %}
+                        {{ song.current.position }}
+                      {% endif %}
                     </td>
                     <td>
                       {% if song.current.premiere %}
@@ -134,7 +134,7 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 6, 7, 8]
+    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 6, 7, 8]
 
     $(document).ready(function () {
       new DataTable('#songTable', {

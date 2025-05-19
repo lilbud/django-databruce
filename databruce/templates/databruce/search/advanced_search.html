@@ -5,13 +5,10 @@
 {% endblock title %}
 {% block content %}
   <div class="row mb-4">
-    <div class="col offset-1">
+    <div class="col-10 offset-1">
       <h4>Advanced Event Search</h4>
-      <h6>
-        Search for events based on a number of parameters like month/day, who was onstage, and even what songs were played.
-      </h6>
-      <h6>
-        This search was entirely based on the advanced search created by the folks over at <a href="https://jerrybase.com">Jerrybase</a>. I largely copied the basic functionality/layout, but the backend is handled differently due to differences in framework.
+      <h6 class="text-body-secondary">
+        Search for events based on a number of parameters like month/day, who was onstage, and even what songs were played.This search was entirely based on the advanced search created by the folks over at <a href="https://jerrybase.com">Jerrybase</a>. I largely copied the basic functionality/layout, but the backend is handled differently due to differences in framework.
       </h6>
     </div>
   </div>
@@ -52,6 +49,10 @@
         <div class="row mb-3">
           <div class="form-label">{{ form.country.label }}</div>
           <div class="col-8 col-md-4">{{ form.country }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-label">{{ form.tour.label }}</div>
+          <div class="col-8 col-md-4">{{ form.tour }}</div>
         </div>
         <div class="row mb-3">
           <div class="form-label">{{ form.musician.label }}</div>

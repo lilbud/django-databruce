@@ -265,3 +265,7 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 .button {
     text-shadow: none !important;
 }
+
+.sky-500 {
+    color: var(--sky-500)
+}

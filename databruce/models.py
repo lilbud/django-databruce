@@ -1009,6 +1009,9 @@ class Songs(models.Model):
         verbose_name_plural = db_table
 
     def __str__(self):
+        if self.original_artist:
+            return f"{self.name} ({self.original_artist})"
+
         return self.name
 
 
@@ -1038,7 +1041,10 @@ class Setlists(models.Model):
 
     set_name = models.CharField(blank=True, default="Show", choices=sets)
 
-    song_num = models.IntegerField(default=1)
+    song_num = models.IntegerField(
+        default=lambda: Setlists.objects.order_by("event", "song_num").last().song_num
+        + 1,
+    )
 
     song = models.ForeignKey(
         to=Songs,

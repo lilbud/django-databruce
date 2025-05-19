@@ -18,6 +18,7 @@ class SetlistInline(admin.TabularInline):
         "debut",
     ]  # Specify the fields you want to include
     fk_name = "event"
+    ordering = ("song_num",)
     extra = 1
 
 
