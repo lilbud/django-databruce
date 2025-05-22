@@ -98,7 +98,9 @@
                                   <div class="row text-body-secondary">
                                     <small>
                                       {% for note in notes_list %}
-                                        {% if note.grouper == song.id %}{{ note.list|setlist_note }}{% endif %}
+                                        {% if note.grouper == song.id %}
+                                          {{ note.list|setlist_note|safe }}
+                                        {% endif %}
                                       {% endfor %}
                                     </small>
                                   </div>

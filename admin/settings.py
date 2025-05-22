@@ -41,10 +41,10 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "dal",
-    "dal_select2",
+    # "dal",
+    # "dal_select2",
     "django.contrib.admin",  # required
-    "django_select2",
+    # "django_select2",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

@@ -8,8 +8,8 @@ from django import forms
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.utils.dates import MONTHS
-from django_select2 import forms as s2forms
 
+# from django_select2 import forms as s2forms
 from . import models
 
 DATE = datetime.datetime.today()

@@ -34,8 +34,9 @@ def get_event_color(event_type: str = "Concert"):
 @register.filter(name="mdlink")
 def md_link(note: str):
     link = re.search(r"(.*)\[(.*)\]\((.*)\)", note)
+
     if link:
-        return re.sub(r"</?p>", "", markdown.markdown(note))
+        return re.sub("</?p>", "", markdown.markdown(note))
     return note
 
 
@@ -50,7 +51,7 @@ def get_date(date: datetime = None, event: str = ""):
 
 @register.filter()
 def setlist_note(notes):
-    return "; ".join([note.note for note in notes])
+    return "; ".join([md_link(note.note) for note in notes])
 
 
 @register.filter()
