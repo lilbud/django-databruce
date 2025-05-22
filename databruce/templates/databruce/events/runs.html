@@ -15,7 +15,8 @@
       <th class="all" scope="col">Name</th>
       <th class="min-tablet-l" scope="col">Band</th>
       <th class="min-tablet-l" scope="col">Venue</th>
-      <th scope="col"class="text-center all">Events</th>
+      <th scope="col" class="text-center all">Events</th>
+      <th scope="col" class="text-center all">Songs</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
     </tr>
@@ -23,7 +24,9 @@
   <tbody>
     {% for run in runs %}
       <tr>
-        <td class="text-wrap">{{ run.name }}</td>
+        <td class="text-wrap">
+          <a href="{% url "databruce:run_details" id=run.id %}">{{ run.name }}</a>
+        </td>
         <td>
           <a href="{% url "databruce:band_details" id=run.band.id %}">{{ run.band.name }}</a>
         </td>
@@ -31,6 +34,7 @@
           <a href="{% url "databruce:venue_details" id=run.first.venue.id %}">{{ run.first.venue }}</a>
         </td>
         <td class="text-center">{{ run.num_shows }}</td>
+        <td class="text-center">{{ run.num_songs }}</td>
         <td>
           <a href="{% url "databruce:event_details" event=run.first.id %}">{{ run.first }}</a>
         </td>

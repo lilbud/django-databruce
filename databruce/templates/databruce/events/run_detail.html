@@ -1,0 +1,116 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Runs &gt; {{ info.name }}
+{% endblock title %}
+{% block content %}
+  <div class="row mb-4">
+    <h4>
+      <a href="{% url "databruce:runs" %}">Runs</a>
+      &gt; {{ info }}
+    </h4>
+  </div>
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card">
+        <h5 class="card-header">Run Details</h5>
+        <div class="card-body">
+          <div class="row justify-content-start">
+            <div class="col-auto pe-0 fs-6 fw-semibold">Band:</div>
+            <div class="col">
+              <a href="{% url "databruce:band_details" id=info.band.id %}">{{ info.band }}</a>
+            </div>
+          </div>
+          <div class="row justify-content-start">
+            <div class="col-auto pe-0 fs-6 fw-semibold">Venue:</div>
+            <div class="col">
+              <a href="{% url "databruce:venue_details" id=info.venue.id %}">{{ info.venue }}, {{ info.venue.city }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-12 col-md-8">
+      <div class="card mb-4">
+        <h5 class="card-header">Events</h5>
+        <div class="card-body px-0">
+          <div class="table-responsive p-0">
+            <table class="table table display" id="eventTable">
+              <thead>
+                <tr>
+                  <th class="all">Show/Total</th>
+                  <th class="all">Date</th>
+                  <th class="all">Tour</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for event in events %}
+                  <tr>
+                    <td class="text-nowrap">{{ forloop.counter }} / {{ events|length }}</td>
+                    <td class="text-nowrap">
+                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                    </td>
+                    <td>
+                      {% if event.tour %}
+                        <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card mb-4">
+        <h5 class="card-header">Songs</h5>
+        <div class="card-body px-0">
+          <div class="table-responsive p-0">
+            <table class="table table display" id="songTable">
+              <thead>
+                <tr>
+                  <th class="text-wrap">Song</th>
+                  <th class="text-center">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% regroup songs by song as songs_list %}
+                {% for song, events in songs_list %}
+                  <tr>
+                    <td>
+                      <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
+                    </td>
+                    <td class="text-center">{{ events|length }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      // custom searchBuilder columns definition
+      layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3];
+
+      new DataTable('#eventTable', {
+        layout: layout,
+        order: [[1, 'asc']],
+      });
+
+      // removes searchBuilder button, not needed for this.
+      layout.topEnd.features[1].buttons.pop();
+
+      new DataTable('#songTable', {
+        searching: false,
+        layout: layout,
+      });
+    })
+  </script>
+{% endblock content %}

@@ -43,13 +43,6 @@ class AdvancedEventSearch(forms.Form):
         ("5", "Thursday"),
         ("6", "Friday"),
         ("7", "Saturday"),
-        ("8", "Not Sunday"),
-        ("9", "Not Monday"),
-        ("10", "Not Tuesday"),
-        ("11", "Not Wednesday"),
-        ("12", "Not Thursday"),
-        ("13", "Not Friday"),
-        ("14", "Not Saturday"),
     ]
 
     def get_states():
@@ -151,12 +144,30 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
+    month_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select monthChoice"},
+        ),
+    )
+
     month = forms.ChoiceField(
         label="Month",
         label_suffix=":",
         choices=get_months(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select", "id": "month"}),
+    )
+
+    day_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select dayChoice"},
+        ),
     )
 
     day = forms.ChoiceField(
@@ -167,12 +178,30 @@ class AdvancedEventSearch(forms.Form):
         widget=forms.Select(attrs={"class": "form-select", "id": "day"}),
     )
 
+    dow_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select dowChoice"},
+        ),
+    )
+
     day_of_week = forms.ChoiceField(
         label="Day of Week",
         label_suffix=":",
         choices=days_of_week,
         required=False,
         widget=forms.Select(attrs={"class": "form-select", "id": "day-of-week"}),
+    )
+
+    city_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select cityChoice"},
+        ),
     )
 
     city = forms.ChoiceField(
@@ -183,6 +212,15 @@ class AdvancedEventSearch(forms.Form):
         widget=forms.Select(attrs={"class": "form-select select2", "id": "citySelect"}),
     )
 
+    state_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select stateChoice"},
+        ),
+    )
+
     state = forms.ChoiceField(
         label="State",
         label_suffix=":",
@@ -190,6 +228,15 @@ class AdvancedEventSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={"class": "form-select select2", "id": "stateSelect"},
+        ),
+    )
+
+    country_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select countryChoice"},
         ),
     )
 
@@ -203,6 +250,15 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
+    tour_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select tourChoice"},
+        ),
+    )
+
     tour = forms.ChoiceField(
         label="Tour",
         label_suffix=":",
@@ -213,6 +269,15 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
+    musician_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select musician-choice"},
+        ),
+    )
+
     musician = forms.ChoiceField(
         label="Musician",
         label_suffix=":",
@@ -220,6 +285,15 @@ class AdvancedEventSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={"class": "form-select select2", "id": "musicianSelect"},
+        ),
+    )
+
+    band_choice = forms.ChoiceField(
+        label=None,
+        choices=[("is", "is"), ("not", "not")],
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select band-choice"},
         ),
     )
 
@@ -282,54 +356,6 @@ class AdvancedEventSearch(forms.Form):
             .first()
             .date
         )
-
-    # def clean_month(self):
-    #     if self.cleaned_data["month"]:
-    #         return [self.cleaned_data["month"]]
-
-    #     return list(range(1, 13))
-
-    # def clean_day(self):
-    #     if self.cleaned_data["day"]:
-    #         return [self.cleaned_data["day"]]
-
-    #     return list(range(1, 32))
-
-    # def clean_day_of_week(self):
-    #     if self.cleaned_data["day_of_week"]:
-    #         return [self.cleaned_data["day_of_week"]]
-
-    #     return list(range(1, 8))
-
-    # def clean_band(self):
-    #     if self.cleaned_data["band"]:
-    #         return [self.cleaned_data["band"]]
-
-    #     return models.Bands.objects.all().values_list("id", flat=True)
-
-    # def clean_city(self):
-    #     if self.cleaned_data["city"]:
-    #         return [self.cleaned_data["city"]]
-
-    #     return models.Cities.objects.all().values_list("id", flat=True)
-
-    # def clean_country(self):
-    #     if self.cleaned_data["country"]:
-    #         return [self.cleaned_data["country"]]
-
-    #     return models.Countries.objects.all().values_list("id", flat=True)
-
-    # def clean_musician(self):
-    #     if self.cleaned_data["musician"]:
-    #         return [self.cleaned_data["musician"]]
-
-    #     return models.Relations.objects.all().values_list("id", flat=True)
-
-    # def clean_tour(self):
-    #     if self.cleaned_data["tour"]:
-    #         return [self.cleaned_data["tour"]]
-
-    #     return models.Tours.objects.all().values_list("id", flat=True)
 
 
 class SetlistSearch(forms.Form):
@@ -445,6 +471,28 @@ class EventSearch(forms.Form):
                 "name": "date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
+                "class": "form-control",
+            },
+        ),
+    )
+
+
+class SetlistNoteSearch(forms.Form):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
+
+    query = forms.CharField(
+        label="",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "id": "noteSearch",
+                "type": "search",
+                "name": "note",
+                "placeholder": "Enter query",
                 "class": "form-control",
             },
         ),

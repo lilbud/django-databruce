@@ -1,0 +1,57 @@
+{% extends "databruce/category.html" %}
+{% block title %}
+  Tour Legs
+{% endblock title %}
+{% block info_row %}
+  <h4>Tour Legs</h4>
+{% endblock info_row %}
+{% block table_id %}
+  tourLegTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr class="header">
+      <th class="all" scope="col">Name</th>
+      <th class="all" scope="col">Tour</th>
+      <th class="min-tablet-l" scope="col">First</th>
+      <th class="min-tablet-l" scope="col">Last</th>
+      <th scope="col" class="text-center all">Shows</th>
+      <th scope="col" class="text-center all">Songs</th>
+      <th scope="col" class="min-tablet-l">Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for leg in legs %}
+      <tr>
+        <td>
+          <a href="{% url "databruce:leg_details" id=leg.id %}">{{ leg.name }}</a>
+        </td>
+        <td>
+          <a href="{% url "databruce:tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
+        </td>
+        <td>
+          <a href="{% url 'databruce:event_details' event=leg.first.id %}">{{ leg.first }}</a>
+        </td>
+        <td>
+          <a href="{% url 'databruce:event_details' event=leg.last.id %}">{{ leg.last }}</a>
+        </td>
+        <td class="text-center">{{ leg.num_shows }}</td>
+        <td class="text-center">{{ leg.num_songs }}</td>
+        <td>{{ leg.note|default_if_none:"" }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
+  <script>
+  // searchBuilder custom columns
+  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6]
+
+  $(document).ready(function () {
+    new DataTable('#tourLegTable', {
+      layout: layout,
+      order: [[2, 'desc']],
+    });
+  });
+  </script>
+{% endblock scripts %}

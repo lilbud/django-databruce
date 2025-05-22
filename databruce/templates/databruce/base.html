@@ -79,10 +79,22 @@
                   <a class="dropdown-item" href="{% url 'databruce:events' %}">Events By Year</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:tours' %}">Events By Tour</a>
+                  <a class="dropdown-item" href="{% url 'databruce:runs' %}">Events By Run</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {% if '/tours' in request.path %}active{% endif %}"
+                 href="#"
+                 role="button"
+                 data-bs-toggle="dropdown"
+                 aria-expanded="false">Tours</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'databruce:tours' %}">Tours</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:runs' %}">Events By Run</a>
+                  <a class="dropdown-item" href="{% url 'databruce:tour_legs' %}">Tour Legs</a>
                 </li>
               </ul>
             </li>
@@ -139,6 +151,9 @@
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'databruce:adv_search' %}">Advanced Event Search</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'databruce:note_search' %}">Setlist Notes Search</a>
                 </li>
               </ul>
             </li>

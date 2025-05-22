@@ -5,10 +5,10 @@
 {% endblock title %}
 {% block content %}
   <div class="col">
-    <div class="row row-cols-1 row-cols-md-2 g-3 justify-content-center">
-      <div class="col-md-4 col-lg-3">
-        <div class="card">
-          <div class="card-header fs-5 fw-bold">Show Info</div>
+    <div class="row row-cols-1 row-cols-md-2 g-2 justify-content-center">
+      <div class="col-md-6 col-lg-2">
+        <div class="card mb-2">
+          <h6 class="card-header">Show Info</h6>
           <div class="card-body">
             <div class="fw-bold fs-5 sky-500">{{ event }}</div>
             {% if event.artist %}
@@ -25,9 +25,11 @@
               <a class="text-body-secondary"
                  href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
             </div>
-            <hr>
-            <a class="fs-5 fw-bold sky-500"
-               href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+            {% if event.tour %}
+              <hr>
+              <a class="fs-5 fw-bold sky-500"
+                 href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+            {% endif %}
             {% if event.leg %}
               <div>
                 <span class="fw-bold">Leg:</span>
@@ -58,11 +60,78 @@
                href="{% url 'databruce:event_details' event=next_event.id %}">Next &gt;</a>
           </div>
         </div>
+        {% if event.note %}
+          <div class="card">
+            <h6 class="card-header">Event Notes</h6>
+            <div class="card-body">{{ event.note }}</div>
+          </div>
+        {% endif %}
       </div>
-      <div class="col-md-8 col-lg-6">
-        <div class="card mb-3">
-          <div class="card-header fs-5 fw-bold">Setlist</div>
+      <div class="col-md-6 col-lg-7 mt-md-2 mt-0">
+        <div class="card mb-2">
+          <h6 class="card-header">
+            Setlist
+            {% if event.setlist_certainty == 'Probable' %}
+              <span class="text-reset fs-6 text-body-secondary">(Setlist possibly incomplete/incorrect)</span>
+            {% endif %}
+          </h6>
           <div class="card-body">
+            {% comment %} {% if setlist %}
+              {% regroup setlist by set_name as event_setlist %}
+              {% regroup notes by id as notes_list %}
+              <div class="table-responsive p-0">
+                <table class="table table-sm" id="setlistTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Song</th>
+                      <th>Last</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for set in event_setlist %}
+                      <tr class="text-center">
+                        <td class="sky-900" colspan="3">{{ set.grouper }}</td>
+                      </tr>
+                      {% for song in set.list %}
+                        <tr>
+                          <td>{{ song.song_num }}</td>
+                          <td>
+                            <div class="row">
+                              <span>
+                                <a class="sky-500" href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                {% if song.segue %}{{ song.separator }}{% endif %}
+                              </span>
+                            </div>
+                            <div class="row text-body-secondary">
+                              <small>
+                                {% for item in notes_list %}
+                                  {% if item.grouper.id == song.id %}
+                                    {% for note in item.list %}
+                                      {% if not note.last %}{{ note.note }}{% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                {% endfor %}
+                              </small>
+                            </div>
+                          </td>
+                          <td>
+                            {% if song.premiere %}
+                              Debut
+                            {% elif song.debut %}
+                              {{ song.last }}, TD
+                            {% else %}
+                              {{ song.last }}
+                              {% if song.last > 50 %}Bustout{% endif %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endif %} {% endcomment %}
             {% if setlist %}
               {% regroup notes by id as notes_list %}
               {% regroup setlist by set_name as event_setlist %}
@@ -71,15 +140,28 @@
                 <p class="card-text">
                   {% for song in set.list %}
                     <span class="text-nowrap">
-                      <a class="pe-0"
+                      <a class="pe-0 sky-500"
                          href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                      {% if song.debut %}
+                        <span class="badge text-bg-danger"
+                              data-bs-toggle="tooltip"
+                              data-bs-html="true"
+                              data-bs-title="Tour Debut">TD</span>
+                      {% elif song.last > 50 %}
+                        <span class="badge text-bg-success"
+                              data-bs-toggle="tooltip"
+                              data-bs-html="true"
+                              data-bs-title="Bustout, LTP {{ song.ltp }} ({{ song.last }} events ago)">B</span>
+                      {% endif %}
                       {% for item in notes_list %}
                         {% if item.grouper.id == song.id %}
                           {% for note in item.list %}
-                            <span class="badge text-bg-light font-monospace"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-html="true"
-                                  data-bs-title="{{ note.note|mdlink }}">{{ note.num }}</span>
+                            {% if not note.last %}
+                              <span class="badge text-bg-light"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-html="true"
+                                    data-bs-title="{{ note.note|mdlink }}">{{ note.num }}</span>
+                            {% endif %}
                           {% endfor %}
                         {% endif %}
                       {% endfor %}
@@ -93,81 +175,112 @@
             {% endif %}
           </div>
         </div>
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-          {% if notes %}
-            <div class="col">
-              <div class="card">
-                <div class="card-header fs-5 fw-bold">Setlist Notes</div>
-                <div class="card-body">
-                  {% regroup notes by num as notes_list %}
-                  {% for item in notes_list %}
-                    {% with note=item.list|first %}
-                      <div class="row">
-                        <span>
-                          <span class="badge text-bg-light me-2 font-monospace">{{ note.num }}</span>
-                          {% if note.last %}
-                            {{ note.note|mdlink|safe }}, LTP
-                            {% include "../partials/event_tooltip.html" with event=note.last %}
-                            ({{ note.gap }} events)
-                          {% else %}
-                            {{ note.note|mdlink|safe }}
-                          {% endif %}
-                        </span>
-                      </div>
-                    {% endwith %}
-                  {% endfor %}
-                </div>
-              </div>
+        {% if notes %}
+          <div class="card mb-2">
+            <h6 class="card-header">Setlist Notes</h6>
+            <div class="card-body">
+              {% regroup notes by num as notes_list %}
+              {% for item in notes_list %}
+                {% with note=item.list|first %}
+                  <div class="row">
+                    <span>
+                      <span class="badge text-bg-light me-2 font-monospace">{{ note.num }}</span>
+                      {% if note.last %}
+                        {{ note.note|mdlink|safe }}, LTP
+                        {% include "../partials/event_tooltip.html" with event=note.last %}
+                        ({{ note.gap }} events)
+                      {% else %}
+                        {{ note.note|mdlink|safe }}
+                      {% endif %}
+                    </span>
+                  </div>
+                {% endwith %}
+              {% endfor %}
             </div>
-          {% endif %}
+          </div>
+        {% endif %}
+        <div class="row row-cols-1 row-cols-lg-2 g-2">
           {% if onstage %}
             <div class="col">
               <div class="card">
-                <div class="card-header fs-5 fw-bold">Onstage</div>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">
-                    <a href="{% url "databruce:relation_details" id=255 %}">Bruce Springsteen</a>
-                  </li>
-                  {% regroup onstage by band as onstage_list %}
-                  {% for band in onstage_list %}
-                    {% if not band.grouper %}
-                      {% for member in band.list %}
-                        <li class="list-group-item">
-                          <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                        </li>
-                      {% endfor %}
-                    {% else %}
-                      <a class="list-group-item dropdown-toggle"
-                         data-bs-toggle="collapse"
-                         href="#{{ band.grouper.id }}"
-                         role="button"
-                         aria-expanded="false"
-                         aria-controls="collapseExample">{{ band.grouper.name }}</a>
-                      <div class="collapse" id="{{ band.grouper.id }}">
+                <h6 class="card-header">Onstage</h6>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <a class="sky-500" href="{% url "databruce:relation_details" id=255 %}">Bruce Springsteen</a>
+                    </li>
+                    {% regroup onstage by band as onstage_list %}
+                    {% for band in onstage_list %}
+                      {% if not band.grouper %}
                         {% for member in band.list %}
                           <li class="list-group-item">
-                            <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                            <a class="sky-500"
+                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                          </li>
+                        {% endfor %}
+                      {% else %}
+                        <a class="list-group-item dropdown-toggle text-wrap"
+                           data-bs-toggle="collapse"
+                           href="#{{ band.grouper.id }}"
+                           role="button"
+                           aria-expanded="false"
+                           aria-controls="collapseExample">{{ band.grouper.name }}</a>
+                        <div class="collapse m-3" id="{{ band.grouper.id }}">
+                          {% for member in band.list %}
+                            <a class="sky-500"
+                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                            {% if not forloop.last %},{% endif %}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                    {% if guests %}
+                      <a class="list-group-item dropdown-toggle"
+                         data-bs-toggle="collapse"
+                         href="#guests"
+                         role="button"
+                         aria-expanded="false"
+                         aria-controls="collapseExample">Guests</a>
+                      <div class="collapse" id="guests">
+                        {% for member in guests %}
+                          <li class="list-group-item">
+                            <a class="sky-500"
+                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                           </li>
                         {% endfor %}
                       </div>
                     {% endif %}
-                  {% endfor %}
-                  {% if guests %}
-                    <a class="list-group-item dropdown-toggle"
-                       data-bs-toggle="collapse"
-                       href="#guests"
-                       role="button"
-                       aria-expanded="false"
-                       aria-controls="collapseExample">Guests</a>
-                    <div class="collapse" id="guests">
-                      {% for member in guests %}
-                        <li class="list-group-item">
-                          <a href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                        </li>
-                      {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          {% if album_breakdown %}
+            <div class="col">
+              <div class="card">
+                <h6 class="card-header">Album Breakdown</h6>
+                <div class="card-body">
+                  {% for album in album_breakdown %}
+                    <div class="row mb-1">
+                      <div class="col">
+                        {% comment %} <div class="d-flex flex-row justify-content-between">
+                          <div class="pe-2 fw-semibold">{{ album.category }}:</div>
+                          <div>{{ album.num }}</div>
+                        </div> {% endcomment %}
+                        {{ album.category }}
+                        <div class="progress px-0"
+                             role="progressbar"
+                             aria-label="Basic example"
+                             aria-valuenow="{{ album.num|album_percent:album_max.max }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                          <div class="progress-bar main-color"
+                               style="width: {{ album.num|album_percent:album_max.max }}%">{{ album.num }}</div>
+                        </div>
+                      </div>
                     </div>
-                  {% endif %}
-                </ul>
+                  {% endfor %}
+                </div>
               </div>
             </div>
           {% endif %}

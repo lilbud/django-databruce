@@ -26,6 +26,11 @@ urlpatterns = [
         views.AdvancedSearch.as_view(),
         name="adv_search",
     ),
+    path(
+        "notes_search/",
+        views.SetlistSearch.as_view(),
+        name="note_search",
+    ),
     path("", include("api.urls")),
     path("relations", views.Relation.as_view(), name="relations"),
     path("relations/<int:id>", views.RelationDetail.as_view(), name="relation_details"),
@@ -40,4 +45,7 @@ urlpatterns = [
     path("countries/", views.Country.as_view(), name="countries"),
     path("countries/<int:id>", views.CountryDetail.as_view(), name="country_details"),
     path("events/runs", views.EventRun.as_view(), name="runs"),
+    path("events/runs/<int:id>", views.RunDetail.as_view(), name="run_details"),
+    path("tours/legs", views.TourLeg.as_view(), name="tour_legs"),
+    path("tours/legs/<int:id>", views.TourLegDetail.as_view(), name="leg_details"),
 ]

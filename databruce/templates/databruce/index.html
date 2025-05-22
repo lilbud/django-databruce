@@ -8,23 +8,27 @@
   <div class="row mb-4">
     <div class="col">
       <h1>Welcome to Databruce</h1>
+      <h4>A new Bruce Springsteen concert database</h4>
     </div>
   </div>
   <div class="row mb-4">
     <div class="col-lg-6">
       <div class="card mb-4">
-        <img class="img-fluid object-fit-cover rounded"
-             id="headimg"
-             src="{% static 'databruce/img/header.jpg' %}"
-             alt=""
-             height="auto"
-             width="auto">
+        <div class="card-body p-0 rounded">
+          <img class="img-fluid object-fit-cover"
+               id="headimg"
+               src="{% static 'databruce/img/header-2025.jpg' %}"
+               alt=""
+               height="auto"
+               width="auto">
+        </div>
+        <div class="card-footer text-body-secondary">Manchester - May 14, 2025 (photo by Rob DeMartin)</div>
       </div>
     </div>
     <div class="col-lg-6">
       <div class="row row-cols-1 row-cols-md-1 g-4 mb-4">
         <div class="col">
-          <div class="card h-100">
+          <div class="card h-100 p-0">
             <h4 class="card-header">Recent Events</h4>
             <div class="card-body p-0">
               <div class="table-responsive p-0 index">

@@ -49,5 +49,10 @@ def get_date(date: datetime = None, event: str = ""):
 
 
 @register.filter()
-def setlist_note(event):
-    return models.SetlistNotes.objects.filter(event__id=event).values_list("id")
+def setlist_note(notes):
+    return "; ".join([note.note for note in notes])
+
+
+@register.filter()
+def album_percent(num: int, max: int):
+    return int((num / max) * 100)

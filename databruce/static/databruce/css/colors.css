@@ -23,7 +23,6 @@
     --zinc-900: #18181b;
     --zinc-950: #09090b;
 
-
     --sky-50: #f0f9ff;
     --sky-100: #e0f2fe;
     --sky-200: #bae6fd;
@@ -66,4 +65,89 @@
 
     --font-heading: "Cabin", sans-serif;
     --font-body: "IBM Plex Sans Hebrew", sans-serif;
+}
+
+.tour23 {
+    background-color: #c86327;
+    color: white;
+}
+
+.bitusa {
+    background-color: #a43134;
+    color: white;
+}
+
+.btr {
+    background-color: #ffffff;
+    color: black;
+}
+
+.darkness {
+    background-color: #d7b79d;
+    color: black;
+}
+
+.devils {
+    background-color: #cd9f69;
+    color: black;
+}
+
+.greetings {
+    background-color: #dd3b64;
+    color: white;
+}
+
+.hh {
+    background-color: #e0ae64;
+    color: black;
+}
+
+.magic {
+    background-color: #752418;
+    color: white;
+}
+
+.joad {
+    background-color: #efbd5a;
+    color: black;
+}
+
+.rising {
+    background-color: #e59750;
+    color: black;
+}
+
+.river {
+    background-color: #4ebcc3;
+    color: black;
+}
+
+.sessions {
+    background-color: #edb22b;
+    color: white;
+}
+
+.shuffle {
+    background-color: #c89c6c;
+    color: black;
+}
+
+.tunnel {
+    background-color: black;
+    color: white;
+}
+
+.dream {
+    background-color: #3b497c;
+    color: yellow;
+}
+
+.tour92 {
+    background-color: #da3931;
+    color: white;
+}
+
+.wrecking {
+    background-color: #85080d;
+    color: white;
 }

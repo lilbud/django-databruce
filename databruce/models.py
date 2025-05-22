@@ -608,7 +608,7 @@ class Events(models.Model):
         default=None,
     )
 
-    event_date_note = models.TextField(blank=True, default=None)
+    note = models.TextField(blank=True, default=None, db_column="event_date_note")
     bootleg = models.BooleanField(blank=True, default=False)
     official = models.BooleanField(blank=True, default=False)
 
@@ -998,6 +998,15 @@ class Songs(models.Model):
     )
 
     original = models.BooleanField(default=False)
+    category = models.TextField(blank=True, default=None)
+
+    album = models.ForeignKey(
+        to=Releases,
+        on_delete=models.DO_NOTHING,
+        db_column="album",
+        blank=True,
+        default=None,
+    )
 
     aliases = models.TextField(blank=True, default=None)
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
@@ -1059,8 +1068,9 @@ class Setlists(models.Model):
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
     position = models.TextField(blank=True, default=None)
-    last = models.TextField(blank=True, default=None)
-    next = models.TextField(blank=True, default=None)
+
+    last = models.IntegerField(blank=True, default=None)
+    next = models.IntegerField(blank=True, default=None)
 
     ltp = models.ForeignKey(
         to=Events,
@@ -1086,7 +1096,7 @@ class Setlists(models.Model):
 
 class SetlistsBySetAndDate(models.Model):
     id = models.AutoField(primary_key=True)
-    min = models.IntegerField(blank=True, default=None)
+    set_order = models.IntegerField(blank=True, default=None)
 
     event = models.ForeignKey(
         "Events",
@@ -1246,6 +1256,7 @@ class Tours(models.Model):
     )
 
     name = models.TextField(blank=True, default=None, db_column="tour_name")
+    slug = models.TextField(blank=True, default=None)
 
     first = models.ForeignKey(
         Events,
@@ -1325,6 +1336,7 @@ class TourLegs(models.Model):
     )
 
     num_shows = models.IntegerField(default=0)
+    num_songs = models.IntegerField(default=0)
     note = models.TextField(blank=True, default=None)
 
     class Meta:
@@ -1379,9 +1391,16 @@ class SongsPage(models.Model):
 
 class Runs(models.Model):
     band = models.ForeignKey(
-        "Bands",
+        Bands,
         models.DO_NOTHING,
         db_column="band",
+        blank=True,
+        null=True,
+    )
+    venue = models.ForeignKey(
+        Venues,
+        models.DO_NOTHING,
+        db_column="venue",
         blank=True,
         null=True,
     )

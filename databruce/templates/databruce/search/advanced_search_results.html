@@ -23,31 +23,31 @@
                 {% include "./result_row.html" with label="End Date:" data=request.POST.last_date %}
               {% endif %}
               {% if request.POST.month %}
-                {% include "./result_row.html" with label="Month:" data=request.POST.month|get_month %}
+                {% include "./result_row.html" with label="Month:" choice=request.POST.month_choice data=request.POST.month|get_month %}
               {% endif %}
               {% if request.POST.day %}
-                {% include "./result_row.html" with label="Day:" data=request.POST.day|get_ordinal %}
+                {% include "./result_row.html" with label="Day:" choice=request.POST.day_choice data=request.POST.day|get_ordinal %}
               {% endif %}
               {% if request.POST.day_of_week %}
-                {% include "./result_row.html" with label="Day of Week:" data=request.POST.day_of_week|get_day %}
+                {% include "./result_row.html" with label="Day of Week:" choice=request.POST.dow_choice data=request.POST.day_of_week|get_day %}
               {% endif %}
               {% if request.POST.city %}
-                {% include "./result_row.html" with label="City:" data=request.POST.city|get_city %}
+                {% include "./result_row.html" with label="City:" choice=request.POST.city_choice data=request.POST.city|get_city %}
               {% endif %}
               {% if request.POST.state %}
-                {% include "./result_row.html" with label="State:" data=request.POST.state|get_state %}
+                {% include "./result_row.html" with label="State:" choice=request.POST.state_choice data=request.POST.state|get_state %}
               {% endif %}
               {% if request.POST.country %}
-                {% include "./result_row.html" with label="Country:" data=request.POST.country|get_country %}
+                {% include "./result_row.html" with label="Country:" choice=request.POST.country_choice data=request.POST.country|get_country %}
               {% endif %}
               {% if request.POST.tour %}
-                {% include "./result_row.html" with label="Tour:" data=request.POST.tour|get_tour %}
+                {% include "./result_row.html" with label="Tour:" choice=request.POST.tour_choice data=request.POST.tour|get_tour %}
               {% endif %}
               {% if request.POST.musician %}
-                {% include "./result_row.html" with label="Musician:" data=request.POST.musician|get_relation %}
+                {% include "./result_row.html" with label="Musician:" choice=request.POST.musician_choice data=request.POST.musician|get_relation %}
               {% endif %}
               {% if request.POST.band %}
-                {% include "./result_row.html" with label="Band:" data=request.POST.band|get_band %}
+                {% include "./result_row.html" with label="Band:" choice=request.POST.band_choice data=request.POST.band|get_band %}
               {% endif %}
               {% if results %}
                 <span>
@@ -96,7 +96,9 @@
                       <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue }}</a>
                     </td>
                     <td>
-                      <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                      {% if event.venue.city %}
+                        <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                      {% endif %}
                     </td>
                     <td>
                       <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
