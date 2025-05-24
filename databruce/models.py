@@ -988,7 +988,7 @@ class Songs(models.Model):
     num_plays_snippet = models.IntegerField(default=0)
     opener = models.IntegerField(default=0)
     closer = models.IntegerField(default=0)
-    cover = models.IntegerField(default=0)
+
     sniponly = models.IntegerField(default=0)
 
     original_artist = models.TextField(
@@ -1067,6 +1067,8 @@ class Setlists(models.Model):
     segue = models.BooleanField(default=False)
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
+    instrumental = models.BooleanField(default=False)
+    snippet = models.BooleanField(default=False)
     position = models.TextField(blank=True, default=None)
 
     last = models.IntegerField(blank=True, default=None)

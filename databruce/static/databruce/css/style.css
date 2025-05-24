@@ -119,3 +119,33 @@ tr th {
 .sky-900 {
     background-color: var(--sky-900) !important;
 }
+
+.setHeader {
+    background-color: var(--sky-900) !important;
+}
+
+/* .btn-main-primary {
+    background-color: var(--sky-500) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-main-secondary {
+    background-color: none !important;
+    color: var(--sky-500) !important;
+    border: 1px solid var(--sky-500) !important;
+} */
+
+#myTab .nav-link.active {
+    background-color: var(--sky-700) !important;
+}
+
+#myTab .nav-link:not(.active) {
+    background-color: var(--dove-gray-850) !important;
+    border: 0.1rem solid var(--dove-gray-700) !important;
+    color: white !important;
+}
+
+.setname {
+    display: none !important;
+}

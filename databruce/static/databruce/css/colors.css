@@ -148,6 +148,6 @@
 }
 
 .wrecking {
-    background-color: #85080d;
-    color: white;
+    background-color: #85080d !important;
+    color: white !important;
 }

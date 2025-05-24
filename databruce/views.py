@@ -689,15 +689,14 @@ class RelationDetail(TemplateView):
         )
 
         context["events"] = (
-            models.Events.objects.filter(id__in=context["bands"].values_list("event"))
+            models.Onstage.objects.filter(relation=context["info"].id)
             .select_related(
-                "venue",
-                "artist",
-                "venue__city",
-                "venue__country",
-                "venue__city__state",
-                "venue__city__country",
-                "tour",
+                "event__venue",
+                "event__artist",
+                "event__venue__city",
+                "event__venue__city__state",
+                "event__venue__city__country",
+                "event__tour",
             )
             .order_by("id")
         )

@@ -46,6 +46,7 @@
             integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
             crossorigin="anonymous"></script>
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
+    <script src="{% static 'databruce/js/dt_tab_reload.js' %}"></script>
     <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
   </head>
   <body>
@@ -183,20 +184,22 @@
       </div>
     </div>
     <script>
-      $(document).ready(function () {
-        $('#eventSearch').mask('0000-00-00');
-      });
+        $(document).ready(function() {
+            $('#eventSearch').mask('0000-00-00');
+        });
     </script>
     <script>
-      $(document).ready(function () {
-        let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new bootstrap.Tooltip(tooltipTriggerEl);
+        $(document).ready(function() {
+            let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         });
-      });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
             crossorigin="anonymous"></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   </body>
 </html>
