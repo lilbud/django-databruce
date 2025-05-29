@@ -51,7 +51,11 @@ def get_date(date: datetime = None, event: str = ""):
 
 @register.filter()
 def setlist_note(notes):
-    return "; ".join([md_link(note.note) for note in notes])
+    print(notes)
+    if len(notes) > 1:
+        return "; ".join([md_link(note.note) for note in notes])
+
+    return md_link(notes[0].note)
 
 
 @register.filter()

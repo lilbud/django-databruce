@@ -113,28 +113,44 @@ class EventDetail(TemplateView):
         if not context["next_event"]:
             context["next_event"] = self.queryset.first()
 
-        context["album_breakdown"] = (
-            models.Songs.objects.filter(
-                id__in=context["setlist"]
-                .filter(
-                    set_name__in=[
-                        "Show",
-                        "Set 1",
-                        "Set 2",
-                        "Pre-Show",
-                        "Encore",
-                        "Post-Show",
-                    ],
-                )
-                .values("song__id"),
+        context["official"] = (
+            models.ReleaseTracks.objects.filter(
+                event__id=self.event.id,
             )
-            .values("category", "album")
-            .annotate(num=Count("id"))
-            .order_by("-num")
+            .distinct("release__id")
+            .select_related("release")
+            .order_by("release__id")
         )
 
-        context["setlist_unique"] = (
-            models.Setlists.objects.filter(
+        context["bootleg"] = models.Bootlegs.objects.filter(event__id=self.event.id)
+
+        context["nugs"] = models.NugsReleases.objects.filter(
+            event__id=self.event.id
+        ).first()
+
+        if self.event.tour.id not in [23, 43]:
+            context["album_breakdown"] = (
+                models.Songs.objects.filter(
+                    id__in=context["setlist"]
+                    .filter(
+                        set_name__in=[
+                            "Show",
+                            "Set 1",
+                            "Set 2",
+                            "Pre-Show",
+                            "Encore",
+                            "Post-Show",
+                        ],
+                    )
+                    .values_list("song__id")
+                    .values("song__id"),
+                )
+                .values("category", "album")
+                .annotate(num=Count("id"))
+                .order_by("-num")
+            )
+
+            context["setlist_unique"] = models.Setlists.objects.filter(
                 event__id=self.event.id,
                 set_name__in=[
                     "Show",
@@ -145,11 +161,8 @@ class EventDetail(TemplateView):
                     "Post-Show",
                 ],
             )
-            .distinct("song__id")
-            .select_related("song")
-        )
 
-        context["album_max"] = context["album_breakdown"].aggregate(max=Max("num"))
+            context["album_max"] = context["album_breakdown"].aggregate(max=Max("num"))
 
         return context
 
@@ -387,7 +400,7 @@ class TourDetail(TemplateView):
         return context
 
 
-class SetlistSearch(View):
+class SetlistNotesSearch(View):
     form_class = forms.SetlistNoteSearch
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
@@ -403,16 +416,19 @@ class SetlistSearch(View):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            results = models.SetlistNotes.objects.filter(
-                note__iregex=rf"{form.cleaned_data['query']}",
-            ).select_related(
-                "id",
-                "last",
-                "id__song",
-                "last__artist",
-                "last__venue",
-                "event",
+            results = (
+                models.SetlistNotes.objects.filter(
+                    note__icontains=form.cleaned_data["query"],
+                )
+                .select_related(
+                    "id",
+                    "id__song",
+                    "event",
+                )
+                .prefetch_related("last", "last__artist", "last__venue")
             )
+
+            print(results)
 
         return render(
             request,

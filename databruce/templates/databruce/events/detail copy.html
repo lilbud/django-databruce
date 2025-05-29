@@ -15,28 +15,43 @@
                   <div class="flex-grow-2 sky-500 fw-semibold fs-5">{{ event }}</div>
                   <div class="text-body-secondary fw-medium fs-5">{{ event.venue }}, {{ event.venue.city }}</div>
                   <div class="text-body fw-medium fs-5 mb-2">{{ event.artist }}</div>
-                  <div class="fs-6">
-                    <a data-bs-toggle="tooltip"
-                       data-bs-placement="top"
-                       data-bs-html="true"
-                       data-bs-title="Tour"
-                       class="badge {{ event.tour.slug|default_if_none:"text-bg-secondary" }}"
-                       href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour }}</a>
+                  <div class="row row-cols-2 row-cols-md-3 g-2">
+                    <div class="col">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <h5 class="fw-medium">Tour</h5>
+                          <h6>
+                            <a class="fw-semibold sky-500"
+                               href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour }}</a>
+                          </h6>
+                        </div>
+                      </div>
+                    </div>
                     {% if event.leg %}
-                      <a data-bs-toggle="tooltip"
-                         data-bs-placement="top"
-                         data-bs-html="true"
-                         data-bs-title="Tour Leg"
-                         class="badge {{ event.tour.slug|default_if_none:"text-bg-secondary" }}"
-                         href="{% url "databruce:leg_details" id=event.leg.id %}">{{ event.leg }}</a>
+                      <div class="col">
+                        <div class="card h-100">
+                          <div class="card-body text-center">
+                            <h5 class="fw-medium">Tour Leg</h5>
+                            <h6>
+                              <a class="fw-semibold sky-500"
+                                 href="{% url "databruce:leg_details" id=event.leg.id %}">{{ event.leg }}</a>
+                            </h6>
+                          </div>
+                        </div>
+                      </div>
                     {% endif %}
                     {% if event.run %}
-                      <a data-bs-toggle="tooltip"
-                         data-bs-placement="top"
-                         data-bs-html="true"
-                         data-bs-title="Run"
-                         class="badge {{ event.tour.slug|default_if_none:"text-bg-secondary" }}"
-                         href="{% url "databruce:run_details" id=event.run.id %}">{{ event.run }}</a>
+                      <div class="col">
+                        <div class="card h-100">
+                          <div class="card-body text-center">
+                            <h5 class="fw-medium">Run</h5>
+                            <h6>
+                              <a class="fw-semibold sky-500"
+                                 href="{% url "databruce:run_details" id=event.run.id %}">{{ event.run }}</a>
+                            </h6>
+                          </div>
+                        </div>
+                      </div>
                     {% endif %}
                   </div>
                 </div>
@@ -63,149 +78,263 @@
       </div>
       <div class="row">
         <div class="col-12 col-lg-8 mb-3">
-          <div class="row row-cols-1 g-3 mb-3">
+          <div class="card">
+            <div class="card-body">
+              {% regroup setlist by set_name as event_setlist %}
+              {% regroup notes|dictsort:"id.id" by id.id as notes_list %}
+              {% if setlist %}
+                <div class="table-responsive p-0">
+                  <table class="table table-sm display" id="setlistTable">
+                    <thead>
+                      <tr>
+                        <th class="all text-center">#</th>
+                        <th class="all">Song</th>
+                        <th class="all text-nowrap">
+                          Gap
+                          <i class="bi bi-info-circle-fill"
+                             data-bs-toggle="tooltip"
+                             data-bs-html="true"
+                             data-bs-title="How many shows since a song was last played."></i>
+                        </th>
+                        <th class="all text-nowrap">
+                          Last Played
+                          <i class="bi bi-info-circle-fill"
+                             data-bs-toggle="tooltip"
+                             data-bs-title="The last show a song was played at."></i>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for set in event_setlist %}
+                        <tr class="text-center">
+                          <td class="setHeader" colspan="4">{{ set.grouper }}</td>
+                          <td class="setname"></td>
+                          <td class="setname"></td>
+                          <td class="setname"></td>
+                        </tr>
+                        {% for song in set.list %}
+                          <tr>
+                            <td class="text-center">
+                              {% if song.position %}
+                                <span data-bs-toggle="tooltip"
+                                      data-bs-title="{{ song.position }}"
+                                      class="badge text-bg-primary">{{ song.song_num }}</span>
+                              {% else %}
+                                {{ song.song_num }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              <div class="row">
+                                <span class="text-nowrap">
+                                  <a class="text-light"
+                                     href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                  {% if song.segue %}{{ song.separator }}{% endif %}
+                                  {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
+                                  {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
+                                </span>
+                              </div>
+                              <div class="row text-body-secondary">
+                                <small>
+                                  {% for note in notes_list %}
+                                    {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
+                                  {% endfor %}
+                                </small>
+                              </div>
+                            </td>
+                            <td class="text-nowrap">
+                              {% if song.debut and not song.premiere %}
+                                {{ song.last }}, TD
+                              {% elif song.last >= 50 %}
+                                {{ song.last }}, Bustout
+                              {% else %}
+                                {{ song.last|default_if_none:"" }}
+                              {% endif %}
+                            </td>
+                            <td class="text-nowrap">
+                              {% if song.premiere %}
+                                Debut
+                              {% elif song.ltp %}
+                                <a href="{% url "databruce:event_details" event=song.ltp.id %}"
+                                   class="text-light">{{ song.ltp }}</a>
+                              {% endif %}
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <h6>No Set Details Available</h6>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="row row-cols-1 g-3">
             <div class="col">
               <div class="card">
+                <div class="card-header">Event Notes</div>
+                <div class="card-body">{{ event.note|default_if_none:"" }}</div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-header">Releases</div>
                 <div class="card-body">
-                  {% regroup setlist by set_name as event_setlist %}
-                  {% regroup notes by id.id as notes_list %}
-                  {% if setlist %}
-                    <div class="table-responsive p-0">
-                      <table class="table table-sm display" id="setlistTable">
-                        <thead>
-                          <tr>
-                            <th class="all text-center">#</th>
-                            <th class="all">Song</th>
-                            <th class="all">Gap</th>
-                            <th class="all">Last Played</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {% for set in event_setlist %}
-                            <tr class="text-center">
-                              <td class="setHeader" colspan="4">{{ set.grouper }}</td>
-                              <td class="setname"></td>
-                              <td class="setname"></td>
-                              <td class="setname"></td>
-                            </tr>
-                            {% for song in set.list %}
-                              <tr>
-                                <td class="text-center">
-                                  {% if song.position %}
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="{{ song.position }}"
-                                          class="badge text-bg-primary">{{ song.song_num }}</span>
-                                  {% else %}
-                                    {{ song.song_num }}
-                                  {% endif %}
-                                </td>
-                                <td>
-                                  <div class="row">
-                                    <span class="text-nowrap ">
-                                      <a class="text-light"
-                                         href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
-                                      {% if song.segue %}{{ song.separator }}{% endif %}
-                                      {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
-                                      {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
-                                    </span>
-                                  </div>
-                                  <div class="row text-body-secondary">
-                                    <small>
-                                      {% for note in notes_list %}
-                                        {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
-                                      {% endfor %}
-                                    </small>
-                                  </div>
-                                </td>
-                                <td class="text-wrap">
-                                  {% if song.debut and not song.premiere %}
-                                    {{ song.last }}, TD
-                                  {% elif song.last >= 50 %}
-                                    {{ song.last }}, Bustout
-                                  {% else %}
-                                    {{ song.last|default_if_none:"" }}
-                                  {% endif %}
-                                </td>
-                                <td class="text-nowrap">
-                                  {% if song.premiere %}
-                                    Debut
-                                  {% elif song.ltp %}
-                                    <a href="{% url "databruce:event_details" event=song.ltp.id %}"
-                                       class="text-light">{{ song.ltp }}</a>
-                                  {% endif %}
-                                </td>
-                              </tr>
-                            {% endfor %}
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
-                  {% else %}
-                    <h6>No Set Details Available</h6>
+                  {% if official or nugs %}
+                    <h6>Official Releases</h6>
+                    <ul>
+                      {% if nugs %}
+                        <li>
+                          <a class="sky-500"href="{{ nugs.url }}">Nugs Release</a>
+                        </li>
+                      {% endif %}
+                      {% for rel in official %}
+                        <li>
+                          <a class="sky-500"
+                             href="{% url "databruce:release_details" id=rel.release.id %}">{{ rel.release.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                  {% if bootleg %}
+                    <h6>
+                      Unofficial Releases
+                      <i class="bi bi-info-circle-fill"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Links direct to SpringsteenLyrics.com"></i>
+                    </h6>
+                    <ul>
+                      {% for rel in bootleg %}
+                        <li>
+                          <a class="sky-500"
+                             href="https://www.springsteenlyrics.com/bootlegs.php?item={{ rel.slid }}">
+                            {% if rel.label %}
+                              {{ rel.title }} ({{ rel.label }})
+                            {% else %}
+                              {{ rel.title }}
+                            {% endif %}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
                   {% endif %}
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row row-cols-1 row-cols-md-2 g-3">
             <div class="col">
               <div class="card">
-                <div class="card-header">Album Breakdown</div>
+                <div class="card-header">Onstage</div>
                 <div class="card-body">
-                  {% comment %} {% for album in album_breakdown %}
-                    <div class="d-flex flex-row justify-content-between">
-                      <div class="pe-2 fw-semibold">{{ album.category }}:</div>
-                      <div>{{ album.num }}</div>
-                    </div>
-                  {% endfor %} {% endcomment %}
-                  {% regroup setlist_unique by song.category as category_list %}
-                  {% for album in album_breakdown %}
-                    <div class="row mb-1">
-                      <div class="col">
-                        {{ album.category }}
-                        <a href="#" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="{% for category in category_list %}{% if category.grouper == album.category %} {% for item in category.list %}{{ item.song.name }}<br>
+                  {% regroup onstage by band as onstage_list %}
+                  {% if 'nobruce' not in event.brucebase_url %}
+                    <ul>
+                      <li>
+                        <a class="sky-500" href="{% url "databruce:relation_details" id=255 %}">Bruce Springsteen</a>
+                      </li>
+                    </ul>
+                  {% endif %}
+                  {% for band in onstage_list %}
+                    {% if band.grouper %}
+                      <h6>{{ band.grouper }}</h6>
+                      <ul>
+                        {% for member in band.list %}
+                          <li>
+                            <a class="sky-500"
+                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                          </li>
                         {% endfor %}
-                      {% endif %}
-                    {% endfor %}
-                    ">
-                    <div class="progress px-0"
-                         role="progressbar"
-                         aria-label="Basic example"
-                         aria-valuenow="{{ album.num|album_percent:album_max.max }}"
-                         aria-valuemin="0"
-                         aria-valuemax="100">
-                      <div class="progress-bar main-color"
-                           style="width: {{ album.num|album_percent:album_max.max }}%">{{ album.num }}</div>
+                      </ul>
+                    {% else %}
+                      <h6>Others</h6>
+                      <ul>
+                        {% for member in band.list %}
+                          <li>
+                            <a class="sky-500"
+                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  {% endfor %}
+                  {% if guests %}
+                    {% regroup guests by band as onstage_guest_list %}
+                    <h6>
+                      Guests
+                      <small>
+                        <a data-bs-toggle="collapse"
+                           class="sky-500"
+                           href="#collapseGuests"
+                           aria-expanded="false"
+                           aria-controls="collapseExample">Show All</a></small>
+                    </h6>
+                    <div class="collapse" id="collapseGuests">
+                      <ul>
+                        {% for band in onstage_guest_list %}
+                          {% if band.grouper %}
+                            <h6>{{ band.grouper }}</h6>
+                            <ul>
+                              {% for member in band.list %}
+                                <li>
+                                  <a class="sky-500"
+                                     href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                                </li>
+                              {% endfor %}
+                            </ul>
+                          {% else %}
+                            {% for member in band.list %}
+                              <li>
+                                <a class="sky-500"
+                                   href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                              </li>
+                            {% endfor %}
+                          {% endif %}
+                        {% endfor %}
+                      </ul>
                     </div>
-                  </a>
+                  {% endif %}
                 </div>
               </div>
-            {% endfor %}
+            </div>
+            {% if album_breakdown %}
+              <div class="col">
+                <div class="card">
+                  <div class="card-header">Album Breakdown</div>
+                  <div class="card-body">
+                    {% regroup setlist_unique by song.category as album_list %}
+                    {% for album in album_breakdown %}
+                      <div class="row pb-2"
+                           data-bs-toggle="tooltip"
+                           data-bs-html="true"
+                           data-bs-title="<!-- djlint:off -->{% for item in album_list %}{% if item.grouper == album.category %}{% for song in item.list %}{{ song.song.name }}<br>{% endfor %}{% endif %}{% endfor %} <!-- djlint:on -->">
+                        <div class="col">
+                          <div class="progress-label">
+                            <div class="pe-2 fw-semibold">{{ album.category }}</div>
+                          </div>
+                          <div class="progress d-flex flex-row justify-content-between"
+                               role="progressbar"
+                               aria-label="Basic example"
+                               aria-valuenow="{{ album.num|album_percent:album_max.max }}"
+                               aria-valuemin="0"
+                               aria-valuemax="{{ album_max.max }}">
+                            <div class="progress-bar"
+                                 style="width: {{ album.num|album_percent:album_max.max }}%"></div>
+                            <span class="song-count pe-2">{{ album.num }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-header">Onstage</div>
-          <div class="card-body">Onstage Here</div>
-        </div>
-      </div>
     </div>
   </div>
-  <div class="col-12 col-lg-4">
-    <div class="row row-cols-1 g-3">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">Event Notes</div>
-          <div class="card-body">{{ event.note|default_if_none:"" }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-</div>
-<script>
+  <script>
       $(document).ready(function() {
           // removes searchBuilder button, not needed for this.
           layout.topEnd.features[1].buttons.pop();
@@ -226,5 +355,5 @@
               columnDefs: [{ target: 0, width: '5%' }],
           });
       })
-</script>
+  </script>
 {% endblock content %}

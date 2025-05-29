@@ -6,7 +6,6 @@
   - events, songs -->
 <!-- - Setlist Notes Search -->
 
-
 # Features?
 - Event page layout improvements
   - clean up setlist notes. Some events (like 2016-01-16) have a ridiculous number of notes, all of which are debut/premiere/bustout. Find another way to display this info. Could maybe do a table like Dripfield, but that doesn't quite work on mobile. They use tooltips with links to indicate last show, which jump to that event when tapped on mobile.

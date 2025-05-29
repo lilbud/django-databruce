@@ -28,7 +28,7 @@ urlpatterns = [
     ),
     path(
         "notes_search/",
-        views.SetlistSearch.as_view(),
+        views.SetlistNotesSearch.as_view(),
         name="note_search",
     ),
     path("", include("api.urls")),

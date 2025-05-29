@@ -649,86 +649,6 @@ class Events(models.Model):
         return event
 
 
-class EventsWithInfo(models.Model):
-    id = models.TextField(blank=True, db_column="event_id", primary_key=True)
-    event_date = models.DateField(blank=True, default=None, verbose_name="Date")
-    event_type = models.TextField(blank=True, default=None)
-    event_title = models.TextField(blank=True, default=None, verbose_name="Title")
-    formatted_date = models.TextField(blank=True, default=None)
-
-    venue = models.ForeignKey(
-        to="Venues",
-        on_delete=models.DO_NOTHING,
-        db_column="venue_id",
-        blank=True,
-        default=None,
-    )
-
-    name = models.TextField(blank=True, default=None)
-    city = models.TextField(blank=True, default=None)
-    state_name = models.TextField(blank=True, default=None)
-    state = models.TextField(blank=True, default=None)
-    country = models.TextField(blank=True, default=None)
-    event_url = models.TextField(blank=True, default=None)
-    venue_loc = models.TextField(blank=True, default=None)
-    venue_url = models.TextField(blank=True, default=None)
-    artist_url = models.TextField(blank=True, default=None)
-
-    artist = models.ForeignKey(
-        to="Bands",
-        on_delete=models.DO_NOTHING,
-        db_column="artist",
-        blank=True,
-        default=None,
-    )
-
-    event_certainty = models.TextField(blank=True, default=None)
-    setlist_certainty = models.TextField(blank=True, default=None)
-
-    tour = models.ForeignKey(
-        to="Tours",
-        on_delete=models.DO_NOTHING,
-        db_column="tour",
-        blank=True,
-        default=None,
-    )
-
-    note = models.TextField(blank=True, default=None)
-    nugs_release = models.BooleanField(blank=True, default=None)
-    nugs_id = models.TextField(blank=True, default=None)
-    archive_url = models.TextField(blank=True, default=None)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "events_with_info"
-        verbose_name_plural = db_table
-
-
-class EveryTimePlayed(models.Model):
-    event_date = models.DateField(blank=True, default=None)
-    day = models.TextField(blank=True, default=None)
-    venue_loc = models.TextField(blank=True, default=None)
-    ssn = models.IntegerField(blank=True, default=None)
-    set_name = models.TextField(blank=True, default=None)
-    last = models.TextField(blank=True, default=None)
-    prev = models.TextField(blank=True, default=None)
-    song = models.TextField(blank=True, default=None)
-    next = models.TextField(blank=True, default=None)
-    pos = models.IntegerField(blank=True, default=None)
-    total = models.IntegerField(blank=True, default=None)
-    rel_pos = models.DecimalField(
-        max_digits=10,
-        decimal_places=5,
-        blank=True,
-        default=None,
-    )  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "every_time_played"
-        verbose_name_plural = db_table
-
-
 class NugsReleases(models.Model):
     id = models.AutoField(primary_key=True)
     nugs_id = models.IntegerField(blank=True, default=None)
@@ -840,7 +760,6 @@ class Onstage(models.Model):
     )
 
     note = models.TextField(blank=True, default=None)
-    instruments = models.TextField(blank=True, default=None)
     guest = models.BooleanField(default=False)
 
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
@@ -1083,7 +1002,6 @@ class Setlists(models.Model):
         default=None,
     )
 
-    band_premiere = models.BooleanField(default=False)
     sign_request = models.BooleanField(default=False)
 
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)

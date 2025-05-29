@@ -37,7 +37,7 @@ div.ui-menu-item-wrapper:hover,
 }
 
 .card {
-    background-color: var(--zinc-900) !important;
+    background-color: var(--zinc-900);
     border: 1px solid var(--zinc-800) !important;
     border-radius: 0.5rem !important;
 }
@@ -148,4 +148,24 @@ tr th {
 
 .setname {
     display: none !important;
+}
+
+.song-count {
+    position: absolute !important;
+}
+
+.progress {
+    position: relative;
+    height: 18px;
+    padding: 0;
+}
+
+.progress>.song-count {
+    position: absolute;
+    right: 0px;
+    cursor: help;
+}
+
+.progress-bar {
+    background-color: var(--sky-700) !important;
 }

@@ -67,84 +67,86 @@
     --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
 
+
+
 .tour23 {
-    background-color: #c86327;
-    color: white;
+    background-color: #c86327 !important;
+    color: white !important;
 }
 
 .bitusa {
     background-color: #a43134;
-    color: white;
+    color: white !important;
 }
 
 .btr {
     background-color: #ffffff;
-    color: black;
+    color: black !important;
 }
 
 .darkness {
     background-color: #d7b79d;
-    color: black;
+    color: black !important;
 }
 
 .devils {
     background-color: #cd9f69;
-    color: black;
+    color: black !important;
 }
 
 .greetings {
     background-color: #dd3b64;
-    color: white;
+    color: white !important;
 }
 
 .hh {
     background-color: #e0ae64;
-    color: black;
+    color: black !important;
 }
 
 .magic {
     background-color: #752418;
-    color: white;
+    color: white !important;
 }
 
 .joad {
     background-color: #efbd5a;
-    color: black;
+    color: black !important;
 }
 
 .rising {
     background-color: #e59750;
-    color: black;
+    color: black !important;
 }
 
 .river {
     background-color: #4ebcc3;
-    color: black;
+    color: black !important;
 }
 
 .sessions {
     background-color: #edb22b;
-    color: white;
+    color: white !important;
 }
 
 .shuffle {
     background-color: #c89c6c;
-    color: black;
+    color: black !important;
 }
 
 .tunnel {
     background-color: black;
-    color: white;
+    color: white !important;
 }
 
 .dream {
     background-color: #3b497c;
-    color: yellow;
+    color: white !important;
 }
 
 .tour92 {
     background-color: #da3931;
-    color: white;
+    color: white !important;
 }
 
 .wrecking {
