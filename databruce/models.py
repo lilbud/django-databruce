@@ -727,7 +727,7 @@ class Relations(models.Model):
         default=None,
     )
     aliases = models.TextField(blank=True, default=None)
-    fts = models.TextField(blank=True, default=None)  # This field type is a guess.
+
     instruments = models.TextField(blank=True, default=None)
 
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
@@ -827,7 +827,6 @@ class Releases(models.Model):
     short_name = models.TextField(blank=True, default=None)
     thumb = models.TextField(blank=True, default=None)
     mbid = models.TextField(blank=True, default=None)
-    fts = models.TextField(blank=True, default=None)  # This field type is a guess.
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
