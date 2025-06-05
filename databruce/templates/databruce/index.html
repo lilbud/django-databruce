@@ -7,12 +7,16 @@
   {% regroup events by artist as events_list %}
   <div class="row mb-4">
     <div class="col">
-      <h1>Welcome to Databruce</h1>
+      {% if user %}
+        <h1>Welcome to Databruce, {{ user|default_if_none:"" }}!</h1>
+      {% else %}
+        <h1>Welcome to Databruce!</h1>
+      {% endif %}
       <h4>A new Bruce Springsteen concert database</h4>
     </div>
   </div>
   <div class="row mb-4">
-    <div class="col-lg-6">
+    <div class="col-lg-4">
       <div class="card mb-4">
         <div class="card-body p-0 rounded">
           <img class="img-fluid object-fit-cover"
@@ -25,14 +29,78 @@
         <div class="card-footer text-body-secondary">Manchester - May 14, 2025 (photo by Rob DeMartin)</div>
       </div>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <h5 class="card-header">Most Recent Show</h5>
+        <div class="card-body px-0">
+          {% with first=recent|first %}
+            <h6 class="ms-2">
+              <div class="row">
+                <a class="sky-500"
+                   href="{% url "databruce:event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
+              </div>
+              <div class="row">
+                <a class="text-reset text-body-light"
+                   href="{% url 'databruce:band_details' id=first.artist.id %}">{{ first.artist }}</a>
+              </div>
+            </h6>
+          {% endwith %}
+          {% regroup latest_show by set_name as event_setlist %}
+          {% if latest_show %}
+            <div class="table-responsive">
+              <table class="table table-sm display" id="setlistTable">
+                <thead>
+                  <tr>
+                    <th class="all text-center">#</th>
+                    <th class="all">Song</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for set in event_setlist %}
+                    <tr class="text-center">
+                      <td class="setHeader" colspan="4">{{ set.grouper }}</td>
+                      <td class="setname"></td>
+                    </tr>
+                    {% for song in set.list %}
+                      <tr>
+                        <td class="text-center">
+                          {% if song.position %}
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="{{ song.position }}"
+                                  class="badge text-bg-primary">{{ song.song_num }}</span>
+                          {% else %}
+                            {{ song.song_num }}
+                          {% endif %}
+                        </td>
+                        <td>
+                          <span class="text-nowrap">
+                            <a class="text-light"
+                               href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                            {% if song.segue %}{{ song.separator }}{% endif %}
+                            {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
+                            {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
+                          </span>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <h6>No Set Details Available</h6>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
       <div class="row row-cols-1 row-cols-md-1 g-4 mb-4">
         <div class="col">
           <div class="card h-100 p-0">
-            <h4 class="card-header">Recent Events</h4>
+            <h5 class="card-header">Recent Events</h5>
             <div class="card-body p-0">
-              <div class="table-responsive p-0 index">
-                <table class="table table display" id="recentTable">
+              <div class="table-responsive index">
+                <table class="table table-hover display" id="recentTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
@@ -43,10 +111,12 @@
                     {% for event in recent %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                          <a class="sky-500"
+                             href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-wrap">
-                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">
+                          <a class="sky-500"
+                             href="{% url "databruce:venue_details" id=event.venue.id %}">
                             {% if event.venue.city %}
                               {{ event.venue }}, {{ event.venue.city }}
                             {% else %}
@@ -64,10 +134,10 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <h4 class="card-header">Upcoming Events</h4>
+            <h5 class="card-header">Upcoming Events</h5>
             <div class="card-body p-0">
-              <div class="table-responsive p-0 index">
-                <table class="table table display" id="upcomingTable">
+              <div class="table-responsive index">
+                <table class="table table-hover display" id="upcomingTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
@@ -78,10 +148,12 @@
                     {% for event in upcoming %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                          <a class="sky-500"
+                             href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-wrap">
-                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">
+                          <a class="sky-500"
+                             href="{% url "databruce:venue_details" id=event.venue.id %}">
                             {% if event.venue.city %}
                               {{ event.venue }}, {{ event.venue.city }}
                             {% else %}
@@ -99,13 +171,13 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <h4 class="card-header">
+            <h5 class="card-header">
               On This Day ({{ date|date:"F d" }})
               <a href="{% url 'databruce:adv_search' %}?current=true">see more</a>
-            </h4>
+            </h5>
             <div class="card-body p-0">
-              <div class="table-responsive p-0 index">
-                <table class="table table display" id="otdTable">
+              <div class="table-responsive index">
+                <table class="table table-hover display" id="otdTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
@@ -116,7 +188,7 @@
                     {% for event in events %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-wrap">
                           <a href="{% url "databruce:venue_details" id=event.venue.id %}">
@@ -143,15 +215,34 @@
     layout.topEnd.features[1].buttons.pop()
     
     $(document).ready(function () {
-      $('table.display').dataTable({
-        columnDefs: [
-        {'width': '200px', 'target': 0}
-        ],
-        searching: false,
-        ordering: false,
-        info: false,
-        paging: false,
-      })
+      new DataTable('#otdTable', {
+          layout: layout,
+          autoWidth: false,
+          paging: false,
+          ordering: false,
+      });
+
+      new DataTable('#recentTable', {
+          layout: layout,
+          autoWidth: false,
+          paging: false,
+          ordering: false,
+      });
+
+      new DataTable('#upcomingTable', {
+          layout: layout,
+          autoWidth: false,
+          paging: false,
+          ordering: false,
+      });
+
+      new DataTable('#setlistTable', {
+          layout: layout,
+          autoWidth: false,
+          paging: false,
+          ordering: false,
+          columnDefs: [{ target: 0, width: '5%' }],
+      });
     })
   </script>
 {% endblock content %}

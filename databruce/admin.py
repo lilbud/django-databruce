@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.forms import BaseInlineFormSet
 
 from . import models
 
@@ -28,6 +27,12 @@ class ArchiveAdmin(admin.ModelAdmin):
     list_select_related = ["event"]
     list_display = ["id", "event", "url"]
     list_display_links = ["id", "event"]
+
+
+@admin.register(models.UserAttendedShows)
+class UserAttendedShowsAdmin(admin.ModelAdmin):
+    search_fields = ["user", "event"]
+    list_select_related = ["user", "event"]
 
 
 @admin.register(models.Bands)
@@ -88,11 +93,6 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = [
         "id",
         "date",
-        "venue__name",
-        "artist__name",
-        "tour__name",
-        "run__name",
-        "leg__name",
     ]
     autocomplete_fields = ["venue", "artist", "tour", "run", "leg"]
     list_select_related = ["venue"]

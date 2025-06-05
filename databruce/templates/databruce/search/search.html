@@ -25,7 +25,7 @@
     {% for event in events %}
       <tr>
         <td scope="row" class="text-nowrap">
-          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
         </td>
         <td>
           {% if event.artist %}

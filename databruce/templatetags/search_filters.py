@@ -1,7 +1,6 @@
 import calendar
 
 from django import template
-from django.db.models import Count
 
 from databruce import models
 
@@ -85,7 +84,7 @@ def make_ordinal(n: int):
     make_ordinal(213) => '213th'
     """
     n = int(n)
-    if 11 <= (n % 100) <= 13:
+    if 11 <= (n % 100) <= 13:  # noqa: PLR2004
         suffix = "th"
     else:
         suffix = ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]

@@ -5,7 +5,6 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-import datetime
 
 from django.db import models
 
@@ -61,6 +60,7 @@ class AuthPermission(models.Model):
 
 
 class AuthUser(models.Model):
+    id = models.BigAutoField(primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(auto_now_add=True, blank=True)
     is_superuser = models.BooleanField()
@@ -133,7 +133,7 @@ class Bands(models.Model):
         db_table = "bands"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -163,7 +163,13 @@ class Bootlegs(models.Model):
     media_type = models.TextField(blank=True, default=None)
     has_info = models.BooleanField()
     has_artwork = models.BooleanField()
-    archive_id = models.TextField(blank=True, default=None)
+    archive = models.ForeignKey(
+        to=ArchiveLinks,
+        on_delete=models.DO_NOTHING,
+        db_column="archive_id",
+        blank=True,
+        default=None,
+    )
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
@@ -243,14 +249,14 @@ class Cities(models.Model):
         verbose_name_plural = db_table
         unique_together = (("name", "state"),)
 
-    def __str__(self):
+    def __str__(self) -> str:
         try:
             if self.country.name == "United States":
                 return f"{self.name}, {self.state.state_abbrev}"
 
-            return f"{self.name}, {self.state}"
+            return f"{self.name}, {self.state}"  # noqa: TRY300
 
-        except:
+        except States.DoesNotExist:
             return f"{self.name}, {self.country}"
 
 
@@ -268,7 +274,7 @@ class Continents(models.Model):
         db_table = "continents"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -316,7 +322,7 @@ class Countries(models.Model):
         db_table = "countries"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -464,12 +470,12 @@ class Venues(models.Model):
         db_table = "venues"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         try:
             if self.detail:
                 return f"{self.name}, {self.detail}"
 
-            return self.name
+            return self.name  # noqa: TRY300
         except TypeError:
             return "Name"
 
@@ -638,7 +644,7 @@ class Events(models.Model):
         verbose_name_plural = db_table
         unique_together = (("id", "date", "brucebase_url"),)
 
-    def __str__(self):
+    def __str__(self) -> str:
         try:
             event = self.date.strftime("%Y-%m-%d [%a]")
             if self.early_late:
@@ -653,7 +659,7 @@ class NugsReleases(models.Model):
     id = models.AutoField(primary_key=True)
     nugs_id = models.IntegerField(blank=True, default=None)
     event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
-    release_date = models.TextField(blank=True, default=None)
+    date = models.TextField(blank=True, default=None, db_column="release_date")
     url = models.TextField(blank=True, default=None, db_column="nugs_url")
     thumbnail = models.TextField(blank=True, default=None, db_column="thumbnail_url")
     name = models.TextField(blank=True, default=None)
@@ -665,6 +671,10 @@ class NugsReleases(models.Model):
         managed = False
         db_table = "nugs_releases"
         verbose_name_plural = db_table
+        ordering = ["-event__id"]
+
+    def __str__(self) -> str:
+        return self.event.id
 
 
 class OpenersClosers(models.Model):
@@ -728,7 +738,7 @@ class Relations(models.Model):
         db_table = "relations"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -832,7 +842,7 @@ class Releases(models.Model):
         db_table = "releases"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -902,9 +912,10 @@ class Songs(models.Model):
         default=None,
     )
 
-    num_plays_public = models.IntegerField(default=0)
-    num_plays_private = models.IntegerField(default=0)
-    num_plays_snippet = models.IntegerField(default=0)
+    num_plays_public = models.IntegerField(default=0, db_column="num_plays_public")
+    num_plays_private = models.IntegerField(default=0, db_column="num_plays_private")
+    num_plays_snippet = models.IntegerField(default=0, db_column="num_plays_snippet")
+
     opener = models.IntegerField(default=0)
     closer = models.IntegerField(default=0)
 
@@ -936,7 +947,7 @@ class Songs(models.Model):
         db_table = "songs"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.original_artist:
             return f"{self.name} ({self.original_artist})"
 
@@ -970,8 +981,7 @@ class Setlists(models.Model):
     set_name = models.CharField(blank=True, default="Show", choices=sets)
 
     song_num = models.IntegerField(
-        default=lambda: Setlists.objects.order_by("event", "song_num").last().song_num
-        + 1,
+        default=1,
     )
 
     song = models.ForeignKey(
@@ -1011,7 +1021,7 @@ class Setlists(models.Model):
         managed = False
         db_table = "setlists"
         verbose_name_plural = db_table
-        unique_together = (("event_id", "song_num", "song_id"),)
+        unique_together = (("event_id", "song_num", "set_name", "song_id"),)
 
 
 class SetlistsBySetAndDate(models.Model):
@@ -1135,7 +1145,7 @@ class States(models.Model):
         db_table = "states"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.country not in [2, 6, 37]:
             state = f"{self.name}, {self.country}"
         else:
@@ -1204,7 +1214,7 @@ class Tours(models.Model):
         db_table = "tours"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -1264,7 +1274,7 @@ class TourLegs(models.Model):
         db_table = "tour_legs"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -1302,6 +1312,7 @@ class SongsPage(models.Model):
         null=True,
         default=None,
     )
+    note = models.TextField(blank=True, default=None)
 
     class Meta:
         managed = False
@@ -1310,6 +1321,8 @@ class SongsPage(models.Model):
 
 
 class Runs(models.Model):
+    id = models.AutoField(primary_key=True)
+
     band = models.ForeignKey(
         Bands,
         models.DO_NOTHING,
@@ -1327,8 +1340,9 @@ class Runs(models.Model):
     name = models.TextField()
     num_shows = models.IntegerField(blank=True, null=True)
     num_songs = models.IntegerField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+
     first = models.ForeignKey(
         Events,
         models.DO_NOTHING,
@@ -1350,11 +1364,12 @@ class Runs(models.Model):
         db_table = "runs"
         verbose_name_plural = db_table
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Sessions(models.Model):
+    id = models.AutoField(primary_key=True)
     band = models.ForeignKey(
         "Bands",
         models.DO_NOTHING,
@@ -1365,8 +1380,8 @@ class Sessions(models.Model):
     name = models.TextField()
     num_events = models.IntegerField(blank=True, null=True)
     num_songs = models.IntegerField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     first = models.ForeignKey(
         Events,
@@ -1397,3 +1412,21 @@ class Sessions(models.Model):
         managed = False
         db_table = "runs"
         verbose_name_plural = db_table
+
+
+class UserAttendedShows(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(
+        to=AuthUser,
+        on_delete=models.DO_NOTHING,
+        db_column="user_id",
+    )
+    event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
+    updated_at = models.DateTimeField(auto_now_add=True, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+
+    class Meta:
+        managed = False
+        db_table = "user_attended_shows"
+        verbose_name_plural = db_table
+        unique_together = ("user", "event")

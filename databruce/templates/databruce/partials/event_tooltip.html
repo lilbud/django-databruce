@@ -2,4 +2,4 @@
    data-bs-placement="top"
    data-bs-html="true"
    data-bs-title="<div>{{ event }}<br>{{ event.artist }}<br>{{ event.venue }}</div>"
-   href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+   href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>

@@ -4,4 +4,8 @@ $(document).ready(function () {
         $($.fn.dataTable.tables(true)).DataTable()
             .columns.adjust();
     });
+    $('button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+        $($.fn.dataTable.tables(true)).DataTable()
+            .columns.adjust();
+    });
 })

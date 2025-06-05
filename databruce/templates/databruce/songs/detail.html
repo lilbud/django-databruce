@@ -14,15 +14,15 @@
       <div class="card h-100">
         <h5 class="card-header">Song Info</h5>
         <div class="card-body">
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Original Artist:</div>
-            <div class="col">{{ song_info.original_artist|default_if_none:"Bruce Springsteen" }}</div>
+          <div class="d-flex flex-row fs-6">
+            <div class="pe-2 fw-semibold">Original Artist:</div>
+            <div>{{ song_info.original_artist|default_if_none:"Bruce Springsteen" }}</div>
           </div>
-          {% if release %}
-            <div class="row justify-content-start">
-              <div class="col-auto pe-0 fs-6 fw-semibold">First Release:</div>
-              <div class="col">
-                <a href="{% url "databruce:release_details" id=release.release.id %}">{{ release.release.name }}</a>
+          {% if song_info.album %}
+            <div class="d-flex flex-row fs-6">
+              <div class="pe-2 fw-semibold">Category:</div>
+              <div>
+                <a href="{% url "databruce:release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
               </div>
             </div>
           {% endif %}
@@ -33,17 +33,97 @@
       <div class="card h-100">
         <h5 class="card-header">Song Stats</h5>
         <div class="card-body">
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Public:</div>
-            <div class="col">{{ song_info.num_plays_public }}</div>
-          </div>
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6">Private:</div>
-            <div class="col">{{ song_info.num_plays_private }}</div>
-          </div>
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6">Frequency:</div>
-            <div class="col">{{ frequency }}%</div>
+          <div class="row row-cols-3 row-cols-lg-6 g-2">
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="sky-500">
+                    Public
+                    <i class="bi bi-info-circle-fill text-light"
+                       data-bs-toggle="tooltip"
+                       data-bs-html="true"
+                       data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
+                  </h6>
+                  <h5>{{ song_info.num_plays_public }}</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="sky-500">
+                    Private
+                    <i class="bi bi-info-circle-fill text-light"
+                       data-bs-toggle="tooltip"
+                       data-bs-html="true"
+                       data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
+                  </h6>
+                  <h5>{{ song_info.num_plays_private }}</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="sky-500">
+                    Snippet
+                    <i class="bi bi-info-circle-fill text-light"
+                       data-bs-toggle="tooltip"
+                       data-bs-html="true"
+                       data-bs-title="Number of times a song was included as part of another."></i>
+                  </h6>
+                  <h5>{{ song_info.num_plays_snippet }}</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="sky-500">
+                    Opener
+                    <i class="bi bi-info-circle-fill text-light"
+                       data-bs-toggle="tooltip"
+                       data-bs-html="true"
+                       data-bs-title="Number of times a song has opened a show."></i>
+                  </h6>
+                  <h5>{{ song_info.opener }}</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="sky-500">
+                    Closer
+                    <i class="bi bi-info-circle-fill text-light"
+                       data-bs-toggle="tooltip"
+                       data-bs-html="true"
+                       data-bs-title="Number of times a song has closed a show."></i>
+                  </h6>
+                  <h5>{{ song_info.closer }}</h5>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="sky-500">
+                    Frequency
+                    <i class="bi bi-info-circle-fill text-light"
+                       data-bs-toggle="tooltip"
+                       data-bs-html="true"
+                       data-bs-title="How common a song is. Number of times played divided by number of shows since the debut. Formula from Dripfield.pro."></i>
+                  </h6>
+                  <h5>
+                    {% if frequency %}
+                      {{ frequency }}%
+                    {% else %}
+                      0%
+                    {% endif %}
+                  </h5>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -54,8 +134,8 @@
       <div class="card">
         <h5 class="card-header">Performances</h5>
         <div class="card-body px-0">
-          <div class="table-responsive p-0">
-            <table class="table table display" id="songTable">
+          <div class="table-responsive">
+            <table class="table table-hover display" id="songTable">
               <thead>
                 <tr>
                   <th class="all" scope="col">Date</th>
@@ -74,7 +154,7 @@
                 {% for song in songs %}
                   <tr>
                     <td class="text-nowrap">
-                      <a href="{% url "databruce:event_details" event=song.current.event.id %}">{{ song.current.event }}</a>
+                      <a href="{% url "databruce:event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
                     </td>
                     <td class="text-nowrap">
                       <a href="{% url "databruce:band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
@@ -93,7 +173,11 @@
                       {% endwith %}
                     </td>
                     <td class="text-nowrap">
-                      {% if song.current.event.tour %}{{ song.current.event.tour }}{% endif %}
+                      {% if song.current.event.tour %}
+                        <h6 class="mb-0">
+                          <a href="{% url "databruce:tour_details" id=song.current.event.tour.id %}"><span class="badge {{ song.current.event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ song.current.event.tour.name }}</span></a>
+                        </h6>
+                      {% endif %}
                     </td>
                     <td class="text-nowrap">
                       {% if song.current.position and song.current.position != song.current.set_name %}
@@ -108,21 +192,21 @@
                       {% endif %}
                     </td>
                     <td>{{ song.current.set_name }}</td>
-                    <td class="text-wrap">
+                    <td class="text-nowrap">
                       {% if song.prev %}
                         <a href="{% url "databruce:song_details" id=song.prev.song.id %}">{{ song.prev.song.short_name|default_if_none:song.prev.song.name }}</a>
                       {% else %}
                         <em>***</em>
                       {% endif %}
                     </td>
-                    <td class="text-wrap">
+                    <td class="text-nowrap">
                       {% if song.next %}
                         <a href="{% url "databruce:song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
                       {% else %}
                         <em>***</em>
                       {% endif %}
                     </td>
-                    <td class="text-wrap">{{ song.current.song_note|default_if_none:"" }}</td>
+                    <td>{{ song.note|default_if_none:"" }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -134,13 +218,14 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 6, 7, 8]
+    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 6, 7, 8, 9]
 
     $(document).ready(function () {
       new DataTable('#songTable', {
         layout: layout,
         initComplete: function () {
           this.api()
+          
           .columns([6])
             .every(function () {
               var column = this;

@@ -1,8 +1,6 @@
 from django.db.models import Q
 from django_filters import rest_framework as filters
 
-from databruce import models
-
 
 class ArchiveFilter(filters.FilterSet):
     event = filters.CharFilter(field_name="event")
@@ -33,17 +31,17 @@ class VenuesFilter(filters.FilterSet):
     state = filters.CharFilter(method="state_filter")
     country = filters.CharFilter(method="country_filter")
 
-    def name_filter(self, queryset, name, value):
+    def name_filter(self, queryset, value):
         return queryset.filter(
             Q(name__icontains=value) | Q(aliases__icontains=value),
         )
 
-    def state_filter(self, queryset, name, value):
+    def state_filter(self, queryset, value):
         return queryset.filter(
             Q(state__name__icontains=value) | Q(state__state_abbrev__iexact=value),
         )
 
-    def country_filter(self, queryset, name, value):
+    def country_filter(self, queryset, value):
         return queryset.filter(
             Q(country__name__icontains=value)
             | Q(country__alpha_2__iexact=value)
@@ -58,13 +56,13 @@ class EventsFilter(filters.FilterSet):
     state = filters.CharFilter(method="state_filter")
     country = filters.CharFilter(method="country_filter")
 
-    def state_filter(self, queryset, name, value):
+    def state_filter(self, queryset, value):
         return queryset.filter(
             Q(venue__state__name__icontains=value)
             | Q(venue__state__state_abbrev__iexact=value),
         )
 
-    def country_filter(self, queryset, name, value):
+    def country_filter(self, queryset, value):
         return queryset.filter(
             Q(venue__country__name__icontains=value)
             | Q(venue__country__alpha_2__iexact=value)
@@ -76,7 +74,7 @@ class OnstageFilter(filters.FilterSet):
     relation = filters.CharFilter(field_name="relation__name", lookup_expr="icontains")
     event = filters.CharFilter(method="event_filter")
 
-    def event_filter(self, queryset, name, value):
+    def event_filter(self, queryset, value):
         return queryset.filter(
             Q(event__id__iexact=value) | Q(event__event_date__iexact=value),
         )
@@ -96,7 +94,7 @@ class SetlistFilter(filters.FilterSet):
     date = filters.CharFilter(field_name="event__event_date", lookup_expr="icontains")
     song = filters.CharFilter(method="song_filter")
 
-    def song_filter(self, queryset, name, value):
+    def song_filter(self, queryset, value):
         return queryset.filter(
             Q(song__name__icontains=value) | Q(song__short_name__icontains=value),
         )
@@ -112,12 +110,12 @@ class StateFilter(filters.FilterSet):
     name = filters.CharFilter(method="state_filter")
     country = filters.CharFilter(method="country_filter")
 
-    def state_filter(self, queryset, name, value):
+    def state_filter(self, queryset, value):
         return queryset.filter(
             Q(name__icontains=value) | Q(state_abbrev__iexact=value),
         )
 
-    def country_filter(self, queryset, name, value):
+    def country_filter(self, queryset, value):
         return queryset.filter(
             Q(country__name__icontains=value)
             | Q(country__alpha_2__iexact=value)

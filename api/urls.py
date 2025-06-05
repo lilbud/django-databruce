@@ -1,17 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from api import views
 
 app_name = "api"
-
-# urlpatterns = [
-#     path("api/archives/", views.ArchiveViewSet.as_view()),
-#     path("api/archives/<int:pk>/", views.ArchiveViewDetail.as_view()),
-# ]
-
-# urlpatterns = format_suffix_patterns(urlpatterns)
 
 router = DefaultRouter()
 router.register(r"archives", views.ArchiveViewSet, basename="archive")
@@ -43,9 +35,4 @@ router.register(r"tour_legs", views.TourLegsViewSet, basename="tour_leg")
 urlpatterns = [
     path("api/", include(router.urls)),
     path("event_autocomplete", views.event_search, name="events_auto"),
-    # path(
-    #     "city_autocomplete/",
-    #     views.CityAutocomplete.as_view(),
-    #     name="city-autocomplete",
-    # ),
 ]

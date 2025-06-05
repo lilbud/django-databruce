@@ -1,0 +1,56 @@
+{% extends "databruce/category.html" %}
+{% block title %}
+    Nugs Releases
+{% endblock title %}
+{% block info_row %}
+    <h4>Nugs Releases</h4>
+    <h6>Shows released on Nugs. Links lead to the page where you can purchase those shows.</h6>
+{% endblock info_row %}
+{% block table_id %}
+    releasesTable
+{% endblock table_id %}
+{% block table %}
+    <thead>
+        <tr class="header">
+            <th>Release Date</th>
+            <th>Event</th>
+            <th>Venue</th>
+            <th>Location</th>
+            <th>Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for release in releases %}
+            <tr>
+                <td>{{ release.date|default_if_none:"" }}</td>
+                <td>
+                    <a href="{% url "databruce:event_details" id=release.event.id %}">{{ release.event }}</a>
+                </td>
+                <td>
+                    <a href="{% url 'databruce:venue_details' id=release.event.venue.id %}">{{ release.event.venue.name }}</a>
+                </td>
+                <td>
+                    {% if release.event.venue.city %}
+                        <a href="{% url 'databruce:city_details' id=release.event.venue.city.id %}">{{ release.event.venue.city }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ release.url }}">Nugs Release</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+{% endblock table %}
+{% block scripts %}
+    <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop()
+
+    $(document).ready(function () {
+      new DataTable('#releasesTable', {
+        layout: layout,
+        order: [[1, 'asc']],
+      });
+    });
+    </script>
+{% endblock scripts %}

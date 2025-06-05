@@ -4,7 +4,7 @@
 {% endblock title %}
 {% block info_row %}
   <h4>Event Runs</h4>
-  <h6>A 'run' is multiple events on consecutive days at the same venue by the same band.</h6>
+  <h6>A 'run' is multiple events at the same venue by the same band. I largely based this off of Jerrybase.</h6>
 {% endblock info_row %}
 {% block table_id %}
   runTable
@@ -15,6 +15,7 @@
       <th class="all" scope="col">Name</th>
       <th class="min-tablet-l" scope="col">Band</th>
       <th class="min-tablet-l" scope="col">Venue</th>
+      <th class="min-tablet-l" scope="col">Location</th>
       <th scope="col" class="text-center all">Events</th>
       <th scope="col" class="text-center all">Songs</th>
       <th class="min-tablet-l" scope="col">First</th>
@@ -27,19 +28,22 @@
         <td class="text-wrap">
           <a href="{% url "databruce:run_details" id=run.id %}">{{ run.name }}</a>
         </td>
-        <td>
+        <td class="text-nowrap">
           <a href="{% url "databruce:band_details" id=run.band.id %}">{{ run.band.name }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:venue_details" id=run.first.venue.id %}">{{ run.first.venue }}</a>
+          <a href="{% url "databruce:venue_details" id=run.venue.id %}">{{ run.venue }}</a>
+        </td>
+        <td>
+          <a href="{% url "databruce:city_details" id=run.venue.city.id %}">{{ run.venue.city }}</a>
         </td>
         <td class="text-center">{{ run.num_shows }}</td>
         <td class="text-center">{{ run.num_songs }}</td>
-        <td>
-          <a href="{% url "databruce:event_details" event=run.first.id %}">{{ run.first }}</a>
+        <td class="text-nowrap">
+          <a href="{% url "databruce:event_details" id=run.first.id %}">{{ run.first }}</a>
         </td>
-        <td>
-          <a href="{% url "databruce:event_details" event=run.last.id %}">{{ run.last }}</a>
+        <td class="text-nowrap">
+          <a href="{% url "databruce:event_details" id=run.last.id %}">{{ run.last }}</a>
         </td>
       </tr>
     {% endfor %}
@@ -48,12 +52,12 @@
 {% block scripts %}
   <script>
   // custom searchBuilder columns definition
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2];
+  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5];
 
     $(document).ready(function () {
         new DataTable('#runTable', {
             layout: layout,
-            order: [[4, 'asc']],
+            order: [[6, 'asc']],
         });
     });
   </script>

@@ -30,10 +30,10 @@
           <a href="{% url "databruce:tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
         </td>
         <td>
-          <a href="{% url 'databruce:event_details' event=leg.first.id %}">{{ leg.first }}</a>
+          <a href="{% url "databruce:event_details" id=leg.first.id %}">{{ leg.first }}</a>
         </td>
         <td>
-          <a href="{% url 'databruce:event_details' event=leg.last.id %}">{{ leg.last }}</a>
+          <a href="{% url "databruce:event_details" id=leg.last.id %}">{{ leg.last }}</a>
         </td>
         <td class="text-center">{{ leg.num_shows }}</td>
         <td class="text-center">{{ leg.num_songs }}</td>

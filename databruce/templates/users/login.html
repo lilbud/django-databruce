@@ -1,0 +1,37 @@
+{% extends "users/base.html" %}
+{% block title %}
+    Login - Databruce
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-header">Login</div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="col">{{ form.non_field_errors }}</div>
+                    <div class="fieldWrapper mb-3">
+                        {{ form.username.errors }}
+                        <label class="form-label" for="{{ form.username.id_for_label }}">Username:</label>
+                        <input type="username" class="form-control" name="username" id="username">
+                    </div>
+                    <div class="fieldWrapper mb-3">
+                        {{ form.password.errors }}
+                        <label class="form-label" for="{{ form.password.id_for_label }}">Password:</label>
+                        <input type="password" class="form-control" name="password" id="password">
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button class="btn btn-primary" type="submit">Login</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <a href="{% url "databruce:password_reset" %}">Forgot Password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

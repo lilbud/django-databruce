@@ -1,0 +1,60 @@
+{% extends "databruce/category.html" %}
+{% block title %}
+    Bootlegs
+{% endblock title %}
+{% block info_row %}
+    <h4>Bootlegs</h4>
+    <h6>
+        <p>
+            Unofficial releases from over the years. All of this information was largely sourced from <a href="https://www.springsteenlyrics.com/">SpringsteenLyrics</a>. Many of these are also available on Archive.org under my Radio Nowhere collection. Only live bootlegs are listed here.
+        </p>
+    </h6>
+{% endblock info_row %}
+{% block table_id %}
+    releasesTable
+{% endblock table_id %}
+{% block table %}
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Label</th>
+            <th>Source</th>
+            <th>Type</th>
+            <th>Event</th>
+            <th>Archive</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for boot in bootlegs %}
+            <tr>
+                <td>
+                    <a href="https://www.springsteenlyrics.com/bootlegs.php?item={{ boot.slid }}">{{ boot.title }}</a>
+                </td>
+                <td>{{ boot.label|default_if_none:"" }}</td>
+                <td>{{ boot.source|default_if_none:"" }}</td>
+                <td>{{ boot.type|default_if_none:"" }}</td>
+                <td>
+                    {% if boot.event %}
+                        <a href="{% url "databruce:event_details" id=boot.event.id %}">{{ boot.event }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if boot.archive %}<a href="https://archive.org/details/{{ boot.archive.url }}">Internet Archive</a>{% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+{% endblock table %}
+{% block scripts %}
+    <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
+
+    $(document).ready(function () {
+      new DataTable('#releasesTable', {
+        layout: layout,
+        order: [[4, 'asc']],
+      });
+    });
+    </script>
+{% endblock scripts %}

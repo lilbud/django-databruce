@@ -27,8 +27,8 @@
     <div class="col">
       <div class="card">
         <div class="card-body">
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="table">
+          <div class="table-responsive">
+            <table class="table table-hover display nowrap" id="table">
               <thead>
                 <tr>
                   <th>Event</th>
@@ -42,7 +42,7 @@
                 {% for result in results %}
                   <tr>
                     <td>
-                      <a href="{% url "databruce:event_details" event=result.event.id %}">{{ result.event }}</a>
+                      <a href="{% url "databruce:event_details" id=result.event.id %}">{{ result.event }}</a>
                     </td>
                     <td>{{ result.id.set_name }}</td>
                     <td>{{ result.id.position|default_if_none:"" }}</td>
@@ -52,7 +52,7 @@
                     <td>
                       {% if result.last %}
                         {{ result.note|mdlink|safe }}, LTP
-                        <a href="{% url 'databruce:event_details' event=result.last.id %}">{{ result.last }}</a>
+                        <a href="{% url "databruce:event_details" id=result.last.id %}">{{ result.last }}</a>
                         ({{ result.gap }} events)
                       {% else %}
                         {{ result.note|mdlink|safe }}

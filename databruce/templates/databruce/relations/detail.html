@@ -16,9 +16,9 @@
       <div class="card">
         <div class="card-body">
           <div class="col">
-            <div class="row justify-content-start">
-              <div class="col-auto pe-0 fs-6 fw-semibold">Appeared With:</div>
-              <div class="col">
+            <div class="d-flex flex-row fs-6">
+              <div class="pe-2 fw-semibold">Appeared With:</div>
+              <div>
                 {% spaceless %}
                   {% for band in bands %}
                     <a href="{% url "databruce:band_details" id=band.band.id %}">{{ band.band.name }}</a>
@@ -37,8 +37,8 @@
       <div class="card">
         <div class="card-body">
           <div class="col">
-            <div class="table-responsive p-0">
-              <table class="table table display nowrap" id="eventTable">
+            <div class="table-responsive">
+              <table class="table table-hover display nowrap" id="eventTable">
                 <thead>
                   <tr class="custom">
                     <th>Date</th>
@@ -54,7 +54,7 @@
                     {% with event=event.event %}
                       <tr>
                         <td>
-                          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td>
                           <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>

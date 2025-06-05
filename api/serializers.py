@@ -1,12 +1,6 @@
-from datetime import datetime
 
 from django.urls import reverse
-from django.utils.html import format_html
-from django_filters import filters
 from rest_framework import serializers
-from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
-from rest_framework_datatables.django_filters.filters import GlobalFilter
-from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
 
 from databruce import models
 

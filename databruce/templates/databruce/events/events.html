@@ -24,7 +24,7 @@
       <th class="all" scope="col">Venue</th>
       <th class="min-tablet-l" scope="col">Location</th>
       <th class="min-tablet-l" scope="col">Tour</th>
-      <th class="min-tablet-l" scope="col">Detail</th>
+      <th class="desktop" scope="col">Detail</th>
       <th class="min-tablet-l" scope="col">Public</th>
     </tr>
   </thead>
@@ -32,9 +32,9 @@
     {% for event in event_info %}
       <tr>
         <td scope="row" class="text-nowrap">
-          <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
         </td>
-        <td>
+        <td class="text-nowrap">
           {% if event.artist %}
             <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
           {% endif %}
@@ -42,17 +42,25 @@
         <td>
           <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
         </td>
-        <td>
+        <td class="text-nowrap">
           {% if event.venue.city %}
             <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
           {% endif %}
         </td>
-        <td>
+        <td class="text-nowrap">
           {% if event.tour %}
-            <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+            <h6 class="mb-0">
+              <a href="{% url "databruce:tour_details" id=event.tour.id %}"><span class="badge {{ event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ event.tour.name }}</span></a>
+            </h6>
           {% endif %}
         </td>
-        <td>{{ event.title|default_if_none:'' }}</td>
+        <td class="text-wrap">
+          {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
+            {{ event.type }}/{{ event.note|default_if_none:'' }}
+          {% else %}
+            {{ event.title|default_if_none:'' }}
+          {% endif %}
+        </td>
         <td>{{ event.public|default_if_none:'' }}</td>
       </tr>
     {% endfor %}
@@ -61,14 +69,16 @@
 {% block scripts %}
   <script>
   //searchBuilder custom columns
-  layout.topEnd.features[1].buttons[0].config.columns = [2, 3, 4, 5]
+  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
 
   $(document).ready(function () {
     new DataTable('#eventTable', {
       layout: layout,
       order: [[0, 'asc']],
       columnDefs: [
-        { target: -1, visible: false }
+        { target: -1, visible: false },
+        { targets: [0, 1], width: "10%" },
+        { targets: [2, 3], width: "15%" },
       ],
       initComplete: function () {
         this.api()

@@ -19,34 +19,108 @@
   <div class="row mb-4">
     <div class="col">
       <div class="card">
-        <h5 class="card-header">Run Details</h5>
+        <div class="card-header">
+          <ul class="nav nav-pills" role="tablist">
+            <li class="nav-item me-2" role="presentation">
+              <button class="nav-link active"
+                      id="pills-events-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#events"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-home"
+                      aria-selected="true">Events</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link"
+                      id="pills-songs-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#songs"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Songs</button>
+            </li>
+          </ul>
+        </div>
         <div class="card-body">
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Tour:</div>
-            <div class="col">
-              <a href="{% url "databruce:tour_details" id=info.tour.id %}">{{ info.tour }}</a>
+          <div class="tab-content">
+            <div id="events" class="tab-pane fade show active">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="eventTable">
+                  <thead>
+                    <tr>
+                      <th class="all">Date</th>
+                      <th class="all">Band</th>
+                      <th class="all">Venue</th>
+                      <th class="all">Location</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for event in events %}
+                      <tr>
+                        <td class="text-nowrap">
+                          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                        </td>
+                        <td class="text-nowrap">
+                          <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist }}</a>
+                        </td>
+                        <td>
+                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                        </td>
+                        <td>
+                          <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Band:</div>
-            <div class="col">
-              <a href="{% url "databruce:band_details" id=info.tour.band.id %}">{{ info.tour.band }}</a>
+            <div id="songs" class="tab-pane fade">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="songTable">
+                  <thead>
+                    <tr>
+                      <th class="text-wrap all">Song</th>
+                      <th class="text-center all">Plays</th>
+                      <th class="text-center all">Show Opener</th>
+                      <th class="text-center all">Main Set Closer</th>
+                      <th class="text-center all">Encore Opener</th>
+                      <th class="text-center all">Show Closer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for song in songs %}
+                      <tr>
+                        <td class="text-nowrap">
+                          <a href="{% url "databruce:song_details" id=song.song_id %}">{{ song.name }}</a>
+                        </td>
+                        <td class="text-center">{{ song.plays }}</td>
+                        <td class="text-center">{{ song.show_opener }}</td>
+                        <td class="text-center">{{ song.main_set_closer }}</td>
+                        <td class="text-center">{{ song.encore_opener }}</td>
+                        <td class="text-center">{{ song.show_closer }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col-12 col-md-8">
+    {% comment %} <div class="col-12 col-md-8">
       <div class="card mb-4">
         <h5 class="card-header">Events</h5>
         <div class="card-body px-0">
-          <div class="table-responsive p-0">
-            <table class="table table display" id="eventTable">
+          <div class="table-responsive">
+            <table class="table table-hover display" id="eventTable">
               <thead>
                 <tr>
                   <th class="all">Date</th>
+                  <th class="all">Band</th>
                   <th class="all">Venue</th>
                   <th class="all">Location</th>
                 </tr>
@@ -55,7 +129,10 @@
                 {% for event in events %}
                   <tr>
                     <td class="text-nowrap">
-                      <a href="{% url 'databruce:event_details' event=event.id %}">{{ event }}</a>
+                      <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                      <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist }}</a>
                     </td>
                     <td>
                       <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue }}</a>
@@ -75,8 +152,8 @@
       <div class="card mb-4">
         <h5 class="card-header">Songs</h5>
         <div class="card-body px-0">
-          <div class="table-responsive p-0">
-            <table class="table table display" id="songTable">
+          <div class="table-responsive">
+            <table class="table table-hover display" id="songTable">
               <thead>
                 <tr>
                   <th class="text-wrap">Song</th>
@@ -101,11 +178,12 @@
       <div class="card mb-4">
         <h5 class="card-header">Venues</h5>
         <div class="card-body px-0">
-          <div class="table-responsive p-0">
-            <table class="table table display" id="venueTable">
+          <div class="table-responsive">
+            <table class="table table-hover display" id="venueTable">
               <thead>
                 <tr>
                   <th class="text-wrap">Name</th>
+                  <th class="text-wrap">Location</th>
                   <th class="text-center" scope="col">#</th>
                 </tr>
               </thead>
@@ -115,6 +193,11 @@
                     <td>
                       <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue.name }}</a>
                     </td>
+                    <td class="text-nowrap">
+                      {% if venue.city %}
+                        <a href="{% url 'databruce:city_details' id=venue.city.id %}">{{ venue.city }}</a>
+                      {% endif %}
+                    </td>
                     <td class="text-center">{{ venue.num_events }}</td>
                   </tr>
                 {% endfor %}
@@ -123,7 +206,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> {% endcomment %}
   </div>
   <script>
     $(document).ready(function () {

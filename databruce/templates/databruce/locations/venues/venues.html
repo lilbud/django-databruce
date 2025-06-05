@@ -44,12 +44,12 @@
         </td>
         <td>
           {% if venue.first %}
-            <a href="{% url "databruce:event_details" event=venue.first.id %}">{{ venue.first }}</a>
+            <a href="{% url "databruce:event_details" id=venue.first.id %}">{{ venue.first }}</a>
           {% endif %}
         </td>
         <td>
           {% if venue.last %}
-            <a href="{% url "databruce:event_details" event=venue.last.id %}">{{ venue.last }}</a>
+            <a href="{% url "databruce:event_details" id=venue.last.id %}">{{ venue.last }}</a>
           {% endif %}
         </td>
         <td class="text-center">{{ venue.num_events }}</td>

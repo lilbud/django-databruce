@@ -42,6 +42,14 @@ div.ui-menu-item-wrapper:hover,
     border-radius: 0.5rem !important;
 }
 
+table a {
+    color: var(--sky-500) !important;
+}
+
+table tbody td {
+    background-color: var(--zinc-900) !important;
+}
+
 .collapse {
     border-radius: inherit !important;
 }
@@ -63,6 +71,14 @@ a:link {
 }
 
 a:hover {
+    text-decoration: underline !important;
+}
+
+.btn.btn-link {
+    text-decoration: none !important;
+}
+
+.btn.btn-link:hover {
     text-decoration: underline !important;
 }
 
@@ -124,18 +140,6 @@ tr th {
     background-color: var(--sky-900) !important;
 }
 
-/* .btn-main-primary {
-    background-color: var(--sky-500) !important;
-    color: white !important;
-    border: none !important;
-}
-
-.btn-main-secondary {
-    background-color: none !important;
-    color: var(--sky-500) !important;
-    border: 1px solid var(--sky-500) !important;
-} */
-
 #myTab .nav-link.active {
     background-color: var(--sky-700) !important;
 }
@@ -168,4 +172,28 @@ tr th {
 
 .progress-bar {
     background-color: var(--sky-700) !important;
+}
+
+/* .btn-main-primary {
+    background-color: var(--sky-700) !important;
+    color: white !important;
+    border: 1px solid var(--sky-700) !important;
+}
+
+.btn-main-secondary {
+    background-color: none !important;
+    color: var(--sky-700) !important;
+    border: 1px solid var(--sky-700) !important;
+} */
+
+.nav-pills button.active {
+    background-color: var(--sky-700) !important;
+    color: white !important;
+    border: 1px solid var(--sky-700) !important;
+}
+
+.nav-pills button:not(.active) {
+    background-color: none !important;
+    color: var(--sky-500) !important;
+    border: 1px solid var(--sky-500) !important;
 }

@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import re
-from datetime import datetime
+from typing import TYPE_CHECKING
 
 import markdown
 from django import template
 
-from databruce import models
-from databruce.models import SetlistNotes, SetlistsBySetAndDate, Venues, VenuesText
+if TYPE_CHECKING:
+    from datetime import datetime
 
 register = template.Library()
 
@@ -41,7 +43,7 @@ def md_link(note: str):
 
 
 @register.filter(name="get_date")
-def get_date(date: datetime = None, event: str = ""):
+def get_date(date: datetime | None, event: str = ""):
     """Date to return if it is null or unknown."""
     if date:
         return date.strftime("%Y-%m-%d")
@@ -51,7 +53,6 @@ def get_date(date: datetime = None, event: str = ""):
 
 @register.filter()
 def setlist_note(notes):
-    print(notes)
     if len(notes) > 1:
         return "; ".join([md_link(note.note) for note in notes])
 
@@ -59,5 +60,5 @@ def setlist_note(notes):
 
 
 @register.filter()
-def album_percent(num: int, max: int):
-    return int((num / max) * 100)
+def album_percent(num: int, maxnum: int):
+    return int((num / maxnum) * 100)

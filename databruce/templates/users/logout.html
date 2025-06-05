@@ -1,0 +1,14 @@
+{% extends "users/base.html" %}
+{% load i18n %}
+{% block title %}
+    Logged Out - Databruce
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-header">Logged Out</div>
+        <div class="card-body">
+            <h5>You have been logged out.</h5>
+            <a href="{% url "databruce:index" %}">Click here to sign in again</a>
+        </div>
+    </div>
+{% endblock content %}

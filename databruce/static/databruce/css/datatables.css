@@ -57,6 +57,8 @@ table.dataTable thead .dt-column-order::after {
 
 .dt-buttons>button {
     margin-bottom: 0px !important;
+    background-color: var(--sky-700) !important;
+    border: 1px solid var(--bs-border-color) !important;
 }
 
 .index .dt-layout-table {
@@ -82,4 +84,17 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     float: right;
     text-align: right;
     visibility: hidden;
+}
+
+.sorting_1 {
+    background-color: color-mix(in srgb, var(--zinc-800), white 0.075%) !important;
+}
+
+.table-responsive {
+    padding: 0% !important;
+    border-radius: inherit !important;
+}
+
+#setlistTable_wrapper .dt-layout-table.mt-2 {
+    margin-top: 0 !important;
 }

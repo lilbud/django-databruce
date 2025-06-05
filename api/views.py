@@ -1,7 +1,5 @@
-import datetime
 import json
 
-from dal import autocomplete
 from django.http import HttpRequest, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, viewsets
@@ -254,14 +252,3 @@ def event_search(request: HttpRequest):
 
     mimetype = "application/json"
     return HttpResponse(data, mimetype)
-
-
-# class CityAutocomplete(autocomplete.Select2QuerySetView):
-#     def get_queryset(self):
-#         qs = models.Cities.objects.all()
-
-#         if self.q:
-#             qs = qs.filter(name__istartswith=self.q)
-#             print(self.q)
-
-#         return qs

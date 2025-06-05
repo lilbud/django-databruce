@@ -50,14 +50,14 @@
                data-bs-placement="top"
                data-bs-html="true"
                data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
-               href="{% url 'databruce:event_details' event=prev_event.id %}">&lt; Prev</a>
+               href="{% url "databruce:event_details" id=prev_event.id %}">&lt; Prev</a>
             <a class="btn btn-sm btn-secondary"
                role="button"
                data-bs-toggle="tooltip"
                data-bs-placement="top"
                data-bs-html="true"
                data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
-               href="{% url 'databruce:event_details' event=next_event.id %}">Next &gt;</a>
+               href="{% url "databruce:event_details" id=next_event.id %}">Next &gt;</a>
           </div>
         </div>
         {% if event.note %}
@@ -79,7 +79,7 @@
             {% comment %} {% if setlist %}
               {% regroup setlist by set_name as event_setlist %}
               {% regroup notes by id as notes_list %}
-              <div class="table-responsive p-0">
+              <div class="table-responsive">
                 <table class="table table-sm" id="setlistTable">
                   <thead>
                     <tr>

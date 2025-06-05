@@ -3,13 +3,8 @@ import datetime
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Reset, Submit
-from dal import autocomplete
 from django import forms
-from django.db.models import Q
-from django.urls import reverse, reverse_lazy
-from django.utils.dates import MONTHS
 
-# from django_select2 import forms as s2forms
 from . import models
 
 DATE = datetime.datetime.today()
@@ -359,7 +354,8 @@ class AdvancedEventSearch(forms.Form):
 
 
 class SetlistSearch(forms.Form):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: dict, **kwargs: dict) -> None:
+        """Initialize form."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
@@ -455,7 +451,8 @@ class SetlistSearch(forms.Form):
 
 
 class EventSearch(forms.Form):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: dict, **kwargs: dict) -> None:
+        """Initialize form."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
@@ -478,7 +475,8 @@ class EventSearch(forms.Form):
 
 
 class SetlistNoteSearch(forms.Form):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: dict, **kwargs: dict) -> None:
+        """Initialize form."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"

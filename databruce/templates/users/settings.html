@@ -1,0 +1,46 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Profile Settings
+{% endblock title %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col col-lg-8">
+      <div class="row mb-4">
+        <h4>User Settings</h4>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">Profile</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label" for="username">Username:</label>
+            <input type="text"
+                   class="form-control"
+                   name="username"
+                   id="username"
+                   value="{{ user.username }}"
+                   disabled>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Email:</label>
+            <input type="text"
+                   class="form-control"
+                   name="email"
+                   id="email"
+                   value="{{ user.email }}"
+                   disabled>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Date Joined:</label>
+            <input type="text"
+                   class="form-control"
+                   name="date"
+                   id="date"
+                   value="{{ user.date_joined }}"
+                   disabled>
+          </div>
+          <div class="mb-3">email</div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

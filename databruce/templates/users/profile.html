@@ -1,0 +1,142 @@
+{% extends "databruce/base.html" %}
+{% block title %}
+  Profile
+{% endblock title %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col col-lg-8">
+      <div class="row mb-4">
+        <div class="col">
+          <h4>Your Profile</h4>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-pills" role="tablist">
+            <li class="nav-item me-2" role="presentation">
+              <button class="nav-link active"
+                      id="pills-events-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#events"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-home"
+                      aria-selected="true">Shows</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link"
+                      id="pills-songs-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#songs"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Songs</button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content">
+            <div id="events" class="tab-pane fade show active">
+              <h6>A list of every show you've seen</h6>
+              <div class="table-responsive">
+                <table class="table table-sm display" id="eventTable">
+                  <thead>
+                    <tr>
+                      <th class="all" scope="col">Date</th>
+                      <th class="min-tablet-l" scope="col">Band</th>
+                      <th class="all" scope="col">Venue</th>
+                      <th class="min-tablet-l" scope="col">Location</th>
+                      <th class="min-tablet-l" scope="col">Tour</th>
+                      <th class="desktop" scope="col">Detail</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for event in user_shows %}
+                      {% with event=event.event %}
+                        <tr>
+                          <td scope="row" class="text-nowrap">
+                            <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                          </td>
+                          <td class="text-nowrap">
+                            {% if event.artist %}
+                              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                            {% endif %}
+                          </td>
+                          <td class="text-nowrap">
+                            <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                          </td>
+                          <td class="text-nowrap">
+                            {% if event.venue.city %}
+                              <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                            {% endif %}
+                          </td>
+                          <td class="text-nowrap">
+                            {% if event.tour %}
+                              <h6 class="mb-0">
+                                <a href="{% url "databruce:tour_details" id=event.tour.id %}"><span class="badge {{ event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ event.tour.name }}</span></a>
+                              </h6>
+                            {% endif %}
+                          </td>
+                          <td class="text-wrap">
+                            {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
+                              {{ event.type }}/{{ event.note|default_if_none:'' }}
+                            {% else %}
+                              {{ event.title|default_if_none:'' }}
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endwith %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="songs" class="tab-pane fade">
+              <h6>A list of every song that you've seen live in concert</h6>
+              <div class="table-responsive">
+                <table class="table table-sm display" id="songTable">
+                  <thead>
+                    <tr>
+                      <th>Song Name</th>
+                      <th class="text-center">Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% regroup user_songs by song as songs_list %}
+                    {% for song, list in songs_list %}
+                      <tr>
+                        <td>
+                          <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
+                        </td>
+                        <td class="text-center">{{ list|length }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+      $(document).ready(function() {
+          layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
+          
+          new DataTable('#eventTable', {
+              layout: layout,
+              pageLength: 25,
+          });
+
+          // removes searchBuilder button, not needed for this.
+          layout.topEnd.features[1].buttons.pop();
+
+          new DataTable('#songTable', {
+              layout: layout,
+              pageLength: 25,
+          });
+      })
+  </script>
+{% endblock content %}

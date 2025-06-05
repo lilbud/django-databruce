@@ -31,10 +31,10 @@
           {% endif %}
         </td>
         <td>
-          <a href="{% url "databruce:event_details" event=state.first.id %}">{{ state.first }}</a>
+          <a href="{% url "databruce:event_details" id=state.first.id %}">{{ state.first }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:event_details" event=state.last.id %}">{{ state.last }}</a>
+          <a href="{% url "databruce:event_details" id=state.last.id %}">{{ state.last }}</a>
         </td>
         <td class="text-center">{{ state.num_events }}</td>
       </tr>

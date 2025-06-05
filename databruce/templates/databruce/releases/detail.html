@@ -16,21 +16,31 @@
       <div class="card">
         <h5 class="card-header">Release Info</h5>
         <div class="card-body">
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Release Date:</div>
-            <div class="col">{{ info.date }}</div>
+          <div class="d-flex flex-row fs-6">
+            <div class="pe-2 fw-semibold">Release Date:</div>
+            <div>{{ info.date }}</div>
           </div>
           {% if info.event %}
-            <div class="row justify-content-start">
-              <div class="col-auto pe-0 fs-6 fw-semibold">Event Date:</div>
-              <div class="col">
-                <a href="{% url "databruce:event_details" event=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
+            <div class="d-flex flex-row fs-6">
+              <div class="pe-2 fw-semibold">Event Date:</div>
+              <div>
+                <a href="{% url "databruce:event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
               </div>
             </div>
           {% endif %}
-          <div class="row justify-content-start">
-            <div class="col-auto pe-0 fs-6 fw-semibold">Type:</div>
-            <div class="col">{{ info.type }}</div>
+          <div class="d-flex flex-row fs-6">
+            <div class="pe-2 fw-semibold">Type:</div>
+            <div>{{ info.type }}</div>
+          </div>
+          <div class="d-flex flex-row fs-6">
+            <div class="pe-2 fw-semibold">Links:</div>
+          </div>
+          <div class="d-flex flex-row fs-6">
+            <ul>
+              <li>
+                <a href="https://musicbrainz.org/release-group/{{ info.mbid }}">Musicbrainz</a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -41,8 +51,8 @@
       <div class="card">
         <h5 class="card-header">Songs</h5>
         <div class="card-body px-0">
-          <div class="table-responsive p-0">
-            <table class="table table display nowrap" id="tracksTable">
+          <div class="table-responsive">
+            <table class="table table-hover display nowrap" id="tracksTable">
               <thead>
                 <tr class="header">
                   <th scope="col">#</th>
@@ -61,7 +71,7 @@
                     <td>{{ track.song.num_plays_public }}</td>
                     <td>
                       {% if track.event %}
-                        <a href="{% url "databruce:event_details" event=track.event.id %}">{{ track.event }}</a>
+                        <a href="{% url "databruce:event_details" id=track.event.id %}">{{ track.event }}</a>
                       {% endif %}
                     </td>
                   </tr>
