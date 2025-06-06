@@ -219,7 +219,7 @@
                   action="{% url 'search' %}">
               {% csrf_token %}
               <div class="input-group">
-                {{ form.date }}
+                {{ searchForm.date }}
                 <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
               </div>
             </form>

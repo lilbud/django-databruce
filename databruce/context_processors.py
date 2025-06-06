@@ -3,5 +3,5 @@ from .forms import EventSearch
 
 def base_data(request):  # noqa: ARG001
     data = {}
-    data["form"] = EventSearch()
+    data["searchForm"] = EventSearch()
     return data
