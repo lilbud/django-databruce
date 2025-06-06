@@ -150,21 +150,19 @@
                         <li>
                           <a class="sky-500" href="{% url "relation_details" id=255 %}">Bruce Springsteen</a>
                         </li>
+                        {% for member in onstage_list.0.list %}
+                          {% if not onstage_list.0.grouper %}
+                            <li>
+                              <a class="sky-500"
+                                 href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                            </li>
+                          {% endif %}
+                        {% endfor %}
                       </ul>
                     {% endif %}
                     {% for band in onstage_list %}
                       {% if band.grouper %}
                         <h6>{{ band.grouper }}</h6>
-                        <ul>
-                          {% for member in band.list %}
-                            <li>
-                              <a class="sky-500"
-                                 href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      {% else %}
-                        <h6>Others</h6>
                         <ul>
                           {% for member in band.list %}
                             <li>
@@ -346,9 +344,11 @@
                   <div class="mb-2">{{ event.note|default_if_none:""|safe }}</div>
                   <h6>Links</h6>
                   <ul>
-                    <li>
-                      <a href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
-                    </li>
+                    {% if event.brucebase_url %}
+                      <li>
+                        <a href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
+                      </li>
+                    {% endif %}
                   </ul>
                 </div>
               </div>

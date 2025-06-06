@@ -118,7 +118,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "start_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control",
+                "class": "form-control form-control-sm",
             },
         ),
     )
@@ -134,7 +134,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "end_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control",
+                "class": "form-control form-control-sm",
             },
         ),
     )
@@ -144,7 +144,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select monthChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "monthChoice"},
         ),
     )
 
@@ -153,7 +153,9 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=get_months(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "month"}),
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm", "id": "month"},
+        ),
     )
 
     day_choice = forms.ChoiceField(
@@ -161,7 +163,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select dayChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "dayChoice"},
         ),
     )
 
@@ -170,7 +172,7 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=get_days(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "day"}),
+        widget=forms.Select(attrs={"class": "form-select form-select-sm", "id": "day"}),
     )
 
     dow_choice = forms.ChoiceField(
@@ -178,7 +180,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select dowChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "dowChoice"},
         ),
     )
 
@@ -187,7 +189,9 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=days_of_week,
         required=False,
-        widget=forms.Select(attrs={"class": "form-select", "id": "day-of-week"}),
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm", "id": "day-of-week"},
+        ),
     )
 
     city_choice = forms.ChoiceField(
@@ -195,7 +199,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select cityChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "cityChoice"},
         ),
     )
 
@@ -204,7 +208,9 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         required=False,
         choices=get_cities(),
-        widget=forms.Select(attrs={"class": "form-select select2", "id": "citySelect"}),
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "citySelect"},
+        ),
     )
 
     state_choice = forms.ChoiceField(
@@ -212,7 +218,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select stateChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "stateChoice"},
         ),
     )
 
@@ -222,7 +228,7 @@ class AdvancedEventSearch(forms.Form):
         choices=get_states(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select select2", "id": "stateSelect"},
+            attrs={"class": "form-select form-select-sm select2", "id": "stateSelect"},
         ),
     )
 
@@ -231,7 +237,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select countryChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "countryChoice"},
         ),
     )
 
@@ -241,7 +247,10 @@ class AdvancedEventSearch(forms.Form):
         choices=get_countries(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select select2", "id": "countrySelect"},
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "countrySelect",
+            },
         ),
     )
 
@@ -250,7 +259,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select tourChoice"},
+            attrs={"class": "form-select form-select-sm", "id": "tourChoice"},
         ),
     )
 
@@ -260,7 +269,7 @@ class AdvancedEventSearch(forms.Form):
         choices=get_tours(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select select2", "id": "tourSelect"},
+            attrs={"class": "form-select form-select-sm select2", "id": "tourSelect"},
         ),
     )
 
@@ -269,7 +278,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select musician-choice"},
+            attrs={"class": "form-select form-select-sm", "id": "musician-choice"},
         ),
     )
 
@@ -279,7 +288,10 @@ class AdvancedEventSearch(forms.Form):
         choices=get_musicians(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select select2", "id": "musicianSelect"},
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "musicianSelect",
+            },
         ),
     )
 
@@ -288,7 +300,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select band-choice"},
+            attrs={"class": "form-select form-select-sm", "id": "band-choice"},
         ),
     )
 
@@ -297,7 +309,9 @@ class AdvancedEventSearch(forms.Form):
         label_suffix=":",
         choices=get_bands(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select select2", "id": "bandSelect"}),
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "bandSelect"},
+        ),
     )
 
     conjunction = forms.ChoiceField(
@@ -306,7 +320,7 @@ class AdvancedEventSearch(forms.Form):
         choices=[("and", "AND"), ("or", "OR")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select", "id": "conjunctionSelect"},
+            attrs={"class": "form-select form-select-sm", "id": "conjunctionSelect"},
         ),
     )
 
@@ -375,7 +389,7 @@ class SetlistSearch(forms.Form):
         choices=songs,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select song1 select2"},
+            attrs={"class": "form-select form-select-sm song1 select2"},
         ),
     )
 
@@ -384,7 +398,7 @@ class SetlistSearch(forms.Form):
         choices=[("is", "is"), ("not", "not")],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select choice"},
+            attrs={"class": "form-select form-select-sm choice"},
         ),
     )
 
@@ -411,7 +425,7 @@ class SetlistSearch(forms.Form):
         ],
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select position"},
+            attrs={"class": "form-select form-select-sm position"},
         ),
     )
 
@@ -421,7 +435,7 @@ class SetlistSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select song2 select2",
+                "class": "form-select form-select-sm song2 select2",
             },
         ),
     )
