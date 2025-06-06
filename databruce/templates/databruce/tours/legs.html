@@ -24,16 +24,16 @@
     {% for leg in legs %}
       <tr>
         <td>
-          <a href="{% url "databruce:leg_details" id=leg.id %}">{{ leg.name }}</a>
+          <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
+          <a href="{% url "tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:event_details" id=leg.first.id %}">{{ leg.first }}</a>
+          <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:event_details" id=leg.last.id %}">{{ leg.last }}</a>
+          <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last }}</a>
         </td>
         <td class="text-center">{{ leg.num_shows }}</td>
         <td class="text-center">{{ leg.num_songs }}</td>

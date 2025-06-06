@@ -22,7 +22,7 @@
     {% for relation in relations %}
       <tr>
         <td>
-          <a href="{% url "databruce:relation_details" id=relation.id %}">{{ relation }}</a>
+          <a href="{% url "relation_details" id=relation.id %}">{{ relation }}</a>
         </td>
         <td>
           {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}

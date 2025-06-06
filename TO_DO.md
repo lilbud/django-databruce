@@ -1,3 +1,10 @@
+# Digital Ocean Stuff to Fix:
+- search looks like hell on mobile
+- actually, check every page on mobile
+- logout not working?
+- sort out static files hosting?
+- get registration and email working
+
 # Pages to add:
 <!-- - Event Run Details
   - events, songs -->

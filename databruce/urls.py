@@ -1,15 +1,19 @@
 import datetime
 
+from debug_toolbar.toolbar import debug_toolbar_urls
+from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path, reverse_lazy
 
-from . import views
+from . import settings, views
 
 date = datetime.datetime.today()
 
 app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls")),
     path(
         "accounts/login/",
         auth_views.LoginView.as_view(template_name="users/login.html"),
@@ -48,7 +52,7 @@ urlpatterns = [
         "accounts/password_reset/",
         auth_views.PasswordResetView.as_view(
             template_name="users/reset_password.html",
-            success_url=reverse_lazy("databruce:password_reset_done"),
+            success_url=reverse_lazy("password_reset_done"),
             email_template_name="users/reset_password_email.html",
         ),
         name="password_reset",
@@ -64,7 +68,7 @@ urlpatterns = [
         "accounts/reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
             template_name="users/reset_password_confirm.html",
-            success_url=reverse_lazy("databruce:password_reset_complete"),
+            success_url=reverse_lazy("password_reset_complete"),
         ),
         name="password_reset_confirm",
     ),
@@ -116,3 +120,6 @@ urlpatterns = [
     path("releases/bootleg", views.Bootleg.as_view(), name="bootlegs"),
     path("accounts/profile/add-show", views.UserAddShow.as_view(), name="add_show"),
 ]
+
+if not settings.TESTING:
+    urlpatterns = [*urlpatterns, *debug_toolbar_urls()]

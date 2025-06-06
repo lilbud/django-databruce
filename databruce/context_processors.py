@@ -1,7 +1,7 @@
-from databruce.forms import EventSearch
+from .forms import EventSearch
 
 
 def base_data(request):  # noqa: ARG001
     data = {}
-    data["my_form"] = EventSearch()
+    data["form"] = EventSearch()
     return data

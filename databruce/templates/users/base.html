@@ -29,7 +29,7 @@
       <div class="col">
         <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
           <div class="container-fluid p-3">
-            <a class="navbar-brand pt-0" href="{% url 'databruce:index' %}">
+            <a class="navbar-brand pt-0" href="{% url 'index' %}">
               <img height="16px"
                    width="auto"
                    src="{% static 'databruce/img/logo.svg' %}"
@@ -64,7 +64,7 @@
                       </h6>
                     </li>
                     <li>
-                      <a class="dropdown-item sky-500"  href="{% url "databruce:profile" %}">View Profile</a>
+                      <a class="dropdown-item sky-500"  href="{% url "profile" %}">View Profile</a>
                     </li>
                     {% if user.is_superuser %}
                       <li>
@@ -72,10 +72,10 @@
                       </li>
                     {% endif %}
                     <li>
-                      <a class="dropdown-item sky-500"  href="{% url "databruce:settings" %}">Settings</a>
+                      <a class="dropdown-item sky-500"  href="{% url "settings" %}">Settings</a>
                     </li>
                     <li>
-                      <form method="post" action="{% url 'databruce:logout' %}">
+                      <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <a class="dropdown-item sky-500" id="logout" type="submit">Logout</a>
                       </form>

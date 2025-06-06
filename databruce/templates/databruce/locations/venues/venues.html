@@ -25,31 +25,31 @@
     {% for venue in venues %}
       <tr>
         <td class="wrap">
-          <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue }}</a>
+          <a href="{% url "venue_details" id=venue.id %}">{{ venue }}</a>
         </td>
         <td class="wrap">
           {% if venue.city %}
-            <a href="{% url "databruce:city_details" id=venue.city.id %}">{{ venue.city.name }}</a>
+            <a href="{% url "city_details" id=venue.city.id %}">{{ venue.city.name }}</a>
           {% endif %}
         </td>
         <td>
           {% if venue.state %}
-            <a href="{% url "databruce:state_details" id=venue.state.id %}">{{ venue.state.name }}</a>
+            <a href="{% url "state_details" id=venue.state.id %}">{{ venue.state.name }}</a>
           {% endif %}
         </td>
         <td>
           {% if venue.country %}
-            <a href="{% url "databruce:country_details" id=venue.country.id %}">{{ venue.country.name }}</a>
+            <a href="{% url "country_details" id=venue.country.id %}">{{ venue.country.name }}</a>
           {% endif %}
         </td>
         <td>
           {% if venue.first %}
-            <a href="{% url "databruce:event_details" id=venue.first.id %}">{{ venue.first }}</a>
+            <a href="{% url "event_details" id=venue.first.id %}">{{ venue.first }}</a>
           {% endif %}
         </td>
         <td>
           {% if venue.last %}
-            <a href="{% url "databruce:event_details" id=venue.last.id %}">{{ venue.last }}</a>
+            <a href="{% url "event_details" id=venue.last.id %}">{{ venue.last }}</a>
           {% endif %}
         </td>
         <td class="text-center">{{ venue.num_events }}</td>

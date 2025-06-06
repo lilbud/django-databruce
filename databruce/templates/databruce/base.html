@@ -51,9 +51,10 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
-      <div class="container-fluid p-3">
-        <a class="navbar-brand pt-0" href="{% url 'databruce:index' %}">
+      <div class="container-fluid p-2 bd-gutter flex-wrap flex-lg-nowrap">
+        <a class="navbar-brand p-0 mx-0 mx-lg-3" href="{% url 'index' %}">
           <img height="16px"
+               class="d-block my-1"
                width="auto"
                src="{% static 'databruce/img/logo.svg' %}"
                alt="">
@@ -77,10 +78,10 @@
                  aria-expanded="false">Events</a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:events' %}">Events By Year</a>
+                  <a class="dropdown-item" href="{% url 'events' %}">Events By Year</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:runs' %}">Events By Run</a>
+                  <a class="dropdown-item" href="{% url 'runs' %}">Events By Run</a>
                 </li>
               </ul>
             </li>
@@ -92,16 +93,16 @@
                  aria-expanded="false">Tours</a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:tours' %}">Tours</a>
+                  <a class="dropdown-item" href="{% url 'tours' %}">Tours</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:tour_legs' %}">Tour Legs</a>
+                  <a class="dropdown-item" href="{% url 'tour_legs' %}">Tour Legs</a>
                 </li>
               </ul>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if '/songs' in request.path %}active{% endif %}"
-                 href="{% url 'databruce:songs' %}">Songs</a>
+                 href="{% url 'songs' %}">Songs</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle {% if '/venues' in request.path or '/cities' in request.path or '/states' in request.path or '/countries' in request.path %}active{% endif %}"
@@ -111,16 +112,16 @@
                  aria-expanded="false">Locations</a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:venues' %}">Venues</a>
+                  <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:cities' %}">Cities</a>
+                  <a class="dropdown-item" href="{% url 'cities' %}">Cities</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:states' %}">States</a>
+                  <a class="dropdown-item" href="{% url 'states' %}">States</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:countries' %}">Countries</a>
+                  <a class="dropdown-item" href="{% url 'countries' %}">Countries</a>
                 </li>
               </ul>
             </li>
@@ -132,10 +133,10 @@
                  aria-expanded="false">Relations and Bands</a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:relations' %}">Relations</a>
+                  <a class="dropdown-item" href="{% url 'relations' %}">Relations</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:bands' %}">Bands</a>
+                  <a class="dropdown-item" href="{% url 'bands' %}">Bands</a>
                 </li>
               </ul>
             </li>
@@ -147,13 +148,13 @@
                  aria-expanded="false">Releases</a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:releases' %}">Official Releases</a>
+                  <a class="dropdown-item" href="{% url 'releases' %}">Official Releases</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:nugs' %}">Nugs Releases</a>
+                  <a class="dropdown-item" href="{% url 'nugs' %}">Nugs Releases</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:bootlegs' %}">Bootlegs</a>
+                  <a class="dropdown-item" href="{% url 'bootlegs' %}">Bootlegs</a>
                 </li>
               </ul>
             </li>
@@ -165,10 +166,10 @@
                  aria-expanded="false">Search</a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:adv_search' %}">Advanced Event Search</a>
+                  <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Event Search</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'databruce:note_search' %}">Setlist Notes Search</a>
+                  <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Notes Search</a>
                 </li>
               </ul>
             </li>
@@ -190,7 +191,7 @@
                   </h6>
                 </li>
                 <li>
-                  <a class="dropdown-item sky-500"  href="{% url "databruce:profile" %}">View Profile</a>
+                  <a class="dropdown-item sky-500"  href="{% url "profile" %}">View Profile</a>
                 </li>
                 {% if user.is_superuser %}
                   <li>
@@ -198,27 +199,29 @@
                   </li>
                 {% endif %}
                 <li>
-                  <a class="dropdown-item sky-500"  href="{% url "databruce:settings" %}">Settings</a>
+                  <a class="dropdown-item sky-500"  href="{% url "settings" %}">Settings</a>
                 </li>
                 <li>
-                  <form method="post" action="{% url 'databruce:logout' %}">
+                  <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <a class="dropdown-item sky-500" id="logout" type="submit">Logout</a>
+                    <button class="btn btn-link dropdown-item sky-500"
+                            type="submit"
+                            id="button-addon2">Logout</button>
                   </form>
                 </li>
               </ul>
             </li>
           </ul>
-          <form class="d-flex me-3"
-                role="search"
-                method="post"
-                action="{% url 'databruce:search' %}">
-            {% csrf_token %}
-            <div class="input-group">
-              {{ my_form }}
+          <div class="d-flex">
+            <form class="d-flex"
+                  role="search"
+                  method="post"
+                  action="{% url 'search' %}">
+              {% csrf_token %}
+              {{ form.date }}
               <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </nav>

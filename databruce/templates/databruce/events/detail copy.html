@@ -12,7 +12,7 @@
             <div class="card-body">
               <div class="d-flex flex-row flex-wrap">
                 <div class="flex-grow-1 mb-4 mb-md-0">
-                  <div class="flex-grow-2 sky-500 fw-semibold fs-5">{{ event }}</div>
+                  <div class="flex-grow-2 sky-500 fw-semibold fs-5 mb-2">{{ event }}</div>
                   <div class="text-body-secondary fw-medium fs-5">{{ event.venue }}, {{ event.venue.city }}</div>
                 </div>
                 <div>
@@ -22,14 +22,14 @@
                      data-bs-placement="top"
                      data-bs-html="true"
                      data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
-                     href="{% url "databruce:event_details" id=prev_event.id %}">&lt; Prev</a>
+                     href="{% url "event_details" id=prev_event.id %}">&lt; Prev</a>
                   <a class="btn btn-sm btn-secondary"
                      role="button"
                      data-bs-toggle="tooltip"
                      data-bs-placement="top"
                      data-bs-html="true"
                      data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
-                     href="{% url "databruce:event_details" id=next_event.id %}">Next &gt;</a>
+                     href="{% url "event_details" id=next_event.id %}">Next &gt;</a>
                 </div>
               </div>
             </div>
@@ -79,9 +79,11 @@
                               <tr>
                                 <td class="text-center">
                                   {% if song.position %}
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="{{ song.position }}"
-                                          class="badge text-bg-primary">{{ song.song_num }}</span>
+                                    <h6 class="mb-0">
+                                      <span data-bs-toggle="tooltip"
+                                            data-bs-title="{{ song.position }}"
+                                            class="badge text-bg-primary">{{ song.song_num }}</span>
+                                    </h6>
                                   {% else %}
                                     {{ song.song_num }}
                                   {% endif %}
@@ -89,8 +91,7 @@
                                 <td>
                                   <div class="row">
                                     <span class="text-nowrap">
-                                      <a class="text-light"
-                                         href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                      <a class="text-light" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                       {% if song.segue %}{{ song.separator }}{% endif %}
                                       {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
                                       {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
@@ -121,8 +122,7 @@
                                   {% if song.premiere %}
                                     Debut
                                   {% elif song.ltp %}
-                                    <a href="{% url "databruce:event_details" id=song.ltp.id %}"
-                                       class="text-light">{{ song.ltp }}</a>
+                                    <a href="{% url "event_details" id=song.ltp.id %}" class="text-light">{{ song.ltp }}</a>
                                   {% endif %}
                                 </td>
                               </tr>
@@ -148,7 +148,7 @@
                     {% if 'nobruce' not in event.brucebase_url %}
                       <ul>
                         <li>
-                          <a class="sky-500" href="{% url "databruce:relation_details" id=255 %}">Bruce Springsteen</a>
+                          <a class="sky-500" href="{% url "relation_details" id=255 %}">Bruce Springsteen</a>
                         </li>
                       </ul>
                     {% endif %}
@@ -159,7 +159,7 @@
                           {% for member in band.list %}
                             <li>
                               <a class="sky-500"
-                                 href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                                 href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                             </li>
                           {% endfor %}
                         </ul>
@@ -169,7 +169,7 @@
                           {% for member in band.list %}
                             <li>
                               <a class="sky-500"
-                                 href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                                 href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                             </li>
                           {% endfor %}
                         </ul>
@@ -195,7 +195,7 @@
                                 {% for member in band.list %}
                                   <li>
                                     <a class="sky-500"
-                                       href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                                       href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                                   </li>
                                 {% endfor %}
                               </ul>
@@ -203,7 +203,7 @@
                               {% for member in band.list %}
                                 <li>
                                   <a class="sky-500"
-                                     href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                                     href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                                 </li>
                               {% endfor %}
                             {% endif %}
@@ -262,7 +262,7 @@
                           <h5 class="fw-medium">Band</h5>
                           <h6>
                             <a class="fw-semibold sky-500"
-                               href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                               href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
                           </h6>
                         </div>
                       </div>
@@ -273,7 +273,7 @@
                           <h5 class="fw-medium">Tour</h5>
                           <h6>
                             <a class="fw-semibold sky-500"
-                               href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour }}</a>
+                               href="{% url "tour_details" id=event.tour.id %}">{{ event.tour }}</a>
                           </h6>
                         </div>
                       </div>
@@ -285,7 +285,7 @@
                             <h5 class="fw-medium">Tour Leg</h5>
                             <h6>
                               <a class="fw-semibold sky-500"
-                                 href="{% url "databruce:leg_details" id=event.leg.id %}">{{ event.leg }}</a>
+                                 href="{% url "leg_details" id=event.leg.id %}">{{ event.leg }}</a>
                             </h6>
                           </div>
                         </div>
@@ -298,7 +298,7 @@
                             <h5 class="fw-medium">Run</h5>
                             <h6>
                               <a class="fw-semibold sky-500"
-                                 href="{% url "databruce:run_details" id=event.run.id %}">{{ event.run }}</a>
+                                 href="{% url "run_details" id=event.run.id %}">{{ event.run }}</a>
                             </h6>
                           </div>
                         </div>
@@ -318,7 +318,7 @@
                     </div>
                     <div class="row">
                       {% if user.is_authenticated %}
-                        <form method="post" action="{% url "databruce:add_show" %}">
+                        <form method="post" action="{% url "add_show" %}">
                           <input type="hidden" name="event" value="{{ event.id }}">
                           {% csrf_token %}
                           <button id="submit-button"
@@ -342,7 +342,15 @@
             <div class="col">
               <div class="card">
                 <div class="card-header">Event Notes</div>
-                <div class="card-body">{{ event.note|default_if_none:"" }}</div>
+                <div class="card-body">
+                  <div class="mb-2">{{ event.note|default_if_none:"" }}</div>
+                  <h6>Links</h6>
+                  <ul>
+                    <li>
+                      <a href="https://brucebase.wikidot.com/{{ event.brucebase_url }}">Brucebase</a>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col">
@@ -359,8 +367,7 @@
                       {% endif %}
                       {% for rel in official %}
                         <li>
-                          <a class="sky-500"
-                             href="{% url "databruce:release_details" id=rel.release.id %}">{{ rel.release.name }}</a>
+                          <a class="sky-500" href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }}</a>
                         </li>
                       {% endfor %}
                     </ul>
@@ -390,6 +397,13 @@
                       </li>
                     </ul>
                   {% endif %}
+                  <h6>Videos</h6>
+                  <ul>
+                    <li>
+                      <a class="sky-500"
+                         href="https://www.google.com/search?q=Bruce+Springsteen+{{ event.date|date:"Y-m-d"|iriencode }}+{{ event.venue.city.name|iriencode }}&source=lnms&tbm=vid">Google Video Search</a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>

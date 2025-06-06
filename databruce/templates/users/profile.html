@@ -56,26 +56,24 @@
                       {% with event=event.event %}
                         <tr>
                           <td scope="row" class="text-nowrap">
-                            <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                            <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                           </td>
                           <td class="text-nowrap">
                             {% if event.artist %}
-                              <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+                              <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
                             {% endif %}
                           </td>
                           <td class="text-nowrap">
-                            <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                            <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
                           </td>
                           <td class="text-nowrap">
                             {% if event.venue.city %}
-                              <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                              <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
                             {% endif %}
                           </td>
                           <td class="text-nowrap">
                             {% if event.tour %}
-                              <h6 class="mb-0">
-                                <a href="{% url "databruce:tour_details" id=event.tour.id %}"><span class="badge {{ event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ event.tour.name }}</span></a>
-                              </h6>
+                              <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                             {% endif %}
                           </td>
                           <td class="text-wrap">
@@ -107,7 +105,7 @@
                     {% for song, list in songs_list %}
                       <tr>
                         <td>
-                          <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
+                          <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
                         </td>
                         <td class="text-center">{{ list|length }}</td>
                       </tr>

@@ -6,7 +6,7 @@
 {% block content %}
   <div class="row mb-2">
     <h4>
-      <a href="{% url 'databruce:songs' %}">Songs</a> &gt; {{ song_info.name }}
+      <a href="{% url 'songs' %}">Songs</a> &gt; {{ song_info.name }}
     </h4>
   </div>
   <div class="row mb-4 row-cols-1 row-cols-md-2 g-4 mt-0">
@@ -22,7 +22,7 @@
             <div class="d-flex flex-row fs-6">
               <div class="pe-2 fw-semibold">Category:</div>
               <div>
-                <a href="{% url "databruce:release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
+                <a href="{% url "release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
               </div>
             </div>
           {% endif %}
@@ -154,14 +154,14 @@
                 {% for song in songs %}
                   <tr>
                     <td class="text-nowrap">
-                      <a href="{% url "databruce:event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
+                      <a href="{% url "event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
                     </td>
                     <td class="text-nowrap">
-                      <a href="{% url "databruce:band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
+                      <a href="{% url "band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
                     </td>
                     <td class="text-nowrap">
                       {% with venue=song.current.event.venue %}
-                        <a href="{% url 'databruce:venue_details' id=venue.id %}">
+                        <a href="{% url 'venue_details' id=venue.id %}">
                           {% spaceless %}
                             {% if venue.city %}
                               {{ venue.name }}, {{ venue.city }}
@@ -175,7 +175,7 @@
                     <td class="text-nowrap">
                       {% if song.current.event.tour %}
                         <h6 class="mb-0">
-                          <a href="{% url "databruce:tour_details" id=song.current.event.tour.id %}"><span class="badge {{ song.current.event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ song.current.event.tour.name }}</span></a>
+                          <a href="{% url "tour_details" id=song.current.event.tour.id %}"><span class="badge {{ song.current.event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ song.current.event.tour.name }}</span></a>
                         </h6>
                       {% endif %}
                     </td>
@@ -194,14 +194,14 @@
                     <td>{{ song.current.set_name }}</td>
                     <td class="text-nowrap">
                       {% if song.prev %}
-                        <a href="{% url "databruce:song_details" id=song.prev.song.id %}">{{ song.prev.song.short_name|default_if_none:song.prev.song.name }}</a>
+                        <a href="{% url "song_details" id=song.prev.song.id %}">{{ song.prev.song.short_name|default_if_none:song.prev.song.name }}</a>
                       {% else %}
                         <em>***</em>
                       {% endif %}
                     </td>
                     <td class="text-nowrap">
                       {% if song.next %}
-                        <a href="{% url "databruce:song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
+                        <a href="{% url "song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
                       {% else %}
                         <em>***</em>
                       {% endif %}

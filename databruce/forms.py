@@ -468,7 +468,7 @@ class EventSearch(forms.Form):
                 "name": "date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control",
+                "class": "form-control me-2",
             },
         ),
     )

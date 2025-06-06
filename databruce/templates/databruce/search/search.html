@@ -25,28 +25,28 @@
     {% for event in events %}
       <tr>
         <td scope="row" class="text-nowrap">
-          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
         </td>
         <td>
           {% if event.artist %}
-            <a href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
+            <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
           {% endif %}
         </td>
         <td>
           {% if event.venue %}
-            <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+            <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
           {% endif %}
         </td>
         <td>
           {% if event.venue.city %}
-            <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">
+            <a href="{% url 'city_details' id=event.venue.city.id %}">
               {{ event.venue.city }}
             {% endif %}
           </a>
         </td>
         <td>
           {% if event.tour %}
-            <a href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
           {% endif %}
         </td>
         <td>{{ event.title|default_if_none:'' }}</td>

@@ -23,13 +23,13 @@
     {% for band in bands %}
       <tr>
         <td>
-          <a href="{% url "databruce:band_details" id=band.id %}">{{ band.name }}</a>
+          <a href="{% url "band_details" id=band.id %}">{{ band.name }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:event_details" id=band.first.id %}">{{ band.first }}</a>
+          <a href="{% url "event_details" id=band.first.id %}">{{ band.first }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:event_details" id=band.last.id %}">{{ band.last }}</a>
+          <a href="{% url "event_details" id=band.last.id %}">{{ band.last }}</a>
         </td>
         <td>{{ band.appearances }}</td>
         <td>

@@ -7,7 +7,7 @@
   <div class="row mb-4">
     <div class="col">
       <h4>
-        <a href="{% url 'databruce:releases' %}">Releases</a> &gt; {{ info.name }}
+        <a href="{% url 'releases' %}">Releases</a> &gt; {{ info.name }}
       </h4>
     </div>
   </div>
@@ -24,7 +24,7 @@
             <div class="d-flex flex-row fs-6">
               <div class="pe-2 fw-semibold">Event Date:</div>
               <div>
-                <a href="{% url "databruce:event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
+                <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
               </div>
             </div>
           {% endif %}
@@ -66,12 +66,12 @@
                   <tr>
                     <td>{{ track.track }}</td>
                     <td>
-                      <a href="{% url "databruce:song_details" id=track.song.id %}">{{ track.song.name }}</a>
+                      <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
                     </td>
                     <td>{{ track.song.num_plays_public }}</td>
                     <td>
                       {% if track.event %}
-                        <a href="{% url "databruce:event_details" id=track.event.id %}">{{ track.event }}</a>
+                        <a href="{% url "event_details" id=track.event.id %}">{{ track.event }}</a>
                       {% endif %}
                     </td>
                   </tr>

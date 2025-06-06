@@ -14,21 +14,21 @@
             {% if event.artist %}
               <div>
                 <a class="text-body-secondary"
-                   href="{% url "databruce:band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                   href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
               </div>
             {% endif %}
             {% if event.title %}<div class="text-body-secondary">{{ event.title }}</div>{% endif %}
             <hr>
             <a class="fs-5 fw-bold sky-500"
-               href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+               href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
             <div>
               <a class="text-body-secondary"
-                 href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                 href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
             </div>
             {% if event.tour %}
               <hr>
               <a class="fs-5 fw-bold sky-500"
-                 href="{% url "databruce:tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                 href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
             {% endif %}
             {% if event.leg %}
               <div>
@@ -50,14 +50,14 @@
                data-bs-placement="top"
                data-bs-html="true"
                data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
-               href="{% url "databruce:event_details" id=prev_event.id %}">&lt; Prev</a>
+               href="{% url "event_details" id=prev_event.id %}">&lt; Prev</a>
             <a class="btn btn-sm btn-secondary"
                role="button"
                data-bs-toggle="tooltip"
                data-bs-placement="top"
                data-bs-html="true"
                data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
-               href="{% url "databruce:event_details" id=next_event.id %}">Next &gt;</a>
+               href="{% url "event_details" id=next_event.id %}">Next &gt;</a>
           </div>
         </div>
         {% if event.note %}
@@ -99,7 +99,7 @@
                           <td>
                             <div class="row">
                               <span>
-                                <a class="sky-500" href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                <a class="sky-500" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                 {% if song.segue %}{{ song.separator }}{% endif %}
                               </span>
                             </div>
@@ -140,8 +140,7 @@
                 <p class="card-text">
                   {% for song in set.list %}
                     <span class="text-nowrap">
-                      <a class="pe-0 sky-500"
-                         href="{% url "databruce:song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                      <a class="pe-0 sky-500" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                       {% if song.debut %}
                         <span class="badge text-bg-danger"
                               data-bs-toggle="tooltip"
@@ -207,7 +206,7 @@
                 <div class="card-body p-0">
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                      <a class="sky-500" href="{% url "databruce:relation_details" id=255 %}">Bruce Springsteen</a>
+                      <a class="sky-500" href="{% url "relation_details" id=255 %}">Bruce Springsteen</a>
                     </li>
                     {% regroup onstage by band as onstage_list %}
                     {% for band in onstage_list %}
@@ -215,7 +214,7 @@
                         {% for member in band.list %}
                           <li class="list-group-item">
                             <a class="sky-500"
-                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                               href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                           </li>
                         {% endfor %}
                       {% else %}
@@ -228,7 +227,7 @@
                         <div class="collapse m-3" id="{{ band.grouper.id }}">
                           {% for member in band.list %}
                             <a class="sky-500"
-                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                               href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                             {% if not forloop.last %},{% endif %}
                           {% endfor %}
                         </div>
@@ -245,7 +244,7 @@
                         {% for member in guests %}
                           <li class="list-group-item">
                             <a class="sky-500"
-                               href="{% url "databruce:relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                               href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                           </li>
                         {% endfor %}
                       </div>

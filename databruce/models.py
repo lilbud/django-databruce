@@ -1021,6 +1021,10 @@ class Setlists(models.Model):
         db_table = "setlists"
         verbose_name_plural = db_table
         unique_together = (("event_id", "song_num", "set_name", "song_id"),)
+        ordering = ("-event_id", "song_num")
+
+    def __str__(self):
+        return f"{self.event} - {self.set_name} - {self.song}"
 
 
 class SetlistsBySetAndDate(models.Model):

@@ -24,14 +24,14 @@
             <tr>
                 <td>{{ release.date|default_if_none:"" }}</td>
                 <td>
-                    <a href="{% url "databruce:event_details" id=release.event.id %}">{{ release.event }}</a>
+                    <a href="{% url "event_details" id=release.event.id %}">{{ release.event }}</a>
                 </td>
                 <td>
-                    <a href="{% url 'databruce:venue_details' id=release.event.venue.id %}">{{ release.event.venue.name }}</a>
+                    <a href="{% url 'venue_details' id=release.event.venue.id %}">{{ release.event.venue.name }}</a>
                 </td>
                 <td>
                     {% if release.event.venue.city %}
-                        <a href="{% url 'databruce:city_details' id=release.event.venue.city.id %}">{{ release.event.venue.city }}</a>
+                        <a href="{% url 'city_details' id=release.event.venue.city.id %}">{{ release.event.venue.city }}</a>
                     {% endif %}
                 </td>
                 <td>

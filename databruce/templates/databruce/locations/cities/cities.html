@@ -24,26 +24,26 @@
     {% for city in cities %}
       <tr>
         <td>
-          <a href="{% url "databruce:city_details" id=city.id %}">{{ city.name }}</a>
+          <a href="{% url "city_details" id=city.id %}">{{ city.name }}</a>
         </td>
         <td>
           {% if city.state %}
-            <a href="{% url "databruce:state_details" id=city.state.id %}">{{ city.state.name }}</a>
+            <a href="{% url "state_details" id=city.state.id %}">{{ city.state.name }}</a>
           {% endif %}
         </td>
         <td>
           {% if city.country %}
-            <a href="{% url "databruce:country_details" id=city.country.id %}">{{ city.country.name }}</a>
+            <a href="{% url "country_details" id=city.country.id %}">{{ city.country.name }}</a>
           {% endif %}
         </td>
         <td>
           {% with first=city.first %}
-            <a href="{% url "databruce:event_details" id=first.id %}">{{ first }}</a>
+            <a href="{% url "event_details" id=first.id %}">{{ first }}</a>
           {% endwith %}
         </td>
         <td>
           {% with last=city.last %}
-            <a href="{% url "databruce:event_details" id=last.id %}">{{ last }}</a>
+            <a href="{% url "event_details" id=last.id %}">{{ last }}</a>
           {% endwith %}
         </td>
         <td class="text-center">{{ city.num_events }}</td>

@@ -6,6 +6,7 @@ from . import models
 class SetlistInline(admin.TabularInline):
     model = models.Setlists
     autocomplete_fields = ["song"]
+    list_select_related = ["event", "song"]
     fields = [
         "event",
         "set_name",
@@ -94,8 +95,15 @@ class EventAdmin(admin.ModelAdmin):
         "id",
         "date",
     ]
-    autocomplete_fields = ["venue", "artist", "tour", "run", "leg"]
-    list_select_related = ["venue"]
+    autocomplete_fields = ["venue", "artist", "tour", "run", "leg", "nugs_id"]
+    list_select_related = [
+        "venue",
+        "artist",
+        "tour",
+        "run",
+        "leg",
+        "nugs_id",
+    ]
     list_display = ["id", "date", "venue"]
     list_display_links = ["id", "venue"]
     inlines = [SetlistInline]
@@ -111,7 +119,7 @@ class SongAdmin(admin.ModelAdmin):
 @admin.register(models.Setlists)
 class SetlistAdmin(admin.ModelAdmin):
     autocomplete_fields = ["event", "song"]
-    search_fields = ["song", "event"]
+    search_fields = ["song__name", "event__id", "set_name"]
     list_select_related = ["event", "song"]
     list_display = ["id", "event", "set_name", "song_num", "song"]
     list_display_links = ["id", "event", "song"]
@@ -149,8 +157,19 @@ class ReleaseAdmin(admin.ModelAdmin):
 
 @admin.register(models.Snippets)
 class SnippetAdmin(admin.ModelAdmin):
-    search_fields = ["snippet__song_name"]
-    list_select_related = ["event", "snippet", "setlist", "setlist__song"]
+    search_fields = [
+        "snippet__song_name",
+        "event",
+        "setlist",
+    ]
+    autocomplete_fields = ["event", "setlist", "snippet"]
+    list_select_related = [
+        "setlist",
+        "snippet",
+        "event",
+        "setlist__song",
+        "setlist__event",
+    ]
     list_display = [
         "id",
         "event",

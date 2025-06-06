@@ -62,8 +62,9 @@ table tbody td {
 table>tbody>tr>td,
 .card-body,
 .list-group-item {
-    font-size: 0.875rem;
-    line-height: calc(1.25 / 0.875);
+    font-size: 0.85rem;
+    line-height: 1.25rem;
+    vertical-align: middle;
 }
 
 a:link {

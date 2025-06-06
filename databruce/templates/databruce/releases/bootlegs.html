@@ -35,7 +35,7 @@
                 <td>{{ boot.type|default_if_none:"" }}</td>
                 <td>
                     {% if boot.event %}
-                        <a href="{% url "databruce:event_details" id=boot.event.id %}">{{ boot.event }}</a>
+                        <a href="{% url "event_details" id=boot.event.id %}">{{ boot.event }}</a>
                     {% endif %}
                 </td>
                 <td>

@@ -22,7 +22,7 @@
     {% for release in releases %}
       <tr>
         <td>
-          <a href="{% url "databruce:release_details" id=release.id %}">{{ release.name }}</a>
+          <a href="{% url "release_details" id=release.id %}">{{ release.name }}</a>
         </td>
         <td>{{ release.date|date:'Y-m-d' }}</td>
         <td>{{ release.type }}</td>

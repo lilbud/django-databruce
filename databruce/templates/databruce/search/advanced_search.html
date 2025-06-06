@@ -19,9 +19,7 @@
   </div>
   <div class="row mb-4">
     <div class="col offset-1">
-      <form action="{% url 'databruce:adv_search' %}"
-            method="post"
-            id="search-form">
+      <form action="{% url 'adv_search' %}" method="post" id="search-form">
         {% csrf_token %}
         <div class="row mb-3">
           <div class="col-3 col-md-1 form-label text-sm-right">{{ form.first_date.label }}</div>

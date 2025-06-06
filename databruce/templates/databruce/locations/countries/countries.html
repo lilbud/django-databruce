@@ -22,16 +22,16 @@
     {% for country in countries %}
       <tr>
         <td>
-          <a href="{% url "databruce:country_details" id=country.id %}">{{ country }}</a>
+          <a href="{% url "country_details" id=country.id %}">{{ country }}</a>
         </td>
         <td>
           {% if country.first %}
-            <a href="{% url "databruce:event_details" id=country.first.id %}">{{ country.first }}</a>
+            <a href="{% url "event_details" id=country.first.id %}">{{ country.first }}</a>
           {% endif %}
         </td>
         <td>
           {% if country.last %}
-            <a href="{% url "databruce:event_details" id=country.last.id %}">{{ country.last }}</a>
+            <a href="{% url "event_details" id=country.last.id %}">{{ country.last }}</a>
           {% endif %}
         </td>
         <td class="text-center">{{ country.num_events }}</td>

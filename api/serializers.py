@@ -1,4 +1,3 @@
-
 from django.urls import reverse
 from rest_framework import serializers
 
@@ -54,7 +53,7 @@ class EventsSerializer(serializers.ModelSerializer):
             date += f" {obj.early_late}"
 
         return {
-            "url": reverse("databruce:event_details", args=[obj.id]),
+            "url": reverse("event_details", args=[obj.id]),
             "date": date,
         }
 

@@ -26,24 +26,24 @@
     {% for run in runs %}
       <tr>
         <td class="text-wrap">
-          <a href="{% url "databruce:run_details" id=run.id %}">{{ run.name }}</a>
+          <a href="{% url "run_details" id=run.id %}">{{ run.name }}</a>
         </td>
         <td class="text-nowrap">
-          <a href="{% url "databruce:band_details" id=run.band.id %}">{{ run.band.name }}</a>
+          <a href="{% url "band_details" id=run.band.id %}">{{ run.band.name }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:venue_details" id=run.venue.id %}">{{ run.venue }}</a>
+          <a href="{% url "venue_details" id=run.venue.id %}">{{ run.venue }}</a>
         </td>
         <td>
-          <a href="{% url "databruce:city_details" id=run.venue.city.id %}">{{ run.venue.city }}</a>
+          <a href="{% url "city_details" id=run.venue.city.id %}">{{ run.venue.city }}</a>
         </td>
         <td class="text-center">{{ run.num_shows }}</td>
         <td class="text-center">{{ run.num_songs }}</td>
         <td class="text-nowrap">
-          <a href="{% url "databruce:event_details" id=run.first.id %}">{{ run.first }}</a>
+          <a href="{% url "event_details" id=run.first.id %}">{{ run.first }}</a>
         </td>
         <td class="text-nowrap">
-          <a href="{% url "databruce:event_details" id=run.last.id %}">{{ run.last }}</a>
+          <a href="{% url "event_details" id=run.last.id %}">{{ run.last }}</a>
         </td>
       </tr>
     {% endfor %}

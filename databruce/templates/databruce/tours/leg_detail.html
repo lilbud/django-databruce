@@ -6,8 +6,8 @@
 {% block content %}
   <div class="row mb-4">
     <h4>
-      <a href="{% url "databruce:tour_legs" %}">Tour Legs</a> &gt;
-      <a href="{% url "databruce:tour_details" id=info.tour.id %}">{{ info.tour }}</a>
+      <a href="{% url "tour_legs" %}">Tour Legs</a> &gt;
+      <a href="{% url "tour_details" id=info.tour.id %}">{{ info.tour }}</a>
       &gt; {{ info.name }}
     </h4>
   </div>
@@ -60,16 +60,16 @@
                     {% for event in events %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-nowrap">
-                          <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist }}</a>
+                          <a href="{% url 'band_details' id=event.artist.id %}">{{ event.artist }}</a>
                         </td>
                         <td>
-                          <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                         </td>
                         <td>
-                          <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                          <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -94,7 +94,7 @@
                     {% for song in songs %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:song_details" id=song.song_id %}">{{ song.name }}</a>
+                          <a href="{% url "song_details" id=song.song_id %}">{{ song.name }}</a>
                         </td>
                         <td class="text-center">{{ song.plays }}</td>
                         <td class="text-center">{{ song.show_opener }}</td>
@@ -129,16 +129,16 @@
                 {% for event in events %}
                   <tr>
                     <td class="text-nowrap">
-                      <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                      <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                     </td>
                     <td class="text-nowrap">
-                      <a href="{% url 'databruce:band_details' id=event.artist.id %}">{{ event.artist }}</a>
+                      <a href="{% url 'band_details' id=event.artist.id %}">{{ event.artist }}</a>
                     </td>
                     <td>
-                      <a href="{% url "databruce:venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                      <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                     </td>
                     <td>
-                      <a href="{% url "databruce:city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                      <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -165,7 +165,7 @@
                 {% for song, events in songs_list %}
                   <tr>
                     <td>
-                      <a href="{% url "databruce:song_details" id=song.id %}">{{ song.name }}</a>
+                      <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
                     </td>
                     <td class="text-center">{{ events|length }}</td>
                   </tr>
@@ -191,11 +191,11 @@
                 {% for venue in venues %}
                   <tr>
                     <td>
-                      <a href="{% url "databruce:venue_details" id=venue.id %}">{{ venue.name }}</a>
+                      <a href="{% url "venue_details" id=venue.id %}">{{ venue.name }}</a>
                     </td>
                     <td class="text-nowrap">
                       {% if venue.city %}
-                        <a href="{% url 'databruce:city_details' id=venue.city.id %}">{{ venue.city }}</a>
+                        <a href="{% url 'city_details' id=venue.city.id %}">{{ venue.city }}</a>
                       {% endif %}
                     </td>
                     <td class="text-center">{{ venue.num_events }}</td>

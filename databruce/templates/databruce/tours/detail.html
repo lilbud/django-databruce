@@ -6,7 +6,7 @@
 {% block content %}
   <div class="row mb-4">
     <h4>
-      <a href="{% url 'databruce:tours' %}">Tours</a> &gt; {{ tour.name }}
+      <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
     </h4>
   </div>
   <div class="row-mb-4">
@@ -64,17 +64,17 @@
                     {% for event in events %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:event_details" id=event.id %}">{{ event }}</a>
+                          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:band_details" id=tour.id %}">{{ tour.band }}</a>
+                          <a href="{% url "band_details" id=tour.id %}">{{ tour.band }}</a>
                         </td>
                         <td class="text-nowrap">
-                          <a href="{% url 'databruce:venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
                         </td>
                         <td class="text-nowrap">
                           {% if event.venue.city %}
-                            <a href="{% url 'databruce:city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                            <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
                           {% endif %}
                         </td>
                         <td class="text-wrap">{{ event.note|default_if_none:"" }}</td>
@@ -101,15 +101,15 @@
                     {% for leg in tour_legs %}
                       <tr>
                         <td class="text-wrap">
-                          <a href="{% url "databruce:leg_details" id=leg.id %}">{{ leg.name }}</a>
+                          <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
                         </td>
                         <td>{{ leg.num_shows }}</td>
                         <td>{{ leg.num_songs }}</td>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:event_details" id=leg.first.id %}">{{ leg.first }}</a>
+                          <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first }}</a>
                         </td>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:event_details" id=leg.last.id %}">{{ leg.last }}</a>
+                          <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last }}</a>
                         </td>
                         <td class="text-wrap">{{ leg.note|default_if_none:"" }}</td>
                       </tr>
@@ -135,7 +135,7 @@
                     {% for song in songs %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "databruce:song_details" id=song.song_id %}">{{ song.name }}</a>
+                          <a href="{% url "song_details" id=song.song_id %}">{{ song.name }}</a>
                         </td>
                         <td class="text-center">{{ song.plays }}</td>
                         <td class="text-center">{{ song.show_opener }}</td>
