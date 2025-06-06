@@ -390,6 +390,14 @@ class SongDetail(TemplateView):
             )
         )
 
+        context["snippets"] = (
+            models.Snippets.objects.filter(
+                snippet=self.kwargs["id"],
+            )
+            .select_related("setlist", "event", "snippet", "setlist__song")
+            .order_by("event", "position")
+        )
+
         filter = Q(event_certainty__in=["Confirmed", "Probable"])
 
         if context["song_info"].num_plays_public > 0:

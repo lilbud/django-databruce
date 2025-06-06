@@ -1,16 +1,4 @@
 :root {
-    --slate-50: #f8fafc;
-    --slate-100: #f1f5f9;
-    --slate-200: #e2e8f0;
-    --slate-300: #cbd5e1;
-    --slate-400: #94a3b8;
-    --slate-500: #64748b;
-    --slate-600: #475569;
-    --slate-700: #334155;
-    --slate-800: #1e293b;
-    --slate-900: #0f172a;
-    --slate-950: #020617;
-
     --zinc-50: #fafafa;
     --zinc-100: #f4f4f5;
     --zinc-200: #e4e4e7;
@@ -20,6 +8,7 @@
     --zinc-600: #52525b;
     --zinc-700: #3f3f46;
     --zinc-800: #27272a;
+    --zinc-850: #132033;
     --zinc-900: #18181b;
     --zinc-950: #09090b;
 
@@ -34,34 +23,6 @@
     --sky-800: #075985;
     --sky-900: #0c4a6e;
     --sky-950: #082f49;
-
-    --denim-50: #f1f8ff;
-    --denim-100: #e2f1ff;
-    --denim-200: #c1e3ff;
-    --denim-300: #8ecdff;
-    --denim-400: #4fb3ff;
-    --denim-500: #309ff9;
-    --denim-600: #0e81d3;
-    --denim-700: #186eb1;
-    --denim-800: #11568d;
-    --denim-900: #1a4870;
-    --denim-950: #0b2e4b;
-
-    --dove-gray-50: #fafafa;
-    --dove-gray-100: #f5f5f5;
-    --dove-gray-200: #e5e5e5;
-    --dove-gray-300: #d4d4d4;
-    --dove-gray-400: #a1a1a1;
-    --dove-gray-500: #737373;
-    --dove-gray-600: #525252;
-    --dove-gray-700: #404040;
-    --dove-gray-800: #262626;
-    --dove-gray-850: #1e1e1e;
-    --dove-gray-900: #171717;
-    --dove-gray-950: #0a0a0a;
-
-    --card: #18181b;
-    --background: #0e0e11;
 
     --font-heading: "Cabin", sans-serif;
     --font-body: "IBM Plex Sans Hebrew", sans-serif;

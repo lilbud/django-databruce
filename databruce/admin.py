@@ -3,6 +3,20 @@ from django.contrib import admin
 from . import models
 
 
+class OnstageInline(admin.TabularInline):
+    model = models.Onstage
+    autocomplete_fields = ["relation", "band"]
+    list_select_related = ["relation", "band", "event"]
+    fields = [
+        "relation",
+        "band",
+        "note",
+        "guest",
+    ]
+    fk_name = "event"
+    extra = 1
+
+
 class SetlistInline(admin.TabularInline):
     model = models.Setlists
     autocomplete_fields = ["song"]
@@ -106,7 +120,7 @@ class EventAdmin(admin.ModelAdmin):
     ]
     list_display = ["id", "date", "venue"]
     list_display_links = ["id", "venue"]
-    inlines = [SetlistInline]
+    inlines = [SetlistInline, OnstageInline]
 
 
 @admin.register(models.Songs)

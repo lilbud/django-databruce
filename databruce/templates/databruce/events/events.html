@@ -56,7 +56,7 @@
           {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
             {{ event.type }}/{{ event.note|default_if_none:'' }}
           {% else %}
-            {{ event.title|default_if_none:'' }}
+            {{ event.title|default_if_none:event.note }}
           {% endif %}
         </td>
         <td>{{ event.public|default_if_none:'' }}</td>

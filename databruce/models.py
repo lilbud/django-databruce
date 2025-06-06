@@ -779,7 +779,7 @@ class Onstage(models.Model):
         managed = False
         db_table = "onstage"
         verbose_name_plural = db_table
-        unique_together = (("event", "relation_id"),)
+        # unique_together = (("event", "relation_id", "band_id"),)
 
 
 class ReleaseTracks(models.Model):

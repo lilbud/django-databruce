@@ -18,7 +18,7 @@ body {
 
 .card-header {
     font-family: var(--font-heading);
-    background-color: var(--dove-gray-800) !important;
+    background-color: var(--zinc-800) !important;
     border: none;
 }
 
@@ -146,8 +146,8 @@ tr th {
 }
 
 #myTab .nav-link:not(.active) {
-    background-color: var(--dove-gray-850) !important;
-    border: 0.1rem solid var(--dove-gray-700) !important;
+    background-color: var(--zinc-850) !important;
+    border: 0.1rem solid var(--zinc-700) !important;
     color: white !important;
 }
 

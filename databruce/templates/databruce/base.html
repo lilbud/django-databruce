@@ -212,14 +212,16 @@
               </ul>
             </li>
           </ul>
-          <div class="d-flex">
+          <div class="d-flex me-2">
             <form class="d-flex"
                   role="search"
                   method="post"
                   action="{% url 'search' %}">
               {% csrf_token %}
-              {{ form.date }}
-              <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
+              <div class="input-group">
+                {{ form.date }}
+                <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
+              </div>
             </form>
           </div>
         </div>

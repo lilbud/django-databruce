@@ -8,7 +8,7 @@
     <div class="row row-cols-1 row-cols-md-2 g-2 justify-content-center">
       <div class="col-md-6 col-lg-2">
         <div class="card mb-2">
-          <h6 class="card-header">Show Info</h6>
+          <div class="card-header">Show Info</div>
           <div class="card-body">
             <div class="fw-bold fs-5 sky-500">{{ event }}</div>
             {% if event.artist %}
@@ -62,7 +62,7 @@
         </div>
         {% if event.note %}
           <div class="card">
-            <h6 class="card-header">Event Notes</h6>
+            <div class="card-header">Event Notes</div>
             <div class="card-body">{{ event.note }}</div>
           </div>
         {% endif %}
@@ -176,7 +176,7 @@
         </div>
         {% if notes %}
           <div class="card mb-2">
-            <h6 class="card-header">Setlist Notes</h6>
+            <div class="card-header">Setlist Notes</div>
             <div class="card-body">
               {% regroup notes by num as notes_list %}
               {% for item in notes_list %}
@@ -202,7 +202,7 @@
           {% if onstage %}
             <div class="col">
               <div class="card">
-                <h6 class="card-header">Onstage</h6>
+                <div class="card-header">Onstage</div>
                 <div class="card-body p-0">
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item">
@@ -257,7 +257,7 @@
           {% if album_breakdown %}
             <div class="col">
               <div class="card">
-                <h6 class="card-header">Album Breakdown</h6>
+                <div class="card-header">Album Breakdown</div>
                 <div class="card-body">
                   {% for album in album_breakdown %}
                     <div class="row mb-1">

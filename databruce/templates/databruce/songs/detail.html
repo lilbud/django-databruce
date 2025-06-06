@@ -12,7 +12,7 @@
   <div class="row mb-4 row-cols-1 row-cols-md-2 g-4 mt-0">
     <div class="col">
       <div class="card h-100">
-        <h5 class="card-header">Song Info</h5>
+        <div class="card-header">Song Info</div>
         <div class="card-body">
           <div class="d-flex flex-row fs-6">
             <div class="pe-2 fw-semibold">Original Artist:</div>
@@ -31,7 +31,7 @@
     </div>
     <div class="col">
       <div class="card h-100">
-        <h5 class="card-header">Song Stats</h5>
+        <div class="card-header">Song Stats</div>
         <div class="card-body">
           <div class="row row-cols-3 row-cols-lg-6 g-2">
             <div class="col">
@@ -132,7 +132,7 @@
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
-        <h5 class="card-header">Performances</h5>
+        <div class="card-header">Performances</div>
         <div class="card-body px-0">
           <div class="table-responsive">
             <table class="table table-hover display" id="songTable">
@@ -216,6 +216,41 @@
       </div>
     </div>
   </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">Snippets</div>
+        <div class="card-body px-0">
+          <div class="table-responsive">
+            <table class="table table-hover display" id="snippetTable">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Song</th>
+                  <th>Position</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for snippet in snippets %}
+                  <tr>
+                    <td>
+                      <a href="{% url "event_details" id=snippet.event.id %}">{{ snippet.event }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
+                    </td>
+                    <td>{{ snippet.position }}</td>
+                    <td>{{ snippet.note|default_if_none:"" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 6, 7, 8, 9]
@@ -250,6 +285,10 @@
               select.append('<option value="^(?!.*(Soundcheck|Rehearsal|Recording)).*$">Public</option>');
             });
         },
+      });
+
+      new DataTable('#snippetTable', {
+        layout: layout,
       });
     });
   </script>

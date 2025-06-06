@@ -29,9 +29,9 @@
         <div class="card-footer text-body-secondary">Manchester - May 14, 2025 (photo by Rob DeMartin)</div>
       </div>
     </div>
-    <div class="col-lg-4">
+    <div class="col-6 col-lg-4">
       <div class="card mb-4">
-        <h5 class="card-header">Most Recent Show</h5>
+        <div class="card-header">Most Recent Show</div>
         <div class="card-body px-0">
           {% with first=recent|first %}
             <h6 class="ms-2">
@@ -93,11 +93,11 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-4">
+    <div class="col-6 col-lg-4">
       <div class="row row-cols-1 row-cols-md-1 g-4 mb-4">
         <div class="col">
           <div class="card h-100 p-0">
-            <h5 class="card-header">Recent Events</h5>
+            <div class="card-header">Recent Events</div>
             <div class="card-body p-0">
               <div class="table-responsive index">
                 <table class="table table-hover display" id="recentTable">
@@ -132,7 +132,7 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <h5 class="card-header">Upcoming Events</h5>
+            <div class="card-header">Upcoming Events</div>
             <div class="card-body p-0">
               <div class="table-responsive index">
                 <table class="table table-hover display" id="upcomingTable">
@@ -167,10 +167,10 @@
         </div>
         <div class="col">
           <div class="card h-100">
-            <h5 class="card-header">
+            <div class="card-header">
               On This Day ({{ date|date:"F d" }})
               <a href="{% url 'adv_search' %}?current=true">see more</a>
-            </h5>
+            </div>
             <div class="card-body p-0">
               <div class="table-responsive index">
                 <table class="table table-hover display" id="otdTable">
