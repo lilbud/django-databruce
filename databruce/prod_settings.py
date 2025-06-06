@@ -112,12 +112,12 @@ FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "databruce",
+        "USER": "postgres",
+        "PASSWORD": "password",
         "HOST": "localhost",
-        "PORT": "5432",
+        "PORT": "",
         "OPTIONS": {
             "pool": {
                 "min_size": 2,
