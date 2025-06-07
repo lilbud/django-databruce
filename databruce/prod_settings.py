@@ -118,14 +118,14 @@ DATABASES = {
         "PASSWORD": "password",
         "HOST": "localhost",
         "PORT": "",
-	"OPTIONS": {
-		"pool": {
-			"min_size": 2,
-			"max_size": 4,
-			"timeout": 10,
-		},
-    	},
-	},
+        "OPTIONS": {
+            "pool": {
+                "min_size": 2,
+                "max_size": 4,
+                "timeout": 10,
+            },
+        },
+    },
 }
 
 
@@ -177,6 +177,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 import os
+
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # Default primary key field type
