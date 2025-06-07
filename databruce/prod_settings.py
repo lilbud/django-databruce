@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = [
@@ -112,20 +112,20 @@ FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "databruce",
         "USER": "postgres",
         "PASSWORD": "password",
         "HOST": "localhost",
         "PORT": "",
-        "OPTIONS": {
-            "pool": {
-                "min_size": 2,
-                "max_size": 4,
-                "timeout": 10,
-            },
-        },
-    },
+	"OPTIONS": {
+		"pool": {
+			"min_size": 2,
+			"max_size": 4,
+			"timeout": 10,
+		},
+    	},
+	},
 }
 
 
@@ -176,9 +176,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-import os  # noqa: E402
-
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")  # noqa: PTH118
+import os
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
