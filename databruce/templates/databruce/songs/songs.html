@@ -25,7 +25,7 @@
   <tbody>
     {% for song in songs %}
       <tr>
-        <td class="text-wrap">
+        <td class="text-nowrap">
           <a href="{% url 'song_details' id=song.id %}">{{ song.name }}</a>
         </td>
         <td>

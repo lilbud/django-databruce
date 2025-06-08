@@ -1,0 +1,48 @@
+{% extends "users/base.html" %}
+{% block title %}
+    Create Account - Databruce
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-header">Create Account</div>
+        <div class="card-body">
+            <form method="post" action="{% url "signup" %}">
+                {% csrf_token %}
+                <div class="col">{{ form.non_field_errors }}</div>
+                <div class="fieldWrapper mb-3">
+                    {{ form.username.errors }}
+                    <label class="form-label" for="{{ form.username.id_for_label }}">Username:</label>
+                    <input type="text" class="form-control" name="username" id="username">
+                </div>
+                <div class="fieldWrapper mb-3">
+                    {{ form.email.errors }}
+                    <label class="form-label" for="{{ form.email.id_for_label }}">Email Address:</label>
+                    <input type="email" class="form-control" name="email" id="email">
+                </div>
+                <div class="fieldWrapper mb-3">
+                    {{ form.password1.errors }}
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">Password:</label>
+                    <input type="password" class="form-control" name="password1" id="password1">
+                    {% if form.password1.help_text %}
+                        <div class="help my-3"
+                             {% if form.password1.id_for_label %}id="{{ form.password1.id_for_label }}_helptext"{% endif %}>
+                            {{ form.password1.help_text|safe }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="fieldWrapper mb-3">
+                    {{ form.password2.errors }}
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">
+                        Enter the same password as before, for verification.:
+                    </label>
+                    <input type="password" class="form-control" name="password2" id="password2">
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit">Create Account</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

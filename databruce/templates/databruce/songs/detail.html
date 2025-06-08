@@ -132,120 +132,138 @@
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
-        <div class="card-header">Performances</div>
-        <div class="card-body px-0">
-          <div class="table-responsive">
-            <table class="table table-hover display" id="songTable">
-              <thead>
-                <tr>
-                  <th class="all" scope="col">Date</th>
-                  <th class="all" scope="col">Act</th>
-                  <th class="min-tablet-l" scope="col">Venue</th>
-                  <th class="min-tablet-l" scope="col">Tour</th>
-                  <th class="min-tablet-l" scope="col">Position</th>
-                  <th class="min-tablet-l" scope="col">Gap</th>
-                  <th class="min-tablet-l" scope="col">Set</th>
-                  <th class="min-tablet-l" scope="col">Prev</th>
-                  <th class="min-tablet-l" scope="col">Next</th>
-                  <th class="min-tablet-l" scope="col">Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for song in songs %}
-                  <tr>
-                    <td class="text-nowrap">
-                      <a href="{% url "event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
-                    </td>
-                    <td class="text-nowrap">
-                      <a href="{% url "band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
-                    </td>
-                    <td class="text-nowrap">
-                      {% with venue=song.current.event.venue %}
-                        <a href="{% url 'venue_details' id=venue.id %}">
-                          {% spaceless %}
-                            {% if venue.city %}
-                              {{ venue.name }}, {{ venue.city }}
-                            {% else %}
-                              {{ venue.name }}
-                            {% endif %}
-                          {% endspaceless %}
-                        </a>
-                      {% endwith %}
-                    </td>
-                    <td class="text-nowrap">
-                      {% if song.current.event.tour %}
-                        <h6 class="mb-0">
-                          <a href="{% url "tour_details" id=song.current.event.tour.id %}"><span class="badge {{ song.current.event.tour.slug|default_if_none:"text-bg-secondary" }}">{{ song.current.event.tour.name }}</span></a>
-                        </h6>
-                      {% endif %}
-                    </td>
-                    <td class="text-nowrap">
-                      {% if song.current.position and song.current.position != song.current.set_name %}
-                        {{ song.current.position }}
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if song.current.premiere %}
-                        first
-                      {% else %}
-                        {{ song.current.last|default_if_none:"" }}
-                      {% endif %}
-                    </td>
-                    <td>{{ song.current.set_name }}</td>
-                    <td class="text-nowrap">
-                      {% if song.prev %}
-                        <a href="{% url "song_details" id=song.prev.song.id %}">{{ song.prev.song.short_name|default_if_none:song.prev.song.name }}</a>
-                      {% else %}
-                        <em>***</em>
-                      {% endif %}
-                    </td>
-                    <td class="text-nowrap">
-                      {% if song.next %}
-                        <a href="{% url "song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
-                      {% else %}
-                        <em>***</em>
-                      {% endif %}
-                    </td>
-                    <td>{{ song.note|default_if_none:"" }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+        <div class="card-header">
+          <ul class="nav nav-pills" role="tablist">
+            <li class="nav-item me-2" role="presentation">
+              <button class="nav-link active"
+                      id="pills-events-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#events"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-home"
+                      aria-selected="true">Performances</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link"
+                      id="pills-snippets-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#snippets"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Times as Snippet</button>
+            </li>
+          </ul>
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">Snippets</div>
-        <div class="card-body px-0">
-          <div class="table-responsive">
-            <table class="table table-hover display" id="snippetTable">
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Song</th>
-                  <th>Position</th>
-                  <th>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for snippet in snippets %}
-                  <tr>
-                    <td>
-                      <a href="{% url "event_details" id=snippet.event.id %}">{{ snippet.event }}</a>
-                    </td>
-                    <td>
-                      <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
-                    </td>
-                    <td>{{ snippet.position }}</td>
-                    <td>{{ snippet.note|default_if_none:"" }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+        <div class="card-body">
+          <div class="tab-content">
+            <div id="events" class="tab-pane fade show active">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="songTable">
+                  <thead>
+                    <tr>
+                      <th class="all" scope="col">Date</th>
+                      <th class="all" scope="col">Act</th>
+                      <th class="min-tablet-l" scope="col">Venue</th>
+                      <th class="min-tablet-l" scope="col">Tour</th>
+                      <th class="min-tablet-l" scope="col">Position</th>
+                      <th class="min-tablet-l" scope="col">Gap</th>
+                      <th class="min-tablet-l" scope="col">Set</th>
+                      <th class="min-tablet-l" scope="col">Prev</th>
+                      <th class="min-tablet-l" scope="col">Next</th>
+                      <th class="min-tablet-l" scope="col">Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for song in songs %}
+                      <tr>
+                        <td class="text-nowrap">
+                          <a href="{% url "event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
+                        </td>
+                        <td class="text-nowrap">
+                          <a href="{% url "band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
+                        </td>
+                        <td class="text-nowrap">
+                          {% with venue=song.current.event.venue %}
+                            <a href="{% url 'venue_details' id=venue.id %}">
+                              {% spaceless %}
+                                {% if venue.city %}
+                                  {{ venue.name }}, {{ venue.city }}
+                                {% else %}
+                                  {{ venue.name }}
+                                {% endif %}
+                              {% endspaceless %}
+                            </a>
+                          {% endwith %}
+                        </td>
+                        <td class="text-nowrap">
+                          {% if song.current.event.tour %}
+                            <a href="{% url "tour_details" id=song.current.event.tour.id %}">{{ song.current.event.tour.name }}</a>
+                          {% endif %}
+                        </td>
+                        <td class="text-nowrap">
+                          {% if song.current.position and song.current.position != song.current.set_name %}
+                            {{ song.current.position }}
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if song.current.premiere %}
+                            first
+                          {% else %}
+                            {{ song.current.last|default_if_none:"" }}
+                          {% endif %}
+                        </td>
+                        <td>{{ song.current.set_name }}</td>
+                        <td class="text-nowrap">
+                          {% if song.prev %}
+                            <a href="{% url "song_details" id=song.prev.song.id %}">{{ song.prev.song.short_name|default_if_none:song.prev.song.name }}</a>
+                          {% else %}
+                            <em>***</em>
+                          {% endif %}
+                        </td>
+                        <td class="text-nowrap">
+                          {% if song.next %}
+                            <a href="{% url "song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
+                          {% else %}
+                            <em>***</em>
+                          {% endif %}
+                        </td>
+                        <td>{{ song.note|default_if_none:"" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="snippets" class="tab-pane fade">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="snippetTable">
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Song</th>
+                      <th>Position</th>
+                      <th>Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for snippet in snippets %}
+                      <tr>
+                        <td>
+                          <a href="{% url "event_details" id=snippet.event.id %}">{{ snippet.event }}</a>
+                        </td>
+                        <td>
+                          <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
+                        </td>
+                        <td>{{ snippet.position }}</td>
+                        <td>{{ snippet.note|default_if_none:"" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>

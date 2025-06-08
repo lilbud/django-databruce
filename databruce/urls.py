@@ -79,6 +79,11 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    path(
+        "accounts/create/",
+        views.SignUp.as_view(),
+        name="signup",
+    ),
     path("events", views.Event.as_view(), name="events"),
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),

@@ -509,3 +509,54 @@ class SetlistNoteSearch(forms.Form):
             },
         ),
     )
+
+
+# class SignUpForm(forms.ModelForm):
+#     def __init__(self, *args: dict, **kwargs: dict) -> None:
+#         """Initialize form."""
+#         super().__init__(*args, **kwargs)
+#         self.helper = FormHelper()
+#         self.helper.form_method = "post"
+#         self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
+
+#     username = forms.CharField(required=True, widget=forms.TextInput())
+
+#     email = forms.EmailField(required=True, widget=forms.EmailInput())
+
+#     password = forms.CharField(
+#         label="Password",
+#         required=True,
+#         strip=False,
+#         widget=forms.PasswordInput(attrs={"autocomplete": "email"}),
+#         help_text=password_validation.password_validators_help_text_html(),
+#     )
+
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+
+class UserForm(UserCreationForm):
+    username = forms.CharField(widget=forms.TextInput())
+    email = forms.CharField(widget=forms.EmailInput())
+
+    password1 = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+
+    password2 = forms.CharField(
+        label="Enter the same password as before, for verification.",
+        widget=forms.PasswordInput(),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "password1",
+            "password2",
+        ]

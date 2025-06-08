@@ -1,10 +1,14 @@
 import datetime
 from typing import Any
 
+from django.contrib.auth.decorators import login_not_required
+from django.contrib.auth.models import Group, User
 from django.db.models import Case, Count, F, Max, Q, Sum, Value, When
 from django.forms import formset_factory
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -93,8 +97,43 @@ class UserProfile(TemplateView):
         return context
 
 
+@method_decorator(
+    login_not_required,
+    name="dispatch",
+)
+class SignUp(TemplateView):
+    template_name = "users/signup.html"
+    form_class = forms.UserForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form_class
+        return context
+
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            user_group = User.objects.get(username=user.username)
+            group = Group.objects.get(name="Users")
+            user_group.groups.add(group)
+
+            return redirect(reverse("login"))
+
+        return render(request, template_name=self.template_name, context={"form": form})
+
+
 class UserSettings(TemplateView):
     template_name = "users/settings.html"
+
+    def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
+        return super().get_context_data(**kwargs)
+
+
+class SignUpDone(TemplateView):
+    template_name = "users/signup_done.html"
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         return super().get_context_data(**kwargs)
@@ -115,7 +154,7 @@ class UserAddShow(View):
 
 
 class EventDetail(TemplateView):
-    template_name = "databruce/events/detail copy.html"
+    template_name = "databruce/events/detail.html"
     queryset = (
         models.Events.objects.all()
         .select_related(
