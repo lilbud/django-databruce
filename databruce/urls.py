@@ -12,6 +12,8 @@ date = datetime.datetime.today()
 app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls")),
     path(
         "accounts/login/",
         auth_views.LoginView.as_view(template_name="users/login.html"),
@@ -82,11 +84,11 @@ urlpatterns = [
         views.SignUp.as_view(),
         name="signup",
     ),
-    path(
-        "accounts/create/<uidb64>/<token>/",
-        views.SignUpConfirm.as_view(),
-        name="signup_confirm",
-    ),
+    # path(
+    #     "accounts/create/",
+    #     views.SignUpConfirm.as_view(),
+    #     name="signup_confirm",
+    # ),
     path("events", views.Event.as_view(), name="events"),
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
@@ -131,9 +133,3 @@ urlpatterns = [
 
 if not settings.TESTING:
     urlpatterns = [*urlpatterns, *debug_toolbar_urls()]
-
-#if settings.ADMIN_ENABLED:
-#    urlpatterns += [
-#        path("admin/", admin.site.urls),
-#        path("api-auth/", include("rest_framework.urls")),
-#    ]
