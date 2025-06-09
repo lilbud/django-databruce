@@ -20,8 +20,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ADMIN_ENABLED = False
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -67,9 +65,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
 ]
-
-if ADMIN_ENABLED is True:
-    INSTALLED_APPS.append("django.contrib.admin")
 
 MIDDLEWARE = [
     # These three are optional, but highly recommended!
