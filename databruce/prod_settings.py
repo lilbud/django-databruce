@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ["142.93.200.133", "databruce.com", "www.databruce.com", 'localhost']
+ALLOWED_HOSTS = ["142.93.200.133", "databruce.com", "www.databruce.com", "localhost"]
 
 INTERNAL_IPS = [
     # ...
