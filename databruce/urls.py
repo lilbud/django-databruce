@@ -132,8 +132,8 @@ urlpatterns = [
 if not settings.TESTING:
     urlpatterns = [*urlpatterns, *debug_toolbar_urls()]
 
-if settings.ADMIN_ENABLED:
-    urlpatterns += [
-        path("admin/", admin.site.urls),
-        path("api-auth/", include("rest_framework.urls")),
-    ]
+#if settings.ADMIN_ENABLED:
+#    urlpatterns += [
+#        path("admin/", admin.site.urls),
+#        path("api-auth/", include("rest_framework.urls")),
+#    ]
