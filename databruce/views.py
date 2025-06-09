@@ -2,7 +2,7 @@ import datetime
 from typing import Any
 
 from django.contrib.auth.decorators import login_not_required
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db.models import Case, Count, F, Max, Q, Sum, Value, When
 from django.forms import formset_factory
 from django.http import HttpRequest
@@ -97,13 +97,30 @@ class UserProfile(TemplateView):
         return context
 
 
+import logging
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMultiAlternatives
+from django.template import loader
+
+logger = logging.getLogger("django.contrib.auth")
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+
+
 @method_decorator(
     login_not_required,
     name="dispatch",
 )
 class SignUp(TemplateView):
     template_name = "users/signup.html"
+    email_template_name = "users/signup_email.html"
+    subject_template_name = "users/signup_confirm_subject.txt"
+    token_generator = PasswordResetTokenGenerator()
     form_class = forms.UserForm
+    extra_email_context = None
+    from_email = None
+    html_email_template_name = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -114,15 +131,136 @@ class SignUp(TemplateView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
 
-            user_group = User.objects.get(username=user.username)
-            group = Group.objects.get(name="Users")
-            user_group.groups.add(group)
+            current_site = get_current_site(request)
+            use_https = False
+            extra_email_context = None
+
+            context = {
+                "email": user.email,
+                "domain": current_site.domain,
+                "site_name": current_site.name,
+                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "user": user,
+                "token": self.token_generator.make_token(user),
+                "protocol": "https" if use_https else "http",
+                **(extra_email_context or {}),
+            }
+
+            self.send_mail(context=context, from_email=None, to_email=user.email)
+
+            # user_group = User.objects.get(username=user.username)
+            # group = Group.objects.get(name="Users")
+            # user_group.groups.add(group)
 
             return redirect(reverse("login"))
 
         return render(request, template_name=self.template_name, context={"form": form})
+
+    def send_mail(
+        self,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        subject_template_name = "users/signup_confirm_subject.txt"
+        email_template_name = "users/signup_email.html"
+
+        subject = loader.render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = "".join(subject.splitlines())
+        body = loader.render_to_string(email_template_name, context)
+
+        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
+        if html_email_template_name is not None:
+            html_email = loader.render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, "text/html")
+
+        try:
+            email_message.send()
+        except Exception:
+            logger.exception(
+                "Failed to send activation email to %s",
+                context["user"].pk,
+            )
+
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.utils.http import urlsafe_base64_decode
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+
+UserModel = get_user_model()
+
+INTERNAL_RESET_SESSION_TOKEN = "_password_reset_token"
+
+
+class SignUpConfirm(TemplateView):
+    template_name = "users/signup_done.html"
+    reset_url_token = "activate"
+    token_generator = default_token_generator
+
+    def get_user(self, uidb64):
+        try:
+            # urlsafe_base64_decode() decodes to bytestring
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = UserModel._default_manager.get(pk=uid)
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            UserModel.DoesNotExist,
+            ValidationError,
+        ):
+            user = None
+        return user
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        if "uidb64" not in kwargs or "token" not in kwargs:
+            raise ImproperlyConfigured(
+                "The URL path must contain 'uidb64' and 'token' parameters.",
+            )
+
+        self.validlink = False
+        self.user = self.get_user(kwargs["uidb64"])
+
+        if self.user is not None:
+            token = kwargs["token"]
+            if token == self.reset_url_token:
+                session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
+                if self.token_generator.check_token(
+                    user=self.user,
+                    token=session_token,
+                ):
+                    self.validlink = True
+
+                    return super().dispatch(*args, **kwargs)
+            else:
+                if self.token_generator.check_token(
+                    user=self.user,
+                    token=token,
+                ):
+                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+
+                    user_group = User.objects.get(username=self.user)
+                    group = Group.objects.get(name="Users")
+                    user_group.groups.add(group)
+
+                    self.user.is_active = True
+                    self.user.save()
+
+                return redirect("login")
+
+        return None
 
 
 class UserSettings(TemplateView):

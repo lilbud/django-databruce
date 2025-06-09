@@ -4,6 +4,9 @@ import datetime
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Reset, Submit
 from django import forms
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 from . import models
 
@@ -511,34 +514,12 @@ class SetlistNoteSearch(forms.Form):
     )
 
 
-# class SignUpForm(forms.ModelForm):
-#     def __init__(self, *args: dict, **kwargs: dict) -> None:
-#         """Initialize form."""
-#         super().__init__(*args, **kwargs)
-#         self.helper = FormHelper()
-#         self.helper.form_method = "post"
-#         self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
-
-#     username = forms.CharField(required=True, widget=forms.TextInput())
-
-#     email = forms.EmailField(required=True, widget=forms.EmailInput())
-
-#     password = forms.CharField(
-#         label="Password",
-#         required=True,
-#         strip=False,
-#         widget=forms.PasswordInput(attrs={"autocomplete": "email"}),
-#         help_text=password_validation.password_validators_help_text_html(),
-#     )
-
-from django.contrib.auth import password_validation
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-
-
 class UserForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput())
-    email = forms.CharField(widget=forms.EmailInput())
+    email = forms.EmailField(
+        max_length=254,
+        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
+    )
 
     password1 = forms.CharField(
         label="Password",

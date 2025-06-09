@@ -1,0 +1,14 @@
+{% load i18n %}
+{% autoescape off %}
+    {% blocktranslate %}Hello,{% endblocktranslate %}
+    {% blocktranslate %}You are receiving this email because you recently created an account on Databruce.{% endblocktranslate %}
+    {% blocktranslate %}Your account {{user.get_username}} is almost ready.{% endblocktranslate %}
+    {% blocktranslate %}You have to verify your email to activate your account.{% endblocktranslate %}
+    {% blocktranslate %}Click on the below link to confirm your email and activate your account.{% endblocktranslate %}
+    {% blocktranslate %}This link will expire in 3 days.{% endblocktranslate %}
+    {% block confirm_link %}
+        {{ protocol }}://{{ domain }}{% url "signup_confirm" uidb64=uid token=token %}
+    {% endblock confirm_link %}
+    {% blocktranslate %}Thanks!{% endblocktranslate %}
+    {% blocktranslate %}The Databruce Team{% endblocktranslate %}
+{% endautoescape %}

@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost", "142.93.200.133"]
 
 INTERNAL_IPS = [
     # ...
@@ -38,12 +38,12 @@ INTERNAL_IPS = [
 ]
 
 
-# SECURE_HSTS_SECONDS = 60
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_SECONDS = 60
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -157,11 +157,12 @@ PASSWORD_HASHERS = [
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "altacct1993@gmail.com"
+EMAIL_HOST_USER = "databrucedb@gmail.com"
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = "Databruce databruce@gmail.com"
+DEFAULT_FROM_EMAIL = "Databruce databrucedb@gmail.com"
+PASSWORD_RESET_TIMEOUT = 259200
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

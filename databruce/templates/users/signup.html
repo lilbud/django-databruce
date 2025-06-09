@@ -31,11 +31,12 @@
                     {% endif %}
                 </div>
                 <div class="fieldWrapper mb-3">
-                    {{ form.password2.errors }}
                     <label class="form-label" for="{{ form.password2.id_for_label }}">
                         Enter the same password as before, for verification.:
                     </label>
                     <input type="password" class="form-control" name="password2" id="password2">
+                    <br>
+                    {{ form.password2.errors }}
                 </div>
                 <div class="row">
                     <div class="col-12">
