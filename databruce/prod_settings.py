@@ -56,7 +56,6 @@ SECURE_HSTS_PRELOAD = True
 
 # Application definition
 INSTALLED_APPS = [
-    "django.contrib.admin",  # required
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -67,6 +66,20 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
 ]
+
+if ADMIN_ENABLED:
+    INSTALLED_APPS = [
+        "django.contrib.admin",  # required
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
+        "databruce.apps.DatabruceConfig",
+        "api",
+        "rest_framework",
+        "django_filters",
+    ]
 
 MIDDLEWARE = [
     # These three are optional, but highly recommended!
