@@ -115,7 +115,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "databruce",
         "USER": "postgres",
-        "PASSWORD": "password",
+        "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": "localhost",
         "PORT": "",
         "OPTIONS": {
@@ -188,11 +188,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-	"LOCATION": "redis://127.0.0.1:6379/1",
-	"OPTIONS": {
-		"CLIENT_CLASS": "django_redis.client.DefaultClient",
-	}
-    }
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
 }
 
 REST_FRAMEWORK = {
