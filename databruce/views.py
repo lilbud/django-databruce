@@ -13,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Case, Count, F, Max, Q, Sum, Value, When
+from django.db.models.functions import TruncYear
 from django.forms import formset_factory
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
@@ -585,6 +586,31 @@ class SongDetail(TemplateView):
         )
 
         filter = Q(event_certainty__in=["Confirmed", "Probable"])
+
+        valid_set_names = [
+            "Show",
+            "Set 1",
+            "Set 2",
+            "Encore",
+            "Pre-Show",
+            "Post-Show",
+        ]
+
+        context["year_stats"] = (
+            models.Setlists.objects.filter(song_id=self.kwargs["id"])
+            .annotate(
+                year=TruncYear("event__date"),
+            )
+            .values("year")
+            .annotate(
+                event_count=Count(
+                    "event_id",
+                    distinct=True,
+                    filter=Q(set_name__in=valid_set_names),
+                ),
+            )
+            .order_by("year")  # 4. Order the results by year
+        )
 
         if context["song_info"].num_plays_public > 0:
             filter.add(

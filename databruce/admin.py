@@ -46,7 +46,7 @@ class ArchiveAdmin(admin.ModelAdmin):
 
 @admin.register(models.UserAttendedShows)
 class UserAttendedShowsAdmin(admin.ModelAdmin):
-    search_fields = ["user", "event"]
+    search_fields = ["user__username", "event__id", "event__date"]
     list_select_related = ["user", "event"]
     list_display = ["user__username", "event"]
     list_display_links = ["user__username", "event"]

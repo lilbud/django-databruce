@@ -132,9 +132,9 @@
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills" role="tablist">
-            <li class="nav-item me-2" role="presentation">
+        <div class="card-header text-nowrap">
+          <ul class="nav nav-pills nav-fill nav-fill" role="tablist">
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link active"
                       id="pills-events-tab"
                       data-bs-toggle="pill"
@@ -144,7 +144,7 @@
                       aria-controls="pills-home"
                       aria-selected="true">Performances</button>
             </li>
-            <li class="nav-item" role="presentation">
+            <li class="nav-item me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link"
                       id="pills-snippets-tab"
                       data-bs-toggle="pill"
@@ -153,6 +153,16 @@
                       role="tab"
                       aria-controls="pills-profile"
                       aria-selected="false">Times as Snippet</button>
+            </li>
+            <li class="nav-item mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-stats-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#yearstats"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-yearstats"
+                      aria-selected="false">Stats By Year</button>
             </li>
           </ul>
         </div>
@@ -264,14 +274,81 @@
                 </table>
               </div>
             </div>
+            <div id="yearstats" class="tab-pane fade">
+              <div class="row justify-content-center">
+                <div id="wrapper" class="p-0">
+                  <div id="statChart">
+                    <canvas id="chart"></canvas>
+                  </div>
+                </div>
+              </div>
+              {% comment %} <div style="width: 100%; overflow-x: auto; overflow-y: hidden">
+                <div style="width: 3000px; height: 300px">
+                  <canvas id="chart1" height="300" width="0"></canvas>
+                </div>
+              </div> {% endcomment %}
+              {% comment %} <div class="table-responsive">
+                <table class="table table-hover display" id="statsTable">
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      <th>Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for year in year_stats %}
+                      <tr>
+                        <td>{{ year.year|date:"Y" }}</td>
+                        <td>{{ year.event_count }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div> {% endcomment %}
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <!-- charts.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
   <script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 6, 7, 8, 9]
+
+    $(document).ready(function () {
+        let ctx = document.getElementById("chart").getContext("2d");
+
+
+
+        let chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [{% for year in year_stats %}{{year.year|date:"Y"}},{% endfor %}],
+            datasets: [
+                {
+                  label: "Events",
+                  backgroundColor: "#0369a1",
+                  borderColor: "#417690",
+                  color: "#ffffff",
+                  data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
+                }
+            ]
+          },
+          options: {
+            title: {
+                text: "Plays by Year",
+                display: true
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+    });
 
     $(document).ready(function () {
       new DataTable('#songTable', {
@@ -306,6 +383,10 @@
       });
 
       new DataTable('#snippetTable', {
+        layout: layout,
+      });
+
+      new DataTable('#statsTable', {
         layout: layout,
       });
     });

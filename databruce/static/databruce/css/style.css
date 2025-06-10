@@ -198,3 +198,7 @@ tr th {
     color: var(--sky-500) !important;
     border: 1px solid var(--sky-500) !important;
 }
+
+#yearstats #statChart {
+    aspect-ratio: 2;
+}
