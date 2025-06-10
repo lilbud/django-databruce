@@ -1,0 +1,121 @@
+:root {
+    --zinc-50: #fafafa;
+    --zinc-100: #f4f4f5;
+    --zinc-200: #e4e4e7;
+    --zinc-300: #d4d4d8;
+    --zinc-400: #a1a1aa;
+    --zinc-500: #71717a;
+    --zinc-600: #52525b;
+    --zinc-700: #3f3f46;
+    --zinc-800: #27272a;
+    --zinc-850: #132033;
+    --zinc-900: #18181b;
+    --zinc-950: #09090b;
+
+    --sky-50: #f0f9ff;
+    --sky-100: #e0f2fe;
+    --sky-200: #bae6fd;
+    --sky-300: #7dd3fc;
+    --sky-400: #38bdf8;
+    --sky-500: #0ea5e9;
+    --sky-600: #0284c7;
+    --sky-700: #0369a1;
+    --sky-800: #075985;
+    --sky-900: #0c4a6e;
+    --sky-950: #082f49;
+
+    --font-heading: "Cabin", sans-serif;
+    --font-body: "IBM Plex Sans Hebrew", sans-serif;
+}
+
+
+
+.tour23 {
+    background-color: #c86327 !important;
+    color: white !important;
+}
+
+.bitusa {
+    background-color: #a43134;
+    color: white !important;
+}
+
+.btr {
+    background-color: #ffffff;
+    color: black !important;
+}
+
+.darkness {
+    background-color: #d7b79d;
+    color: black !important;
+}
+
+.devils {
+    background-color: #cd9f69;
+    color: black !important;
+}
+
+.greetings {
+    background-color: #dd3b64;
+    color: white !important;
+}
+
+.hh {
+    background-color: #e0ae64;
+    color: black !important;
+}
+
+.magic {
+    background-color: #752418;
+    color: white !important;
+}
+
+.joad {
+    background-color: #efbd5a;
+    color: black !important;
+}
+
+.rising {
+    background-color: #e59750;
+    color: black !important;
+}
+
+.river {
+    background-color: #4ebcc3;
+    color: black !important;
+}
+
+.sessions {
+    background-color: #edb22b;
+    color: white !important;
+}
+
+.shuffle {
+    background-color: #c89c6c;
+    color: black !important;
+}
+
+.tunnel {
+    background-color: black;
+    color: white !important;
+}
+
+.dream {
+    background-color: #3b497c;
+    color: white !important;
+}
+
+.tour92 {
+    background-color: #da3931;
+    color: white !important;
+}
+
+.wrecking {
+    background-color: #85080d !important;
+    color: white !important;
+}
+
+.chicago {
+    background-color: #e8daa9 !important;
+    color: black !important;
+}

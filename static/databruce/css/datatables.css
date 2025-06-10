@@ -1,0 +1,100 @@
+/* Remove default content */
+table.dataTable thead .dt-column-order::before,
+table.dataTable thead .dt-column-order::after {
+    content: "" !important;
+    font-family: "bootstrap-icons";
+    line-height: 0px !important;
+}
+
+/* up arrow */
+table.dataTable thead .dt-column-order::before {
+    content: "\F148" !important;
+}
+
+/* down arrow */
+table.dataTable thead .dt-column-order::after {
+    content: "\F128" !important;
+}
+
+.dt-orderable-asc span.dt-column-order:before,
+.dt-orderable-asc span.dt-column-order:after,
+.dt-orderable-desc span.dt-column-order:before,
+.dt-orderable-desc span.dt-column-order:after {
+    opacity: 0 !important;
+}
+
+.dt-ordering-asc span.dt-column-order:before,
+.dt-ordering-desc span.dt-column-order:after {
+    opacity: 1 !important;
+}
+
+.dt-container label,
+.dt-info {
+    font-size: .85rem;
+}
+
+@media only screen and (max-width: 992px) {
+    .dt-container>div.row>.d-md-flex>.dt-buttons {
+        display: none !important;
+    }
+
+    /* Hides the empty search/buttons row when there is none */
+    .dt-container>div.row:has(.d-md-flex:empty) {
+        display: none !important;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .dt-layout-full {
+        margin-top: 0px !important;
+    }
+}
+
+.dt-layout-full {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.dt-buttons>button {
+    margin-bottom: 0px !important;
+    background-color: var(--sky-700) !important;
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+.index .dt-layout-table {
+    margin-top: 0px !important;
+}
+
+div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-start:empty),
+div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
+    display: none !important;
+    margin-top: 0px !important;
+}
+
+.dt-orderable-none span.dt-column-order {
+    display: none;
+}
+
+.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
+    width: 700px !important;
+    transform: translateX(-2%) !important;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+    visibility: hidden;
+}
+
+.sorting_1 {
+    background-color: color-mix(in srgb, var(--zinc-800), white 0.075%) !important;
+}
+
+.table-responsive {
+    padding: 0% !important;
+    border-radius: inherit !important;
+}
+
+#setlistTable_wrapper .dt-layout-table.mt-2 {
+    margin-top: 0 !important;
+}
