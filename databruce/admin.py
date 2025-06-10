@@ -59,6 +59,7 @@ admin.site.unregister(User)
 @admin.register(User)
 class AuthUserAdmin(admin.ModelAdmin):
     search_fields = ["username"]
+    list_filter = ["is_staff", "is_active"]
     list_display = (
         "username",
         "email",

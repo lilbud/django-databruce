@@ -77,6 +77,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.http.ConditionalGetMiddleware",
 ]
 
 TESTING = "test" in sys.argv
@@ -126,11 +127,7 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": "",
         "OPTIONS": {
-            "pool": {
-                "min_size": 2,
-                "max_size": 4,
-                "timeout": 10,
-            },
+            "pool": True,
         },
     },
 }

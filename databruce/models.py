@@ -779,7 +779,6 @@ class Onstage(models.Model):
         managed = False
         db_table = "onstage"
         verbose_name_plural = db_table
-        # unique_together = (("event", "relation_id", "band_id"),)
 
 
 class ReleaseTracks(models.Model):
@@ -1023,7 +1022,7 @@ class Setlists(models.Model):
         unique_together = (("event_id", "song_num", "set_name", "song_id"),)
         ordering = ("-event_id", "song_num")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.event} - {self.set_name} - {self.song}"
 
 
@@ -1371,7 +1370,7 @@ class Runs(models.Model):
         return self.name
 
 
-class Sessions(models.Model):
+class StudioSessions(models.Model):
     id = models.AutoField(primary_key=True)
     band = models.ForeignKey(
         "Bands",
@@ -1413,7 +1412,7 @@ class Sessions(models.Model):
 
     class Meta:
         managed = False
-        db_table = "runs"
+        db_table = "studio_sessions"
         verbose_name_plural = db_table
 
 
