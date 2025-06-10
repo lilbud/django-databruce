@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 from . import models
 
@@ -50,6 +51,23 @@ class UserAttendedShowsAdmin(admin.ModelAdmin):
     list_select_related = ["user", "event"]
     list_display = ["user__username", "event"]
     list_display_links = ["user__username", "event"]
+
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class AuthUserAdmin(admin.ModelAdmin):
+    search_fields = ["username"]
+    list_display = (
+        "username",
+        "email",
+        "first_name",
+        "is_active",
+        "is_staff",
+        "last_login",
+        "date_joined",
+    )
 
 
 @admin.register(models.Bands)
