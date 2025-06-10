@@ -48,6 +48,8 @@ class ArchiveAdmin(admin.ModelAdmin):
 class UserAttendedShowsAdmin(admin.ModelAdmin):
     search_fields = ["user", "event"]
     list_select_related = ["user", "event"]
+    list_display = ["user__username", "event"]
+    list_display_links = ["user__username", "event"]
 
 
 @admin.register(models.Bands)
