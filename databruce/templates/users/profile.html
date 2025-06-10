@@ -8,7 +8,6 @@
       <div class="row mb-4">
         <div class="col">
           <h4>Your Profile</h4>
-          {{ user.groups }}
         </div>
       </div>
       <div class="card">
@@ -50,6 +49,7 @@
                       <th class="min-tablet-l" scope="col">Location</th>
                       <th class="min-tablet-l" scope="col">Tour</th>
                       <th class="desktop" scope="col">Detail</th>
+                      <th class="desktop" scope="col">Remove Show</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -82,6 +82,18 @@
                               {{ event.type }}/{{ event.note|default_if_none:'' }}
                             {% else %}
                               {{ event.title|default_if_none:'' }}
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if user.is_authenticated %}
+                              <form method="post" action="{% url "remove_show" %}">
+                                <input type="hidden" name="event" value="{{ event.id }}">
+                                {% csrf_token %}
+                                <button id="submit-button"
+                                        type="submit"
+                                        name="submit"
+                                        class="btn btn-sm btn-danger">Remove Show from Profile</button>
+                              </form>
                             {% endif %}
                           </td>
                         </tr>

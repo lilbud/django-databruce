@@ -1,18 +1,36 @@
 import datetime
+import logging
 from typing import Any
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.tokens import (
+    PasswordResetTokenGenerator,
+    default_token_generator,
+)
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Case, Count, F, Max, Q, Sum, Value, When
 from django.forms import formset_factory
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views import View
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 
 from . import forms, models
+
+UserModel = get_user_model()
+logger = logging.getLogger("django.contrib.auth")
+INTERNAL_RESET_SESSION_TOKEN = "_password_reset_token"
 
 
 class Index(TemplateView):
@@ -97,17 +115,6 @@ class UserProfile(TemplateView):
         return context
 
 
-import logging
-
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMultiAlternatives
-from django.template import loader
-
-logger = logging.getLogger("django.contrib.auth")
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-
-
 @method_decorator(
     login_not_required,
     name="dispatch",
@@ -189,19 +196,6 @@ class SignUp(TemplateView):
             )
 
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.http import urlsafe_base64_decode
-from django.views.decorators.cache import never_cache
-from django.views.decorators.debug import sensitive_post_parameters
-
-UserModel = get_user_model()
-
-INTERNAL_RESET_SESSION_TOKEN = "_password_reset_token"
-
-
 class SignUpConfirm(TemplateView):
     template_name = "users/signup_done.html"
     reset_url_token = "activate"
@@ -226,8 +220,9 @@ class SignUpConfirm(TemplateView):
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
         if "uidb64" not in kwargs or "token" not in kwargs:
+            msg = "The URL path must contain 'uidb64' and 'token' parameters."
             raise ImproperlyConfigured(
-                "The URL path must contain 'uidb64' and 'token' parameters.",
+                msg,
             )
 
         self.validlink = False
@@ -283,6 +278,20 @@ class UserAddShow(View):
             user_id=request.user.id,
             event_id=request.POST["event"],
         )
+
+        print(f"{request.POST['event']} added to user profile")
+
+        return redirect(
+            request.META.get("HTTP_REFERER", "redirect_if_referer_not_found"),
+        )
+
+
+class UserRemoveShow(View):
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        models.UserAttendedShows.objects.filter(
+            user_id=request.user.id,
+            event_id=request.POST["event"],
+        ).delete()
 
         print(f"{request.POST['event']} added to user profile")
 
