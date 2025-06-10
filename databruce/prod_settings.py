@@ -54,7 +54,7 @@ SECURE_HSTS_PRELOAD = True
 
 # Application definition
 INSTALLED_APPS = [
-    # "django.contrib.admin",  # required
+    "django.contrib.admin",  # required
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
