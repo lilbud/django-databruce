@@ -21,7 +21,7 @@ urlpatterns = [
         name="login",
     ),
     path(
-        "accounts/profile/",
+        "accounts/profile/<str:username>",
         views.UserProfile.as_view(),
         name="profile",
     ),

@@ -7,7 +7,11 @@
     <div class="col col-lg-8">
       <div class="row mb-4">
         <div class="col">
-          <h4>Your Profile</h4>
+          {% if user_info.username == user.username %}
+            <h4>Your Profile</h4>
+          {% else %}
+            <h4>{{ user_info.username|title }}'s Profile</h4>
+          {% endif %}
         </div>
       </div>
       <div class="card">

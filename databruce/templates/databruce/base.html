@@ -188,7 +188,8 @@
                   </h6>
                 </li>
                 <li>
-                  <a class="dropdown-item sky-500"  href="{% url "profile" %}">View Profile</a>
+                  <a class="dropdown-item sky-500"
+                     href="{% url "profile" username=user.username %}">View Profile</a>
                 </li>
                 {% if user.is_superuser %}
                   <li>
