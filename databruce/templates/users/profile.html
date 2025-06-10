@@ -81,14 +81,14 @@
                               <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                             {% endif %}
                           </td>
-                          <td class="text-wrap">
+                          <td class="text-nowrap">
                             {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
                               {{ event.type }}/{{ event.note|default_if_none:'' }}
                             {% else %}
                               {{ event.title|default_if_none:'' }}
                             {% endif %}
                           </td>
-                          <td>
+                          <td class="text-nowrap">
                             {% if user.is_authenticated %}
                               <form method="post" action="{% url "remove_show" %}">
                                 <input type="hidden" name="event" value="{{ event.id }}">
