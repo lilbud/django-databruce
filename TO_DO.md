@@ -1,9 +1,14 @@
 # Digital Ocean Stuff to Fix:
-- search looks like hell on mobile
-- actually, check every page on mobile
-- logout not working?
-- sort out static files hosting?
+<!-- - search looks like hell on mobile -->
+<!-- - actually, check every page on mobile -->
+<!-- - logout not working? -->
+<!-- - sort out static files hosting? -->
 - get registration and email working
+  - have to purchase porkbun email, as DO blocks all SMTP email ports for security reasons
+- flesh out user profile, add personal info and ability for user to edit that.
+- add users page with table so people can find other pages
+- look into "friends" with profiles?
+
 
 # Pages to add:
 <!-- - Event Run Details
