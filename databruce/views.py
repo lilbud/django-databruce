@@ -93,10 +93,10 @@ class UserProfile(TemplateView):
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["user_info"] = models.AuthUser.objects.get(
-            username=self.kwargs["username"],
+            username__iexact=self.kwargs["username"],
         )
         context["user_shows"] = models.UserAttendedShows.objects.filter(
-            user__username=self.kwargs["username"],
+            user__username__iexact=self.kwargs["username"],
         ).select_related("event")
 
         context["user_songs"] = (
