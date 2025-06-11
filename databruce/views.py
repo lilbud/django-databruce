@@ -94,7 +94,7 @@ class Users(TemplateView):
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        context["users"] = models.AuthUser.objects.all()
+        context["users"] = models.AuthUser.objects.filter(is_active=True)
 
         return context
 
