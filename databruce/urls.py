@@ -85,11 +85,11 @@ urlpatterns = [
         views.SignUp.as_view(),
         name="signup",
     ),
-    # path(
-    #     "accounts/create/",
-    #     views.SignUpConfirm.as_view(),
-    #     name="signup_confirm",
-    # ),
+    path(
+        "users",
+        views.Users.as_view(),
+        name="users",
+    ),
     path("events", views.Event.as_view(), name="events"),
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),

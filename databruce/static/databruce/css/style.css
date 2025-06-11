@@ -84,7 +84,7 @@ a:hover {
 }
 
 .invisible {
-    visibility: hidden !important;
+    display: none !important;
 }
 
 div.ui-menu-item-wrapper {

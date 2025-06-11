@@ -42,7 +42,13 @@
         <div class="card-body">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
-              <h6>A list of every show you've seen</h6>
+              <h6>
+                {% if user_info.username == user.username %}
+                  Shows that you have seen
+                {% else %}
+                  Shows that {{ user_info.username|title }} has seen
+                {% endif %}
+              </h6>
               <div class="table-responsive">
                 <table class="table table-sm display" id="eventTable">
                   <thead>
@@ -108,7 +114,13 @@
               </div>
             </div>
             <div id="songs" class="tab-pane fade">
-              <h6>A list of every song that you've seen live in concert</h6>
+              <h6>
+                {% if user_info.username == user.username %}
+                  Songs that you have seen
+                {% else %}
+                  Songs that {{ user_info.username|title }} has seen
+                {% endif %}
+              </h6>
               <div class="table-responsive">
                 <table class="table table-sm display" id="songTable">
                   <thead>

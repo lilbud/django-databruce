@@ -541,3 +541,44 @@ class UserForm(UserCreationForm):
             "password1",
             "password2",
         ]
+
+
+class UpdateUserForm(forms.ModelForm):
+    def __init__(self, *args: dict, **kwargs: dict) -> None:
+        """Initialize form."""
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.add_input(
+            Submit("submit", "Update", css_class="btn btn-sm btn-success"),
+        )
+
+    username = forms.CharField(
+        label="Username:",
+        widget=forms.TextInput(
+            attrs={
+                "id": "username",
+                "type": "text",
+                "name": "username",
+                "class": "form-control mb-3",
+            },
+        ),
+    )
+
+    email = forms.EmailField(
+        label="Email:",
+        max_length=254,
+        widget=forms.EmailInput(
+            attrs={
+                "autocomplete": "email",
+                "id": "email",
+                "type": "email",
+                "name": "email",
+                "class": "form-control mb-3",
+            },
+        ),
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "email"]

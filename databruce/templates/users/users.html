@@ -1,0 +1,48 @@
+{% extends "databruce/category.html" %}
+{% block title %}
+  Users
+{% endblock title %}
+{% block info_row %}
+  <h4>Users</h4>
+  <h6>All active users on the site.</h6>
+{% endblock info_row %}
+{% block table_id %}
+  userTable
+{% endblock table_id %}
+{% block table %}
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user_data in users %}
+      <tr>
+        <td>
+          <a class="sky-500"
+             href="{% url "profile" username=user_data.username %}">{{ user_data.username }}</a>
+        </td>
+        <td>
+          {% if user_data.is_staff %}
+            Staff
+          {% else %}
+            User
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock table %}
+{% block scripts %}
+  <script>
+      // removes searchBuilder button, not needed for this.
+      layout.topEnd.features[1].buttons.pop();
+
+    $(document).ready(function () {
+        new DataTable('#userTable', {
+            layout: layout,
+        })
+    });
+  </script>
+{% endblock scripts %}

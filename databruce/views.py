@@ -2,6 +2,7 @@ import datetime
 import logging
 from typing import Any
 
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import Group, User
@@ -56,11 +57,11 @@ class Index(TemplateView):
         ).order_by("-id")[:5]
 
         context["recent"] = self.queryset.filter(
-            date__lt=self.date,
+            date__lte=self.date,
         ).order_by("-id")[:5]
 
         context["upcoming"] = self.queryset.filter(
-            date__gte=self.date,
+            date__gt=self.date,
         ).order_by("id")[:5]
 
         context["latest_show"] = (
@@ -84,6 +85,17 @@ class Song(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["songs"] = self.queryset
+        return context
+
+
+class Users(TemplateView):
+    template_name = "users/users.html"
+
+    def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["users"] = models.AuthUser.objects.all()
+
         return context
 
 
@@ -161,10 +173,6 @@ class SignUp(TemplateView):
             }
 
             self.send_mail(context=context, from_email=None, to_email=user.email)
-
-            # user_group = User.objects.get(username=user.username)
-            # group = Group.objects.get(name="Users")
-            # user_group.groups.add(group)
 
             return redirect(reverse("login"))
 
@@ -263,9 +271,24 @@ class SignUpConfirm(TemplateView):
 
 class UserSettings(TemplateView):
     template_name = "users/settings.html"
+    form_class = forms.UpdateUserForm
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
-        return super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form_class(instance=self.request.user)
+
+        return context
+
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
+        user_form = self.form_class(request.POST, instance=request.user)
+
+        if user_form.is_valid():
+            user_form.save()
+            messages.success(request, "Your profile is updated successfully")
+            return redirect(reverse("settings"))
+
+        messages.error(request, f"Error: {user_form.errors}")
+        return redirect(reverse("settings"))
 
 
 class SignUpDone(TemplateView):
