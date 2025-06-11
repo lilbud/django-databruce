@@ -135,9 +135,6 @@ class EventAdmin(admin.ModelAdmin):
         "venue",
         "artist",
         "tour",
-        "run",
-        "leg",
-        "nugs_id",
     ]
     list_display = ["id", "date", "venue"]
     list_display_links = ["id", "venue"]
