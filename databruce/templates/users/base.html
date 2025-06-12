@@ -47,42 +47,43 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
-		{% if 'login' not in request.path and 'logout' not in request.path %}
-                  <a class="nav-link dropdown-toggle"
-                     href="#"
-                     role="button"
-                     data-bs-toggle="dropdown"
-                     aria-expanded="false">Profile</a>
-		  <ul class="dropdown-menu">
-                    <li>
-                      <h6 class="dropdown-header">
-                        Hello {{ user }}
-                        {% if user.is_staff %}
-                          (Admin)
-                        {% else %}
-                          (User)
-                        {% endif %}
-                      </h6>
-                    </li>
-                    <li>
-                      <a class="dropdown-item sky-500"  href="{% url "profile" username=user.username %}">View Profile</a>
-                    </li>
-                    {% if user.is_superuser %}
+                  {% if 'login' not in request.path and 'logout' not in request.path %}
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">Profile</a>
+                    <ul class="dropdown-menu">
                       <li>
-                        <a class="dropdown-item sky-500" href="{% url "admin:index" %}">Admin Portal</a>
+                        <h6 class="dropdown-header">
+                          Hello {{ user }}
+                          {% if user.is_staff %}
+                            (Admin)
+                          {% else %}
+                            (User)
+                          {% endif %}
+                        </h6>
                       </li>
-                    {% endif %}
-                    <li>
-                      <a class="dropdown-item sky-500"  href="{% url "settings" %}">Settings</a>
-                    </li>
-                    <li>
-                      <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <a class="dropdown-item sky-500" id="logout" type="submit">Logout</a>
-                      </form>
-                    </li>
-                  </ul>
-		{% endif %}
+                      <li>
+                        <a class="dropdown-item sky-500"
+                           href="{% url "profile" username=user.username %}">View Profile</a>
+                      </li>
+                      {% if user.is_superuser %}
+                        <li>
+                          <a class="dropdown-item sky-500" href="{% url "admin:index" %}">Admin Portal</a>
+                        </li>
+                      {% endif %}
+                      <li>
+                        <a class="dropdown-item sky-500"  href="{% url "settings" %}">Settings</a>
+                      </li>
+                      <li>
+                        <form method="post" action="{% url 'logout' %}">
+                          {% csrf_token %}
+                          <a class="dropdown-item sky-500" id="logout" type="submit">Logout</a>
+                        </form>
+                      </li>
+                    </ul>
+                  {% endif %}
                 </li>
               </ul>
             </div>

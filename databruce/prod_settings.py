@@ -112,6 +112,23 @@ TEMPLATES = [
     },
 ]
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+        "logfile": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR + "/../django_logfile",
+        },
+    },
+    "root": {"level": "INFO", "handlers": ["console", "logfile"]},
+}
+
 WSGI_APPLICATION = "databruce.wsgi.application"
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
