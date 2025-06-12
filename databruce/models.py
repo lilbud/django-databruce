@@ -1432,3 +1432,29 @@ class UserAttendedShows(models.Model):
         db_table = "user_attended_shows"
         verbose_name_plural = db_table
         unique_together = ("user", "event")
+
+
+class Guests(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    setlist = models.ForeignKey(
+        to=Setlists,
+        on_delete=models.DO_NOTHING,
+        db_column="setlist_id",
+    )
+
+    guest = models.ForeignKey(
+        to=Relations,
+        on_delete=models.DO_NOTHING,
+        db_column="guest_id",
+    )
+
+    event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
+    note = models.TextField(blank=True, null=True)  # noqa: DJ001
+    updated_at = models.DateTimeField(auto_now_add=True, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+
+    class Meta:
+        managed = False
+        db_table = "guests"
+        verbose_name_plural = db_table

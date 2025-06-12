@@ -30,6 +30,8 @@ class SetlistInline(admin.TabularInline):
         "song_note",
         "premiere",
         "debut",
+        "sign_request",
+        "instrumental",
     ]  # Specify the fields you want to include
     fk_name = "event"
     ordering = ("song_num",)
@@ -65,6 +67,14 @@ class BandAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
+
+
+@admin.register(models.Guests)
+class GuestAdmin(admin.ModelAdmin):
+    autocomplete_fields = ["setlist", "guest", "event"]
+    search_fields = ["guest__name"]
+    list_display = ["setlist__id", "setlist__song", "guest__name"]
+    list_select_related = ["setlist", "guest"]
 
 
 @admin.register(models.Bootlegs)
