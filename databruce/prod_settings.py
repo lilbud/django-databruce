@@ -121,16 +121,16 @@ LOGGING = {
             "class": "logging.StreamHandler",
         },
         "logfile": {
-            "level": "DEBUG",
+            "level": "WARNING",
             "class": "logging.FileHandler",
             "filename": Path(BASE_DIR, "django_logfile"),
         },
     },
-    "root": {"level": "INFO", "handlers": ["console", "logfile"]},
+    "root": {"level": "WARNING", "handlers": ["console", "logfile"]},
     "loggers": {
         "django": {
             "handlers": ["console", "logfile"],
-            "level": "DEBUG",
+            "level": "WARNING",
             "propagate": True,
         },
     },
