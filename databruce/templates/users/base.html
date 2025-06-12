@@ -47,12 +47,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
+		{% if 'login' not in request.path and 'logout' not in request.path %}
                   <a class="nav-link dropdown-toggle"
                      href="#"
                      role="button"
                      data-bs-toggle="dropdown"
                      aria-expanded="false">Profile</a>
-                  <ul class="dropdown-menu">
+		  <ul class="dropdown-menu">
                     <li>
                       <h6 class="dropdown-header">
                         Hello {{ user }}
@@ -64,7 +65,7 @@
                       </h6>
                     </li>
                     <li>
-                      <a class="dropdown-item sky-500"  href="{% url "profile" %}">View Profile</a>
+                      <a class="dropdown-item sky-500"  href="{% url "profile" username=user.username %}">View Profile</a>
                     </li>
                     {% if user.is_superuser %}
                       <li>
@@ -81,6 +82,7 @@
                       </form>
                     </li>
                   </ul>
+		{% endif %}
                 </li>
               </ul>
             </div>

@@ -84,7 +84,7 @@ a:hover {
 }
 
 .invisible {
-    visibility: hidden !important;
+    display: none !important;
 }
 
 div.ui-menu-item-wrapper {
@@ -197,4 +197,8 @@ tr th {
     background-color: none !important;
     color: var(--sky-500) !important;
     border: 1px solid var(--sky-500) !important;
+}
+
+#yearstats #statChart {
+    aspect-ratio: 2;
 }
