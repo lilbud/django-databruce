@@ -127,6 +127,13 @@ LOGGING = {
         },
     },
     "root": {"level": "INFO", "handlers": ["console", "logfile"]},
+    "loggers": {
+        "django": {
+            "handlers": ["console", "logfile"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
 }
 
 WSGI_APPLICATION = "databruce.wsgi.application"
