@@ -569,15 +569,13 @@ class SongDetail(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        self.song = (
+        context["song_info"] = (
             models.Songs.objects.filter(id=self.kwargs["id"])
             .prefetch_related(
                 "album",
             )
             .first()
         )
-
-        context["song_info"] = self.song
 
         context["songs"] = (
             models.SongsPage.objects.filter(
@@ -602,13 +600,14 @@ class SongDetail(TemplateView):
             )
         )
 
-        context["snippets"] = (
-            models.Snippets.objects.filter(
-                snippet=self.kwargs["id"],
+        if context["song_info"].num_plays_snippet > 0:
+            context["snippets"] = (
+                models.Snippets.objects.filter(
+                    snippet=self.kwargs["id"],
+                )
+                .select_related("setlist", "event", "snippet", "setlist__song")
+                .order_by("event", "position")
             )
-            .select_related("setlist", "event", "snippet", "setlist__song")
-            .order_by("event", "position")
-        )
 
         filter = Q(event_certainty__in=["Confirmed", "Probable"])
 
@@ -621,23 +620,23 @@ class SongDetail(TemplateView):
             "Post-Show",
         ]
 
-        context["year_stats"] = (
-            models.Setlists.objects.filter(song_id=self.kwargs["id"])
-            .annotate(
-                year=TruncYear("event__date"),
-            )
-            .values("year")
-            .annotate(
-                event_count=Count(
-                    "event_id",
-                    distinct=True,
-                    filter=Q(set_name__in=valid_set_names),
-                ),
-            )
-            .order_by("year")  # 4. Order the results by year
-        )
-
         if context["song_info"].num_plays_public > 0:
+            context["year_stats"] = (
+                models.Setlists.objects.filter(song_id=self.kwargs["id"])
+                .annotate(
+                    year=TruncYear("event__date"),
+                )
+                .values("year")
+                .annotate(
+                    event_count=Count(
+                        "event_id",
+                        distinct=True,
+                        filter=Q(set_name__in=valid_set_names),
+                    ),
+                )
+                .order_by("year")
+            )
+
             filter.add(
                 Q(
                     id__gt=context["song_info"].first.id,

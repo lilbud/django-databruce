@@ -134,7 +134,8 @@
       <div class="card">
         <div class="card-header text-nowrap">
           <ul class="nav nav-pills nav-fill nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <li class="nav-item {% if snippets or year_stats %}me-1 me-lg-2{% endif %} mb-2 mb-lg-0"
+                role="presentation">
               <button class="nav-link active"
                       id="pills-events-tab"
                       data-bs-toggle="pill"
@@ -144,26 +145,30 @@
                       aria-controls="pills-home"
                       aria-selected="true">Performances</button>
             </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-snippets-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#snippets"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Times as Snippet</button>
-            </li>
-            <li class="nav-item mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-stats-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#yearstats"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-yearstats"
-                      aria-selected="false">Stats By Year</button>
-            </li>
+            {% if snippets %}
+              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link"
+                        id="pills-snippets-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#snippets"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-profile"
+                        aria-selected="false">Times as Snippet</button>
+              </li>
+            {% endif %}
+            {% if year_stats %}
+              <li class="nav-item mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link"
+                        id="pills-stats-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#yearstats"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-yearstats"
+                        aria-selected="false">Stats By Year</button>
+              </li>
+            {% endif %}
           </ul>
         </div>
         <div class="card-body">
@@ -246,66 +251,47 @@
                 </table>
               </div>
             </div>
-            <div id="snippets" class="tab-pane fade">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="snippetTable">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Song</th>
-                      <th>Position</th>
-                      <th>Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for snippet in snippets %}
+            {% if snippets %}
+              <div id="snippets" class="tab-pane fade">
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="snippetTable">
+                    <thead>
                       <tr>
-                        <td>
-                          <a href="{% url "event_details" id=snippet.event.id %}">{{ snippet.event }}</a>
-                        </td>
-                        <td>
-                          <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
-                        </td>
-                        <td>{{ snippet.position }}</td>
-                        <td>{{ snippet.note|default_if_none:"" }}</td>
+                        <th>Event</th>
+                        <th>Song</th>
+                        <th>Position</th>
+                        <th>Note</th>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {% for snippet in snippets %}
+                        <tr>
+                          <td>
+                            <a href="{% url "event_details" id=snippet.event.id %}">{{ snippet.event }}</a>
+                          </td>
+                          <td>
+                            <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
+                          </td>
+                          <td>{{ snippet.position }}</td>
+                          <td>{{ snippet.note|default_if_none:"" }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-            <div id="yearstats" class="tab-pane fade">
-              <div class="row justify-content-center">
-                <div id="wrapper" class="p-0">
-                  <div id="statChart">
-                    <canvas id="chart"></canvas>
+            {% endif %}
+            {% if year_stats %}
+              <div id="yearstats" class="tab-pane fade">
+                <div class="row justify-content-center">
+                  <div id="wrapper" class="p-0">
+                    <div id="statChart">
+                      <canvas id="chart"></canvas>
+                    </div>
                   </div>
                 </div>
               </div>
-              {% comment %} <div style="width: 100%; overflow-x: auto; overflow-y: hidden">
-                <div style="width: 3000px; height: 300px">
-                  <canvas id="chart1" height="300" width="0"></canvas>
-                </div>
-              </div> {% endcomment %}
-              {% comment %} <div class="table-responsive">
-                <table class="table table-hover display" id="statsTable">
-                  <thead>
-                    <tr>
-                      <th>Year</th>
-                      <th>Count</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for year in year_stats %}
-                      <tr>
-                        <td>{{ year.year|date:"Y" }}</td>
-                        <td>{{ year.event_count }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div> {% endcomment %}
-            </div>
+            {% endif %}
           </div>
         </div>
       </div>
