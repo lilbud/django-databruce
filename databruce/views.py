@@ -1252,11 +1252,11 @@ class CityDetail(TemplateView):
             models.Events.objects.filter(venue__city=self.city.id)
             .select_related(
                 "venue__city",
-                "venue__city__state",
                 "venue__city__country",
                 "artist",
                 "tour",
             )
+            .prefetch_related("venue__city__state")
             .order_by("id")
         )
         context["venues"] = models.Venues.objects.filter(city__id=self.city.id)
