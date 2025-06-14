@@ -1023,7 +1023,7 @@ class Setlists(models.Model):
         ordering = ("-event_id", "song_num")
 
     def __str__(self) -> str:
-        return f"{self.event} - {self.set_name} - {self.song}"
+        return f"{self.event} - {self.set_name} - {self.song} ({self.id})"
 
 
 class SetlistsBySetAndDate(models.Model):
