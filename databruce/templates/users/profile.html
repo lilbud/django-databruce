@@ -40,10 +40,10 @@
             </li>
           </ul>
         </div>
-        <div class="card-body">
+        <div class="card-body px-0">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
-              <h6>
+              <h6 class="ms-3">
                 {% if user_info.username == user.username %}
                   Shows that you have seen
                 {% else %}
@@ -115,7 +115,7 @@
               </div>
             </div>
             <div id="songs" class="tab-pane fade">
-              <h6>
+              <h6 class="ms-3">
                 {% if user_info.username == user.username %}
                   Songs that you have seen
                 {% else %}
@@ -184,11 +184,11 @@
             </li>
           </ul>
         </div>
-        <div class="card-body">
+        <div class="card-body px-0">
           <div class="tab-content">
             <div id="mostplayed" class="tab-pane show active fade">
               <div class="row mb-2">
-                <h6>Most commonly played songs not seen</h6>
+                <h6 class="ms-3">Most commonly played songs not seen</h6>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover display" id="notSeenTable">
@@ -213,7 +213,7 @@
             </div>
             <div id="rare" class="tab-pane fade">
               <div class="row mb-2">
-                <h6>Songs seen with 100 plays or less</h6>
+                <h6 class="ms-3">Songs seen with 100 plays or less</h6>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover display" id="rareTable">
