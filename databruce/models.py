@@ -20,8 +20,8 @@ class ArchiveLinks(models.Model):
     )
 
     url = models.TextField(blank=True, null=True, db_column="archive_url")  # noqa: DJ001
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -62,7 +62,7 @@ class AuthPermission(models.Model):
 class AuthUser(models.Model):
     id = models.BigAutoField(primary_key=True)
     password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(auto_now_add=True, blank=True)
+    last_login = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     is_superuser = models.BooleanField()
     username = models.CharField(unique=True, max_length=150)
     first_name = models.CharField(max_length=150)
@@ -125,8 +125,8 @@ class Bands(models.Model):
 
     springsteen_band = models.BooleanField()
     mbid = models.TextField(blank=True, default=None)
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -170,8 +170,8 @@ class Bootlegs(models.Model):
         blank=True,
         default=None,
     )
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -240,8 +240,8 @@ class Cities(models.Model):
         default=None,
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -265,8 +265,8 @@ class Continents(models.Model):
     name = models.TextField(blank=True, default=None, db_column="continent_name")
     num_events = models.IntegerField(default=0)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -314,8 +314,8 @@ class Countries(models.Model):
         default=None,
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -339,8 +339,8 @@ class Covers(models.Model):
         default=None,
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -462,8 +462,8 @@ class Venues(models.Model):
         default=None,
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -635,8 +635,8 @@ class Events(models.Model):
         db_column="nugs_id",
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -664,8 +664,8 @@ class NugsReleases(models.Model):
     thumbnail = models.TextField(blank=True, default=None, db_column="thumbnail_url")
     name = models.TextField(blank=True, default=None)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -730,8 +730,8 @@ class Relations(models.Model):
 
     instruments = models.TextField(blank=True, default=None)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -772,8 +772,8 @@ class Onstage(models.Model):
     note = models.TextField(blank=True, default=None)
     guest = models.BooleanField(default=False)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -806,8 +806,8 @@ class ReleaseTracks(models.Model):
         default=None,
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -832,8 +832,8 @@ class Releases(models.Model):
         related_name="release_event",
         db_column="event_id",
     )
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -937,8 +937,8 @@ class Songs(models.Model):
     )
 
     aliases = models.TextField(blank=True, default=None)
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1012,8 +1012,8 @@ class Setlists(models.Model):
 
     sign_request = models.BooleanField(default=False)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1070,8 +1070,8 @@ class Snippets(models.Model):
     position = models.IntegerField(db_column="snippet_pos")
     note = models.TextField(blank=True, default=None, db_column="snippet_note")
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1139,8 +1139,8 @@ class States(models.Model):
         db_column="last_played",
     )
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1166,8 +1166,8 @@ class Tags(models.Model):
     )
     tags = models.TextField(blank=True, default=None)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1208,8 +1208,8 @@ class Tours(models.Model):
     num_songs = models.IntegerField(default=0)
     num_legs = models.IntegerField(default=0)
 
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1342,8 +1342,8 @@ class Runs(models.Model):
     name = models.TextField()
     num_shows = models.IntegerField(blank=True, null=True)
     num_songs = models.IntegerField(blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     first = models.ForeignKey(
         Events,
@@ -1382,13 +1382,14 @@ class StudioSessions(models.Model):
     name = models.TextField()
     num_events = models.IntegerField(blank=True, null=True)
     num_songs = models.IntegerField(blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     first = models.ForeignKey(
         Events,
         models.DO_NOTHING,
-        db_column="session_first_event",
+        db_column="first_event",
+        related_name="session_first_event",
         blank=True,
         null=True,
     )
@@ -1424,8 +1425,8 @@ class UserAttendedShows(models.Model):
         db_column="user_id",
     )
     event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
-    updated_at = models.DateTimeField(auto_now_add=True, blank=False)
-    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1451,8 +1452,8 @@ class Guests(models.Model):
 
     event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
     note = models.TextField(blank=True, null=True)  # noqa: DJ001
-    updated_at = models.DateTimeField(auto_now_add=True, blank=False)
-    created_at = models.DateTimeField(auto_now_add=True, blank=False)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         managed = False

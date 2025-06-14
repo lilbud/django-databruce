@@ -54,14 +54,6 @@ class UserAttendedShowsAdmin(admin.ModelAdmin):
     list_display_links = ["user__username", "event"]
 
 
-# admin.site.unregister(User)
-
-
-# @admin.register(User)
-# class AuthUserAdmin(admin.ModelAdmin):
-#     search_fields = ["username"]
-
-
 @admin.register(models.Bands)
 class BandAdmin(admin.ModelAdmin):
     search_fields = ["name"]
@@ -72,7 +64,7 @@ class BandAdmin(admin.ModelAdmin):
 @admin.register(models.Guests)
 class GuestAdmin(admin.ModelAdmin):
     autocomplete_fields = ["setlist", "guest", "event"]
-    search_fields = ["guest__name"]
+    search_fields = ["guest__name", "setlist__id"]
     list_display = ["setlist__id", "setlist__song", "guest__name"]
     list_select_related = ["setlist", "guest"]
 

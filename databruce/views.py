@@ -13,7 +13,17 @@ from django.contrib.auth.tokens import (
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import Case, Count, F, Max, Q, Sum, Value, When
+from django.db.models import (
+    Case,
+    Count,
+    F,
+    Max,
+    Min,
+    Q,
+    Sum,
+    Value,
+    When,
+)
 from django.db.models.functions import TruncYear
 from django.forms import formset_factory
 from django.http import HttpRequest
@@ -104,28 +114,52 @@ class UserProfile(TemplateView):
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+
         context["user_info"] = models.AuthUser.objects.get(
             username__iexact=self.kwargs["username"],
         )
+
         context["user_shows"] = models.UserAttendedShows.objects.filter(
             user__username__iexact=self.kwargs["username"],
-        ).select_related("event")
+        ).select_related("event", "event__tour", "event__venue")
 
-        context["user_songs"] = (
-            models.Setlists.objects.filter(
-                event__id__in=context["user_shows"].values_list("event__id"),
-                set_name__in=[
-                    "Show",
-                    "Set 1",
-                    "Set 2",
-                    "Encore",
-                    "Pre-Show",
-                    "Post-Show",
-                ],
+        context["user_songs"] = models.Setlists.objects.filter(
+            event__id__in=context["user_shows"].values_list("event__id"),
+            set_name__in=[
+                "Show",
+                "Set 1",
+                "Set 2",
+                "Encore",
+                "Pre-Show",
+                "Post-Show",
+            ],
+        ).select_related("song")
+
+        context["user_seen"] = (
+            context["user_songs"]
+            .values("song__id")
+            .annotate(
+                songid=F("song__id"),
+                name=F("song__name"),
+                count=Count("event"),
+                first=Min("event"),
+                firstdate=Min("event__date"),
             )
-            .select_related("song")
-            .order_by("song__id")
+            .order_by("-count", "name")
         )
+
+        context["user_not_seen"] = (
+            models.Songs.objects.exclude(
+                id__in=context["user_songs"].values_list("song__id"),
+            )
+            .filter(num_plays_public__gte=100)
+            .order_by("-num_plays_public")
+        )
+
+        context["user_rare_songs"] = models.Songs.objects.filter(
+            id__in=context["user_songs"].values("song__id"),
+            num_plays_public__lte=100,
+        ).order_by("num_plays_public")
 
         return context
 
@@ -762,7 +796,7 @@ class TourDetail(TemplateView):
                 event__tour__id=self.tour.id,
             )
             .values(
-                "song_id",
+                "song__id",
             )
             .annotate(
                 plays=Count("event_id"),
@@ -796,6 +830,63 @@ class TourDetail(TemplateView):
                 "song_id",
             )
         )
+
+        context["slots"] = (
+            models.Setlists.objects.filter(
+                event__tour__id=self.tour.id,
+                position__isnull=False,
+            )
+            .values("event__id")
+            .annotate(
+                event_date=F("event__date"),
+                show_opener_id=Min(
+                    Case(
+                        When(position="Show Opener", then=F("song")),
+                    ),
+                ),
+                show_opener_name=Min(
+                    Case(
+                        When(position="Show Opener", then=F("song__name")),
+                    ),
+                ),
+                main_set_closer_id=Min(
+                    Case(
+                        When(position="Main Set Closer", then=F("song")),
+                    ),
+                ),
+                main_set_closer_name=Min(
+                    Case(
+                        When(position="Main Set Closer", then=F("song__name")),
+                    ),
+                ),
+                encore_opener_id=Min(
+                    Case(
+                        When(position="Encore Opener", then=F("song")),
+                    ),
+                ),
+                encore_opener_name=Min(
+                    Case(
+                        When(position="Encore Opener", then=F("song__name")),
+                    ),
+                ),
+                show_closer_id=Min(
+                    Case(
+                        When(
+                            position="Show Closer",
+                            then=F("song"),
+                        ),
+                    ),
+                ),
+                show_closer_name=Min(
+                    Case(
+                        When(
+                            position="Show Closer",
+                            then=F("song__name"),
+                        ),
+                    ),
+                ),
+            )
+        ).order_by("event")
 
         return context
 

@@ -1,9 +1,10 @@
 {% extends "databruce/base.html" %}
+{% load filters %}
 {% block title %}
   Profile
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
+  <div class="row justify-content-center mb-3">
     <div class="col col-lg-8">
       <div class="row mb-4">
         <div class="col">
@@ -50,7 +51,7 @@
                 {% endif %}
               </h6>
               <div class="table-responsive">
-                <table class="table table-sm display" id="eventTable">
+                <table class="table table-hover display" id="eventTable">
                   <thead>
                     <tr>
                       <th class="all" scope="col">Date</th>
@@ -122,7 +123,75 @@
                 {% endif %}
               </h6>
               <div class="table-responsive">
-                <table class="table table-sm display" id="songTable">
+                <table class="table table-hover display" id="songTable">
+                  <thead>
+                    <tr>
+                      <th>Song Name</th>
+                      <th class="text-center">Count</th>
+                      <th class="text-center">First Seen</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for song in user_seen %}
+                      <tr>
+                        <td>
+                          <a href="{% url "song_details" id=song.songid %}">{{ song.name }}</a>
+                        </td>
+                        <td class="text-center">{{ song.count }}</td>
+                        <td class="text-center">
+                          <a href="{% url "event_details" id=song.first %}">{{ song.firstdate|get_date:song.first }}</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col col-lg-8">
+      <div class="row mb-2">
+        <div class="col">
+          <h4>Stats</h4>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-pills nav-fill" role="tablist">
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link active"
+                      id="pills-events-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#mostplayed"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-home"
+                      aria-selected="true">Most Played Not Seen</button>
+            </li>
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-songs-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#rare"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Rare Songs</button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content">
+            <div id="mostplayed" class="tab-pane show active fade">
+              <div class="row mb-2">
+                <h6>Most commonly played songs not seen</h6>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover display" id="notSeenTable">
                   <thead>
                     <tr>
                       <th>Song Name</th>
@@ -130,13 +199,37 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% regroup user_songs by song as songs_list %}
-                    {% for song, list in songs_list %}
+                    {% for song in user_not_seen %}
                       <tr>
                         <td>
                           <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
                         </td>
-                        <td class="text-center">{{ list|length }}</td>
+                        <td class="text-center">{{ song.num_plays_public }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="rare" class="tab-pane fade">
+              <div class="row mb-2">
+                <h6>Songs seen with 100 plays or less</h6>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover display" id="rareTable">
+                  <thead>
+                    <tr>
+                      <th>Song Name</th>
+                      <th class="text-center">Event</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for song in user_rare_songs %}
+                      <tr>
+                        <td>
+                          <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
+                        </td>
+                        <td class="text-center">{{ song.num_plays_public }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -154,6 +247,7 @@
           
           new DataTable('#eventTable', {
               layout: layout,
+              order: [[0, 'asc']],
               pageLength: 25,
           });
 
@@ -162,6 +256,19 @@
 
           new DataTable('#songTable', {
               layout: layout,
+              order: [[0, 'asc']],
+              pageLength: 25,
+          });
+
+          new DataTable('#notSeenTable', {
+              layout: layout,
+              order: [[1, 'desc']],
+              pageLength: 25,
+          });
+          
+          new DataTable('#rareTable', {
+              layout: layout,
+              order: [[1, 'asc']],
               pageLength: 25,
           });
       })

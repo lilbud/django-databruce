@@ -46,7 +46,7 @@ def md_link(note: str):
 def get_date(date: datetime | None, event: str = ""):
     """Date to return if it is null or unknown."""
     if date:
-        return date.strftime("%Y-%m-%d")
+        return date.strftime("%Y-%m-%d [%a]")
 
     return f"{event[0:4]}-{event[4:6]}-{event[6:8]}"
 

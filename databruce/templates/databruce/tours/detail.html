@@ -44,6 +44,16 @@
                       aria-controls="pills-profile"
                       aria-selected="false">Songs</button>
             </li>
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-songs-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#slots"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Slots</button>
+            </li>
           </ul>
         </div>
         <div class="card-body px-0">
@@ -135,13 +145,52 @@
                     {% for song in songs %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "song_details" id=song.song_id %}">{{ song.name }}</a>
+                          <a href="{% url "song_details" id=song.song__id %}">{{ song.name }}</a>
                         </td>
                         <td class="text-center">{{ song.plays }}</td>
                         <td class="text-center">{{ song.show_opener }}</td>
                         <td class="text-center">{{ song.main_set_closer }}</td>
                         <td class="text-center">{{ song.encore_opener }}</td>
                         <td class="text-center">{{ song.show_closer }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="slots" class="tab-pane fade">
+              <div class="row mb-2">
+                <h4>Modelled after a similar feature from Dripfield.pro</h4>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover display" id="tourSlots">
+                  <thead>
+                    <tr>
+                      <th class="text-wrap all">Event</th>
+                      <th class="text-center all">Show Opener</th>
+                      <th class="text-center all">Main Set Closer</th>
+                      <th class="text-center all">Encore Opener</th>
+                      <th class="text-center all">Show Closer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for slot in slots %}
+                      <tr>
+                        <td class="text-nowrap">
+                          <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event_date|get_date:slot.event__id }}</a>
+                        </td>
+                        <td class="text-center">
+                          <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
+                        </td>
+                        <td class="text-center">
+                          <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
+                        </td>
+                        <td class="text-center">
+                          <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
+                        </td>
+                        <td class="text-center">
+                          <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
+                        </td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -159,7 +208,13 @@
     $(document).ready(function () {
       new DataTable('#tourEvents', {
         layout: layout,
+      });
 
+      layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
+
+      new DataTable('#tourSlots', {
+        layout: layout,
+        order: [[0, 'asc']],
       });
 
       // removes searchBuilder button, not needed for this.
@@ -174,6 +229,8 @@
         layout: layout,
         order: [[0, 'asc']],
       });
+
+
     });
 
   </script>
