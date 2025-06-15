@@ -18,7 +18,8 @@
       <div class="card">
         <div class="card-header">
           <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <li class="nav-item {% if user_songs %}me-1 me-lg-2{% endif %} mb-2 mb-lg-0"
+                role="presentation">
               <button class="nav-link active"
                       id="pills-events-tab"
                       data-bs-toggle="pill"
@@ -28,16 +29,18 @@
                       aria-controls="pills-home"
                       aria-selected="true">Shows</button>
             </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-songs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#songs"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
-            </li>
+            {% if user_songs %}
+              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link"
+                        id="pills-songs-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#songs"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-profile"
+                        aria-selected="false">Songs</button>
+              </li>
+            {% endif %}
           </ul>
         </div>
         <div class="card-body px-0">
@@ -152,95 +155,97 @@
       </div>
     </div>
   </div>
-  <div class="row justify-content-center">
-    <div class="col col-lg-8">
-      <div class="row mb-2">
-        <div class="col">
-          <h4>Stats</h4>
+  {% if user_songs %}
+    <div class="row justify-content-center">
+      <div class="col col-lg-8">
+        <div class="row mb-2">
+          <div class="col">
+            <h4>Stats</h4>
+          </div>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link active"
-                      id="pills-events-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#mostplayed"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-home"
-                      aria-selected="true">Most Played Not Seen</button>
-            </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-songs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#rare"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Rare Songs</button>
-            </li>
-          </ul>
-        </div>
-        <div class="card-body px-0">
-          <div class="tab-content">
-            <div id="mostplayed" class="tab-pane show active fade">
-              <div class="row mb-2">
-                <h6 class="ms-3">Most commonly played songs not seen</h6>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover display" id="notSeenTable">
-                  <thead>
-                    <tr>
-                      <th>Song Name</th>
-                      <th class="text-center">Count</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for song in user_not_seen %}
+        <div class="card">
+          <div class="card-header">
+            <ul class="nav nav-pills nav-fill" role="tablist">
+              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link active"
+                        id="pills-events-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#mostplayed"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-home"
+                        aria-selected="true">Most Played Not Seen</button>
+              </li>
+              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link"
+                        id="pills-songs-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#rare"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-profile"
+                        aria-selected="false">Rare Songs</button>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body px-0">
+            <div class="tab-content">
+              <div id="mostplayed" class="tab-pane show active fade">
+                <div class="row mb-2">
+                  <h6 class="ms-3">Most commonly played songs not seen</h6>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="notSeenTable">
+                    <thead>
                       <tr>
-                        <td>
-                          <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
-                        </td>
-                        <td class="text-center">{{ song.num_plays_public }}</td>
+                        <th>Song Name</th>
+                        <th class="text-center">Count</th>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {% for song in user_not_seen %}
+                        <tr>
+                          <td>
+                            <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
+                          </td>
+                          <td class="text-center">{{ song.num_plays_public }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-            <div id="rare" class="tab-pane fade">
-              <div class="row mb-2">
-                <h6 class="ms-3">Songs seen with 100 plays or less</h6>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover display" id="rareTable">
-                  <thead>
-                    <tr>
-                      <th>Song Name</th>
-                      <th class="text-center">Event</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for song in user_rare_songs %}
+              <div id="rare" class="tab-pane fade">
+                <div class="row mb-2">
+                  <h6 class="ms-3">Songs seen with 100 plays or less</h6>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="rareTable">
+                    <thead>
                       <tr>
-                        <td>
-                          <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
-                        </td>
-                        <td class="text-center">{{ song.num_plays_public }}</td>
+                        <th>Song Name</th>
+                        <th class="text-center">Event</th>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {% for song in user_rare_songs %}
+                        <tr>
+                          <td>
+                            <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
+                          </td>
+                          <td class="text-center">{{ song.num_plays_public }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endif %}
   <script>
       $(document).ready(function() {
           layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]

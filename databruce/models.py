@@ -1314,7 +1314,6 @@ class SongsPage(models.Model):
         null=True,
         default=None,
     )
-    note = models.TextField(blank=True, default=None)
 
     class Meta:
         managed = False

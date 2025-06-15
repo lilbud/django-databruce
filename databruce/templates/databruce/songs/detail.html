@@ -214,7 +214,7 @@
                         </td>
                         <td class="text-nowrap">
                           {% if song.current.event.tour %}
-                            <a href="{% url "tour_details" id=song.current.event.tour.id %}">{{ song.current.event.tour.name }}</a>
+                            <a href="{% url "tour_details" id=song.current.event.tour.id %}">{{ song.current.event.tour }}</a>
                           {% endif %}
                         </td>
                         <td class="text-nowrap">
@@ -244,7 +244,7 @@
                             <em>***</em>
                           {% endif %}
                         </td>
-                        <td>{{ song.note|default_if_none:"" }}</td>
+                        <td>{{ song.current.song_note|default_if_none:"" }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>

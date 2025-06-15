@@ -44,16 +44,18 @@
                       aria-controls="pills-profile"
                       aria-selected="false">Songs</button>
             </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-songs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#slots"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Slots</button>
-            </li>
+            {% if slots %}
+              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link"
+                        id="pills-songs-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#slots"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-profile"
+                        aria-selected="false">Slots</button>
+              </li>
+            {% endif %}
           </ul>
         </div>
         <div class="card-body px-0">
@@ -180,16 +182,24 @@
                           <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event_date|get_date:slot.event__id }}</a>
                         </td>
                         <td class="text-center">
-                          <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
+                          {% if slot.show_opener_id %}
+                            <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
+                          {% endif %}
                         </td>
                         <td class="text-center">
-                          <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
+                          {% if slot.main_set_closer_id %}
+                            <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
+                          {% endif %}
                         </td>
                         <td class="text-center">
-                          <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
+                          {% if slot.encore_opener_id %}
+                            <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
+                          {% endif %}
                         </td>
                         <td class="text-center">
-                          <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
+                          {% if slot.show_closer_id %}
+                            <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
+                          {% endif %}
                         </td>
                       </tr>
                     {% endfor %}

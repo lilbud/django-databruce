@@ -74,8 +74,10 @@ class Index(TemplateView):
             date__gt=self.date,
         ).order_by("id")[:5]
 
+        latest_event = models.Setlists.objects.all().order_by("-event").first()
+
         context["latest_show"] = (
-            models.Setlists.objects.filter(event__id=context["recent"].first().id)
+            models.Setlists.objects.filter(event__id=latest_event.event.id)
             .annotate(
                 separator=Case(When(segue=True, then=Value(">")), default=Value(",")),
             )
@@ -88,13 +90,14 @@ class Index(TemplateView):
 
 class Song(TemplateView):
     template_name = "databruce/songs/songs.html"
-    queryset = (
-        models.Songs.objects.all().prefetch_related("first", "last").order_by("name")
-    )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["songs"] = self.queryset
+        context["songs"] = (
+            models.Songs.objects.all()
+            .prefetch_related("first", "last")
+            .order_by("name")
+        )
         return context
 
 
@@ -103,9 +106,7 @@ class Users(TemplateView):
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-
         context["users"] = models.AuthUser.objects.filter(is_active=True)
-
         return context
 
 
@@ -121,45 +122,54 @@ class UserProfile(TemplateView):
 
         context["user_shows"] = models.UserAttendedShows.objects.filter(
             user__username__iexact=self.kwargs["username"],
-        ).select_related("event", "event__tour", "event__venue")
-
-        context["user_songs"] = models.Setlists.objects.filter(
-            event__id__in=context["user_shows"].values_list("event__id"),
-            set_name__in=[
-                "Show",
-                "Set 1",
-                "Set 2",
-                "Encore",
-                "Pre-Show",
-                "Post-Show",
-            ],
-        ).select_related("song")
-
-        context["user_seen"] = (
-            context["user_songs"]
-            .values("song__id")
-            .annotate(
-                songid=F("song__id"),
-                name=F("song__name"),
-                count=Count("event"),
-                first=Min("event"),
-                firstdate=Min("event__date"),
-            )
-            .order_by("-count", "name")
+        ).select_related(
+            "event",
+            "event__tour",
+            "event__venue",
+            "event__artist",
+            "event__venue__city",
+            "event__venue__city__state",
+            "event__venue__city__country",
         )
 
-        context["user_not_seen"] = (
-            models.Songs.objects.exclude(
-                id__in=context["user_songs"].values_list("song__id"),
-            )
-            .filter(num_plays_public__gte=100)
-            .order_by("-num_plays_public")
-        )
+        if context["user_shows"].count() > 0:
+            context["user_songs"] = models.Setlists.objects.filter(
+                event__id__in=context["user_shows"].values_list("event__id"),
+                set_name__in=[
+                    "Show",
+                    "Set 1",
+                    "Set 2",
+                    "Encore",
+                    "Pre-Show",
+                    "Post-Show",
+                ],
+            ).select_related("song")
 
-        context["user_rare_songs"] = models.Songs.objects.filter(
-            id__in=context["user_songs"].values("song__id"),
-            num_plays_public__lte=100,
-        ).order_by("num_plays_public")
+            context["user_seen"] = (
+                context["user_songs"]
+                .values("song__id")
+                .annotate(
+                    songid=F("song__id"),
+                    name=F("song__name"),
+                    count=Count("event"),
+                    first=Min("event"),
+                    firstdate=Min("event__date"),
+                )
+                .order_by("-count", "name")
+            )
+
+            context["user_not_seen"] = (
+                models.Songs.objects.exclude(
+                    id__in=context["user_songs"].values_list("song__id"),
+                )
+                .filter(num_plays_public__gte=100)
+                .order_by("-num_plays_public")
+            )
+
+            context["user_rare_songs"] = models.Songs.objects.filter(
+                id__in=context["user_songs"].values("song__id"),
+                num_plays_public__lte=100,
+            ).order_by("num_plays_public")
 
         return context
 
@@ -369,8 +379,9 @@ class EventDetail(TemplateView):
             "artist",
             "venue__city",
             "venue__country",
+            "tour",
         )
-        .prefetch_related("tour", "venue__state")
+        .prefetch_related("venue__state")
     )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
@@ -383,7 +394,8 @@ class EventDetail(TemplateView):
             .annotate(
                 separator=Case(When(segue=True, then=Value(">")), default=Value(",")),
             )
-            .select_related("song")
+            .select_related("song", "event")
+            .prefetch_related("ltp")
             .order_by("song_num")
         )
 
@@ -391,6 +403,7 @@ class EventDetail(TemplateView):
             models.Onstage.objects.filter(event__id=self.event.id)
             .exclude(relation__id=255)
             .select_related("relation")
+            .prefetch_related("band")
             .order_by("band_id", "relation__name")
         )
 
@@ -477,7 +490,7 @@ class EventDetail(TemplateView):
                     "Encore",
                     "Post-Show",
                 ],
-            )
+            ).select_related("song")
 
             context["album_max"] = context["album_breakdown"].aggregate(max=Max("num"))
 
@@ -616,15 +629,15 @@ class SongDetail(TemplateView):
                 id=self.kwargs["id"],
             )
             .select_related(
-                "prev",
-                "prev__song",
-                "current__event",
+                "current",
                 "current__song",
-                "current__event__venue",
+                "current__event",
                 "current__event__artist",
                 "current__event__tour",
                 "next",
                 "next__song",
+                "prev",
+                "prev__song",
             )
             .prefetch_related(
                 "current__event__venue__city",
@@ -773,14 +786,6 @@ class TourDetail(TemplateView):
             )
         )
 
-        context["setlists"] = (
-            models.SetlistsBySetAndDate.objects.filter(
-                event__tour__id=self.tour.id,
-            )
-            .order_by("set_order")
-            .select_related("event")
-        )
-
         context["tour_legs"] = (
             models.TourLegs.objects.filter(
                 tour__id=self.tour.id,
@@ -831,62 +836,63 @@ class TourDetail(TemplateView):
             )
         )
 
-        context["slots"] = (
-            models.Setlists.objects.filter(
-                event__tour__id=self.tour.id,
-                position__isnull=False,
-            )
-            .values("event__id")
-            .annotate(
-                event_date=F("event__date"),
-                show_opener_id=Min(
-                    Case(
-                        When(position="Show Opener", then=F("song")),
-                    ),
-                ),
-                show_opener_name=Min(
-                    Case(
-                        When(position="Show Opener", then=F("song__name")),
-                    ),
-                ),
-                main_set_closer_id=Min(
-                    Case(
-                        When(position="Main Set Closer", then=F("song")),
-                    ),
-                ),
-                main_set_closer_name=Min(
-                    Case(
-                        When(position="Main Set Closer", then=F("song__name")),
-                    ),
-                ),
-                encore_opener_id=Min(
-                    Case(
-                        When(position="Encore Opener", then=F("song")),
-                    ),
-                ),
-                encore_opener_name=Min(
-                    Case(
-                        When(position="Encore Opener", then=F("song__name")),
-                    ),
-                ),
-                show_closer_id=Min(
-                    Case(
-                        When(
-                            position="Show Closer",
-                            then=F("song"),
+        if len(context["songs"]) > 0:
+            context["slots"] = (
+                models.Setlists.objects.filter(
+                    event__tour__id=self.tour.id,
+                    position__isnull=False,
+                )
+                .values("event__id")
+                .annotate(
+                    event_date=F("event__date"),
+                    show_opener_id=Min(
+                        Case(
+                            When(position="Show Opener", then=F("song")),
                         ),
                     ),
-                ),
-                show_closer_name=Min(
-                    Case(
-                        When(
-                            position="Show Closer",
-                            then=F("song__name"),
+                    show_opener_name=Min(
+                        Case(
+                            When(position="Show Opener", then=F("song__name")),
                         ),
                     ),
-                ),
-            )
-        ).order_by("event")
+                    main_set_closer_id=Min(
+                        Case(
+                            When(position="Main Set Closer", then=F("song")),
+                        ),
+                    ),
+                    main_set_closer_name=Min(
+                        Case(
+                            When(position="Main Set Closer", then=F("song__name")),
+                        ),
+                    ),
+                    encore_opener_id=Min(
+                        Case(
+                            When(position="Encore Opener", then=F("song")),
+                        ),
+                    ),
+                    encore_opener_name=Min(
+                        Case(
+                            When(position="Encore Opener", then=F("song__name")),
+                        ),
+                    ),
+                    show_closer_id=Min(
+                        Case(
+                            When(
+                                position="Show Closer",
+                                then=F("song"),
+                            ),
+                        ),
+                    ),
+                    show_closer_name=Min(
+                        Case(
+                            When(
+                                position="Show Closer",
+                                then=F("song__name"),
+                            ),
+                        ),
+                    ),
+                )
+            ).order_by("event")
 
         return context
 
@@ -1635,9 +1641,19 @@ class TourLegDetail(TemplateView):
         context = super().get_context_data(**kwargs)
         self.leg = get_object_or_404(self.queryset, id=self.kwargs["id"])
         context["info"] = self.leg
-        context["events"] = models.Events.objects.filter(leg__id=self.leg.id).order_by(
-            "id",
+        context["events"] = (
+            models.Events.objects.filter(leg__id=self.leg.id)
+            .order_by(
+                "id",
+            )
+            .select_related("venue", "artist")
+            .prefetch_related(
+                "venue__city",
+                "venue__city__state",
+                "venue__city__country",
+            )
         )
+
         context["songs"] = (
             models.Setlists.objects.filter(
                 event__leg=self.leg.id,
