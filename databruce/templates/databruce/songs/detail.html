@@ -244,7 +244,7 @@
                             <em>***</em>
                           {% endif %}
                         </td>
-                        <td>{{ song.current.song_note|default_if_none:"" }}</td>
+                        <td>{{ song.note|default_if_none:"" }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
