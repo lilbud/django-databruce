@@ -35,13 +35,15 @@
           <div class="d-flex flex-row fs-6">
             <div class="pe-2 fw-semibold">Links:</div>
           </div>
-          <div class="d-flex flex-row fs-6">
-            <ul>
-              <li>
-                <a href="https://musicbrainz.org/release-group/{{ info.mbid }}">Musicbrainz</a>
-              </li>
-            </ul>
-          </div>
+          {% if info.mbid %}
+            <div class="d-flex flex-row fs-6">
+              <ul>
+                <li>
+                  <a href="https://musicbrainz.org/release-group/{{ info.mbid }}">Musicbrainz</a>
+                </li>
+              </ul>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>

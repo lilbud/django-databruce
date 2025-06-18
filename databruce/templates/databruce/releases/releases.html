@@ -27,7 +27,7 @@
         <td>{{ release.date|date:'Y-m-d' }}</td>
         <td>{{ release.type }}</td>
         <td>
-          <a href="https://musicbrainz.org/release/{{ release.mbid }}">Musicbrainz</a>
+          {% if release.mbid %}<a href="https://musicbrainz.org/release/{{ release.mbid }}">Musicbrainz</a>{% endif %}
         </td>
       </tr>
     {% endfor %}
