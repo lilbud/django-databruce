@@ -40,7 +40,7 @@
           {% endif %}
         </td>
         <td>
-          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue }}</a>
         </td>
         <td class="text-nowrap">
           {% if event.venue.city %}
@@ -55,10 +55,8 @@
         <td class="text-wrap">
           {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
             {{ event.type }}/{{ event.note|default_if_none:'' }}
-          {% elif event.title %}
-            {{ event.title|default_if_none:"" }}. {{ event.note|default_if_none:"" }}
           {% else %}
-            {{ event.note|default_if_none:"" }}
+            {{ event.title|default_if_none:"" }}
           {% endif %}
         </td>
         <td>{{ event.public|default_if_none:'' }}</td>

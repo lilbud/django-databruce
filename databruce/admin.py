@@ -181,9 +181,9 @@ class ReleaseAdmin(admin.ModelAdmin):
 @admin.register(models.Snippets)
 class SnippetAdmin(admin.ModelAdmin):
     search_fields = [
-        "snippet__song_name",
-        "event",
-        "setlist",
+        "snippet__name",
+        "event__id",
+        "setlist__id",
     ]
     autocomplete_fields = ["event", "setlist", "snippet"]
     list_select_related = [

@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 from typing import Any
 
 from django.contrib import messages
@@ -725,11 +726,22 @@ class EventSearch(TemplateView):
         form = self.form(request.POST)
 
         if form.is_valid():
-            result = self.queryset.filter(
-                date=form.cleaned_data["date"],
-            ).order_by(
-                "id",
-            )
+            print(form.cleaned_data["date"])
+
+            try:
+                result = self.queryset.filter(
+                    date=form.cleaned_data["date"],
+                ).order_by(
+                    "id",
+                )
+            except ValidationError:
+                date = re.sub(r"\-", "", form.cleaned_data["date"])
+
+                result = self.queryset.filter(
+                    id__contains=date,
+                ).order_by(
+                    "id",
+                )
 
             if len(result) == 1:
                 return redirect(f"/events/{result.first().id}")
@@ -1092,9 +1104,18 @@ class AdvancedSearch(View):
                             f"{song1} ({form['choice']} followed by) {song2}",
                         )
 
-                    elif form["position"] != "Anywhere":
+                        qs = models.SongsPage.objects.filter(
+                            setlist_filter,
+                        )
+
+                        event_results.append(
+                            list(qs.values_list("current__event", flat=True)),
+                        )
+
+                    elif form["position"] not in ["Anywhere", "Followed By"]:
                         # all others except anywhere and followed by
-                        position_filter = Q(current__position=form["position"])
+                        setlist_filter = Q(song__id=song1.id)
+                        position_filter = Q(position=form["position"])
 
                         if form["choice"] == "is":
                             setlist_filter.add(position_filter, Q.AND)
@@ -1104,29 +1125,66 @@ class AdvancedSearch(View):
                         results.append(
                             f"{song1} ({form['choice']} {form['position']})",
                         )
+
+                        qs = models.Setlists.objects.filter(
+                            setlist_filter,
+                        )
+
+                        event_results.append(
+                            list(qs.values_list("event__id", flat=True)),
+                        )
+
                     else:
+                        setlist_filter = Q(
+                            set_name__in=[
+                                "Show",
+                                "Set 1",
+                                "Set 2",
+                                "Encore",
+                                "Pre-Show",
+                                "Post-Show",
+                            ],
+                        )
+
+                        song_events = models.Setlists.objects.filter(
+                            song__id=song1.id,
+                        ).values("event__id")
+
+                        if form["choice"] == "is":
+                            setlist_filter.add(Q(song__id=song1.id), Q.AND)
+                            setlist_filter.add(Q(event__id__in=song_events), Q.AND)
+                        else:
+                            setlist_filter.add(~Q(song__id=song1.id), Q.AND)
+                            setlist_filter.add(~Q(event__id__in=song_events), Q.AND)
+
+                        qs = models.Setlists.objects.filter(
+                            setlist_filter,
+                        )
+
+                        event_results.append(
+                            list(qs.values_list("event__id", flat=True)),
+                        )
+
                         results.append(
                             f"{song1} ({form['choice']} anywhere)",
                         )
 
-                    qs = models.SongsPage.objects.filter(
-                        setlist_filter,
-                    )
-
-                    events_list = qs.values_list("current__event", flat=True)
-
-                    event_results.append(list(events_list))
-
                     if event_form.cleaned_data["conjunction"] == "and":
                         setlist_event_filter.add(
-                            Q(id__in=list(set.intersection(*map(set, event_results)))),
+                            Q(
+                                id__in=list(
+                                    set.intersection(*map(set, event_results)),
+                                ),
+                            ),
                             Q.AND,
                         )
+
                     else:
                         setlist_event_filter.add(
                             Q(id__in=list(set.union(*map(set, event_results)))),
                             Q.OR,
                         )
+
                 except ValueError:
                     break
 

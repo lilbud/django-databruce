@@ -308,106 +308,112 @@
             </div>
             <div class="col">
               <div class="card">
-                <div class="card-header">User Stats</div>
-                <div class="card-body">
-                  <div class="col">
-                    <div class="row mb-2">
-                      <h6>{{ user_count }} user(s) were at this show.</h6>
-                    </div>
-                    <div class="row">
-                      {% if user.is_authenticated %}
-                        <form method="post" action="{% url "add_show" %}">
-                          <input type="hidden" name="event" value="{{ event.id }}">
-                          {% csrf_token %}
-                          <button id="submit-button"
-                                  type="submit"
-                                  name="submit"
-                                  class="btn btn-sm btn-success"
-                                  {% if event.id in user_shows %}disabled{% endif %}>
-                            {% if event.id in user_shows %}
-                              Show already in Profile
-                            {% else %}
-                              Add Show to Profile
-                            {% endif %}
-                          </button>
-                        </form>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
                 <div class="card-header">Event Notes</div>
                 <div class="card-body">
                   <div class="mb-2">{{ event.note|default_if_none:""|safe }}</div>
-                  <h6>Links</h6>
-                  <ul>
-                    {% if event.brucebase_url %}
+                  {% if event.brucebase_url %}
+                    <h6>Links</h6>
+                    <ul>
                       <li>
                         <a class="sky-500"
                            href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
                       </li>
+                    </ul>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% if official or nugs or archive or event.date %}
+              <div class="col">
+                <div class="card">
+                  <div class="card-header">Releases</div>
+                  <div class="card-body">
+                    {% if official or nugs %}
+                      <h6>Official Releases</h6>
+                      <ul>
+                        {% if nugs %}
+                          <li>
+                            <a class="sky-500"href="{{ nugs.url }}">Nugs Release</a>
+                          </li>
+                        {% endif %}
+                        {% for rel in official %}
+                          <li>
+                            <a class="sky-500" href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
                     {% endif %}
-                  </ul>
+                    {% if archive %}
+                      <h6>
+                        Radio Nowhere @ Archive.org
+                        <i class="bi bi-info-circle-fill"
+                           data-bs-toggle="tooltip"
+                           data-bs-html="true"
+                           data-bs-title="An archive.org collection of Bruce bootlegs maintained by me"></i>
+                      </h6>
+                      <ul>
+                        {% for rel in archive %}
+                          <li>
+                            <a class="sky-500" href="https://archive.org/details/{{ rel.url }}">{{ rel.url }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                    {% if bootleg %}
+                      <h6>Bootlegs</h6>
+                      <ul>
+                        <li>
+                          <a class="sky-500"
+                             href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}">View bootlegs on SpringsteenLyrics</a>
+                        </li>
+                      </ul>
+                    {% endif %}
+                    {% if event.date %}
+                      <h6>Videos</h6>
+                      <ul>
+                        <li>
+                          <a class="sky-500"
+                             href="https://www.google.com/search?q=Bruce+Springsteen+{{ event.date|date:"Y-m-d"|iriencode }}+{{ event.venue.city.name|iriencode }}&source=lnms&tbm=vid">Google Video Search</a>
+                        </li>
+                      </ul>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-header">Releases</div>
-                <div class="card-body">
-                  {% if official or nugs %}
-                    <h6>Official Releases</h6>
-                    <ul>
-                      {% if nugs %}
-                        <li>
-                          <a class="sky-500"href="{{ nugs.url }}">Nugs Release</a>
-                        </li>
-                      {% endif %}
-                      {% for rel in official %}
-                        <li>
-                          <a class="sky-500" href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% endif %}
-                  {% if archive %}
-                    <h6>
-                      Radio Nowhere @ Archive.org
-                      <i class="bi bi-info-circle-fill"
-                         data-bs-toggle="tooltip"
-                         data-bs-html="true"
-                         data-bs-title="An archive.org collection of Bruce bootlegs maintained by me"></i>
-                    </h6>
-                    <ul>
-                      {% for rel in archive %}
-                        <li>
-                          <a class="sky-500" href="https://archive.org/details/{{ rel.url }}">{{ rel.url }}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% endif %}
-                  {% if bootleg %}
-                    <h6>Bootlegs</h6>
-                    <ul>
-                      <li>
-                        <a class="sky-500"
-                           href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}">View bootlegs on SpringsteenLyrics</a>
-                      </li>
-                    </ul>
-                  {% endif %}
-                  <h6>Videos</h6>
-                  <ul>
-                    <li>
-                      <a class="sky-500"
-                         href="https://www.google.com/search?q=Bruce+Springsteen+{{ event.date|date:"Y-m-d"|iriencode }}+{{ event.venue.city.name|iriencode }}&source=lnms&tbm=vid">Google Video Search</a>
-                    </li>
-                  </ul>
+            {% endif %}
+            {% if event.publicity == "Public" %}
+              <div class="col">
+                <div class="card">
+                  <div class="card-header">User Stats</div>
+                  <div class="card-body">
+                    <div class="col">
+                      <div class="row mb-2">
+                        <h6>{{ user_count }} user(s) were at this show.</h6>
+                      </div>
+                      <div class="row">
+                        {% if user.is_authenticated %}
+                          <form method="post" action="{% url "add_show" %}">
+                            <input type="hidden" name="event" value="{{ event.id }}">
+                            {% csrf_token %}
+                            <button id="submit-button"
+                                    type="submit"
+                                    name="submit"
+                                    class="btn btn-sm btn-success"
+                                    {% if event.id in user_shows %}disabled{% endif %}>
+                              {% if event.id in user_shows %}
+                                Show already in Profile
+                              {% else %}
+                                Add Show to Profile
+                              {% endif %}
+                            </button>
+                          </form>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            {% endif %}
           </div>
         </div>
       </div>

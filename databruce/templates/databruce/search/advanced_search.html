@@ -18,68 +18,68 @@
     </div>
   </div>
   <div class="row mb-4">
-    <div class="col offset-1">
+    <div class="col col-md-10 offset-1">
       <form action="{% url 'adv_search' %}" method="post" id="search-form">
         {% csrf_token %}
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.first_date.label }}</label>
-          <div class="col-6 col-lg-2 pe-0 mb-1">{{ form.first_date }}</div>
+          <div class="col-4 col-lg-1 pe-0 mb-1">{{ form.first_date }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.last_date.label }}</label>
-          <div class="col-6 col-lg-2 pe-0 mb-1">{{ form.last_date }}</div>
+          <div class="col-4 col-lg-1 pe-0 mb-1">{{ form.last_date }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.month.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.month_choice }}</div>
-          <div class="col-6 col-lg-2 px-2">{{ form.month }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.month_choice }}</div>
+          <div class="col-4 col-md-3 px-1">{{ form.month }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.day.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.day_choice }}</div>
-          <div class="col-6 col-lg-2 px-2">{{ form.day }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.day_choice }}</div>
+          <div class="col-4 col-md-2 px-1">{{ form.day }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <div class="form-label text-nowrap">{{ form.day_of_week.label }}</div>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.dow_choice }}</div>
-          <div class="col-6 col-lg-2 px-2">{{ form.day_of_week }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.dow_choice }}</div>
+          <div class="col-4 col-md-3 px-1">{{ form.day_of_week }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.city.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.city_choice }}</div>
-          <div class="col-8 col-lg-4 px-2">{{ form.city }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.city_choice }}</div>
+          <div class="col-7 col-lg-3 px-1">{{ form.city }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.state.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.state_choice }}</div>
-          <div class="col-8 col-lg-4 px-2">{{ form.state }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.state_choice }}</div>
+          <div class="col-7 col-lg-3 px-1">{{ form.state }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.country.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.country_choice }}</div>
-          <div class="col-8 col-lg-4 px-2">{{ form.country }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.country_choice }}</div>
+          <div class="col-7 col-lg-3 px-1">{{ form.country }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.tour.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.tour_choice }}</div>
-          <div class="col-8 col-lg-4 px-2">{{ form.tour }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.tour_choice }}</div>
+          <div class="col-7 col-lg-3 px-1">{{ form.tour }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.musician.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.musician_choice }}</div>
-          <div class="col-8 col-lg-4 px-2">{{ form.musician }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.musician_choice }}</div>
+          <div class="col-7 col-lg-3 px-1">{{ form.musician }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.band.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.band_choice }}</div>
-          <div class="col-8 col-lg-4 px-2">{{ form.band }}</div>
+          <div class="col-3 col-md-2 pe-1 mb-1">{{ form.band_choice }}</div>
+          <div class="col-7 col-lg-3 px-1">{{ form.band }}</div>
         </div>
         <div class="row mb-3 mb-lg-2">
           <label class="form-label">{{ form.conjunction.label }}</label>
-          <div class="col-3 col-lg-1 pe-0 mb-1">{{ form.conjunction }}</div>
+          <div class="col-2  pe-1 mb-1">{{ form.conjunction }}</div>
         </div>
         {{ formset.management_form.as_p }}
-        <div id="setlist-search" class="mb-5">
+        <div id="setlist-search" class="mb-5 col-10">
           {% for form in formset.forms %}
             <div class="row mb-3 mb-lg-2" id="song_row-{{ forloop.counter0 }}">
               {% include "./setlist_form.html" with form=form prefix=forloop.counter0 %}
