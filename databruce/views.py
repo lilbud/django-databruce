@@ -500,15 +500,19 @@ class EventDetail(TemplateView):
 
 class Event(TemplateView):
     template_name = "databruce/events/events.html"
-    queryset = models.Events.objects.all().select_related(
-        "venue",
-        "tour",
-        "artist",
-        "venue__city",
-        "venue__city__state",
-        "venue__city__country",
-        "venue__state",
-        "venue__country",
+    queryset = (
+        models.Events.objects.all()
+        .select_related(
+            "venue",
+            "tour",
+            "artist",
+            "venue__city",
+            "venue__city__state",
+            "venue__city__country",
+            "venue__state",
+            "venue__country",
+        )
+        .order_by("id")
     )
     date = datetime.datetime.today()
 
@@ -670,7 +674,10 @@ class SongDetail(TemplateView):
 
         if context["song_info"].num_plays_public > 0:
             context["year_stats"] = (
-                models.Setlists.objects.filter(song_id=self.kwargs["id"])
+                models.Setlists.objects.filter(
+                    song_id=self.kwargs["id"],
+                    set_name__in=valid_set_names,
+                )
                 .annotate(
                     year=TruncYear("event__date"),
                 )

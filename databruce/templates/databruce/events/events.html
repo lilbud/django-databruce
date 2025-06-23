@@ -54,7 +54,7 @@
         </td>
         <td class="text-wrap">
           {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
-            {{ event.type }}/{{ event.note|default_if_none:'' }}
+            {{ event.note|default_if_none:'' }}
           {% else %}
             {{ event.title|default_if_none:"" }}
           {% endif %}

@@ -202,3 +202,20 @@ tr th {
 #yearstats #statChart {
     aspect-ratio: 2;
 }
+
+div#quote {
+  margin: 10px auto;
+  padding: 10px;
+}
+
+blockquote p::before {
+  content: "\201C";
+}
+
+blockquote p::after {
+  content: "\201D";
+}
+
+blockquote + p {
+  text-align: right;
+}
