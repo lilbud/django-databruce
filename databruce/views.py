@@ -1123,13 +1123,29 @@ class AdvancedSearch(View):
 
                     elif form["position"] not in ["Anywhere", "Followed By"]:
                         # all others except anywhere and followed by
-                        setlist_filter = Q(song__id=song1.id)
-                        position_filter = Q(position=form["position"])
+                        setlist_filter = Q(
+                            set_name__in=[
+                                "Show",
+                                "Set 1",
+                                "Set 2",
+                                "Encore",
+                                "Pre-Show",
+                                "Post-Show",
+                            ],
+                        )
+
+                        song_events = models.Setlists.objects.filter(
+                            song__id=song1.id,
+                        ).values("event__id")
 
                         if form["choice"] == "is":
-                            setlist_filter.add(position_filter, Q.AND)
+                            setlist_filter.add(Q(song__id=song1.id), Q.AND)
+                            setlist_filter.add(Q(position=form["position"]), Q.AND)
+                            setlist_filter.add(Q(event__id__in=song_events), Q.AND)
                         else:
-                            setlist_filter.add(~position_filter, Q.AND)
+                            setlist_filter.add(~Q(song__id=song1.id), Q.AND)
+                            setlist_filter.add(~Q(position=form["position"]), Q.AND)
+                            setlist_filter.add(Q(event__id__in=song_events), Q.AND)
 
                         results.append(
                             f"{song1} ({form['choice']} {form['position']})",
@@ -1138,6 +1154,8 @@ class AdvancedSearch(View):
                         qs = models.Setlists.objects.filter(
                             setlist_filter,
                         )
+
+                        print(qs)
 
                         event_results.append(
                             list(qs.values_list("event__id", flat=True)),
