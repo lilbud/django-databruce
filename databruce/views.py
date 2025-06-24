@@ -75,10 +75,12 @@ class Index(TemplateView):
             date__gt=self.date,
         ).order_by("id")[:5]
 
-        latest_event = models.Setlists.objects.all().order_by("-event").first()
+        context["latest_event"] = (
+            models.Setlists.objects.all().order_by("-event").first()
+        )
 
         context["latest_show"] = (
-            models.Setlists.objects.filter(event__id=latest_event.event.id)
+            models.Setlists.objects.filter(event__id=context["latest_event"].event.id)
             .annotate(
                 separator=Case(When(segue=True, then=Value(">")), default=Value(",")),
             )

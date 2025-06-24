@@ -35,7 +35,7 @@
         <div class="card-body px-0">
           <div class="col">
             <h6 class="ms-2">
-              {% with first=recent|first %}
+              {% with first=latest_event.event %}
                 <div class="row">
                   <a class="sky-500" href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
                 </div>
