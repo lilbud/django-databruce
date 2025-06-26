@@ -1145,7 +1145,7 @@ class AdvancedSearch(View):
                         else:
                             setlist_filter.add(~Q(song__id=song1.id), Q.AND)
                             setlist_filter.add(~Q(position=form["position"]), Q.AND)
-                            setlist_filter.add(Q(event__id__in=song_events), Q.AND)
+                            setlist_filter.add(~Q(event__id__in=song_events), Q.AND)
 
                         results.append(
                             f"{song1} ({form['choice']} {form['position']})",
