@@ -32,7 +32,15 @@
     {% for event in event_info %}
       <tr>
         <td scope="row" class="text-nowrap">
-          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
+          <a href="{% url "event_details" id=event.id %}">
+            {{ event }}
+            {% if event.setlist_certainty == "Confirmed" %}
+              <i class="bi bi-file-earmark-check"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Has Setlist"></i>
+            {% endif %}
+          </a>
         </td>
         <td class="text-nowrap">
           {% if event.artist %}

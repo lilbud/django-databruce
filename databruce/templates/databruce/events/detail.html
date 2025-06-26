@@ -12,8 +12,11 @@
             <div class="card-body">
               <div class="d-flex flex-row flex-wrap">
                 <div class="flex-grow-1 mb-4 mb-md-0">
-                  <div class="flex-grow-2 sky-500 fw-semibold fs-5 mb-2">{{ event }}</div>
-                  <div class="text-body-secondary fw-medium fs-5">{{ event.venue }}, {{ event.venue.city }}</div>
+                  <div class="flex-grow-4 sky-500 fw-semibold fs-5 mb-2">
+                    {{ event }}
+                    <span class="text-body-secondary">[{{ event.type }}]</span>
+                  </div>
+                  <div class="text-light fw-medium fs-5">{{ event.venue }}, {{ event.venue.city }}</div>
                 </div>
                 <div>
                   <a class="btn btn-sm btn-secondary"
@@ -302,6 +305,36 @@
                         </div>
                       </div>
                     {% endif %}
+                    <div class="col">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <h5 class="fw-medium">
+                            <button type="button"
+                                    class="btn btn-link fs-5 fw-medium text-reset text-body-light"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#eventCertaintyModal">
+                              Event Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
+                            </button>
+                          </h5>
+                          <h6 class="fw-semibold sky-500">{{ event.event_certainty }}</h6>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <h5 class="fw-medium">
+                            <button type="button"
+                                    class="btn btn-link fs-5 fw-medium text-reset text-body-light"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#setlistCertaintyModal">
+                              Setlist Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
+                            </button>
+                          </h5>
+                          <h6 class="fw-semibold sky-500">{{ event.setlist_certainty }}</h6>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -415,6 +448,74 @@
               </div>
             {% endif %}
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade"
+       id="eventCertaintyModal"
+       tabindex="-1"
+       aria-labelledby="eventCertaintyModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="eventCertaintyModalLabel">Event Certainty</h1>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="fw-medium">
+            These designations were adapted from <i>Listen To The Music Play</i> by Justin Mason
+          </div>
+          <br>
+          <div class="fw-semibold">Confirmed:</div>
+          There is enough evidence (like a recording or a review) to confirm that this show happened.
+          <hr>
+          <div class="fw-semibold">Unknown Date:</div>
+          This event was known to have happened, but the specific date is unknown. Usually in cases of rehearsals/recording.
+          <hr>
+          <div class="fw-semibold">Unknown Location:</div>
+          This event was known to have happened, but the specific location is unknown. Usually in cases of private events.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade"
+       id="setlistCertaintyModal"
+       tabindex="-1"
+       aria-labelledby="setlistCertaintyModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="setlistCertaintyModalLabel">Setlist Certainty</h1>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="fw-medium">
+            These designations were adapted from <i>Listen To The Music Play</i> by Justin Mason
+          </div>
+          <br>
+          <div class="fw-semibold">Confirmed:</div>
+          The full setlist is known and has been verified with a recording.
+          <hr>
+          <div class="fw-semibold">Probable:</div>
+          No/incomplete recording, but the setlist is entirely or partially known from reviews or articles.
+          <hr>
+          <div class="fw-semibold">Unknown:</div>
+          The setlist is unknown, more common in the early days.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
