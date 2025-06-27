@@ -35,19 +35,21 @@
                    src="{% static 'databruce/img/logo.svg' %}"
                    alt="">
             </a>
-            <button class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
+            {% if 'login' not in request.path and 'logout' not in request.path and 'create' not in request.path %}
+              <button class="navbar-toggler"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#navbarSupportedContent"
+                      aria-controls="navbarSupportedContent"
+                      aria-expanded="false"
+                      aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            {% endif %}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
-                  {% if 'login' not in request.path and 'logout' not in request.path %}
+                  {% if 'login' not in request.path and 'logout' not in request.path and 'create' not in request.path %}
                     <a class="nav-link dropdown-toggle"
                        href="#"
                        role="button"
@@ -65,8 +67,10 @@
                         </h6>
                       </li>
                       <li>
-                        <a class="dropdown-item sky-500"
-                           href="{% url "profile" username=user.username %}">View Profile</a>
+                        {% if user.is_authenticated %}
+                          <a class="dropdown-item sky-500"
+                             href="{% url "profile" username=user.username %}">View Profile</a>
+                        {% endif %}
                       </li>
                       {% if user.is_superuser %}
                         <li>

@@ -17,4 +17,5 @@ dependencies = [
     "markdown==3.7",
     "psycopg[binary,pool]",
     "python-dotenv==1.1.0",
+    "requests>=2.32.4",
 ]

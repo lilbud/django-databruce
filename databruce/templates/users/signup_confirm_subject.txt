@@ -1,4 +1,4 @@
 {% load i18n %}
 {% autoescape off %}
-    {% blocktranslate %}Verify email on {{ site_name }}{% endblocktranslate %}
+    {% blocktranslate %}Verify email on Databruce.com{% endblocktranslate %}
 {% endautoescape %}

@@ -1,8 +1,10 @@
 import datetime
 import logging
+import os
 import re
 from typing import Any
 
+import requests
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
@@ -13,7 +15,6 @@ from django.contrib.auth.tokens import (
 )
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.core.mail import EmailMultiAlternatives
 from django.db.models import (
     Case,
     Count,
@@ -219,7 +220,11 @@ class SignUp(TemplateView):
                 **(extra_email_context or {}),
             }
 
-            self.send_mail(context=context, from_email=None, to_email=user.email)
+            self.send_mail(
+                context=context,
+                from_email=os.getenv("MAILGUN_EMAIL"),
+                to_email=user.email,
+            )
 
             return redirect(reverse("login"))
 
@@ -227,10 +232,9 @@ class SignUp(TemplateView):
 
     def send_mail(
         self,
-        context,
-        from_email,
-        to_email,
-        html_email_template_name=None,
+        context: dict,
+        from_email: str,
+        to_email: str,
     ):
         subject_template_name = "users/signup_confirm_subject.txt"
         email_template_name = "users/signup_email.html"
@@ -240,18 +244,24 @@ class SignUp(TemplateView):
         subject = "".join(subject.splitlines())
         body = loader.render_to_string(email_template_name, context)
 
-        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
-        if html_email_template_name is not None:
-            html_email = loader.render_to_string(html_email_template_name, context)
-            email_message.attach_alternative(html_email, "text/html")
+        return requests.post(
+            "https://api.mailgun.net/v3/databruce.com/messages",
+            auth=("api", os.getenv("MAILGUN_API", "MAILGUN_API")),
+            data={
+                "from": f"Databruce <{from_email}>",
+                "to": f"{context['user']} <{to_email}>",
+                "subject": subject,
+                "text": body,
+            },
+        )
 
-        try:
-            email_message.send()
-        except Exception:
-            logger.exception(
-                "Failed to send activation email to %s",
-                context["user"].pk,
-            )
+        # try:
+        #     email_message.send()
+        # except Exception:
+        #     logger.exception(
+        #         "Failed to send activation email to %s",
+        #         context["user"].pk,
+        #     )
 
 
 class SignUpConfirm(TemplateView):
