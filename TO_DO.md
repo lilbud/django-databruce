@@ -4,7 +4,8 @@
 <!-- - logout not working? -->
 <!-- - sort out static files hosting? -->
 - get registration and email working
-  - have to purchase porkbun email, as DO blocks all SMTP email ports for security reasons
+  <!-- - have to purchase porkbun email, as DO blocks all SMTP email ports for security reasons -->
+  - got working with mailgun as a temporary. They have pretty low limits (100/day, 3000/mo) so I'm not sure how well it will work exactly. I doubt password resets will be major but activations could be limited not sure. Site won't require login so its not a major deal.
 <!-- - flesh out user profile, add personal info and ability for user to edit that. -->
 <!-- - add users page with table so people can find other pages -->
 - look into "friends" with profiles?
