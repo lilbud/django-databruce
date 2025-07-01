@@ -451,8 +451,6 @@ class EventDetail(TemplateView):
             event__id=self.event.id,
         ).distinct("url")
 
-        print(context["archive"])
-
         context["nugs"] = models.NugsReleases.objects.filter(
             event__id=self.event.id,
         ).first()
@@ -745,8 +743,6 @@ class EventSearch(TemplateView):
         form = self.form(request.POST)
 
         if form.is_valid():
-            print(form.cleaned_data["date"])
-
             try:
                 result = self.queryset.filter(
                     date=form.cleaned_data["date"],
@@ -1164,8 +1160,6 @@ class AdvancedSearch(View):
                         qs = models.Setlists.objects.filter(
                             setlist_filter,
                         )
-
-                        print(qs)
 
                         event_results.append(
                             list(qs.values_list("event__id", flat=True)),
