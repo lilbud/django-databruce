@@ -10,7 +10,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import (
-    PasswordResetTokenGenerator,
     default_token_generator,
 )
 from django.contrib.sites.shortcuts import get_current_site
@@ -186,7 +185,7 @@ class SignUp(TemplateView):
     template_name = "users/signup.html"
     email_template_name = "users/signup_email.html"
     subject_template_name = "users/signup_confirm_subject.txt"
-    token_generator = PasswordResetTokenGenerator()
+    token_generator = default_token_generator
     form_class = forms.UserForm
     extra_email_context = None
     from_email = None
