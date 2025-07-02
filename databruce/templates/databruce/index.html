@@ -7,7 +7,7 @@
   {% regroup events by artist as events_list %}
   <div class="row mb-4">
     <div class="col">
-      {% if user %}
+      {% if user.is_authenticated %}
         <h1>Welcome to Databruce, {{ user|default_if_none:"" }}!</h1>
       {% else %}
         <h1>Welcome to Databruce!</h1>
