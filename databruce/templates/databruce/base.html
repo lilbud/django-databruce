@@ -216,6 +216,11 @@
                   </li>
                 </ul>
               </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link {% if '/login' in request.path %}active{% endif %}"
+                   href="{% url 'login' %}">Login</a>
+              </li>
             {% endif %}
           </ul>
           <div class="d-flex me-2">

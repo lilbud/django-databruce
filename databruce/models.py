@@ -659,7 +659,7 @@ class NugsReleases(models.Model):
     id = models.AutoField(primary_key=True)
     nugs_id = models.IntegerField(blank=True, default=None)
     event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
-    date = models.TextField(blank=True, default=None, db_column="release_date")
+    date = models.DateField(blank=True, default=None, db_column="release_date")
     url = models.TextField(blank=True, default=None, db_column="nugs_url")
     thumbnail = models.TextField(blank=True, default=None, db_column="thumbnail_url")
     name = models.TextField(blank=True, default=None)

@@ -822,9 +822,19 @@ class TourDetail(TemplateView):
             .select_related("first", "last")
         )
 
+        valid_set_names = [
+            "Show",
+            "Set 1",
+            "Set 2",
+            "Encore",
+            "Pre-Show",
+            "Post-Show",
+        ]
+
         context["songs"] = (
             models.Setlists.objects.filter(
                 event__tour__id=self.tour.id,
+                set_name__in=valid_set_names,
             )
             .values(
                 "song__id",
@@ -1246,6 +1256,10 @@ class AdvancedSearch(View):
                 "results": results,
             },
         )
+
+
+class AdvancedSearchResults(View):
+    print()
 
 
 class Relation(TemplateView):

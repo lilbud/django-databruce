@@ -25,6 +25,15 @@
   - nugs/releases/archive links
   - notes
   - album breakdown -->
+- Advanced Search: change to GET instead of POST
+  - while POST works, it doesn't allow sharing of results. JB has a "get short link" which returns a bit.ly link for the long search url. This allows results to be shared with others rather than everyone having to put in all the search results manually.
+  - would require making an "advanced search results" view again, and going that way.
+  - alternatively, keep the current view and have a parameter passed to the view like "url ... with submit=true"?.
+- update structure of pages
+  - especially the tour/song pages, or any with the header buttons. Maybe have the following as shortcuts?
+    - tours/###/stats
+    - tours/###/songs
+    - tours/###/shows
 
 - Songs page additions? likely dropdowns or maybe incorporate the sidebar filter that dripfield does?
   - Songs only played as snippets (if snip_only is true)

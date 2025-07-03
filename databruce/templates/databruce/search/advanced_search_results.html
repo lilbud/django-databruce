@@ -16,52 +16,54 @@
         <div class="card-body">
           <div id="row">
             <div class="d-flex flex-column">
-              {% if request.POST.first_date %}
-                {% include "./result_row.html" with label="Start Date:" data=request.POST.first_date %}
-              {% endif %}
-              {% if request.POST.last_date %}
-                {% include "./result_row.html" with label="End Date:" data=request.POST.last_date %}
-              {% endif %}
-              {% if request.POST.month %}
-                {% include "./result_row.html" with label="Month:" choice=request.POST.month_choice data=request.POST.month|get_month %}
-              {% endif %}
-              {% if request.POST.day %}
-                {% include "./result_row.html" with label="Day:" choice=request.POST.day_choice data=request.POST.day|get_ordinal %}
-              {% endif %}
-              {% if request.POST.day_of_week %}
-                {% include "./result_row.html" with label="Day of Week:" choice=request.POST.dow_choice data=request.POST.day_of_week|get_day %}
-              {% endif %}
-              {% if request.POST.city %}
-                {% include "./result_row.html" with label="City:" choice=request.POST.city_choice data=request.POST.city|get_city %}
-              {% endif %}
-              {% if request.POST.state %}
-                {% include "./result_row.html" with label="State:" choice=request.POST.state_choice data=request.POST.state|get_state %}
-              {% endif %}
-              {% if request.POST.country %}
-                {% include "./result_row.html" with label="Country:" choice=request.POST.country_choice data=request.POST.country|get_country %}
-              {% endif %}
-              {% if request.POST.tour %}
-                {% include "./result_row.html" with label="Tour:" choice=request.POST.tour_choice data=request.POST.tour|get_tour %}
-              {% endif %}
-              {% if request.POST.musician %}
-                {% include "./result_row.html" with label="Musician:" choice=request.POST.musician_choice data=request.POST.musician|get_relation %}
-              {% endif %}
-              {% if request.POST.band %}
-                {% include "./result_row.html" with label="Band:" choice=request.POST.band_choice data=request.POST.band|get_band %}
-              {% endif %}
-              {% if results %}
-                <span>
-                  <div class="d-flex flex-row">
-                    <div class="pe-2">Songs:</div>
-                    <div>
-                      {% for result in results %}
-                        {{ result }}
-                        {% if not forloop.last %}<span class="text-uppercase">{{ request.POST.conjunction }}</span>{% endif %}
-                      {% endfor %}
+              {% with data=request.POST %}
+                {% if data.first_date %}
+                  {% include "./result_row.html" with label="Start Date:" data=data.first_date %}
+                {% endif %}
+                {% if data.last_date %}
+                  {% include "./result_row.html" with label="End Date:" data=data.last_date %}
+                {% endif %}
+                {% if data.month %}
+                  {% include "./result_row.html" with label="Month:" choice=data.month_choice data=data.month|get_month %}
+                {% endif %}
+                {% if data.day %}
+                  {% include "./result_row.html" with label="Day:" choice=data.day_choice data=data.day|get_ordinal %}
+                {% endif %}
+                {% if data.day_of_week %}
+                  {% include "./result_row.html" with label="Day of Week:" choice=data.dow_choice data=data.day_of_week|get_day %}
+                {% endif %}
+                {% if data.city %}
+                  {% include "./result_row.html" with label="City:" choice=data.city_choice data=data.city|get_city %}
+                {% endif %}
+                {% if data.state %}
+                  {% include "./result_row.html" with label="State:" choice=data.state_choice data=data.state|get_state %}
+                {% endif %}
+                {% if data.country %}
+                  {% include "./result_row.html" with label="Country:" choice=data.country_choice data=data.country|get_country %}
+                {% endif %}
+                {% if data.tour %}
+                  {% include "./result_row.html" with label="Tour:" choice=data.tour_choice data=data.tour|get_tour %}
+                {% endif %}
+                {% if data.musician %}
+                  {% include "./result_row.html" with label="Musician:" choice=data.musician_choice data=data.musician|get_relation %}
+                {% endif %}
+                {% if data.band %}
+                  {% include "./result_row.html" with label="Band:" choice=data.band_choice data=data.band|get_band %}
+                {% endif %}
+                {% if results %}
+                  <span>
+                    <div class="d-flex flex-row">
+                      <div class="pe-2">Songs:</div>
+                      <div>
+                        {% for result in results %}
+                          {{ result }}
+                          {% if not forloop.last %}<span class="text-uppercase">{{ data.conjunction }}</span>{% endif %}
+                        {% endfor %}
+                      </div>
                     </div>
-                  </div>
-                </span>
-              {% endif %}
+                  </span>
+                {% endif %}
+              {% endwith %}
             </div>
           </div>
         </div>
