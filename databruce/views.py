@@ -61,6 +61,7 @@ class Index(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Home"
         context["date"] = self.date
         context["events"] = self.queryset.filter(
             date__month=self.date.month,
@@ -96,6 +97,7 @@ class Song(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Songs"
         context["songs"] = (
             models.Songs.objects.all()
             .prefetch_related("first", "last")
@@ -109,6 +111,7 @@ class Users(TemplateView):
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "Users"
         context["users"] = models.AuthUser.objects.filter(is_active=True)
         return context
 
@@ -118,6 +121,7 @@ class UserProfile(TemplateView):
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "User Profile"
 
         context["user_info"] = models.AuthUser.objects.get(
             username__iexact=self.kwargs["username"],
@@ -193,6 +197,7 @@ class SignUp(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Signup"
         context["form"] = self.form_class
         return context
 
@@ -331,6 +336,7 @@ class UserSettings(TemplateView):
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "User Settings"
         context["form"] = self.form_class(instance=self.request.user)
 
         return context
@@ -351,7 +357,9 @@ class SignUpDone(TemplateView):
     template_name = "users/signup_done.html"
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
-        return super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Sign Up Complete"
+        return context
 
 
 class UserAddShow(View):
@@ -398,11 +406,10 @@ class EventDetail(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        self.event = get_object_or_404(self.queryset, id=self.kwargs["id"])
-        context["event"] = self.queryset.filter(id=self.event.id).first()
-
+        context["event"] = self.queryset.filter(id=self.kwargs["id"]).first()
+        context["title"] = f"{context['event']} {context['event'].venue}"
         context["setlist"] = (
-            models.Setlists.objects.filter(event__id=self.event.id)
+            models.Setlists.objects.filter(event__id=context["event"].id)
             .annotate(
                 separator=Case(When(segue=True, then=Value(">")), default=Value(",")),
             )
@@ -412,7 +419,7 @@ class EventDetail(TemplateView):
         )
 
         self.onstage = (
-            models.Onstage.objects.filter(event__id=self.event.id)
+            models.Onstage.objects.filter(event__id=context["event"].id)
             .exclude(relation__id=255)
             .select_related("relation")
             .prefetch_related("band")
@@ -424,11 +431,11 @@ class EventDetail(TemplateView):
         context["guests"] = self.onstage.filter(guest=True)
 
         context["notes"] = models.SetlistNotes.objects.filter(
-            event__id=self.event.id,
+            event__id=context["event"].id,
         ).order_by("num")
 
-        context["prev_event"] = self.queryset.filter(id__lt=self.event.id).last()
-        context["next_event"] = self.queryset.filter(id__gt=self.event.id).first()
+        context["prev_event"] = self.queryset.filter(id__lt=context["event"].id).last()
+        context["next_event"] = self.queryset.filter(id__gt=context["event"].id).first()
 
         if not context["prev_event"]:
             context["prev_event"] = self.queryset.last()
@@ -438,37 +445,39 @@ class EventDetail(TemplateView):
 
         context["official"] = (
             models.ReleaseTracks.objects.filter(
-                event__id=self.event.id,
+                event__id=context["event"].id,
             )
             .distinct("release__id")
             .select_related("release")
             .order_by("release__id")
         )
 
-        context["bootleg"] = models.Bootlegs.objects.filter(event__id=self.event.id)
+        context["bootleg"] = models.Bootlegs.objects.filter(
+            event__id=context["event"].id,
+        )
         context["archive"] = models.ArchiveLinks.objects.filter(
-            event__id=self.event.id,
+            event__id=context["event"].id,
         ).distinct("url")
 
         context["nugs"] = models.NugsReleases.objects.filter(
-            event__id=self.event.id,
+            event__id=context["event"].id,
         ).first()
 
         if self.request.user.is_authenticated:
             context["user_shows"] = models.UserAttendedShows.objects.filter(
                 user=self.request.user.id,
-                event=self.event.id,
+                event=context["event"].id,
             ).values_list("event__id", flat=True)
 
             context["user_count"] = (
                 models.UserAttendedShows.objects.filter(
-                    event=self.event.id,
+                    event=context["event"].id,
                 )
                 .distinct("user__id")
                 .count()
             )
 
-        if self.event.tour.id not in [23, 43]:
+        if context["event"].tour.id not in [23, 43]:
             context["album_breakdown"] = (
                 models.Songs.objects.filter(
                     id__in=context["setlist"]
@@ -491,7 +500,7 @@ class EventDetail(TemplateView):
             )
 
             context["setlist_unique"] = models.Setlists.objects.filter(
-                event__id=self.event.id,
+                event__id=context["event"].id,
                 set_name__in=[
                     "Show",
                     "Set 1",
@@ -527,6 +536,7 @@ class Event(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Events"
 
         try:
             self.year = self.kwargs["year"]
@@ -558,6 +568,7 @@ class Venue(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Venues"
         context["venues"] = self.queryset
         return context
 
@@ -567,7 +578,6 @@ class VenueDetail(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        self.venue = self.kwargs["id"]
 
         context["events"] = models.Events.objects.filter(
             venue__id=self.kwargs["id"],
@@ -580,6 +590,8 @@ class VenueDetail(TemplateView):
             .select_related("city", "city__state", "city__country")
             .first()
         )
+
+        context["title"] = f"{context['venue_info'].name}"
 
         context["songs"] = (
             models.Setlists.objects.filter(
@@ -637,6 +649,8 @@ class SongDetail(TemplateView):
             )
             .first()
         )
+
+        context["title"] = f"{context['song_info'].name}"
 
         context["songs"] = (
             models.SongsPage.objects.filter(
@@ -785,6 +799,7 @@ class Tour(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["tours"] = self.queryset
+        context["title"] = "Tours"
 
         return context
 
@@ -794,10 +809,10 @@ class TourDetail(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        self.tour = models.Tours.objects.get(id=self.kwargs["id"])
-        context["tour"] = self.tour
+        context["tour"] = models.Tours.objects.get(id=self.kwargs["id"])
+        context["title"] = f"{context['tour']}"
         context["events"] = (
-            models.Events.objects.filter(tour=self.tour.id)
+            models.Events.objects.filter(tour=self.kwargs["id"])
             .order_by("id")
             .select_related(
                 "venue",
@@ -814,7 +829,7 @@ class TourDetail(TemplateView):
 
         context["tour_legs"] = (
             models.TourLegs.objects.filter(
-                tour__id=self.tour.id,
+                tour__id=self.kwargs["id"],
             )
             .order_by(
                 "first",
@@ -833,7 +848,7 @@ class TourDetail(TemplateView):
 
         context["songs"] = (
             models.Setlists.objects.filter(
-                event__tour__id=self.tour.id,
+                event__tour__id=self.kwargs["id"],
                 set_name__in=valid_set_names,
             )
             .values(
@@ -875,7 +890,7 @@ class TourDetail(TemplateView):
         if len(context["songs"]) > 0:
             context["slots"] = (
                 models.Setlists.objects.filter(
-                    event__tour__id=self.tour.id,
+                    event__tour__id=self.kwargs["id"],
                     position__isnull=False,
                 )
                 .values("event__id")
@@ -1267,6 +1282,7 @@ class Relation(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Relations"
         context["relations"] = models.Relations.objects.all().select_related(
             "first",
             "last",
@@ -1279,6 +1295,7 @@ class Band(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        context["title"] = "Bands"
         context["bands"] = (
             models.Bands.objects.filter()
             .select_related("first", "last")
@@ -1294,6 +1311,8 @@ class RelationDetail(TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["info"] = models.Relations.objects.get(id=self.kwargs["id"])
+
+        context["title"] = f"{context['info']}"
 
         context["bands"] = (
             models.Onstage.objects.filter(relation=context["info"].id)
@@ -1324,6 +1343,7 @@ class BandDetail(TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["info"] = get_object_or_404(models.Bands, id=self.kwargs["id"])
+        context["title"] = f"{context['info']}"
 
         context["members"] = (
             models.Onstage.objects.filter(band=self.kwargs["id"])
@@ -1365,6 +1385,7 @@ class Release(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["releases"] = models.Releases.objects.all().order_by("date")
+        context["title"] = "Releases"
         return context
 
 
@@ -1374,6 +1395,7 @@ class ReleaseDetail(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["info"] = get_object_or_404(models.Releases, id=self.kwargs["id"])
+        context["title"] = f"{context['info'].name}"
 
         context["tracks"] = (
             models.ReleaseTracks.objects.filter(release=self.kwargs["id"])
@@ -1396,6 +1418,7 @@ class City(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "Cities"
         context["cities"] = self.queryset
         return context
 
@@ -1408,6 +1431,7 @@ class CityDetail(TemplateView):
         context = super().get_context_data(**kwargs)
         self.city = get_object_or_404(self.queryset, id=self.kwargs["id"])
         context["info"] = self.city
+        context["title"] = f"{context['info']}"
         context["songs"] = (
             models.Setlists.objects.filter(
                 event__venue__city__id=self.kwargs["id"],
@@ -1468,6 +1492,7 @@ class State(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "States"
         context["states"] = (
             models.States.objects.all()
             .select_related("country", "first", "last")
@@ -1488,6 +1513,7 @@ class StateDetail(TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["info"] = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["title"] = f"{context['info']}"
 
         context["events"] = models.Events.objects.filter(
             venue__state=self.kwargs["id"],
@@ -1550,6 +1576,7 @@ class Country(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "Countries"
         context["countries"] = (
             models.Countries.objects.all()
             .select_related("first", "last")
@@ -1569,6 +1596,7 @@ class CountryDetail(TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["info"] = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["title"] = f"{context['info']}"
 
         context["events"] = (
             models.Events.objects.filter(venue__country=self.kwargs["id"])
@@ -1625,6 +1653,7 @@ class EventRun(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "Event Runs"
         context["runs"] = (
             models.Runs.objects.all()
             .select_related(
@@ -1659,6 +1688,7 @@ class RunDetail(TemplateView):
         context = super().get_context_data(**kwargs)
         self.run = get_object_or_404(self.queryset, id=self.kwargs["id"])
         context["info"] = self.run
+        context["title"] = f"{context['info']}"
         context["events"] = (
             models.Events.objects.filter(run__id=self.run.id)
             .order_by(
@@ -1723,6 +1753,7 @@ class TourLeg(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["title"] = "Tour Legs"
         context["legs"] = (
             models.TourLegs.objects.all()
             .select_related("first", "last")
@@ -1743,6 +1774,7 @@ class TourLegDetail(TemplateView):
         context = super().get_context_data(**kwargs)
         self.leg = get_object_or_404(self.queryset, id=self.kwargs["id"])
         context["info"] = self.leg
+        context["title"] = f"{context['info']}"
         context["events"] = (
             models.Events.objects.filter(leg__id=self.leg.id)
             .order_by(
@@ -1808,6 +1840,8 @@ class NugsRelease(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
+        context["title"] = "Nugs Releases"
+
         context["releases"] = (
             models.NugsReleases.objects.all()
             .select_related(
@@ -1829,6 +1863,8 @@ class Bootleg(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+
+        context["title"] = "Bootlegs"
 
         context["bootlegs"] = (
             models.Bootlegs.objects.all()
