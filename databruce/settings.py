@@ -124,6 +124,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = Path(BASE_DIR) / "static/"
 LOGIN_REDIRECT_URL = "/"
 
 # Default primary key field type
