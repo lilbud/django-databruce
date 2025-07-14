@@ -125,6 +125,10 @@ tr th {
     text-shadow: none !important;
 }
 
+.sky-400 {
+    color: var(--sky-400)
+}
+
 .sky-500 {
     color: var(--sky-500)
 }
@@ -140,6 +144,17 @@ tr th {
 .setHeader {
     background-color: var(--sky-900) !important;
 }
+
+.badge-row .badge {
+    background-color: var(--sky-900) !important;
+    color: white !important;
+}
+
+.badge-row .badge:hover {
+    background-color: var(--sky-800) !important;
+}
+
+
 
 #myTab .nav-link.active {
     background-color: var(--sky-700) !important;

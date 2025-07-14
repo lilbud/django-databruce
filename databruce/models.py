@@ -646,7 +646,7 @@ class Events(models.Model):
 
     def __str__(self) -> str:
         try:
-            event = self.date.strftime("%Y-%m-%d [%a]")
+            event = self.date.strftime("%Y-%m-%d")
             if self.early_late:
                 event += f" {self.early_late}"
         except AttributeError:

@@ -9,30 +9,50 @@
       <div class="row mb-3">
         <div class="col">
           <div class="card">
+            <div class="card-header">
+              <div class="float-end">
+                <a class="btn btn-sm btn-secondary"
+                   role="button"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   data-bs-html="true"
+                   data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
+                   href="{% url "event_details" id=prev_event.id %}">&lt; Prev</a>
+                <a class="btn btn-sm btn-secondary"
+                   role="button"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   data-bs-html="true"
+                   data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
+                   href="{% url "event_details" id=next_event.id %}">Next &gt;</a>
+              </div>
+            </div>
             <div class="card-body">
               <div class="d-flex flex-row flex-wrap">
-                <div class="flex-grow-1 mb-4 mb-md-0">
-                  <div class="flex-grow-4 sky-500 fw-semibold fs-5 mb-2">
-                    {{ event }}
-                    <span class="text-body-secondary">[{{ event.type }}]</span>
+                <div class="mb-0 fs-5">
+                  <div class="mb-2">
+                    <span class="sky-500 fw-semibold">{{ event }}</span>
+                    <span class="text-body-secondary fw-medium">({{ event.type }})</span>
                   </div>
-                  <div class="text-light fw-medium fs-5">{{ event.venue }}, {{ event.venue.city }}</div>
-                </div>
-                <div>
-                  <a class="btn btn-sm btn-secondary"
-                     role="button"
-                     data-bs-toggle="tooltip"
-                     data-bs-placement="top"
-                     data-bs-html="true"
-                     data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
-                     href="{% url "event_details" id=prev_event.id %}">&lt; Prev</a>
-                  <a class="btn btn-sm btn-secondary"
-                     role="button"
-                     data-bs-toggle="tooltip"
-                     data-bs-placement="top"
-                     data-bs-html="true"
-                     data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
-                     href="{% url "event_details" id=next_event.id %}">Next &gt;</a>
+                  <div class="mb-2">
+                    <a class="text-light fw-medium"
+                       href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                  </div>
+                  <div class="mb-3">
+                    <a class="text-light fw-medium"
+                       href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
+                  </div>
+                  <div class="badge-row fw-medium fs-6 mb-0">
+                    {% if event.tour %}
+                      <a href="{% url "tour_details" id=event.tour.id %}"><span class="badge text-bg-secondary">{{ event.tour }}</span></a>
+                    {% endif %}
+                    {% if event.leg %}
+                      <a href="{% url "leg_details" id=event.leg.id %}"><span class="badge text-bg-secondary">{{ event.leg }}</span></a>
+                    {% endif %}
+                    {% if event.run %}
+                      <a href="{% url "run_details" id=event.run.id %}"><span class="badge text-bg-secondary">{{ event.run }}</span></a>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
             </div>
@@ -49,13 +69,13 @@
                   {% regroup setlist by set_name as event_setlist %}
                   {% regroup notes|dictsort:"id.id" by id.id as notes_list %}
                   {% if setlist %}
-                    <div class="table-responsive p-0">
+                    <div class="table-responsive">
                       <table class="table table-hover display" id="setlistTable">
                         <thead>
                           <tr>
-                            <th class="all text-center">#</th>
-                            <th class="all">Song</th>
-                            <th class="all text-nowrap">
+                            <th class="all text-center px-2">#</th>
+                            <th class="all px-2">Song</th>
+                            <th class="all text-center text-nowrap">
                               Gap
                               <i class="bi bi-info-circle-fill"
                                  data-bs-toggle="tooltip"
@@ -80,7 +100,7 @@
                             </tr>
                             {% for song in set.list %}
                               <tr>
-                                <td class="text-center">
+                                <td class="text-center px-2">
                                   {% if song.position %}
                                     <h6 class="mb-0">
                                       <span data-bs-toggle="tooltip"
@@ -91,10 +111,11 @@
                                     {{ song.song_num }}
                                   {% endif %}
                                 </td>
-                                <td>
+                                <td class="px-2 py-2">
                                   <div class="row">
                                     <span class="text-nowrap">
-                                      <a class="text-light" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                      <a class="sky-400 fw-medium"
+                                         href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                       {% if song.segue %}{{ song.separator }}{% endif %}
                                       {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
                                       {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
@@ -108,7 +129,7 @@
                                     </small>
                                   </div>
                                 </td>
-                                <td class="text-nowrap">
+                                <td class="text-nowrap text-center">
                                   {% if song.debut and not song.premiere %}
                                     <h6 class="mb-0">
                                       <span class="badge text-bg-danger">{{ song.last }}, Debut</span>
@@ -117,14 +138,14 @@
                                     <h6 class="mb-0">
                                       <span class="badge text-bg-danger">{{ song.last }}, Bustout</span>
                                     </h6>
+                                  {% elif song.premiere %}
+                                    First
                                   {% else %}
                                     {{ song.last|default_if_none:"" }}
                                   {% endif %}
                                 </td>
                                 <td class="text-nowrap">
-                                  {% if song.premiere %}
-                                    Debut
-                                  {% elif song.ltp %}
+                                  {% if song.ltp %}
                                     <a href="{% url "event_details" id=song.ltp.id %}" class="text-light">{{ song.ltp }}</a>
                                   {% endif %}
                                 </td>
@@ -255,87 +276,35 @@
             <div class="col">
               <div class="card">
                 <div class="card-header">Event Info</div>
-                <div class="card-body">
-                  <div class="row row-cols-1 row-cols-md-2 g-2 ">
-                    <div class="col">
-                      <div class="card h-100">
-                        <div class="card-body text-center">
-                          <h5 class="fw-medium">Band</h5>
-                          <h6>
-                            <a class="fw-semibold sky-500"
-                               href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
-                          </h6>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <div class="row align-items-center">
+                        <div class="col fw-bold p-0">
+                          <button type="button"
+                                  class="btn btn-link py-0 fw-medium text-reset text-body-light"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#eventCertaintyModal">
+                            Event Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
+                          </button>
                         </div>
+                        <div class="col fw-medium">{{ event.event_certainty }}</div>
                       </div>
-                    </div>
-                    <div class="col">
-                      <div class="card h-100">
-                        <div class="card-body text-center">
-                          <h5 class="fw-medium">Tour</h5>
-                          <h6>
-                            <a class="fw-semibold sky-500"
-                               href="{% url "tour_details" id=event.tour.id %}">{{ event.tour }}</a>
-                          </h6>
+                    </li>
+                    <li class="list-group-item">
+                      <div class="row align-items-center">
+                        <div class="col fw-bold p-0">
+                          <button type="button"
+                                  class="btn btn-link py-0 fw-medium text-reset text-body-light"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#setlistCertaintyModal">
+                            Setlist Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
+                          </button>
                         </div>
+                        <div class="col fw-medium">{{ event.setlist_certainty }}</div>
                       </div>
-                    </div>
-                    {% if event.leg %}
-                      <div class="col">
-                        <div class="card h-100">
-                          <div class="card-body text-center">
-                            <h5 class="fw-medium">Tour Leg</h5>
-                            <h6>
-                              <a class="fw-semibold sky-500"
-                                 href="{% url "leg_details" id=event.leg.id %}">{{ event.leg }}</a>
-                            </h6>
-                          </div>
-                        </div>
-                      </div>
-                    {% endif %}
-                    {% if event.run %}
-                      <div class="col">
-                        <div class="card h-100">
-                          <div class="card-body text-center">
-                            <h5 class="fw-medium">Run</h5>
-                            <h6>
-                              <a class="fw-semibold sky-500"
-                                 href="{% url "run_details" id=event.run.id %}">{{ event.run }}</a>
-                            </h6>
-                          </div>
-                        </div>
-                      </div>
-                    {% endif %}
-                    <div class="col">
-                      <div class="card h-100">
-                        <div class="card-body text-center">
-                          <h5 class="fw-medium mb-0">
-                            <button type="button"
-                                    class="btn btn-link fs-5 fw-medium text-reset text-body-light"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#eventCertaintyModal">
-                              Event Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
-                            </button>
-                          </h5>
-                          <h6 class="fw-semibold sky-500">{{ event.event_certainty }}</h6>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="card h-100">
-                        <div class="card-body text-center">
-                          <h5 class="fw-medium mb-0">
-                            <button type="button"
-                                    class="btn btn-link fs-5 fw-medium text-reset text-body-light"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#setlistCertaintyModal">
-                              Setlist Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
-                            </button>
-                          </h5>
-                          <h6 class="fw-semibold sky-500">{{ event.setlist_certainty }}</h6>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -344,23 +313,23 @@
                 <div class="card-header">Event Notes</div>
                 <div class="card-body">
                   <div class="mb-2">{{ event.note|default_if_none:""|safe }}</div>
-                  {% if event.brucebase_url %}
-                    <h6>Links</h6>
-                    <ul>
-                      <li>
-                        <a class="sky-500"
-                           href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
-                      </li>
-                    </ul>
-                  {% endif %}
                 </div>
               </div>
             </div>
             {% if official or nugs or archive or event.date %}
               <div class="col">
                 <div class="card">
-                  <div class="card-header">Releases</div>
+                  <div class="card-header">Links</div>
                   <div class="card-body">
+                    {% if event.brucebase_url %}
+                      <h6>Links</h6>
+                      <ul>
+                        <li>
+                          <a class="sky-500"
+                             href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
+                        </li>
+                      </ul>
+                    {% endif %}
                     {% if official or nugs %}
                       <h6>Official Releases</h6>
                       <ul>
@@ -397,7 +366,7 @@
                       <ul>
                         <li>
                           <a class="sky-500"
-                             href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}">View bootlegs on SpringsteenLyrics</a>
+                             href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
                         </li>
                       </ul>
                     {% endif %}
@@ -530,7 +499,7 @@
               autoWidth: false,
               paging: false,
               ordering: false,
-              columnDefs: [{ target: 0, width: '5%' }],
+              columnDefs: [{ target: 0, width: '1%' }],
           });
       })
   </script>
