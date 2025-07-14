@@ -154,8 +154,6 @@ tr th {
     background-color: var(--sky-800) !important;
 }
 
-
-
 #myTab .nav-link.active {
     background-color: var(--sky-700) !important;
 }
