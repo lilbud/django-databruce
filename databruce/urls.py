@@ -13,7 +13,8 @@ app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
     path("admin/", admin.site.urls),
-    path("api-auth/", include("rest_framework.urls")),
+    path("event_autocomplete", views.event_search, name="events_auto"),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "accounts/login/",
         auth_views.LoginView.as_view(template_name="users/login.html"),

@@ -1,6 +1,3 @@
-import json
-
-from django.http import HttpRequest, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -222,33 +219,3 @@ class TourLegsViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = filters.TourLegFilter
     permission_classes = permission_classes
-
-
-def event_search(request: HttpRequest):
-    data = None
-
-    if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
-        q = request.GET.get("term", "")
-        results = []
-
-        search_qs = models.Events.objects.filter(date__startswith=q).order_by("date")
-
-        for r in search_qs:
-            result = {
-                "id": r.id,
-                "value": f"{r.date.strftime('%Y-%m-%d [%a]')} - {r.venue.city}",
-                "date": r.date.strftime("%Y-%m-%d"),
-            }
-
-            if r.early_late:
-                result["value"] = (
-                    f"{r.date.strftime('%Y-%m-%d [%a]')} {r.early_late} - {r.venue.city}"
-                )
-
-            results.append(result)
-
-        data = json.dumps(results)
-        print(data)
-
-    mimetype = "application/json"
-    return HttpResponse(data, mimetype)

@@ -34,5 +34,4 @@ router.register(r"tour_legs", views.TourLegsViewSet, basename="tour_leg")
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path("api/", include(router.urls)),
-    path("event_autocomplete", views.event_search, name="events_auto"),
 ]

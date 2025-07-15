@@ -4,7 +4,7 @@
 {% endblock title %}
 {% block info_row %}
   <h4>Event Search</h4>
-  <h6>Event Date: {{ request.POST.date }}</h6>
+  <h6>Event Date: {{ request.GET.date }}</h6>
 {% endblock info_row %}
 {% block table_id %}
   eventTable

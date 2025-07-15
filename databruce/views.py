@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import os
 import re
@@ -27,7 +28,7 @@ from django.db.models import (
 )
 from django.db.models.functions import TruncYear
 from django.forms import formset_factory
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
@@ -43,7 +44,6 @@ from . import forms, models
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
-INTERNAL_RESET_SESSION_TOKEN = "_password_reset_token"
 
 
 class Index(TemplateView):
@@ -195,13 +195,13 @@ class SignUp(TemplateView):
     from_email = None
     html_email_template_name = None
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Signup"
         context["form"] = self.form_class
         return context
 
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class(request.POST)
 
         if form.is_valid():
@@ -257,27 +257,20 @@ class SignUp(TemplateView):
                 "subject": subject,
                 "text": body,
             },
+            timeout=10,
         )
-
-        # try:
-        #     email_message.send()
-        # except Exception:
-        #     logger.exception(
-        #         "Failed to send activation email to %s",
-        #         context["user"].pk,
-        #     )
 
 
 class SignUpConfirm(TemplateView):
     template_name = "users/signup_done.html"
-    reset_url_token = "activate"
+    reset_url_token = "activate"  # noqa: S105
     token_generator = default_token_generator
 
     def get_user(self, uidb64):
         try:
             # urlsafe_base64_decode() decodes to bytestring
             uid = urlsafe_base64_decode(uidb64).decode()
-            user = UserModel._default_manager.get(pk=uid)
+            user = UserModel._default_manager.get(pk=uid)  # noqa: SLF001
         except (
             TypeError,
             ValueError,
@@ -303,7 +296,9 @@ class SignUpConfirm(TemplateView):
         if self.user is not None:
             token = kwargs["token"]
             if token == self.reset_url_token:
-                session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
+                session_token = self.request.session.get(
+                    os.getenv("INTERNAL_RESET_SESSION_TOKEN"),
+                )
                 if self.token_generator.check_token(
                     user=self.user,
                     token=session_token,
@@ -316,7 +311,9 @@ class SignUpConfirm(TemplateView):
                     user=self.user,
                     token=token,
                 ):
-                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+                    self.request.session[os.getenv("INTERNAL_RESET_SESSION_TOKEN")] = (
+                        token
+                    )
 
                     user_group = User.objects.get(username=self.user)
                     group = Group.objects.get(name="Users")
@@ -740,6 +737,34 @@ class SongDetail(TemplateView):
         return context
 
 
+def event_search(request: HttpRequest):
+    data = None
+
+    if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
+        q = request.GET.get("term", "")
+        results = []
+
+        search_qs = models.Events.objects.filter(date__startswith=q).order_by("id")
+
+        for r in search_qs:
+            result = {
+                "id": r.id,
+                "value": f"{r.date.strftime('%Y-%m-%d')} - {r.venue}",
+                "date": r.date.strftime("%Y-%m-%d"),
+            }
+
+            if r.early_late:
+                result["value"] = (
+                    f"{r.date.strftime('%Y-%m-%d')} {r.early_late} - {r.venue}"
+                )
+
+            results.append(result)
+
+        data = json.dumps(results)
+
+    return HttpResponse(data, "application/json")
+
+
 class EventSearch(TemplateView):
     template_name = "databruce/search/search.html"
     form = forms.EventSearch
@@ -752,10 +777,11 @@ class EventSearch(TemplateView):
         "tour",
     )
 
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        form = self.form(request.POST)
+    def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        form = self.form(request.GET)
 
         if form.is_valid():
+            print(form.cleaned_data)
             try:
                 result = self.queryset.filter(
                     date=form.cleaned_data["date"],

@@ -254,9 +254,19 @@
       </div>
     </div>
     <script>
-        $(document).ready(function() {
-            $('#eventSearch').mask('0000-00-00');
+      $(document).ready(function () {
+        $("#eventSearch").autocomplete({
+            autoFocus: true,
+            source: "{% url 'events_auto' %}",
+            minLength: 7,
+            position: { my : "right top", at: "right bottom" },
+            select: function (event, ui) {
+                window.location.href = "/search/results?date=" + ui.item.date;
+                console.log(ui.item);
+            }
         });
+        $('#eventSearch').mask('0000-00-00');
+      });
     </script>
     <script>
         $(document).ready(function() {
