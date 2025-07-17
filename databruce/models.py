@@ -927,6 +927,11 @@ class Songs(models.Model):
 
     original = models.BooleanField(default=False)
     category = models.TextField(blank=True, default=None)
+    spotify_id = models.TextField(blank=True, default=None)
+
+    mbid = models.TextField(blank=True, default=None)
+
+    length = models.TimeField(blank=True, default=None)
 
     album = models.ForeignKey(
         to=Releases,

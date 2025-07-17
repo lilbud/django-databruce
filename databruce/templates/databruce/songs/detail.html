@@ -18,12 +18,37 @@
             <div class="pe-2 fw-semibold">Original Artist:</div>
             <div>{{ song_info.original_artist|default_if_none:"Bruce Springsteen" }}</div>
           </div>
+          {% if song_info.length %}
+            <div class="d-flex flex-row fs-6">
+              <div class="pe-2 fw-semibold">Length:</div>
+              <div>{{ song_info.length|date:"i:s" }}</div>
+            </div>
+          {% endif %}
           {% if song_info.album %}
             <div class="d-flex flex-row fs-6">
               <div class="pe-2 fw-semibold">Category:</div>
               <div>
                 <a href="{% url "release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
               </div>
+            </div>
+          {% endif %}
+          {% if song_info.spotify_id or song_info.brucebase_url %}
+            <div class="d-flex flex-row fs-6">
+              <div class="pe-2 fw-semibold">Links:</div>
+            </div>
+            <div class="d-flex flex-row fs-6">
+              <ul>
+                {% if song_info.brucebase_url %}
+                  <li>
+                    <a href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
+                  </li>
+                {% endif %}
+                {% if song_info.spotify_id %}
+                  <li>
+                    <a href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
+                  </li>
+                {% endif %}
+              </ul>
             </div>
           {% endif %}
         </div>

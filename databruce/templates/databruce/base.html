@@ -229,11 +229,8 @@
             {% endif %}
           </ul>
           <div class="d-flex me-2">
-            <form class="d-flex"
-                  role="search"
-                  method="post"
-                  action="{% url 'search' %}">
-              {% csrf_token %}
+            <form class="d-flex" role="search" method="get" action="{% url 'search' %}">
+              {% comment %} {% csrf_token %} {% endcomment %}
               <div class="input-group">
                 {{ searchForm.date }}
                 <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
@@ -255,13 +252,14 @@
     </div>
     <script>
       $(document).ready(function () {
+        $('.noEnterSubmit').bind('keypress', false);
         $("#eventSearch").autocomplete({
             autoFocus: true,
             source: "{% url 'events_auto' %}",
             minLength: 7,
             position: { my : "right top", at: "right bottom" },
             select: function (event, ui) {
-                window.location.href = "/search/results?date=" + ui.item.date;
+                window.location.href = "/events/" + ui.item.id;
                 console.log(ui.item);
             }
         });

@@ -59,6 +59,7 @@
                 <tr class="header">
                   <th scope="col">#</th>
                   <th scope="col">Song</th>
+                  <th scope="col">Length</th>
                   <th scope="col">Plays</th>
                   <th scope="col">Event Date</th>
                 </tr>
@@ -69,6 +70,9 @@
                     <td>{{ track.track }}</td>
                     <td>
                       <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
+                    </td>
+                    <td>
+                      {% if track.song.length %}{{ track.song.length|date:"i:s" }}{% endif %}
                     </td>
                     <td>{{ track.song.num_plays_public }}</td>
                     <td>
