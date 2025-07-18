@@ -59,7 +59,7 @@ table tbody td {
     border-top-right-radius: inherit !important;
 }
 
-table>tbody>tr>td,
+table.dataTable>tbody>tr>td,
 .card-body,
 .list-group-item {
     font-size: 0.85rem;

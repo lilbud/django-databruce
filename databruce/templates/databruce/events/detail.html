@@ -273,6 +273,39 @@
         </div>
         <div class="col-12 col-lg-4 order-1 order-lg-2">
           <div class="row row-cols-1 g-3 mb-3">
+            {% if event.public %}
+              <div class="col">
+                <div class="card">
+                  <div class="card-header">User Stats</div>
+                  <div class="card-body">
+                    <div class="col">
+                      <div class="row mb-2">
+                        <h6>{{ user_count }} user(s) were at this show.</h6>
+                      </div>
+                      <div class="row">
+                        {% if user.is_authenticated %}
+                          <form method="post" action="{% url "add_show" %}">
+                            <input type="hidden" name="event" value="{{ event.id }}">
+                            {% csrf_token %}
+                            <button id="submit-button"
+                                    type="submit"
+                                    name="submit"
+                                    class="btn btn-sm btn-success"
+                                    {% if event.id in user_shows %}disabled{% endif %}>
+                              {% if event.id in user_shows %}
+                                Show already in Profile
+                              {% else %}
+                                Add Show to Profile
+                              {% endif %}
+                            </button>
+                          </form>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
             <div class="col">
               <div class="card">
                 <div class="card-header">Event Info</div>
@@ -379,39 +412,6 @@
                         </li>
                       </ul>
                     {% endif %}
-                  </div>
-                </div>
-              </div>
-            {% endif %}
-            {% if event.publicity == "Public" %}
-              <div class="col">
-                <div class="card">
-                  <div class="card-header">User Stats</div>
-                  <div class="card-body">
-                    <div class="col">
-                      <div class="row mb-2">
-                        <h6>{{ user_count }} user(s) were at this show.</h6>
-                      </div>
-                      <div class="row">
-                        {% if user.is_authenticated %}
-                          <form method="post" action="{% url "add_show" %}">
-                            <input type="hidden" name="event" value="{{ event.id }}">
-                            {% csrf_token %}
-                            <button id="submit-button"
-                                    type="submit"
-                                    name="submit"
-                                    class="btn btn-sm btn-success"
-                                    {% if event.id in user_shows %}disabled{% endif %}>
-                              {% if event.id in user_shows %}
-                                Show already in Profile
-                              {% else %}
-                                Add Show to Profile
-                              {% endif %}
-                            </button>
-                          </form>
-                        {% endif %}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
