@@ -30,12 +30,12 @@
         </td>
         <td>
           {% if song.first %}
-            <a href="{% url "event_details" id=song.first.id %}">{{ song.first }}</a>
+            <a href="{% url "event_details" id=song.first.id %}">{{ song.first.date|date:"Y-m-d" }}</a>
           {% endif %}
         </td>
         <td>
           {% if song.last %}
-            <a href="{% url "event_details" id=song.last.id %}">{{ song.last }}</a>
+            <a href="{% url "event_details" id=song.last.id %}">{{ song.last.date|date:"Y-m-d" }}</a>
           {% endif %}
         </td>
         <td class="text-center">{{ song.num_plays_public }}</td>
