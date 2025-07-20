@@ -1319,7 +1319,7 @@ class ShortenURL(TemplateView):
         short_url = shortener.create(user, request.GET["url"])
 
         return HttpResponse(
-            json.dumps({"short_url": f"{request.get_host()}/s/{short_url}"}),
+            json.dumps({"short_url": f"https://{request.get_host()}/s/{short_url}"}),
             content_type="application/json",
         )
 
