@@ -35,7 +35,14 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",
     "django_filters",
+    "shortener",
 ]
+
+SHORTENER_ENABLED = True
+SHORTENER_MAX_URLS = -1
+SHORTENER_MAX_CONCURRENT = -1
+SHORTENER_LIFESPAN = -1
+SHORTENER_MAX_USES = -1
 
 MIDDLEWARE = [
     # These three are optional, but highly recommended!

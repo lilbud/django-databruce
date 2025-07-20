@@ -12,6 +12,7 @@ date = datetime.datetime.today()
 app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
+    path("s/", include("shortener.urls")),
     path("admin/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
@@ -110,6 +111,16 @@ urlpatterns = [
         "advanced_search/",
         views.AdvancedSearch.as_view(),
         name="adv_search",
+    ),
+    path(
+        "advanced_search_results",
+        views.AdvancedSearchResults.as_view(),
+        name="adv_search_results",
+    ),
+    path(
+        "short_url/",
+        views.ShortenURL.as_view(),
+        name="short_url",
     ),
     path(
         "notes_search/",

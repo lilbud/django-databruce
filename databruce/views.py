@@ -39,6 +39,7 @@ from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
+from shortener import shortener
 
 from . import forms, models
 
@@ -1045,9 +1046,23 @@ class AdvancedSearch(View):
             context={"form": form, "formset": setlist_formset},
         )
 
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002, C901, PLR0912, PLR0915
-        event_form = self.form_class(request.POST)
-        formset = self.formset_class(data=request.POST)
+
+class AdvancedSearchResults(View):
+    template_name = "databruce/search/advanced_search_results.html"
+    form_class = forms.AdvancedEventSearch
+    formset_class = formset_factory(forms.SetlistSearch)
+    date = datetime.datetime.today()
+
+    def check_field_choice(self, choice: str, field_filter: Q) -> Q:
+        """Every field has a IS/NOT choice on it. Depending on that choice, the filter can be negated or not. This checks for that value and returns the correct filter."""
+        if choice == "is":
+            return field_filter
+
+        return ~field_filter
+
+    def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        event_form = self.form_class(request.GET)
+        formset = self.formset_class(data=request.GET)
         results = []
 
         if event_form.is_valid():
@@ -1289,18 +1304,24 @@ class AdvancedSearch(View):
         )
 
         return render(
-            request,
-            "databruce/search/advanced_search_results.html",
+            request=request,
+            template_name=self.template_name,
             context={
                 "events": result.order_by("id"),
-                "form": event_form,
                 "results": results,
             },
         )
 
 
-class AdvancedSearchResults(View):
-    print()
+class ShortenURL(TemplateView):
+    def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        user = User.objects.first()
+        short_url = shortener.create(user, request.GET["url"])
+
+        return HttpResponse(
+            json.dumps({"short_url": f"{request.get_host()}/s/{short_url}"}),
+            content_type="application/json",
+        )
 
 
 class Relation(TemplateView):

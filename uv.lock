@@ -146,6 +146,7 @@ dependencies = [
     { name = "django-crispy-forms" },
     { name = "django-debug-toolbar" },
     { name = "django-filter" },
+    { name = "django-link-shortener" },
     { name = "djangorestframework" },
     { name = "djangorestframework-datatables" },
     { name = "djlint" },
@@ -163,6 +164,7 @@ requires-dist = [
     { name = "django-crispy-forms", specifier = "==2.3" },
     { name = "django-debug-toolbar", specifier = "==5.1.0" },
     { name = "django-filter", specifier = "==24.3" },
+    { name = "django-link-shortener", specifier = ">=1.0.1" },
     { name = "djangorestframework", specifier = "==3.15.2" },
     { name = "djangorestframework-datatables", specifier = "==0.7.2" },
     { name = "djlint", specifier = ">=1.36.4" },
@@ -195,6 +197,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/50/bc/dc19ae39c235332926dd0efe0951f663fa1a9fc6be8430737ff7fd566b20/django_filter-24.3.tar.gz", hash = "sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3", size = 144444 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/09/b1/92f1c30b47c1ebf510c35a2ccad9448f73437e5891bbd2b4febe357cc3de/django_filter-24.3-py3-none-any.whl", hash = "sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64", size = 95011 },
+]
+
+[[package]]
+name = "django-link-shortener"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/65/ca/5aaffcc734f5a1117ffe5d6931243318de6a1ecc7707d96887d48f704934/django_link_shortener-1.0.1.tar.gz", hash = "sha256:0aa36a18fe74208e1a04b94835f8afbf70270a308f90cabad2628b1d80584571", size = 7452 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/36/6504a205241b1e567d9027754a64037d74f34be0527dd3d4296ddabda3eb/django_link_shortener-1.0.1-py3-none-any.whl", hash = "sha256:568e30ba1bb195df59085d64de1300a3fecb65ef628ffbb15f0ee6a9d8894327", size = 10731 },
 ]
 
 [[package]]

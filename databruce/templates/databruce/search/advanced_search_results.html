@@ -8,6 +8,10 @@
   <div class="row mb-4">
     <div class="col">
       <h4>Event Search Results</h4>
+      <h6>Click link below to copy a short url to these results (the links are very long and look awful).</h6>
+      <div id="short_url">
+        <button id="short-url" class="btn btn-link">Get Short URL</button>
+      </div>
     </div>
   </div>
   <div class="row mb-4">
@@ -16,7 +20,7 @@
         <div class="card-body">
           <div id="row">
             <div class="d-flex flex-column">
-              {% with data=request.POST %}
+              {% with data=request.GET %}
                 {% if data.first_date %}
                   {% include "./result_row.html" with label="Start Date:" data=data.first_date %}
                 {% endif %}
@@ -123,7 +127,28 @@
     $(document).ready(function () {
       new DataTable('#table', {
         layout: layout,
-      })
-    })
+      });
+
+      $('#short-url').click(function () {
+        var received_data  = "{{ request.get_full_path|safe }}"
+        
+        $.ajax({
+            url: "/short_url/",
+            type: "GET",
+            data: {'url': received_data},
+            cache: false,
+            dataType: "json",
+            success: function(resp) {
+              var a = $('<span />');
+              a.attr('id', 'shortLink');
+              a.text(resp.short_url);
+
+              $('#short_url').append(a);
+            }
+        });
+
+        $('#short-url').prop('disabled', true);
+      });
+    });
   </script>
 {% endblock content %}

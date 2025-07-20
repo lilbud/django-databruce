@@ -9,3 +9,4 @@ django-autocomplete-light
 psycopg[binary,pool]
 requests
 django-allauth
+django-link-shortener
