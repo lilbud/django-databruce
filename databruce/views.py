@@ -1063,6 +1063,7 @@ class AdvancedSearchResults(View):
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         event_form = self.form_class(request.GET)
         formset = self.formset_class(data=request.GET)
+        song_results = []
         results = []
 
         if event_form.is_valid():
@@ -1071,6 +1072,11 @@ class AdvancedSearchResults(View):
                 date__lte=event_form.cleaned_data["last_date"],
             )
 
+            results.append(f"Start Date: {event_form.cleaned_data['first_date']}")
+            results.append(f"End Date: {event_form.cleaned_data['last_date']}")
+
+            from .templatetags import search_filters
+
             if event_form.cleaned_data["month"]:
                 event_filter.add(
                     self.check_field_choice(
@@ -1078,6 +1084,10 @@ class AdvancedSearchResults(View):
                         Q(date__month=event_form.cleaned_data["month"]),
                     ),
                     Q.AND,
+                )
+
+                results.append(
+                    f"Month: ({event_form.cleaned_data['month_choice']}) {search_filters.get_month_from_num(event_form.cleaned_data['month'])}",
                 )
 
             if event_form.cleaned_data["day"]:
@@ -1089,6 +1099,10 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                results.append(
+                    f"Day: ({event_form.cleaned_data['day_choice']}) {event_form.cleaned_data['day']}",
+                )
+
             if event_form.cleaned_data["city"]:
                 event_filter.add(
                     self.check_field_choice(
@@ -1096,6 +1110,10 @@ class AdvancedSearchResults(View):
                         Q(venue__city__id=event_form.cleaned_data["city"]),
                     ),
                     Q.AND,
+                )
+
+                results.append(
+                    f"City: ({event_form.cleaned_data['city_choice']}) {search_filters.get_city(event_form.cleaned_data['city'])}",
                 )
 
             if event_form.cleaned_data["state"]:
@@ -1106,6 +1124,9 @@ class AdvancedSearchResults(View):
                     ),
                     Q.AND,
                 )
+                results.append(
+                    f"State: ({event_form.cleaned_data['state_choice']}) {search_filters.get_state(event_form.cleaned_data['state'])}",
+                )
 
             if event_form.cleaned_data["country"]:
                 event_filter.add(
@@ -1115,6 +1136,9 @@ class AdvancedSearchResults(View):
                     ),
                     Q.AND,
                 )
+                results.append(
+                    f"Country: ({event_form.cleaned_data['country_choice']}) {search_filters.get_country(event_form.cleaned_data['country'])}",
+                )
 
             if event_form.cleaned_data["tour"]:
                 event_filter.add(
@@ -1123,6 +1147,10 @@ class AdvancedSearchResults(View):
                         Q(tour__id=event_form.cleaned_data["tour"]),
                     ),
                     Q.AND,
+                )
+
+                results.append(
+                    f"Tour: ({event_form.cleaned_data['tour_choice']}) {search_filters.get_tour(event_form.cleaned_data['tour'])}",
                 )
 
             # musician and band query a different model, and have to be handled separately
@@ -1140,6 +1168,10 @@ class AdvancedSearchResults(View):
 
                 event_filter.add(Q(id__in=events), Q.AND)
 
+                results.append(
+                    f"Musician: ({event_form.cleaned_data['musician_choice']}) {search_filters.get_relation(event_form.cleaned_data['musician'])}",
+                )
+
             if event_form.cleaned_data["band"]:
                 filter = self.check_field_choice(
                     event_form.cleaned_data["band_choice"],
@@ -1152,6 +1184,10 @@ class AdvancedSearchResults(View):
 
                 event_filter.add(Q(id__in=events), Q.AND)
 
+                results.append(
+                    f"Band: ({event_form.cleaned_data['band_choice']}) {search_filters.get_band(event_form.cleaned_data['band'])}",
+                )
+
             if event_form.cleaned_data["day_of_week"]:
                 event_filter.add(
                     self.check_field_choice(
@@ -1159,6 +1195,10 @@ class AdvancedSearchResults(View):
                         Q(date__week_day=event_form.cleaned_data["day_of_week"]),
                     ),
                     Q.AND,
+                )
+
+                results.append(
+                    f"Day of Week: ({event_form.cleaned_data['dow_choice']}) {search_filters.get_day_from_num(event_form.cleaned_data['day_of_week'])}",
                 )
 
         event_results = []
@@ -1180,7 +1220,7 @@ class AdvancedSearchResults(View):
                         else:
                             setlist_filter.add(~followed_filter, Q.AND)
 
-                        results.append(
+                        song_results.append(
                             f"{song1} ({form['choice']} followed by) {song2}",
                         )
 
@@ -1218,7 +1258,7 @@ class AdvancedSearchResults(View):
                             setlist_filter.add(~Q(position=form["position"]), Q.AND)
                             setlist_filter.add(~Q(event__id__in=song_events), Q.AND)
 
-                        results.append(
+                        song_results.append(
                             f"{song1} ({form['choice']} {form['position']})",
                         )
 
@@ -1261,7 +1301,7 @@ class AdvancedSearchResults(View):
                             list(qs.values_list("event__id", flat=True)),
                         )
 
-                        results.append(
+                        song_results.append(
                             f"{song1} ({form['choice']} anywhere)",
                         )
 
@@ -1308,7 +1348,10 @@ class AdvancedSearchResults(View):
             template_name=self.template_name,
             context={
                 "events": result.order_by("id"),
+                "title": "Advanced Search",
+                "description": ", ".join(results + song_results),
                 "results": results,
+                "song_results": song_results,
             },
         )
 

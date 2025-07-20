@@ -7,10 +7,12 @@
     <meta name="description" content="A Springsteen Setlist Database">
     <meta name="keywords" content="Databruce, Setlists, Springsteen">
     <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
-    <meta property="og:title" content="{{ title }}">
+    <meta property="og:title" content="{{ title|default_if_none:"Databruce" }}">
     <meta property="og:site_name" content="Databruce">
     <meta property="og:type" content="website">
-    <meta property="og:description" content="A Springsteen Setlist Database">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:description"
+          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
     <title>
       {% block title %}
       {% endblock title %}

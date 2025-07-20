@@ -2,12 +2,12 @@
 {% load search_filters %}
 {% load filters %}
 {% block title %}
-  Event Search Results
+  Advanced Search Results
 {% endblock title %}
 {% block content %}
   <div class="row mb-4">
     <div class="col">
-      <h4>Event Search Results</h4>
+      <h4>Advanced Search Results</h4>
       <h6>Click link below to copy a short url to these results (the links are very long and look awful).</h6>
       <div id="short_url">
         <button id="short-url" class="btn btn-link">Get Short URL</button>
@@ -20,54 +20,26 @@
         <div class="card-body">
           <div id="row">
             <div class="d-flex flex-column">
-              {% with data=request.GET %}
-                {% if data.first_date %}
-                  {% include "./result_row.html" with label="Start Date:" data=data.first_date %}
-                {% endif %}
-                {% if data.last_date %}
-                  {% include "./result_row.html" with label="End Date:" data=data.last_date %}
-                {% endif %}
-                {% if data.month %}
-                  {% include "./result_row.html" with label="Month:" choice=data.month_choice data=data.month|get_month %}
-                {% endif %}
-                {% if data.day %}
-                  {% include "./result_row.html" with label="Day:" choice=data.day_choice data=data.day|get_ordinal %}
-                {% endif %}
-                {% if data.day_of_week %}
-                  {% include "./result_row.html" with label="Day of Week:" choice=data.dow_choice data=data.day_of_week|get_day %}
-                {% endif %}
-                {% if data.city %}
-                  {% include "./result_row.html" with label="City:" choice=data.city_choice data=data.city|get_city %}
-                {% endif %}
-                {% if data.state %}
-                  {% include "./result_row.html" with label="State:" choice=data.state_choice data=data.state|get_state %}
-                {% endif %}
-                {% if data.country %}
-                  {% include "./result_row.html" with label="Country:" choice=data.country_choice data=data.country|get_country %}
-                {% endif %}
-                {% if data.tour %}
-                  {% include "./result_row.html" with label="Tour:" choice=data.tour_choice data=data.tour|get_tour %}
-                {% endif %}
-                {% if data.musician %}
-                  {% include "./result_row.html" with label="Musician:" choice=data.musician_choice data=data.musician|get_relation %}
-                {% endif %}
-                {% if data.band %}
-                  {% include "./result_row.html" with label="Band:" choice=data.band_choice data=data.band|get_band %}
-                {% endif %}
-                {% if results %}
-                  <span>
-                    <div class="d-flex flex-row">
-                      <div class="pe-2">Songs:</div>
-                      <div>
-                        {% for result in results %}
-                          {{ result }}
-                          {% if not forloop.last %}<span class="text-uppercase">{{ data.conjunction }}</span>{% endif %}
-                        {% endfor %}
-                      </div>
+              {% if results or song_results %}
+                <span>
+                  <div class="d-flex flex-row">
+                    <div class="pe-2">Songs:</div>
+                    <div>
+                      {% for result in song_results %}
+                        {{ result }}
+                        {% if not forloop.last %}<span class="text-uppercase">{{ data.conjunction }}</span>{% endif %}
+                      {% endfor %}
                     </div>
-                  </span>
-                {% endif %}
-              {% endwith %}
+                  </div>
+                </span>
+                <span>
+                  {% for result in results %}
+                    <div class="d-flex flex-row">
+                      <div>{{ result }}</div>
+                    </div>
+                  {% endfor %}
+                </span>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -130,7 +102,7 @@
       });
 
       $('#short-url').click(function () {
-        var received_data  = "{{ request.get_full_path|safe }}"
+        var received_data  = "{{ request.build_absolute_uri|safe }}"
         
         $.ajax({
             url: "/short_url/",
