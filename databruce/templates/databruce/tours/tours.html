@@ -26,10 +26,16 @@
         <td class="wrap">
           <a href="{% url "tour_details" id=tour.id %}">{{ tour.name }}</a>
         </td>
-        <td>
+        <td {% with first=tour.first %}
+            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            {% endwith %}>
           <a href="{% url "event_details" id=tour.first.id %}">{{ tour.first }}</a>
         </td>
-        <td>
+        <td {% with last=tour.last %}
+            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            {% endwith %}>
           <a href="{% url "event_details" id=tour.last.id %}">{{ tour.last }}</a>
         </td>
         <td class="text-center">{{ tour.num_shows }}</td>
@@ -53,7 +59,8 @@
         {
           target: -1,
           visible: false
-        }
+        },
+        { type: 'date', targets: [1, 2] }
       ],
     });
   });

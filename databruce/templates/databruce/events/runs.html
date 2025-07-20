@@ -39,10 +39,14 @@
         </td>
         <td class="text-center">{{ run.num_shows }}</td>
         <td class="text-center">{{ run.num_songs }}</td>
-        <td class="text-nowrap">
+        <td class="text-nowrap"
+            data-sort="{{ run.first.id|slice:"0:4" }}-{{ run.first.id|slice:"4:6" }}-{{ run.first.id|slice:"6:8" }}"
+            data-filter="{{ run.first.id|slice:"0:4" }}-{{ run.first.id|slice:"4:6" }}-{{ run.first.id|slice:"6:8" }}">
           <a href="{% url "event_details" id=run.first.id %}">{{ run.first }}</a>
         </td>
-        <td class="text-nowrap">
+        <td class="text-nowrap"
+            data-sort="{{ run.last.id|slice:"0:4" }}-{{ run.last.id|slice:"4:6" }}-{{ run.last.id|slice:"6:8" }}"
+            data-filter="{{ run.last.id|slice:"0:4" }}-{{ run.last.id|slice:"4:6" }}-{{ run.last.id|slice:"6:8" }}">
           <a href="{% url "event_details" id=run.last.id %}">{{ run.last }}</a>
         </td>
       </tr>
@@ -52,12 +56,13 @@
 {% block scripts %}
   <script>
   // custom searchBuilder columns definition
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5];
+  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6, 7];
 
     $(document).ready(function () {
         new DataTable('#runTable', {
             layout: layout,
             order: [[6, 'asc']],
+            columnDefs: [{ type: 'date', targets: [6, 7] }]
         });
     });
   </script>

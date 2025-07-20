@@ -24,15 +24,17 @@
         <td>
           <a href="{% url "country_details" id=country.id %}">{{ country }}</a>
         </td>
-        <td>
-          {% if country.first %}
-            <a href="{% url "event_details" id=country.first.id %}">{{ country.first }}</a>
-          {% endif %}
+        <td {% with first=country.first %}
+            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            {% endwith %}>
+          <a href="{% url "event_details" id=country.first.id %}">{{ country.first }}</a>
         </td>
-        <td>
-          {% if country.last %}
-            <a href="{% url "event_details" id=country.last.id %}">{{ country.last }}</a>
-          {% endif %}
+        <td {% with last=country.last %}
+            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            {% endwith %}>
+          <a href="{% url "event_details" id=country.last.id %}">{{ country.last }}</a>
         </td>
         <td class="text-center">{{ country.num_events }}</td>
       </tr>
@@ -42,12 +44,13 @@
 {% block scripts %}
   <script>
     // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [3];
+    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3];
 
     $(document).ready(function () {
       new DataTable('#countryTable', {  
         order: [[0, 'asc']],
         layout: layout,
+        columnDefs: [{ type: 'date', targets: [1,2] }]
       })
     })
   </script>

@@ -30,10 +30,16 @@
             <a href="{% url "country_details" id=state.country.id %}">{{ state.country }}</a>
           {% endif %}
         </td>
-        <td>
+        <td {% with first=state.first %}
+            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            {% endwith %}>
           <a href="{% url "event_details" id=state.first.id %}">{{ state.first }}</a>
         </td>
-        <td>
+        <td {% with last=state.last %}
+            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            {% endwith %}>
           <a href="{% url "event_details" id=state.last.id %}">{{ state.last }}</a>
         </td>
         <td class="text-center">{{ state.num_events }}</td>
@@ -44,11 +50,12 @@
 {% block scripts %}
   <script>
     // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [1];
+    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3,4];
 
     $(document).ready(function () {
       new DataTable('#stateTable', {
         layout: layout,
+        columnDefs: [{ type: 'date', targets: [2,3] }]
       });
     })
   </script>

@@ -24,11 +24,17 @@
         <td>
           <a href="{% url "relation_details" id=relation.id %}">{{ relation }}</a>
         </td>
-        <td>
-          {% if relation.first %}<a href="">{{ relation.first }}</a>{% endif %}
+        <td {% with first=relation.first %}
+            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            {% endwith %}>
+          <a href="{% url "event_details" id=relation.last.id %}">{{ relation.first }}</a>
         </td>
-        <td>
-          {% if relation.last %}<a href="">{{ relation.last }}</a>{% endif %}
+        <td {% with last=relation.last %}
+            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            {% endwith %}>
+          <a href="{% url "event_details" id=relation.last.id %}">{{ relation.last }}</a>
         </td>
         <td class="text-center">{{ relation.appearances }}</td>
       </tr>
@@ -37,13 +43,14 @@
 {% endblock table %}
 {% block scripts %}
   <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop();
+    // custom searchBuilder columns definition
+    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3];
 
     $(document).ready(function () {
       new DataTable('#relationsTable', {
         layout: layout,
         order: [[0, 'asc']],
+        columnDefs: [{ type: 'date', targets: [1, 2] }]
       });
     });
   </script>

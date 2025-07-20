@@ -28,14 +28,14 @@
         <td class="text-nowrap">
           <a href="{% url 'song_details' id=song.id %}">{{ song.name }}</a>
         </td>
-        <td data-sort="{{ song.first.id|slice:"0:8" }}"
-            data-filter="{{ song.first.id|slice:"0:8" }}">
+        <td data-sort="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}"
+            data-filter="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}">
           {% if song.first %}
             <a href="{% url "event_details" id=song.first.id %}">{{ song.first }}</a>
           {% endif %}
         </td>
-        <td data-sort="{{ song.last.id|slice:"0:8" }}"
-            data-filter="{{ song.last.id|slice:"0:8" }}">
+        <td data-sort="{{ song.last.id|slice:"0:4" }}-{{ song.last.id|slice:"4:6" }}-{{ song.last.id|slice:"6:8" }}"
+            data-filter="{{ song.last.id|slice:"0:4" }}-{{ song.last.id|slice:"4:6" }}-{{ song.last.id|slice:"6:8" }}">
           {% if song.last %}
             <a href="{% url "event_details" id=song.last.id %}">{{ song.last }}</a>
           {% endif %}
@@ -75,6 +75,7 @@
           target: -1,
           visible: false
         },
+        { type: 'date', targets: [1, 2] }
       ],
       initComplete: function () {
         this.api()

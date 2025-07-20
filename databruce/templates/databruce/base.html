@@ -267,15 +267,20 @@
             }
         });
         $('#eventSearch').mask('0000-00-00');
-        $('.dtsb-input').mask('0000-00-00');
+
+        let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
+        DateTime.defaults.maxDate = new Date();
+        DataTable.datetime('YYYYMMDD');
       });
     </script>
     <script>
         $(document).ready(function() {
-            let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"

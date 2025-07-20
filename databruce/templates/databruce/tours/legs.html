@@ -29,10 +29,16 @@
         <td>
           <a href="{% url "tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
         </td>
-        <td>
+        <td {% with first=leg.first %}
+            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
+            {% endwith %}>
           <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first }}</a>
         </td>
-        <td>
+        <td {% with last=leg.last %}
+            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
+            {% endwith %}>
           <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last }}</a>
         </td>
         <td class="text-center">{{ leg.num_shows }}</td>
@@ -50,7 +56,8 @@
   $(document).ready(function () {
     new DataTable('#tourLegTable', {
       layout: layout,
-      order: [[2, 'desc']],
+      order: [[3, 'desc']],
+      columnDefs: [{ type: 'date', targets: [2, 3] }]
     });
   });
   </script>
