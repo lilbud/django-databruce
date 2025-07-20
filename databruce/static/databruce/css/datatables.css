@@ -77,7 +77,10 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 
 .dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
     width: 700px !important;
-    transform: translateX(-2%) !important;
+    transform: translateX(-4%) !important;
+    display: block;
+    top: 31px;
+    left: 1100px;
 }
 
 .dataTables_wrapper .dataTables_filter {
@@ -97,4 +100,19 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 
 #setlistTable_wrapper .dt-layout-table.mt-2 {
     margin-top: 0 !important;
+}
+
+.dt-datetime-calendar > table {
+    table-layout: fixed;
+}
+
+.dt-datetime-calendar > table > tbody > tr > td,
+.dt-datetime-calendar > table > thead > tr > th
+{
+    padding: 0% !important;
+}
+
+div.dt-datetime {
+    top: 57.6px !important;
+    left: 1562.33px !important;
 }
