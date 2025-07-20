@@ -341,12 +341,7 @@ class AdvancedEventSearch(forms.Form):
         except ValueError:
             pass
 
-        return (
-            models.Events.objects.filter(date__isnull=False)
-            .order_by("date")
-            .first()
-            .date
-        )
+        return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
 
     def clean_last_date(self):
         # found on stackoverflow, probably not the "best" way to do this
@@ -362,12 +357,7 @@ class AdvancedEventSearch(forms.Form):
         except ValueError:
             pass
 
-        return (
-            models.Events.objects.filter(date__isnull=False)
-            .order_by("-date")
-            .first()
-            .date
-        )
+        return datetime.datetime.strptime(f"{DATE.year}-12-31", "%Y-%m-%d").date()
 
 
 class SetlistSearch(forms.Form):

@@ -42,6 +42,7 @@ from django.views.generic import TemplateView
 from shortener import shortener
 
 from . import forms, models
+from .templatetags import search_filters
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -1072,10 +1073,17 @@ class AdvancedSearchResults(View):
                 date__lte=event_form.cleaned_data["last_date"],
             )
 
-            results.append(f"Start Date: {event_form.cleaned_data['first_date']}")
-            results.append(f"End Date: {event_form.cleaned_data['last_date']}")
+            if (
+                event_form.cleaned_data["first_date"].strftime("%Y-%m-%d")
+                != "1965-01-01"
+            ):
+                results.append(f"Start Date: {event_form.cleaned_data['first_date']}")
 
-            from .templatetags import search_filters
+            if (
+                event_form.cleaned_data["last_date"].strftime("%Y-%m-%d")
+                != f"{datetime.datetime.today().year}-12-31"
+            ):
+                results.append(f"End Date: {event_form.cleaned_data['last_date']}")
 
             if event_form.cleaned_data["month"]:
                 event_filter.add(
@@ -1343,13 +1351,24 @@ class AdvancedSearchResults(View):
             )
         )
 
+        description = ""
+        event_des = song_des = ""
+
+        if results:
+            event_des = ", ".join(results)
+
+        if song_results:
+            song_des = f"Songs: {', '.join(song_results)}"
+
+        description += event_des + song_des
+
         return render(
             request=request,
             template_name=self.template_name,
             context={
                 "events": result.order_by("id"),
                 "title": "Advanced Search",
-                "description": ", ".join(results + song_results),
+                "description": description,
                 "results": results,
                 "song_results": song_results,
             },
