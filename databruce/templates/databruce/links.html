@@ -1,0 +1,30 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Links
+{% endblock title %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="row mb-2">
+        <h4>
+          <a class="sky-500" href="{% url 'index' %}">Databruce</a> &gt; Links
+        </h4>
+        <h6>Below are links to various sites. Some of which acted as data sources. This will be updated over time.</h6>
+        <div class="col">
+          <ul>
+            <li>
+              <a class="sky-500" href="https://brucebase.wikidot.com">Brucebase</a> (Main Source for the data.)
+            </li>
+            <li>
+              <a class="sky-500" href="https://www.springsteenlyrics.com">SpringsteenLyrics</a> (Where I got most of the bootleg info).
+            </li>
+            <li>
+              <a class="sky-500" href="https://springsteendvds.wordpress.com">SpringsteenDVDs</a> (Where much of the video bootleg info comes from).
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

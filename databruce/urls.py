@@ -12,6 +12,8 @@ date = datetime.datetime.today()
 app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
+    path("about/", views.About.as_view(), name="about"),
+    path("links/", views.Links.as_view(), name="links"),
     path("s/", include("shortener.urls")),
     path("admin/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
@@ -102,6 +104,12 @@ urlpatterns = [
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
     path("songs", views.Song.as_view(), name="songs"),
     path("songs/<int:id>", views.SongDetail.as_view(), name="song_details"),
+    path("songs/lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
+    path(
+        "songs/<int:songid>/lyrics/<int:version>",
+        views.SongLyricDetail.as_view(),
+        name="lyric_detail",
+    ),
     path("venues", views.Venue.as_view(), name="venues"),
     path("venues/<int:id>", views.VenueDetail.as_view(), name="venue_details"),
     path("tours", views.Tour.as_view(), name="tours"),

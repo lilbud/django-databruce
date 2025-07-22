@@ -232,3 +232,15 @@ blockquote p::after {
 blockquote + p {
   text-align: right;
 }
+
+li.nav-item {
+    list-style: none !important;
+}
+
+.mr-auto {
+    margin-right: auto !important;
+}
+
+.ml-auto {
+    margin-left: auto !important;
+}

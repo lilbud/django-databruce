@@ -102,10 +102,25 @@ class Song(TemplateView):
         context["title"] = "Songs"
         context["songs"] = (
             models.Songs.objects.all()
-            .prefetch_related("first", "last")
+            .prefetch_related("first", "last", "album")
             .order_by("name")
         )
+
         return context
+
+
+class About(TemplateView):
+    template_name = "databruce/about.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        return super().get_context_data(**kwargs)
+
+
+class Links(TemplateView):
+    template_name = "databruce/links.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        return super().get_context_data(**kwargs)
 
 
 class Users(TemplateView):
@@ -635,6 +650,33 @@ class VenueDetail(TemplateView):
         return context
 
 
+class SongLyrics(TemplateView):
+    template_name = "databruce/songs/lyrics.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["lyrics"] = models.Lyrics.objects.all().select_related("song")
+        return context
+
+
+class SongLyricDetail(TemplateView):
+    template_name = "databruce/songs/lyric_detail.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["song_info"] = models.Songs.objects.filter(
+            id=self.kwargs["songid"],
+        ).first()
+
+        context["lyrics"] = models.Lyrics.objects.get(
+            song__id=self.kwargs["songid"],
+            num=self.kwargs["version"],
+        )
+
+        return context
+
+
 class SongDetail(TemplateView):
     template_name = "databruce/songs/detail.html"
 
@@ -673,6 +715,11 @@ class SongDetail(TemplateView):
                 "current__event__venue__city__country",
             )
         )
+
+        if context["song_info"].lyrics:
+            context["lyrics"] = models.Lyrics.objects.filter(
+                song__id=self.kwargs["id"],
+            ).order_by("id")
 
         if context["song_info"].num_plays_snippet > 0:
             context["snippets"] = (
@@ -1018,13 +1065,6 @@ class AdvancedSearch(View):
     form_class = forms.AdvancedEventSearch
     formset_class = formset_factory(forms.SetlistSearch)
     date = datetime.datetime.today()
-
-    def check_field_choice(self, choice: str, field_filter: Q) -> Q:
-        """Every field has a IS/NOT choice on it. Depending on that choice, the filter can be negated or not. This checks for that value and returns the correct filter."""
-        if choice == "is":
-            return field_filter
-
-        return ~field_filter
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()

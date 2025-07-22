@@ -926,6 +926,8 @@ class Songs(models.Model):
     )
 
     original = models.BooleanField(default=False)
+    lyrics = models.BooleanField(default=False)
+
     category = models.TextField(blank=True, default=None)
     spotify_id = models.TextField(blank=True, default=None)
 
@@ -1465,3 +1467,57 @@ class Guests(models.Model):
         managed = False
         db_table = "guests"
         verbose_name_plural = db_table
+
+
+class Lyrics(models.Model):
+    id = models.AutoField(primary_key=True)
+    song = models.ForeignKey(
+        Songs,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        db_column="song_id",
+        related_name="lyrics_song",
+    )
+    version = models.TextField(db_column="version_info")
+    num = models.TextField(db_column="version_num")
+    source = models.TextField(db_column="source_info")
+    text = models.TextField(db_column="lyrics")
+    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    language = models.TextField(blank=True, null=True)  # noqa: DJ001
+    note = models.TextField(blank=True, null=True)  # noqa: DJ001
+
+    class Meta:
+        managed = False
+        db_table = "lyrics"
+
+
+class ShortenerUrlmap(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    full_url = models.TextField()
+    short_url = models.CharField(unique=True, max_length=50)
+    usage_count = models.IntegerField()
+    max_count = models.IntegerField()
+    lifespan = models.IntegerField()
+    date_created = models.DateTimeField()
+    date_expired = models.DateTimeField()
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = "shortener_urlmap"
+
+
+class ShortenerUrlprofile(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    enabled = models.BooleanField(blank=True, null=True)
+    max_urls = models.IntegerField(blank=True, null=True)
+    max_concurrent_urls = models.IntegerField(blank=True, null=True)
+    default_lifespan = models.IntegerField(blank=True, null=True)
+    default_max_uses = models.IntegerField(blank=True, null=True)
+    user = models.OneToOneField("AuthUser", models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = "shortener_urlprofile"

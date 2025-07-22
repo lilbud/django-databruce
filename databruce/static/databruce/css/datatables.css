@@ -116,3 +116,12 @@ div.dt-datetime {
     top: 57.6px !important;
     left: 1562.33px !important;
 }
+
+table.dataTable div.dt-column-header {
+    flex-direction: row !important;
+}
+
+table.dataTable thead th,
+.dt-type-date {
+    text-align: left !important;
+}

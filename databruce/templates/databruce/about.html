@@ -1,0 +1,98 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  About
+{% endblock title %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="row mb-2">
+        <h4>
+          <a class="sky-500" href="{% url 'index' %}">Databruce</a> &gt; About
+        </h4>
+      </div>
+      <div class="row mb-3">
+        <p>Welcome to Databruce, a new Bruce Springsteen database.</p>
+        <h5 class="sky-500">What is Databruce?</h5>
+        <p>
+          Databruce is a database for tracking stats about Bruce Springsteen's performing history which was first made public in July 2025
+          after a "beta-testing" phase in June 2025. It was created by and is maintained by Brian (lilbud).
+        </p>
+        <h5 class="sky-500">How was it made?</h5>
+        <p>The site is built on Django, and the database is Postgres.</p>
+        <h5 class="sky-500">Why?</h5>
+        <p>
+          I created Databruce after being inspired by a site called Jerrybase, which is a newer database site for tracking "Jerry Garcia's musical activities". I really liked the layout and feature set, and wanted to create something similar for Bruce. While sites exist for tracking his history like Brucebase, there really aren't any currently that are similar to JB for reasons I'll get into later.
+          <br>
+          <br>
+          Databruce is also an extension of Brucebot (another project of mine). I had compiled this database for use with it, but aside from a Discord bot, there really wasn't an easy way for most people to interact with it outside of knowing SQL.
+        </p>
+        <h5 class="sky-500">What makes it different?</h5>
+        <p>
+          I'll admit, I've strugged with an answer to this question, least when it comes to explaining it to most people.
+          <br>
+          <br>
+          Pretty much, it was created to be a more "modern" Bruce database site. Not necessarily in terms of data, but moreso in terms of layout, features, and presentation. I guess in a way it can be considered a "supplement" of sorts to Brucebase, same basic idea but presented differently.
+          <br>
+          <br>
+          As mentioned, Jerrybase was a big inspiration for this site. I thought their layout and presentation of information was better than Brucebase, which is somewhat dated in comparison. Another thing Jerrybase had that I really liked was their advanced searching functions, able to search for events not just by time/location, but also find shows with a specific setlist order. Which is something that I don't believe many sites have.
+          <br>
+          <br>
+          Those two things where something of a main focus for me when building Databruce. I wanted to make a site that looked good and had that same kind of ability to search and filter the data, rather than just viewing it.
+          <br>
+          <br>
+          As an aside: To be clear, I don't want it to appear that I'm  acting like this is better than Brucebase in any way. Without them and their work over the decades, there would be no Databruce, it's that simple.
+        </p>
+        <h5 class="sky-500">Unique Features</h5>
+        <p>
+          This section will briefly cover some of the features that this site provides.
+          <div class="mb-2">
+            <strong>Searching:</strong>
+            <br>
+            &nbsp;On many of the pages, I use DataTables to present the data. In addition, I make use of their "SearchBuilder", which allows users to filter the data by any number of queries.
+          </div>
+          <div class="mb-2">
+            <strong>Advanced Event Search:</strong>
+            <br>
+            &nbsp;This is a feature that comes right from Jerrybase. I thought it was an incredibly useful feature that I'm not aware of many sites having. While the concept is very much the same, the execution is different due to differences in the sites backend. Using this, events can be searched for by many different parameters like: Date Range, Month/Day, Location, and even the band on stage. In addition, there is also the ability to search for specific setlists, based on certain songs being present (or not present). As well as being able to search for specific ordering of songs, like being able to find how often he followed Incident on 57th Street with Rosalita. Or even how often a certain song opened or closed a show/set. In short, the search is incredibly powerful, and the query possibilities are quite possibly limitless. It's also quite possibly broken, so keep that in mind.
+          </div>
+          <div>
+            <strong>Setlist Info:</strong>
+            <br>
+            &nbsp;I've taken something of a "different" approach when it comes to setlists. As part of the setlists, I track snippets (songs appearing in another), and when guests appeared on songs. These are incorporated into the database, meaning it is data that can be searched/queried/filtered, rather than just a text-based note on a page.
+          </div>
+        </p>
+        <h5 class="sky-500">Credits</h5>
+        <p>
+          This is by no means a comprehensive or complete list. But some thanks are in order.
+          <br>
+          <br>
+          First and foremost, <a class="sky-500"href="https://brucebase.wikidot.com">Brucebase</a>. This site was largely built using their data and information. They are an invaluable resource, and as mentioned without them this site wouldn't exist.
+          <br>
+          <br>
+          <a class="sky-500"href="https://www.springsteenlyrics.com">SpringsteenLyrics</a>. This is where I got information on the many bootlegs that are out there.
+          <br>
+          <br>
+          Next are the sites that I drew inspiration from. While I don't feel like I "ripped off" any, I credit several sites for influencing different aspects of this site.
+          <br>
+          <br>
+          <a class="sky-500"href="https://Jerrybase.com">Jerrybase</a>
+          provided the initial spark for me to even create this site in the first place. I also heavily based various layouts on theirs,
+          not to mention the Advanced Search, which was almost entirely based on theirs. It was a big help in figuring out how to add the song rows,
+          as it required a bit of JS fuckery that I simply had no clue on where to even begin.
+          <br>
+          <br>
+          <a class="sky-500"href="https://dripfield.co">Dripfield.co</a>
+          This is a site focused on the band Goose. It's pretty new, and I really like their site. The event pages took major inspiration from this, as I much preferred their style to something like Jerrybase's.
+          <br>
+          <br>
+          Lastly I want to thank the members of the r/brucespringsteen Discord server for being my unwilling <s>Guinea Pigs</s> beta testers.
+          I've literally never done anything on this scale before (let alone something that was public), so getting their help in testing the site was a major help.
+          <br>
+          <br>
+          This site is always going to be a work in progress. If you have suggestions/questions, I can usually be found on Discord (.lilbud), or Twitter (<a href="https://x.com/_lilbud_">@_lilbud_</a>). Feel free to reach out!
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

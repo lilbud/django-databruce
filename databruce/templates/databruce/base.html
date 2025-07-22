@@ -58,8 +58,8 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
-      <div class="container-fluid p-2 bd-gutter flex-wrap flex-lg-nowrap">
-        <a class="navbar-brand p-0 mx-0 mx-lg-3" href="{% url 'index' %}">
+      <div class="container-fluid p-2 bd-gutter flex-wrap flex-xl-nowrap">
+        <a class="p-0 mx-0 mx-lg-3" href="{% url 'index' %}">
           <img height="16px"
                class="d-block my-1"
                width="auto"
@@ -75,8 +75,8 @@
                 aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <div class="navbar-collapse collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle {% if '/events' in request.path %}active{% endif %}"
                  href="#"
@@ -107,9 +107,20 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item">
-              <a class="nav-link {% if '/songs' in request.path %}active{% endif %}"
-                 href="{% url 'songs' %}">Songs</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {% if '/songs' in request.path %}active{% endif %}"
+                 href="#"
+                 role="button"
+                 data-bs-toggle="dropdown"
+                 aria-expanded="false">Songs</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'songs' %}">Songs</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'song_lyrics' %}">Lyrics</a>
+                </li>
+              </ul>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle {% if '/venues' in request.path or '/cities' in request.path or '/states' in request.path or '/countries' in request.path %}active{% endif %}"
@@ -180,20 +191,34 @@
                 </li>
               </ul>
             </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {% if 'search' in request.path %}active{% endif %}"
+                 href="#"
+                 role="button"
+                 data-bs-toggle="dropdown"
+                 aria-expanded="false">More</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'about' %}">About Site</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'links' %}">Links</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <form role="search" method="get" action="{% url 'search' %}">
+              {{ searchForm.date }}
+            </form>
             {% if user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link {% if '/users' in request.path %}active{% endif %}"
-                   href="{% url 'users' %}">Users</a>
-              </li>
-            {% endif %}
-            {% if user.is_authenticated %}
-              <li class="nav-item dropdown">
+              <li class="nav-item mx-3 dropdown">
                 <a class="nav-link dropdown-toggle"
                    href="#"
                    role="button"
                    data-bs-toggle="dropdown"
                    aria-expanded="false">Profile</a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu dropdown-menu-end">
                   <li>
                     <h6 class="dropdown-header">
                       Hello {{ user }}
@@ -207,6 +232,9 @@
                   <li>
                     <a class="dropdown-item sky-500"
                        href="{% url "profile" username=user.username %}">View Profile</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item sky-500" href="{% url 'users' %}">View Users</a>
                   </li>
                   {% if user.is_superuser %}
                     <li>
@@ -233,14 +261,6 @@
               </li>
             {% endif %}
           </ul>
-          <div class="d-flex me-2">
-            <form class="d-flex" role="search" method="get" action="{% url 'search' %}">
-              <div class="input-group">
-                {{ searchForm.date }}
-                <button class="btn btn-secondary" type="submit" id="button-addon2">Go</button>
-              </div>
-            </form>
-          </div>
         </div>
       </div>
     </nav>

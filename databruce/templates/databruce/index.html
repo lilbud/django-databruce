@@ -171,7 +171,7 @@
           <div class="card h-100">
             <div class="card-header">
               On This Day ({{ date|date:"F d" }})
-              <a href="{% url 'adv_search' %}?current=true">see more</a>
+              <a href="{% url 'adv_search_results' %}?month_choice=is&month={{ date|date:"n" }}&day_choice=is&day={{ date|date:"j" }}">see more</a>
             </div>
             <div class="card-body p-0">
               <div class="table-responsive index">

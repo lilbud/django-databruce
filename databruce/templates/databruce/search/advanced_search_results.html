@@ -10,7 +10,13 @@
       <h4>Advanced Search Results</h4>
       <h6>Click link below to copy a short url to these results (the links are very long and look awful).</h6>
       <div id="short_url">
-        <button id="short-url" class="btn btn-link">Get Short URL</button>
+        <button id="short-url" class="btn btn-link py-0">Get Short URL</button>
+        <span id="shortLink" class="invisible"></span>
+        <button onclick="copy_to_clipboard()"
+                class="btn btn-link py-0 invisible"
+                id="copyButton">
+          <i class="bi bi-copy"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -94,14 +100,20 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
+    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
+
+    function copy_to_clipboard() {
+      var text = document.getElementById('shortLink').innerHTML;
+      navigator.clipboard.writeText( text );
+      console.log('copied URL')
+    };
 
     $(document).ready(function () {
       new DataTable('#table', {
         layout: layout,
       });
 
-      $('#short-url').click(function () {
+      $('button#short-url').click(function () {
         var received_data  = "{{ request.build_absolute_uri|safe }}"
         
         $.ajax({
@@ -111,11 +123,9 @@
             cache: false,
             dataType: "json",
             success: function(resp) {
-              var a = $('<span />');
-              a.attr('id', 'shortLink');
-              a.text(resp.short_url);
-
-              $('#short_url').append(a);
+              $('#shortLink').removeClass('invisible');
+              $('#shortLink').text(`${resp.short_url}`);
+              $('#copyButton').removeClass('invisible');
             }
         });
 
