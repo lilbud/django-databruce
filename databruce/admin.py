@@ -182,29 +182,28 @@ class ReleaseAdmin(admin.ModelAdmin):
 class SnippetAdmin(admin.ModelAdmin):
     search_fields = [
         "snippet__name",
-        "event__id",
+        "setlist__event__id",
         "setlist__id",
     ]
-    autocomplete_fields = ["event", "setlist", "snippet"]
+
+    autocomplete_fields = ["setlist", "snippet"]
+
     list_select_related = [
         "setlist",
         "snippet",
-        "event",
         "setlist__song",
         "setlist__event",
     ]
     list_display = [
         "id",
-        "event",
-        "setlist",
+        "setlist__event__id",
         "setlist__song__name",
         "snippet__name",
         "note",
     ]
     list_display_links = [
         "id",
-        "event",
-        "setlist",
+        "setlist__event__id",
         "setlist__song__name",
         "snippet__name",
     ]

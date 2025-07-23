@@ -59,12 +59,17 @@ table tbody td {
     border-top-right-radius: inherit !important;
 }
 
-table.dataTable>tbody>tr>td,
-.card-body,
-.list-group-item {
-    font-size: 0.85rem;
-    line-height: 1.25rem;
+table.dataTable > thead > tr > th,
+.setHeader,
+table.dataTable>tbody>tr>td {
+    padding-top: .4rem !important;
+    padding-bottom: .4rem !important;
+    font-size: 0.875rem;
     vertical-align: middle;
+}
+
+th.text-center > div.dt-column-header {
+    text-align: center !important;
 }
 
 a:link {
@@ -143,15 +148,6 @@ tr th {
 
 .setHeader {
     background-color: var(--sky-900) !important;
-}
-
-.badge-row .badge {
-    background-color: var(--sky-900) !important;
-    color: white !important;
-}
-
-.badge-row .badge:hover {
-    background-color: var(--sky-800) !important;
 }
 
 #myTab .nav-link.active {

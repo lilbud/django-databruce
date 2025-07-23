@@ -30,15 +30,15 @@
             <div class="card-body">
               <div class="d-flex flex-row flex-wrap">
                 <div class="mb-0 fs-5">
-                  <div class="mb-2">
+                  <div>
                     <span class="sky-500 fw-semibold">{{ event }}</span>
                     <span class="text-body-secondary fw-medium">({{ event.type }})</span>
                   </div>
-                  <div class="mb-2">
+                  <div>
                     <a class="text-light fw-medium"
                        href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-2">
                     <a class="text-light fw-medium"
                        href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
                   </div>
@@ -75,14 +75,14 @@
                           <tr>
                             <th class="all text-center px-2">#</th>
                             <th class="all px-2">Song</th>
-                            <th class="all text-center text-nowrap">
+                            <th class="all text-center">
                               Gap
                               <i class="bi bi-info-circle-fill"
                                  data-bs-toggle="tooltip"
                                  data-bs-html="true"
                                  data-bs-title="How many shows since a song was last played."></i>
                             </th>
-                            <th class="all text-nowrap">
+                            <th class="all text-nowrap text-center">
                               Last Played
                               <i class="bi bi-info-circle-fill"
                                  data-bs-toggle="tooltip"
@@ -114,14 +114,14 @@
                                 <td class="px-2 py-2">
                                   <div class="row">
                                     <span class="text-nowrap">
-                                      <a class="sky-400 fw-medium"
+                                      <a class="sky-400 fw-medium me-1"
                                          href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                       {% if song.segue %}{{ song.separator }}{% endif %}
                                       {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
                                       {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
                                     </span>
                                   </div>
-                                  <div class="row text-body-secondary">
+                                  <div class="row text-body-secondary" id="setlist_note">
                                     <small>
                                       {% for note in notes_list %}
                                         {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
@@ -144,9 +144,9 @@
                                     {{ song.last|default_if_none:"" }}
                                   {% endif %}
                                 </td>
-                                <td class="text-nowrap">
+                                <td class="text-nowrap text-center">
                                   {% if song.ltp %}
-                                    <a href="{% url "event_details" id=song.ltp.id %}" class="text-light">{{ song.ltp }}</a>
+                                    <a href="{% url "event_details" id=song.ltp.id %}" class="sky-500">{{ song.ltp }}</a>
                                   {% endif %}
                                 </td>
                               </tr>
