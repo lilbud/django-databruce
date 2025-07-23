@@ -614,9 +614,8 @@ class Events(models.Model):
         default=None,
     )
 
-    note = models.TextField(blank=True, default=None, db_column="event_date_note")
+    note = models.TextField(blank=True, default=None)
     bootleg = models.BooleanField(blank=True, default=False)
-    official = models.BooleanField(blank=True, default=False)
 
     official_id = models.ForeignKey(
         to="Releases",
@@ -626,7 +625,6 @@ class Events(models.Model):
         db_column="official_id",
     )
 
-    nugs = models.BooleanField(blank=True, default=False)
     nugs_id = models.ForeignKey(
         to="NugsReleases",
         on_delete=models.DO_NOTHING,
@@ -1057,14 +1055,11 @@ class SetlistsBySetAndDate(models.Model):
 
 class Snippets(models.Model):
     id = models.AutoField(primary_key=True)
-    event = models.ForeignKey(Events, models.DO_NOTHING)
-
     setlist = models.ForeignKey(
         Setlists,
         models.DO_NOTHING,
-        db_column="setlist_song_id",
+        db_column="setlist_id",
     )
-
     snippet = models.ForeignKey(
         to=Songs,
         on_delete=models.DO_NOTHING,
