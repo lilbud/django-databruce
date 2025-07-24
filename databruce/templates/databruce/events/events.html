@@ -21,10 +21,10 @@
     <tr class="custom">
       <th class="all" scope="col">Date</th>
       <th class="min-tablet-l" scope="col">Band</th>
-      <th class="all" scope="col">Venue</th>
+      <th class="min-tablet-l" scope="col">Venue</th>
       <th class="min-tablet-l" scope="col">Location</th>
       <th class="min-tablet-l" scope="col">Tour</th>
-      <th class="desktop" scope="col">Detail</th>
+      <th class="min-tablet-l" scope="col">Detail</th>
       <th class="min-tablet-l" scope="col">Public</th>
     </tr>
   </thead>
@@ -43,31 +43,19 @@
           </a>
         </td>
         <td class="text-nowrap">
-          {% if event.artist %}
-            <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-          {% endif %}
-        </td>
-        <td>
-          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue }}</a>
+          <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
         </td>
         <td class="text-nowrap">
-          {% if event.venue.city %}
-            <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-          {% endif %}
+          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue|default_if_none:"" }}</a>
         </td>
         <td class="text-nowrap">
-          {% if event.tour %}
-            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-          {% endif %}
+          <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
         </td>
-        <td class="text-wrap">
-          {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
-            {{ event.note|default_if_none:'' }}
-          {% else %}
-            {{ event.title|default_if_none:"" }}
-          {% endif %}
+        <td class="text-nowrap">
+          <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
         </td>
-        <td>{{ event.public|default_if_none:'' }}</td>
+        <td class="text-wrap">{{ event.note|default_if_none:""|safe }}</td>
+        <td>{{ event.public|default_if_none:"" }}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -84,8 +72,8 @@
       columnDefs: [
         { target: -1, visible: false },
         { targets: [0, 1], width: "10%" },
-        { targets: [2, 3], width: "20%" },
-        { targets: [4], width: "15%" },
+        { targets: [2, 3], width: "15%" },
+        { targets: [4], width: "20%" },
       ],
       initComplete: function () {
         this.api()

@@ -61,8 +61,8 @@
     $(document).ready(function () {
         new DataTable('#runTable', {
             layout: layout,
-            order: [[6, 'asc']],
-            columnDefs: [{ type: 'date', targets: [6, 7] }]
+            order: [[-2, 'asc']],
+            columnDefs: [{ type: 'date', targets: [-2, -1] }]
         });
     });
   </script>
