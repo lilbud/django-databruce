@@ -77,10 +77,11 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 
 .dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
     width: 700px !important;
-    transform: translateX(-4%) !important;
-    display: block;
-    top: 31px;
-    left: 1100px;
+    transform: translateX(-8%) !important;
+    /* display: block; */
+    /* top: 31px; */
+    /* left: 1100px; */
+    z-index: 9999 !important;
 }
 
 .dataTables_wrapper .dataTables_filter {
@@ -124,4 +125,14 @@ table.dataTable div.dt-column-header {
 table.dataTable thead th,
 .dt-type-date {
     text-align: left !important;
+}
+
+table.dataTable th,table.dataTable td {
+white-space: nowrap;
+}
+
+.table-responsive,
+.dataTables_scrollBody {
+   overflow: visible !important;
+
 }

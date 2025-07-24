@@ -281,7 +281,7 @@
                             <em>***</em>
                           {% endif %}
                         </td>
-                        <td>{{ song.note|default_if_none:"" }}</td>
+                        <td class="text-wrap">{{ song.note|default_if_none:"" }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
