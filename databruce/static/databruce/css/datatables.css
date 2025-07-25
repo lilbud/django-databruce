@@ -127,12 +127,11 @@ table.dataTable thead th,
     text-align: left !important;
 }
 
-table.dataTable th,table.dataTable td {
+/* table.dataTable th,table.dataTable td {
 white-space: nowrap;
-}
+} */
 
-.table-responsive,
+/* .table-responsive,
 .dataTables_scrollBody {
    overflow: visible !important;
-
-}
+} */

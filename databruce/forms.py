@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import re
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Reset, Submit
@@ -329,33 +330,58 @@ class AdvancedEventSearch(forms.Form):
 
     def clean_first_date(self):
         # found on stackoverflow, probably not the "best" way to do this
-        try:
-            for i in ("%Y-%m-%d", "%Y-%m"):
-                try:
-                    return datetime.datetime.strptime(
-                        self.cleaned_data["first_date"],
-                        i,
-                    ).date()
-                except ValueError:
-                    pass
-        except ValueError:
-            pass
+        # print(self.cleaned_data["first_date"])
+        # try:
+        #     for i in ("%Y-%m-%d", "%Y-%m"):
+        #         try:
+        #             return datetime.datetime.strptime(
+        #                 self.cleaned_data["first_date"],
+        #                 i,
+        #             ).date()
+        #         except ValueError:
+        #             pass
+        # except ValueError:
+        #     pass
 
-        return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
+        # return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
+
+        if self.cleaned_data["first_date"]:
+            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["first_date"]):
+                return (
+                    datetime.datetime.strptime(
+                        self.cleaned_data["first_date"],
+                        "%Y-%m",
+                    )
+                    .replace(day=1)
+                    .date()
+                )
+
+            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["first_date"]):
+                return datetime.datetime.strptime(
+                    self.cleaned_data["first_date"],
+                    "%Y-%m-%d",
+                )
+
+        else:
+            return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
 
     def clean_last_date(self):
-        # found on stackoverflow, probably not the "best" way to do this
-        try:
-            for i in ("%Y-%m-%d", "%Y-%m"):
-                try:
-                    return datetime.datetime.strptime(
-                        self.cleaned_data["last_date"],
-                        i,
-                    ).date()
-                except ValueError:
-                    pass
-        except ValueError:
-            pass
+        if self.cleaned_data["last_date"]:
+            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["last_date"]):
+                dt = datetime.datetime.strptime(
+                    self.cleaned_data["last_date"],
+                    "%Y-%m",
+                )
+
+                last = calendar.monthrange(dt.year, dt.month)[1]
+
+                return dt.replace(day=last).date()
+
+            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["last_date"]):
+                return datetime.datetime.strptime(
+                    self.cleaned_data["last_date"],
+                    "%Y-%m-%d",
+                )
 
         return datetime.datetime.strptime(f"{DATE.year}-12-31", "%Y-%m-%d").date()
 
