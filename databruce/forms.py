@@ -335,7 +335,7 @@ class AdvancedEventSearch(forms.Form):
                     return datetime.datetime.strptime(
                         self.cleaned_data["first_date"],
                         i,
-                    ).strftime("%Y-%m-%d")
+                    ).date()
                 except ValueError:
                     pass
         except ValueError:
@@ -351,7 +351,7 @@ class AdvancedEventSearch(forms.Form):
                     return datetime.datetime.strptime(
                         self.cleaned_data["last_date"],
                         i,
-                    ).strftime("%Y-%m-%d")
+                    ).date()
                 except ValueError:
                     pass
         except ValueError:
