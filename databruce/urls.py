@@ -15,7 +15,7 @@ urlpatterns = [
     path("about/", views.About.as_view(), name="about"),
     path("links/", views.Links.as_view(), name="links"),
     path("s/", include("shortener.urls")),
-    path("admin/", admin.site.urls),
+    path("benner/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
