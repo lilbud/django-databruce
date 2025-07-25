@@ -1,66 +1,75 @@
-{% extends "databruce/category.html" %}
+{% extends "databruce/base.html" %}
 {% block title %}
   Events
 {% endblock title %}
-{% block info_row %}
-  <h4>Events</h4>
-  <div class="col-3 col-md-1">
-    <select class="form-select form-select-sm" id="year_select">
-      <option selected disabled hidden>{{ year }}</option>
-      {% for i in years %}
-        <option value="{% url "events_year" year=i %}">{{ i }}</option>
-      {% endfor %}
-    </select>
+{% block content %}
+  <div class="row mb-4">
+    <div class="col">
+      <h4>Events</h4>
+      <div class="col-3 col-md-1">
+        <select class="form-select form-select-sm" id="year_select">
+          <option selected disabled hidden>{{ year }}</option>
+          {% for i in years %}
+            <option value="{% url "events_year" year=i %}">{{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
   </div>
-{% endblock info_row %}
-{% block table_id %}
-  eventTable
-{% endblock table_id %}
-{% block table %}
-  <thead>
-    <tr class="custom">
-      <th class="all" scope="col">Date</th>
-      <th class="min-tablet-l" scope="col">Band</th>
-      <th class="min-tablet-l" scope="col">Venue</th>
-      <th class="min-tablet-l" scope="col">Location</th>
-      <th class="min-tablet-l" scope="col">Tour</th>
-      <th class="min-tablet-l" scope="col">Detail</th>
-      <th class="min-tablet-l" scope="col">Public</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for event in event_info %}
-      <tr>
-        <td scope="row" class="text-nowrap">
-          <a href="{% url "event_details" id=event.id %}">
-            {{ event }}
-            {% if event.setlist_certainty == "Confirmed" %}
-              <i class="bi bi-file-earmark-check"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Has Setlist"></i>
-            {% endif %}
-          </a>
-        </td>
-        <td class="text-nowrap">
-          <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
-        </td>
-        <td class="text-nowrap">
-          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue|default_if_none:"" }}</a>
-        </td>
-        <td class="text-nowrap">
-          <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
-        </td>
-        <td class="text-nowrap">
-          <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
-        </td>
-        <td class="text-wrap">{{ event.note|default_if_none:""|safe }}</td>
-        <td>{{ event.public|default_if_none:"" }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-{% endblock table %}
-{% block scripts %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body px-0">
+          <div class="table-responsive">
+            <table class="table table-hover display" id="eventTable">
+              <thead>
+                <tr class="custom">
+                  <th class="all" scope="col">Date</th>
+                  <th class="min-tablet-l" scope="col">Band</th>
+                  <th class="min-tablet-l" scope="col">Venue</th>
+                  <th class="min-tablet-l" scope="col">Location</th>
+                  <th class="min-tablet-l" scope="col">Tour</th>
+                  <th class="min-tablet-l" scope="col">Detail</th>
+                  <th class="min-tablet-l" scope="col">Public</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for event in event_info %}
+                  <tr>
+                    <td scope="row" class="text-nowrap">
+                      <a href="{% url "event_details" id=event.id %}">
+                        {{ event }}
+                        {% if event.setlist_certainty == "Confirmed" %}
+                          <i class="bi bi-file-earmark-check"
+                             data-bs-toggle="tooltip"
+                             data-bs-placement="top"
+                             data-bs-title="Has Setlist"></i>
+                        {% endif %}
+                      </a>
+                    </td>
+                    <td class="text-nowrap">
+                      <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                      <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue|default_if_none:"" }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                      <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                      <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
+                    </td>
+                    <td class="text-wrap">{{ event.note|default_if_none:""|safe }}</td>
+                    <td>{{ event.public|default_if_none:"" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
   //searchBuilder custom columns
   layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
@@ -115,4 +124,4 @@
     });
   });
   </script>
-{% endblock scripts %}
+{% endblock content %}

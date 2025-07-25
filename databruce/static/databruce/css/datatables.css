@@ -75,14 +75,6 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     display: none;
 }
 
-.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
-    width: 700px !important;
-    transform: translateX(-8%) !important;
-    /* display: block; */
-    /* top: 31px; */
-    /* left: 1100px; */
-    z-index: 9999 !important;
-}
 
 .dataTables_wrapper .dataTables_filter {
     float: right;
@@ -127,11 +119,12 @@ table.dataTable thead th,
     text-align: left !important;
 }
 
-/* table.dataTable th,table.dataTable td {
-white-space: nowrap;
-} */
+.sbpopover.dtb-collection-closeable {
+    width: 800px !important;
+    left: 56vw !important;
+    top: 2vh !important;
+}
 
-/* .table-responsive,
-.dataTables_scrollBody {
-   overflow: visible !important;
-} */
+.table-responsive {
+    overflow-x: visible;
+}
