@@ -99,14 +99,14 @@
                             {% endif %}
                           </td>
                           <td class="text-nowrap">
-                            {% if user.is_authenticated %}
+                            {% if user_info.username == user.username or user.is_superuser %}
                               <form method="post" action="{% url "remove_show" %}">
                                 <input type="hidden" name="event" value="{{ event.id }}">
                                 {% csrf_token %}
                                 <button id="submit-button"
                                         type="submit"
                                         name="submit"
-                                        class="btn btn-sm btn-danger">Remove Show from Profile</button>
+                                        class="btn btn-sm btn-danger">Remove?</button>
                               </form>
                             {% endif %}
                           </td>

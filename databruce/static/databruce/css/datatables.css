@@ -119,9 +119,9 @@ table.dataTable thead th,
     text-align: left !important;
 }
 
-.sbpopover.dtb-collection-closeable {
-    width: 800px !important;
-    left: 56vw !important;
+div.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
+    width: 700px !important;
+    left: calc(100vw - 60vw) !important;
     top: 2vh !important;
 }
 
