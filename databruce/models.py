@@ -1055,11 +1055,13 @@ class SetlistsBySetAndDate(models.Model):
 
 class Snippets(models.Model):
     id = models.AutoField(primary_key=True)
+
     setlist = models.ForeignKey(
         Setlists,
         models.DO_NOTHING,
         db_column="setlist_id",
     )
+
     snippet = models.ForeignKey(
         to=Songs,
         on_delete=models.DO_NOTHING,

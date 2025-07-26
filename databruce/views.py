@@ -726,8 +726,8 @@ class SongDetail(TemplateView):
                 models.Snippets.objects.filter(
                     snippet=self.kwargs["id"],
                 )
-                .select_related("setlist", "event", "snippet", "setlist__song")
-                .order_by("event", "position")
+                .select_related("setlist", "setlist__event", "snippet", "setlist__song")
+                .order_by("setlist__event", "position")
             )
 
         filter = Q(event_certainty__in=["Confirmed", "Probable"])

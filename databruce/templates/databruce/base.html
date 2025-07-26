@@ -255,7 +255,7 @@
                 </ul>
               </li>
             {% else %}
-              <li class="nav-item">
+              <li class="nav-item mx-3">
                 <a class="nav-link {% if '/login' in request.path %}active{% endif %}"
                    href="{% url 'login' %}?next={{ request.path }}">Login</a>
               </li>

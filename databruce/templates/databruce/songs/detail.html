@@ -304,7 +304,7 @@
                       {% for snippet in snippets %}
                         <tr>
                           <td>
-                            <a href="{% url "event_details" id=snippet.event.id %}">{{ snippet.event }}</a>
+                            <a href="{% url "event_details" id=snippet.setlist.event.id %}">{{ snippet.setlist.event }}</a>
                           </td>
                           <td>
                             <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
