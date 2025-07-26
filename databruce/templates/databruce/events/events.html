@@ -54,7 +54,9 @@
                       <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue|default_if_none:"" }}</a>
                     </td>
                     <td class="text-nowrap">
-                      <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
+                      {% if event.venue.city %}
+                        <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
+                      {% endif %}
                     </td>
                     <td class="text-nowrap">
                       <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
