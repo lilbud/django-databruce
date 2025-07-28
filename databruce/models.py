@@ -6,11 +6,14 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 
+import uuid
+
 from django.db import models
 
 
 class ArchiveLinks(models.Model):
-    id = models.AutoField(primary_key=True, blank=True)
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
@@ -38,7 +41,7 @@ class AuthGroup(models.Model):
 
 
 class AuthGroupPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
     permission = models.ForeignKey("AuthPermission", models.DO_NOTHING)
 
@@ -60,7 +63,7 @@ class AuthPermission(models.Model):
 
 
 class AuthUser(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     is_superuser = models.BooleanField()
@@ -78,7 +81,7 @@ class AuthUser(models.Model):
 
 
 class AuthUserGroups(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
 
@@ -89,7 +92,7 @@ class AuthUserGroups(models.Model):
 
 
 class AuthUserUserPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
 
@@ -101,6 +104,7 @@ class AuthUserUserPermissions(models.Model):
 
 class Bands(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     brucebase_url = models.TextField(unique=True, blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     appearances = models.IntegerField(default=0)
@@ -139,6 +143,7 @@ class Bands(models.Model):
 
 class Bootlegs(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     slid = models.IntegerField(blank=True, default=None)
     mbid = models.TextField(blank=True, default=None)
 
@@ -199,6 +204,7 @@ class BootlegsByDate(models.Model):
 
 class Cities(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.TextField(blank=True, default=None, db_column="name")
 
     state = models.ForeignKey(
@@ -262,6 +268,7 @@ class Cities(models.Model):
 
 class Continents(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.TextField(blank=True, default=None, db_column="continent_name")
     num_events = models.IntegerField(default=0)
 
@@ -280,6 +287,7 @@ class Continents(models.Model):
 
 class Countries(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.TextField(unique=True, blank=True, default=None)
     num_events = models.IntegerField(blank=True, default=None)
 
@@ -328,6 +336,7 @@ class Countries(models.Model):
 
 class Covers(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     event_date = models.TextField(blank=True, default=None)
     url = models.TextField(unique=True, blank=True, default=None, db_column="cover_url")
 
@@ -400,6 +409,7 @@ class DjangoSession(models.Model):
 
 class Venues(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     brucebase_url = models.TextField(unique=True, blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     detail = models.TextField(unique=True, blank=True, default=None)
@@ -655,6 +665,7 @@ class Events(models.Model):
 
 class NugsReleases(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     nugs_id = models.IntegerField(blank=True, default=None)
     event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
     date = models.DateField(blank=True, default=None, db_column="release_date")
@@ -705,6 +716,7 @@ class PremiereDebut(models.Model):
 
 class Relations(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     brucebase_url = models.TextField(unique=True, blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     appearances = models.IntegerField(default=0)
@@ -742,6 +754,7 @@ class Relations(models.Model):
 
 class Onstage(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     event = models.ForeignKey(
         to=Events,
         on_delete=models.DO_NOTHING,
@@ -781,6 +794,7 @@ class Onstage(models.Model):
 
 class ReleaseTracks(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     release = models.ForeignKey("Releases", models.DO_NOTHING, db_column="release_id")
     track = models.IntegerField(db_column="track_num")
 
@@ -816,6 +830,7 @@ class ReleaseTracks(models.Model):
 
 class Releases(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     brucebase_id = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     type = models.TextField(blank=True, default=None)
@@ -879,6 +894,7 @@ class SetlistNotes(models.Model):
 
 class Songs(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     brucebase_url = models.TextField(unique=True)
     name = models.TextField(
         blank=True,
@@ -959,6 +975,7 @@ class Songs(models.Model):
 
 class Setlists(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     event = models.ForeignKey(
         to=Events,
@@ -1055,6 +1072,7 @@ class SetlistsBySetAndDate(models.Model):
 
 class Snippets(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     setlist = models.ForeignKey(
         Setlists,
@@ -1123,6 +1141,7 @@ class SongsFirstRelease(models.Model):
 
 class States(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     state_abbrev = models.TextField(unique=True, blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     country = models.ForeignKey(Countries, models.DO_NOTHING, db_column="country")
@@ -1162,6 +1181,7 @@ class States(models.Model):
 
 class Tags(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
@@ -1181,6 +1201,7 @@ class Tags(models.Model):
 
 class Tours(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     brucebase_id = models.TextField(blank=True, default=None, unique=True)
     brucebase_tag = models.TextField()
 
@@ -1248,6 +1269,7 @@ class VenuesText(models.Model):
 
 class TourLegs(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     tour = models.ForeignKey(
         Tours,
@@ -1329,6 +1351,7 @@ class SongsPage(models.Model):
 
 class Runs(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     band = models.ForeignKey(
         Bands,
@@ -1377,6 +1400,7 @@ class Runs(models.Model):
 
 class StudioSessions(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     band = models.ForeignKey(
         "Bands",
         models.DO_NOTHING,
@@ -1424,6 +1448,7 @@ class StudioSessions(models.Model):
 
 class UserAttendedShows(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         to=AuthUser,
         on_delete=models.DO_NOTHING,
@@ -1442,6 +1467,7 @@ class UserAttendedShows(models.Model):
 
 class Guests(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     setlist = models.ForeignKey(
         to=Setlists,
@@ -1468,6 +1494,7 @@ class Guests(models.Model):
 
 class Lyrics(models.Model):
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     song = models.ForeignKey(
         Songs,
         models.DO_NOTHING,
@@ -1488,33 +1515,3 @@ class Lyrics(models.Model):
     class Meta:
         managed = False
         db_table = "lyrics"
-
-
-class ShortenerUrlmap(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    full_url = models.TextField()
-    short_url = models.CharField(unique=True, max_length=50)
-    usage_count = models.IntegerField()
-    max_count = models.IntegerField()
-    lifespan = models.IntegerField()
-    date_created = models.DateTimeField()
-    date_expired = models.DateTimeField()
-    user = models.ForeignKey("AuthUser", models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = "shortener_urlmap"
-
-
-class ShortenerUrlprofile(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    enabled = models.BooleanField(blank=True, null=True)
-    max_urls = models.IntegerField(blank=True, null=True)
-    max_concurrent_urls = models.IntegerField(blank=True, null=True)
-    default_lifespan = models.IntegerField(blank=True, null=True)
-    default_max_uses = models.IntegerField(blank=True, null=True)
-    user = models.OneToOneField("AuthUser", models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = "shortener_urlprofile"
