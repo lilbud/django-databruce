@@ -89,6 +89,17 @@ class ReleaseFilter(filters.FilterSet):
     type = filters.CharFilter(lookup_expr="icontains")
 
 
+class SongsPageFilter(filters.FilterSet):
+    id = filters.NumberFilter(
+        field_name="id",
+        lookup_expr="exact",
+    )
+    date = filters.DateFilter(
+        field_name="current__event__date",
+        lookup_expr="icontains",
+    )
+
+
 class SetlistFilter(filters.FilterSet):
     event = filters.CharFilter()
     date = filters.CharFilter(field_name="event__event_date", lookup_expr="icontains")

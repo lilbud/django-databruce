@@ -29,7 +29,7 @@ class ArchiveLinks(models.Model):
     class Meta:
         managed = False
         db_table = "archive_links"
-        verbose_name_plural = db_table
+        verbose_name_plural = "archive_links"
 
 
 class AuthGroup(models.Model):
@@ -135,7 +135,7 @@ class Bands(models.Model):
     class Meta:
         managed = False
         db_table = "bands"
-        verbose_name_plural = db_table
+        verbose_name_plural = "bands"
 
     def __str__(self) -> str:
         return self.name
@@ -181,7 +181,7 @@ class Bootlegs(models.Model):
     class Meta:
         managed = False
         db_table = "bootlegs"
-        verbose_name_plural = db_table
+        verbose_name_plural = "bootlegs"
 
 
 class BootlegsByDate(models.Model):
@@ -252,7 +252,7 @@ class Cities(models.Model):
     class Meta:
         managed = False
         db_table = "cities"
-        verbose_name_plural = db_table
+        verbose_name_plural = "cities"
         unique_together = (("name", "state"),)
 
     def __str__(self) -> str:
@@ -277,9 +277,8 @@ class Continents(models.Model):
 
     class Meta:
         managed = False
-
         db_table = "continents"
-        verbose_name_plural = db_table
+        verbose_name_plural = "continents"
 
     def __str__(self) -> str:
         return self.name
@@ -328,7 +327,7 @@ class Countries(models.Model):
     class Meta:
         managed = False
         db_table = "countries"
-        verbose_name_plural = db_table
+        verbose_name_plural = "countries"
 
     def __str__(self) -> str:
         return self.name
@@ -354,7 +353,7 @@ class Covers(models.Model):
     class Meta:
         managed = False
         db_table = "covers"
-        verbose_name_plural = db_table
+        verbose_name_plural = "covers"
 
 
 class DjangoAdminLog(models.Model):
@@ -478,16 +477,13 @@ class Venues(models.Model):
     class Meta:
         managed = False
         db_table = "venues"
-        verbose_name_plural = db_table
+        verbose_name_plural = "venues"
 
     def __str__(self) -> str:
-        try:
-            if self.detail:
-                return f"{self.name}, {self.detail}"
+        if self.detail:
+            return f"{self.name}, {self.detail}"
 
-            return self.name  # noqa: TRY300
-        except TypeError:
-            return "Name"
+        return self.name
 
 
 class SetlistsByDate(models.Model):
@@ -505,7 +501,7 @@ class SetlistsByDate(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "setlists_by_date"
-        verbose_name_plural = db_table
+        verbose_name_plural = "setlists_by_date"
 
 
 class Events(models.Model):
@@ -649,8 +645,9 @@ class Events(models.Model):
     class Meta:
         managed = False
         db_table = "events"
-        verbose_name_plural = db_table
+        verbose_name_plural = "events"
         unique_together = (("id", "date", "brucebase_url"),)
+        ordering = ["id"]
 
     def __str__(self) -> str:
         try:
@@ -679,7 +676,7 @@ class NugsReleases(models.Model):
     class Meta:
         managed = False
         db_table = "nugs_releases"
-        verbose_name_plural = db_table
+        verbose_name_plural = "nugs_releases"
         ordering = ["-event__id"]
 
     def __str__(self) -> str:
@@ -694,13 +691,7 @@ class OpenersClosers(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "openers_closers"
-        verbose_name_plural = db_table
-
-
-# Unable to inspect table 'pg_stat_statements'
-# The error was: pg_stat_statements must be loaded via shared_preload_libraries
-# Unable to inspect table 'pg_stat_statements_info'
-# The error was: pg_stat_statements must be loaded via shared_preload_libraries
+        verbose_name_plural = "openers_closers"
 
 
 class PremiereDebut(models.Model):
@@ -711,7 +702,7 @@ class PremiereDebut(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "premiere_debut"
-        verbose_name_plural = db_table
+        verbose_name_plural = "premiere_debut"
 
 
 class Relations(models.Model):
@@ -746,7 +737,7 @@ class Relations(models.Model):
     class Meta:
         managed = False
         db_table = "relations"
-        verbose_name_plural = db_table
+        verbose_name_plural = "relations"
 
     def __str__(self) -> str:
         return self.name
@@ -789,7 +780,7 @@ class Onstage(models.Model):
     class Meta:
         managed = False
         db_table = "onstage"
-        verbose_name_plural = db_table
+        verbose_name_plural = "onstage"
 
 
 class ReleaseTracks(models.Model):
@@ -824,7 +815,7 @@ class ReleaseTracks(models.Model):
     class Meta:
         managed = False
         db_table = "release_tracks"
-        verbose_name_plural = db_table
+        verbose_name_plural = "release_tracks"
         ordering = ["release__name", "track"]
 
 
@@ -851,7 +842,7 @@ class Releases(models.Model):
     class Meta:
         managed = False
         db_table = "releases"
-        verbose_name_plural = db_table
+        verbose_name_plural = "releases"
 
     def __str__(self) -> str:
         return self.name
@@ -889,7 +880,7 @@ class SetlistNotes(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "setlist_notes"
-        verbose_name_plural = db_table
+        verbose_name_plural = "setlist_notes"
 
 
 class Songs(models.Model):
@@ -964,11 +955,14 @@ class Songs(models.Model):
     class Meta:
         managed = False
         db_table = "songs"
-        verbose_name_plural = db_table
+        verbose_name_plural = "songs"
 
     def __str__(self) -> str:
         if self.original_artist:
             return f"{self.name} ({self.original_artist})"
+
+        if self.short_name:
+            return self.short_name
 
         return self.name
 
@@ -1040,7 +1034,7 @@ class Setlists(models.Model):
     class Meta:
         managed = False
         db_table = "setlists"
-        verbose_name_plural = db_table
+        verbose_name_plural = "setlists"
         unique_together = (("event_id", "song_num", "set_name", "song_id"),)
         ordering = ("-event_id", "song_num")
 
@@ -1067,7 +1061,7 @@ class SetlistsBySetAndDate(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "setlists_by_set_and_date"
-        verbose_name_plural = db_table
+        verbose_name_plural = "setlists_by_set_and_date"
 
 
 class Snippets(models.Model):
@@ -1098,7 +1092,7 @@ class Snippets(models.Model):
     class Meta:
         managed = False
         db_table = "snippets"
-        verbose_name_plural = db_table
+        verbose_name_plural = "snippets"
 
 
 class SongGaps(models.Model):
@@ -1110,7 +1104,7 @@ class SongGaps(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "song_gaps"
-        verbose_name_plural = db_table
+        verbose_name_plural = "song_gaps"
 
 
 class SongsAfterRelease(models.Model):
@@ -1122,7 +1116,7 @@ class SongsAfterRelease(models.Model):
     class Meta:
         managed = False  # Created from a view. Don't remove.
         db_table = "songs_after_release"
-        verbose_name_plural = db_table
+        verbose_name_plural = "songs_after_release"
 
 
 class SongsFirstRelease(models.Model):
@@ -1168,7 +1162,7 @@ class States(models.Model):
     class Meta:
         managed = False
         db_table = "states"
-        verbose_name_plural = db_table
+        verbose_name_plural = "states"
 
     def __str__(self) -> str:
         if self.country not in [2, 6, 37]:
@@ -1196,7 +1190,7 @@ class Tags(models.Model):
     class Meta:
         managed = False
         db_table = "tags"
-        verbose_name_plural = db_table
+        verbose_name_plural = "tags"
 
 
 class Tours(models.Model):
@@ -1239,7 +1233,7 @@ class Tours(models.Model):
     class Meta:
         managed = False
         db_table = "tours"
-        verbose_name_plural = db_table
+        verbose_name_plural = "tours"
 
     def __str__(self) -> str:
         return self.name
@@ -1252,7 +1246,8 @@ class VenuesText(models.Model):
         db_column="id",
         primary_key=True,
     )
-    brucebase_url = models.TextField(blank=True, default=None)
+
+    url = models.TextField(blank=True, default=None, db_column="brucebase_url")
     formatted_loc = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     city = models.TextField(blank=True, default=None)
@@ -1264,7 +1259,7 @@ class VenuesText(models.Model):
     class Meta:
         managed = False
         db_table = "venues_text"
-        verbose_name_plural = db_table
+        verbose_name_plural = "venues_text"
 
 
 class TourLegs(models.Model):
@@ -1300,7 +1295,7 @@ class TourLegs(models.Model):
     class Meta:
         managed = False
         db_table = "tour_legs"
-        verbose_name_plural = db_table
+        verbose_name_plural = "tour_legs"
 
     def __str__(self) -> str:
         return self.name
@@ -1346,7 +1341,8 @@ class SongsPage(models.Model):
     class Meta:
         managed = False
         db_table = "songs_page"
-        verbose_name_plural = db_table
+        verbose_name_plural = "songs_page"
+        ordering = ["current__event__date"]
 
 
 class Runs(models.Model):
@@ -1392,7 +1388,7 @@ class Runs(models.Model):
     class Meta:
         managed = False
         db_table = "runs"
-        verbose_name_plural = db_table
+        verbose_name_plural = "runs"
 
     def __str__(self) -> str:
         return self.name
@@ -1443,7 +1439,7 @@ class StudioSessions(models.Model):
     class Meta:
         managed = False
         db_table = "studio_sessions"
-        verbose_name_plural = db_table
+        verbose_name_plural = "studio_sessions"
 
 
 class UserAttendedShows(models.Model):
@@ -1461,7 +1457,7 @@ class UserAttendedShows(models.Model):
     class Meta:
         managed = False
         db_table = "user_attended_shows"
-        verbose_name_plural = db_table
+        verbose_name_plural = "user_attended_shows"
         unique_together = ("user", "event")
 
 
@@ -1489,7 +1485,7 @@ class Guests(models.Model):
     class Meta:
         managed = False
         db_table = "guests"
-        verbose_name_plural = db_table
+        verbose_name_plural = "guests"
 
 
 class Lyrics(models.Model):

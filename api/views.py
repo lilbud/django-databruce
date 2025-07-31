@@ -52,6 +52,24 @@ class CitiesViewSet(viewsets.ModelViewSet):
     ordering = ["name", "first", "last"]
 
 
+class SongsPageViewSet(viewsets.ModelViewSet):
+    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+    def get_queryset(self):
+        """Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """  # noqa: D205
+        queryset = models.SongsPage.objects.all()
+        song = self.request.query_params.get("id")
+        if song is not None:
+            queryset = queryset.filter(id=song)
+        return queryset
+
+    serializer_class = serializers.SongsPageSerializer
+    permission_classes = permission_classes
+    filter_backends = [DjangoFilterBackend]
+
+
 class ContinentsViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
@@ -85,6 +103,17 @@ class CoversViewSet(viewsets.ModelViewSet):
     ordering = ["event"]
 
 
+class VenuesTextViewSet(viewsets.ModelViewSet):
+    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+    queryset = models.VenuesText.objects.all()
+    serializer_class = serializers.VenuesTextSerializer
+    permission_classes = permission_classes
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    # filterset_class = filters.VenuesTextFilter
+    ordering = ["formatted_loc"]
+
+
 class VenuesViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
@@ -103,7 +132,7 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EventsSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = filters.EventsFilter
-    ordering_fields = ["id", "event_date"]
+    ordering_fields = ["id", "date"]
     permission_classes = permission_classes
 
 

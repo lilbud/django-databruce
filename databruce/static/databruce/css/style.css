@@ -5,7 +5,6 @@
 
 body {
     font-family: var(--font-body);
-    background-color: var(--zinc-950) !important;
 }
 
 .main-color {
@@ -18,7 +17,6 @@ body {
 
 .card-header {
     font-family: var(--font-heading);
-    background-color: var(--zinc-800) !important;
     border: none;
 }
 
@@ -32,22 +30,19 @@ div.ui-menu-item-wrapper:hover,
 }
 
 .list-group-item {
-    background-color: var(--zinc-900) !important;
     border-radius: inherit !important;
 }
 
 .card {
-    background-color: var(--zinc-900);
-    border: 1px solid var(--zinc-800) !important;
     border-radius: 0.5rem !important;
 }
 
-table a {
+html[data-bs-theme="dark"] table a {
     color: var(--sky-500) !important;
 }
 
-table tbody td {
-    background-color: var(--zinc-900) !important;
+html[data-bs-theme="light"] table a {
+    color: var(--sky-600) !important;
 }
 
 .collapse {
@@ -131,41 +126,35 @@ tr th {
 }
 
 .sky-400 {
-    color: var(--sky-400)
+    color: var(--sky-400);
 }
 
 .sky-500 {
-    color: var(--sky-500)
+    color: var(--sky-500);
 }
 
-.sky-700 {
+.sky-700,
+#myTab .nav-link.active,
+.progress-bar,
+.nav-pills button.active {
     background-color: var(--sky-700) !important;
 }
 
-.sky-900 {
-    background-color: var(--sky-900) !important;
+.nav-link.active {
+    font-family: "IBM Plex Sans Hebrew", sans-serif;
+    font-weight: 700;
 }
 
-.setHeader {
-    background-color: var(--sky-900) !important;
-}
-
-#myTab .nav-link.active {
-    background-color: var(--sky-700) !important;
-}
-
-#myTab .nav-link:not(.active) {
-    background-color: var(--zinc-850) !important;
-    border: 0.1rem solid var(--zinc-700) !important;
+.nav-link, #myTab .nav-link:not(.active), .setHeader {
     color: white !important;
+}
+
+.sky-900, .setHeader {
+    background-color: var(--sky-900) !important;
 }
 
 .setname {
     display: none !important;
-}
-
-.song-count {
-    position: absolute !important;
 }
 
 .progress {
@@ -174,30 +163,13 @@ tr th {
     padding: 0;
 }
 
-.progress>.song-count {
+.progress > .song-count {
     position: absolute;
     right: 0px;
     cursor: help;
 }
 
-.progress-bar {
-    background-color: var(--sky-700) !important;
-}
-
-/* .btn-main-primary {
-    background-color: var(--sky-700) !important;
-    color: white !important;
-    border: 1px solid var(--sky-700) !important;
-}
-
-.btn-main-secondary {
-    background-color: none !important;
-    color: var(--sky-700) !important;
-    border: 1px solid var(--sky-700) !important;
-} */
-
 .nav-pills button.active {
-    background-color: var(--sky-700) !important;
     color: white !important;
     border: 1px solid var(--sky-700) !important;
 }

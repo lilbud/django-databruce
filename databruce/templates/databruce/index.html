@@ -76,7 +76,7 @@
                           </td>
                           <td>
                             <span class="text-nowrap">
-                              <a class="text-light" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                              <a class="text-body" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                               {% if song.segue %}{{ song.separator }}{% endif %}
                               {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
                               {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}

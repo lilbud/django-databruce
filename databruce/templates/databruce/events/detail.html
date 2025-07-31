@@ -35,11 +35,11 @@
                     <span class="text-body-secondary fw-medium">({{ event.type }})</span>
                   </div>
                   <div>
-                    <a class="text-light fw-medium"
+                    <a class="text-body fw-medium"
                        href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
                   </div>
                   <div class="mb-2">
-                    <a class="text-light fw-medium"
+                    <a class="text-body fw-medium"
                        href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
                   </div>
                   <div class="badge-row fw-medium fs-6 mb-0">

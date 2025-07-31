@@ -697,22 +697,13 @@ class SongDetail(TemplateView):
             models.SongsPage.objects.filter(
                 id=self.kwargs["id"],
             )
-            .select_related(
-                "current",
-                "current__song",
-                "current__event",
+            .select_related("current__song", "current", "current__event")
+            .prefetch_related(
+                "current__event__venue",
                 "current__event__artist",
                 "current__event__tour",
-                "next",
                 "next__song",
-                "prev",
                 "prev__song",
-            )
-            .prefetch_related(
-                "current__event__venue__city",
-                "current__event__venue__city__state",
-                "current__event__venue__city__state__country",
-                "current__event__venue__city__country",
             )
         )
 
