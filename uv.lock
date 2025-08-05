@@ -105,6 +105,14 @@ wheels = [
 ]
 
 [[package]]
+name = "django-ajax-datatable"
+version = "4.5.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/9f/e1f1ebe5d2b86345145074fef106621be5cc4aa6119e30cbad1c2e23fe08/django_ajax_datatable-4.5.0-py2.py3-none-any.whl", hash = "sha256:99233042e6c7d03ed730ea13b4dba1c3e8a66dd1f57022a07b29acb8812ad6f1", size = 64562 },
+]
+
+[[package]]
 name = "django-allauth"
 version = "65.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -141,6 +149,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "django-ajax-datatable" },
     { name = "django-allauth" },
     { name = "django-autocomplete-light" },
     { name = "django-crispy-forms" },
@@ -159,6 +168,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = "==5.1.7" },
+    { name = "django-ajax-datatable", specifier = ">=4.5.0" },
     { name = "django-allauth", specifier = ">=65.9.0" },
     { name = "django-autocomplete-light", specifier = ">=3.12.1" },
     { name = "django-crispy-forms", specifier = "==2.3" },

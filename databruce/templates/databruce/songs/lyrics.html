@@ -6,7 +6,7 @@
     <h4>Lyrics</h4>
     <h6>Lyrics for many of Bruce's songs.</h6>
     <h6>
-        English lyrics sourced from Genius. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
+        English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
         The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
         I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
         Credit to each translator provided when it was listed in the original files.
@@ -29,7 +29,7 @@
         {% for lyric in lyrics %}
             <tr>
                 <td>
-                    <a href="{% url "lyric_detail" songid=lyric.song.id version=lyric.num %}">{{ lyric.song.name }}</a>
+                    <a href="{% url "lyric_detail" songid=lyric.song.id uuid=lyric.uuid %}">{{ lyric.song.name }}</a>
                 </td>
                 <td>{{ lyric.version }}</td>
                 <td>{{ lyric.source }}</td>

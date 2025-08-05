@@ -10,3 +10,4 @@ psycopg[binary,pool]
 requests
 django-allauth
 django-link-shortener
+django-ajax-datatable

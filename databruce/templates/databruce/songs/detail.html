@@ -315,15 +315,21 @@
               <div id="lyrics" class="tab-pane fade">
                 <div class="row">
                   <div class="col">
+                    {% for lyric in lyrics %}
+                      {% if lyric.language == 'English' and lyric.version == song_info.category %}{{ lyric.text|linebreaks }}{% endif %}
+                    {% endfor %}
+                    <h6>Other Versions</h6>
                     <ul>
                       {% for lyric in lyrics %}
-                        <h6>
-                          <li>
-                            <a href="{% url "lyric_detail" songid=song_info.id version=lyric.num %}">{{ lyric.version }} ({{ lyric.language }})
-                              {% if lyric.note %}[{{ lyric.note }}]{% endif %}
-                            </a>
-                          </li>
-                        </h6>
+                        {% if lyric.language != 'English' %}
+                          <h6>
+                            <li>
+                              <a href="{% url "lyric_detail" songid=song_info.id uuid=lyric.uuid %}">{{ lyric.version }} ({{ lyric.language }})
+                                {% if lyric.note %}[{{ lyric.note }}]{% endif %}
+                              </a>
+                            </li>
+                          </h6>
+                        {% endif %}
                       {% endfor %}
                     </ul>
                   </div>

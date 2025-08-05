@@ -115,9 +115,12 @@ class ReleasesSerializer(serializers.ModelSerializer):
 
 
 class SongsSerializer(serializers.ModelSerializer):
+    first = EventsSerializer()
+    last = EventsSerializer()
+
     class Meta:
         model = models.Songs
-        fields = ["id", "name"]
+        fields = "__all__"
 
 
 class ReleaseTracksSerializer(serializers.ModelSerializer):

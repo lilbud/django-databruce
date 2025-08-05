@@ -15,9 +15,11 @@ urlpatterns = [
     path("about/", views.About.as_view(), name="about"),
     path("links/", views.Links.as_view(), name="links"),
     path("s/", include("shortener.urls")),
-    # path("", include("api.urls")),
+    path("", include("api.urls")),
     path("benner/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
+    # path("test/", views.Test.as_view(), name="test"),
+    path("ajax/", views.get_data, name="ajaxsongs"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "accounts/login/",
@@ -107,7 +109,7 @@ urlpatterns = [
     path("songs/<int:id>", views.SongDetail.as_view(), name="song_details"),
     path("songs/lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
     path(
-        "songs/<int:songid>/lyrics/<int:version>",
+        "songs/<int:songid>/lyrics/<uuid:uuid>",
         views.SongLyricDetail.as_view(),
         name="lyric_detail",
     ),

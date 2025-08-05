@@ -84,6 +84,20 @@ class ReleaseTracksFilter(filters.FilterSet):
     release = filters.CharFilter(field_name="release__name", lookup_expr="icontains")
 
 
+class SongsFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+    first = filters.CharFilter(method="event_filter")
+    last = filters.CharFilter(method="event_filter")
+
+    def event_filter(self, queryset, value):
+        return queryset.filter(
+            Q(first__id__istartswith=value)
+            | Q(first__event_date__istartswith=value)
+            | Q(last__id__istartswith=value)
+            | Q(last__event_date__istartswith=value),
+        )
+
+
 class ReleaseFilter(filters.FilterSet):
     name = filters.CharFilter(lookup_expr="icontains")
     type = filters.CharFilter(lookup_expr="icontains")

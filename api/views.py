@@ -230,6 +230,16 @@ class StatesViewSet(viewsets.ModelViewSet):
     permission_classes = permission_classes
 
 
+class SongsViewSet(viewsets.ModelViewSet):
+    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+    queryset = models.Songs.objects.all()
+    serializer_class = serializers.SongsSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = filters.SongsFilter
+    permission_classes = permission_classes
+
+
 class ToursViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
