@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
+    "django.contrib.sites",
     "databruce.apps.DatabruceConfig",
     "api",
     "rest_framework",
@@ -39,6 +41,8 @@ INSTALLED_APPS = [
     "ajax_datatable",
     "rest_framework_datatables",
 ]
+
+SITE_ID = 1
 
 SHORTENER_ENABLED = True
 SHORTENER_MAX_URLS = -1

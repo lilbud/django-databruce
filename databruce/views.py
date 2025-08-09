@@ -2099,8 +2099,8 @@ class Bootleg(TemplateView):
             models.Bootlegs.objects.all()
             .prefetch_related(
                 "archive",
+                "event",
             )
-            .select_related("event")
             .order_by("event")
         )
 
