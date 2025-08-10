@@ -566,13 +566,13 @@ class EventDetail(TemplateView):
                 event=context["event"].id,
             ).values_list("event__id", flat=True)
 
-            context["user_count"] = (
-                models.UserAttendedShows.objects.filter(
-                    event=context["event"].id,
-                )
-                .distinct("user__id")
-                .count()
+        context["user_count"] = (
+            models.UserAttendedShows.objects.filter(
+                event=context["event"].id,
             )
+            .distinct("user__id")
+            .count()
+        )
 
         if context["event"].tour.id not in [23, 43]:
             context["album_breakdown"] = (
