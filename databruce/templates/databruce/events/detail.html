@@ -279,7 +279,7 @@
                 <div class="card-body">
                   <div class="col">
                     <div class="row mb-2">
-                      <h6>{{ user_count }} user(s) were at this show.</h6>
+                      <h6>{{ user_count|default_if_none:"0" }} user(s) were at this show.</h6>
                     </div>
                     {% if user.is_authenticated %}
                       <div class="row">
