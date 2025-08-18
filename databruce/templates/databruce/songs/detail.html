@@ -324,7 +324,7 @@
                         {% if lyric.language != 'English' %}
                           <h6>
                             <li>
-                              <a href="{% url "lyric_detail" songid=song_info.id uuid=lyric.uuid %}">{{ lyric.version }} ({{ lyric.language }})
+                              <a href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.version }} ({{ lyric.language }})
                                 {% if lyric.note %}[{{ lyric.note }}]{% endif %}
                               </a>
                             </li>

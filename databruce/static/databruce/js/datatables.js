@@ -41,7 +41,7 @@ $.extend(true, DataTable.defaults, {
     },
     info: true,
     pageLength: 25,
-    lengthMenu: [25, 50, 100, { label: 'All', value: -1 }],
+    lengthMenu: [25, 50, 100],
     language: {
         searchBuilder: {
             button: '&nbspFilter'

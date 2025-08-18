@@ -82,6 +82,8 @@ class Index(TemplateView):
             models.Setlists.objects.all().order_by("-event").first()
         )
 
+        context["updates"] = models.Updates.objects.all().order_by("-created_at")[:10]
+
         context["latest_show"] = (
             models.Setlists.objects.filter(event__id=context["latest_event"].event.id)
             .annotate(
@@ -748,14 +750,17 @@ class SongLyricDetail(TemplateView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        context["song_info"] = models.Songs.objects.filter(
-            id=self.kwargs["songid"],
-        ).first()
-
-        context["lyrics"] = models.Lyrics.objects.get(
-            song__id=self.kwargs["songid"],
-            uuid=self.kwargs["uuid"],
+        context["lyrics"] = (
+            models.Lyrics.objects.filter(
+                uuid=self.kwargs["id"],
+            )
+            .select_related("song")
+            .first()
         )
+
+        context["song_info"] = models.Songs.objects.filter(
+            id=context["lyrics"].song.id,
+        ).first()
 
         return context
 
@@ -2103,5 +2108,18 @@ class Bootleg(TemplateView):
             )
             .order_by("event")
         )
+
+        return context
+
+
+class Updates(TemplateView):
+    template_name = "databruce/updates.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["title"] = "Updates"
+
+        context["updates"] = models.Updates.objects.all().order_by("-created_at")
 
         return context

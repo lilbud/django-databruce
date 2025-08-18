@@ -116,7 +116,7 @@ urlpatterns = [
     path("songs/<int:id>", views.SongDetail.as_view(), name="song_details"),
     path("songs/lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
     path(
-        "songs/<int:songid>/lyrics/<uuid:uuid>",
+        "lyrics/<uuid:id>",
         views.SongLyricDetail.as_view(),
         name="lyric_detail",
     ),
@@ -179,6 +179,7 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path("updates", views.Updates.as_view(), name="updates"),
 ]
 
 if not settings.TESTING:

@@ -1503,11 +1503,25 @@ class Lyrics(models.Model):
     num = models.TextField(db_column="version_num")
     source = models.TextField(db_column="source_info")
     text = models.TextField(db_column="lyrics")
-    updated_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     language = models.TextField(blank=True, null=True)  # noqa: DJ001
     note = models.TextField(blank=True, null=True)  # noqa: DJ001
 
     class Meta:
         managed = False
         db_table = "lyrics"
+
+
+class Updates(models.Model):
+    id = models.AutoField(primary_key=True)
+    item_id = models.IntegerField(blank=True, null=True)
+    item = models.TextField(blank=True, null=True)  # noqa: DJ001
+    value = models.TextField(blank=True, null=True, db_column="to_value")  # noqa: DJ001
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    view = models.TextField(blank=True, null=True)  # noqa: DJ001
+    msg = models.TextField(blank=True, null=True)  # noqa: DJ001
+
+    class Meta:
+        managed = False
+        db_table = "updates"

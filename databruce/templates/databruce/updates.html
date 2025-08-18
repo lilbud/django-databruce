@@ -1,0 +1,54 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+  Updates
+{% endblock title %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-10 col-md-6">
+      <div class="row mb-2">
+        <h4>
+          <a class="sky-500" href="{% url 'index' %}">Databruce</a> &gt; Updates
+        </h4>
+      </div>
+      <div class="row mb-2">
+        <h6>
+          This is a running list of new additions to the database. To keep things simple, I've limited it to the last 1000 updates.
+        </h6>
+      </div>
+      <div class="row mb-3">
+        <div class="table-responsive">
+          <table class="table table-hover display" id="updateTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in updates %}
+                <tr>
+                  <td>{{ item.created_at|date:'Y-m-d' }}</td>
+                  <td>
+                    {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // removes searchBuilder button, not needed for this.
+    layout.topEnd.features[1].buttons.pop()
+
+    $(document).ready(function () {
+      new DataTable('#updateTable', {
+        layout: layout,
+        order: [[0, 'desc']],
+      });
+    });
+  </script>
+{% endblock content %}

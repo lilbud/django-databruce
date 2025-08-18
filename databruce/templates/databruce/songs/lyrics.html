@@ -29,7 +29,7 @@
         {% for lyric in lyrics %}
             <tr>
                 <td>
-                    <a href="{% url "lyric_detail" songid=lyric.song.id uuid=lyric.uuid %}">{{ lyric.song.name }}</a>
+                    <a href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.song.name }}</a>
                 </td>
                 <td>{{ lyric.version }}</td>
                 <td>{{ lyric.source }}</td>
