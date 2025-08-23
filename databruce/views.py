@@ -576,7 +576,7 @@ class EventDetail(TemplateView):
             .count()
         )
 
-        if context["event"].tour.id not in [23, 43]:
+        if context["event"].artist.springsteen_band:
             context["album_breakdown"] = (
                 models.Songs.objects.filter(
                     id__in=context["setlist"]

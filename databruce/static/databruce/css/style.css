@@ -39,11 +39,35 @@ div.ui-menu-item-wrapper:hover,
 }
 
 .card tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 10px !important;
+    border-bottom-left-radius: 0.5rem !important;
 }
 
 .card tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 10px !important;
+    border-bottom-right-radius: 0.5rem !important;
+}
+
+.card tbody tr:last-child td {
+    border-style: none !important;
+}
+
+.card.event-info .card-body, 
+.card.event-info button,
+div.card-body {
+    font-size: .875rem !important;
+}
+
+div.card-body ul {
+    margin-bottom: 0.5rem !important;
+}
+
+div.card-body ul:last-child {
+    margin-bottom: 0 !important;
+}
+
+.list-group-flush > .list-group-item:last-child {
+	border-bottom-width: 0;
+    border-bottom-right-radius: 0.5rem !important;
+    border-bottom-left-radius: 0.5rem !important;
 }
 
 .card {

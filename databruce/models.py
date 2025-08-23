@@ -653,7 +653,7 @@ class Events(models.Model):
         try:
             event = self.date.strftime("%Y-%m-%d")
             if self.early_late:
-                event += f" {self.early_late}"
+                event += f" ({self.early_late})"
         except AttributeError:
             event = f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
 

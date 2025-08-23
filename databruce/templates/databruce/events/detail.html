@@ -1,7 +1,7 @@
 {% extends "databruce/base.html" %}
 {% load filters %}
 {% block title %}
-  {{ event }} {{ event.venue }}
+  {{ event }} {{ event.artist }}
 {% endblock title %}
 {% block content %}
   <div class="row justify-content-center">
@@ -31,12 +31,11 @@
               <div class="d-flex flex-row flex-wrap">
                 <div class="mb-0 fs-5">
                   <div>
-                    <span class="sky-500 fw-semibold">{{ event }}</span>
-                    <span class="text-body-secondary fw-medium">({{ event.type }})</span>
-                  </div>
-                  <div>
-                    <a class="text-body fw-medium"
-                       href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                    <span>
+                      <a class="fw-bold text-body"
+                         href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                    </span>
+                    <span class="sky-500 fw-medium">{{ event }}</span>
                   </div>
                   <div class="mb-2">
                     <a class="text-body fw-medium"
@@ -60,7 +59,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 col-lg-8 mb-3 order-1 order-lg-1">
+        <div class="col-12 col-lg-8 mb-3 pe-2 order-1 order-lg-1">
           <div class="row mb-3">
             <div class="col">
               <div class="card">
@@ -111,7 +110,7 @@
                                     {{ song.song_num }}
                                   {% endif %}
                                 </td>
-                                <td class="px-2 py-2">
+                                <td class="px-2">
                                   <div class="row">
                                     <span class="text-nowrap">
                                       <a class="sky-400 fw-medium me-1"
@@ -271,15 +270,15 @@
             {% endif %}
           </div>
         </div>
-        <div class="col-12 col-lg-4 order-2 order-lg-2">
+        <div class="col-12 col-lg-4 ps-2 order-2 order-lg-2">
           <div class="row row-cols-1 g-3 mb-3">
             <div class="col">
               <div class="card">
                 <div class="card-header">User Stats</div>
                 <div class="card-body">
                   <div class="col">
-                    <div class="row mb-2">
-                      <h6>{{ user_count|default_if_none:"0" }} user(s) were at this show.</h6>
+                    <div class="row {% if user.is_authenticated %}mb-2{% else %}mb-0{% endif %}">
+                      <div>{{ user_count|default_if_none:"0" }} user(s) were at this show.</div>
                     </div>
                     {% if user.is_authenticated %}
                       <div class="row">
@@ -305,15 +304,15 @@
               </div>
             </div>
             <div class="col">
-              <div class="card">
+              <div class="card event-info">
                 <div class="card-header">Event Info</div>
                 <div class="card-body p-0">
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                      <div class="row align-items-center">
-                        <div class="col fw-bold p-0">
+                      <div class="row justify-content-between">
+                        <div class="col fw-bold">
                           <button type="button"
-                                  class="btn btn-link py-0 fw-medium text-reset text-body-light"
+                                  class="btn btn-link p-0 fw-bold text-nowrap text-reset text-body-light"
                                   data-bs-toggle="modal"
                                   data-bs-target="#eventCertaintyModal">
                             Event Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
@@ -323,59 +322,73 @@
                       </div>
                     </li>
                     <li class="list-group-item">
-                      <div class="row align-items-center">
-                        <div class="col fw-bold p-0">
+                      <div class="row justify-content-between">
+                        <div class="col fw-bold">
                           <button type="button"
-                                  class="btn btn-link py-0 fw-medium text-reset text-body-light"
+                                  class="btn btn-link p-0 fw-bold text-nowrap text-reset text-body-light"
                                   data-bs-toggle="modal"
                                   data-bs-target="#setlistCertaintyModal">
                             Setlist Certainty<i class="ms-1 bi bi-info-circle-fill"></i>
                           </button>
                         </div>
-                        <div class="col fw-medium">{{ event.setlist_certainty }}</div>
+                        <div class="col fw-medium ">{{ event.setlist_certainty }}</div>
+                      </div>
+                    </li>
+                    <li class="list-group-item">
+                      <div class="row justify-content-between">
+                        <div class="col fw-bold py-0 text-nowrap text-reset text-body-light">Event Type</div>
+                        <div class="col fw-medium">{{ event.type }}</div>
                       </div>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-header">Event Notes</div>
-                <div class="card-body">
-                  <div class="mb-2">{{ event.note|default_if_none:""|safe }}</div>
+            {% if event.note %}
+              <div class="col">
+                <div class="card" id="notes-card">
+                  <div class="card-header">Event Notes</div>
+                  <div class="card-body">{{ event.note|safe }}</div>
                 </div>
               </div>
-            </div>
+            {% endif %}
             {% if official or nugs or archive or event.date %}
               <div class="col">
-                <div class="card">
+                <div class="card" id="links-card">
                   <div class="card-header">Links</div>
                   <div class="card-body">
-                    {% if event.brucebase_url %}
-                      <h6>Links</h6>
-                      <ul>
+                    <ul>
+                      {% if event.brucebase_url %}
                         <li>
                           <a class="sky-500"
                              href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
                         </li>
-                      </ul>
-                    {% endif %}
-                    {% if official or nugs %}
-                      <h6>Official Releases</h6>
-                      <ul>
-                        {% if nugs %}
-                          <li>
-                            <a class="sky-500"href="{{ nugs.url }}">Nugs Release</a>
-                          </li>
-                        {% endif %}
+                      {% endif %}
+                      {% if nugs %}
+                        <li>
+                          <a class="sky-500"href="{{ nugs.url }}">Nugs Release</a>
+                        </li>
+                      {% endif %}
+                      {% if official %}
                         {% for rel in official %}
                           <li>
-                            <a class="sky-500" href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }}</a>
+                            <a class="sky-500" href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
                           </li>
                         {% endfor %}
-                      </ul>
-                    {% endif %}
+                      {% endif %}
+                      {% if bootleg %}
+                        <li>
+                          <a class="sky-500"
+                             href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
+                        </li>
+                      {% endif %}
+                      {% if event.date %}
+                        <li>
+                          <a class="sky-500"
+                             href="https://www.google.com/search?q=Bruce+Springsteen+{{ event.date|date:"Y-m-d"|iriencode }}+{{ event.venue.city.name|iriencode }}&source=lnms&tbm=vid">Google Video Search</a>
+                        </li>
+                      {% endif %}
+                    </ul>
                     {% if archive %}
                       <h6>
                         Radio Nowhere @ Archive.org
@@ -390,24 +403,6 @@
                             <a class="sky-500" href="https://archive.org/details/{{ rel.url }}">{{ rel.url }}</a>
                           </li>
                         {% endfor %}
-                      </ul>
-                    {% endif %}
-                    {% if bootleg %}
-                      <h6>Bootlegs</h6>
-                      <ul>
-                        <li>
-                          <a class="sky-500"
-                             href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
-                        </li>
-                      </ul>
-                    {% endif %}
-                    {% if event.date %}
-                      <h6>Videos</h6>
-                      <ul>
-                        <li>
-                          <a class="sky-500"
-                             href="https://www.google.com/search?q=Bruce+Springsteen+{{ event.date|date:"Y-m-d"|iriencode }}+{{ event.venue.city.name|iriencode }}&source=lnms&tbm=vid">Google Video Search</a>
-                        </li>
                       </ul>
                     {% endif %}
                   </div>
