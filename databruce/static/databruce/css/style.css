@@ -29,7 +29,8 @@ div.ui-menu-item-wrapper:hover,
     background-color: var(--sky-700) !important;
 }
 
-.list-group-item {
+.list-group-item,
+.collapse {
     border-radius: inherit !important;
 }
 
@@ -50,7 +51,7 @@ div.ui-menu-item-wrapper:hover,
     border-style: none !important;
 }
 
-.card.event-info .card-body, 
+.card.event-info .card-body,
 .card.event-info button,
 div.card-body {
     font-size: .875rem !important;
@@ -64,8 +65,8 @@ div.card-body ul:last-child {
     margin-bottom: 0 !important;
 }
 
-.list-group-flush > .list-group-item:last-child {
-	border-bottom-width: 0;
+.list-group-flush>.list-group-item:last-child {
+    border-bottom-width: 0;
     border-bottom-right-radius: 0.5rem !important;
     border-bottom-left-radius: 0.5rem !important;
 }
@@ -80,10 +81,6 @@ html[data-bs-theme="dark"] table a {
 
 html[data-bs-theme="light"] table a {
     color: var(--sky-600) !important;
-}
-
-.collapse {
-    border-radius: inherit !important;
 }
 
 .card-header:first-child {
@@ -104,18 +101,12 @@ th.text-center>div.dt-column-header {
     text-align: center !important;
 }
 
-a:link {
-    text-decoration: none !important;
-}
-
-a:hover {
-    text-decoration: underline !important;
-}
-
+a:link,
 .btn.btn-link {
     text-decoration: none !important;
 }
 
+a:hover,
 .btn.btn-link:hover {
     text-decoration: underline !important;
 }
@@ -154,7 +145,8 @@ tr th {
     padding-left: 8px
 }
 
-.text-sm-right {
+.text-sm-right,
+blockquote>p {
     text-align: right !important;
 }
 
@@ -168,6 +160,10 @@ tr th {
 
 .sky-500 {
     color: var(--sky-500);
+}
+
+.sky-600 {
+    color: var(--sky-600);
 }
 
 .sky-700,
@@ -237,10 +233,6 @@ blockquote p::after {
     content: "\201D";
 }
 
-blockquote+p {
-    text-align: right;
-}
-
 li.nav-item {
     list-style: none !important;
 }
@@ -251,4 +243,8 @@ li.nav-item {
 
 .ml-auto {
     margin-left: auto !important;
+}
+
+#about a {
+    color: var(--sky-500) !important;
 }

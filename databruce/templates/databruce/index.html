@@ -7,11 +7,14 @@
   {% regroup events by artist as events_list %}
   <div class="row mb-4">
     <div class="col">
-      <h1>
-        Welcome to Databruce
-        {% if user.is_authenticated %}, {{ user|default_if_none:"" }}!{% endif %}
-      </h1>
-      <h4>A new Bruce Springsteen concert database</h4>
+      <h2>
+        {% if user.is_authenticated %}
+          Welcome to Databruce, {{ user|default_if_none:"" }}!
+        {% else %}
+          Welcome to Databruce!
+        {% endif %}
+      </h2>
+      <h5>A new Bruce Springsteen concert database</h5>
     </div>
   </div>
   <div class="row mb-4">
