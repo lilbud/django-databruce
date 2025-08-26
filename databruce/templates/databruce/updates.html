@@ -13,7 +13,7 @@
       </div>
       <div class="row mb-2">
         <h6>
-          This is a running list of new additions to the database. To keep things simple, I've limited it to the last 1000 updates.
+          This is a running list of new additions to the database. To keep things simple, I've limited it to the last 1000 additions.
         </h6>
       </div>
       <div class="row mb-3">
@@ -30,7 +30,11 @@
                 <tr>
                   <td>{{ item.created_at|date:'Y-m-d' }}</td>
                   <td>
-                    {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a>
+                    {% if item.view %}
+                      {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a>
+                    {% else %}
+                      {{ item.msg }}
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}

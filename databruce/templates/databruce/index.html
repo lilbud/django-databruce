@@ -23,12 +23,14 @@
         <div class="card-body p-0 rounded">
           <img class="img-fluid object-fit-cover"
                id="headimg"
-               src="{% static 'databruce/img/header-sm.jpg' %}"
+               src="{% static 'databruce/img/header-2025.jpg' %}"
                alt=""
                height="1280"
                width="auto">
         </div>
-        <div class="card-footer text-body-secondary">Manchester - May 14, 2025 (photo by Rob DeMartin)</div>
+        <div class="card-footer text-body-secondary">
+          San Siro - July 3, 2025 (photo by <a href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)
+        </div>
       </div>
       <div class="card mb-3 mb-lg-0">
         <div class="card-header">
@@ -39,7 +41,11 @@
           <ul class="mb-0">
             {% for item in updates %}
               <li>
-                {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a> ({{ item.created_at|date:'m/d' }})
+                {% if item.view %}
+                  {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a> ({{ item.created_at|date:'m/d' }})
+                {% else %}
+                  {{ item.msg }} ({{ item.created_at|date:'m/d' }})
+                {% endif %}
               </li>
             {% endfor %}
           </ul>
@@ -47,7 +53,7 @@
       </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4 px-2">
-      <div class="card mb-4 mb-lg-0">
+      <div class="card mb-3 mb-lg-0">
         <div class="card-header">Most Recent Show</div>
         <div class="card-body p-0">
           <h6 class="p-3 mb-0">
