@@ -8,7 +8,6 @@ from typing import Any
 import requests
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import (
     default_token_generator,
@@ -59,30 +58,29 @@ class Index(TemplateView):
         "venue__state",
         "venue__country",
     )
-    date = datetime.datetime.today()
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Home"
-        context["date"] = self.date
+        context["date"] = datetime.datetime.today()
         context["events"] = self.queryset.filter(
-            date__month=self.date.month,
-            date__day=self.date.day,
+            date__month=datetime.datetime.today().month,
+            date__day=datetime.datetime.today().day,
         ).order_by("-id")[:5]
 
         context["recent"] = self.queryset.filter(
-            date__lte=self.date,
+            date__lte=datetime.datetime.today(),
         ).order_by("-id")[:5]
 
         context["upcoming"] = self.queryset.filter(
-            date__gt=self.date,
+            date__gt=datetime.datetime.today(),
         ).order_by("id")[:5]
+
+        context["updates"] = models.Updates.objects.all().order_by("-created_at")[:10]
 
         context["latest_event"] = (
             models.Setlists.objects.all().order_by("-event").first()
         )
-
-        context["updates"] = models.Updates.objects.all().order_by("-created_at")[:10]
 
         context["latest_show"] = (
             models.Setlists.objects.filter(event__id=context["latest_event"].event.id)
@@ -283,10 +281,6 @@ class UserProfile(TemplateView):
         return context
 
 
-@method_decorator(
-    login_not_required,
-    name="dispatch",
-)
 class SignUp(TemplateView):
     template_name = "users/signup.html"
     email_template_name = "users/signup_email.html"
