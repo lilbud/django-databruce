@@ -128,7 +128,7 @@ class Bands(models.Model):
     )
 
     springsteen_band = models.BooleanField()
-    mbid = models.TextField(blank=True, default=None)
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
     updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
@@ -145,7 +145,7 @@ class Bootlegs(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     slid = models.IntegerField(blank=True, default=None)
-    mbid = models.TextField(blank=True, default=None)
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     event = models.ForeignKey(
         to="Events",
@@ -301,7 +301,7 @@ class Countries(models.Model):
     alpha_2 = models.TextField(blank=True, default=None, max_length=2)
     alpha_3 = models.TextField(blank=True, default=None, max_length=3)
     aliases = models.TextField(blank=True, default=None)
-    mbid = models.TextField(blank=True, default=None)
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     first = models.ForeignKey(
         to="Events",
@@ -451,7 +451,7 @@ class Venues(models.Model):
 
     num_events = models.IntegerField(default=0)
     aliases = models.TextField(blank=True, default=None)
-    mbid = models.TextField(blank=True, default=None, db_column="mb_id")
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     first = models.ForeignKey(
         "Events",
@@ -829,7 +829,7 @@ class Releases(models.Model):
     date = models.DateField(blank=True, default=None, db_column="release_date")
     short_name = models.TextField(blank=True, default=None)
     thumb = models.TextField(blank=True, default=None)
-    mbid = models.TextField(blank=True, default=None)
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
@@ -936,7 +936,7 @@ class Songs(models.Model):
     category = models.TextField(blank=True, default=None)
     spotify_id = models.TextField(blank=True, default=None)
 
-    mbid = models.TextField(blank=True, default=None)
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     length = models.TimeField(blank=True, default=None)
 
@@ -1119,20 +1119,6 @@ class SongsAfterRelease(models.Model):
         verbose_name_plural = "songs_after_release"
 
 
-class SongsFirstRelease(models.Model):
-    song_id = models.TextField(blank=True, default=None)
-    date = models.TextField(blank=True, default=None)
-    year = models.TextField(blank=True, default=None)
-    name = models.TextField(blank=True, default=None, db_column="release_name")
-    brucebase_id = models.TextField(blank=True, default=None)
-    release_thumb = models.TextField(blank=True, default=None)
-    mbid = models.TextField(blank=True, default=None)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "songs_first_release"
-
-
 class States(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -1140,7 +1126,7 @@ class States(models.Model):
     name = models.TextField(blank=True, default=None)
     country = models.ForeignKey(Countries, models.DO_NOTHING, db_column="country")
     num_events = models.IntegerField(default=0)
-    mbid = models.TextField(blank=True, default=None)
+    mbid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     first = models.ForeignKey(
         Events,
