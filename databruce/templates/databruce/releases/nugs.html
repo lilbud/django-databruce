@@ -22,7 +22,7 @@
     <tbody>
         {% for release in releases %}
             <tr>
-                <td>{{ release.date|default_if_none:"" }}</td>
+                <td>{{ release.date|default_if_none:""|date:"Y-m-d" }}</td>
                 <td>
                     <a href="{% url "event_details" id=release.event.id %}">{{ release.event }}</a>
                 </td>

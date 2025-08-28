@@ -34,10 +34,10 @@ div.ui-menu-item-wrapper:hover,
     border-radius: inherit !important;
 }
 
-.card tbody tr:last-child td:first-child,
+/* .card tbody tr:last-child td:first-child,
 .card tbody tr:last-child td:last-child {
     border-bottom-style: none;
-}
+} */
 
 .card tbody tr:last-child td:first-child {
     border-bottom-left-radius: 0.5rem !important;
@@ -47,9 +47,9 @@ div.ui-menu-item-wrapper:hover,
     border-bottom-right-radius: 0.5rem !important;
 }
 
-.card tbody tr:last-child td {
+/* .card tbody tr:last-child td {
     border-style: none !important;
-}
+} */
 
 .card.event-info .card-body,
 .card.event-info button,

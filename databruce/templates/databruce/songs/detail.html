@@ -46,6 +46,11 @@
                   <a href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
                 </li>
               {% endif %}
+              {% if song_info.mbid %}
+                <li>
+                  <a href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
+                </li>
+              {% endif %}
             </ul>
           </div>
         {% endif %}
@@ -204,7 +209,7 @@
             {% endif %}
           </ul>
         </div>
-        <div class="card-body">
+        <div class="card-body px-0">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
               <div class="table-responsive">
