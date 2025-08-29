@@ -14,13 +14,13 @@
     <tr class="custom">
       <th class="all" scope="col">Name</th>
       <th class="min-tablet-l" scope="col">Original Artist</th>
-      <th class="all" scope="col">Category</th>
+      <th class="min-tablet-l" scope="col">Category</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
-      <th class="all text-center" scope="col">Public</th>
-      <th class="all text-center" scope="col">Private</th>
-      <th class="all text-center" scope="col">Snippet</th>
-      <th class="all" scope="col">Original</th>
+      <th class="min-tablet-l text-center" scope="col">Public</th>
+      <th class="min-tablet-l text-center" scope="col">Private</th>
+      <th class="min-tablet-l text-center" scope="col">Snippet</th>
+      <th class="min-tablet-l" scope="col">Original</th>
     </tr>
   </thead>
   <tbody>
@@ -37,7 +37,7 @@
           </a>
         </td>
         <td>{{ song.original_artist }}</td>
-        <td class="text-start">{{ song.category }}</td>
+        <td class="text-nowrap">{{ song.category }}</td>
         <td data-sort="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}"
             data-filter="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}">
           {% if song.first %}
