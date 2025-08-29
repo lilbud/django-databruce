@@ -26,7 +26,6 @@ urlpatterns = [
     path("benner/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
     # path("test/", views.Test.as_view(), name="test"),
-    path("ajax/", views.get_data, name="ajaxsongs"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "accounts/login/",

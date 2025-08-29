@@ -13,23 +13,30 @@
   <thead>
     <tr class="custom">
       <th class="all" scope="col">Name</th>
+      <th class="min-tablet-l" scope="col">Original Artist</th>
       <th class="all" scope="col">Category</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
       <th class="all text-center" scope="col">Public</th>
       <th class="all text-center" scope="col">Private</th>
       <th class="all text-center" scope="col">Snippet</th>
-      <th class="min-tablet-l" scope="col">Original Artist</th>
-      <th class="min-tablet-l" scope="col">Has Lyrics?</th>
-      <th class="all" scope="col">Original?</th>
+      <th class="all" scope="col">Original</th>
     </tr>
   </thead>
   <tbody>
     {% for song in songs %}
       <tr>
         <td class="text-nowrap">
-          <a href="{% url 'song_details' id=song.id %}">{{ song.name }}</a>
+          <a href="{% url 'song_details' id=song.id %}">{{ song.name }}
+            {% if song.lyrics %}
+              <i class="bi bi-file-earmark-check"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Has Lyrics"></i>
+            {% endif %}
+          </a>
         </td>
+        <td>{{ song.original_artist }}</td>
         <td class="text-start">{{ song.category }}</td>
         <td data-sort="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}"
             data-filter="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}">
@@ -46,21 +53,7 @@
         <td class="text-center">{{ song.num_plays_public }}</td>
         <td class="text-center">{{ song.num_plays_private }}</td>
         <td class="text-center">{{ song.num_plays_snippet }}</td>
-        <td>
-          {% if not song.original %}
-            {{ song.original_artist|default_if_none:"" }}
-          {% else %}
-            Bruce Springsteen
-          {% endif %}
-        </td>
-        <td>{{ song.lyrics }}</td>
-        <td>
-          {% if song.original %}
-            Original
-          {% else %}
-            Cover
-          {% endif %}
-        </td>
+        <td>{{ song.original }}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -68,7 +61,7 @@
 {% block scripts %}
   <script>
   // removes searchBuilder button, not needed for this.
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6, 7, 8]
+  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6, 7]
 
   $(document).ready(function () {
     new DataTable('#songsTable', {
@@ -79,7 +72,7 @@
           target: -1,
           visible: false
         },
-        { type: 'date', targets: [1, 2] }
+        { type: 'text', targets: [3, 4] }
       ],
       initComplete: function () {
         this.api()
@@ -98,8 +91,8 @@
               });
 
             select.append('<option value=".*">All</option>');
-            select.append('<option value="Original">Originals</option>');
-            select.append('<option value="Cover">Covers</option>');
+            select.append('<option value="True">Originals</option>');
+            select.append('<option value="False">Covers</option>');
           });
       },
     });

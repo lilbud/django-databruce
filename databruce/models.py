@@ -957,6 +957,7 @@ class Songs(models.Model):
     class Meta:
         managed = False
         db_table = "songs"
+        ordering = ["name"]
         verbose_name_plural = "songs"
 
     def __str__(self) -> str:

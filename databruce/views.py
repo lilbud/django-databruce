@@ -27,7 +27,7 @@ from django.db.models import (
 )
 from django.db.models.functions import TruncYear
 from django.forms import formset_factory
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
@@ -102,7 +102,7 @@ class Song(TemplateView):
         context["title"] = "Songs"
         context["songs"] = (
             models.Songs.objects.all()
-            .prefetch_related("first", "last", "album")
+            .prefetch_related("first", "last")
             .order_by("name")
         )
 
@@ -121,82 +121,6 @@ class Links(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         return super().get_context_data(**kwargs)
-
-
-from django.core.paginator import Paginator
-
-
-def get_data(request):
-    draw = int(request.GET.get("draw", 1))
-    start = int(request.GET.get("start", 0))
-    length = int(request.GET.get("length", 10))
-    sort_column = request.GET.get("order[0][name]")
-    sort_order = request.GET.get("order[0][dir]")
-    search = request.GET.get("search[value]")
-    filter = Q()
-
-    if search:
-        filter = (
-            Q(name__icontains=search)
-            | Q(first__id__istartswith=search)
-            | Q(first__date__istartswith=search)
-            | Q(last__id__istartswith=search)
-            | Q(last__date__istartswith=search)
-        )
-
-    print(request.GET)
-
-    if sort_order == "asc":
-        query_set = models.Songs.objects.all().order_by(f"{sort_column}").filter(filter)
-    elif sort_order == "desc":
-        query_set = (
-            models.Songs.objects.all().order_by(f"-{sort_column}").filter(filter)
-        )
-    else:
-        query_set = models.Songs.objects.all().filter(filter)
-
-    paginator = Paginator(query_set, length)
-    page_number = start // length + 1
-    page = paginator.get_page(page_number)
-    data = []
-
-    for obj in page:
-        current = {
-            "name": obj.name,
-            "first": "",
-            "last": "",
-        }
-
-        try:
-            current["first"] = str(obj.first)
-        except:
-            current["first"] = ""
-
-        try:
-            current["last"] = str(obj.last)
-        except:
-            current["last"] = ""
-
-        data.append(current)
-
-    # data = [
-    #     {
-    #         "id": obj.id.id,
-    #         "name": obj.current.song.name,
-    #         "first": "",
-    #         "last": obj.id.last.date,
-    #     }
-    #     for obj in page
-    # ]
-
-    response = {
-        "draw": draw,
-        "recordsTotal": query_set.count(),
-        "recordsFiltered": query_set.count(),
-        "data": data,
-    }
-
-    return JsonResponse(response)
 
 
 class Test(TemplateView):

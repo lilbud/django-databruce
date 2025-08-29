@@ -1,3 +1,5 @@
+from django.urls import reverse
+from django.utils.html import format_html
 from rest_framework import serializers
 
 from databruce import models
@@ -37,7 +39,9 @@ class EventsSerializer(serializers.ModelSerializer):
         if obj.early_late:
             date += f" {obj.early_late}"
 
-        return date
+        return f"<a href='{reverse('event_details', kwargs={'id': obj.id})}'>{date}</a>"
+
+        # return date
 
     class Meta:
         model = models.Events
@@ -117,6 +121,23 @@ class ReleasesSerializer(serializers.ModelSerializer):
 class SongsSerializer(serializers.ModelSerializer):
     first = EventsSerializer()
     last = EventsSerializer()
+    name = serializers.SerializerMethodField()
+    original = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        song_url = reverse("song_details", kwargs={"id": f"{obj.id}"})
+        name = obj.name
+
+        if obj.lyrics:
+            name = format_html(
+                "{} <i class='bi bi-file-earmark-check' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-title='Has Lyrics'></i>",
+                obj.name,
+            )
+
+        return format_html("<a href={}>{}<a>", song_url, name)
+
+    def get_original(self, obj):
+        return obj.original
 
     class Meta:
         model = models.Songs

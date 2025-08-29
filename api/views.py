@@ -235,8 +235,6 @@ class SongsViewSet(viewsets.ModelViewSet):
 
     queryset = models.Songs.objects.all()
     serializer_class = serializers.SongsSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = filters.SongsFilter
     permission_classes = permission_classes
 
 

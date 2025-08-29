@@ -13,7 +13,7 @@ var layout = {
                     },
                     className: "btn-sm bi bi-search mb-1 mr-2 d-none d-lg-inline search",
                     config: {
-                        depthLimit: 4,
+                        depthLimit: 2,
                     }
                 }],
             }]
