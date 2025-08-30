@@ -232,12 +232,14 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop()
+    layout.topEnd.features[1].buttons.pop();
+    layout.topStart = 'pageLength';
     
     $(document).ready(function () {
       new DataTable('#otdTable', {
           layout: layout,
           autoWidth: false,
+          searching: false,
           paging: false,
           ordering: false,
       });
@@ -246,6 +248,7 @@
           layout: layout,
           autoWidth: false,
           paging: false,
+          searching: false,
           ordering: false,
       });
 
@@ -253,6 +256,7 @@
           layout: layout,
           autoWidth: false,
           paging: false,
+          searching: false,
           ordering: false,
       });
 
@@ -260,6 +264,7 @@
           layout: layout,
           autoWidth: false,
           paging: false,
+          searching: false,
           ordering: false,
           columnDefs: [{ target: 0, width: '5%' }],
       });

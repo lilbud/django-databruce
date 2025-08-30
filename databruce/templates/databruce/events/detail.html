@@ -6,60 +6,56 @@
 {% block content %}
   <div class="row justify-content-center">
     <div class="col col-xl-8">
+      <div class="row">
+        <div class="col">
+          <h6 class="float-end">
+            <a class="btn btn-sm btn-secondary"
+               role="button"
+               data-bs-toggle="tooltip"
+               data-bs-placement="top"
+               data-bs-html="true"
+               data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
+               href="{% url "event_details" id=prev_event.id %}">&lt; Prev</a>
+            <a class="btn btn-sm btn-secondary"
+               role="button"
+               data-bs-toggle="tooltip"
+               data-bs-placement="top"
+               data-bs-html="true"
+               data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
+               href="{% url "event_details" id=next_event.id %}">Next &gt;</a>
+          </h6>
+        </div>
+      </div>
       <div class="row mb-3">
         <div class="col">
           <div class="card">
-            <div class="card-header">
-              <div class="float-end">
-                <a class="btn btn-sm btn-secondary"
-                   role="button"
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top"
-                   data-bs-html="true"
-                   data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue }}</div>"
-                   href="{% url "event_details" id=prev_event.id %}">&lt; Prev</a>
-                <a class="btn btn-sm btn-secondary"
-                   role="button"
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top"
-                   data-bs-html="true"
-                   data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue }}</div>"
-                   href="{% url "event_details" id=next_event.id %}">Next &gt;</a>
-              </div>
-            </div>
             <div class="card-body">
-              <div class="d-flex flex-row flex-wrap">
-                <div class="mb-0 fs-5">
-                  <div>
-                    <span>
-                      <a class="fw-bold text-body"
-                         href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
-                    </span>
-                    <span class="sky-500 fw-medium">{{ event }}</span>
-                  </div>
-                  <div class="mb-2">
-                    <a class="text-body fw-medium"
-                       href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
-                  </div>
-                  <div class="badge-row fw-medium fs-6 mb-0">
-                    {% if event.tour %}
-                      <a href="{% url "tour_details" id=event.tour.id %}"><span class="badge text-bg-secondary">{{ event.tour }}</span></a>
-                    {% endif %}
-                    {% if event.leg %}
-                      <a href="{% url "leg_details" id=event.leg.id %}"><span class="badge text-bg-secondary">{{ event.leg }}</span></a>
-                    {% endif %}
-                    {% if event.run %}
-                      <a href="{% url "run_details" id=event.run.id %}"><span class="badge text-bg-secondary">{{ event.run }}</span></a>
-                    {% endif %}
-                  </div>
-                </div>
+              <div class="fs-5 d-flex flex-nowrap mb-0">
+                <a class="fw-bold text-body pe-2"
+                   href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                <span class="sky-500 fw-medium">{{ event }}</span>
+              </div>
+              <div class="row mb-1 mt-0">
+                <a class="text-body fw-medium fs-5"
+                   href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
+              </div>
+              <div class="badge-row row fw-medium fs-6 mb-0">
+                {% if event.tour %}
+                  <a href="{% url "tour_details" id=event.tour.id %}"><span class="badge text-bg-secondary">{{ event.tour }}</span></a>
+                {% endif %}
+                {% if event.leg %}
+                  <a href="{% url "leg_details" id=event.leg.id %}"><span class="badge text-bg-secondary">{{ event.leg }}</span></a>
+                {% endif %}
+                {% if event.run %}
+                  <a href="{% url "run_details" id=event.run.id %}"><span class="badge text-bg-secondary">{{ event.run }}</span></a>
+                {% endif %}
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-12 col-lg-8 mb-3 pe-2 order-1 order-lg-1">
+        <div class="col-12 col-lg-8 mb-3 order-2 order-lg-1 pe-lg-2">
           <div class="row mb-3">
             <div class="col">
               <div class="card">
@@ -67,96 +63,92 @@
                 <div class="card-body p-0">
                   {% regroup setlist by set_name as event_setlist %}
                   {% regroup notes|dictsort:"id.id" by id.id as notes_list %}
-                  {% if setlist %}
-                    <div class="table-responsive">
-                      <table class="table table-hover display" id="setlistTable">
-                        <thead>
-                          <tr>
-                            <th class="all text-center px-2">#</th>
-                            <th class="all px-2">Song</th>
-                            <th class="all text-center text-nowrap">
-                              Gap
-                              <i class="bi bi-info-circle-fill"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-html="true"
-                                 data-bs-title="How many shows since a song was last played."></i>
-                            </th>
-                            <th class="all text-nowrap text-center">
-                              Last Played
-                              <i class="bi bi-info-circle-fill"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-title="The last show a song was played at."></i>
-                            </th>
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="setlistTable">
+                      <thead>
+                        <tr>
+                          <th class="all text-center px-2">#</th>
+                          <th class="all px-2">Song</th>
+                          <th class="all text-center text-nowrap">
+                            Gap
+                            <i class="bi bi-info-circle-fill"
+                               data-bs-toggle="tooltip"
+                               data-bs-html="true"
+                               data-bs-title="How many shows since a song was last played."></i>
+                          </th>
+                          <th class="all text-nowrap text-center">
+                            Last Played
+                            <i class="bi bi-info-circle-fill"
+                               data-bs-toggle="tooltip"
+                               data-bs-title="The last show a song was played at."></i>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for set in event_setlist %}
+                          <tr class="text-center">
+                            <td class="setHeader" colspan="4">{{ set.grouper }}</td>
+                            <td class="setname"></td>
+                            <td class="setname"></td>
+                            <td class="setname"></td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {% for set in event_setlist %}
-                            <tr class="text-center">
-                              <td class="setHeader" colspan="4">{{ set.grouper }}</td>
-                              <td class="setname"></td>
-                              <td class="setname"></td>
-                              <td class="setname"></td>
+                          {% for song in set.list %}
+                            <tr>
+                              <td class="text-center px-2">
+                                {% if song.position %}
+                                  <h6 class="mb-0">
+                                    <span data-bs-toggle="tooltip"
+                                          data-bs-title="{{ song.position }}"
+                                          class="badge text-bg-primary">{{ song.song_num }}</span>
+                                  </h6>
+                                {% else %}
+                                  {{ song.song_num }}
+                                {% endif %}
+                              </td>
+                              <td class="px-2">
+                                <div class="row">
+                                  <span class="text-nowrap">
+                                    <a class="sky-400 fw-medium me-1"
+                                       href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                    {% if song.segue %}{{ song.separator }}{% endif %}
+                                    {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
+                                    {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
+                                  </span>
+                                </div>
+                                <div class="row text-body-secondary" id="setlist_note">
+                                  <small>
+                                    {% for note in notes_list %}
+                                      {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
+                                    {% endfor %}
+                                  </small>
+                                </div>
+                              </td>
+                              <td class="text-nowrap text-center">
+                                {% if song.debut and not song.premiere %}
+                                  <h6 class="mb-0">
+                                    <span class="badge text-bg-danger">{{ song.last }}, Debut</span>
+                                  </h6>
+                                {% elif song.last >= 50 %}
+                                  <h6 class="mb-0">
+                                    <span class="badge text-bg-danger">{{ song.last }}, Bustout</span>
+                                  </h6>
+                                {% elif song.premiere %}
+                                  First
+                                {% else %}
+                                  {{ song.last|default_if_none:"" }}
+                                {% endif %}
+                              </td>
+                              <td class="text-nowrap text-center">
+                                {% if song.ltp %}
+                                  <a href="{% url "event_details" id=song.ltp.id %}" class="sky-500">{{ song.ltp }}</a>
+                                {% endif %}
+                              </td>
                             </tr>
-                            {% for song in set.list %}
-                              <tr>
-                                <td class="text-center px-2">
-                                  {% if song.position %}
-                                    <h6 class="mb-0">
-                                      <span data-bs-toggle="tooltip"
-                                            data-bs-title="{{ song.position }}"
-                                            class="badge text-bg-primary">{{ song.song_num }}</span>
-                                    </h6>
-                                  {% else %}
-                                    {{ song.song_num }}
-                                  {% endif %}
-                                </td>
-                                <td class="px-2">
-                                  <div class="row">
-                                    <span class="text-nowrap">
-                                      <a class="sky-400 fw-medium me-1"
-                                         href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
-                                      {% if song.segue %}{{ song.separator }}{% endif %}
-                                      {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
-                                      {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
-                                    </span>
-                                  </div>
-                                  <div class="row text-body-secondary" id="setlist_note">
-                                    <small>
-                                      {% for note in notes_list %}
-                                        {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
-                                      {% endfor %}
-                                    </small>
-                                  </div>
-                                </td>
-                                <td class="text-nowrap text-center">
-                                  {% if song.debut and not song.premiere %}
-                                    <h6 class="mb-0">
-                                      <span class="badge text-bg-danger">{{ song.last }}, Debut</span>
-                                    </h6>
-                                  {% elif song.last >= 50 %}
-                                    <h6 class="mb-0">
-                                      <span class="badge text-bg-danger">{{ song.last }}, Bustout</span>
-                                    </h6>
-                                  {% elif song.premiere %}
-                                    First
-                                  {% else %}
-                                    {{ song.last|default_if_none:"" }}
-                                  {% endif %}
-                                </td>
-                                <td class="text-nowrap text-center">
-                                  {% if song.ltp %}
-                                    <a href="{% url "event_details" id=song.ltp.id %}" class="sky-500">{{ song.ltp }}</a>
-                                  {% endif %}
-                                </td>
-                              </tr>
-                            {% endfor %}
                           {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
-                  {% else %}
-                    <h6 class="p-4">No Set Details Available</h6>
-                  {% endif %}
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -235,6 +227,19 @@
                   </div>
                 </div>
               </div>
+            {% elif 'nobruce' not in event.brucebase_url %}
+              <div class="col">
+                <div class="card">
+                  <div class="card-header">Onstage</div>
+                  <div class="card-body">
+                    <ul>
+                      <li>
+                        <a class="sky-500" href="{% url "relation_details" id=255 %}">Bruce Springsteen</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             {% endif %}
             {% if album_breakdown %}
               <div class="col">
@@ -270,10 +275,10 @@
             {% endif %}
           </div>
         </div>
-        <div class="col-12 col-lg-4 ps-2 order-2 order-lg-2">
+        <div class="col-12 col-lg-4 order-1 order-lg-2 ps-lg-2">
           <div class="row row-cols-1 g-3 mb-3">
             <div class="col">
-              <div class="card">
+              <div class="card h-100">
                 <div class="card-header">User Stats</div>
                 <div class="card-body">
                   <div class="col">
@@ -337,7 +342,7 @@
                     <li class="list-group-item">
                       <div class="row justify-content-between">
                         <div class="col fw-bold py-0 text-nowrap text-reset text-body-light">Event Type</div>
-                        <div class="col fw-medium">{{ event.type }}</div>
+                        <div class="col fw-medium">{{ event.type|default_if_none:"" }}</div>
                       </div>
                     </li>
                   </ul>
@@ -352,7 +357,7 @@
                 </div>
               </div>
             {% endif %}
-            {% if official or nugs or archive or event.date %}
+            {% if official or nugs or archive or event.date or event.brucebase_url %}
               <div class="col">
                 <div class="card" id="links-card">
                   <div class="card-header">Links</div>
@@ -437,7 +442,7 @@
           There is enough evidence (like a recording or a review) to confirm that this show happened.
           <hr>
           <div class="fw-semibold">Unknown Date:</div>
-          This event was known to have happened, but the specific date is unknown. Usually in cases of rehearsals/recording.
+          This event was known to have happened, but the specific date is unknown. Usually in cases of private events.
           <hr>
           <div class="fw-semibold">Unknown Location:</div>
           This event was known to have happened, but the specific location is unknown. Usually in cases of private events.
@@ -486,11 +491,14 @@
       $(document).ready(function() {
           // removes searchBuilder button, not needed for this.
           layout.topEnd.features[1].buttons.pop();
+          layout.topStart = 'pageLength';
 
           new DataTable('#setlistTable', {
               layout: layout,
               autoWidth: false,
               paging: false,
+              searching: false,
+              
               ordering: false,
               columnDefs: [{ target: 0, width: '1%' }],
           });

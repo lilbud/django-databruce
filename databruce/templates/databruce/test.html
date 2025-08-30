@@ -29,6 +29,8 @@
       var table = $('#myTable').DataTable(
         {
           layout: layout,
+          serverSide: true,
+          processing: true,
           columnDefs: [
           {
             target: -1,
@@ -51,7 +53,8 @@
         }
       );
 
-      table.ajax.reload();
+      var d = table.searchBuilder.getDetails();
+      console.log(d);
       
       $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="artist">Category:</label></div><div class="col" id="artist-select"></div></div>').appendTo($('#dropdown-container'));
 
@@ -65,10 +68,7 @@
         table.columns(-1).search(this.value, { regex: true }).draw();
       });
 
-      $('.search').on('click', function () {
-        stored = table.searchBuilder.getDetails();
-        console.log(stored);
-      });
+      
     });
   </script>
 {% endblock content %}

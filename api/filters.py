@@ -84,18 +84,18 @@ class ReleaseTracksFilter(filters.FilterSet):
     release = filters.CharFilter(field_name="release__name", lookup_expr="icontains")
 
 
-class SongsFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
-    first = filters.CharFilter(method="event_filter")
-    last = filters.CharFilter(method="event_filter")
+from rest_framework_datatables.django_filters.filters import GlobalFilter
+from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
 
-    def event_filter(self, queryset, value):
-        return queryset.filter(
-            Q(first__id__istartswith=value)
-            | Q(first__event_date__istartswith=value)
-            | Q(last__id__istartswith=value)
-            | Q(last__event_date__istartswith=value),
-        )
+
+class GlobalCharFilter(GlobalFilter, filters.CharFilter):
+    pass
+
+
+class SongsFilter(DatatablesFilterSet):
+    name = GlobalCharFilter(field_name="name", lookup_expr="icontains")
+    first = GlobalCharFilter(lookup_expr="icontains")
+    last = GlobalCharFilter(lookup_expr="icontains")
 
 
 class ReleaseFilter(filters.FilterSet):

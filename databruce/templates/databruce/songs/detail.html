@@ -14,14 +14,8 @@
       <h6>
         <div class="d-flex flex-row">
           <div class="pe-2 fw-semibold">Originally Performed By:</div>
-          <div>{{ song_info.original_artist|default_if_none:"Bruce Springsteen" }}</div>
+          <div>{{ song_info.original_artist }}</div>
         </div>
-        {% if song_info.length %}
-          <div class="d-flex flex-row">
-            <div class="pe-2 fw-semibold">Song Length:</div>
-            <div>{{ song_info.length|date:"i:s" }}</div>
-          </div>
-        {% endif %}
         {% if song_info.album %}
           <div class="d-flex flex-row">
             <div class="pe-2 fw-semibold">Category:</div>
@@ -209,7 +203,7 @@
             {% endif %}
           </ul>
         </div>
-        <div class="card-body px-0">
+        <div class="card-body">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
               <div class="table-responsive">
@@ -257,15 +251,11 @@
                         <td class="text-nowrap">
                           {% if song.prev %}
                             <a href="{% url "song_details" id=song.prev.song.id %}">{{ song.prev.song }}</a>
-                          {% else %}
-                            <em>***</em>
                           {% endif %}
                         </td>
                         <td class="text-nowrap">
                           {% if song.next %}
                             <a href="{% url "song_details" id=song.next.song.id %}">{{ song.next.song }}</a>
-                          {% else %}
-                            <em>***</em>
                           {% endif %}
                         </td>
                         <td class="text-nowrap">{{ song.note|default_if_none:"" }}</td>

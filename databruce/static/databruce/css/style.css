@@ -11,6 +11,10 @@ body {
     background-color: var(--sky-700) !important;
 }
 
+.card-header, .card-body, li.list-group-item {
+    background-color: #272b2f !important;
+}
+
 .dt-column-title,
 .card-header {
     font-family: var(--font-heading);
@@ -34,11 +38,6 @@ div.ui-menu-item-wrapper:hover,
     border-radius: inherit !important;
 }
 
-/* .card tbody tr:last-child td:first-child,
-.card tbody tr:last-child td:last-child {
-    border-bottom-style: none;
-} */
-
 .card tbody tr:last-child td:first-child {
     border-bottom-left-radius: 0.5rem !important;
 }
@@ -46,10 +45,6 @@ div.ui-menu-item-wrapper:hover,
 .card tbody tr:last-child td:last-child {
     border-bottom-right-radius: 0.5rem !important;
 }
-
-/* .card tbody tr:last-child td {
-    border-style: none !important;
-} */
 
 .card.event-info .card-body,
 .card.event-info button,
@@ -65,7 +60,7 @@ div.card-body ul:last-child {
     margin-bottom: 0 !important;
 }
 
-.list-group-flush>.list-group-item:last-child {
+.list-group-flush>.list-group-item:last-child, .card-body {
     border-bottom-width: 0;
     border-bottom-right-radius: 0.5rem !important;
     border-bottom-left-radius: 0.5rem !important;
@@ -95,6 +90,10 @@ table.dataTable>tbody>tr>td {
     padding-bottom: .4rem !important;
     font-size: 0.875rem;
     vertical-align: middle;
+}
+
+table>tbody>tr>td{
+    background-color: #272b2f !important;
 }
 
 th.text-center>div.dt-column-header {

@@ -416,9 +416,8 @@ class EventDetail(TemplateView):
             "artist",
             "venue__city",
             "venue__country",
-            "tour",
         )
-        .prefetch_related("venue__state")
+        .prefetch_related("venue__state", "tour")
     )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
@@ -707,10 +706,6 @@ class SongDetail(TemplateView):
                 "current__song",
                 "current__event__venue",
                 "current__event__artist",
-                "current",
-                "next",
-                "prev",
-                "current__event",
             )
             .prefetch_related(
                 "current__event__tour",

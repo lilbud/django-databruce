@@ -961,7 +961,7 @@ class Songs(models.Model):
         verbose_name_plural = "songs"
 
     def __str__(self) -> str:
-        if self.original_artist:
+        if not self.original:
             return f"{self.name} ({self.original_artist})"
 
         if self.short_name:
