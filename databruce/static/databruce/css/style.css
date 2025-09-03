@@ -1,4 +1,5 @@
 @import './colors.css';
+@import './new.css';
 @import './select2.css';
 @import './datatables.css';
 
@@ -7,43 +8,120 @@ body {
     font-family: var(--font-body);
 }
 
-.main-color {
-    background-color: var(--sky-700) !important;
+.card-header,
+.card-body,
+li.list-group-item,
+table>tbody>tr>td {
+    background-color: var(--zinc-750) !important;
 }
 
-.card-header, .card-body, li.list-group-item {
-    background-color: #272b2f !important;
+
+
+#stats .row .card .card-body {
+    background-color: var(--zinc-800) !important;
 }
 
-.dt-column-title,
 .card-header {
-    font-family: var(--font-heading);
+    border: none !important;
 }
 
-.card-header {
-    border: none;
+.nav-pills .nav-link:not(.active),
+.nav-pills button.active {
+    border: 1px solid var(--sky-700);
 }
 
+.nav-link,
+#myTab .nav-link:not(.active),
+.setHeader,
+.nav-pills button.active {
+    color: white !important;
+}
+
+.sky-500,
+.page-item:not(.active)>.page-link,
+#song-info a,
+#about a,
+html[data-bs-theme="dark"] table a,
+.nav-pills .nav-link:not(.active),
+.nav-pills button:not(.active) {
+    color: var(--sky-500) !important;
+}
+
+.nav-pills button:not(.active) {
+    background-color: none !important;
+    border: 1px solid var(--sky-500) !important;
+}
+
+.active>.page-link {
+    border-color: var(--sky-700);
+}
+
+.sky-700,
+#myTab .nav-link.active,
+.progress-bar,
 .navbar,
 table th,
 .select2-results__option--highlighted,
 .select2-results__option--selected,
 div.ui-menu-item-wrapper:hover,
-.btn-primary {
+.btn-primary,
+.dropdown-item.active,
+.active>.page-link,
+.nav-pills .nav-link.active,
+.badge-row .badge {
     background-color: var(--sky-700) !important;
 }
+
+.sky-900,
+.setHeader {
+    background-color: var(--sky-900) !important;
+}
+
+.nav-link.active {
+    font-family: var(--font-body);
+    font-weight: 700;
+}
+
+.dt-column-title,
+.card-header {
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+/* disables hovering on set divider rows */
+table.table.dataTable.table-hover > tbody > tr > td.setHeader:hover {
+	box-shadow: none !important;
+}
+
+.table-hover > tbody > tr > td.setHeader:hover {
+	--bs-table-color-state: none !important;
+	--bs-table-bg-state: none !important;
+}
+
+.sky-600,
+html[data-bs-theme="light"] table a {
+    color: var(--sky-600) !important;
+}
+
+div.ui-menu-item-wrapper {
+    background-color: var(--bs-body-bg) !important;
+    border: 0px solid var(--bs-border-color) !important;
+}
+
+div.ui-menu-item-wrapper:hover {
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+
 
 .list-group-item,
 .collapse {
     border-radius: inherit !important;
 }
 
-.card tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 0.5rem !important;
-}
-
-.card tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 0.5rem !important;
+.card .setlist tbody tr:last-child td,
+.card .setlist tbody tr:last-child>td {
+    border-bottom: 0px !important;
 }
 
 .card.event-info .card-body,
@@ -60,40 +138,39 @@ div.card-body ul:last-child {
     margin-bottom: 0 !important;
 }
 
-.list-group-flush>.list-group-item:last-child, .card-body {
+.list-group-flush>.list-group-item:last-child {
     border-bottom-width: 0;
-    border-bottom-right-radius: 0.5rem !important;
-    border-bottom-left-radius: 0.5rem !important;
+    border-radius: inherit !important;
 }
 
-.card {
-    border-radius: 0.5rem !important;
-}
-
-html[data-bs-theme="dark"] table a {
-    color: var(--sky-500) !important;
-}
-
-html[data-bs-theme="light"] table a {
-    color: var(--sky-600) !important;
-}
-
-.card-header:first-child {
-    border-top-left-radius: inherit !important;
-    border-top-right-radius: inherit !important;
-}
-
-table.dataTable>thead>tr>th,
-.setHeader,
-table.dataTable>tbody>tr>td {
-    padding-top: .4rem !important;
-    padding-bottom: .4rem !important;
+table.dataTable>thead>tr>th {
+    padding-top: .3rem !important;
+    padding-bottom: .3rem !important;
     font-size: 0.875rem;
     vertical-align: middle;
 }
 
-table>tbody>tr>td{
-    background-color: #272b2f !important;
+.setHeader {
+    padding-top: .075rem !important;
+    padding-bottom: .075rem !important;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+table.dataTable>thead>tr>th {
+    border-radius: 0% !important;
+}
+
+table.dataTable>tbody>tr>td {
+    font-size: 0.8rem !important;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+    vertical-align: middle;
+}
+
+/* this fixes the card body overlapping the rounded corner. Took me far too long to figure out */
+.card {
+    overflow: clip;
 }
 
 th.text-center>div.dt-column-header {
@@ -105,6 +182,10 @@ a:link,
     text-decoration: none !important;
 }
 
+.tooltip {
+    font-size: 0.8rem !important;
+}
+
 a:hover,
 .btn.btn-link:hover {
     text-decoration: underline !important;
@@ -112,15 +193,6 @@ a:hover,
 
 .invisible {
     display: none !important;
-}
-
-div.ui-menu-item-wrapper {
-    background-color: var(--bs-body-bg) !important;
-    border: 0px solid var(--bs-border-color) !important;
-}
-
-div.ui-menu-item-wrapper:hover {
-    border: 1px solid var(--bs-border-color) !important;
 }
 
 #info-box.row {
@@ -153,40 +225,7 @@ blockquote>p {
     text-shadow: none !important;
 }
 
-.sky-400 {
-    color: var(--sky-400);
-}
 
-.sky-500 {
-    color: var(--sky-500);
-}
-
-.sky-600 {
-    color: var(--sky-600);
-}
-
-.sky-700,
-#myTab .nav-link.active,
-.progress-bar,
-.nav-pills button.active {
-    background-color: var(--sky-700) !important;
-}
-
-.nav-link.active {
-    font-family: "IBM Plex Sans Hebrew", sans-serif;
-    font-weight: 700;
-}
-
-.nav-link,
-#myTab .nav-link:not(.active),
-.setHeader {
-    color: white !important;
-}
-
-.sky-900,
-.setHeader {
-    background-color: var(--sky-900) !important;
-}
 
 .setname {
     display: none !important;
@@ -194,25 +233,16 @@ blockquote>p {
 
 .progress {
     position: relative;
-    height: 18px;
+    height: 16px;
     padding: 0;
 }
 
 .progress>.song-count {
     position: absolute;
+    font-size: 0.75rem;
+    vertical-align: middle;
     right: 0px;
     cursor: help;
-}
-
-.nav-pills button.active {
-    color: white !important;
-    border: 1px solid var(--sky-700) !important;
-}
-
-.nav-pills button:not(.active) {
-    background-color: none !important;
-    color: var(--sky-500) !important;
-    border: 1px solid var(--sky-500) !important;
 }
 
 #yearstats #statChart {
@@ -226,6 +256,14 @@ div#quote {
 
 blockquote p::before {
     content: "\201C";
+}
+
+.dt-scroll-body thead {
+    display: none;
+}
+
+#statChart {
+    position: relative;
 }
 
 blockquote p::after {
@@ -242,8 +280,4 @@ li.nav-item {
 
 .ml-auto {
     margin-left: auto !important;
-}
-
-#about a {
-    color: var(--sky-500) !important;
 }

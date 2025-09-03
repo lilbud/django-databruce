@@ -121,7 +121,7 @@ class SetlistFilter(filters.FilterSet):
 
     def song_filter(self, queryset, value):
         return queryset.filter(
-            Q(song__name__icontains=value) | Q(song__short_name__icontains=value),
+            song=value,
         )
 
 

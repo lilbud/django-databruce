@@ -1,5 +1,4 @@
 from django.urls import reverse
-from django.utils.html import format_html
 from rest_framework import serializers
 
 from databruce import models
@@ -23,11 +22,17 @@ class BandsSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
+class VenuesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Venues
+        fields = "__all__"
+
+
 class EventsSerializer(serializers.ModelSerializer):
-    venue = VenuesTextSerializer(read_only=True)
-    artist = BandsSerializer(read_only=True)
-    tour = ToursSerializer(read_only=True)
     date = serializers.SerializerMethodField()
+    venue = serializers.SerializerMethodField()
+    artist = serializers.SerializerMethodField()
+    tour = serializers.SerializerMethodField()
 
     def get_date(self, obj):
         """Get event date, falling back to the event_id if no date."""
@@ -41,11 +46,23 @@ class EventsSerializer(serializers.ModelSerializer):
 
         return f"<a href='{reverse('event_details', kwargs={'id': obj.id})}'>{date}</a>"
 
-        # return date
+    def get_venue(self, obj):
+        name = obj.venue.name
+
+        if obj.venue.detail:
+            name = f"{obj.venue.name}, {obj.venue.detail}"
+
+        return f"<a href='{reverse('venue_details', kwargs={'id': obj.venue.id})}'>{name}</a>"
+
+    def get_artist(self, obj):
+        return obj.artist.name
+
+    def get_tour(self, obj):
+        return obj.tour.name
 
     class Meta:
         model = models.Events
-        fields = ["venue", "artist", "tour", "date", "id"]
+        fields = ["date", "venue", "artist", "tour"]
 
 
 class ArchiveLinksSerializer(serializers.ModelSerializer):
@@ -118,26 +135,25 @@ class ReleasesSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+from django.utils.html import format_html
+
+
 class SongsSerializer(serializers.ModelSerializer):
     first = EventsSerializer()
     last = EventsSerializer()
     name = serializers.SerializerMethodField()
-    original = serializers.SerializerMethodField()
 
     def get_name(self, obj):
-        song_url = reverse("song_details", kwargs={"id": f"{obj.id}"})
         name = obj.name
 
-        if obj.lyrics:
-            name = format_html(
-                "{} <i class='bi bi-file-earmark-check' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-title='Has Lyrics'></i>",
-                obj.name,
-            )
+        if obj.short_name:
+            name = obj.short_name
 
-        return format_html("<a href={}>{}<a>", song_url, name)
-
-    def get_original(self, obj):
-        return obj.original
+        return format_html(
+            "<a href={}>{}<a>",
+            reverse("song_details", kwargs={"id": f"{obj.id}"}),
+            name,
+        )
 
     class Meta:
         model = models.Songs
@@ -162,8 +178,8 @@ class SetlistNotesSerializer(serializers.ModelSerializer):
 
 
 class SetlistSerializer(serializers.ModelSerializer):
-    song = SongsSerializer(read_only=True)
-    event = EventsSerializer(read_only=True)
+    song = SongsSerializer()
+    event = EventsSerializer()
 
     class Meta:
         model = models.Setlists
@@ -191,18 +207,31 @@ class TourLegsSerializer(serializers.ModelSerializer):
 
 
 class SongsPageSerializer(serializers.ModelSerializer):
-    qs = models.Setlists.objects.prefetch_related("song", "event")
-    # No additional database hits required
-    prev = SetlistSerializer(qs, many=False)
-    current = SetlistSerializer(qs, many=False)
-    next = SetlistSerializer(qs, many=False)
+    prev = serializers.SerializerMethodField()
+    current = SetlistSerializer()
+    band = serializers.SerializerMethodField()
+    next = serializers.SerializerMethodField()
+
+    # date, band, venue, tour, position, gap, set, note
+
+    def get_band(self, obj):
+        try:
+            return obj.current.event.band.name
+        except:
+            return ""
+
+    def get_prev(self, obj):
+        try:
+            return obj.prev.song.name
+        except AttributeError:
+            return ""
+
+    def get_next(self, obj):
+        try:
+            return obj.next.song.name
+        except AttributeError:
+            return ""
 
     class Meta:
         model = models.SongsPage
-        fields = "__all__"
-
-
-class VenuesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Venues
         fields = "__all__"

@@ -52,22 +52,46 @@ class CitiesViewSet(viewsets.ModelViewSet):
     ordering = ["name", "first", "last"]
 
 
+from django_filters import filters as djfilters
+from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
+from rest_framework_datatables.django_filters.filters import GlobalFilter
+from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
+
+
+class GlobalCharFilter(GlobalFilter, djfilters.CharFilter):
+    pass
+
+
+class SongsPageFilter(DatatablesFilterSet):
+    """Filter name, artist and genre by name with icontains"""
+
+    prev = GlobalCharFilter(field_name="prev__song__name", lookup_expr="icontains")
+    next = GlobalCharFilter(field_name="next__song__name", lookup_expr="icontains")
+    venue = GlobalCharFilter(
+        field_name="current__event__venue__name",
+        lookup_expr="icontains",
+    )
+
+    class Meta:
+        model = models.SongsPage
+        fields = "__all__"
+
+
 class SongsPageViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
     def get_queryset(self):
-        """Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
-        """  # noqa: D205
-        queryset = models.SongsPage.objects.all()
         song = self.request.query_params.get("id")
+
         if song is not None:
-            queryset = queryset.filter(id=song)
-        return queryset
+            return models.SongsPage.objects.filter(id=song)
+
+        return models.SongsPage.objects.all()
 
     serializer_class = serializers.SongsPageSerializer
     permission_classes = permission_classes
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DatatablesFilterBackend]
+    filterset_class = SongsPageFilter
 
 
 class ContinentsViewSet(viewsets.ModelViewSet):
@@ -206,8 +230,9 @@ class SetlistViewSet(viewsets.ModelViewSet):
     queryset = models.Setlists.objects.all()
     serializer_class = serializers.SetlistSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = filters.SetlistFilter
+    # filterset_class = filters.SetlistFilter
     permission_classes = permission_classes
+    filterset_fields = ["song", "event"]
 
 
 class SnippetViewSet(viewsets.ModelViewSet):

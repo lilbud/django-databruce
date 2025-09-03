@@ -416,13 +416,15 @@ class EventDetail(TemplateView):
             "artist",
             "venue__city",
             "venue__country",
+            "tour",
         )
-        .prefetch_related("venue__state", "tour")
+        .prefetch_related("venue__state")
     )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["event"] = self.queryset.filter(id=self.kwargs["id"]).first()
+
         context["title"] = f"{context['event']} {context['event'].venue}"
         context["setlist"] = (
             models.Setlists.objects.filter(event__id=context["event"].id)
@@ -434,21 +436,23 @@ class EventDetail(TemplateView):
             .order_by("song_num")
         )
 
-        self.onstage = (
+        onstage = (
             models.Onstage.objects.filter(event__id=context["event"].id)
-            .exclude(relation__id=255)
             .select_related("relation")
-            .prefetch_related("band")
             .order_by("band_id", "relation__name")
         )
 
-        context["onstage"] = self.onstage.filter(guest=False)
+        context["musicians"] = onstage.filter(band=None)
 
-        context["guests"] = self.onstage.filter(guest=True)
+        context["bands"] = onstage.exclude(band=None).select_related("band")
 
-        context["notes"] = models.SetlistNotes.objects.filter(
-            event__id=context["event"].id,
-        ).order_by("num")
+        context["notes"] = (
+            models.SetlistNotes.objects.filter(
+                event__id=context["event"].id,
+            )
+            .select_related("id", "event")
+            .order_by("num")
+        )
 
         context["prev_event"] = self.queryset.filter(id__lt=context["event"].id).last()
         context["next_event"] = self.queryset.filter(id__gt=context["event"].id).first()
@@ -688,6 +692,27 @@ class SongDetail(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
+        context["songs"] = (
+            models.SongsPage.objects.filter(
+                id=self.kwargs["id"],
+            )
+            .select_related(
+                "current__event__venue",
+                "current__event__artist",
+                "current__event__tour",
+            )
+            .prefetch_related("next__song", "prev__song")
+        )
+
+        valid_set_names = [
+            "Show",
+            "Set 1",
+            "Set 2",
+            "Encore",
+            "Pre-Show",
+            "Post-Show",
+        ]
+
         context["song_info"] = (
             models.Songs.objects.filter(id=self.kwargs["id"])
             .prefetch_related(
@@ -698,35 +723,42 @@ class SongDetail(TemplateView):
 
         context["title"] = f"{context['song_info'].name}"
 
-        context["songs"] = (
-            models.SongsPage.objects.filter(
-                id=self.kwargs["id"],
-            )
-            .select_related(
-                "current__song",
-                "current__event__venue",
-                "current__event__artist",
-            )
-            .prefetch_related(
-                "current__event__tour",
-                "next__song",
-                "prev__song",
-            )
+        setlists = models.Setlists.objects.filter(song__id=self.kwargs["id"])
+
+        context["public_count"] = setlists.filter(
+            set_name__in=valid_set_names,
         )
+
+        context["private_count"] = setlists.exclude(
+            set_name__in=valid_set_names,
+        )
+
+        context["snippet_count"] = setlists.filter(
+            snippet=True,
+        )
+
+        context["positions"] = (
+            setlists.filter(set_name__in=valid_set_names)
+            .exclude(position=None)
+            .values("position")
+            .annotate(
+                count=Count("position"),
+                num=Min("song_num"),
+            )
+        ).order_by("num")
 
         if context["song_info"].lyrics:
             context["lyrics"] = models.Lyrics.objects.filter(
                 song__id=self.kwargs["id"],
             ).order_by("id")
 
-        if context["song_info"].num_plays_snippet > 0:
-            context["snippets"] = (
-                models.Snippets.objects.filter(
-                    snippet=self.kwargs["id"],
-                )
-                .select_related("setlist", "setlist__event", "snippet", "setlist__song")
-                .order_by("setlist__event", "position")
+        context["snippets"] = (
+            models.Snippets.objects.filter(
+                snippet=self.kwargs["id"],
             )
+            .select_related("setlist", "setlist__event", "snippet", "setlist__song")
+            .order_by("setlist__event", "position")
+        )
 
         filter = Q(event_certainty__in=["Confirmed", "Probable"])
 

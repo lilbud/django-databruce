@@ -961,11 +961,13 @@ class Songs(models.Model):
         verbose_name_plural = "songs"
 
     def __str__(self) -> str:
-        if not self.original:
-            return f"{self.name} ({self.original_artist})"
+        name = self.name
 
         if self.short_name:
-            return self.short_name
+            name = self.short_name
+
+        if not self.original:
+            return f"{name} ({self.original_artist})"
 
         return self.name
 
@@ -1015,6 +1017,7 @@ class Setlists(models.Model):
     debut = models.BooleanField(default=False)
     instrumental = models.BooleanField(default=False)
     snippet = models.BooleanField(default=False)
+    band_premiere = models.BooleanField(default=False, db_column="band_premiere")
     position = models.TextField(blank=True, default=None)
 
     last = models.IntegerField(blank=True, default=None)

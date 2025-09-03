@@ -80,7 +80,6 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     display: none;
 }
 
-
 .dataTables_wrapper .dataTables_filter {
     float: right;
     text-align: right;
@@ -124,9 +123,4 @@ div.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
     width: 700px !important;
     left: calc(100vw - 60vw) !important;
     top: 2vh !important;
-}
-
-/* for unknown reasons, the "upcoming events" table date column is wider than the other tables. This very specific width fixes that */
-#upcomingTable > thead:nth-child(2) > tr:nth-child(1) > th:nth-child(1) {
-    width: 174.883px !important;
 }
