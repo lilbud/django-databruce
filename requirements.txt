@@ -11,4 +11,3 @@ requests
 django-allauth
 django-link-shortener
 django-ajax-datatable
-celery
