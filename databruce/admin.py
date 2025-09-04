@@ -211,9 +211,9 @@ class SnippetAdmin(admin.ModelAdmin):
 
 @admin.register(models.States)
 class StateAdmin(admin.ModelAdmin):
-    search_fields = ["name", "state_abbrev", "country", "first", "last"]
+    search_fields = ["name", "abbrev", "country", "first", "last"]
     list_select_related = ["country", "first", "last"]
-    list_display = ["id", "name", "state_abbrev", "country", "first", "last"]
+    list_display = ["id", "name", "abbrev", "country", "first", "last"]
     list_display_links = ["id", "country", "first", "last"]
 
 
@@ -273,3 +273,9 @@ class TagAdmin(admin.ModelAdmin):
     list_select_related = ["id", "event"]
     list_display = ["id", "event", "tags"]
     list_display_links = ["id", "event"]
+
+
+@admin.register(models.VenuesText)
+class VenuesTextAdmin(admin.ModelAdmin):
+    search_fields = ["formatted_loc"]
+    list_display = ["id", "formatted_loc"]

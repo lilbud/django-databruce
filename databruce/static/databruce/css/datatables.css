@@ -38,20 +38,13 @@ table.dataTable thead .dt-column-order::after {
     font-size: .85rem;
 }
 
-@media only screen and (max-width: 992px) {
-    /* Hides the empty search/buttons row when there is none */
-    .dt-container>div.row:has(.d-md-flex:empty) {
-        display: none !important;
-    }
-
-    div.dt-buttons {
-        justify-content: center;
-    }
-}
-
 @media only screen and (max-width: 768px) {
     .dt-layout-full {
         margin-top: 0px !important;
+    }
+
+    span.dtcc {
+        display: none !important;
     }
 }
 

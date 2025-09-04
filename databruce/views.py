@@ -79,7 +79,19 @@ class Index(TemplateView):
         context["updates"] = models.Updates.objects.all().order_by("-created_at")[:10]
 
         context["latest_event"] = (
-            models.Setlists.objects.all().order_by("-event").first()
+            models.Setlists.objects.all()
+            .select_related(
+                "event",
+                "event__artist",
+                "event__venue",
+                "event__venue__city",
+                "event__venue__city__state",
+                "event__venue__city__country",
+                "event__venue__state",
+                "event__venue__state__country",
+            )
+            .order_by("-event")
+            .first()
         )
 
         context["latest_show"] = (
@@ -578,6 +590,7 @@ class Venue(TemplateView):
         .select_related(
             "city",
             "city__state",
+            "city__state__country",
             "city__country",
             "state",
             "country",
@@ -697,7 +710,12 @@ class SongDetail(TemplateView):
                 id=self.kwargs["id"],
             )
             .select_related(
+                "current__event",
                 "current__event__venue",
+                "current__event__venue__city",
+                "current__event__venue__city__country",
+                "current__event__venue__city__state",
+                "current__event__venue__city__state__country",
                 "current__event__artist",
                 "current__event__tour",
             )
@@ -727,15 +745,15 @@ class SongDetail(TemplateView):
 
         context["public_count"] = setlists.filter(
             set_name__in=valid_set_names,
-        )
+        ).count()
 
         context["private_count"] = setlists.exclude(
             set_name__in=valid_set_names,
-        )
+        ).count()
 
         context["snippet_count"] = setlists.filter(
             snippet=True,
-        )
+        ).count()
 
         context["positions"] = (
             setlists.filter(set_name__in=valid_set_names)
@@ -914,7 +932,11 @@ class TourDetail(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["tour"] = models.Tours.objects.get(id=self.kwargs["id"])
+        context["tour"] = (
+            models.Tours.objects.filter(id=self.kwargs["id"])
+            .select_related("band")
+            .first()
+        )
         context["title"] = f"{context['tour']}"
         context["events"] = (
             models.Events.objects.filter(tour=self.kwargs["id"])
@@ -1506,6 +1528,7 @@ class RelationDetail(TemplateView):
                 "event__artist",
                 "event__venue__city",
                 "event__venue__city__state",
+                "event__venue__city__state__country",
                 "event__venue__city__country",
                 "event__tour",
             )
@@ -1581,7 +1604,7 @@ class ReleaseDetail(TemplateView):
             .order_by(
                 "track",
             )
-            .prefetch_related("song__first", "song__last")
+            .prefetch_related("song__first", "song__last", "event")
         )
         return context
 
@@ -1779,7 +1802,15 @@ class CountryDetail(TemplateView):
 
         context["events"] = (
             models.Events.objects.filter(venue__country=self.kwargs["id"])
-            .select_related("venue__state", "artist", "venue__city")
+            .select_related(
+                "venue__state",
+                "venue__state__country",
+                "artist",
+                "tour",
+                "venue__city",
+                "venue__city__country",
+                "venue__city__state",
+            )
             .order_by("id")
         )
 
@@ -2046,11 +2077,11 @@ class Bootleg(TemplateView):
         context["title"] = "Bootlegs"
 
         context["bootlegs"] = (
-            models.Bootlegs.objects.all()
+            models.Bootlegs.objects.exclude(archive=None)
             .prefetch_related(
-                "archive",
                 "event",
             )
+            .select_related("archive")
             .order_by("event")
         )
 

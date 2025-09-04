@@ -52,29 +52,29 @@ class CitiesViewSet(viewsets.ModelViewSet):
     ordering = ["name", "first", "last"]
 
 
-from django_filters import filters as djfilters
-from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
-from rest_framework_datatables.django_filters.filters import GlobalFilter
-from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
+# from django_filters import filters as djfilters
+# from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
+# from rest_framework_datatables.django_filters.filters import GlobalFilter
+# from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
 
 
-class GlobalCharFilter(GlobalFilter, djfilters.CharFilter):
-    pass
+# class GlobalCharFilter(GlobalFilter, djfilters.CharFilter):
+#     pass
 
 
-class SongsPageFilter(DatatablesFilterSet):
-    """Filter name, artist and genre by name with icontains"""
+# class SongsPageFilter(DatatablesFilterSet):
+#     """Filter name, artist and genre by name with icontains"""
 
-    prev = GlobalCharFilter(field_name="prev__song__name", lookup_expr="icontains")
-    next = GlobalCharFilter(field_name="next__song__name", lookup_expr="icontains")
-    venue = GlobalCharFilter(
-        field_name="current__event__venue__name",
-        lookup_expr="icontains",
-    )
+#     prev = GlobalCharFilter(field_name="prev__song__name", lookup_expr="icontains")
+#     next = GlobalCharFilter(field_name="next__song__name", lookup_expr="icontains")
+#     venue = GlobalCharFilter(
+#         field_name="current__event__venue__name",
+#         lookup_expr="icontains",
+#     )
 
-    class Meta:
-        model = models.SongsPage
-        fields = "__all__"
+#     class Meta:
+#         model = models.SongsPage
+#         fields = "__all__"
 
 
 class SongsPageViewSet(viewsets.ModelViewSet):
@@ -90,8 +90,8 @@ class SongsPageViewSet(viewsets.ModelViewSet):
 
     serializer_class = serializers.SongsPageSerializer
     permission_classes = permission_classes
-    filter_backends = [DatatablesFilterBackend]
-    filterset_class = SongsPageFilter
+    # filter_backends = [DatatablesFilterBackend]
+    # filterset_class = SongsPageFilter
 
 
 class ContinentsViewSet(viewsets.ModelViewSet):

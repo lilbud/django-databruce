@@ -38,7 +38,7 @@ class VenuesFilter(filters.FilterSet):
 
     def state_filter(self, queryset, value):
         return queryset.filter(
-            Q(state__name__icontains=value) | Q(state__state_abbrev__iexact=value),
+            Q(state__name__icontains=value) | Q(state__abbrev__iexact=value),
         )
 
     def country_filter(self, queryset, value):
@@ -59,7 +59,7 @@ class EventsFilter(filters.FilterSet):
     def state_filter(self, queryset, value):
         return queryset.filter(
             Q(venue__state__name__icontains=value)
-            | Q(venue__state__state_abbrev__iexact=value),
+            | Q(venue__state__abbrev__iexact=value),
         )
 
     def country_filter(self, queryset, value):

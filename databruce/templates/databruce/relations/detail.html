@@ -63,7 +63,6 @@
                     <th>Date</th>
                     <th>Band</th>
                     <th>Venue</th>
-                    <th>Location</th>
                     <th>Tour</th>
                     <th>Detail</th>
                   </tr>
@@ -79,12 +78,7 @@
                           <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
                         </td>
                         <td>
-                          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-                        </td>
-                        <td>
-                          {% if event.venue.city %}
-                            <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                          {% endif %}
+                          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue }}</a>
                         </td>
                         <td>
                           {% if event.tour %}

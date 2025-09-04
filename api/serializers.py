@@ -207,10 +207,10 @@ class TourLegsSerializer(serializers.ModelSerializer):
 
 
 class SongsPageSerializer(serializers.ModelSerializer):
-    prev = serializers.SerializerMethodField()
+    prev = SetlistSerializer()
     current = SetlistSerializer()
     band = serializers.SerializerMethodField()
-    next = serializers.SerializerMethodField()
+    next = SetlistSerializer()
 
     # date, band, venue, tour, position, gap, set, note
 

@@ -25,7 +25,7 @@ urlpatterns = [
     path("", include("api.urls")),
     path("benner/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
-    path("test/", views.Test.as_view(), name="test"),
+    # path("test/", views.Test.as_view(), name="test"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "accounts/login/",

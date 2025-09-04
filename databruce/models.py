@@ -259,7 +259,7 @@ class Cities(models.Model):
     def __str__(self) -> str:
         try:
             if self.country.name == "United States":
-                return f"{self.name}, {self.state.state_abbrev}"
+                return f"{self.name}, {self.state.abbrev}"
 
             return f"{self.name}, {self.state}"  # noqa: TRY300
 
@@ -407,6 +407,67 @@ class DjangoSession(models.Model):
         db_table = "django_session"
 
 
+class States(models.Model):
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid4, editable=False)
+    abbrev = models.TextField(
+        unique=True,
+        blank=True,
+        default=None,
+        db_column="state_abbrev",
+    )
+    name = models.TextField(blank=True, default=None)
+    country = models.ForeignKey(Countries, models.DO_NOTHING, db_column="country")
+    num_events = models.IntegerField(default=0)
+    mbid = models.UUIDField(default=None, editable=False)
+
+    first = models.ForeignKey(
+        "Events",
+        models.DO_NOTHING,
+        related_name="state_first",
+        db_column="first_played",
+    )
+
+    last = models.ForeignKey(
+        "Events",
+        models.DO_NOTHING,
+        related_name="state_last",
+        db_column="last_played",
+    )
+
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "states"
+        verbose_name_plural = "states"
+
+    def __str__(self) -> str:
+        if self.country not in [2, 6, 37]:
+            return f"{self.name}, {self.country}"
+
+        return self.name
+
+
+class VenuesText(models.Model):
+    id = models.ForeignKey(
+        "Venues",
+        on_delete=models.DO_NOTHING,
+        primary_key=True,
+        db_column="id",
+    )
+    formatted_loc = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = "venues_text"
+        verbose_name_plural = "venues_text"
+
+    def __str__(self) -> str:
+        return self.formatted_loc
+
+
 class Venues(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
@@ -424,7 +485,7 @@ class Venues(models.Model):
     )
 
     state = models.ForeignKey(
-        "States",
+        States,
         on_delete=models.CASCADE,
         db_column="state",
         related_name="venue_state",
@@ -481,10 +542,15 @@ class Venues(models.Model):
         verbose_name_plural = "venues"
 
     def __str__(self) -> str:
-        if self.detail:
-            return f"{self.name}, {self.detail}"
+        name = self.name
 
-        return self.name
+        if self.detail:
+            name = f"{self.name}, {self.detail}"
+
+        if self.city:
+            name += f", {self.city}"
+
+        return name
 
 
 class SetlistsByDate(models.Model):
@@ -532,7 +598,7 @@ class Events(models.Model):
     brucebase_url = models.TextField(blank=True, default=None)
 
     venue = models.ForeignKey(
-        to="Venues",
+        to=Venues,
         on_delete=models.DO_NOTHING,
         related_name="event_venue",
         db_column="venue_id",
@@ -1125,46 +1191,6 @@ class SongsAfterRelease(models.Model):
         verbose_name_plural = "songs_after_release"
 
 
-class States(models.Model):
-    id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(default=uuid4, editable=False)
-    state_abbrev = models.TextField(unique=True, blank=True, default=None)
-    name = models.TextField(blank=True, default=None)
-    country = models.ForeignKey(Countries, models.DO_NOTHING, db_column="country")
-    num_events = models.IntegerField(default=0)
-    mbid = models.UUIDField(default=None, editable=False)
-
-    first = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        related_name="state_first",
-        db_column="first_played",
-    )
-
-    last = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        related_name="state_last",
-        db_column="last_played",
-    )
-
-    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = "states"
-        verbose_name_plural = "states"
-
-    def __str__(self) -> str:
-        if self.country not in [2, 6, 37]:
-            state = f"{self.name}, {self.country}"
-        else:
-            state = self.name
-
-        return state
-
-
 class Tags(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
@@ -1229,29 +1255,6 @@ class Tours(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-class VenuesText(models.Model):
-    id = models.OneToOneField(
-        Venues,
-        models.DO_NOTHING,
-        db_column="id",
-        primary_key=True,
-    )
-
-    url = models.TextField(blank=True, default=None, db_column="brucebase_url")
-    formatted_loc = models.TextField(blank=True, default=None)
-    name = models.TextField(blank=True, default=None)
-    city = models.TextField(blank=True, default=None)
-    state = models.TextField(blank=True, default=None)
-    country = models.TextField(blank=True, default=None)
-    aliases = models.TextField(blank=True, default=None)
-    num_events = models.IntegerField(default=0)
-
-    class Meta:
-        managed = False
-        db_table = "venues_text"
-        verbose_name_plural = "venues_text"
 
 
 class TourLegs(models.Model):

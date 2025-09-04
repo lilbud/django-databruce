@@ -3,6 +3,11 @@
 {% block title %}
   {{ song_info.name }}
 {% endblock title %}
+{% block extrajs %}
+  <link href="https://cdn.datatables.net/columncontrol/1.0.7/css/columnControl.dataTables.min.css"
+        rel="stylesheet">
+  <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
+{% endblock extrajs %}
 {% block content %}
   <div class="row mb-2" id="song-info">
     <h4>
@@ -70,7 +75,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
                           </h6>
-                          <h5>{{ public_count.count }}</h5>
+                          <h5>{{ public_count }}</h5>
                         </div>
                       </div>
                     </div>
@@ -84,7 +89,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
                           </h6>
-                          <h5>{{ private_count.count }}</h5>
+                          <h5>{{ private_count }}</h5>
                         </div>
                       </div>
                     </div>
@@ -98,7 +103,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was included as part of another."></i>
                           </h6>
-                          <h5>{{ snippet_count.count }}</h5>
+                          <h5>{{ snippet_count|add:snippets.count }}</h5>
                         </div>
                       </div>
                     </div>
@@ -175,17 +180,23 @@
                           <a href="{% url "event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
                         </td>
                         <td class="text-nowrap">
-                          <a href="{% url "band_details" id=song.current.event.artist.id %}">{{ song.current.event.artist }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          {% with venue=song.current.event.venue %}
-                            <a href="{% url 'venue_details' id=venue.id %}">{{ venue }}</a>
+                          {% with band=song.current.event.artist %}
+                            <a href="{% url "band_details" id=band.id %}">{{ band }}</a>
                           {% endwith %}
                         </td>
                         <td class="text-nowrap">
-                          {% if song.current.event.tour %}
-                            <a href="{% url "tour_details" id=song.current.event.tour.id %}">{{ song.current.event.tour }}</a>
-                          {% endif %}
+                          {% with venue=song.current.event.venue %}
+                            {% if venue %}
+                              <a href="{% url 'venue_details' id=venue.id %}">{{ venue }}</a>
+                            {% endif %}
+                          {% endwith %}
+                        </td>
+                        <td class="text-nowrap">
+                          {% with tour=song.current.event.tour %}
+                            {% if tour %}
+                              <a href="{% url "tour_details" id=tour.id %}">{{ tour }}</a>
+                            {% endif %}
+                          {% endwith %}
                         </td>
                         <td class="text-nowrap">
                           {% if song.current.position and song.current.position != song.current.set_name %}
@@ -195,18 +206,20 @@
                         <td class="text-center">{{ song.current.last|default_if_none:"" }}</td>
                         <td>{{ song.current.set_name }}</td>
                         <td class="text-nowrap">
-                          {% if song.prev %}
-                            <a href="{% url "song_details" id=song.prev.song.id %}">
-                              {{ song.prev.song.short_name|default_if_none:song.prev.song.name }}
-                            </a>
-                            {% if song.prev.segue %}&gt;{% endif %}
-                          {% endif %}
+                          {% with prev=song.prev %}
+                            {% if prev %}
+                              <a href="{% url "song_details" id=prev.song.id %}">{{ prev.song.short_name|default_if_none:prev.song.name }}</a>
+                              {% if prev.segue %}&gt;{% endif %}
+                            {% endif %}
+                          {% endwith %}
                         </td>
                         <td class="text-nowrap">
-                          {% if song.next %}
-                            {% if song.current.segue %}&gt;{% endif %}
-                            <a href="{% url "song_details" id=song.next.song.id %}">{{ song.next.song.short_name|default_if_none:song.next.song.name }}</a>
-                          {% endif %}
+                          {% with next=song.next %}
+                            {% if next %}
+                              {% if song.current.segue %}&gt;{% endif %}
+                              <a href="{% url "song_details" id=next.song.id %}">{{ next.song.short_name|default_if_none:next.song.name }}</a>
+                            {% endif %}
+                          {% endwith %}
                         </td>
                         <td class="text-nowrap">{{ song.note|default_if_none:"" }}</td>
                       </tr>
@@ -221,32 +234,32 @@
           <div class="card mb-3">
             <div class="card-header">Snippets</div>
             <div class="card-body px-0">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="snippetTable">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Song</th>
-                      <th>Position</th>
-                      <th>Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for snippet in snippets %}
+              {% if snippets %}
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="snippetTable">
+                    <thead>
                       <tr>
-                        <td>
-                          <a href="{% url "event_details" id=snippet.setlist.event.id %}">{{ snippet.setlist.event }}</a>
-                        </td>
-                        <td>
-                          <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
-                        </td>
-                        <td>{{ snippet.position }}</td>
-                        <td>{{ snippet.note|default_if_none:"" }}</td>
+                        <th>Date</th>
+                        <th>During Song</th>
+                        <th>Note</th>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {% for snippet in snippets %}
+                        <tr>
+                          <td>
+                            <a href="{% url "event_details" id=snippet.setlist.event.id %}">{{ snippet.setlist.event }}</a>
+                          </td>
+                          <td>
+                            <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
+                          </td>
+                          <td>{{ snippet.note|default_if_none:"" }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -257,17 +270,20 @@
               <ul class="mb-1">
                 {% if song_info.brucebase_url %}
                   <li>
-                    <a href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
+                    <a class="sky-500"
+                       href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
                   </li>
                 {% endif %}
                 {% if song_info.spotify_id %}
                   <li>
-                    <a href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
+                    <a class="sky-500"
+                       href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
                   </li>
                 {% endif %}
                 {% if song_info.mbid %}
                   <li>
-                    <a href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
+                    <a class="sky-500"
+                       href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
                   </li>
                 {% endif %}
               </ul>
@@ -305,86 +321,6 @@
       </div>
     {% endif %}
   </div>
-  {% comment %} <div class="col col-9 pe-2">
-      <div class="card">
-
-        <div class="card-body px-0">
-          <div class="tab-content">
-            
-            <div id="snippets" class="tab-pane fade px-0">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="snippetTable">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Song</th>
-                      <th>Position</th>
-                      <th>Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for snippet in snippets %}
-                      <tr>
-                        <td>
-                          <a href="{% url "event_details" id=snippet.setlist.event.id %}">{{ snippet.setlist.event }}</a>
-                        </td>
-                        <td>
-                          <a href="{% url "song_details" id=snippet.setlist.song.id %}">{{ snippet.setlist.song }}</a>
-                        </td>
-                        <td>{{ snippet.position }}</td>
-                        <td>{{ snippet.note|default_if_none:"" }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div id="stats" class="tab-pane fade show active px-3">
-              <div class="row justify-content-center">
-                <div class="col-6"></div>
-                <div class="col-6">
-                  {% if year_stats %}
-                    <div id="wrapper" class="p-0">
-                      <div id="statChart">
-                        <canvas id="chart"></canvas>
-                      </div>
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% if lyrics %}
-      <div class="col col-lg-3 ps-lg-2">
-        <div class="card">
-          <div class="card-header">Lyrics</div>
-          <div class="card-body">
-            {% for lyric in lyrics %}
-              {% if lyric.language == 'English' and lyric.version == song_info.category %}{{ lyric.text|linebreaks }}{% endif %}
-            {% endfor %}
-            {% if lyrics.count > 1 %}
-              <h6>Other Versions</h6>
-              <ul>
-                {% for lyric in lyrics %}
-                  {% if lyric.language != 'English' %}
-                    <h6>
-                      <li>
-                        <a class="sky-500" href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.language }}
-                          {% if lyric.note %}[{{ lyric.note }}]{% endif %}
-                        </a>
-                      </li>
-                    </h6>
-                  {% endif %}
-                {% endfor %}
-              </ul>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-  {% endif %} {% endcomment %}
   <!-- charts.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
   <script>

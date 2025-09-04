@@ -3,6 +3,11 @@
 {% block title %}
   Test
 {% endblock title %}
+{% block extrajs %}
+  <link href="https://cdn.datatables.net/columncontrol/1.0.7/css/columnControl.dataTables.min.css"
+        rel="stylesheet">
+  <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
+{% endblock extrajs %}
 {% block content %}
   <h4>Songs</h4>
   <div class="table-responsive">
@@ -30,10 +35,11 @@
       var table = $('#myTable').DataTable(
         {
           layout: layout,
-          processing: true,
+          columnControl: ['searchDropdown'],
+          searchDelay: 0,
           serverSide: true,
           ajax: {
-            'url': '/api/v1/songspage/?id={{ song_info.id }}&format=datatables',
+            'url': '/api/v1/songspage/?id=164&format=datatables',
           },
           columns: [
             {'data': 'current.event.date', 'name': 'current.event.id'},
@@ -43,8 +49,8 @@
             {'data': 'current.position', 'name': 'current.position'},
             {'data': 'current.last', 'name': 'current.last'},
             {'data': 'current.set_name', 'name': 'current.set_name'},
-            {'data': 'prev', 'name': 'prev'},
-            {'data': 'next', 'name': 'next'},
+            {'data': 'prev', 'name': 'prev.song.name'},
+            {'data': 'next', 'name': 'next.song.name'},
             {'data': 'current.song_note', 'name': 'current.song_note'},
           ]
         }

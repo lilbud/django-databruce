@@ -23,7 +23,7 @@
     {% for state in states %}
       <tr>
         <td>
-          <a href="{% url "state_details" id=state.id %}">{{ state.name }} ({{ state.state_abbrev|default_if_none:"" }})</a>
+          <a href="{% url "state_details" id=state.id %}">{{ state.name }} ({{ state.abbrev|default_if_none:"" }})</a>
         </td>
         <td>
           {% if state.country %}

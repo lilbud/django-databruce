@@ -18,7 +18,6 @@ var layout = {
         }],
       }]
   },
-  // topStart: 'pageLength',
   topStart: {
     buttons: [
       {
@@ -35,11 +34,6 @@ var layout = {
   bottomEnd: {
     paging: {
       numbers: 3
-    }
-  },
-  bottomStart: {
-    info: {
-      text: 'Showing _START_-_END_ of _TOTAL_'
     }
   }
 };
@@ -64,3 +58,11 @@ $.extend(true, DataTable.defaults, {
     $('[data-bs-toggle="tooltip"]').tooltip();
   },
 });
+
+// needed to fix pages with multiple tables behind tabs
+$(document).ready(function () {
+    $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+        $($.fn.dataTable.tables(true)).DataTable()
+            .columns.adjust();
+    });
+})

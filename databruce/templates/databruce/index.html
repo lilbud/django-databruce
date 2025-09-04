@@ -37,8 +37,8 @@
           Recent Updates
           <a class="sky-500" href="{% url 'updates' %}">see more</a>
         </div>
-        <div class="card-body px-0">
-          <ul class="mb-0">
+        <div class="card-body px-3">
+          <ul class="mb-0 ps-4">
             {% for item in updates %}
               <li>
                 {% if item.view %}
@@ -137,13 +137,7 @@
                           <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-wrap">
-                          <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">
-                            {% if event.venue.city %}
-                              {{ event.venue }}, {{ event.venue.city }}
-                            {% else %}
-                              {{ event.venue }}
-                            {% endif %}
-                          </a>
+                          <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -172,13 +166,7 @@
                           <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-wrap">
-                          <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">
-                            {% if event.venue.city %}
-                              {{ event.venue }}, {{ event.venue.city }}
-                            {% else %}
-                              {{ event.venue }}
-                            {% endif %}
-                          </a>
+                          <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -211,13 +199,7 @@
                           <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                         </td>
                         <td class="text-wrap">
-                          <a href="{% url "venue_details" id=event.venue.id %}">
-                            {% if event.venue.city %}
-                              {{ event.venue }}, {{ event.venue.city }}
-                            {% else %}
-                              {{ event.venue }}
-                            {% endif %}
-                          </a>
+                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                         </td>
                       </tr>
                     {% endfor %}
