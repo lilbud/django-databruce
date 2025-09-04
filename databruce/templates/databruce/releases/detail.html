@@ -9,6 +9,7 @@
       <h4>
         <a href="{% url 'releases' %}">Releases</a> &gt; {{ info.name }}
       </h4>
+      {% if info.note %}<h6>{{ info.note }}</h6>{% endif %}
     </div>
   </div>
   <div class="row mb-4">
@@ -32,17 +33,19 @@
             <div class="pe-2 fw-semibold">Type:</div>
             <div>{{ info.type }}</div>
           </div>
-          <div class="d-flex flex-row fs-6">
-            <div class="pe-2 fw-semibold">Links:</div>
-          </div>
-          {% if info.mbid %}
+          {% if links %}
             <div class="d-flex flex-row fs-6">
-              <ul>
-                <li>
-                  <a href="https://musicbrainz.org/release-group/{{ info.mbid }}">Musicbrainz</a>
-                </li>
-              </ul>
+              <div class="pe-2 fw-semibold">Links:</div>
             </div>
+            {% if info.mbid %}
+              <div class="d-flex flex-row fs-6">
+                <ul>
+                  <li>
+                    <a href="https://musicbrainz.org/release-group/{{ info.mbid }}">Musicbrainz</a>
+                  </li>
+                </ul>
+              </div>
+            {% endif %}
           {% endif %}
         </div>
       </div>

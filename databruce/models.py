@@ -897,6 +897,7 @@ class Releases(models.Model):
     date = models.DateField(blank=True, default=None, db_column="release_date")
     short_name = models.TextField(blank=True, default=None)
     thumb = models.TextField(blank=True, default=None)
+    note = models.TextField(blank=True, default=None)
     mbid = models.UUIDField(default=None, editable=False)
     event = models.ForeignKey(
         Events,

@@ -39,6 +39,8 @@
         </div>
         <div class="card-body px-3">
           <ul class="mb-0 ps-4">
+            {% load tz %}
+            {% timezone "America/New_York" %}
             {% for item in updates %}
               <li>
                 {% if item.view %}
@@ -48,171 +50,172 @@
                 {% endif %}
               </li>
             {% endfor %}
-          </ul>
-        </div>
+          {% endtimezone %}
+        </ul>
       </div>
     </div>
-    <div class="col-12 col-md-6 col-lg-4 px-2">
-      <div class="card mb-3 mb-lg-0">
-        <div class="card-header">Most Recent Show</div>
-        <div class="card-body p-0">
-          <h6 class="p-3 mb-0">
-            {% with first=latest_event.event %}
-              <div class="row">
-                <a class="sky-500" href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
-              </div>
-              <div class="row">
-                <a class="text-reset text-body-light"
-                   href="{% url 'band_details' id=first.artist.id %}">{{ first.artist }}</a>
-              </div>
-            {% endwith %}
-          </h6>
-          {% regroup latest_show by set_name as event_setlist %}
-          {% if latest_show %}
-            <div class="table-responsive">
-              <table class="table table-hover display" id="setlistTable">
+  </div>
+  <div class="col-12 col-md-6 col-lg-4 px-2">
+    <div class="card mb-3 mb-lg-0">
+      <div class="card-header">Most Recent Show</div>
+      <div class="card-body p-0">
+        <h6 class="p-3 mb-0">
+          {% with first=latest_event.event %}
+            <div class="row">
+              <a class="sky-500" href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
+            </div>
+            <div class="row">
+              <a class="text-reset text-body-light"
+                 href="{% url 'band_details' id=first.artist.id %}">{{ first.artist }}</a>
+            </div>
+          {% endwith %}
+        </h6>
+        {% regroup latest_show by set_name as event_setlist %}
+        {% if latest_show %}
+          <div class="table-responsive">
+            <table class="table table-hover display" id="setlistTable">
+              <thead>
+                <tr>
+                  <th class="all text-center">#</th>
+                  <th class="all">Song</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for set in event_setlist %}
+                  <tr class="text-center">
+                    <td class="setHeader" colspan="4">{{ set.grouper }}</td>
+                    <td class="setname"></td>
+                  </tr>
+                  {% for song in set.list %}
+                    <tr>
+                      <td class="text-center">
+                        {% if song.position %}
+                          <h6 class="mb-0">
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="{{ song.position }}"
+                                  class="badge text-bg-primary">{{ song.song_num }}</span>
+                          </h6>
+                        {% else %}
+                          {{ song.song_num }}
+                        {% endif %}
+                      </td>
+                      <td>
+                        <span class="text-nowrap">
+                          <a class="text-body" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                          {% if song.segue %}{{ song.separator }}{% endif %}
+                          {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
+                          {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
+                        </span>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <h6 class="ms-2">No Set Details Available</h6>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 col-lg-4 px-2">
+    <div class="row row-cols-1 row-cols-md-1 g-3 mb-4">
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-header">Recent Events</div>
+          <div class="card-body p-0">
+            <div class="table-responsive index">
+              <table class="table table-hover display" id="recentTable">
                 <thead>
                   <tr>
-                    <th class="all text-center">#</th>
-                    <th class="all">Song</th>
+                    <th class="all">Date</th>
+                    <th class="all">Location</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for set in event_setlist %}
-                    <tr class="text-center">
-                      <td class="setHeader" colspan="4">{{ set.grouper }}</td>
-                      <td class="setname"></td>
+                  {% for event in recent %}
+                    <tr>
+                      <td class="text-nowrap">
+                        <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                      </td>
+                      <td class="text-wrap">
+                        <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                      </td>
                     </tr>
-                    {% for song in set.list %}
-                      <tr>
-                        <td class="text-center">
-                          {% if song.position %}
-                            <h6 class="mb-0">
-                              <span data-bs-toggle="tooltip"
-                                    data-bs-title="{{ song.position }}"
-                                    class="badge text-bg-primary">{{ song.song_num }}</span>
-                            </h6>
-                          {% else %}
-                            {{ song.song_num }}
-                          {% endif %}
-                        </td>
-                        <td>
-                          <span class="text-nowrap">
-                            <a class="text-body" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
-                            {% if song.segue %}{{ song.separator }}{% endif %}
-                            {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
-                            {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
-                          </span>
-                        </td>
-                      </tr>
-                    {% endfor %}
                   {% endfor %}
                 </tbody>
               </table>
             </div>
-          {% else %}
-            <h6 class="ms-2">No Set Details Available</h6>
-          {% endif %}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-4 px-2">
-      <div class="row row-cols-1 row-cols-md-1 g-3 mb-4">
-        <div class="col">
-          <div class="card h-100">
-            <div class="card-header">Recent Events</div>
-            <div class="card-body p-0">
-              <div class="table-responsive index">
-                <table class="table table-hover display" id="recentTable">
-                  <thead>
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-header">Upcoming Events</div>
+          <div class="card-body p-0">
+            <div class="table-responsive index">
+              <table class="table table-hover display" id="upcomingTable">
+                <thead>
+                  <tr>
+                    <th class="all">Date</th>
+                    <th class="all">Location</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for event in upcoming %}
                     <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Location</th>
+                      <td class="text-nowrap">
+                        <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                      </td>
+                      <td class="text-wrap">
+                        <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in recent %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
-                        </td>
-                        <td class="text-wrap">
-                          <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-        <div class="col">
-          <div class="card h-100">
-            <div class="card-header">Upcoming Events</div>
-            <div class="card-body p-0">
-              <div class="table-responsive index">
-                <table class="table table-hover display" id="upcomingTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Location</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in upcoming %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
-                        </td>
-                        <td class="text-wrap">
-                          <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+      </div>
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-header">
+            On This Day ({{ date|date:"F d" }})
+            <a class="sky-500"
+               href="{% url 'adv_search_results' %}?month_choice=is&month={{ date|date:"n" }}&day_choice=is&day={{ date|date:"j" }}">see more</a>
           </div>
-        </div>
-        <div class="col">
-          <div class="card h-100">
-            <div class="card-header">
-              On This Day ({{ date|date:"F d" }})
-              <a class="sky-500"
-                 href="{% url 'adv_search_results' %}?month_choice=is&month={{ date|date:"n" }}&day_choice=is&day={{ date|date:"j" }}">see more</a>
-            </div>
-            <div class="card-body p-0">
-              <div class="table-responsive index">
-                <table class="table table-hover display" id="otdTable">
-                  <thead>
+          <div class="card-body p-0">
+            <div class="table-responsive index">
+              <table class="table table-hover display" id="otdTable">
+                <thead>
+                  <tr>
+                    <th class="all">Date</th>
+                    <th class="all">Location</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for event in events %}
                     <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Location</th>
+                      <td class="text-nowrap">
+                        <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                      </td>
+                      <td class="text-wrap">
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in events %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
-                        </td>
-                        <td class="text-wrap">
-                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <script>
+</div>
+<script>
     // removes searchBuilder button, not needed for this.
     layout.topEnd.features[1].buttons.pop();
     layout.topStart = 'pageLength';
@@ -252,5 +255,5 @@
           columnDefs: [{ target: 0, width: '1%' }],
       });
     })
-  </script>
+</script>
 {% endblock content %}
