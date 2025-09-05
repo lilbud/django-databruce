@@ -128,6 +128,13 @@ class About(TemplateView):
         return super().get_context_data(**kwargs)
 
 
+class Roadmap(TemplateView):
+    template_name = "databruce/roadmap.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        return super().get_context_data(**kwargs)
+
+
 class Links(TemplateView):
     template_name = "databruce/links.html"
 

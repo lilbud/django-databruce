@@ -1,0 +1,51 @@
+{% extends "databruce/base.html" %}
+{% load filters %}
+{% block title %}
+    Roadmap
+{% endblock title %}
+{% block content %}
+    <div class="row justify-content-center" id="about">
+        <div class="col-lg-6">
+            <div class="row">
+                <h4>
+                    <a class="sky-500" href="{% url 'index' %}">Databruce</a> &gt; Roadmap
+                </h4>
+            </div>
+            <div class="row mb-3">
+                <h5>
+                    This page is primarily to list things that I plan to do at some point. No ETA on any of these, and details for each are still in the air.
+                </h5>
+            </div>
+            <div class="row mb-3">
+                <p>
+                    As of writing, the only thing with any sort of work done on it is some kind of online "Library/Archive/Vault". Some things are already available, but the plan is a centralized repo for it all. Even just a page where links can be found.
+                </p>
+                <p>So far, 3 portions of it are available. These links lead to my website with more info.</p>
+                <ul class="ms-4">
+                    <li>
+                        <a href="https://lilbud.github.io/2025/04/06/backstreets-mag-archive/">Backstreets Magazine Archive</a>
+                    </li>
+                    <li>
+                        <a href="https://lilbud.github.io/2025/04/10/point-blank-archive/">Point Blank Archive</a>
+                    </li>
+                    <li>
+                        <a href="https://lilbud.github.io/2025/04/09/btx-article-thread/">BTX Article Dump</a>
+                    </li>
+                </ul>
+                <p>The following is also in the works.</p>
+                <h4 class="sky-500">Bruce Website Archives</h4>
+                <p>
+                    A collection of Bruce-related sites I managed to preserve/archive. Some no longer exist, and others are no longer available in their original form. As I finalize this, more details will be available.
+                </p>
+                <h4 class="sky-500">A Public API</h4>
+                <p>
+                    I really don't know if/when this will happen, would have to figure out how to host it without killing my wallet in hosting fees.
+                </p>
+                <h4 class="sky-500">Data Improvements</h4>
+                <p>
+                    I want to add more detailed data in general. Things like having Venue locations, capacity, and even possibly ticket sales per show. Would have to find a data source for the latter.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

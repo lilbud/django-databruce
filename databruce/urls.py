@@ -20,6 +20,7 @@ app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
     path("about/", views.About.as_view(), name="about"),
+    path("roadmap/", views.Roadmap.as_view(), name="roadmap"),
     path("links/", views.Links.as_view(), name="links"),
     path("s/", include("shortener.urls")),
     path("", include("api.urls")),

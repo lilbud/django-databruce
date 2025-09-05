@@ -211,7 +211,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if 'about' in request.path or 'links' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle {% if 'about' in request.path or 'links' in request.path or 'updates' in request.path or 'roadmap' in request.path %}active{% endif %}"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -225,6 +225,9 @@
                 </li>
                 <li>
                   <a class="dropdown-item" href="{% url 'updates' %}">Updates</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'roadmap' %}">Roadmap</a>
                 </li>
               </ul>
             </li>
