@@ -16,7 +16,9 @@ table>tbody>tr>td {
     background-color: var(--zinc-750) !important;
 }
 
-
+#notes-card .card-body p:last-child {
+    margin-bottom: 0px !important;
+}
 
 #stats .row .card .card-body {
     background-color: var(--zinc-800) !important;

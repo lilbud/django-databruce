@@ -42,7 +42,7 @@
               </div>
               <div class="row mb-1 mt-0">
                 <a class="text-body fw-medium fs-5"
-                   href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
+                   href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
               </div>
               <div class="badge-row d-flex flex-wrap fw-medium fs-6 mb-0">
                 {% if event.tour %}
@@ -289,7 +289,7 @@
               <div class="col">
                 <div class="card" id="notes-card">
                   <div class="card-header">Event Notes</div>
-                  <div class="card-body">{{ event.note|safe }}</div>
+                  <div class="card-body">{{ event.note|safe|linebreaks }}</div>
                 </div>
               </div>
             {% endif %}
