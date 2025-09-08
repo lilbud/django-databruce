@@ -26,7 +26,7 @@
         <div class="card-body">
           <div id="row">
             <div class="d-flex flex-column">
-              {% if results or song_results %}
+              {% if song_results %}
                 <span>
                   <div class="d-flex flex-row">
                     <div class="pe-2">Songs:</div>
@@ -38,6 +38,8 @@
                     </div>
                   </div>
                 </span>
+              {% endif %}
+              {% if results %}
                 <span>
                   {% for result in results %}
                     <div class="d-flex flex-row">

@@ -329,22 +329,6 @@ class AdvancedEventSearch(forms.Form):
     )
 
     def clean_first_date(self):
-        # found on stackoverflow, probably not the "best" way to do this
-        # print(self.cleaned_data["first_date"])
-        # try:
-        #     for i in ("%Y-%m-%d", "%Y-%m"):
-        #         try:
-        #             return datetime.datetime.strptime(
-        #                 self.cleaned_data["first_date"],
-        #                 i,
-        #             ).date()
-        #         except ValueError:
-        #             pass
-        # except ValueError:
-        #     pass
-
-        # return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
-
         if self.cleaned_data["first_date"]:
             if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["first_date"]):
                 return (
@@ -360,10 +344,9 @@ class AdvancedEventSearch(forms.Form):
                 return datetime.datetime.strptime(
                     self.cleaned_data["first_date"],
                     "%Y-%m-%d",
-                )
+                ).date()
 
-        else:
-            return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
+        return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
 
     def clean_last_date(self):
         if self.cleaned_data["last_date"]:
@@ -381,7 +364,7 @@ class AdvancedEventSearch(forms.Form):
                 return datetime.datetime.strptime(
                     self.cleaned_data["last_date"],
                     "%Y-%m-%d",
-                )
+                ).date()
 
         return datetime.datetime.strptime(f"{DATE.year}-12-31", "%Y-%m-%d").date()
 

@@ -7,7 +7,7 @@
   <div class="row mb-2">
     <h4>
       <a href="{% url "venues" %}">Venues</a>
-      &gt; {{ venue_info }}, {{ venue_info.city }}
+      &gt; {{ venue_info }}
     </h4>
   </div>
   <div class="row mb-3">
@@ -108,6 +108,8 @@
                       <th class="text-wrap all">Song</th>
                       <th class="text-center all">Plays</th>
                       <th class="text-center all">Show Opener</th>
+                      <th class="text-center all">Set 1 Closer</th>
+                      <th class="text-center all">Set 2 Opener</th>
                       <th class="text-center all">Main Set Closer</th>
                       <th class="text-center all">Encore Opener</th>
                       <th class="text-center all">Show Closer</th>
@@ -121,6 +123,8 @@
                         </td>
                         <td class="text-center">{{ song.plays }}</td>
                         <td class="text-center">{{ song.show_opener }}</td>
+                        <td class="text-center">{{ song.set_1_closer }}</td>
+                        <td class="text-center">{{ song.set_2_opener }}</td>
                         <td class="text-center">{{ song.main_set_closer }}</td>
                         <td class="text-center">{{ song.encore_opener }}</td>
                         <td class="text-center">{{ song.show_closer }}</td>

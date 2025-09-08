@@ -552,6 +552,12 @@ class Venues(models.Model):
 
         return name
 
+    def get_name(self) -> str:
+        if self.detail:
+            return f"{self.name}, {self.detail}"
+
+        return self.name
+
 
 class SetlistsByDate(models.Model):
     event = models.OneToOneField(
@@ -717,6 +723,16 @@ class Events(models.Model):
         ordering = ["id"]
 
     def __str__(self) -> str:
+        try:
+            event = self.date.strftime("%Y-%m-%d")
+            if self.early_late:
+                event += f" ({self.early_late})"
+        except AttributeError:
+            event = f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
+
+        return event
+
+    def get_date(self) -> str:
         try:
             event = self.date.strftime("%Y-%m-%d")
             if self.early_late:

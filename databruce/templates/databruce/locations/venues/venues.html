@@ -25,7 +25,7 @@
     {% for venue in venues %}
       <tr>
         <td class="wrap">
-          <a href="{% url "venue_details" id=venue.id %}">{{ venue }}</a>
+          <a href="{% url "venue_details" id=venue.id %}">{{ venue.get_name }}</a>
         </td>
         <td class="wrap">
           {% if venue.city %}

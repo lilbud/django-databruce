@@ -138,6 +138,8 @@
                       <th class="text-wrap all">Song</th>
                       <th class="text-center all">Plays</th>
                       <th class="text-center all">Show Opener</th>
+                      <th class="text-center all">Set 1 Closer</th>
+                      <th class="text-center all">Set 2 Opener</th>
                       <th class="text-center all">Main Set Closer</th>
                       <th class="text-center all">Encore Opener</th>
                       <th class="text-center all">Show Closer</th>
@@ -151,6 +153,8 @@
                         </td>
                         <td class="text-center">{{ song.plays }}</td>
                         <td class="text-center">{{ song.show_opener }}</td>
+                        <td class="text-center">{{ song.set_1_closer }}</td>
+                        <td class="text-center">{{ song.set_2_opener }}</td>
                         <td class="text-center">{{ song.main_set_closer }}</td>
                         <td class="text-center">{{ song.encore_opener }}</td>
                         <td class="text-center">{{ song.show_closer }}</td>
@@ -170,6 +174,8 @@
                     <tr>
                       <th class="text-wrap all">Event</th>
                       <th class="text-center all">Show Opener</th>
+                      <th class="text-center all">Set 1 Closer</th>
+                      <th class="text-center all">Set 2 Opener</th>
                       <th class="text-center all">Main Set Closer</th>
                       <th class="text-center all">Encore Opener</th>
                       <th class="text-center all">Show Closer</th>
@@ -179,11 +185,21 @@
                     {% for slot in slots %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event_date|get_date:slot.event__id }}</a>
+                          <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event_date }}</a>
                         </td>
                         <td class="text-center">
                           {% if slot.show_opener_id %}
                             <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if slot.set_1_closer_id %}
+                            <a href="{% url "song_details" id=slot.set_1_closer_id %}">{{ slot.set_1_closer_name }}</a>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          {% if slot.set_2_opener_id %}
+                            <a href="{% url "song_details" id=slot.set_2_opener_id %}">{{ slot.set_2_opener_name }}</a>
                           {% endif %}
                         </td>
                         <td class="text-center">
