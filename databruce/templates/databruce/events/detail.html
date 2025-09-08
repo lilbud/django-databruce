@@ -45,6 +45,7 @@
                    href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
               </div>
               <div class="badge-row d-flex flex-wrap fw-medium fs-6 mb-0">
+                {% if event.type %}<a class="pe-1"><span class="badge text-bg-secondary">{{ event.type }}</span></a>{% endif %}
                 {% if event.tour %}
                   <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge text-bg-secondary">{{ event.tour }}</span></a>
                 {% endif %}
@@ -54,7 +55,6 @@
                 {% if event.run %}
                   <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge text-bg-secondary">{{ event.run }}</span></a>
                 {% endif %}
-                {% if event.type %}<a class="pe-1"><span class="badge text-bg-secondary">{{ event.type }}</span></a>{% endif %}
               </div>
             </div>
           </div>
@@ -82,6 +82,7 @@
                                data-bs-html="true"
                                data-bs-title="How many shows since a song was last played."></i>
                           </th>
+                          <th class="all text-center">Tour</th>
                           <th class="all text-nowrap text-center">
                             Last Played
                             <i class="bi bi-info-circle-fill"
@@ -93,23 +94,17 @@
                       <tbody>
                         {% for set in event_setlist %}
                           <tr class="text-center">
-                            <td class="setHeader" colspan="4">{{ set.grouper }}</td>
+                            <td class="setHeader" colspan="5">{{ set.grouper }}</td>
+                            <td class="setname"></td>
                             <td class="setname"></td>
                             <td class="setname"></td>
                             <td class="setname"></td>
                           </tr>
                           {% for song in set.list %}
                             <tr>
-                              <td class="text-center align-top px-2">
-                                {% if song.position and song.position != song.set_name %}
-                                  <h6 class="mb-0">
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="{{ song.position }}"
-                                          class="badge text-bg-primary">{{ song.song_num }}</span>
-                                  </h6>
-                                {% else %}
-                                  {{ song.song_num }}
-                                {% endif %}
+                              <td class="text-center px-2 songnum {% if song.position and song.position != song.set_name %}position-{{ song.position|lower|cut:" " }}{% endif %}"
+                                  {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
+                                {{ song.song_num }}
                               </td>
                               <td class="px-2">
                                 <div class="row">
@@ -134,7 +129,9 @@
                               <td class="text-nowrap text-center">
                                 {% if song.debut and not song.premiere %}
                                   <h6 class="mb-0">
-                                    <span class="badge text-bg-danger">{{ song.last }}, Debut</span>
+                                    <span class="badge text-bg-danger">
+                                      {% if song.last %}{{ song.last }},{% endif %}
+                                    Debut</span>
                                   </h6>
                                 {% elif song.last >= 50 %}
                                   <h6 class="mb-0">
@@ -145,6 +142,9 @@
                                 {% else %}
                                   {{ song.last|default_if_none:"" }}
                                 {% endif %}
+                              </td>
+                              <td class="text-nowrap text-center">
+                                {% if song.tour_num %}{{ song.tour_num }} of {{ song.tour_total }}{% endif %}
                               </td>
                               <td class="text-nowrap text-center">
                                 {% if song.ltp %}

@@ -1078,17 +1078,19 @@ class Setlists(models.Model):
         default=None,
     )
 
-    song_note = models.TextField(blank=True, default=None)
+    note = models.TextField(blank=True, default=None, db_column="song_note")
     segue = models.BooleanField(default=False)
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
     instrumental = models.BooleanField(default=False)
-    snippet = models.BooleanField(default=False)
     band_premiere = models.BooleanField(default=False, db_column="band_premiere")
     position = models.TextField(blank=True, default=None)
 
     last = models.IntegerField(blank=True, default=None)
     next = models.IntegerField(blank=True, default=None)
+
+    tour_num = models.IntegerField(blank=True, default=None)
+    tour_total = models.IntegerField(blank=True, default=None)
 
     ltp = models.ForeignKey(
         to=Events,
@@ -1113,6 +1115,16 @@ class Setlists(models.Model):
 
     def __str__(self) -> str:
         return f"{self.event} - {self.set_name} - {self.song} ({self.id})"
+
+    def notes(self) -> str:
+        noteslist = list(
+            SetlistNotes.objects.filter(id=self.id).values_list("note", flat=True),
+        )
+
+        if noteslist:
+            return "; ".join(noteslist)
+
+        return ""
 
 
 class SetlistsBySetAndDate(models.Model):
@@ -1308,7 +1320,7 @@ class SongsPage(models.Model):
     prev = models.ForeignKey(
         to=Setlists,
         on_delete=models.DO_NOTHING,
-        related_name="new_prev",
+        related_name="prev",
         db_column="prev",
         null=True,
         default=None,
@@ -1317,7 +1329,7 @@ class SongsPage(models.Model):
     current = models.ForeignKey(
         to=Setlists,
         on_delete=models.DO_NOTHING,
-        related_name="new_current",
+        related_name="current",
         db_column="current",
         blank=True,
         default=None,
@@ -1326,19 +1338,18 @@ class SongsPage(models.Model):
     next = models.ForeignKey(
         to=Setlists,
         on_delete=models.DO_NOTHING,
-        related_name="new_next",
+        related_name="songpage_next",
         db_column="next",
         null=True,
         default=None,
     )
 
-    note = models.TextField(blank=True, default=None)
+    note = models.TextField(default=None, blank=True)
 
     class Meta:
         managed = False
         db_table = "songs_page"
         verbose_name_plural = "songs_page"
-        ordering = ["current__event__date"]
 
 
 class Runs(models.Model):
@@ -1521,3 +1532,34 @@ class Updates(models.Model):
     class Meta:
         managed = False
         db_table = "updates"
+
+
+class Songspagenew(models.Model):
+    id = models.AutoField(primary_key=True)
+    song = models.IntegerField(blank=True, null=True, db_column="song_id")
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        db_column="event_id",
+        related_name="page_events",
+    )
+    artist = models.IntegerField(blank=True, null=True, db_column="artist_id")
+    artist_name = models.TextField(blank=True, null=True)  # noqa: DJ001
+    venue = models.IntegerField(blank=True, null=True, db_column="venue_id")
+    venue_name = models.TextField(blank=True, null=True, db_column="venue")  # noqa: DJ001
+    tour = models.IntegerField(blank=True, null=True, db_column="tour_id")
+    tour_name = models.TextField(blank=True, null=True)  # noqa: DJ001
+    position = models.TextField(blank=True, null=True)  # noqa: DJ001
+    gap = models.IntegerField(blank=True, null=True)
+    set_name = models.TextField(blank=True, null=True)  # noqa: DJ001
+    prev = models.IntegerField(blank=True, null=True, db_column="prev_id")
+    prev_name = models.TextField(blank=True, null=True)  # noqa: DJ001
+    next = models.IntegerField(blank=True, null=True, db_column="next_id")
+    next_name = models.TextField(blank=True, null=True)  # noqa: DJ001
+    note = models.TextField(blank=True, null=True)  # noqa: DJ001
+
+    class Meta:
+        managed = False
+        db_table = "songspagenew"

@@ -91,3 +91,6 @@ CACHES = {
         },
     },
 }
+
+
+RATELIMIT_USE_CACHE = "default"

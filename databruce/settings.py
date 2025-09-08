@@ -38,8 +38,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "shortener",
-    "ajax_datatable",
-    "rest_framework_datatables",
 ]
 
 SITE_ID = 1

@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 register = template.Library()
+from databruce import models
 
 
 @register.filter(name="color")
@@ -53,10 +54,21 @@ def get_date(date: datetime | None, event: str = ""):
 
 @register.filter()
 def setlist_note(notes):
-    if len(notes) > 1:
-        return "; ".join([md_link(note.note) for note in notes])
+    return "; ".join([md_link(note.note) for note in notes])
 
-    return md_link(notes[0].note)
+    # return md_link(notes[0].note)
+
+
+@register.filter()
+def get_notes(id: int):
+    return "; ".join(
+        list(
+            models.SetlistNotes.objects.filter(id__id=id).values_list(
+                "note",
+                flat=True,
+            ),
+        ),
+    )
 
 
 @register.filter()

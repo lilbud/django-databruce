@@ -6,14 +6,21 @@
 
 body {
     font-family: var(--font-body);
+    background-color: var(--background-900) !important;
+}
+
+.bg-800 {
+    background-color: var(--background-800);
 }
 
 .card-header,
 .card-footer,
 .card-body,
 li.list-group-item,
-table>tbody>tr>td {
-    background-color: var(--zinc-750) !important;
+table>tbody>tr>td,
+.form-control,
+.form-select {
+    background-color: var(--background-800) !important;
 }
 
 #notes-card .card-body p:last-child {
@@ -21,23 +28,24 @@ table>tbody>tr>td {
 }
 
 #stats .row .card .card-body {
-    background-color: var(--zinc-800) !important;
+    background-color: var(--background-700) !important;
 }
 
-.card-header {
+.card-header,
+.card {
     border: none !important;
 }
 
 .nav-pills .nav-link:not(.active),
 .nav-pills button.active {
-    border: 1px solid var(--sky-700);
+    border: 1px solid var(--primary-700);
 }
 
 .nav-link,
 #myTab .nav-link:not(.active),
 .setHeader,
 .nav-pills button.active {
-    color: white !important;
+    color: var(--text-50) !important;
 }
 
 .sky-500,
@@ -47,37 +55,52 @@ table>tbody>tr>td {
 html[data-bs-theme="dark"] table a,
 .nav-pills .nav-link:not(.active),
 .nav-pills button:not(.active) {
-    color: var(--sky-500) !important;
+    color: var(--primary-500) !important;
 }
 
 .nav-pills button:not(.active) {
     background-color: none !important;
-    border: 1px solid var(--sky-500) !important;
+    border: 1px solid var(--primary-500) !important;
 }
 
 .active>.page-link {
-    border-color: var(--sky-700);
+    border-color: var(--primary-700);
 }
 
 .sky-700,
-#myTab .nav-link.active,
 .progress-bar,
 .navbar,
 table th,
-.select2-results__option--highlighted,
-.select2-results__option--selected,
 div.ui-menu-item-wrapper:hover,
 .btn-primary,
 .dropdown-item.active,
-.active>.page-link,
+.active > .page-link,
 .nav-pills .nav-link.active,
-.badge-row .badge {
-    background-color: var(--sky-700) !important;
+.badge-row .badge,
+.position {
+    background-color: var(--primary-700) !important;
 }
 
-.sky-900,
 .setHeader {
-    background-color: var(--sky-900) !important;
+    background-color: var(--primary-800) !important;
+}
+
+.position-showopener,
+.position-set2opener {
+    background-color: var(--secondary-700) !important;
+}
+
+.position-mainsetcloser,
+.position-set1closer {
+    background-color: var(--secondary-800) !important;
+}
+
+.position-encoreopener {
+    background-color: var(--accent-600) !important;
+}
+
+.position-showcloser {
+    background-color: var(--accent-700) !important;
 }
 
 .nav-link.active {
@@ -103,7 +126,7 @@ table.table.dataTable.table-hover > tbody > tr > td.setHeader:hover {
 
 .sky-600,
 html[data-bs-theme="light"] table a {
-    color: var(--sky-600) !important;
+    color: var(--primary-600) !important;
 }
 
 div.ui-menu-item-wrapper {
@@ -115,14 +138,11 @@ div.ui-menu-item-wrapper:hover {
     border: 1px solid var(--bs-border-color) !important;
 }
 
-
-
 .list-group-item,
 .collapse {
     border-radius: inherit !important;
 }
 
-.card .setlist tbody tr:last-child td,
 .card .setlist tbody tr:last-child>td {
     border-bottom: 0px !important;
 }
@@ -203,10 +223,14 @@ a:hover,
     flex-wrap: wrap;
 }
 
-tr td,
-tr th {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
+tr > td:first-child:not(.songnum),
+tr > th:first-child {
+    padding-left: 1rem !important;
+}
+
+tr > td:last-child,
+tr > th:last-child {
+    padding-right: 1rem !important;
 }
 
 #headimg {
@@ -215,17 +239,9 @@ tr th {
     border-radius: inherit !important;
 }
 
-.button>span {
-    padding-left: 8px
-}
-
 .text-sm-right,
 blockquote>p {
     text-align: right !important;
-}
-
-.button {
-    text-shadow: none !important;
 }
 
 .setname {

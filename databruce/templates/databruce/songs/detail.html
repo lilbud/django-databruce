@@ -103,7 +103,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was included as part of another."></i>
                           </h6>
-                          <h5>{{ snippet_count|add:snippets.count }}</h5>
+                          <h5>{{ snippets.count }}</h5>
                         </div>
                       </div>
                     </div>
@@ -124,23 +124,25 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col">
-                  <h5>Position Stats</h5>
-                  <div class="row row-cols-1 row-cols-lg-4 g-2">
-                    {% for item in positions %}
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-body">
-                            <h6 class="sky-500 text-nowrap">{{ item.position }}</h6>
-                            <h5>{{ item.count }}</h5>
+              {% if positions %}
+                <div class="row">
+                  <div class="col">
+                    <h5>Position Stats</h5>
+                    <div class="row row-cols-1 row-cols-lg-4 g-2">
+                      {% for item in positions %}
+                        <div class="col">
+                          <div class="card">
+                            <div class="card-body">
+                              <h6 class="sky-500 text-nowrap">{{ item.position }}</h6>
+                              <h5>{{ item.count }}</h5>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    {% endfor %}
+                      {% endfor %}
+                    </div>
                   </div>
                 </div>
-              </div>
+              {% endif %}
             </div>
           </div>
           <div class="card mb-3">
@@ -177,49 +179,31 @@
                     {% for song in songs %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "event_details" id=song.current.event.id %}">{{ song.current.event }}</a>
+                          <a href="{% url "event_details" id=song.event.id %}">{{ song.event }}</a>
                         </td>
                         <td class="text-nowrap">
-                          {% with band=song.current.event.artist %}
-                            <a href="{% url "band_details" id=band.id %}">{{ band }}</a>
-                          {% endwith %}
+                          <a href="{% url "band_details" id=song.artist %}">{{ song.artist_name }}</a>
                         </td>
                         <td class="text-nowrap">
-                          {% with venue=song.current.event.venue %}
-                            {% if venue %}
-                              <a href="{% url 'venue_details' id=venue.id %}">{{ venue }}</a>
-                            {% endif %}
-                          {% endwith %}
+                          <a href="{% url 'venue_details' id=song.venue %}">{{ song.venue_name }}</a>
                         </td>
                         <td class="text-nowrap">
-                          {% with tour=song.current.event.tour %}
-                            {% if tour %}
-                              <a href="{% url "tour_details" id=tour.id %}">{{ tour }}</a>
-                            {% endif %}
-                          {% endwith %}
+                          <a href="{% url "tour_details" id=song.tour %}">{{ song.tour_name }}</a>
                         </td>
                         <td class="text-nowrap">
-                          {% if song.current.position and song.current.position != song.current.set_name %}
-                            {{ song.current.position }}
+                          {% if song.position and song.position != song.set_name %}{{ song.position }}{% endif %}
+                        </td>
+                        <td class="text-center">{{ song.gap|default_if_none:"" }}</td>
+                        <td>{{ song.set_name }}</td>
+                        <td class="text-nowrap">
+                          {% if song.prev %}
+                            <a href="{% url "song_details" id=song.prev %}">{{ song.prev_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-center">{{ song.current.last|default_if_none:"" }}</td>
-                        <td>{{ song.current.set_name }}</td>
                         <td class="text-nowrap">
-                          {% with prev=song.prev %}
-                            {% if prev %}
-                              <a href="{% url "song_details" id=prev.song.id %}">{{ prev.song.short_name|default_if_none:prev.song.name }}</a>
-                              {% if prev.segue %}&gt;{% endif %}
-                            {% endif %}
-                          {% endwith %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% with next=song.next %}
-                            {% if next %}
-                              {% if song.current.segue %}&gt;{% endif %}
-                              <a href="{% url "song_details" id=next.song.id %}">{{ next.song.short_name|default_if_none:next.song.name }}</a>
-                            {% endif %}
-                          {% endwith %}
+                          {% if song.next %}
+                            <a href="{% url "song_details" id=song.next %}">{{ song.next_name }}</a>
+                          {% endif %}
                         </td>
                         <td class="text-nowrap">{{ song.note|default_if_none:"" }}</td>
                       </tr>

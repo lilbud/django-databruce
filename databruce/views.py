@@ -465,13 +465,11 @@ class EventDetail(TemplateView):
 
         context["bands"] = onstage.exclude(band=None).select_related("band")
 
-        context["notes"] = (
-            models.SetlistNotes.objects.filter(
-                event__id=context["event"].id,
-            )
-            .select_related("id", "event")
-            .order_by("num")
+        context["notes"] = models.SetlistNotes.objects.filter(
+            event=self.kwargs["id"],
         )
+
+        print(context["notes"])
 
         context["prev_event"] = self.queryset.filter(id__lt=context["event"].id).last()
         context["next_event"] = self.queryset.filter(id__gt=context["event"].id).first()
@@ -712,22 +710,9 @@ class SongDetail(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["songs"] = (
-            models.SongsPage.objects.filter(
-                id=self.kwargs["id"],
-            )
-            .select_related(
-                "current__event",
-                "current__event__venue",
-                "current__event__venue__city",
-                "current__event__venue__city__country",
-                "current__event__venue__city__state",
-                "current__event__venue__city__state__country",
-                "current__event__artist",
-                "current__event__tour",
-            )
-            .prefetch_related("next__song", "prev__song")
-        )
+        context["songs"] = models.Songspagenew.objects.filter(
+            song=self.kwargs["id"],
+        ).select_related("event")
 
         valid_set_names = [
             "Show",
@@ -758,10 +743,6 @@ class SongDetail(TemplateView):
             set_name__in=valid_set_names,
         ).count()
 
-        context["snippet_count"] = setlists.filter(
-            snippet=True,
-        ).count()
-
         context["positions"] = (
             setlists.filter(set_name__in=valid_set_names)
             .exclude(position=None)
@@ -772,10 +753,9 @@ class SongDetail(TemplateView):
             )
         ).order_by("num")
 
-        if context["song_info"].lyrics:
-            context["lyrics"] = models.Lyrics.objects.filter(
-                song__id=self.kwargs["id"],
-            ).order_by("id")
+        context["lyrics"] = models.Lyrics.objects.filter(
+            song__id=self.kwargs["id"],
+        ).order_by("id")
 
         context["snippets"] = (
             models.Snippets.objects.filter(
