@@ -324,7 +324,7 @@ class SignUpConfirm(TemplateView):
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):  # noqa: ANN002, ANN003
         if "uidb64" not in kwargs or "token" not in kwargs:
             msg = "The URL path must contain 'uidb64' and 'token' parameters."
             raise ImproperlyConfigured(
@@ -379,7 +379,7 @@ class UserSettings(TemplateView):
 
         return context
 
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
+    def post(self, request: HttpRequest):
         user_form = self.form_class(request.POST, instance=request.user)
 
         if user_form.is_valid():
@@ -683,7 +683,7 @@ class VenueDetail(TemplateView):
 class SongLyrics(TemplateView):
     template_name = "databruce/songs/lyrics.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["lyrics"] = models.Lyrics.objects.all().select_related("song")
         return context
@@ -692,7 +692,7 @@ class SongLyrics(TemplateView):
 class SongLyricDetail(TemplateView):
     template_name = "databruce/songs/lyric_detail.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
         context["lyrics"] = (
@@ -1188,16 +1188,10 @@ class AdvancedSearchResults(View):
                 date__lte=event_form.cleaned_data["last_date"],
             )
 
-            if (
-                event_form.cleaned_data["first_date"].strftime("%Y-%m-%d")
-                != "1965-01-01"
-            ):
+            if "first_date" in event_form.changed_data:
                 results.append(f"Start Date: {event_form.cleaned_data['first_date']}")
 
-            if (
-                event_form.cleaned_data["last_date"].strftime("%Y-%m-%d")
-                != f"{datetime.datetime.today().year}-12-31"
-            ):
+            if "last_date" in event_form.changed_data:
                 results.append(f"End Date: {event_form.cleaned_data['last_date']}")
 
             if event_form.cleaned_data["month"]:
@@ -1247,6 +1241,7 @@ class AdvancedSearchResults(View):
                     ),
                     Q.AND,
                 )
+
                 results.append(
                     f"State: ({event_form.cleaned_data['state_choice']}) {search_filters.get_state(event_form.cleaned_data['state'])}",
                 )
@@ -1372,7 +1367,7 @@ class AdvancedSearchResults(View):
 
                         song_events = models.Setlists.objects.filter(
                             song__id=song1.id,
-                        ).values("event__id")
+                        )
 
                         setlist_filter.add(
                             self.check_field_choice(
@@ -1381,6 +1376,7 @@ class AdvancedSearchResults(View):
                             ),
                             Q.AND,
                         )
+
                         setlist_filter.add(
                             self.check_field_choice(
                                 form["choice"],
@@ -1388,10 +1384,11 @@ class AdvancedSearchResults(View):
                             ),
                             Q.AND,
                         )
+
                         setlist_filter.add(
                             self.check_field_choice(
                                 form["choice"],
-                                Q(event__id__in=song_events),
+                                Q(event__id__in=song_events.values("event__id")),
                             ),
                             Q.AND,
                         )
@@ -1400,64 +1397,51 @@ class AdvancedSearchResults(View):
                             f"{song1} ({form['choice']} {form['position']})",
                         )
 
-                        qs = models.Setlists.objects.filter(
-                            setlist_filter,
-                        )
-
                         event_results.append(
-                            list(qs.values_list("event__id", flat=True)),
+                            list(song_events.values_list("event__id", flat=True)),
                         )
 
                     else:
+                        # anywhere
                         setlist_filter = Q(
                             set_name__in=valid_set_names,
                         )
 
                         song_events = models.Setlists.objects.filter(
                             song__id=song1.id,
-                        ).values("event__id")
-
-                        setlist_filter.add(
-                            self.check_field_choice(
-                                form["choice"],
-                                Q(song__id=song1.id),
-                            ),
-                            Q.AND,
                         )
 
                         setlist_filter.add(
                             self.check_field_choice(
                                 form["choice"],
-                                Q(event__id__in=song_events),
+                                Q(event__id__in=song_events.values("event__id")),
                             ),
                             Q.AND,
-                        )
-
-                        qs = models.Setlists.objects.filter(
-                            setlist_filter,
                         )
 
                         event_results.append(
-                            list(qs.values_list("event__id", flat=True)),
+                            list(song_events.values_list("event__id", flat=True)),
                         )
 
                         song_results.append(
                             f"{song1} ({form['choice']} anywhere)",
                         )
 
-                    setlist_event_filter.add(
-                        Q(
-                            id__in=list(
-                                set.intersection(*map(set, event_results)),
-                            ),
-                        ),
-                        Q.AND,
-                    )
-
-                    if event_form.cleaned_data["conjunction"] != "and":
+                    # AND conjunction, events in all lists that get here
+                    if event_form.cleaned_data["conjunction"] == "or":
                         setlist_event_filter.add(
                             Q(id__in=list(set.union(*map(set, event_results)))),
                             Q.OR,
+                        )
+                    else:
+                        # AND conjunction, events in all lists that get here
+                        setlist_event_filter.add(
+                            Q(
+                                id__in=list(
+                                    set.intersection(*map(set, event_results)),
+                                ),
+                            ),
+                            Q.AND,
                         )
 
                 except ValueError:
@@ -1472,13 +1456,12 @@ class AdvancedSearchResults(View):
                 "artist",
                 "venue__city",
                 "venue__country",
+                "venue__city__country",
                 "tour",
             )
             .prefetch_related(
                 "venue__city__state",
-                "venue__city__country",
                 "venue__city__state__country",
-                "venue__state",
             )
         )
 

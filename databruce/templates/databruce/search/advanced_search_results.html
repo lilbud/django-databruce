@@ -109,7 +109,7 @@
   </div>
   <script>
     // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
+    layout.topEnd.features[1].buttons.pop()
 
     function copy_to_clipboard() {
       var text = document.getElementById('shortLink').innerHTML;

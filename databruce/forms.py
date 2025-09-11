@@ -23,6 +23,15 @@ class AdvancedEventSearch(forms.Form):
         self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
         self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
 
+    class FormChoiceSelect(forms.ChoiceField):
+        def __init__(self, widget_id, *args, **kwargs):
+            kwargs["choices"] = [("is", "is"), ("not", "not")]
+            kwargs["required"] = False
+            kwargs["widget"] = forms.Select(
+                attrs={"class": "form-select form-select-sm", "id": widget_id},
+            )
+            super().__init__(*args, **kwargs)
+
     def get_months():
         months = [("", "")]
         months.extend([(i, calendar.month_name[i]) for i in range(1, 13)])
@@ -113,7 +122,6 @@ class AdvancedEventSearch(forms.Form):
 
     first_date = forms.CharField(
         label="Start Date",
-        label_suffix=":",
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -129,7 +137,6 @@ class AdvancedEventSearch(forms.Form):
 
     last_date = forms.CharField(
         label="Last Date",
-        label_suffix=":",
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -143,18 +150,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    month_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "monthChoice"},
-        ),
-    )
+    month_choice = FormChoiceSelect(widget_id="monthChoice")
 
     month = forms.ChoiceField(
         label="Month",
-        label_suffix=":",
         choices=get_months(),
         required=False,
         widget=forms.Select(
@@ -162,35 +161,19 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    day_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "dayChoice"},
-        ),
-    )
+    day_choice = FormChoiceSelect(widget_id="dayChoice")
 
     day = forms.ChoiceField(
         label="Day",
-        label_suffix=":",
         choices=get_days(),
         required=False,
         widget=forms.Select(attrs={"class": "form-select form-select-sm", "id": "day"}),
     )
 
-    dow_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "dowChoice"},
-        ),
-    )
+    dow_choice = FormChoiceSelect(widget_id="dowChoice")
 
     day_of_week = forms.ChoiceField(
         label="Day of Week",
-        label_suffix=":",
         choices=days_of_week,
         required=False,
         widget=forms.Select(
@@ -198,18 +181,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    city_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "cityChoice"},
-        ),
-    )
+    city_choice = FormChoiceSelect(widget_id="cityChoice")
 
     city = forms.ChoiceField(
         label="City",
-        label_suffix=":",
         required=False,
         choices=get_cities(),
         widget=forms.Select(
@@ -217,18 +192,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    state_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "stateChoice"},
-        ),
-    )
+    state_choice = FormChoiceSelect(widget_id="stateChoice")
 
     state = forms.ChoiceField(
         label="State",
-        label_suffix=":",
         choices=get_states(),
         required=False,
         widget=forms.Select(
@@ -236,18 +203,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    country_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "countryChoice"},
-        ),
-    )
+    country_choice = FormChoiceSelect(widget_id="countryChoice")
 
     country = forms.ChoiceField(
         label="Country",
-        label_suffix=":",
         choices=get_countries(),
         required=False,
         widget=forms.Select(
@@ -258,18 +217,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    tour_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "tourChoice"},
-        ),
-    )
+    tour_choice = FormChoiceSelect(widget_id="tourChoice")
 
     tour = forms.ChoiceField(
         label="Tour",
-        label_suffix=":",
         choices=get_tours(),
         required=False,
         widget=forms.Select(
@@ -277,18 +228,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    musician_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "musician-choice"},
-        ),
-    )
+    musician_choice = FormChoiceSelect(widget_id="musicianChoice")
 
     musician = forms.ChoiceField(
         label="Musician",
-        label_suffix=":",
         choices=get_musicians(),
         required=False,
         widget=forms.Select(
@@ -299,18 +242,10 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    band_choice = forms.ChoiceField(
-        label=None,
-        choices=[("is", "is"), ("not", "not")],
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "band-choice"},
-        ),
-    )
+    band_choice = FormChoiceSelect(widget_id="dayChoice")
 
     band = forms.ChoiceField(
         label="Band",
-        label_suffix=":",
         choices=get_bands(),
         required=False,
         widget=forms.Select(
@@ -320,7 +255,6 @@ class AdvancedEventSearch(forms.Form):
 
     conjunction = forms.ChoiceField(
         label="Conjunction",
-        label_suffix=":",
         choices=[("and", "AND"), ("or", "OR")],
         required=False,
         widget=forms.Select(
