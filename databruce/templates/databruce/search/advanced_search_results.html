@@ -28,14 +28,16 @@
             <div class="d-flex flex-column">
               {% if song_results %}
                 <span>
-                  <div class="d-flex flex-row">
-                    <div class="pe-2">Songs:</div>
-                    <div>
-                      {% for result in song_results %}
-                        {{ result }}
-                        {% if not forloop.last %}<span class="text-uppercase">{{ data.conjunction }}</span>{% endif %}
-                      {% endfor %}
-                    </div>
+                  <div class="pe-2">Songs:</div>
+                  <div>
+                    {% for result in song_results %}
+                      <div class="d-flex flex-row">{{ result }}</div>
+                      {% if not forloop.last %}
+                        <div class="d-flex flex-row">
+                          <span class="text-uppercase">{{ request.GET.conjunction }}</span>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
                   </div>
                 </span>
               {% endif %}
