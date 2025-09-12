@@ -76,8 +76,7 @@ div.ui-menu-item-wrapper:hover,
 .dropdown-item.active,
 .active > .page-link,
 .nav-pills .nav-link.active,
-.badge-row .badge,
-.position {
+.badge-row .badge {
     background-color: var(--primary-700) !important;
 }
 
