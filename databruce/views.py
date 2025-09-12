@@ -1335,7 +1335,9 @@ class AdvancedSearchResults(View):
             for form in formset.cleaned_data:
                 try:
                     song1 = models.Songs.objects.get(id=form["song1"])
-                    setlist_filter = Q(current__song__id=song1.id)
+                    setlist_filter = Q(current__song__id=song1.id) & Q(
+                        current__set_name__in=valid_set_names,
+                    )
 
                     if form["position"] == "Followed By":
                         song2 = models.Songs.objects.get(id=form["song2"])

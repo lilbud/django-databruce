@@ -195,6 +195,10 @@ table.dataTable>tbody>tr>td {
     overflow: clip;
 }
 
+#search-form {
+    overflow-x: clip;
+}
+
 th.text-center>div.dt-column-header {
     text-align: center !important;
 }
