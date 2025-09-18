@@ -82,6 +82,7 @@
           <img height="16px"
                class="d-block my-1"
                width="auto"
+               id="logo"
                src="{% static 'databruce/img/logo.svg' %}"
                alt="">
         </a>
@@ -95,9 +96,9 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="navbar-collapse collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
+          <ul class="navbar-nav me-auto">
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if '/events' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -112,7 +113,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if '/tours' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -127,7 +128,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if '/songs' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -142,7 +143,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if '/venues' in request.path or '/cities' in request.path or '/states' in request.path or '/countries' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -163,7 +164,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if '/relations' in request.path or '/bands' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -178,7 +179,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if '/releases' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -196,7 +197,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if 'search' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -211,7 +212,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {% if 'about' in request.path or 'links' in request.path or 'updates' in request.path or 'roadmap' in request.path %}active{% endif %}"
+              <a class="nav-link dropdown-toggle"
                  href="#"
                  role="button"
                  data-bs-toggle="dropdown"
@@ -232,7 +233,7 @@
               </ul>
             </li>
           </ul>
-          <ul class="navbar-nav ml-auto">
+          <ul class="navbar-nav ms-auto">
             <form role="search" method="get" action="{% url 'search' %}">
               {{ searchForm.date }}
             </form>
@@ -255,34 +256,31 @@
                     </h6>
                   </li>
                   <li>
-                    <a class="dropdown-item sky-500"
+                    <a class="dropdown-item "
                        href="{% url "profile" username=user.username %}">View Profile</a>
                   </li>
                   <li>
-                    <a class="dropdown-item sky-500" href="{% url 'users' %}">View Users</a>
+                    <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
                   </li>
                   {% if user.is_superuser %}
                     <li>
-                      <a class="dropdown-item sky-500" href="{% url "admin:index" %}">Admin Portal</a>
+                      <a class="dropdown-item" href="{% url "admin:index" %}">Admin Portal</a>
                     </li>
                   {% endif %}
                   <li>
-                    <a class="dropdown-item sky-500"  href="{% url "settings" %}">Settings</a>
+                    <a class="dropdown-item"  href="{% url "settings" %}">Settings</a>
                   </li>
                   <li>
                     <form method="post" action="{% url 'logout' %}">
                       {% csrf_token %}
-                      <button class="btn btn-link dropdown-item sky-500"
-                              type="submit"
-                              id="button-addon2">Logout</button>
+                      <button class="btn btn-link dropdown-item " type="submit" id="button-addon2">Logout</button>
                     </form>
                   </li>
                 </ul>
               </li>
             {% else %}
               <li class="nav-item mx-3">
-                <a class="nav-link {% if '/login' in request.path %}active{% endif %}"
-                   href="{% url 'login' %}?next={{ request.path }}">Login</a>
+                <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
               </li>
             {% endif %}
           </ul>

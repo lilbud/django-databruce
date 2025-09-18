@@ -32,29 +32,22 @@ function addForm() {
 
     var clonedDiv = $("#new_row").clone();
 
-    clonedDiv.attr("id", `song_row-${totalFormsValue}`);
-    clonedDiv.removeClass("invisible");
+    clonedDiv.attr("id", `song_row-${totalFormsValue}`).removeClass("d-none");
 
     clonedDiv.find('[class*=choice]').each(function () {
-        $(this).attr("id", "id_form-" + totalFormsValue + "-choice");
-        $(this).attr("name", "form-" + totalFormsValue + "-choice");
+        $(this).attr("id", "id_form-" + totalFormsValue + "-choice").attr("name", "form-" + totalFormsValue + "-choice");
     });
 
     clonedDiv.find('[class*=song1]').each(function () {
-        $(this).attr("id", "id_form-" + totalFormsValue + "-song1");
-        $(this).attr("name", "form-" + totalFormsValue + "-song1");
-        $(this).select2(selectOptions);
+        $(this).attr("id", "id_form-" + totalFormsValue + "-song1").attr("name", "form-" + totalFormsValue + "-song1").select2(selectOptions);
     });
 
     clonedDiv.find('[class*=position]').each(function () {
-        $(this).attr("id", "id_form-" + totalFormsValue + "-position");
-        $(this).attr("name", "form-" + totalFormsValue + "-position");
+        $(this).attr("id", "id_form-" + totalFormsValue + "-position").attr("name", "form-" + totalFormsValue + "-position");
     });
 
     clonedDiv.find('[class*=song2]').each(function () {
-        $(this).attr("id", "id_form-" + totalFormsValue + "-song2");
-        $(this).attr("name", "form-" + totalFormsValue + "-song2");
-        $(this).parent().hide();
+        $(this).attr("id", "id_form-" + totalFormsValue + "-song2").attr("name", "form-" + totalFormsValue + "-song2").parent().hide();
     });
 
     $(wrapFormEl).append(clonedDiv);

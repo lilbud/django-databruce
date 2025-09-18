@@ -1,6 +1,6 @@
 /* Select 2 bootstrap-5 theme override */
 html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
-    background-color: var(--background-800) !important;
+    background-color: var(--bs-body-bg) !important;
     border: 1px solid #495057;
 }
 
@@ -25,7 +25,7 @@ html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--s
 }
 
 html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
-    background-color: var(--background-800) !important;
+    background-color: var(--bs-body-bg) !important;
     color: var(--bs-body-color) !important;
     border: 1px solid #495057 !important;
 }
@@ -33,7 +33,7 @@ html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .se
 html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown {
     color: var(--bs-body-color) !important;
     border: 1px solid #495057 !important;
-    background-color: var(--background-800);
+    background-color: var(--bs-body-bg);
 }
 
 html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[role=group] .select2-results__group {

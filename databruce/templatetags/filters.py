@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
+import string
 
 import markdown
 from django import template
 
-if TYPE_CHECKING:
-    from datetime import datetime
-
 register = template.Library()
-from databruce import models
 
 
 @register.filter(name="color")
@@ -44,11 +40,8 @@ def md_link(note: str):
 
 
 @register.filter(name="get_date")
-def get_date(date: datetime | None, event: str = ""):
+def get_date(event: str):
     """Date to return if it is null or unknown."""
-    if date:
-        return date.strftime("%Y-%m-%d [%a]")
-
     return f"{event[0:4]}-{event[4:6]}-{event[6:8]}"
 
 
@@ -56,21 +49,11 @@ def get_date(date: datetime | None, event: str = ""):
 def setlist_note(notes):
     return "; ".join([md_link(note.note) for note in notes])
 
-    # return md_link(notes[0].note)
-
 
 @register.filter()
-def get_notes(id: int):
-    return "; ".join(
-        list(
-            models.SetlistNotes.objects.filter(id__id=id).values_list(
-                "note",
-                flat=True,
-            ),
-        ),
-    )
+def brucebase_url(event: str):
+    if int(event[-1]) > 1:
+        d = dict(enumerate(string.ascii_lowercase, 1))
+        return f"{event[0:4]}#{event[6:8]}{event[4:6]}{event[2:4]}{d[int(event[-1])]}"
 
-
-@register.filter()
-def album_percent(num: int, maxnum: int):
-    return int((num / maxnum) * 100)
+    return f"{event[0:4]}#{event[6:8]}{event[4:6]}{event[2:4]}"

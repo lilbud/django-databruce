@@ -20,8 +20,7 @@
     {% for user_data in users %}
       <tr>
         <td>
-          <a class="sky-500"
-             href="{% url "profile" username=user_data.username %}">{{ user_data.username }}</a>
+          <a href="{% url "profile" username=user_data.username %}">{{ user_data.username }}</a>
         </td>
         <td>
           {% if user_data.is_staff %}

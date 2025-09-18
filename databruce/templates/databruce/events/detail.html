@@ -28,33 +28,96 @@
       </div>
       <div class="row mb-3">
         <div class="col">
-          <div class="card">
+          <div class="card" id="eventInfo">
             <div class="card-body">
-              {% if event.title %}
-                <div class="fs-6 fw-medium d-flex flex-nowrap mb-2">
-                  <span class="text-body-secondary">{{ event.title }}</span>
+              <div class="d-flex flex-wrap">
+                <div class="flex-grow-1 mb-4 mb-sm-0">
+                  {% if event.title %}
+                    <div class="text-nowrap mb-1">
+                      <span id="title" class="fs-6 text-secondary-emphasis">{{ event.title }}</span>
+                    </div>
+                  {% endif %}
+                  <div class="fs-4 mb-0">
+                    <a class="pe-1 text-nowrap fw-semibold text-primary-500"
+                       href="{% url "band_details" id=event.artist.id %}"
+                       id="artist">{{ event.artist }}</a>
+                    <span class="text-nowrap fw-bold text-light" id="date">{{ event.get_date }}</span>
+                  </div>
+                  {% if not event.date %}
+                    <div class="text-nowrap">
+                      <span class="text-secondary-emphasis small">This is a placeholder date, actual date unknown.</span>
+                    </div>
+                  {% endif %}
+                  <div class="fs-5">
+                    <a class="text-light" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                  </div>
+                  <div class="badge-row text-wrap fs-6 mt-1">
+                    {% if event.tour %}
+                      <a href="{% url "tour_details" id=event.tour.id %}"><span class="badge bg-primary-700">{{ event.tour }}</span></a>
+                    {% endif %}
+                    {% if event.leg %}
+                      <a href="{% url "leg_details" id=event.leg.id %}"><span class="badge bg-primary-700">{{ event.leg }}</span></a>
+                    {% endif %}
+                    {% if event.run %}
+                      <a href="{% url "run_details" id=event.run.id %}"><span class="badge bg-primary-700">{{ event.run }}</span></a>
+                    {% endif %}
+                  </div>
+                  <div class="badge-row my-2">
+                    {% if event.brucebase_url %}
+                      <a class="pe-1"
+                         id="eventlink"
+                         href="https://brucebase.wikidot.com/{{ event.id|brucebase_url }}">
+                        <span class="badge text-bg-secondary eventlink">
+                          <i class="bi bi-link-45deg pe-1"></i>
+                          <span>Brucebase</span>
+                        </span>
+                      </a>
+                    {% endif %}
+                    {% if nugs %}
+                      <a class="pe-1" id="eventlink" href="{{ nugs.url }}">
+                        <span class="badge text-bg-secondary eventlink">
+                          <i class="bi bi-headphones"></i>
+                          <span>Nugs</span>
+                        </span>
+                      </a>
+                    {% endif %}
+                  </div>
                 </div>
-              {% endif %}
-              <div class="fs-4 d-flex flex-wrap mb-0">
-                <a class="text-body pe-2 text-nowrap fw-semibold"
-                   href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
-                <span class="sky-500 text-nowrap fw-bold">{{ event.date|date:"Y-m-d [D]" }}</span>
-              </div>
-              <div class="row mb-1 mt-0">
-                <a class="text-body fw-medium fs-5"
-                   href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
-              </div>
-              <div class="badge-row d-flex flex-wrap fw-medium fs-6 mb-0">
-                {% if event.type %}<a class="pe-1"><span class="badge text-bg-secondary">{{ event.type }}</span></a>{% endif %}
-                {% if event.tour %}
-                  <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge text-bg-secondary">{{ event.tour }}</span></a>
-                {% endif %}
-                {% if event.leg %}
-                  <a class="pe-1" href="{% url "leg_details" id=event.leg.id %}"><span class="badge text-bg-secondary">{{ event.leg }}</span></a>
-                {% endif %}
-                {% if event.run %}
-                  <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge text-bg-secondary">{{ event.run }}</span></a>
-                {% endif %}
+                <div>
+                  {% if user.is_authenticated and event.publicity == true %}
+                    <form method="post" id="userForm">
+                      <input type="hidden" name="event" value="{{ event.id }}">
+                      <input type="hidden" name="user" value="{{ user.id }}">
+                      {% csrf_token %}
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button id="addshow-button"
+                                type="submit"
+                                name="submit"
+                                class="btn btn-sm text-nowrap {% if event.id in user_shows %}active{% endif %}">
+                          <span class="pe-1" id="star">
+                            {% if event.id in user_shows %}
+                              <i class="bi bi-star-fill"></i>
+                            {% else %}
+                              <i class="bi bi-star"></i>
+                            {% endif %}
+                          </span>
+                          <span id="attended">
+                            {% if event.id in user_shows %}
+                              Attended
+                            {% else %}
+                              Attended?
+                            {% endif %}
+                          </span>
+                        </button>
+                        <button type="button"
+                                id="userCount"
+                                class="btn btn-sm {% if event.id in user_shows %}active{% endif %}">
+                          {{ user_count|default_if_none:"0" }}
+                        </button>
+                      </div>
+                    </form>
+                  {% endif %}
+                </div>
               </div>
             </div>
           </div>
@@ -62,13 +125,21 @@
       </div>
       <div class="row">
         <div class="col-12 col-lg-8 mb-3 order-2 order-lg-1 pe-lg-2">
-          <div class="row mb-3">
+          <div class="row">
             <div class="col">
+              {% if event.note %}
+                <div class="col d-xs-block d-lg-none">
+                  <div class="card mb-3" id="notes-card">
+                    <div class="card-header">Event Notes</div>
+                    <div class="card-body">{{ event.note|safe|linebreaks }}</div>
+                  </div>
+                </div>
+              {% endif %}
               <div class="card">
                 <div class="card-header">Setlist</div>
                 <div class="card-body p-0 setlist">
                   {% regroup setlist by set_name as event_setlist %}
-                  {% regroup notes|dictsort:"id.id" by id.id as notes_list %}
+                  {% regroup notes by id.id as notes_list %}
                   <div class="table-responsive">
                     <table class="table table-hover display" id="setlistTable">
                       <thead>
@@ -95,29 +166,28 @@
                         {% for set in event_setlist %}
                           <tr class="text-center">
                             <td class="setHeader" colspan="5">{{ set.grouper }}</td>
-                            <td class="setname"></td>
-                            <td class="setname"></td>
-                            <td class="setname"></td>
-                            <td class="setname"></td>
+                            <td class="setname d-none"></td>
+                            <td class="setname d-none"></td>
+                            <td class="setname d-none"></td>
+                            <td class="setname d-none"></td>
                           </tr>
                           {% for song in set.list %}
                             <tr>
-                              <td class="text-center px-2 songnum {% if song.position and song.position != song.set_name %}position-{{ song.position|lower|cut:" " }}{% endif %}"
+                              <td class="text-center px-2 songnum {% if song.position and song.position != song.set_name %}position {{ song.position|lower|cut:" " }}{% endif %}"
                                   {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
                                 {{ song.song_num }}
                               </td>
                               <td class="px-2">
                                 <div class="row">
-                                  <span class="text-nowrap">
-                                    <a class="sky-500 fw-medium me-1"
-                                       href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                  <span class="text-nowrap fw-semibold">
+                                    <a class="me-1" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                     {% if song.segue %}{{ song.separator }}{% endif %}
                                     {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
                                     {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
                                   </span>
                                 </div>
                                 {% if notes_list %}
-                                  <div class="row text-body-secondary" id="setlist_note">
+                                  <div class="row text-body-secondary mt-0.5" id="setlist_note">
                                     <small>
                                       {% for note in notes_list %}
                                         {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
@@ -131,7 +201,7 @@
                                   <h6 class="mb-0">
                                     <span class="badge text-bg-danger">
                                       {% if song.last %}{{ song.last }},{% endif %}
-                                    Debut</span>
+                                    TD</span>
                                   </h6>
                                 {% elif song.last >= 50 %}
                                   <h6 class="mb-0">
@@ -146,9 +216,9 @@
                               <td class="text-nowrap text-center">
                                 {% if song.tour_num %}{{ song.tour_num }} of {{ song.tour_total }}{% endif %}
                               </td>
-                              <td class="text-nowrap text-center">
+                              <td class="text-nowrap text-center fw-semibold">
                                 {% if song.ltp %}
-                                  <a href="{% url "event_details" id=song.ltp.id %}" class="sky-500">{{ song.ltp }}</a>
+                                  <a href="{% url "event_details" id=song.ltp.id %}">{{ song.ltp }}</a>
                                 {% endif %}
                               </td>
                             </tr>
@@ -161,18 +231,27 @@
               </div>
             </div>
           </div>
-          <div class="row row-cols-1 row-cols-md-2 g-3">
+        </div>
+        <div class="col-12 col-lg-4 order-2 ps-lg-2">
+          <div class="row row-cols-1 g-3 mb-3">
+            {% if event.note %}
+              <div class="col d-none d-lg-block">
+                <div class="card" id="notes-card">
+                  <div class="card-header">Event Notes</div>
+                  <div class="card-body">{{ event.note|safe|linebreaks }}</div>
+                </div>
+              </div>
+            {% endif %}
             {% if musicians or bands %}
               <div class="col">
-                <div class="card">
-                  <div class="card-header">Onstage</div>
+                <div class="card" id="onstage">
+                  <div class="card-header">Performers</div>
                   <div class="card-body">
                     {% if musicians %}
-                      <ul class="ps-2">
+                      <ul>
                         {% for member in musicians %}
                           <li>
-                            <a class="sky-500"
-                               href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                            <a href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                           </li>
                         {% endfor %}
                       </ul>
@@ -180,40 +259,17 @@
                     {% if bands %}
                       {% regroup bands by band as bands_list %}
                       {% for band in bands_list %}
-                        <h6>
-                          <a class="text-body" href="{% url "band_details" id=band.grouper.id %}">{{ band.grouper }}</a>
-                        </h6>
-                        <ul class="ps-4">
+                        <a class="fw-semibold fs-6 text-reset text-body-light"
+                           href="{% url "band_details" id=band.grouper.id %}">{{ band.grouper }}</a>
+                        <ul>
                           {% for member in band.list %}
                             <li>
-                              <a class="sky-500"
-                                 href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
+                              <a href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
                             </li>
                           {% endfor %}
                         </ul>
                       {% endfor %}
                     {% endif %}
-                    {% comment %} {% if not band.grouper %}
-                        <ul class="ps-2">
-                          {% for member in band.list %}
-                            <li>
-                              <a class="sky-500" href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      {% else %}
-                        <h6>
-                          <a class="text-body" href="{% url "band_details" id=band.grouper.id %}">{{ band.grouper }}</a>
-                        </h6>
-                        <ul class="ps-4">
-                          {% for member in band.list %}
-                            <li>
-                              <a class="sky-500" href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      {% endif %}
-                    {% endfor %} {% endcomment %}
                   </div>
                 </div>
               </div>
@@ -221,14 +277,16 @@
             {% if album_breakdown %}
               <div class="col">
                 <div class="card">
-                  <div class="card-header">Album Breakdown</div>
+                  <div class="card-header">
+                    <span class="align-middle">Album Breakdown</span>
+                    <button class="btn btn-sm btn-success float-end"
+                            data-bs-toggle="modal"
+                            data-bs-target="#album-breakdown-modal"
+                            role="button">Breakdown</button>
+                  </div>
                   <div class="card-body">
-                    {% regroup setlist_unique by song.category as album_list %}
                     {% for album in album_breakdown %}
-                      <div class="row pb-2"
-                           data-bs-toggle="tooltip"
-                           data-bs-html="true"
-                           data-bs-title="<!-- djlint:off -->{% for item in album_list %}{% if item.grouper == album.category %}{% for song in item.list %}{{ song.song.name }}<br>{% endfor %}{% endif %}{% endfor %}<!-- djlint:on -->">
+                      <div class="row pb-1" id="album-breakdown">
                         <div class="col">
                           <div class="progress-label">
                             <div class="pe-2 fw-semibold">{{ album.category }}</div>
@@ -236,12 +294,12 @@
                           <div class="progress d-flex flex-row justify-content-between"
                                role="progressbar"
                                aria-label="Basic example"
-                               aria-valuenow="{{ album.num|album_percent:album_max.max }}"
+                               aria-valuenow="{{ album.num }}"
                                aria-valuemin="0"
-                               aria-valuemax="{{ album_max.max }}">
-                            <div class="progress-bar"
-                                 style="width: {{ album.num|album_percent:album_max.max }}%"></div>
-                            <span class="song-count pe-2">{{ album.num }}</span>
+                               aria-valuemax="{{ album.max }}">
+                            <div class="progress-bar" style="width: {{ album.percent }}%">
+                              <span class="song-count position-absolute end-0 fw-bold pe-4">{{ album.num }}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -250,83 +308,22 @@
                 </div>
               </div>
             {% endif %}
-          </div>
-        </div>
-        <div class="col-12 col-lg-4 order-1 order-lg-2 ps-lg-2">
-          <div class="row row-cols-1 g-3 mb-3">
-            <div class="col">
-              <div class="card h-100">
-                <div class="card-header">User Stats</div>
-                <div class="card-body">
-                  <div class="col">
-                    <div class="row {% if user.is_authenticated %}mb-2{% else %}mb-0{% endif %}">
-                      <div>{{ user_count|default_if_none:"0" }} user(s) were at this show.</div>
-                    </div>
-                    {% if user.is_authenticated %}
-                      <div class="row">
-                        <form method="post" action="{% url "add_show" %}">
-                          <input type="hidden" name="event" value="{{ event.id }}">
-                          {% csrf_token %}
-                          <button id="submit-button"
-                                  type="submit"
-                                  name="submit"
-                                  class="btn btn-sm btn-success"
-                                  {% if event.id in user_shows %}disabled{% endif %}>
-                            {% if event.id in user_shows %}
-                              Show already in Profile
-                            {% else %}
-                              Add Show to Profile
-                            {% endif %}
-                          </button>
-                        </form>
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% if event.note %}
-              <div class="col">
-                <div class="card" id="notes-card">
-                  <div class="card-header">Event Notes</div>
-                  <div class="card-body">{{ event.note|safe|linebreaks }}</div>
-                </div>
-              </div>
-            {% endif %}
-            {% if official or nugs or archive or event.date or event.brucebase_url %}
+            {% if official or archive %}
               <div class="col">
                 <div class="card" id="links-card">
                   <div class="card-header">Links</div>
                   <div class="card-body">
                     <ul class="ps-3">
-                      {% if event.brucebase_url %}
-                        <li>
-                          <a class="sky-500"
-                             href="https://brucebase.wikidot.com{{ event.brucebase_url }}">Brucebase</a>
-                        </li>
-                      {% endif %}
-                      {% if nugs %}
-                        <li>
-                          <a class="sky-500"href="{{ nugs.url }}">Nugs Release</a>
-                        </li>
-                      {% endif %}
                       {% if official %}
                         {% for rel in official %}
                           <li>
-                            <a class="sky-500" href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
+                            <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
                           </li>
                         {% endfor %}
                       {% endif %}
                       {% if bootleg %}
                         <li>
-                          <a class="sky-500"
-                             href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
-                        </li>
-                      {% endif %}
-                      {% if event.date %}
-                        <li>
-                          <a class="sky-500"
-                             href="https://www.google.com/search?q=Bruce+Springsteen+{{ event.date|date:"Y-m-d"|iriencode }}+{{ event.venue.city.name|iriencode }}&source=lnms&tbm=vid">Google Video Search</a>
+                          <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
                         </li>
                       {% endif %}
                     </ul>
@@ -341,7 +338,7 @@
                       <ul>
                         {% for rel in archive %}
                           <li>
-                            <a class="sky-500" href="https://archive.org/details/{{ rel.url }}">{{ rel.url }}</a>
+                            <a href="https://archive.org/details/{{ rel.url }}">{{ rel.url }}</a>
                           </li>
                         {% endfor %}
                       </ul>
@@ -356,69 +353,40 @@
     </div>
   </div>
   <div class="modal fade"
-       id="eventCertaintyModal"
+       id="album-breakdown-modal"
        tabindex="-1"
-       aria-labelledby="eventCertaintyModalLabel"
+       aria-labelledby="album-breakdown-modal-label"
        aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="eventCertaintyModalLabel">Event Certainty</h1>
+          <h1 class="modal-title fs-5" id="album-breakdown-modal-label">Album Breakdown</h1>
           <button type="button"
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="fw-medium">
-            These designations were adapted from <i>Listen To The Music Play</i> by Justin Mason
-          </div>
-          <br>
-          <div class="fw-semibold">Confirmed:</div>
-          There is enough evidence (like a recording or a review) to confirm that this show happened.
-          <hr>
-          <div class="fw-semibold">Unknown Date:</div>
-          This event was known to have happened, but the specific date is unknown. Usually in cases of private events.
-          <hr>
-          <div class="fw-semibold">Unknown Location:</div>
-          This event was known to have happened, but the specific location is unknown. Usually in cases of private events.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade"
-       id="setlistCertaintyModal"
-       tabindex="-1"
-       aria-labelledby="setlistCertaintyModalLabel"
-       aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="setlistCertaintyModalLabel">Setlist Certainty</h1>
-          <button type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="fw-medium">
-            These designations were adapted from <i>Listen To The Music Play</i> by Justin Mason
-          </div>
-          <br>
-          <div class="fw-semibold">Confirmed:</div>
-          The full setlist is known and has been verified with a recording.
-          <hr>
-          <div class="fw-semibold">Probable:</div>
-          No/incomplete recording, but the setlist is entirely or partially known from reviews or articles.
-          <hr>
-          <div class="fw-semibold">Unknown:</div>
-          The setlist is unknown, more common in the early days.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          {% regroup setlist_unique by song.category as album_list %}
+          {% for album in album_breakdown %}
+            <ul class="list-group mb-3" id="breakdown">
+              <li class="list-group-item active">
+                <h5 class="mb-0">{{ album.category }}</h5>
+              </li>
+              {% for item in album_list %}
+                {% if item.grouper == album.category %}
+                  {% for song in item.list %}
+                    <li class="list-group-item">
+                      <span class="fw-semibold">
+                        <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                      </span>
+                      {% if song.song.original_artist != 'Bruce Springsteen' %}[{{ song.song.original_artist }}]{% endif %}
+                    </li>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -437,6 +405,33 @@
               
               ordering: false,
               columnDefs: [{ target: 0, width: '1%' }],
+          });
+
+          $('#userForm').submit(function(e) {
+              e.preventDefault();
+              var serializedData = $(this).serialize();
+
+              $.ajax({
+                type: "POST",
+                url: "{% url 'add_show' %}",
+                data:  serializedData,
+                success: function(data) {
+                  $("#userCount").text(data['count']);
+
+                  if (data['action'] === 'added') {
+                    $("#star").html('<i class="bi bi-star-fill"></i>');
+                    $("#attended").text('Attended');
+                    $("#addshow-button").addClass('active');
+                    $("#userCount").addClass('active');
+
+                  } else if (data['action'] === 'removed') {
+                    $("#star").html('<i class="bi bi-star"></i>');
+                    $("#attended").text('Attended?');
+                    $("#addshow-button").removeClass('active');
+                    $("#userCount").removeClass('active');
+                  };
+                },
+              });
           });
       })
   </script>

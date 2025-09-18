@@ -20,22 +20,22 @@
   <div class="row mb-4">
     <div class="col-12 col-md-6 col-lg-4 px-2">
       <div class="card mb-3">
-        <div class="card-body p-0 rounded">
-          <img class="img-fluid object-fit-cover"
+        <div class="card-body p-0">
+          <img class="img-fluid rounded"
                id="headimg"
-               src="{% static 'databruce/img/header-2025.jpg' %}"
+               src="{% static 'databruce/img/header-2025.webp' %}"
                alt=""
-               height="1280"
+               height="auto"
                width="auto">
         </div>
-        <div class="card-footer text-body-secondary">
+        <div class="card-footer">
           San Siro - July 3, 2025 (photo by <a href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)
         </div>
       </div>
       <div class="card mb-3 mb-lg-0">
         <div class="card-header">
           Recent Updates
-          <a class="sky-500" href="{% url 'updates' %}">see more</a>
+          <a href="{% url 'updates' %}">see more</a>
         </div>
         <div class="card-body px-3">
           <ul class="mb-0 ps-4">
@@ -62,7 +62,7 @@
         <h6 class="p-3 mb-0">
           {% with first=latest_event.event %}
             <div class="row">
-              <a class="sky-500" href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
+              <a class="fw-semibold" href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
             </div>
             <div class="row">
               <a class="text-reset text-body-light"
@@ -83,8 +83,8 @@
               <tbody>
                 {% for set in event_setlist %}
                   <tr class="text-center">
-                    <td class="setHeader" colspan="4">{{ set.grouper }}</td>
-                    <td class="setname"></td>
+                    <td class="setHeader" colspan="2">{{ set.grouper }}</td>
+                    <td class="setname d-none"></td>
                   </tr>
                   {% for song in set.list %}
                     <tr>
@@ -101,7 +101,7 @@
                       </td>
                       <td>
                         <span class="text-nowrap">
-                          <a class="text-body" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                          <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                           {% if song.segue %}{{ song.separator }}{% endif %}
                           {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
                           {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
@@ -137,10 +137,10 @@
                   {% for event in recent %}
                     <tr>
                       <td class="text-nowrap">
-                        <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                        <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -166,10 +166,10 @@
                   {% for event in upcoming %}
                     <tr>
                       <td class="text-nowrap">
-                        <a class="sky-500" href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                        <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a class="sky-500" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -183,8 +183,7 @@
         <div class="card h-100">
           <div class="card-header">
             On This Day ({{ date|date:"F d" }})
-            <a class="sky-500"
-               href="{% url 'adv_search_results' %}?month_choice=is&month={{ date|date:"n" }}&day_choice=is&day={{ date|date:"j" }}">see more</a>
+            <a href="{% url 'adv_search_results' %}{% querystring month=date|date:'n' day=date|date:"j" %}">see more</a>
           </div>
           <div class="card-body p-0">
             <div class="table-responsive index">

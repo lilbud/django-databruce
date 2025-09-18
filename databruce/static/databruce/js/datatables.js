@@ -54,6 +54,7 @@ $.extend(true, DataTable.defaults, {
       button: '&nbspFilter'
     }
   },
+  order: [],
   drawCallback: function (settings) {
     $('[data-bs-toggle="tooltip"]').tooltip();
   },
@@ -61,8 +62,9 @@ $.extend(true, DataTable.defaults, {
 
 // needed to fix pages with multiple tables behind tabs
 $(document).ready(function () {
-    $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
-        $($.fn.dataTable.tables(true)).DataTable()
-            .columns.adjust();
-    });
+  $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+    $($.fn.dataTable.tables(true)).DataTable()
+      .columns.adjust()
+      .responsive.recalc();
+  });
 })

@@ -6,13 +6,18 @@
   <div class="row mb-4">
     <div class="col">
       <h4>Events</h4>
-      <div class="col-3 col-md-1">
-        <select class="form-select form-select-sm" id="year_select">
-          <option selected disabled hidden>{{ year }}</option>
+      <div class="col-3 col-md-1" id="year-select">
+        <button class="btn dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">{{ year }}</button>
+        <ul class="dropdown-menu">
           {% for i in years %}
-            <option value="{% url "events_year" year=i %}">{{ i }}</option>
+            <li>
+              <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
+            </li>
           {% endfor %}
-        </select>
+        </ul>
       </div>
     </div>
   </div>
@@ -92,23 +97,27 @@
           .every(function () {
               var column = this;
 
-              $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="select">Publicity:</label></div><div class="col" id="select"></div></div>').appendTo($('#dropdown-container'));
+              $('<label for="select" class="me-2">Publicity:</label><div class="btn-group" id="select"></div>').appendTo($('#dropdown-container'));
 
-              // this appears to be the only way to add a select filter
-              // without going through ajax calls. I originally had a pre-made dropdown in
-              // another file and included it like above, however, I had to use an ajax call
-              // otherwise it would appear but not work
-              var select = $('<select id="type" class="form-select form-select-sm"></select>')
-                .appendTo($('#select'))
-                .on('change', function () {
-                    column
-                      .search($(this).val(), {regex: true})
-                      .draw();
-                });
+              var select = $('<button class="btn btn-secondary btn-sm mb-1 mr-2 dropdown-toggle" id="publicity-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">All</button>').appendTo($('#select'))
+              var options = $('<div class="dropdown-menu" id="publicity-select"><a class="dropdown-item dt-button" href="#" value=".*"><span>All</span></a></li><a class="dropdown-item dt-button" href="#" value="True"><span>Public</span></a></li><a class="dropdown-item dt-button" href="#" value="False"><span>Private</span></a></li> </div>').appendTo($('#select'))
               
-              select.append('<option value=".*">All</option>');
-              select.append('<option value="True">Public</option>');
-              select.append('<option value="False">Private</option>');
+              $('#publicity-select .dropdown-item.dt-button').on('click', function() {
+
+                // removes active check from all buttons
+                $('#publicity-select .dropdown-item.dt-button').each(function() {
+                  $('.check').remove();
+                });
+
+                // gets value attribute and searches last column
+                column.search($(this).attr('value'), {regex: true}).draw();
+
+                // sets button text to selected
+                $('#publicity-select-btn').text($(this).find('span').html());
+
+                // adds check to actively filtered value
+                $(this).append('<div class="float-end check">✓</div>');
+              })
           });
       },
     });

@@ -6,12 +6,12 @@
   <div class="row mb-4">
     <div class="col-10 offset-1">
       <h4>Advanced Event Search</h4>
-      <h6 class="text-body-secondary">
+      <h6>
         Search for events based on a number of parameters like month/day, who was onstage, and even what songs were played.
         I referenced the advanced search created by the folks over at <a href="https://jerrybase.com">Jerrybase</a> during the creation of mine.
         It was a big help in figuring out how to get the song rows to add/remove correctly. Although, the backend between mine and theirs is likely very different.
       </h6>
-      <h6 class="text-body-secondary">
+      <h6>
         Start/Last Date accepts full dates as well as partial dates. So, entering '1975-02' for start will find events after February 1st, 1975.
         Likewise, entering '1975-02' for last will find events from before February 28th, 1975.
       </h6>
@@ -118,9 +118,7 @@
           </div>
         </div>
       </form>
-      <div id="new_row" class="row invisible mb-2">
-        {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
-      </div>
+      <div id="new_row" class="row d-none mb-2">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
     </div>
   </div>
   {% load static %}

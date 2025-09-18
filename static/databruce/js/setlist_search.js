@@ -33,7 +33,7 @@ function addForm() {
     var clonedDiv = $("#new_row").clone();
 
     clonedDiv.attr("id", `song_row-${totalFormsValue}`);
-    clonedDiv.removeClass("invisible");
+    clonedDiv.removeClass("d-none");
 
     clonedDiv.find('[class*=choice]').each(function () {
         $(this).attr("id", "id_form-" + totalFormsValue + "-choice");

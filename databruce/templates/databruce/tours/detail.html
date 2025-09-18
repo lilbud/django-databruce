@@ -4,13 +4,11 @@
   Tours &gt; {{ tour.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row mb-4">
-    <h4>
-      <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
-    </h4>
-  </div>
-  <div class="row-mb-4">
-    <div class="col">
+  <div class="row justify-content-center">
+    <div class="col col-lg-9">
+      <h4 class="mb-3">
+        <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
+      </h4>
       <div class="card">
         <div class="card-header">
           <ul class="nav nav-pills nav-fill" role="tablist">
@@ -89,7 +87,7 @@
                             <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-wrap">{{ event.note|default_if_none:"" }}</td>
+                        <td class="text-wrap">{{ event.title|default_if_none:"" }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -102,8 +100,8 @@
                   <thead>
                     <tr>
                       <th scope="col">Name</th>
-                      <th scope="col">Shows</th>
-                      <th scope="col">Songs</th>
+                      <th scope="col" class="text-center">Shows</th>
+                      <th scope="col" class="text-center">Songs</th>
                       <th scope="col">First</th>
                       <th scope="col">Last</th>
                       <th scope="col">Note</th>
@@ -115,13 +113,13 @@
                         <td class="text-wrap">
                           <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
                         </td>
-                        <td>{{ leg.num_shows }}</td>
-                        <td>{{ leg.num_songs }}</td>
+                        <td class="text-center">{{ leg.num_shows }}</td>
+                        <td class="text-center">{{ leg.num_songs }}</td>
                         <td class="text-nowrap">
-                          <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first }}</a>
+                          <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first.get_date }}</a>
                         </td>
                         <td class="text-nowrap">
-                          <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last }}</a>
+                          <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last.get_date }}</a>
                         </td>
                         <td class="text-wrap">{{ leg.note|default_if_none:"" }}</td>
                       </tr>
@@ -131,88 +129,54 @@
               </div>
             </div>
             <div id="songs" class="tab-pane fade">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="tourSongs">
-                  <thead>
-                    <tr>
-                      <th class="text-wrap all">Song</th>
-                      <th class="text-center all">Plays</th>
-                      <th class="text-center all">Show Opener</th>
-                      <th class="text-center all">Set 1 Closer</th>
-                      <th class="text-center all">Set 2 Opener</th>
-                      <th class="text-center all">Main Set Closer</th>
-                      <th class="text-center all">Encore Opener</th>
-                      <th class="text-center all">Show Closer</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for song in songs %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "song_details" id=song.song__id %}">{{ song.name }}</a>
-                        </td>
-                        <td class="text-center">{{ song.plays }}</td>
-                        <td class="text-center">{{ song.show_opener }}</td>
-                        <td class="text-center">{{ song.set_1_closer }}</td>
-                        <td class="text-center">{{ song.set_2_opener }}</td>
-                        <td class="text-center">{{ song.main_set_closer }}</td>
-                        <td class="text-center">{{ song.encore_opener }}</td>
-                        <td class="text-center">{{ song.show_closer }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+              {% include "databruce/partials/song_position_table.html" with songs=songs %}
             </div>
             <div id="slots" class="tab-pane fade">
-              <div class="row mb-2">
-                <h6 class="ms-3">Modelled after a similar feature from Dripfield.pro</h6>
-              </div>
               <div class="table-responsive">
                 <table class="table table-hover display" id="tourSlots">
                   <thead>
                     <tr>
-                      <th class="text-wrap all">Event</th>
-                      <th class="text-center all">Show Opener</th>
-                      <th class="text-center all">Set 1 Closer</th>
-                      <th class="text-center all">Set 2 Opener</th>
-                      <th class="text-center all">Main Set Closer</th>
-                      <th class="text-center all">Encore Opener</th>
-                      <th class="text-center all">Show Closer</th>
+                      <th class="text-nowrap all">Event</th>
+                      <th class="text-nowrap all showopener">Show Opener</th>
+                      <th class="text-nowrap all set1closer">Set 1 Closer</th>
+                      <th class="text-nowrap all set2opener">Set 2 Opener</th>
+                      <th class="text-nowrap all mainsetcloser">Main Set Closer</th>
+                      <th class="text-nowrap all encoreopener">Encore Opener</th>
+                      <th class="text-nowrap all showcloser">Show Closer</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for slot in slots %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event_date }}</a>
+                          <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event__id|get_date }}</a>
                         </td>
-                        <td class="text-center">
+                        <td class="text-nowrap">
                           {% if slot.show_opener_id %}
                             <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="text-nowrap">
                           {% if slot.set_1_closer_id %}
                             <a href="{% url "song_details" id=slot.set_1_closer_id %}">{{ slot.set_1_closer_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="text-nowrap">
                           {% if slot.set_2_opener_id %}
                             <a href="{% url "song_details" id=slot.set_2_opener_id %}">{{ slot.set_2_opener_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="text-nowrap">
                           {% if slot.main_set_closer_id %}
                             <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="text-nowrap">
                           {% if slot.encore_opener_id %}
                             <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="text-nowrap">
                           {% if slot.show_closer_id %}
                             <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
                           {% endif %}
@@ -234,26 +198,38 @@
     $(document).ready(function () {
       new DataTable('#tourEvents', {
         layout: layout,
+        paging: false,
+        responsive: false,
       });
 
-      layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
+      layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6];
 
       new DataTable('#tourSlots', {
         layout: layout,
-        order: [[0, 'asc']],
+        ordering: false,
+        scrollX: false,
+        paging: false,
+        searching: false,
+        columnDefs: [
+          { target: 0, width: '10%' },
+          { targets: [1, 2, 3, 4, 5, 6], width: '15%' },
+        ],
       });
 
-      // removes searchBuilder button, not needed for this.
       layout.topEnd.features[1].buttons.pop();
+      // removes searchBuilder button, not needed for this.
+      layout.topStart = {};
 
       new DataTable('#tourLegs', {
         layout: layout,
-        order: [[3, 'asc']],
+        paging: false,
+        searching: false,
       });
 
-      new DataTable('#tourSongs', {
+      new DataTable('#songTable', {
         layout: layout,
-        order: [[0, 'asc']],
+        paging: false,
+        responsive: false,
       });
 
 

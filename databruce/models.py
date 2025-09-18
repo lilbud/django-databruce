@@ -473,7 +473,7 @@ class Venues(models.Model):
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_url = models.TextField(unique=True, blank=True, default=None)
     name = models.TextField(blank=True, default=None)
-    detail = models.TextField(unique=True, blank=True, default=None)
+    detail = models.TextField(blank=True, default=None)
 
     city = models.ForeignKey(
         Cities,

@@ -25,6 +25,7 @@ class AdvancedEventSearch(forms.Form):
 
     class FormChoiceSelect(forms.ChoiceField):
         def __init__(self, widget_id, *args, **kwargs):
+            kwargs["initial"] = "is"
             kwargs["choices"] = [("is", "is"), ("not", "not")]
             kwargs["required"] = False
             kwargs["widget"] = forms.Select(
@@ -256,6 +257,7 @@ class AdvancedEventSearch(forms.Form):
     conjunction = forms.ChoiceField(
         label="Conjunction",
         choices=[("and", "AND"), ("or", "OR")],
+        initial="and",
         required=False,
         widget=forms.Select(
             attrs={"class": "form-select form-select-sm", "id": "conjunctionSelect"},

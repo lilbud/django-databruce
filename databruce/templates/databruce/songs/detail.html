@@ -10,26 +10,24 @@
 {% endblock extrajs %}
 {% block content %}
   <div class="row mb-2" id="song-info">
-    <h4>
-      <a href="{% url 'songs' %}">Songs</a> &gt; {{ song_info.name }}
-    </h4>
+    <h3 class="text-nowrap">{{ song_info.name }}</h3>
   </div>
-  <div class="row mb-2" id="song-info">
+  <div class="row mb-2">
     <div class="col">
-      <h6>
-        <div class="d-flex flex-row">
-          <div class="pe-2 fw-semibold">Original Artist:</div>
-          <div>{{ song_info.original_artist }}</div>
-        </div>
+      <h5>
         {% if song_info.album %}
-          <div class="d-flex flex-row">
-            <div class="pe-2 fw-semibold">Category:</div>
+          <div class="mb-3">
+            <div class="fw-semibold">Album</div>
             <div>
               <a href="{% url "release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
             </div>
           </div>
         {% endif %}
-      </h6>
+        <div>
+          <div class="fw-semibold">Original Artist</div>
+          <div>{{ song_info.original_artist }}</div>
+        </div>
+      </h5>
     </div>
   </div>
   <div class="row mb-2">
@@ -68,9 +66,9 @@
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class="sky-500 text-nowrap">
+                          <h6 class=" text-nowrap">
                             Public
-                            <i class="bi bi-info-circle-fill text-body"
+                            <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
@@ -82,9 +80,9 @@
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class="sky-500 text-nowrap">
+                          <h6 class=" text-nowrap">
                             Private
-                            <i class="bi bi-info-circle-fill text-body"
+                            <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
@@ -96,9 +94,9 @@
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class="sky-500 text-nowrap">
+                          <h6 class=" text-nowrap">
                             Snippet
-                            <i class="bi bi-info-circle-fill text-body"
+                            <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="Number of times a song was included as part of another."></i>
@@ -110,9 +108,9 @@
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class="sky-500 text-nowrap">
+                          <h6 class="text-nowrap">
                             Frequency
-                            <i class="bi bi-info-circle-fill text-body"
+                            <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="How common a song is. Number of times played divided by number of shows since the debut. Formula from Dripfield.pro."></i>
@@ -133,7 +131,7 @@
                         <div class="col">
                           <div class="card">
                             <div class="card-body">
-                              <h6 class="sky-500 text-nowrap">{{ item.position }}</h6>
+                              <h6 class=" text-nowrap">{{ item.position }}</h6>
                               <h5>{{ item.count }}</h5>
                             </div>
                           </div>
@@ -179,7 +177,7 @@
                     {% for song in songs %}
                       <tr>
                         <td class="text-nowrap">
-                          <a href="{% url "event_details" id=song.event.id %}">{{ song.event }}</a>
+                          <a href="{% url "event_details" id=song.event.id %}">{{ song.event.get_date }}</a>
                         </td>
                         <td class="text-nowrap">
                           <a href="{% url "band_details" id=song.artist %}">{{ song.artist_name }}</a>
@@ -254,20 +252,19 @@
               <ul class="mb-1">
                 {% if song_info.brucebase_url %}
                   <li>
-                    <a class="sky-500"
+                    <a class=" "
                        href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
                   </li>
                 {% endif %}
                 {% if song_info.spotify_id %}
                   <li>
-                    <a class="sky-500"
+                    <a class=" "
                        href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
                   </li>
                 {% endif %}
                 {% if song_info.mbid %}
                   <li>
-                    <a class="sky-500"
-                       href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
+                    <a class=" " href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
                   </li>
                 {% endif %}
               </ul>
@@ -291,7 +288,7 @@
                   {% if lyric.language != 'English' %}
                     <h6>
                       <li>
-                        <a class="sky-500" href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.language }}
+                        <a class=" " href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.language }}
                           {% if lyric.note %}[{{ lyric.note }}]{% endif %}
                         </a>
                       </li>
@@ -356,6 +353,7 @@
       new DataTable('#songTable', {
         layout: layout,
         scrollX: true,
+        pageLength: 50,
         initComplete: function () {
           this.api()
           

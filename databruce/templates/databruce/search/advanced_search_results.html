@@ -11,9 +11,9 @@
       <h6>Click link below to copy a short url to these results (the links are very long and look awful).</h6>
       <div id="short_url">
         <button id="short-url" class="btn btn-link py-0">Get Short URL</button>
-        <span id="shortLink" class="invisible"></span>
+        <span id="shortLink" class="d-none"></span>
         <button onclick="copy_to_clipboard()"
-                class="btn btn-link py-0 invisible"
+                class="btn btn-link py-0 d-none"
                 id="copyButton">
           <i class="bi bi-copy"></i>
         </button>
@@ -134,9 +134,9 @@
             cache: false,
             dataType: "json",
             success: function(resp) {
-              $('#shortLink').removeClass('invisible');
+              $('#shortLink').removeClass('d-none');
               $('#shortLink').text(`${resp.short_url}`);
-              $('#copyButton').removeClass('invisible');
+              $('#copyButton').removeClass('d-none');
             }
         });
 

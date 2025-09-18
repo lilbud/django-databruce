@@ -1,0 +1,12 @@
+{% autoescape on %}
+    {% for item in album_list %}
+        {% if item.grouper == album.category %}
+            {% for song in item.list %}
+                <div>
+                    {{ song.song.name }}
+                    {% if song.song.original_artist != "Bruce Springsteen" %}[{{ song.song.original_artist }}]{% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endautoescape %}

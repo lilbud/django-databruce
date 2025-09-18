@@ -16,11 +16,6 @@ table.dataTable thead .dt-column-order::after {
     content: "\F128" !important;
 }
 
-.dt-column-title,
-.dt-column-order {
-    color: var(--bs-light) !important;
-}
-
 .dt-orderable-asc span.dt-column-order:before,
 .dt-orderable-asc span.dt-column-order:after,
 .dt-orderable-desc span.dt-column-order:before,
@@ -33,9 +28,37 @@ table.dataTable thead .dt-column-order::after {
     opacity: 1 !important;
 }
 
-.dt-container label,
-.dt-info {
-    font-size: .85rem;
+th.text-center > div.dt-column-header {
+    text-align: center !important;
+}
+
+/* disables hovering on set divider rows */
+table.table.dataTable.table-hover > tbody > tr > td.setHeader:hover {
+	box-shadow: none !important;
+}
+
+.setHeader {
+    background-color: var(--background-500) !important;
+    font-size: 0.85rem !important;
+}
+
+/* table.dataTable>thead>tr>th,
+table.dataTable>tbody>tr>td {
+    padding-top: 0.125rem !important;
+    padding-bottom: 0.125rem !important;
+} */
+
+[data-bs-theme="dark"] table a {
+    color: var(--text-50) !important;
+}
+
+[data-bs-theme="light"] table a {
+    color: var(--text-900) !important;
+}
+
+table.dataTable>thead>tr>th,
+.setHeader {
+    color: var(--text-50) !important;
 }
 
 @media only screen and (max-width: 768px) {
@@ -51,12 +74,6 @@ table.dataTable thead .dt-column-order::after {
 .dt-layout-full {
     padding-left: 0 !important;
     padding-right: 0 !important;
-}
-
-.dt-buttons>button {
-    margin-bottom: 0px !important;
-    background-color: var(--sky-700) !important;
-    border: 1px solid var(--bs-border-color) !important;
 }
 
 .index .dt-layout-table {
@@ -88,32 +105,91 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     margin-top: 0 !important;
 }
 
-.dt-datetime-calendar > table {
-    table-layout: fixed;
-}
-
-.dt-datetime-calendar > table > tbody > tr > td,
-.dt-datetime-calendar > table > thead > tr > th
-{
-    padding: 0% !important;
-}
-
-div.dt-datetime {
-    top: 57.6px !important;
-    left: 1562.33px !important;
-}
-
 table.dataTable div.dt-column-header {
     flex-direction: row !important;
 }
 
-table.dataTable thead th,
-.dt-type-date {
-    text-align: left !important;
-}
-
 div.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
     width: 700px !important;
-    left: calc(100vw - 60vw) !important;
-    top: 2vh !important;
+    right: 3vw !important;
+    z-index: 9999;
+    position: fixed;
+}
+
+table {
+    border-collapse: collapse !important;
+}
+
+/* hides double header on some datatables */
+div.dt-scroll-body thead tr th
+{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+} 
+
+table.dataTable>tbody>tr>td:first-child {
+    font-weight: 600 !important;
+}
+
+.position[class~="opener"][class~="closer"] {
+	color: var(--text-50) !important;
+}
+
+.showopener,
+.set2opener {
+    background-color: var(--secondary-700) !important;
+}
+
+.mainsetcloser,
+.set1closer {
+    background-color: var(--secondary-800) !important;
+}
+
+.encoreopener {
+    background-color: var(--accent-500) !important;
+}
+
+.showcloser {
+    background-color: var(--accent-600) !important;
+}
+
+table.dataTable > tbody > tr.child ul.dtr-details > li {
+    padding-bottom: 0.25rem !important;
+}
+
+table.dataTable > tbody > tr.child ul.dtr-details > li > span {
+    font-weight: normal !important;
+}
+
+table {
+    width: 100% !important;
+}
+
+table tbody tr {
+    font-size: 0.8rem !important;
+    line-height: 1.2rem !important;
+}
+
+table tbody tr td,
+table thead tr th {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+td a[href~="song"] {
+	text-wrap: nowrap !important;
+}
+
+.dt-column-title {
+    font-size: 0.875rem !important;
+}
+
+table th {
+    background-color: var(--background-600) !important;
+}
+
+.mt-0\.5 {
+    padding-top: 0.125rem !important
 }

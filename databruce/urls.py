@@ -163,7 +163,11 @@ urlpatterns = [
     path("tours/legs/<int:id>", views.TourLegDetail.as_view(), name="leg_details"),
     path("releases/nugs", views.NugsRelease.as_view(), name="nugs"),
     path("releases/bootleg", views.Bootleg.as_view(), name="bootlegs"),
-    path("accounts/profile/add-show/", views.UserAddShow.as_view(), name="add_show"),
+    path(
+        "accounts/profile/add-show/",
+        views.UserAddRemoveShow.as_view(),
+        name="add_show",
+    ),
     path(
         "accounts/profile/remove-show/",
         views.UserRemoveShow.as_view(),

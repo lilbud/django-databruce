@@ -138,11 +138,11 @@
                     {% for song in user_seen %}
                       <tr>
                         <td>
-                          <a href="{% url "song_details" id=song.songid %}">{{ song.name }}</a>
+                          <a href="{% url "song_details" id=song.song %}">{{ song.name }}</a>
                         </td>
                         <td class="text-center">{{ song.count }}</td>
                         <td class="text-center">
-                          <a href="{% url "event_details" id=song.first %}">{{ song.firstdate|get_date:song.first }}</a>
+                          <a href="{% url "event_details" id=song.first %}">{{ song.first|get_date }}</a>
                         </td>
                       </tr>
                     {% endfor %}

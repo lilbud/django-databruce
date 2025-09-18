@@ -27,7 +27,7 @@ class SetlistInline(admin.TabularInline):
         "song_num",
         "song",
         "segue",
-        "song_note",
+        "note",
         "premiere",
         "debut",
         "sign_request",
@@ -246,6 +246,8 @@ class VenueAdmin(admin.ModelAdmin):
         "state__name",
         "country__name",
     ]
+
+    autocomplete_fields = ["city", "state"]
 
     list_display_links = [
         "id",

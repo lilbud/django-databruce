@@ -93,7 +93,7 @@
                             <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-wrap">{{ event.note|default_if_none:"" }}</td>
+                        <td class="text-wrap">{{ event.title|default_if_none:""|safe }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -101,38 +101,7 @@
               </div>
             </div>
             <div id="songs" class="tab-pane fade">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="songTable">
-                  <thead>
-                    <tr>
-                      <th class="text-wrap all">Song</th>
-                      <th class="text-center all">Plays</th>
-                      <th class="text-center all">Show Opener</th>
-                      <th class="text-center all">Set 1 Closer</th>
-                      <th class="text-center all">Set 2 Opener</th>
-                      <th class="text-center all">Main Set Closer</th>
-                      <th class="text-center all">Encore Opener</th>
-                      <th class="text-center all">Show Closer</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for song in songs %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "song_details" id=song.song_id %}">{{ song.name }}</a>
-                        </td>
-                        <td class="text-center">{{ song.plays }}</td>
-                        <td class="text-center">{{ song.show_opener }}</td>
-                        <td class="text-center">{{ song.set_1_closer }}</td>
-                        <td class="text-center">{{ song.set_2_opener }}</td>
-                        <td class="text-center">{{ song.main_set_closer }}</td>
-                        <td class="text-center">{{ song.encore_opener }}</td>
-                        <td class="text-center">{{ song.show_closer }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+              {% include "databruce/partials/song_position_table.html" with songs=songs %}
             </div>
           </div>
         </div>
