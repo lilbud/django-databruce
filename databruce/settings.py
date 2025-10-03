@@ -164,5 +164,5 @@ REST_FRAMEWORK = {
 
 try:
     from .local_settings import *  # noqa: F403
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     from .prod_settings import *  # noqa: F403
