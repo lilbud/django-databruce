@@ -158,4 +158,4 @@ cython_debug/
 .cursorindexingignore
 
 notes/
-static/
+# static/
