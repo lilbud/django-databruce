@@ -11,3 +11,4 @@ django-link-shortener
 django-browser-reload
 django-ratelimit
 markdown-it-py
+django-crispy-forms
