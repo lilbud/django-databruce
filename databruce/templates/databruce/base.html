@@ -142,8 +142,10 @@
             </li>
           </ul>
         {% else %}
-          <li class="nav-item mx-lg-3">
-            <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+          <li class="nav-item mx-lg-3 ms-auto d-inline d-xl-none mb-0">
+            <button class="btn btn-sm btn-link"
+                    role="button"
+                    href="{% url 'login' %}?next={{ request.path }}">Login</button>
           </li>
         {% endif %}
         <div class="navbar-collapse collapse" id="navbarSupportedContent">
@@ -327,8 +329,11 @@
                 </ul>
               </li>
             {% else %}
-              <li class="nav-item mx-lg-3">
-                <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+              <li class="nav-item mx-lg-3 ms-auto d-none d-xl-inline mb-0">
+                <a class="btn btn-sm btn-link"
+                   role="button"
+                   type="button"
+                   href="{% url 'login' %}?next={{ request.path }}">Login</a>
               </li>
             {% endif %}
             <li class="nav-item dropdown">

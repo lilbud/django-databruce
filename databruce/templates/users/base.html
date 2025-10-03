@@ -22,16 +22,19 @@
     <!--Static-->
     {% load static %}
     <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
+    <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
   </head>
   <body>
     {% load i18n %}
     <div class="row mb-4">
       <div class="col">
         <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
-          <div class="container-fluid p-3">
-            <a class="navbar-brand pt-0" href="{% url 'index' %}">
+          <div class="container-fluid p-2 bd-gutter flex-wrap flex-xl-nowrap">
+            <a class="p-0 mx-0 mx-lg-3 d-none d-xl-block" href="{% url 'index' %}">
               <img height="16px"
+                   class="my-1"
                    width="auto"
+                   id="logo"
                    src="{% static 'databruce/img/logo.svg' %}"
                    alt="">
             </a>
