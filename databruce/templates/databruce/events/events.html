@@ -3,26 +3,24 @@
   Events
 {% endblock title %}
 {% block content %}
-  <div class="row mb-4">
-    <div class="col">
-      <h4>Events</h4>
-      <div class="col-3 col-md-1" id="year-select">
-        <button class="btn dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">{{ year }}</button>
-        <ul class="dropdown-menu">
-          {% for i in years %}
-            <li>
-              <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
-            </li>
-          {% endfor %}
-        </ul>
+  <div class="row justify-content-center">
+    <div class="col-12 col-xl-8">
+      <div class="d-flex justify-content-between mb-3">
+        <div class="text-2xl">Events</div>
+        <div class="float-end" id="year-select">
+          <button class="btn btn-primary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">{{ year }}</button>
+          <ul class="dropdown-menu">
+            {% for i in years %}
+              <li>
+                <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col-12">
       <div class="card">
         <div class="card-body px-0">
           <div class="table-responsive">
@@ -30,6 +28,14 @@
               <thead>
                 <tr class="custom">
                   <th class="all" scope="col">Date</th>
+                  <th class="min-tablet-l icon text-center align-middle" scope="col">
+                    <i class="bi bi-file-earmark-check"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="Has Setlist">
+                      <div class="d-none">Setlist</div>
+                    </i>
+                  </th>
                   <th class="min-tablet-l" scope="col">Band</th>
                   <th class="min-tablet-l" scope="col">Venue</th>
                   <th class="min-tablet-l" scope="col">Location</th>
@@ -41,22 +47,28 @@
               <tbody>
                 {% for event in event_info %}
                   <tr>
-                    <td scope="row" class="text-nowrap">
-                      <a href="{% url "event_details" id=event.id %}">
-                        {{ event }}
-                        {% if event.setlist_certainty == "Confirmed" %}
-                          <i class="bi bi-file-earmark-check"
-                             data-bs-toggle="tooltip"
-                             data-bs-placement="top"
-                             data-bs-title="Has Setlist"></i>
-                        {% endif %}
-                      </a>
+                    <td scope="row"
+                        class="text-nowrap"
+                        data-sort="{{ event.get_date }}"
+                        data-filter="{{ event.get_date }}">
+                      <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                    </td>
+                    <td class="icon text-center align-middle">
+                      {% if event.setlist_certainty == "Confirmed" %}
+                        <i class="bi bi-file-earmark-check"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           data-bs-title="Has Setlist"></i>
+                        <div class="d-none">True</div>
+                      {% else %}
+                        <div class="d-none">False</div>
+                      {% endif %}
                     </td>
                     <td class="text-nowrap">
                       <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
                     </td>
                     <td class="text-nowrap">
-                      <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                      <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
                     </td>
                     <td class="text-nowrap">
                       {% if event.venue.city %}
@@ -66,7 +78,7 @@
                     <td class="text-nowrap">
                       <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
                     </td>
-                    <td class="text-wrap">{{ event.title|default_if_none:""|safe }}</td>
+                    <td class="text-nowrap">{{ event.title|default_if_none:""|safe }}</td>
                     <td>{{ event.public|default_if_none:"" }}</td>
                   </tr>
                 {% endfor %}
@@ -78,46 +90,19 @@
     </div>
   </div>
   <script>
-  //searchBuilder custom columns
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
-
   $(document).ready(function () {
     new DataTable('#eventTable', {
-      layout: layout,
-      order: [[0, 'asc']],
+      layout: getDatatableLayout([1,2,3,4]),
       columnDefs: [
-        { target: -1, visible: false },
-        { targets: [0, 1], width: "10%" },
-        { targets: [2, 3], width: "15%" },
-        { targets: [4], width: "20%" },
+        { targets: [1], orderable: false },
+        { targets: [0], type: 'date' },
+        { targets: [-1], visible: false },
       ],
       initComplete: function () {
         this.api()
           .columns([-1])
           .every(function () {
-              var column = this;
-
-              $('<label for="select" class="me-2">Publicity:</label><div class="btn-group" id="select"></div>').appendTo($('#dropdown-container'));
-
-              var select = $('<button class="btn btn-secondary btn-sm mb-1 mr-2 dropdown-toggle" id="publicity-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">All</button>').appendTo($('#select'))
-              var options = $('<div class="dropdown-menu" id="publicity-select"><a class="dropdown-item dt-button" href="#" value=".*"><span>All</span></a></li><a class="dropdown-item dt-button" href="#" value="True"><span>Public</span></a></li><a class="dropdown-item dt-button" href="#" value="False"><span>Private</span></a></li> </div>').appendTo($('#select'))
-              
-              $('#publicity-select .dropdown-item.dt-button').on('click', function() {
-
-                // removes active check from all buttons
-                $('#publicity-select .dropdown-item.dt-button').each(function() {
-                  $('.check').remove();
-                });
-
-                // gets value attribute and searches last column
-                column.search($(this).attr('value'), {regex: true}).draw();
-
-                // sets button text to selected
-                $('#publicity-select-btn').text($(this).find('span').html());
-
-                // adds check to actively filtered value
-                $(this).append('<div class="float-end check">✓</div>');
-              })
+            categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
           });
       },
     });

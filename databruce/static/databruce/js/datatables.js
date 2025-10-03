@@ -3,33 +3,22 @@ var layout = {
     features: [
       { div: { id: "dropdown-container", className: "mr-6 d-none d-lg-inline" } },
       {
-        search: true,
-        buttons: [{
-          extend: 'searchBuilder',
-          action: function (e, dt, node, config) {
-            this.popover(config._searchBuilder.getNode(), {
-              collectionLayout: 'sbpopover'
-            })
-          },
-          className: "btn-sm bi bi-search mb-1 mr-2 d-none d-lg-inline search",
-          config: {
-            depthLimit: 2,
-          }
-        }],
-      }]
+        search: true
+      },
+    ],
   },
   topStart: {
     buttons: [
       {
         extend: 'pageLength',
-        className: 'btn-sm mb-1 mr-2',
+        className: 'btn btn-sm mb-1 mr-2 btn-primary ',
       },
       {
         extend: 'colvis',
-        columns: 'th:nth-child(n+2)',
-        className: 'btn-sm mb-1 mr-2',
-      }
-    ]
+        columns: 'th:nth-child(n+2)', //starts at second column
+        className: 'btn btn-sm mb-1 mr-2 btn-primary ',
+      },
+    ],
   },
   bottomEnd: {
     paging: {
@@ -37,6 +26,12 @@ var layout = {
     }
   }
 };
+
+DataTable.type('num', 'className', 'dt-center');
+DataTable.type('num-fmt', 'className', 'dt-center');
+DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
+DateTime.defaults.maxDate = new Date();
+DataTable.datetime('YYYYMMDD');
 
 $.extend(true, DataTable.defaults, {
   searching: true,
@@ -47,7 +42,10 @@ $.extend(true, DataTable.defaults, {
     }
   },
   info: true,
-  pageLength: 25,
+  scrollX: true,
+  // scrollY: '50vh',
+  // scrollCollapse: true,
+  pageLength: 50,
   lengthMenu: [25, 50, 100],
   language: {
     searchBuilder: {
@@ -67,4 +65,28 @@ $(document).ready(function () {
       .columns.adjust()
       .responsive.recalc();
   });
-})
+});
+
+function getDatatableLayout(columns) {
+  if (columns) {
+    layout.topEnd.features[1]['buttons'] = [];
+
+    var searchbuilder = {
+      extend: 'searchBuilder',
+      action: function (e, dt, node, config) {
+        this.popover(config._searchBuilder.getNode(), {
+          collectionLayout: 'sbpopover'
+        })
+      },
+      className: "btn-sm btn-primary bi bi-search mb-1 mr-2 d-none d-lg-inline search",
+      config: {
+        depthLimit: 2,
+        columns: columns,
+      },
+    };
+
+    layout.topEnd.features[1].buttons[0] = searchbuilder;
+  };
+
+  return layout;
+};

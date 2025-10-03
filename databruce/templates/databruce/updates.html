@@ -1,5 +1,4 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
   Updates
 {% endblock title %}
@@ -7,14 +6,14 @@
   <div class="row justify-content-center">
     <div class="col-10 col-md-6">
       <div class="row mb-2">
-        <h4>
+        <div class="text-2xl">
           <a href="{% url 'index' %}">Databruce</a> &gt; Updates
-        </h4>
+        </div>
       </div>
       <div class="row mb-2">
-        <h6>
+        <div class="text-base">
           This is a running list of new additions to the database. To keep things simple, I've limited it to the last 1000 additions.
-        </h6>
+        </div>
       </div>
       <div class="row mb-3">
         <div class="table-responsive">
@@ -45,12 +44,9 @@
     </div>
   </div>
   <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop()
-
     $(document).ready(function () {
       new DataTable('#updateTable', {
-        layout: layout,
+        layout: getDatatableLayout(),
         order: [[0, 'desc']],
       });
     });

@@ -1,0 +1,345 @@
+/* @import './colors.css'; */
+/* @import './new.css'; */
+@import './select2.css';
+@import './datatables.css';
+
+:root {
+    --font-heading: "Cabin", sans-serif;
+    --font-body: "IBM Plex Sans Hebrew", sans-serif;
+}
+
+#logo {
+    filter: invert(100%);
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--primary-950) !important;
+}
+
+.bg-800 {
+    background-color: var(--background-800);
+}
+
+.btn-primary {
+    background-color: var(--primary-700) !important;
+}
+
+.nav-pills .nav-link:not(.active),
+.nav-pills button.active,
+.btn, .btn-primary {
+    border: 1px solid var(--primary-700) !important;
+}
+
+.nav-pills button.active,
+.nav-pills .nav-link.active {
+    color: var(--background-950) !important;
+    background-color: var(--primary-600) !important;
+}
+
+.nav-pills .nav-link:not(.active),
+.nav-pills button:not(.active) {
+    color: var(--text-50) !important;
+}
+
+.card-header,
+.card-footer,
+.card-body,
+li.list-group-item,
+table>tbody>tr>td,
+.form-control,
+.form-select {
+    background-color: var(--primary-950) !important;
+}
+
+tr>td>a {
+    color: var(--primary-500) !important;
+}
+
+#notes-card .card-body p:last-child {
+    margin-bottom: 0px !important;
+}
+
+#stats .row .card .card-body {
+    background-color: var(--primary-800) !important;
+}
+
+.nav-link,
+#myTab .nav-link:not(.active),
+.setHeader,
+.nav-pills button.active {
+    color: var(--text-50) !important;
+}
+
+.sky-500,
+.page-item:not(.active)>.page-link,
+#song-info a,
+#about a {
+    color: var(--primary-500) !important;
+}
+
+.nav-pills button:not(.active) {
+    background-color: none !important;
+    border: 1px solid var(--primary-500) !important;
+}
+
+.active>.page-link {
+    border-color: var(--primary-700);
+}
+
+.sky-700,
+.progress-bar,
+.navbar,
+table th,
+div.ui-menu-item-wrapper:hover,
+.btn-primary,
+.dropdown-item.active,
+.active > .page-link,
+.badge-row .badge {
+    background-color: var(--primary-700) !important;
+}
+
+.setHeader {
+    background-color: var(--primary-800) !important;
+}
+
+.position-showopener,
+.position-set2opener {
+    background-color: var(--secondary-700) !important;
+}
+
+.position-mainsetcloser,
+.position-set1closer {
+    background-color: var(--secondary-800) !important;
+}
+
+.position-encoreopener {
+    background-color: var(--accent-600) !important;
+}
+
+.position-showcloser {
+    background-color: var(--accent-700) !important;
+}
+
+.nav-link.active {
+    font-family: var(--font-body);
+    font-weight: 700;
+}
+
+.dt-column-title,
+.card-header {
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+/* disables hovering on set divider rows */
+table.table.dataTable.table-hover > tbody > tr > td.setHeader:hover {
+	box-shadow: none !important;
+}
+
+.table-hover > tbody > tr > td.setHeader:hover {
+	--bs-table-color-state: none !important;
+	--bs-table-bg-state: none !important;
+}
+
+.sky-600 {
+    color: var(--primary-600) !important;
+}
+
+div.ui-menu-item-wrapper {
+    background-color: var(--bs-body-bg) !important;
+    border: 0px solid var(--bs-border-color) !important;
+}
+
+div.ui-menu-item-wrapper:hover {
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+.list-group-item,
+.collapse {
+    border-radius: inherit !important;
+}
+
+.card .setlist tbody tr:last-child>td {
+    border-bottom: 0px !important;
+}
+
+.card.event-info .card-body,
+.card.event-info button,
+div.card-body {
+    font-size: .875rem !important;
+}
+
+div.card-body ul {
+    margin-bottom: 0.5rem !important;
+}
+
+div.card-body ul:last-child {
+    margin-bottom: 0 !important;
+}
+
+.list-group-flush>.list-group-item:last-child {
+    border-bottom-width: 0;
+    border-radius: inherit !important;
+}
+
+table.dataTable>thead>tr>th {
+    padding-top: .3rem !important;
+    padding-bottom: .3rem !important;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.setHeader {
+    padding-top: .075rem !important;
+    padding-bottom: .075rem !important;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+table.dataTable>thead>tr>th {
+    border-radius: 0% !important;
+}
+
+table.dataTable>tbody>tr>td {
+    font-size: 0.8rem !important;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+    vertical-align: middle;
+}
+
+/* this fixes the card body overlapping the rounded corner. Took me far too long to figure out */
+.card {
+    overflow: clip;
+}
+
+
+#search-form {
+    overflow-x: clip;
+}
+
+th.text-center>div.dt-column-header {
+    text-align: center !important;
+}
+
+a:link,
+.btn.btn-link {
+    text-decoration: none !important;
+}
+
+a:hover,
+.btn.btn-link:hover {
+    text-decoration: underline !important;
+}
+
+.tooltip {
+    font-size: 0.8rem !important;
+}
+
+
+
+.invisible {
+    display: none !important;
+}
+
+#info-box.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+tr > td:first-child:not(.songnum),
+tr > th:first-child {
+    padding-left: 1rem !important;
+}
+
+tr > td:last-child,
+tr > th:last-child {
+    padding-right: 1rem !important;
+}
+
+#headimg {
+    width: 100%;
+    object-fit: cover;
+    border-radius: inherit !important;
+}
+
+.text-sm-right,
+blockquote>p {
+    text-align: right !important;
+}
+
+.setname {
+    display: none !important;
+}
+
+.progress {
+    position: relative;
+    height: 16px;
+    padding: 0;
+}
+
+.progress>.song-count {
+    position: absolute;
+    font-size: 0.75rem;
+    vertical-align: middle;
+    right: 0px;
+    cursor: help;
+}
+
+#yearstats #statChart {
+    aspect-ratio: 2;
+}
+
+div#quote {
+    margin: 10px auto;
+    padding: 10px;
+}
+
+blockquote p::before {
+    content: "\201C";
+}
+
+div.dt-scroll-body {
+	thead,
+	tfoot {
+		tr {
+			height: 0;
+			th, td {
+				height: 0 !important;
+				padding-top: 0px !important;
+				padding-bottom: 0px !important;
+				border-top-width: 0px !important;
+				border-bottom-width: 0px !important;
+
+				div.dt-scroll-sizing {
+					height: 0 !important;
+					overflow: hidden !important;
+				}
+			}
+		}
+	}
+}
+
+div.dtcc-dropdown div.dtcc-search > div select, div.dtcc-dropdown div.dtcc-search > div input {
+    color: black !important;
+}
+
+#statChart {
+    position: relative;
+}
+
+blockquote p::after {
+    content: "\201D";
+}
+
+li.nav-item {
+    list-style: none !important;
+}
+
+.mr-auto {
+    margin-right: auto !important;
+}
+
+.ml-auto {
+    margin-left: auto !important;
+}

@@ -1,49 +1,25 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
     Lyrics for "{{ song_info.name }}"
 {% endblock title %}
 {% block content %}
-    <div class="row mb-2">
-        <div class="col">
-            <h4>
-                <a href="{% url 'songs' %}">Songs</a> &gt;
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="text-2xl">
                 <a href="{% url "song_details" id=song_info.id %}">{{ song_info.name }}</a>
-                &gt; Lyrics &gt; {{ lyrics.version }} ({{ lyrics.language }})
-            </h4>
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">Info</div>
-                <div class="card-body">
-                    <div class="d-flex flex-row fs-6">
-                        <div class="pe-2 fw-semibold">Version:</div>
-                        <div>{{ lyrics.version }}</div>
-                    </div>
-                    <div class="d-flex flex-row fs-6">
-                        <div class="pe-2 fw-semibold">Source:</div>
-                        <div>{{ lyrics.source }}</div>
-                    </div>
-                    <div class="d-flex flex-row fs-6">
-                        <div class="pe-2 fw-semibold">Language:</div>
-                        <div>{{ lyrics.language }}</div>
-                    </div>
-                    <div class="d-flex flex-row fs-6">
-                        <div class="pe-2 fw-semibold">Notes:</div>
-                        <div>{{ lyrics.note|default_if_none:"" }}</div>
-                    </div>
-                </div>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">Text</div>
-                <div class="card-body">{{ lyrics.text|linebreaks }}</div>
+            <div class="text-base">
+                <div class="fw-semibold">Source:</div>
+                {{ lyrics.source }}
+                <div class="fw-semibold mt-2">Language:</div>
+                {{ lyrics.language }}
+                {% if lyrics.note %}
+                    <div class="fw-semibold mt-2">Notes:</div>
+                    {{ lyrics.note }}
+                {% endif %}
             </div>
+            <hr>
+            <div class="text-sm">{{ lyrics.text|linebreaks }}</div>
         </div>
     </div>
 {% endblock content %}

@@ -19,6 +19,7 @@ date = datetime.datetime.today()
 app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
+    path("__reload__/", include("django_browser_reload.urls")),
     path("about/", views.About.as_view(), name="about"),
     path("roadmap/", views.Roadmap.as_view(), name="roadmap"),
     path("links/", views.Links.as_view(), name="links"),
@@ -29,41 +30,41 @@ urlpatterns = [
     # path("test/", views.Test.as_view(), name="test"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
-        "accounts/login/",
+        "login/",
         auth_views.LoginView.as_view(template_name="users/login.html"),
         name="login",
     ),
     path(
-        "accounts/profile/<str:username>",
+        "profile/<str:username>",
         views.UserProfile.as_view(),
         name="profile",
     ),
     path(
-        "accounts/settings/",
+        "settings/",
         views.UserSettings.as_view(),
         name="settings",
     ),
     path(
-        "accounts/logout/",
+        "logout/",
         auth_views.LogoutView.as_view(template_name="users/logout.html"),
         name="logout",
     ),
     path(
-        "accounts/password_change/",
+        "password_change/",
         auth_views.PasswordChangeView.as_view(
             template_name="users/change_password.html",
         ),
         name="password_change",
     ),
     path(
-        "accounts/password_change/done/",
+        "password_change/done/",
         auth_views.PasswordChangeDoneView.as_view(
             template_name="users/change_password_done.html",
         ),
         name="password_change_done",
     ),
     path(
-        "accounts/password_reset/",
+        "password_reset/",
         auth_views.PasswordResetView.as_view(
             template_name="users/reset_password.html",
             success_url=reverse_lazy("password_reset_done"),
@@ -73,14 +74,14 @@ urlpatterns = [
         name="password_reset",
     ),
     path(
-        "accounts/password_reset/done/",
+        "password_reset/done/",
         auth_views.PasswordResetDoneView.as_view(
             template_name="users/reset_password_done.html",
         ),
         name="password_reset_done",
     ),
     path(
-        "accounts/reset/<uidb64>/<token>/",
+        "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
             template_name="users/reset_password_confirm.html",
             success_url=reverse_lazy("login"),
@@ -88,19 +89,19 @@ urlpatterns = [
         name="password_reset_confirm",
     ),
     path(
-        "accounts/reset/done/",
+        "reset/done/",
         auth_views.PasswordResetCompleteView.as_view(
             template_name="users/reset_password_done.html",
         ),
         name="password_reset_complete",
     ),
     path(
-        "accounts/create/",
+        "signup/",
         views.SignUp.as_view(),
         name="signup",
     ),
     path(
-        "accounts/create/<uidb64>/<token>/",
+        "signup/<uidb64>/<token>/",
         views.SignUpConfirm.as_view(),
         name="signup_confirm",
     ),

@@ -3,8 +3,8 @@
   States
 {% endblock title %}
 {% block info_row %}
-  <h4>States</h4>
-  <h6>States that Bruce has played in</h6>
+  <div class="text-2xl">States</div>
+  <div class="text-base">States that Bruce has played in</div>
 {% endblock info_row %}
 {% block table_id %}
   stateTable
@@ -12,50 +12,46 @@
 {% block table %}
   <thead>
     <tr>
+      <th class="text-center" scope="col">#</th>
       <th scope="col">Name</th>
       <th scope="col">Country</th>
       <th scope="col">First</th>
       <th scope="col">Last</th>
-      <th class="text-center" scope="col">Events</th>
     </tr>
   </thead>
   <tbody>
     {% for state in states %}
       <tr>
+        <td class="text-center">{{ state.num_events }}</td>
         <td>
-          <a href="{% url "state_details" id=state.id %}">{{ state.name }} ({{ state.abbrev|default_if_none:"" }})</a>
+          <a href="{% url "state_details" id=state.id %}">{{ state.name }}</a>
         </td>
         <td>
           {% if state.country %}
             <a href="{% url "country_details" id=state.country.id %}">{{ state.country }}</a>
           {% endif %}
         </td>
-        <td {% with first=state.first %}
-            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=state.first.id %}">{{ state.first }}</a>
+        <td data-sort="{{ state.first.get_date }}"
+            data-filter="{{ state.first.get_date }}">
+          <a href="{% url "event_details" id=state.first.id %}">{{ state.first.get_date }}</a>
         </td>
-        <td {% with last=state.last %}
-            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=state.last.id %}">{{ state.last }}</a>
+        <td data-sort="{{ state.last.get_date }}"
+            data-filter="{{ state.last.get_date }}">
+          <a href="{% url "event_details" id=state.last.id %}">{{ state.last.get_date }}</a>
         </td>
-        <td class="text-center">{{ state.num_events }}</td>
       </tr>
     {% endfor %}
   </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
-    // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3,4];
-
     $(document).ready(function () {
       new DataTable('#stateTable', {
-        layout: layout,
-        columnDefs: [{ type: 'date', targets: [2,3] }]
+        layout: getDatatableLayout(),
+        columnDefs: [
+          { targets: [0], width: '1rem' },
+          { targets: [3,4], type: 'date' },
+        ],
       });
     })
   </script>

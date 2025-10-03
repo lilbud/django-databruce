@@ -1,5 +1,4 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
   {{ song_info.name }}
 {% endblock title %}
@@ -10,11 +9,11 @@
 {% endblock extrajs %}
 {% block content %}
   <div class="row mb-2" id="song-info">
-    <h3 class="text-nowrap">{{ song_info.name }}</h3>
+    <div class="text-2xl text-nowrap">{{ song_info.name }}</div>
   </div>
   <div class="row mb-2">
     <div class="col">
-      <h5>
+      <div class="text-xl">
         {% if song_info.album %}
           <div class="mb-3">
             <div class="fw-semibold">Album</div>
@@ -27,25 +26,37 @@
           <div class="fw-semibold">Original Artist</div>
           <div>{{ song_info.original_artist }}</div>
         </div>
-      </h5>
+      </div>
     </div>
   </div>
   <div class="row mb-2">
     <div class="col">
       <ul class="nav nav-pills items-end" role="tablist">
-        <button class="nav-link text-center me-1 mb-2 active"
-                data-bs-toggle="pill"
-                data-bs-target="#stats"
-                aria-controls="pills-stats">Summary</button>
-        <button class="nav-link text-center mx-1 mb-2"
+        <button class="nav-link text-center mb-2 active"
                 data-bs-toggle="pill"
                 data-bs-target="#events"
                 aria-controls="pills-events">Performances</button>
-        <button class="nav-link text-center mx-1 mb-2"
+        {% if snippets %}
+          <button class="nav-link text-center mb-2"
+                  data-bs-toggle="pill"
+                  data-bs-target="#snippets"
+                  aria-controls="pills-snippets">Snippets</button>
+        {% endif %}
+        <button class="nav-link text-center mb-2"
                 data-bs-toggle="pill"
-                data-bs-target="#snippets"
-                aria-controls="pills-snippets">Snippets</button>
-        <button class="nav-link text-center mx-1 mb-2"
+                data-bs-target="#stats"
+                aria-controls="pills-stats">Stats</button>
+        <button class="nav-link text-center mb-2"
+                data-bs-toggle="pill"
+                data-bs-target="#yearstats"
+                aria-controls="pills-stats">Year by Year</button>
+        {% if lyrics %}
+          <button class="nav-link text-center mb-2"
+                  data-bs-toggle="pill"
+                  data-bs-target="#lyrics"
+                  aria-controls="pills-stats">Lyrics</button>
+        {% endif %}
+        <button class="nav-link text-center mb-2"
                 data-bs-toggle="pill"
                 data-bs-target="#links"
                 aria-controls="pills-links">Links</button>
@@ -53,69 +64,69 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="col {% if lyrics %}col-lg-6 col-xl-9 pe-lg-3{% endif %}">
+    <div class="col">
       <div class="tab-content">
-        <div id="stats" class="tab-pane fade show active">
+        <div id="stats" class="tab-pane fade">
           <div class="card mb-3">
             <div class="card-header">Song Stats</div>
             <div class="card-body">
               <div class="row mb-3">
                 <div class="col">
-                  <h5>Performance Stats</h5>
+                  <div class="text-lg pb-2">Performance Stats</div>
                   <div class="row row-cols-1 row-cols-lg-4 g-2">
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class=" text-nowrap">
+                          <div class="text-sm text-nowrap">
                             Public
                             <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
-                          </h6>
-                          <h5>{{ public_count }}</h5>
+                          </div>
+                          <div class="text-xl">{{ public_count }}</div>
                         </div>
                       </div>
                     </div>
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class=" text-nowrap">
+                          <div class="text-sm text-nowrap">
                             Private
                             <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
-                          </h6>
-                          <h5>{{ private_count }}</h5>
+                          </div>
+                          <div class="text-xl">{{ private_count }}</div>
                         </div>
                       </div>
                     </div>
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class=" text-nowrap">
+                          <div class="text-sm text-nowrap">
                             Snippet
                             <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="Number of times a song was included as part of another."></i>
-                          </h6>
-                          <h5>{{ snippets.count }}</h5>
+                          </div>
+                          <div class="text-xl">{{ snippets.count }}</div>
                         </div>
                       </div>
                     </div>
                     <div class="col">
                       <div class="card">
                         <div class="card-body">
-                          <h6 class="text-nowrap">
+                          <div class="text-sm text-nowrap">
                             Frequency
                             <i class="bi bi-info-circle-fill"
                                data-bs-toggle="tooltip"
                                data-bs-html="true"
                                data-bs-title="How common a song is. Number of times played divided by number of shows since the debut. Formula from Dripfield.pro."></i>
-                          </h6>
-                          <h5>{{ frequency|default_if_none:"0" }}%</h5>
+                          </div>
+                          <div class="text-xl">{{ frequency|default_if_none:"0" }}%</div>
                         </div>
                       </div>
                     </div>
@@ -125,14 +136,14 @@
               {% if positions %}
                 <div class="row">
                   <div class="col">
-                    <h5>Position Stats</h5>
+                    <div class="text-lg pb-2">Position Stats</div>
                     <div class="row row-cols-1 row-cols-lg-4 g-2">
                       {% for item in positions %}
                         <div class="col">
                           <div class="card">
                             <div class="card-body">
-                              <h6 class=" text-nowrap">{{ item.position }}</h6>
-                              <h5>{{ item.count }}</h5>
+                              <div class="text-sm text-nowrap">{{ item.position }}</div>
+                              <div class="text-xl">{{ item.count }}</div>
                             </div>
                           </div>
                         </div>
@@ -143,18 +154,8 @@
               {% endif %}
             </div>
           </div>
-          <div class="card mb-3">
-            <div class="card-header">Year Stats</div>
-            <div class="card-body">
-              <div id="wrapper" class="p-0">
-                <div id="statChart">
-                  <canvas id="chart"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-        <div id="events" class="tab-pane fade">
+        <div id="events" class="tab-pane fade show active">
           <div class="card mb-3">
             <div class="card-body px-0">
               <div class="table-responsive">
@@ -171,12 +172,15 @@
                       <th class="min-tablet-l" scope="col">Prev</th>
                       <th class="min-tablet-l" scope="col">Next</th>
                       <th class="min-tablet-l text-nowrap" scope="col">Note</th>
+                      <th class="min-tablet-l text-nowrap" scope="col">Public</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for song in songs %}
                       <tr>
-                        <td class="text-nowrap">
+                        <td class="text-nowrap"
+                            data-sort="{{ song.event.get_date }}"
+                            data-filter="{{ song.event.get_date }}">
                           <a href="{% url "event_details" id=song.event.id %}">{{ song.event.get_date }}</a>
                         </td>
                         <td class="text-nowrap">
@@ -204,6 +208,7 @@
                           {% endif %}
                         </td>
                         <td class="text-nowrap">{{ song.note|default_if_none:"" }}</td>
+                        <td class="text-nowrap">{{ song.event.public }}</td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -212,7 +217,7 @@
             </div>
           </div>
         </div>
-        <div id="snippets" class="tab-pane fade px-0">
+        <div id="snippets" class="tab-pane fade">
           <div class="card mb-3">
             <div class="card-header">Snippets</div>
             <div class="card-body px-0">
@@ -271,43 +276,50 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    {% if lyrics %}
-      <div class="col col-lg-6 col-xl-3 ps-lg-0">
-        <div class="card">
-          <div class="card-header">Lyrics</div>
-          <div class="card-body">
-            {% for lyric in lyrics %}
-              {% if lyric.language == 'English' and lyric.version == song_info.category %}{{ lyric.text|linebreaks }}{% endif %}
-            {% endfor %}
-            {% if lyrics.count > 1 %}
-              <h6>Other Versions</h6>
-              <ul>
-                {% for lyric in lyrics %}
-                  {% if lyric.language != 'English' %}
-                    <h6>
-                      <li>
-                        <a class=" " href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.language }}
-                          {% if lyric.note %}[{{ lyric.note }}]{% endif %}
-                        </a>
-                      </li>
-                    </h6>
-                  {% endif %}
-                {% endfor %}
-              </ul>
-            {% endif %}
+        <div id="yearstats" class="tab-pane fade">
+          <div class="card mb-3">
+            <div class="card-header">Year Stats</div>
+            <div class="card-body">
+              <div id="wrapper" class="p-0">
+                <div id="statChart">
+                  <canvas id="chart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="lyrics" class="tab-pane fade">
+          <div class="card">
+            <div class="card-header">Lyrics</div>
+            <div class="card-body text-sm">
+              {% for lyric in lyrics %}
+                {% if lyric.language == 'English' and lyric.version == song_info.category %}{{ lyric.text|linebreaks }}{% endif %}
+              {% endfor %}
+              {% if lyrics.count > 1 %}
+                <div class="text-base">Other Versions</div>
+                <ul>
+                  {% for lyric in lyrics %}
+                    {% if lyric.language != 'English' %}
+                      <div class="text-base">
+                        <li>
+                          <a class=" " href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.language }}
+                            {% if lyric.note %}[{{ lyric.note }}]{% endif %}
+                          </a>
+                        </li>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
-    {% endif %}
+    </div>
   </div>
   <!-- charts.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
   <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 6, 7, 8, 9]
-
     $(document).ready(function () {
         let ctx = document.getElementById("chart").getContext("2d");
         Chart.defaults.color = '#999';
@@ -351,44 +363,20 @@
 
     $(document).ready(function () {
       new DataTable('#songTable', {
-        layout: layout,
-        scrollX: true,
+        layout: getDatatableLayout(),
         pageLength: 50,
+        columnDefs: [{ target: -1, visible: false },{ targets: [0], type: 'date' },],
         initComplete: function () {
           this.api()
-          
-          .columns([6])
+          .columns([-1])
             .every(function () {
-              var column = this;
-
-              $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="publicity">Publicity:</label></div><div class="col" id="publicity-select"></div></div>').appendTo($('#dropdown-container'));
-  
-              // this appears to be the only way to add a select filter
-              // without going through ajax calls. I originally had a pre-made dropdown in
-              // another file and included it like above, however, I had to use an ajax call
-              // otherwise it would appear but not work
-              var select = $('<select id="publicity" class="custom-select form-select form-select-sm"></select>')
-                .appendTo($('#publicity-select'))
-                .on('change', function () {
-                    column
-                      .search($(this).val(), {regex: true})
-                      .draw();
-                });
-              
-              
-              select.append('<option value=".*">All</option>');
-              select.append('<option value="(Soundcheck|Rehearsal|Recording|Interview)">Private</option>');
-              select.append('<option value="^(?!.*(Soundcheck|Rehearsal|Recording|Interview)).*$">Public</option>');
+              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
             });
         },
       });
 
       new DataTable('#snippetTable', {
-        layout: layout,
-      });
-
-      new DataTable('#statsTable', {
-        layout: layout,
+        layout: getDatatableLayout(),
       });
     });
   </script>

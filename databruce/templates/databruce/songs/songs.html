@@ -3,8 +3,8 @@
   Songs
 {% endblock title %}
 {% block info_row %}
-  <h4>Songs</h4>
-  <h6>Songs that Bruce has played live</h6>
+  <div class="text-2xl">Songs</div>
+  <div class="text-base">Songs that Bruce has played live</div>
 {% endblock info_row %}
 {% block table_id %}
   songsTable
@@ -13,6 +13,13 @@
   <thead>
     <tr class="custom">
       <th class="all" scope="col">Name</th>
+      <th class="all" scope="col">
+        <i class="bi bi-file-earmark-check"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"
+           data-bs-title="Has Lyrics"></i>
+        <div class="d-none">Has Lyrics</div>
+      </th>
       <th class="min-tablet-l" scope="col">Original Artist</th>
       <th class="min-tablet-l" scope="col">Category</th>
       <th class="min-tablet-l" scope="col">First</th>
@@ -20,81 +27,64 @@
       <th class="min-tablet-l text-center" scope="col">Public</th>
       <th class="min-tablet-l text-center" scope="col">Private</th>
       <th class="min-tablet-l text-center" scope="col">Snippet</th>
-      <th class="min-tablet-l" scope="col">Original</th>
     </tr>
   </thead>
   <tbody>
     {% for song in songs %}
       <tr>
         <td class="text-nowrap">
-          <a href="{% url 'song_details' id=song.id %}">{{ song.name }}
-            {% if song.lyrics %}
-              <i class="bi bi-file-earmark-check"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Has Lyrics"></i>
-            {% endif %}
-          </a>
+          <a href="{% url 'song_details' id=song.id %}">{{ song.name }}</a>
         </td>
-        <td>{{ song.original_artist }}</td>
-        <td class="text-nowrap">{{ song.category }}</td>
-        <td data-sort="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}"
-            data-filter="{{ song.first.id|slice:"0:4" }}-{{ song.first.id|slice:"4:6" }}-{{ song.first.id|slice:"6:8" }}">
-          {% if song.first %}
-            <a href="{% url "event_details" id=song.first.id %}">{{ song.first }}</a>
+        <td class="icon text-center align-middle">
+          {% if song.lyrics %}
+            <i class="bi bi-file-earmark-check"
+               data-bs-toggle="tooltip"
+               data-bs-placement="top"
+               data-bs-title="Has Lyrics"></i>
+            <div class="d-none">True</div>
+          {% else %}
+            <div class="d-none">False</div>
           {% endif %}
         </td>
-        <td data-sort="{{ song.last.id|slice:"0:4" }}-{{ song.last.id|slice:"4:6" }}-{{ song.last.id|slice:"6:8" }}"
-            data-filter="{{ song.last.id|slice:"0:4" }}-{{ song.last.id|slice:"4:6" }}-{{ song.last.id|slice:"6:8" }}">
+        <td class="text-nowrap">{{ song.original_artist }}</td>
+        <td class="text-wrap">{{ song.category }}</td>
+        <td class="text-nowrap"
+            data-sort="{{ song.first.get_date }}"
+            data-filter="{{ song.first.get_date }}">
+          {% if song.first %}
+            <a href="{% url "event_details" id=song.first.id %}">{{ song.first.get_date }}</a>
+          {% endif %}
+        </td>
+        <td class="text-nowrap"
+            data-sort="{{ song.last.get_date }}"
+            data-filter="{{ song.last.get_date }}">
           {% if song.last %}
-            <a href="{% url "event_details" id=song.last.id %}">{{ song.last }}</a>
+            <a href="{% url "event_details" id=song.last.id %}">{{ song.last.get_date }}</a>
           {% endif %}
         </td>
         <td class="text-center">{{ song.num_plays_public }}</td>
         <td class="text-center">{{ song.num_plays_private }}</td>
         <td class="text-center">{{ song.num_plays_snippet }}</td>
-        <td>{{ song.original }}</td>
       </tr>
     {% endfor %}
   </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
-  // removes searchBuilder button, not needed for this.
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6, 7]
-
   $(document).ready(function () {
     new DataTable('#songsTable', {
-      layout: layout,
-      order: [[0, 'asc']],
+      layout: getDatatableLayout([1, 2, 3, 4, 5, 6, 7, 8]),
       columnDefs: [
-        {
-          target: -1,
-          visible: false
-        },
-        { type: 'text', targets: [3, 4] }
+        { type: 'date', targets: [4, 5] },
+        { targets: [6,7,8], width: "1rem" },
+        { targets: [1], orderable: false },
       ],
       initComplete: function () {
         this.api()
-          .columns([-1])
+          .columns([3])
           .every(function () {
-            var column = this;
-
-            $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="artist">Category:</label></div><div class="col" id="artist-select"></div></div>').appendTo($('#dropdown-container'));
-
-            var select = $('<select id="artist" class="custom-select form-select form-select-sm"></select>')
-              .appendTo($('#artist-select'))
-              .on('change', function () {
-                column
-                  .search($(this).val(), { regex: true })
-                  .draw();
-              });
-
-            select.append('<option value=".*">All</option>');
-            select.append('<option value="True">Originals</option>');
-            select.append('<option value="False">Covers</option>');
+              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Originals', 'value': 'Originals'}, {'label': 'Covers', 'value': 'Covers'}]);
           });
-          //$(this).show();
       },
     });
   });

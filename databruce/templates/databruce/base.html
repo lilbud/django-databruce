@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
   <head>
     {% load static %}
     <meta charset="utf-8" />
@@ -58,18 +58,19 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Cutive&family=IBM+Plex+Sans+Hebrew:wght@100;200;300;400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
           rel="stylesheet">
     <!--Static-->
     <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
     <!--Select2-->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="{% static 'databruce/js/select2-dropdown.js' %}"></script>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
+    <script src="{% static 'databruce/js/category_select.js' %}"></script>
+    <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
     {% block extrastyle %}
     {% endblock extrastyle %}
     {% block extrajs %}
@@ -78,31 +79,80 @@
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-2 bd-gutter flex-wrap flex-xl-nowrap">
-        <a class="p-0 mx-0 mx-lg-3" href="{% url 'index' %}">
+        <a class="p-0 mx-0 mx-lg-3 d-none d-xl-block" href="{% url 'index' %}">
           <img height="16px"
-               class="d-block my-1"
+               class="my-1"
                width="auto"
                id="logo"
                src="{% static 'databruce/img/logo.svg' %}"
                alt="">
         </a>
-        <button class="navbar-toggler"
+        <button class="btn btn-sm d-xl-none d-block dropdown-toggle me-auto py-0"
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent"
                 aria-expanded="false"
                 aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+          <i class="bi bi-list text-xl fw-semibold"></i>
         </button>
+        <a class="d-block d-xl-none" href="{% url 'index' %}">
+          <img height="16px"
+               class="my-1"
+               width="auto"
+               id="logo"
+               src="{% static 'databruce/img/logo.svg' %}"
+               alt="">
+        </a>
+        {% if user.is_authenticated %}
+          <button class="btn btn-sm dropdown-toggle ms-auto d-block d-xl-none mb-0"
+                  role="button"
+                  data-bs-toggle="dropdown">Profile</button>
+          <ul class="dropdown-menu dropdown-menu-end" id="profile">
+            <li>
+              <div class="text-sm px-4 py-1">
+                Hello {{ user }}
+                {% if user.is_superuser %}
+                  (Admin)
+                {% else %}
+                  (User)
+                {% endif %}
+              </div>
+            </li>
+            <li>
+              <a class="dropdown-item"
+                 href="{% url "profile" username=user.username %}">View Profile</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
+            </li>
+            {% if user.is_superuser %}
+              <li>
+                <a class="dropdown-item" href="{% url "admin:index" %}">Admin Portal</a>
+              </li>
+            {% endif %}
+            <li>
+              <a class="dropdown-item" href="{% url "settings" %}">Settings</a>
+            </li>
+            <li>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="dropdown-item" role="button" type="submit" id="button-addon2">Logout</button>
+              </form>
+            </li>
+          </ul>
+        {% else %}
+          <li class="nav-item mx-lg-3">
+            <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+          </li>
+        {% endif %}
         <div class="navbar-collapse collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto">
+          <ul class="navbar-nav me-auto my-3 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-2">
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Events</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Events</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'events' %}">Events By Year</a>
@@ -113,11 +163,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Tours</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Tours</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'tours' %}">Tours</a>
@@ -128,11 +177,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Songs</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Songs</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'songs' %}">Songs</a>
@@ -143,11 +191,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Locations</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Locations</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
@@ -164,11 +211,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Relations and Bands</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Relations and Bands</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'relations' %}">Relations</a>
@@ -179,11 +225,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Releases</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Releases</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'releases' %}">Official Releases</a>
@@ -197,11 +242,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">Search</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Search</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Event Search</a>
@@ -212,11 +256,10 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 role="button"
-                 data-bs-toggle="dropdown"
-                 aria-expanded="false">More</a>
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">More</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'about' %}">About Site</a>
@@ -233,30 +276,35 @@
               </ul>
             </li>
           </ul>
-          <ul class="navbar-nav ms-auto">
-            <form role="search" method="get" action="{% url 'search' %}">
+          <hr class="d-xl-none">
+          <ul class="navbar-nav ms-auto align-middle">
+            <form role="search"
+                  method="get"
+                  action="{% url 'search' %}"
+                  class="d-flex my-xl-auto">
               {{ searchForm.date }}
+              <button type="submit" class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
             </form>
+            <hr class="d-xl-none">
             {% if user.is_authenticated %}
-              <li class="nav-item mx-3 dropdown">
-                <a class="nav-link dropdown-toggle"
-                   href="#"
-                   role="button"
-                   data-bs-toggle="dropdown"
-                   aria-expanded="false">Profile</a>
+              <li class="nav-item mx-xl-2 d-none d-xl-inline my-xl-auto dropdown">
+                <button class="btn btn-sm dropdown-toggle"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">Profile</button>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>
-                    <h6 class="dropdown-header">
+                    <div class="text-sm px-4 py-1">
                       Hello {{ user }}
-                      {% if user.is_staff %}
+                      {% if user.is_superuser %}
                         (Admin)
                       {% else %}
                         (User)
                       {% endif %}
-                    </h6>
+                    </div>
                   </li>
                   <li>
-                    <a class="dropdown-item "
+                    <a class="dropdown-item"
                        href="{% url "profile" username=user.username %}">View Profile</a>
                   </li>
                   <li>
@@ -268,28 +316,73 @@
                     </li>
                   {% endif %}
                   <li>
-                    <a class="dropdown-item"  href="{% url "settings" %}">Settings</a>
+                    <a class="dropdown-item" href="{% url "settings" %}">Settings</a>
                   </li>
                   <li>
                     <form method="post" action="{% url 'logout' %}">
                       {% csrf_token %}
-                      <button class="btn btn-link dropdown-item " type="submit" id="button-addon2">Logout</button>
+                      <button class="dropdown-item" role="button" type="submit" id="button-addon2">Logout</button>
                     </form>
                   </li>
                 </ul>
               </li>
             {% else %}
-              <li class="nav-item mx-3">
+              <li class="nav-item mx-lg-3">
                 <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
               </li>
             {% endif %}
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm nav-item px-2 py-1 dropdown-toggle d-inline align-items-center"
+                      id="bd-theme"
+                      type="button"
+                      aria-expanded="false"
+                      data-bs-toggle="dropdown"
+                      data-bs-display="static"
+                      aria-label="Toggle theme (light)">
+                <i class="bi bi-sun-fill theme-icon-active mx-2" aria-hidden="true"></i>
+                <span class="d-lg-none" id="bd-theme-text">Toggle theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="bd-theme-text">
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center active"
+                          data-bs-theme-value="light"
+                          aria-pressed="true">
+                    <i class="bi bi-sun-fill me-2" aria-hidden="true"></i>
+                    Light
+                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
+                  </button>
+                </li>
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center"
+                          data-bs-theme-value="dark"
+                          aria-pressed="false">
+                    <i class="bi bi-moon-stars-fill me-2" aria-hidden="true"></i>
+                    Dark
+                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
+                  </button>
+                </li>
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center"
+                          data-bs-theme-value="auto"
+                          aria-pressed="false">
+                    <i class="bi bi-circle-half me-2" aria-hidden="true"></i>
+                    Auto
+                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
+                  </button>
+                </li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
     <div class="padded-body">
-      <div class="container-fluid py-4">
-        <div class="row justify-content-center">
+      <div class="container-fluid">
+        <div class="row justify-content-center my-3">
           <div class="col-12">
             {% block content %}
             {% endblock content %}
@@ -297,9 +390,16 @@
         </div>
       </div>
     </div>
+    <div class="footer">
+      <div class="card">
+        <div class="card-body text-center">
+          All statistical information and computations copyright ©2025, Databruce.com. Use of this websites content is permitted only with proper credit. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
+        </div>
+      </div>
+    </div>
     <script>
       $(document).ready(function () {
-        $('.noEnterSubmit').bind('keypress', false);
+        /*
         $("#eventSearch").autocomplete({
             autoFocus: true,
             source: "{% url 'events_auto' %}",
@@ -310,20 +410,22 @@
                 console.log(ui.item);
             }
         });
-        $('#eventSearch').mask('0000-00-00');
+        */
+
+        // masks all date forms to fill in dashes
+        $('.date-form').each(function() {
+          $(this).mask('0000-00-00');
+        });
 
         let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-
-        DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
-        DateTime.defaults.maxDate = new Date();
-        DataTable.datetime('YYYYMMDD');
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
             crossorigin="anonymous"></script>
+    <script></script>
   </body>
 </html>

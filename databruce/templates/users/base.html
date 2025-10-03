@@ -57,14 +57,14 @@
                        aria-expanded="false">Profile</a>
                     <ul class="dropdown-menu">
                       <li>
-                        <h6 class="dropdown-header">
+                        <div class="text-base dropdown-header">
                           Hello {{ user }}
                           {% if user.is_staff %}
                             (Admin)
                           {% else %}
                             (User)
                           {% endif %}
-                        </h6>
+                        </div>
                       </li>
                       <li>
                         {% if user.is_authenticated %}

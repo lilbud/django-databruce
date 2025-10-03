@@ -1,77 +1,162 @@
 @import './colors.css';
+@import './preflight.css';
 @import './select2.css';
 @import './datatables.css';
 
 :root {
-    --font-heading: "Cabin", sans-serif;
     --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
 
-a:link {
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+body {
+    font-size: 0.75rem !important;
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+a:link,
+.btn-link {
     text-decoration: none !important;
 }
 
-a:hover {
+[data-bs-theme="light"] a.update-link {
+    color: var(--primary-600) !important;
+}
+
+[data-bs-theme="dark"] a.update-link {
+    color: var(--primary-500) !important;
+}
+
+.dropdown-item:active {
+    background-color: var(--primary-500) !important;
+}
+
+a:hover,
+.btn-link:hover {
     text-decoration: underline !important;
 }
 
 /* navbar stuff */
 .navbar {
     background-color: var(--primary-700) !important;
-    border-bottom: 0 solid !important;
-}
-
-.navbar .nav-link:hover {
-    background-color: var(--primary-600) !important;
 }
 
 .navbar .nav-link {
     color: var(--text-50) !important;
-    font-size: 1rem !important;
+    font-size: 0.875rem !important;
 }
 
 /* card */
 .card tbody tr:last-child td {
-    border-bottom: none !important;
+    border-bottom: 0px solid !important;
 }
 
-.card tbody tr:last-child td:first-child {
-    border-bottom-left-radius: var(--bs-border-radius) !important;
+.card tbody tr:first-child:hover {
+    border-radius: 0 !important;
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
-.card tbody tr:last-child td:last-child {
-    border-bottom-right-radius: var(--bs-border-radius) !important;
-}
-
-.card .card-body :not(.btn, .badge):last-child,
-.modal-body ul:last-child {
-    margin-bottom: 0 !important;
-}
-
-button.nav-link.active,
-.progress-bar {
-    background-color: var(--primary-600) !important;
-}
-
-.active>.page-link {
-    border-color: var(--primary-600) !important;
-    background-color: var(--primary-600) !important;
-}
-
-button.nav-link:not(.active) {
-    border: 1px solid;
-    color: var(--primary-500) !important;
-    border-color: var(--primary-600) !important;
+.card {
+    border-radius: var(--bs-border-radius) !important;
 }
 
 .card-body {
-    overflow: visible !important;
+    overflow: clip !important;
 }
 
-.card-body img {
-    border-radius: 0px !important;
-    border-top-left-radius: var(--bs-border-radius) !important;
-    border-top-right-radius: var(--bs-border-radius) !important;
+.card-body :not(*),
+.card-body .table-responsive {
+    border-radius: var(--bs-border-radius) !important;
+}
+
+button.nav-link.active,
+.card-header,
+.card-footer {
+    font-weight: 600 !important;
+}
+
+.card-header,
+.card-footer {
+    padding: 0.5rem 0.75rem !important;
+    border-bottom: none !important;
+}
+
+.card-header *,
+.card-footer * {
+    vertical-align: middle !important;
+}
+
+.card-header,
+.card-footer {
+    font-size: 1rem !important;
+}
+
+.card-body :last-child:not(.dt-buttons button),
+.modal-body :last-child {
+    margin-bottom: 0 !important;
+}
+
+button.nav-link {
+    font-size: 0.875rem !important;
+}
+
+.progress-bar {
+    background-color: var(--primary-600) !important;
+    color: var(--text-50) !important;
+}
+
+button.nav-link.active {
+    background-color: var(--primary-600) !important;
+}
+
+button.nav-link:not(.active, #bd-theme) {
+    background-color: var(--background-500) !important;
+    color: var(--text-50) !important;
 }
 
 #year-select .dropdown-menu {
@@ -79,64 +164,67 @@ button.nav-link:not(.active) {
     overflow-y: scroll;
 }
 
-#year-select .dropdown-toggle,
-#year-select .dropdown-toggle:active {
-    background-color: var(--primary-700) !important;
-    border-color: var(--primary-700) !important;
-}
-
-#eventInfo .badge:hover,
-#year-select .dropdown-toggle:hover {
+.badge:hover,
+.dropdown-toggle:hover,
+.nav-link:hover,
+.btn:hover {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
-.dropdown-menu a:hover {
-    background-color: var(--primary-700) !important;
-}
-
-#userCount,
-#addshow-button {
-    vertical-align: middle !important;
+.navbar .btn {
+    /* box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.2); */
     color: var(--text-50) !important;
-    border: 0 !important;
 }
 
-#addshow-button:not(.active) {
-    background-color: var(--background-600) !important;
+.navbar .btn:hover {
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.3);
 }
 
-#addshow-button.active {
-    background-color: var(--accent-500) !important;
+@media (max-width: 1280px) {
+  /* profile dropdown, it gets pushed to under navbar on mobile when open.*/
+    ul#profile {
+        top: 4vh;
+    }
 }
 
-#userCount:not(.active) {
-    background-color: var(--background-700) !important;
+nav ul {
+    list-style-type: none;
 }
 
-#userCount.active {
-    background-color: var(--accent-600) !important;
-}
-
-.badge.eventlink {
-    background-color: var(--background-600) !important;
-    font-size: 0.75rem !important;
-}
-
-.badge.eventlink .bi {
-    font-size: medium !important;
-}
-
-/* needed to center text on badge */
-.badge.eventlink * {
-	vertical-align: middle !important;
-}
-
-#eventlink:hover {
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item.active
+{
+    background-color: var(--primary-600) !important;
+    color: var(--text-50) !important;
     text-decoration: none !important;
 }
 
-#onstage ul:not(:last-child) {
-    margin-bottom: 0.5rem !important;
+.dropdown-item {
+    font-size: .875rem !important;
+}
+
+button {
+    vertical-align: middle !important;
+    /* color: var(--text-50) !important; */
+    border: 0 !important;
+}
+
+button#addshow.active {
+    background-color: var(--accent-500) !important;
+}
+
+button#usercount.active {
+    background-color: var(--accent-600) !important;
+}
+
+.badge .bi,
+th .bi {
+    font-size: 1rem !important;
+}
+
+/* needed to center text on badge */
+.badge * {
+    vertical-align: middle !important;
 }
 
 .progress {
@@ -148,19 +236,97 @@ button.nav-link:not(.active) {
     border-radius: inherit !important;
 }
 
-.progress>.song-count {
-    cursor: help;
+.list-group-item.active {
+    background-color: var(--primary-700) !important;
+    border-color: var(--primary-700) !important;
 }
 
-#breakdown .list-group-item.active {
-    background-color: var(--primary-700);
-    border-color: var(--primary-700);
+ul.nav-pills>.nav-link:not(:last-child) {
+    margin-right: 0.5rem !important;
 }
 
-#breakdown a {
+ul.nav-pills>.nav-link:last-child {
+    margin-right: 0 !important;
+}
+
+/* jquery autocomplete styling */
+.ui-autocomplete {
+    background-color: var(--bs-body-bg) !important;
+    margin-top: 0.25rem !important;
+    padding-top: 0.5rem !important;
+    z-index: 1100 !important;
+}
+
+.ui-menu-item {
+    color: var(--bs-body-color) !important;
+}
+
+.ui-state-active:hover,
+.ui-state-active,
+.ui-button:active {
+    background-color: var(--primary-700) !important;
+    border-color: var(--primary-700) !important;
+}
+
+.ui-widget.ui-widget-content {
+    border-radius: var(--bs-border-radius) !important;
+    border-width: var(--bs-border-width) !important;
+    border-color: var(--bs-border-color-translucent);
+    font-family: inherit !important;
+    font-size: 1rem;
+}
+
+td .badge {
+    padding: 0.25rem 0.35rem !important;
+    vertical-align: middle !important;
+}
+
+.badge {
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+}
+
+.card-body:has(.table) {
+    overflow: clip !important;
+}
+
+#eventlink.a:hover {
+    text-decoration: none !important;
+}
+
+#setlistTable.dataTable th:last-child {
+    padding-right: 1rem !important;
+}
+
+.card-body:not(.p-0) {
+    padding: 0.75rem !important;
+}
+
+#links li {
+    font-size: 0.875rem !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-600) !important;
     color: var(--text-50) !important;
 }
 
-#onstage a[href*=relation] {
+.footer {
+    clear: both !important;
+    bottom: 0 !important;
+    position: relative !important;
+    z-index: 10 !important;
+    margin: 1rem !important;
+}
+
+.padded-body {
+    min-height: calc(100vh - 5em) !important;
+}
+
+[data-bs-theme="light"] #short-url {
+    color: var(--primary-600) !important;
+}
+
+[data-bs-theme="dark"] #short-url {
     color: var(--primary-500) !important;
 }

@@ -1,17 +1,16 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
   Profile
 {% endblock title %}
 {% block content %}
   <div class="row justify-content-center mb-3">
-    <div class="col col-lg-8">
+    <div class="col-12 col-lg-8">
       <div class="row mb-4">
         <div class="col">
           {% if user_info.username == user.username %}
-            <h4>Your Profile</h4>
+            <div class="text-2xl">Your Profile</div>
           {% else %}
-            <h4>{{ user_info.username|title }}'s Profile</h4>
+            <div class="text-2xl">{{ user_info.username|title }}'s Profile</div>
           {% endif %}
         </div>
       </div>
@@ -46,44 +45,42 @@
         <div class="card-body px-0">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
-              <h6 class="ms-3">
+              <div class="text-lg pb-2">
                 {% if user_info.username == user.username %}
                   Shows that you have seen
                 {% else %}
                   Shows that {{ user_info.username|title }} has seen
                 {% endif %}
-              </h6>
+              </div>
               <div class="table-responsive">
                 <table class="table table-hover display" id="eventTable">
                   <thead>
                     <tr>
                       <th class="all" scope="col">Date</th>
-                      <th class="min-tablet-l" scope="col">Band</th>
+                      <th class="all" scope="col">Band</th>
                       <th class="all" scope="col">Venue</th>
-                      <th class="min-tablet-l" scope="col">Location</th>
-                      <th class="min-tablet-l" scope="col">Tour</th>
-                      <th class="desktop" scope="col">Detail</th>
-                      <th class="desktop" scope="col">Remove Show</th>
+                      <th class="all" scope="col">Location</th>
+                      <th class="all" scope="col">Tour</th>
+                      <th class="all" scope="col">Detail</th>
+                      <th class="all" scope="col">Remove</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for event in user_shows %}
                       {% with event=event.event %}
                         <tr>
-                          <td scope="row" class="text-nowrap">
-                            <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                          <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
+                            <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                           </td>
                           <td class="text-nowrap">
-                            {% if event.artist %}
-                              <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-                            {% endif %}
+                            <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
                           </td>
                           <td class="text-nowrap">
-                            <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
+                            <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
                           </td>
                           <td class="text-nowrap">
                             {% if event.venue.city %}
-                              <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                              <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
                             {% endif %}
                           </td>
                           <td class="text-nowrap">
@@ -91,22 +88,18 @@
                               <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
                             {% endif %}
                           </td>
+                          <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
                           <td class="text-nowrap">
-                            {% if event.type == 'Rescheduled' or event.type == 'Cancelled' %}
-                              {{ event.type }}/{{ event.note|default_if_none:'' }}
-                            {% else %}
-                              {{ event.title|default_if_none:'' }}
-                            {% endif %}
-                          </td>
-                          <td class="text-nowrap">
-                            {% if user_info.username == user.username or user.is_superuser %}
+                            {% if user_info.id == user.id or user.is_superuser %}
                               <form method="post" action="{% url "remove_show" %}">
                                 <input type="hidden" name="event" value="{{ event.id }}">
                                 {% csrf_token %}
                                 <button id="submit-button"
                                         type="submit"
                                         name="submit"
-                                        class="btn btn-sm btn-danger">Remove?</button>
+                                        class="btn btn-sm btn-danger text-xs">
+                                  <i class="bi bi-x-lg"></i>
+                                </button>
                               </form>
                             {% endif %}
                           </td>
@@ -118,29 +111,31 @@
               </div>
             </div>
             <div id="songs" class="tab-pane fade">
-              <h6 class="ms-3">
+              <div class="text-lg pb-2">
                 {% if user_info.username == user.username %}
                   Songs that you have seen
                 {% else %}
                   Songs that {{ user_info.username|title }} has seen
                 {% endif %}
-              </h6>
+              </div>
               <div class="table-responsive">
                 <table class="table table-hover display" id="songTable">
                   <thead>
                     <tr>
+                      <th>#</th>
                       <th>Song Name</th>
-                      <th class="text-center">Count</th>
+                      <th>Category</th>
                       <th class="text-center">First Seen</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for song in user_seen %}
                       <tr>
+                        <td class="text-center">{{ song.count }}</td>
                         <td>
                           <a href="{% url "song_details" id=song.song %}">{{ song.name }}</a>
                         </td>
-                        <td class="text-center">{{ song.count }}</td>
+                        <td>{{ song.category }}</td>
                         <td class="text-center">
                           <a href="{% url "event_details" id=song.first %}">{{ song.first|get_date }}</a>
                         </td>
@@ -157,10 +152,10 @@
   </div>
   {% if user_songs %}
     <div class="row justify-content-center">
-      <div class="col col-lg-8">
+      <div class="col-12 col-lg-8">
         <div class="row mb-2">
           <div class="col">
-            <h4>Stats</h4>
+            <div class="text-2xl">Stats</div>
           </div>
         </div>
         <div class="card">
@@ -192,23 +187,25 @@
             <div class="tab-content">
               <div id="mostplayed" class="tab-pane show active fade">
                 <div class="row mb-2">
-                  <h6 class="ms-3">Most commonly played songs not seen</h6>
+                  <div class="text-lg pb-2">Most commonly played songs not seen</div>
                 </div>
                 <div class="table-responsive">
                   <table class="table table-hover display" id="notSeenTable">
                     <thead>
                       <tr>
+                        <th>#</th>
                         <th>Song Name</th>
-                        <th class="text-center">Count</th>
+                        <th>Category</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for song in user_not_seen %}
                         <tr>
+                          <td class="text-center">{{ song.num_plays_public }}</td>
                           <td>
                             <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
                           </td>
-                          <td class="text-center">{{ song.num_plays_public }}</td>
+                          <td>{{ song.category }}</td>
                         </tr>
                       {% endfor %}
                     </tbody>
@@ -217,23 +214,25 @@
               </div>
               <div id="rare" class="tab-pane fade">
                 <div class="row mb-2">
-                  <h6 class="ms-3">Songs seen with 100 plays or less</h6>
+                  <div class="text-lg pb-2">Songs seen with 100 plays or less</div>
                 </div>
                 <div class="table-responsive">
                   <table class="table table-hover display" id="rareTable">
                     <thead>
                       <tr>
+                        <th>#</th>
                         <th>Song Name</th>
-                        <th class="text-center">Event</th>
+                        <th>Category</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for song in user_rare_songs %}
                         <tr>
+                          <td class="text-center">{{ song.num_plays_public }}</td>
                           <td>
                             <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
                           </td>
-                          <td class="text-center">{{ song.num_plays_public }}</td>
+                          <td>{{ song.category }}</td>
                         </tr>
                       {% endfor %}
                     </tbody>
@@ -248,33 +247,20 @@
   {% endif %}
   <script>
       $(document).ready(function() {
-          layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
-          
           new DataTable('#eventTable', {
-              layout: layout,
-              order: [[0, 'asc']],
-              pageLength: 25,
+            layout: getDatatableLayout(),
           });
 
-          // removes searchBuilder button, not needed for this.
-          layout.topEnd.features[1].buttons.pop();
-
           new DataTable('#songTable', {
-              layout: layout,
-              order: [[0, 'asc']],
-              pageLength: 25,
+            layout: getDatatableLayout([0,2,3]),
           });
 
           new DataTable('#notSeenTable', {
-              layout: layout,
-              order: [[1, 'desc']],
-              pageLength: 25,
+            layout: getDatatableLayout([0,2]),
           });
-          
+
           new DataTable('#rareTable', {
-              layout: layout,
-              order: [[1, 'asc']],
-              pageLength: 25,
+            layout: getDatatableLayout([0,2]),
           });
       })
   </script>

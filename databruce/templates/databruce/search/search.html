@@ -3,8 +3,8 @@
   Search
 {% endblock title %}
 {% block info_row %}
-  <h4>Event Search</h4>
-  <h6>Event Date: {{ request.GET.date }}</h6>
+  <div class="text-2xl">Event Search</div>
+  <div class="text-base">Event Date: {{ request.GET.date }}</div>
 {% endblock info_row %}
 {% block table_id %}
   eventTable
@@ -59,8 +59,7 @@
   <script>
   $(document).ready(function () {
     new DataTable('#eventTable', {
-      layout: layout,
-      order: [[0, 'asc']],
+      layout: getDatatableLayout(),
       columnDefs: [
         { target: -1, visible: false }
       ],
@@ -68,25 +67,7 @@
         this.api()
           .columns([-1])
           .every(function () {
-              var column = this;
-
-              $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="select">Publicity:</label></div><div class="col" id="select"></div></div>').appendTo($('#dropdown-container'));
-
-              // this appears to be the only way to add a select filter
-              // without going through ajax calls. I originally had a pre-made dropdown in
-              // another file and included it like above, however, I had to use an ajax call
-              // otherwise it would appear but not work
-              var select = $('<select id="type" class="form-select form-select-sm"></select>')
-                .appendTo($('#select'))
-                .on('change', function () {
-                    column
-                      .search($(this).val(), {regex: true})
-                      .draw();
-                });
-              
-              select.append('<option value=".*">All</option>');
-              select.append('<option value="True">Public</option>');
-              select.append('<option value="False">Private</option>');
+              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
           });
       },
     });

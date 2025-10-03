@@ -1,13 +1,18 @@
-<label class="form-label">
-    Song:
-    <button class="btn ml-2 p-0 me-2"
-            type="reset"
-            id="remove-form-btn"
-            onclick="removeForm(this)">
-        <i class="bi bi-x-circle-fill text-danger"></i>
-    </button>
-</label>
-<div class="col-12 col-lg-6 col-xl-4 mb-1 pe-1">{{ form.song1 }}</div>
-<div class="col-3 col-lg-2 col-xl-1 ps-lg-1 pe-lg-1 pe-0 mb-1">{{ form.choice }}</div>
-<div class="col-9 col-lg-3 col-xl-2 mb-1 px-1">{{ form.position }}</div>
-<div class="col-12 col-lg-6 col-xl-4 mb-1 ps-2 ps-lg-1 pe-1">{{ form.song2 }}</div>
+<div class="row song-row" id="song_row-0">
+    <label class="col-form-label text-sm col-1" for="song">
+        Song:
+        <button name="button"
+                type="button"
+                class="btn btn-sm btn-link ml-2 p-0"
+                id="remove-form-btn"
+                onclick="removeForm(this)">
+            <i class="btn-icon">
+                <i class="bi bi-x-circle-fill text-danger"></i>
+            </i>
+        </button>
+    </label>
+    <div class="col-12 col-lg-6 col-xl-4 mb-1 pe-1">{{ form.song1 }}</div>
+    <div class="col-3 col-lg-2 col-xl-1 ps-lg-1 pe-lg-1 pe-0 mb-1">{{ form.choice }}</div>
+    <div class="col-9 col-lg-3 col-xl-2 mb-1 px-1">{{ form.position }}</div>
+    <div class="col-12 col-lg-6 col-xl-4 mb-1 ps-2 ps-lg-1 pe-1">{{ form.song2 }}</div>
+</div>

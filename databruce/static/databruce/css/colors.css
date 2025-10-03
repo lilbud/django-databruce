@@ -61,51 +61,51 @@
 	--accent-900: #321201;
 	--accent-950: #190901;
 
-    --font-heading: "Cabin", sans-serif;
-    --font-body: "IBM Plex Sans Hebrew", sans-serif;
+  --font-heading: "Cabin", sans-serif;
+  --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
 
-.text-text-50 {
+.text-50 {
   color: var(--text-50) !important;
 }
 
-.text-text-100 {
+.text-100 {
   color: var(--text-100) !important;
 }
 
-.text-text-200 {
+.text-200 {
   color: var(--text-200) !important;
 }
 
-.text-text-300 {
+.text-300 {
   color: var(--text-300) !important;
 }
 
-.text-text-400 {
+.text-400 {
   color: var(--text-400) !important;
 }
 
-.text-text-500 {
+.text-500 {
   color: var(--text-500) !important;
 }
 
-.text-text-600 {
+.text-600 {
   color: var(--text-600) !important;
 }
 
-.text-text-700 {
+.text-700 {
   color: var(--text-700) !important;
 }
 
-.text-text-800 {
+.text-800 {
   color: var(--text-800) !important;
 }
 
-.text-text-900 {
+.text-900 {
   color: var(--text-900) !important;
 }
 
-.text-text-950 {
+.text-950 {
   color: var(--text-950) !important;
 }
 

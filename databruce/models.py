@@ -105,7 +105,7 @@ class AuthUserUserPermissions(models.Model):
 class Bands(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    brucebase_url = models.TextField(unique=True, blank=True, default=None)
+    brucebase_url = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     appearances = models.IntegerField(default=0)
 
@@ -444,7 +444,7 @@ class States(models.Model):
         verbose_name_plural = "states"
 
     def __str__(self) -> str:
-        if self.country not in [2, 6, 37]:
+        if self.country.id not in [2, 6, 37]:
             return f"{self.name}, {self.country}"
 
         return self.name
@@ -732,11 +732,15 @@ class Events(models.Model):
 
         return event
 
+    def filter_date(self) -> str:
+        return f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
+
     def get_date(self) -> str:
         try:
             event = self.date.strftime("%Y-%m-%d")
             if self.early_late:
                 event += f" ({self.early_late})"
+
         except AttributeError:
             event = f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
 
@@ -792,7 +796,7 @@ class Relations(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     mbid = models.UUIDField(default=None, editable=False)
-    brucebase_url = models.TextField(unique=True, blank=True, default=None)
+    brucebase_url = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     appearances = models.IntegerField(default=0)
     first = models.ForeignKey(
@@ -1092,6 +1096,7 @@ class Setlists(models.Model):
         db_column="song_id",
         blank=True,
         default=None,
+        to_field="id",
     )
 
     note = models.TextField(blank=True, default=None, db_column="song_note")
@@ -1099,14 +1104,14 @@ class Setlists(models.Model):
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
     instrumental = models.BooleanField(default=False)
-    band_premiere = models.BooleanField(default=False, db_column="band_premiere")
+    nobruce = models.BooleanField(default=False)
     position = models.TextField(blank=True, default=None)
 
     last = models.IntegerField(blank=True, default=None)
     next = models.IntegerField(blank=True, default=None)
 
-    tour_num = models.IntegerField(blank=True, default=None)
-    tour_total = models.IntegerField(blank=True, default=None)
+    tour_num = models.IntegerField(blank=True, default=0)
+    tour_total = models.IntegerField(blank=True, default=0)
 
     ltp = models.ForeignKey(
         to=Events,
@@ -1115,6 +1120,7 @@ class Setlists(models.Model):
         related_name="ltp_event",
         blank=True,
         default=None,
+        to_field="id",
     )
 
     sign_request = models.BooleanField(default=False)
@@ -1130,7 +1136,7 @@ class Setlists(models.Model):
         ordering = ("-event_id", "song_num")
 
     def __str__(self) -> str:
-        return f"{self.event} - {self.set_name} - {self.song} ({self.id})"
+        return f"{self.event.id} - {self.set_name} - {self.song} ({self.id})"
 
     def notes(self) -> str:
         noteslist = list(
@@ -1553,6 +1559,7 @@ class Updates(models.Model):
 class Songspagenew(models.Model):
     id = models.AutoField(primary_key=True)
     song = models.IntegerField(blank=True, null=True, db_column="song_id")
+    num = models.IntegerField(blank=True, null=True, db_column="song_num")
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,

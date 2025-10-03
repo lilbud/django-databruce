@@ -3,8 +3,8 @@
   Users
 {% endblock title %}
 {% block info_row %}
-  <h4>Users</h4>
-  <h6>All active users on the site.</h6>
+  <div class="text-2xl">Users</div>
+  <div class="text-base">All active users on the site.</div>
 {% endblock info_row %}
 {% block table_id %}
   userTable
@@ -35,12 +35,9 @@
 {% endblock table %}
 {% block scripts %}
   <script>
-      // removes searchBuilder button, not needed for this.
-      layout.topEnd.features[1].buttons.pop();
-
     $(document).ready(function () {
         new DataTable('#userTable', {
-            layout: layout,
+            layout: getDatatableLayout(),
         })
     });
   </script>

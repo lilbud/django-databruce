@@ -3,8 +3,8 @@
     Nugs Releases
 {% endblock title %}
 {% block info_row %}
-    <h4>Nugs Releases</h4>
-    <h6>Shows released on Nugs. Links lead to the page where you can purchase those shows.</h6>
+    <div class="text-2xl">Nugs Releases</div>
+    <div class="text-base">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
 {% endblock info_row %}
 {% block table_id %}
     releasesTable
@@ -43,13 +43,9 @@
 {% endblock table %}
 {% block scripts %}
     <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop()
-
     $(document).ready(function () {
       new DataTable('#releasesTable', {
-        layout: layout,
-        order: [[1, 'asc']],
+        layout: getDatatableLayout(),
       });
     });
     </script>

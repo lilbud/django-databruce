@@ -5,46 +5,44 @@
 {% load static %}
 {% block content %}
   {% regroup events by artist as events_list %}
-  <div class="row mb-4">
+  <div class="row mb-3">
     <div class="col">
-      <h2>
-        {% if user.is_authenticated %}
-          Welcome to Databruce, {{ user|default_if_none:"" }}!
-        {% else %}
-          Welcome to Databruce!
-        {% endif %}
-      </h2>
-      <h5>A new Bruce Springsteen concert database</h5>
+      <div class="text-3xl">Welcome to Databruce!</div>
+      <div class="text-base">A Bruce Springsteen concert database</div>
     </div>
   </div>
   <div class="row mb-4">
     <div class="col-12 col-md-6 col-lg-4 px-2">
       <div class="card mb-3">
         <div class="card-body p-0">
-          <img class="img-fluid rounded"
+          <img class="img-fluid card-img-top object-fit-cover"
                id="headimg"
                src="{% static 'databruce/img/header-2025.webp' %}"
                alt=""
-               height="auto"
+               height="1280"
                width="auto">
         </div>
         <div class="card-footer">
-          San Siro - July 3, 2025 (photo by <a href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)
+          <span class="text-base">San Siro - July 3, 2025</span>
+          <span class="text-sm">
+            (photo by <a class="text-reset"
+    href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)
+          </span>
         </div>
       </div>
-      <div class="card mb-3 mb-lg-0">
+      <div class="card mb-3 mb-lg-0 d-none d-lg-block">
         <div class="card-header">
-          Recent Updates
-          <a href="{% url 'updates' %}">see more</a>
+          <span class="text-base">Recent Updates</span>
+          <span class="text-sm">(<a class="text-reset" href="{% url 'updates' %}">see more</a>)</span>
         </div>
         <div class="card-body px-3">
-          <ul class="mb-0 ps-4">
+          <ul class="mb-0 ps-4 text-sm">
             {% load tz %}
             {% timezone "America/New_York" %}
             {% for item in updates %}
               <li>
                 {% if item.view %}
-                  {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a> ({{ item.created_at|date:'m/d' }})
+                  {{ item.msg }} <a class="update-link" href="{% url item.view id=item.item_id %}">{{ item.value }}</a> ({{ item.created_at|date:'m/d' }})
                 {% else %}
                   {{ item.msg }} ({{ item.created_at|date:'m/d' }})
                 {% endif %}
@@ -59,62 +57,56 @@
     <div class="card mb-3 mb-lg-0">
       <div class="card-header">Most Recent Show</div>
       <div class="card-body p-0">
-        <h6 class="p-3 mb-0">
+        {% if latest_event.event.title %}<div class="text-sm px-2 pt-2 pb-0">{{ latest_event.event.title }}</div>{% endif %}
+        <div class="px-2 py-2">
           {% with first=latest_event.event %}
             <div class="row">
-              <a class="fw-semibold" href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue }}</a>
+              <a class="fw-medium text-sm text-reset"
+                 href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue.city }}</a>
             </div>
             <div class="row">
-              <a class="text-reset text-body-light"
+              <a class="text-reset text-sm"
                  href="{% url 'band_details' id=first.artist.id %}">{{ first.artist }}</a>
             </div>
           {% endwith %}
-        </h6>
-        {% regroup latest_show by set_name as event_setlist %}
+        </div>
         {% if latest_show %}
+          {% regroup latest_show by set_name as event_setlist %}
           <div class="table-responsive">
             <table class="table table-hover display" id="setlistTable">
               <thead>
                 <tr>
-                  <th class="all text-center">#</th>
-                  <th class="all">Song</th>
+                  <th>#</th>
+                  <th>Song</th>
                 </tr>
               </thead>
               <tbody>
                 {% for set in event_setlist %}
                   <tr class="text-center">
-                    <td class="setHeader" colspan="2">{{ set.grouper }}</td>
+                    <td class="setHeader {{ set.grouper|lower|cut:" " }}" colspan="2">{{ set.grouper }}</td>
                     <td class="setname d-none"></td>
                   </tr>
                   {% for song in set.list %}
-                    <tr>
-                      <td class="text-center">
-                        {% if song.position %}
-                          <h6 class="mb-0">
-                            <span data-bs-toggle="tooltip"
-                                  data-bs-title="{{ song.position }}"
-                                  class="badge text-bg-primary">{{ song.song_num }}</span>
-                          </h6>
-                        {% else %}
-                          {{ song.song_num }}
-                        {% endif %}
+                    <tr class="p-0">
+                      <td class="text-center songnum {% if song.position and song.position != song.set_name %}position {{ song.position|lower|cut:" " }}{% endif %}"
+                          {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
+                        {{ song.song_num }}
                       </td>
-                      <td>
+                      <td class="py-1">
                         <span class="text-nowrap">
-                          <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                          <a class="fw-semibold" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                           {% if song.segue %}{{ song.separator }}{% endif %}
-                          {% if song.instrumental %}<span class="badge text-bg-success">Instrumental</span>{% endif %}
-                          {% if song.sign_request %}<span class="badge text-bg-danger">Sign Request</span>{% endif %}
                         </span>
                       </td>
                     </tr>
                   {% endfor %}
+                  {% comment %} <hr class="my-0"> {% endcomment %}
                 {% endfor %}
               </tbody>
             </table>
           </div>
         {% else %}
-          <h6 class="ms-2">No Set Details Available</h6>
+          <div class="text-base ms-2">No Set Details Available</div>
         {% endif %}
       </div>
     </div>
@@ -129,18 +121,20 @@
               <table class="table table-hover display" id="recentTable">
                 <thead>
                   <tr>
-                    <th class="all">Date</th>
-                    <th class="all">Location</th>
+                    <th class="d-none">Date</th>
+                    <th class="d-none">Location</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for event in recent %}
                     <tr>
-                      <td class="text-nowrap">
-                        <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                      <td class="text-nowrap"
+                          data-sort="{{ event.get_date }}"
+                          data-filter="{{ event.get_date }}">
+                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}, {{ event.venue.city }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -158,18 +152,20 @@
               <table class="table table-hover display" id="upcomingTable">
                 <thead>
                   <tr>
-                    <th class="all">Date</th>
-                    <th class="all">Location</th>
+                    <th class="d-none">Date</th>
+                    <th class="d-none">Location</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for event in upcoming %}
                     <tr>
-                      <td class="text-nowrap">
-                        <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                      <td class="text-nowrap"
+                          data-sort="{{ event.get_date }}"
+                          data-filter="{{ event.get_date }}">
+                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}, {{ event.venue.city }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -182,26 +178,30 @@
       <div class="col">
         <div class="card h-100">
           <div class="card-header">
-            On This Day ({{ date|date:"F d" }})
-            <a href="{% url 'adv_search_results' %}{% querystring month=date|date:'n' day=date|date:"j" %}">see more</a>
+            <span class="text-base">On This Day</span>
+            <span class="text-sm">(<a class="text-reset"
+   href="{% url 'adv_search_results' %}?month_choice=is&month={{ date|date:"n" }}&day_choice=is&day={{ date|date:"j" }}">see more</a>)
+            </span>
           </div>
           <div class="card-body p-0">
             <div class="table-responsive index">
               <table class="table table-hover display" id="otdTable">
                 <thead>
                   <tr>
-                    <th class="all">Date</th>
-                    <th class="all">Location</th>
+                    <th class="d-none">Date</th>
+                    <th class="d-none">Location</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for event in events %}
                     <tr>
-                      <td class="text-nowrap">
-                        <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
+                      <td class="text-nowrap"
+                          data-sort="{{ event.get_date }}"
+                          data-filter="{{ event.get_date }}">
+                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}, {{ event.venue.city }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -215,17 +215,18 @@
   </div>
 </div>
 <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop();
+    var layout = getDatatableLayout();
     layout.topStart = 'pageLength';
-    
+
     $(document).ready(function () {
       new DataTable('#otdTable', {
           layout: layout,
           autoWidth: false,
           searching: false,
+          scrollX: false,
           paging: false,
           ordering: false,
+          columnDefs: [{ targets: 0, width: '8rem' }],
       });
 
       new DataTable('#recentTable', {
@@ -233,7 +234,9 @@
           autoWidth: false,
           paging: false,
           searching: false,
+          scrollX: false,
           ordering: false,
+          columnDefs: [{ targets: 0, width: '8rem' }],
       });
 
       new DataTable('#upcomingTable', {
@@ -241,7 +244,9 @@
           autoWidth: false,
           paging: false,
           searching: false,
+          scrollX: false,
           ordering: false,
+          columnDefs: [{ targets: 0, width: '8rem' }],
       });
 
       new DataTable('#setlistTable', {
@@ -251,7 +256,7 @@
           scrollX: false,
           searching: false,
           ordering: false,
-          columnDefs: [{ target: 0, width: '1%' }],
+          columnDefs: [{ targets: 0, width: '2rem' }],
       });
     })
 </script>

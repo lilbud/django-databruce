@@ -3,54 +3,49 @@
   Relations
 {% endblock title %}
 {% block info_row %}
-  <h4>Relations</h4>
-  <h6>People who have shared a stage or appeared at an event with Bruce.</h6>
+  <div class="text-2xl">Relations</div>
+  <div class="text-base">People who have shared a stage or appeared at an event with Bruce.</div>
 {% endblock info_row %}
 {% block table_id %}
   relationsTable
 {% endblock table_id %}
 {% block table %}
   <thead>
-    <tr class="header">
-      <th scope="col">Name</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th class="text-center" scope="col">Events</th>
+    <tr>
+      <th class="all">#</th>
+      <th class="all">Name</th>
+      <th class="min-tablet-l">First</th>
+      <th class="min-tablet-l">Last</th>
     </tr>
   </thead>
   <tbody>
     {% for relation in relations %}
       <tr>
+        <td>{{ relation.appearances }}</td>
         <td>
           <a href="{% url "relation_details" id=relation.id %}">{{ relation }}</a>
         </td>
-        <td {% with first=relation.first %}
-            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=relation.last.id %}">{{ relation.first }}</a>
+        <td data-sort="{{ relation.first.get_date }}"
+            data-filter="{{ relation.first.get_date }}">
+          <a href="{% url "event_details" id=relation.last.id %}">{{ relation.first.get_date }}</a>
         </td>
-        <td {% with last=relation.last %}
-            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=relation.last.id %}">{{ relation.last }}</a>
+        <td data-sort="{{ relation.last.get_date }}"
+            data-filter="{{ relation.last.get_date }}">
+          <a href="{% url "event_details" id=relation.last.id %}">{{ relation.last.get_date }}</a>
         </td>
-        <td class="text-center">{{ relation.appearances }}</td>
       </tr>
     {% endfor %}
   </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
-    // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3];
-
     $(document).ready(function () {
       new DataTable('#relationsTable', {
-        layout: layout,
-        order: [[0, 'asc']],
-        columnDefs: [{ type: 'date', targets: [1, 2] }]
+        layout: getDatatableLayout(),
+        columnDefs: [
+          { type: 'date', targets: [2, 3] },
+          { targets: [0], width: '1rem' },
+        ]
       });
     });
   </script>

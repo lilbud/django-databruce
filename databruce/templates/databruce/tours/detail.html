@@ -1,14 +1,13 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
   Tours &gt; {{ tour.name }}
 {% endblock title %}
 {% block content %}
   <div class="row justify-content-center">
-    <div class="col col-lg-9">
-      <h4 class="mb-3">
+    <div class="col-12 col-lg-8">
+      <div class="text-2xl mb-3">
         <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
-      </h4>
+      </div>
       <div class="card">
         <div class="card-header">
           <ul class="nav nav-pills nav-fill" role="tablist">
@@ -22,16 +21,18 @@
                       aria-controls="pills-home"
                       aria-selected="true">Events</button>
             </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-legs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#legs"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Legs</button>
-            </li>
+            {% if tour_legs %}
+              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+                <button class="nav-link"
+                        id="pills-legs-tab"
+                        data-bs-toggle="pill"
+                        data-bs-target="#legs"
+                        type="button"
+                        role="tab"
+                        aria-controls="pills-profile"
+                        aria-selected="false">Legs</button>
+              </li>
+            {% endif %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link"
                       id="pills-songs-tab"
@@ -59,40 +60,7 @@
         <div class="card-body px-0">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="tourEvents">
-                  <thead>
-                    <tr class="custom">
-                      <th class="all">Date</th>
-                      <th class="all">Band</th>
-                      <th class="min-tablet-l">Venue</th>
-                      <th class="min-tablet-l">Location</th>
-                      <th class="min-tablet-l">Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in events %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url "band_details" id=tour.id %}">{{ tour.band }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          {% if event.venue.city %}
-                            <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-wrap">{{ event.title|default_if_none:"" }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+              {% include "databruce/partials/event_table.html" with events=events %}
             </div>
             <div id="legs" class="tab-pane fade">
               <div class="table-responsive">
@@ -136,13 +104,13 @@
                 <table class="table table-hover display" id="tourSlots">
                   <thead>
                     <tr>
-                      <th class="text-nowrap all">Event</th>
-                      <th class="text-nowrap all showopener">Show Opener</th>
-                      <th class="text-nowrap all set1closer">Set 1 Closer</th>
-                      <th class="text-nowrap all set2opener">Set 2 Opener</th>
-                      <th class="text-nowrap all mainsetcloser">Main Set Closer</th>
-                      <th class="text-nowrap all encoreopener">Encore Opener</th>
-                      <th class="text-nowrap all showcloser">Show Closer</th>
+                      <th class="text-nowrap all text-start">Event</th>
+                      <th class="text-nowrap all text-start text-50 showopener">Show Opener</th>
+                      <th class="text-nowrap all text-start text-50 set1closer">Set 1 Closer</th>
+                      <th class="text-nowrap all text-start text-50 set2opener">Set 2 Opener</th>
+                      <th class="text-nowrap all text-start text-50 mainsetcloser">Main Set Closer</th>
+                      <th class="text-nowrap all text-start text-50 encoreopener">Encore Opener</th>
+                      <th class="text-nowrap all text-start text-50 showcloser">Show Closer</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -193,46 +161,27 @@
     </div>
   </div>
   <script>
-    layout.topEnd.features[1].buttons[0].config.columns = [0, 1, 2, 3, 4, 5];
-
     $(document).ready(function () {
-      new DataTable('#tourEvents', {
-        layout: layout,
-        paging: false,
-        responsive: false,
+      new DataTable('#eventTable', {
+        layout: getDatatableLayout(),
       });
 
-      layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6];
-
       new DataTable('#tourSlots', {
-        layout: layout,
+        layout: getDatatableLayout([1,2,3,4,5,6]),
         ordering: false,
-        scrollX: false,
-        paging: false,
-        searching: false,
         columnDefs: [
-          { target: 0, width: '10%' },
+          { target: 0, type: 'date' },
           { targets: [1, 2, 3, 4, 5, 6], width: '15%' },
         ],
       });
 
-      layout.topEnd.features[1].buttons.pop();
-      // removes searchBuilder button, not needed for this.
-      layout.topStart = {};
-
       new DataTable('#tourLegs', {
-        layout: layout,
-        paging: false,
-        searching: false,
+        layout: getDatatableLayout([0, 2]),
       });
 
       new DataTable('#songTable', {
-        layout: layout,
-        paging: false,
-        responsive: false,
+        layout: getDatatableLayout([0, 2]),
       });
-
-
     });
 
   </script>

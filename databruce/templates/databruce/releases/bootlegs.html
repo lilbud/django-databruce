@@ -3,13 +3,13 @@
     Bootlegs
 {% endblock title %}
 {% block info_row %}
-    <h4>Bootlegs</h4>
-    <h6>
+    <div class="text-2xl">Bootlegs</div>
+    <div class="text-base">
         <p>
             Unofficial releases from over the years. All of this information was largely sourced from <a href="https://www.springsteenlyrics.com/">SpringsteenLyrics</a>. Many of these are also available on Archive.org under my Radio Nowhere collection. Only live bootlegs are listed here.
             To keep this page from taking forever to load, only bootlegs that I've uploaded to Archive are showing currently. Still working on matching them all up, so it might take a bit.
         </p>
-    </h6>
+    </div>
 {% endblock info_row %}
 {% block table_id %}
     releasesTable
@@ -17,12 +17,12 @@
 {% block table %}
     <thead>
         <tr>
-            <th>Title</th>
-            <th>Label</th>
-            <th>Source</th>
-            <th>Type</th>
-            <th>Event</th>
-            <th>Archive</th>
+            <th class="all">Title</th>
+            <th class="all">Label</th>
+            <th class="all">Source</th>
+            <th class="all">Type</th>
+            <th class="all">Event</th>
+            <th class="all">Archive</th>
         </tr>
     </thead>
     <tbody>
@@ -34,13 +34,14 @@
                 <td>{{ boot.label|default_if_none:"" }}</td>
                 <td>{{ boot.source|default_if_none:"" }}</td>
                 <td>{{ boot.type|default_if_none:"" }}</td>
-                <td>
+                <td data-sort="{{ boot.event.get_date }}"
+                    data-filter="{{ boot.event.get_date }}">
                     {% if boot.event %}
-                        <a href="{% url "event_details" id=boot.event.id %}">{{ boot.event }}</a>
+                        <a href="{% url "event_details" id=boot.event.id %}">{{ boot.event.get_date }}</a>
                     {% endif %}
                 </td>
                 <td>
-                    {% if boot.archive %}<a href="https://archive.org/details/{{ boot.archive.url }}">Internet Archive</a>{% endif %}
+                    {% if boot.archive %}<a href="https://archive.org/details/{{ boot.archive.url }}">Link</a>{% endif %}
                 </td>
             </tr>
         {% endfor %}
@@ -48,13 +49,12 @@
 {% endblock table %}
 {% block scripts %}
     <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4]
-
     $(document).ready(function () {
       new DataTable('#releasesTable', {
-        layout: layout,
-        order: [[4, 'asc']],
+        layout: getDatatableLayout([1,2,3,4]),
+        columnDefs: [
+            { type: 'date', targets: [4] },
+        ]
       });
     });
     </script>

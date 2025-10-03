@@ -27,6 +27,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 INSTALLED_APPS = [
     "django.contrib.admin",  # required
     "django.contrib.auth",
+    "django.contrib.postgres",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "django.contrib.sites",
     "databruce.apps.DatabruceConfig",
+    "django_browser_reload",
     "api",
     "rest_framework",
     "django_filters",
@@ -60,6 +62,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.http.ConditionalGetMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 TESTING = "test" in sys.argv
@@ -90,6 +93,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "databruce.context_processors.base_data",
             ],
+            "builtins": ["databruce.templatetags.filters"],
         },
     },
 ]

@@ -1,17 +1,14 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
   Runs &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row mb-4">
-    <h4>
-      <a href="{% url "runs" %}">Runs</a>
-      &gt; {{ info }}
-    </h4>
-  </div>
-  <div class="row mb-4 justify-content-center">
-    <div class="col">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="text-2xl text-nowrap mb-3">
+        <a href="{% url "runs" %}">Runs</a>
+        &gt; {{ info }}
+      </div>
       <div class="card">
         <div class="card-header">
           <ul class="nav nav-pills nav-fill" role="tablist">
@@ -40,46 +37,7 @@
         <div class="card-body px-0">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="eventTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Band</th>
-                      <th class="min-tablet-l">Venue</th>
-                      <th class="min-tablet-l">Location</th>
-                      <th class="min-tablet-l">Tour</th>
-                      <th class="min-tablet-l">Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in events %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          {% if event.artist %}
-                            <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          {% if event.tour %}
-                            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-wrap">{{ event.title|default_if_none:"" }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+              {% include "databruce/partials/event_table.html" with events=events %}
             </div>
             <div id="songs" class="tab-pane fade">
               {% include "databruce/partials/song_position_table.html" with songs=songs %}
@@ -91,20 +49,20 @@
   </div>
   <script>
     $(document).ready(function () {
-      // custom searchBuilder columns definition
-      layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3];
-
       new DataTable('#eventTable', {
-        layout: layout,
-        order: [[0, 'asc']],
+        layout: getDatatableLayout(),
+        columnDefs: [
+          { targets: [1], width: '10rem' }, //band
+          { targets: [0], type: 'date' }, //band
+          { targets: [2, 3], width: '14rem' }, //venue, location
+        ],
       });
 
-      // removes searchBuilder button, not needed for this.
-      layout.topEnd.features[1].buttons.pop();
-
       new DataTable('#songTable', {
-        searching: false,
-        layout: layout,
+        layout: getDatatableLayout([1,2]),
+        columnDefs: [
+          { targets: 0, width: '1rem' },
+        ],
       });
     })
   </script>

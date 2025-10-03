@@ -1,16 +1,17 @@
 {% extends "databruce/base.html" %}
-{% load search_filters %}
 {% load filters %}
 {% block title %}
   Advanced Search Results
 {% endblock title %}
 {% block content %}
-  <div class="row mb-4">
-    <div class="col">
-      <h4>Advanced Search Results</h4>
-      <h6>Click link below to copy a short url to these results (the links are very long and look awful).</h6>
-      <div id="short_url">
-        <button id="short-url" class="btn btn-link py-0">Get Short URL</button>
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="text-2xl text-nowrap">Advanced Search Results</div>
+      <div class="text-base mb-2">
+        Click link below to copy a short url to these results (the links are very long and look awful).
+      </div>
+      <div id="short_url" class="mb-3">
+        <button id="short-url" class="btn btn-link py-0 text-reset fw-semibold">Get Short URL</button>
         <span id="shortLink" class="d-none"></span>
         <button onclick="copy_to_clipboard()"
                 class="btn btn-link py-0 d-none"
@@ -18,17 +19,13 @@
           <i class="bi bi-copy"></i>
         </button>
       </div>
-    </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
+      <div class="card mb-3">
+        <div class="card-body text-sm">
           <div id="row">
             <div class="d-flex flex-column">
               {% if song_results %}
                 <span>
-                  <div class="pe-2">Songs:</div>
+                  <div class="pe-2 fw-semibold">Songs:</div>
                   <div>
                     {% for result in song_results %}
                       <div class="d-flex flex-row">{{ result }}</div>
@@ -54,65 +51,12 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col">
       <div class="card">
-        <div class="card-body px-0">
-          <div class="table-responsive">
-            <table class="table table-hover display nowrap" id="table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Band</th>
-                  <th>Venue</th>
-                  <th>Location</th>
-                  <th>Tour</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for event in events %}
-                  <tr>
-                    <td>
-                      <a href="{% url "event_details" id=event.id %}">{{ event }}
-                        {% if event.setlist_certainty == "Confirmed" %}
-                          <i class="bi bi-file-earmark-check"
-                             data-bs-toggle="tooltip"
-                             data-bs-placement="top"
-                             data-bs-title="Has Setlist"></i>
-                        {% endif %}
-                      </a>
-                    </td>
-                    <td>
-                      <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-                    </td>
-                    <td>
-                      <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.get_name }}</a>
-                    </td>
-                    <td>
-                      {% if event.venue.city %}
-                        <a href="{% url 'city_details' id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if event.tour %}
-                        <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <div class="card-body px-0">{% include "databruce/partials/event_table.html" with events=events %}</div>
       </div>
     </div>
   </div>
   <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons.pop()
-
     function copy_to_clipboard() {
       var text = document.getElementById('shortLink').innerHTML;
       navigator.clipboard.writeText( text );
@@ -120,8 +64,11 @@
     };
 
     $(document).ready(function () {
-      new DataTable('#table', {
-        layout: layout,
+      new DataTable('#eventTable', {
+        layout: getDatatableLayout([1,2,3,4]),
+        columnDefs: [
+          { targets: [1], width: '1rem', orderable: false },
+        ],
       });
 
       $('button#short-url').click(function () {

@@ -3,7 +3,7 @@
   Tours
 {% endblock title %}
 {% block info_row %}
-  <h4>Tours</h4>
+  <div class="text-2xl">Tours</div>
 {% endblock info_row %}
 {% block table_id %}
   tourTable
@@ -12,55 +12,48 @@
   <thead>
     <tr class="header">
       <th class="all" scope="col">Name</th>
+      <th class="all" scope="col">Band</th>
       <th class="min-tablet" scope="col">First</th>
       <th class="min-tablet" scope="col">Last</th>
       <th scope="col" class="text-center all">Shows</th>
       <th scope="col" class="text-center min-tablet">Songs</th>
       <th scope="col" class="text-center min-tablet">Legs</th>
-      <th scope="col" class="text-center min-tablet">Band</th>
     </tr>
   </thead>
   <tbody>
     {% for tour in tours %}
       <tr>
-        <td class="wrap">
+        <td class="nowrap">
           <a href="{% url "tour_details" id=tour.id %}">{{ tour.name }}</a>
         </td>
-        <td {% with first=tour.first %}
-            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=tour.first.id %}">{{ tour.first }}</a>
+        <td class="nowrap">
+          <a href="{% url "band_details" id=tour.band.id %}">{{ tour.band.name }}</a>
         </td>
-        <td {% with last=tour.last %}
-            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=tour.last.id %}">{{ tour.last }}</a>
+        <td data-sort="{{ tour.first.get_date }}"
+            data-filter="{{ tour.first.get_date }}">
+          <a href="{% url "event_details" id=tour.first.id %}">{{ tour.first.get_date }}</a>
+        </td>
+        <td data-sort="{{ tour.last.get_date }}"
+            data-filter="{{ tour.last.get_date }}">
+          <a href="{% url "event_details" id=tour.last.id %}">{{ tour.last.get_date }}</a>
         </td>
         <td class="text-center">{{ tour.num_shows }}</td>
         <td class="text-center">{{ tour.num_songs }}</td>
         <td class="text-center">{{ tour.num_legs }}</td>
-        <td class="text-center">{{ tour.band.name }}</td>
       </tr>
     {% endfor %}
   </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
-  // searchBuilder custom columns
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6]
-
   $(document).ready(function () {
     new DataTable('#tourTable', {
-      layout: layout,
-      order: [[2, 'desc']],
+      layout: getDatatableLayout([1, 2, 3, 4, 5, 6]),
       columnDefs: [
-        {
-          target: -1,
-          visible: false
-        },
-        { type: 'date', targets: [1, 2] }
+        { type: 'date', targets: [2, 3] },
+        { targets: [4, 5, 6], width: '6rem', className: 'dt-center' },
+        { targets: [2, 3], width: '8rem', className: 'dt-left' },
+        { targets: [1], width: '12rem', className: 'dt-left' },
       ],
     });
   });

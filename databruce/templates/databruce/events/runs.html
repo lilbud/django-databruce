@@ -3,8 +3,10 @@
   Event Runs
 {% endblock title %}
 {% block info_row %}
-  <h4>Event Runs</h4>
-  <h6>A 'run' is multiple events at the same venue by the same band. I largely based this off of Jerrybase.</h6>
+  <div class="text-2xl">Event Runs</div>
+  <div class="text-base">
+    A 'run' is multiple events at the same venue by the same band. I largely based this off of Jerrybase.
+  </div>
 {% endblock info_row %}
 {% block table_id %}
   runTable
@@ -16,8 +18,8 @@
       <th class="min-tablet-l" scope="col">Band</th>
       <th class="min-tablet-l" scope="col">Venue</th>
       <th class="min-tablet-l" scope="col">Location</th>
-      <th scope="col" class="text-center all">Events</th>
-      <th scope="col" class="text-center all">Songs</th>
+      <th scope="col" class="all">Events</th>
+      <th scope="col" class="all">Songs</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
     </tr>
@@ -25,29 +27,29 @@
   <tbody>
     {% for run in runs %}
       <tr>
-        <td class="text-wrap">
+        <td class="text-nowrap">
           <a href="{% url "run_details" id=run.id %}">{{ run.name }}</a>
         </td>
         <td class="text-nowrap">
           <a href="{% url "band_details" id=run.band.id %}">{{ run.band.name }}</a>
         </td>
-        <td>
-          <a href="{% url "venue_details" id=run.venue.id %}">{{ run.venue }}</a>
+        <td class="text-nowrap">
+          <a href="{% url "venue_details" id=run.venue.id %}">{{ run.venue.name }}</a>
         </td>
-        <td>
+        <td class="text-nowrap">
           <a href="{% url "city_details" id=run.venue.city.id %}">{{ run.venue.city }}</a>
         </td>
-        <td class="text-center">{{ run.num_shows }}</td>
-        <td class="text-center">{{ run.num_songs }}</td>
+        <td>{{ run.num_shows }}</td>
+        <td>{{ run.num_songs }}</td>
         <td class="text-nowrap"
-            data-sort="{{ run.first.id|slice:"0:4" }}-{{ run.first.id|slice:"4:6" }}-{{ run.first.id|slice:"6:8" }}"
-            data-filter="{{ run.first.id|slice:"0:4" }}-{{ run.first.id|slice:"4:6" }}-{{ run.first.id|slice:"6:8" }}">
-          <a href="{% url "event_details" id=run.first.id %}">{{ run.first }}</a>
+            data-sort="{{ run.first.get_date }}"
+            data-filter="{{ run.first.get_date }}">
+          <a href="{% url "event_details" id=run.first.id %}">{{ run.first.get_date }}</a>
         </td>
         <td class="text-nowrap"
-            data-sort="{{ run.last.id|slice:"0:4" }}-{{ run.last.id|slice:"4:6" }}-{{ run.last.id|slice:"6:8" }}"
-            data-filter="{{ run.last.id|slice:"0:4" }}-{{ run.last.id|slice:"4:6" }}-{{ run.last.id|slice:"6:8" }}">
-          <a href="{% url "event_details" id=run.last.id %}">{{ run.last }}</a>
+            data-sort="{{ run.last.get_date }}"
+            data-filter="{{ run.last.get_date }}">
+          <a href="{% url "event_details" id=run.last.id %}">{{ run.last.get_date }}</a>
         </td>
       </tr>
     {% endfor %}
@@ -55,14 +57,12 @@
 {% endblock table %}
 {% block scripts %}
   <script>
-  // custom searchBuilder columns definition
-  layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4, 5, 6, 7];
-
     $(document).ready(function () {
         new DataTable('#runTable', {
-            layout: layout,
-            scrollX: true,
-            order: [[-2, 'asc']],
+            layout: getDatatableLayout([1, 2, 3, 4, 5, 6, 7]),
+            columnDefs: [
+              { targets: [6, 7], type: 'date' }, 
+            ],
         });
     });
   </script>

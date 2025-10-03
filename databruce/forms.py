@@ -131,7 +131,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "start_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control form-control-sm",
+                "class": "form-control form-control-sm date-form",
             },
         ),
     )
@@ -146,7 +146,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "end_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control form-control-sm",
+                "class": "form-control form-control-sm date-form",
             },
         ),
     )
@@ -327,7 +327,7 @@ class SetlistSearch(forms.Form):
         choices=songs,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm song1 select2"},
+            attrs={"class": "form-select form-select-sm song1"},
         ),
     )
 
@@ -373,7 +373,7 @@ class SetlistSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select form-select-sm song2 select2",
+                "class": "form-select form-select-sm song2",
             },
         ),
     )
@@ -420,7 +420,7 @@ class EventSearch(forms.Form):
                 "name": "date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control",
+                "class": "form-control form-control-sm date-form",
             },
         ),
     )

@@ -3,8 +3,8 @@
   Bands
 {% endblock title %}
 {% block info_row %}
-  <h4>Bands</h4>
-  <h6>Bands that have shared a stage or appeared at an event with Bruce.</h6>
+  <div class="text-2xl">Bands</div>
+  <div class="text-base">Bands that have shared a stage or appeared at an event with Bruce.</div>
 {% endblock info_row %}
 {% block table_id %}
   bandTable
@@ -12,81 +12,48 @@
 {% block table %}
   <thead>
     <tr class="header">
-      <th scope="col">Name</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Appearances</th>
-      <th scope="col">Bruce's Band?</th>
+      <th>#</th>
+      <th>Name</th>
+      <th>First</th>
+      <th>Last</th>
+      <th>Bruce's Band?</th>
     </tr>
   </thead>
   <tbody>
     {% for band in bands %}
       <tr>
-        <td>
+        <td>{{ band.appearances }}</td>
+        <td class="text-nowrap">
           <a href="{% url "band_details" id=band.id %}">{{ band.name }}</a>
         </td>
-        <td {% with first=band.first %}
-            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=band.first.id %}">{{ band.first }}</a>
+        <td data-sort="{{ band.first.get_date }}"
+            data-filter="{{ band.first.get_date }}">
+          <a href="{% url "event_details" id=band.first.id %}">{{ band.first.get_date }}</a>
         </td>
-        <td {% with last=band.last %}
-            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=band.last.id %}">{{ band.last }}</a>
+        <td data-sort="{{ band.last.get_date }}"
+            data-filter="{{ band.last.get_date }}">
+          <a href="{% url "event_details" id=band.last.id %}">{{ band.last.get_date }}</a>
         </td>
-        <td>{{ band.appearances }}</td>
-        <td>
-          {% if band.springsteen_band %}
-            Yes
-          {% else %}
-            No
-          {% endif %}
-        </td>
+        <td>{{ band.springsteen_band }}</td>
       </tr>
     {% endfor %}
   </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
-    // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3];
-
   $(document).ready(function () {
     new DataTable('#bandTable', {
-      layout: layout,
+      layout: getDatatableLayout([0,1,2,3]),
       columnDefs: [
-        {
-          target: -1,
-          visible: false
-        },
-        { type: 'date', targets: [1,2] }
+        { target: -1, visible: false },
+        { type: 'date', targets: [2, 3] },
+        { type: 'num', targets: [0], width: '1rem' },
       ],
       initComplete: function () {
         this.api()
           .columns([-1])
           .every(function () {
-              var column = this;
-
-              $('<div class="row g-3 align-items-center"><div class="col-auto"><label for="artist">Category:</label></div><div class="col" id="artist-select"></div></div>').appendTo($('#dropdown-container'));
-
-              // this appears to be the only way to add a select filter
-              // without going through ajax calls. I originally had a pre-made dropdown in
-              // another file and included it like above, however, I had to use an ajax call
-              // otherwise it would appear but not work
-              var select = $('<select id="artist" class="custom-select form-select form-select-sm"></select>')
-                .appendTo($('#artist-select'))
-                .on('change', function () {
-                    column
-                      .search($(this).val(), {regex: true})
-                      .draw();
-                });
-              
-              select.append('<option value=".*">All</option>');
-              select.append('<option value="Yes">Bruce as member</option>');
-              select.append('<option value="No">Bruce as guest</option>');
+              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Bruce Bands', 'value': 'True'}, {'label': 'Guests', 'value': 'False'}]);
           });
       },
     });

@@ -2,19 +2,19 @@
     <table class="table table-hover display" id="songTable">
         <thead>
             <tr>
-                <th class="text-center all">#</th>
-                <th class="text-nowrap all">Song</th>
-                <th class="text-nowrap all">Category</th>
+                <th>#</th>
+                <th>Song</th>
+                <th>Category</th>
             </tr>
         </thead>
         <tbody>
             {% for song in songs %}
                 <tr>
-                    <td class="text-center">{{ song.plays }}</td>
-                    <td class="text-nowrap">
+                    <td>{{ song.plays }}</td>
+                    <td>
                         <a href="{% url "song_details" id=song.song_id %}">{{ song.name }}</a>
                     </td>
-                    <td class="text-nowrap">{{ song.category }}</td>
+                    <td>{{ song.category }}</td>
                 </tr>
             {% endfor %}
         </tbody>

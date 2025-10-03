@@ -1,0 +1,40 @@
+<div class="table-responsive">
+    <table class="table table-hover display" id="eventTable">
+        <thead>
+            <tr>
+                <th class="all">Date</th>
+                <th class="all">Band</th>
+                <th class="min-tablet-l">Venue</th>
+                <th class="min-tablet-l">Location</th>
+                <th class="min-tablet-l">Tour</th>
+                <th class="all">Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                <tr>
+                    <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
+                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+                    </td>
+                    <td class="text-nowrap">
+                        {% if event.venue.city %}
+                            <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">
+                        {% if event.tour %}
+                            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

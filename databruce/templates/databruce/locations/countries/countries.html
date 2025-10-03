@@ -3,8 +3,8 @@
   Countries
 {% endblock title %}
 {% block info_row %}
-  <h4>Countries</h4>
-  <h6>Countries that Bruce has played in</h6>
+  <div class="text-2xl">Countries</div>
+  <div class="text-base">Countries that Bruce has played in</div>
 {% endblock info_row %}
 {% block table_id %}
   countryTable
@@ -12,45 +12,40 @@
 {% block table %}
   <thead>
     <tr>
-      <th scope="col">Name</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th class="text-center" scope="col">Events</th>
+      <th>#</th>
+      <th>Name</th>
+      <th>First</th>
+      <th>Last</th>
     </tr>
   </thead>
   <tbody>
     {% for country in countries %}
       <tr>
+        <td class="text-center">{{ country.num_events }}</td>
         <td>
           <a href="{% url "country_details" id=country.id %}">{{ country }}</a>
         </td>
-        <td {% with first=country.first %}
-            data-sort="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            data-filter="{{ first.id|slice:"0:4" }}-{{ first.id|slice:"4:6" }}-{{ first.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=country.first.id %}">{{ country.first }}</a>
+        <td data-sort="{{ country.first.get_date }}"
+            data-filter="{{ country.first.get_date }}">
+          <a href="{% url "event_details" id=country.first.id %}">{{ country.first.get_date }}</a>
         </td>
-        <td {% with last=country.last %}
-            data-sort="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            data-filter="{{ last.id|slice:"0:4" }}-{{ last.id|slice:"4:6" }}-{{ last.id|slice:"6:8" }}"
-            {% endwith %}>
-          <a href="{% url "event_details" id=country.last.id %}">{{ country.last }}</a>
+        <td data-sort="{{ country.last.get_date }}"
+            data-filter="{{ country.last.get_date }}">
+          <a href="{% url "event_details" id=country.last.id %}">{{ country.last.get_date }}</a>
         </td>
-        <td class="text-center">{{ country.num_events }}</td>
       </tr>
     {% endfor %}
   </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
-    // custom searchBuilder columns definition
-    layout.topEnd.features[1].buttons[0].config.columns = [0,1,2,3];
-
     $(document).ready(function () {
       new DataTable('#countryTable', {  
-        order: [[0, 'asc']],
-        layout: layout,
-        columnDefs: [{ type: 'date', targets: [1,2] }]
+        layout: getDatatableLayout([0,1,2,3]),
+        columnDefs: [
+          { width: '1rem', targets: [0] },
+          { type: 'date', targets: [2,3] },
+        ]
       })
     })
   </script>

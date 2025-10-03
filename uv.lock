@@ -105,6 +105,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-browser-reload"
+version = "1.20.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6d/28/575971463f26d97889b46e99e44159291f0f32a25d5d7a177b8818632d6a/django_browser_reload-1.20.0.tar.gz", hash = "sha256:a5e23fc4d0ab67d594edf220fb1e3fd8b35fad4c36b9a03b590bf84f58549735", size = 14846 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/30/4ef7e7b30f51ae0e3a94eb2ba8c1c6807859969a9c40ecb7633dc95362eb/django_browser_reload-1.20.0-py3-none-any.whl", hash = "sha256:e1e2a7b8835b6a367b4dcb0e6560b0dd1c027bd9e3b4f77a4ba4df27d6a8a676", size = 12276 },
+]
+
+[[package]]
 name = "django-crispy-forms"
 version = "2.3"
 source = { registry = "https://pypi.org/simple" }
@@ -122,6 +135,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "django-browser-reload" },
     { name = "django-crispy-forms" },
     { name = "django-debug-toolbar" },
     { name = "django-filter" },
@@ -131,6 +145,7 @@ dependencies = [
     { name = "djangorestframework-datatables" },
     { name = "djlint" },
     { name = "markdown" },
+    { name = "markdown-it-py" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "python-dotenv" },
     { name = "requests" },
@@ -139,6 +154,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = "==5.1.7" },
+    { name = "django-browser-reload", specifier = ">=1.20.0" },
     { name = "django-crispy-forms", specifier = "==2.3" },
     { name = "django-debug-toolbar", specifier = "==5.1.0" },
     { name = "django-filter", specifier = "==24.3" },
@@ -148,6 +164,7 @@ requires-dist = [
     { name = "djangorestframework-datatables", specifier = "==0.7.2" },
     { name = "djlint", specifier = ">=1.36.4" },
     { name = "markdown", specifier = "==3.7" },
+    { name = "markdown-it-py", specifier = ">=4.0.0" },
     { name = "psycopg", extras = ["binary", "pool"] },
     { name = "python-dotenv", specifier = "==1.1.0" },
     { name = "requests", specifier = ">=2.32.4" },
@@ -298,6 +315,27 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/54/28/3af612670f82f4c056911fbbbb42760255801b3068c48de792d354ff4472/markdown-3.7.tar.gz", hash = "sha256:2ae2471477cfd02dbbf038d5d9bc226d40def84b4fe2986e49b59b6b472bbed2", size = 357086 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3f/08/83871f3c50fc983b88547c196d11cf8c3340e37c32d2e9d6152abe2c61f7/Markdown-3.7-py3-none-any.whl", hash = "sha256:7eb6df5690b81a1d7942992c97fad2938e956e79df20cbc6186e9c3a77b1c803", size = 106349 },
+]
+
+[[package]]
+name = "markdown-it-py"
+version = "4.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mdurl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5b/f5/4ec618ed16cc4f8fb3b701563655a69816155e79e24a17b651541804721d/markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3", size = 73070 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl", hash = "sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147", size = 87321 },
+]
+
+[[package]]
+name = "mdurl"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba", size = 8729 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8", size = 9979 },
 ]
 
 [[package]]

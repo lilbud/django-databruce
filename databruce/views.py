@@ -42,7 +42,7 @@ from django.views.generic import TemplateView
 from shortener import shortener
 
 from . import forms, models
-from .templatetags import search_filters
+from .templatetags import filters
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -59,14 +59,16 @@ VALID_SET_NAMES = [
 
 class Index(TemplateView):
     template_name = "databruce/index.html"
-    queryset = models.Events.objects.all().select_related(
-        "artist",
-        "venue",
-        "venue__city",
-        "venue__city__country",
-        "venue__city__state",
-        "venue__state",
-        "venue__country",
+    queryset = (
+        models.Events.objects.all()
+        .select_related(
+            "artist",
+            "venue",
+            "venue__city",
+            "venue__city__country",
+            "venue__country",
+        )
+        .prefetch_related("venue__city__state", "venue__state")
     )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
@@ -97,10 +99,10 @@ class Index(TemplateView):
                 "event__artist",
                 "event__venue",
                 "event__venue__city",
-                "event__venue__city__state",
                 "event__venue__city__country",
-                "event__venue__state",
-                "event__venue__state__country",
+            )
+            .prefetch_related(
+                "event__venue__city__state",
             )
             .order_by("-event")
             .first()
@@ -109,7 +111,7 @@ class Index(TemplateView):
         context["latest_show"] = (
             models.Setlists.objects.filter(event__id=context["latest_event"].event.id)
             .annotate(
-                separator=Case(When(segue=True, then=Value(">")), default=Value(",")),
+                separator=Case(When(segue=True, then=Value(">"))),
             )
             .select_related("song")
             .order_by("song_num")
@@ -182,29 +184,28 @@ class UserProfile(TemplateView):
             username__iexact=self.kwargs["username"],
         )
 
-        context["user_shows"] = models.UserAttendedShows.objects.filter(
-            user__username__iexact=self.kwargs["username"],
-        ).select_related(
-            "event",
-            "event__tour",
-            "event__venue",
-            "event__artist",
-            "event__venue__city",
-            "event__venue__city__state",
-            "event__venue__city__country",
+        context["user_shows"] = (
+            models.UserAttendedShows.objects.filter(
+                user__id=context["user_info"].id,
+            )
+            .order_by("event__id")
+            .select_related(
+                "event",
+                "event__tour",
+                "event__venue",
+                "event__artist",
+                "event__venue__city",
+                "event__venue__city__country",
+            )
+            .prefetch_related(
+                "event__venue__city__state",
+            )
         )
 
         if context["user_shows"].count() > 0:
             context["user_songs"] = models.Setlists.objects.filter(
                 event__id__in=context["user_shows"].values_list("event__id"),
-                set_name__in=[
-                    "Show",
-                    "Set 1",
-                    "Set 2",
-                    "Encore",
-                    "Pre-Show",
-                    "Post-Show",
-                ],
+                set_name__in=VALID_SET_NAMES,
             ).select_related("song", "song__first", "event")
 
             context["user_seen"] = (
@@ -214,24 +215,23 @@ class UserProfile(TemplateView):
                     name=F("song__name"),
                     count=Count("event"),
                     first=Min("event__id"),
+                    category=F("song__category"),
                 )
-                .order_by("-count")
+                .order_by("-count", "name")
             )
-
-            print(context["user_seen"])
 
             context["user_not_seen"] = (
                 models.Songs.objects.exclude(
                     id__in=context["user_songs"].values_list("song__id"),
                 )
                 .filter(num_plays_public__gte=100)
-                .order_by("-num_plays_public")
+                .order_by("-num_plays_public", "name")
             )
 
             context["user_rare_songs"] = models.Songs.objects.filter(
                 id__in=context["user_songs"].values("song__id"),
                 num_plays_public__lte=100,
-            ).order_by("num_plays_public")
+            ).order_by("num_plays_public", "name")
 
         return context
 
@@ -294,14 +294,15 @@ class SignUp(TemplateView):
         subject_template_name = "users/signup_confirm_subject.txt"
         email_template_name = "users/signup_email.html"
 
-        subject = loader.render_to_string(subject_template_name, context)
         # Email subject *must not* contain newlines
-        subject = "".join(subject.splitlines())
+        subject = "".join(
+            loader.render_to_string(subject_template_name, context).splitlines(),
+        )
         body = loader.render_to_string(email_template_name, context)
 
         return requests.post(
-            "https://api.mailgun.net/v3/databruce.com/messages",
-            auth=("api", os.getenv("MAILGUN_API", "MAILGUN_API")),
+            os.getenv("MAILGUN_URL"),
+            auth=("api", os.getenv("MAILGUN_API")),
             data={
                 "from": f"Databruce <{from_email}>",
                 "to": f"{context['user']} <{to_email}>",
@@ -462,24 +463,29 @@ class EventDetail(TemplateView):
         "artist",
         "venue__city",
         "venue__city__country",
-        "venue__city__state__country",
         "tour",
-    ).prefetch_related("venue__state", "venue__city__state")
+    ).prefetch_related("venue__city__state", "venue__city__state__country")
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["event"] = self.queryset.filter(id=self.kwargs["id"]).first()
 
         context["title"] = f"{context['event']} {context['event'].venue}"
-        context["setlist"] = (
+
+        setlist = (
             models.Setlists.objects.filter(event__id=context["event"].id)
             .annotate(
-                separator=Case(When(segue=True, then=Value(">")), default=Value(",")),
+                separator=Case(When(segue=True, then=Value(">"))),
             )
             .select_related("song", "event")
             .prefetch_related("ltp")
             .order_by("song_num")
         )
+
+        context["setlist"] = setlist.exclude(set_name="Soundcheck")
+
+        context["soundcheck"] = setlist.filter(set_name="Soundcheck")
+        print(context["soundcheck"])
 
         onstage = (
             models.Onstage.objects.filter(event__id=context["event"].id)
@@ -491,13 +497,25 @@ class EventDetail(TemplateView):
 
         context["bands"] = onstage.exclude(band=None).select_related("band")
 
-        context["notes"] = (
-            models.SetlistNotes.objects.filter(
-                event=self.kwargs["id"],
+        if context["setlist"]:
+            context["notes"] = models.SetlistNotes.objects.filter(
+                event__id=context["event"].id,
+            ).select_related("id", "event")
+
+            context["note_ids"] = context["notes"].values_list("id", flat=True)
+
+            context["snippets"] = (
+                models.Snippets.objects.filter(
+                    setlist__id__in=context["setlist"].values("id"),
+                )
+                .select_related("setlist", "snippet")
+                .order_by("position")
             )
-            .select_related("id")
-            .order_by("id")
-        )
+
+            context["snippet_ids"] = context["snippets"].values_list(
+                "setlist__id",
+                flat=True,
+            )
 
         context["prev_event"] = self.queryset.filter(id__lt=context["event"].id).last()
         context["next_event"] = self.queryset.filter(id__gt=context["event"].id).first()
@@ -541,16 +559,8 @@ class EventDetail(TemplateView):
         context["setlist_unique"] = (
             context["setlist"]
             .filter(
-                set_name__in=[
-                    "Show",
-                    "Set 1",
-                    "Set 2",
-                    "Pre-Show",
-                    "Encore",
-                    "Post-Show",
-                ],
+                set_name__in=VALID_SET_NAMES,
             )
-            .select_related("song")
             .order_by("song__category", "song_num")
         )
 
@@ -575,6 +585,7 @@ class EventDetail(TemplateView):
                     output_field=IntegerField(),
                 ),
             )
+            # print(context["album_breakdown"])
 
         return context
 
@@ -613,23 +624,15 @@ class Event(TemplateView):
 
 class Venue(TemplateView):
     template_name = "databruce/locations/venues/venues.html"
-    queryset = (
-        models.Venues.objects.all()
-        .order_by("name")
-        .select_related(
-            "city",
-            "city__country",
-            "country",
-            "first",
-            "last",
-        )
-        .prefetch_related("state", "city__state", "city__state__country", "state")
-    )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Venues"
-        context["venues"] = self.queryset
+        context["venues"] = (
+            models.Venues.objects.all()
+            .order_by("name")
+            .select_related("city", "state", "country", "first", "last")
+        )
         return context
 
 
@@ -639,16 +642,25 @@ class VenueDetail(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["events"] = models.Events.objects.filter(
-            venue__id=self.kwargs["id"],
-        ).select_related("artist", "tour")
+        context["events"] = (
+            models.Events.objects.filter(
+                venue__id=self.kwargs["id"],
+            )
+            .select_related(
+                "artist",
+                "tour",
+                "venue__city",
+                "venue__city__country",
+            )
+            .prefetch_related("venue__city__state", "venue__city__state__country")
+            .order_by("id")
+        )
 
         context["venue_info"] = (
             models.Venues.objects.filter(
                 id=self.kwargs["id"],
             )
             .select_related("city", "city__country")
-            .prefetch_related("city__state")
             .first()
         )
 
@@ -659,15 +671,18 @@ class VenueDetail(TemplateView):
                 event__venue__id=self.kwargs["id"],
                 set_name__in=VALID_SET_NAMES,
             )
+            .select_related("song")
             .values(
                 "song_id",
             )
             .annotate(
                 plays=Count("event_id"),
                 name=F("song__name"),
+                category=F("song__category"),
             )
             .order_by(
-                "song_id",
+                "-plays",
+                "name",
             )
         )
 
@@ -679,7 +694,9 @@ class SongLyrics(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["lyrics"] = models.Lyrics.objects.all().select_related("song")
+        context["lyrics"] = (
+            models.Lyrics.objects.all().order_by("song__name").select_related("song")
+        )
         return context
 
 
@@ -715,7 +732,7 @@ class SongDetail(TemplateView):
                 song=self.kwargs["id"],
             )
             .select_related("event")
-            .order_by("event")
+            .order_by("event", "num")
         )
 
         context["song_info"] = (
@@ -725,8 +742,6 @@ class SongDetail(TemplateView):
             )
             .first()
         )
-
-        print(context["song_info"])
 
         context["title"] = f"{context['song_info'].name}"
 
@@ -821,14 +836,9 @@ def event_search(request: HttpRequest):
         for r in search_qs:
             result = {
                 "id": r.id,
-                "value": f"{r.date.strftime('%Y-%m-%d')} - {r.venue}",
-                "date": r.date.strftime("%Y-%m-%d"),
+                "value": f"{r.get_date()} - {r.venue}",
+                "date": r.get_date(),
             }
-
-            if r.early_late:
-                result["value"] = (
-                    f"{r.date.strftime('%Y-%m-%d')} {r.early_late} - {r.venue}"
-                )
 
             results.append(result)
 
@@ -840,20 +850,22 @@ def event_search(request: HttpRequest):
 class EventSearch(TemplateView):
     template_name = "databruce/search/search.html"
     form = forms.EventSearch
-    queryset = models.Events.objects.all().select_related(
-        "venue",
-        "venue__city",
-        "venue__city__country",
-        "venue__city__state",
-        "artist",
-        "tour",
+    queryset = (
+        models.Events.objects.all()
+        .select_related(
+            "venue",
+            "venue__city",
+            "venue__city__country",
+            "artist",
+            "tour",
+        )
+        .prefetch_related("venue__city__state")
     )
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form(request.GET)
 
         if form.is_valid():
-            print(form.cleaned_data)
             try:
                 result = self.queryset.filter(
                     date=form.cleaned_data["date"],
@@ -882,19 +894,16 @@ class EventSearch(TemplateView):
 
 class Tour(TemplateView):
     template_name = "databruce/tours/tours.html"
-    queryset = (
-        models.Tours.objects.all()
-        .order_by("-last")
-        .select_related(
-            "first",
-            "last",
-            "band",
-        )
-    )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["tours"] = self.queryset
+
+        context["tours"] = (
+            models.Tours.objects.all()
+            .order_by("-last")
+            .select_related("first", "last", "band")
+        )
+
         context["title"] = "Tours"
 
         return context
@@ -910,9 +919,11 @@ class TourDetail(TemplateView):
             .select_related("band")
             .first()
         )
+
         context["title"] = f"{context['tour']}"
+
         context["events"] = (
-            models.Events.objects.filter(tour=self.kwargs["id"])
+            models.Events.objects.filter(tour=context["tour"].id)
             .order_by("id")
             .select_related(
                 "venue",
@@ -929,21 +940,25 @@ class TourDetail(TemplateView):
             )
         )
 
-        context["tour_legs"] = (
-            models.TourLegs.objects.filter(
-                tour__id=self.kwargs["id"],
+        if context["tour"].num_legs > 0:
+            context["tour_legs"] = (
+                models.TourLegs.objects.filter(
+                    tour__id=context["tour"].id,
+                )
+                .order_by(
+                    "first",
+                )
+                .select_related("first", "last")
             )
-            .order_by(
-                "first",
-            )
-            .select_related("first", "last")
-        )
 
-        # try rewriting with a position group by
+        songfilter = Q(event__tour__id=context["tour"].id)
+
+        if context["tour"].id != 49:
+            songfilter.add(Q(set_name__in=VALID_SET_NAMES), Q.AND)
+
         context["songs"] = (
             models.Setlists.objects.filter(
-                event__tour__id=self.kwargs["id"],
-                set_name__in=VALID_SET_NAMES,
+                songfilter,
             )
             .values(
                 "song_id",
@@ -955,13 +970,14 @@ class TourDetail(TemplateView):
             )
             .order_by(
                 "-plays",
+                "name",
             )
         )
 
         if len(context["songs"]) > 0:
             context["slots"] = (
                 models.Setlists.objects.filter(
-                    event__tour__id=self.kwargs["id"],
+                    event__tour__id=context["tour"].id,
                     set_name__in=VALID_SET_NAMES,
                 )
                 .exclude(position=None)
@@ -1036,8 +1052,6 @@ class TourDetail(TemplateView):
                 )
             ).order_by("event")
 
-        print(context["slots"])
-
         return context
 
 
@@ -1045,28 +1059,21 @@ class SetlistNotesSearch(View):
     form_class = forms.SetlistNoteSearch
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        form = self.form_class()
-
         return render(
             request,
             "databruce/search/notes_search.html",
-            context={"form": form},
+            context={"form": self.form_class()},
         )
 
     def post(self, request: HttpRequest):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            results = (
-                models.SetlistNotes.objects.filter(
-                    note__icontains=form.cleaned_data["query"],
-                )
-                .select_related(
-                    "id",
-                    "id__song",
-                    "event",
-                )
-                .prefetch_related("last", "last__artist", "last__venue")
+            results = models.Setlists.objects.filter(
+                note__search=form.cleaned_data["query"],
+            ).select_related(
+                "song",
+                "event",
             )
 
         return render(
@@ -1087,16 +1094,8 @@ class AdvancedSearch(View):
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()
 
-        if request.GET.get("current", None):
-            form = self.form_class(
-                initial={
-                    "month": self.date.month,
-                    "day": self.date.day,
-                },
-            )
-
         setlist_formset = self.formset_class(
-            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "0"},
+            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "1"},
         )
 
         return render(
@@ -1119,6 +1118,13 @@ class AdvancedSearchResults(View):
 
         return field_filter
 
+    def result_choice(self, choice: str) -> str:
+        """Return IS/NOT depending on field value. Used for result display."""
+        if choice:
+            return choice
+
+        return "is"
+
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         event_form = self.form_class(request.GET)
         formset = self.formset_class(data=request.GET)
@@ -1126,8 +1132,6 @@ class AdvancedSearchResults(View):
         results = []
 
         if event_form.is_valid():
-            print(event_form.changed_data)
-
             event_filter = Q(date__gte=event_form.cleaned_data["first_date"]) & Q(
                 date__lte=event_form.cleaned_data["last_date"],
             )
@@ -1151,8 +1155,10 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                choice = self.result_choice(event_form.cleaned_data["month_choice"])
+
                 results.append(
-                    f"{event_form.fields['month'].label}: ({event_form.cleaned_data['month_choice']}) {search_filters.get_month_from_num(event_form.cleaned_data['month'])}",
+                    f"{event_form.fields['month'].label}: ({choice}) {filters.get_month_from_num(event_form.cleaned_data['month'])}",
                 )
 
             if "day" in event_form.changed_data:
@@ -1164,8 +1170,10 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                choice = self.result_choice(event_form.cleaned_data["day_choice"])
+
                 results.append(
-                    f"{event_form.fields['day'].label}: ({event_form.cleaned_data['day_choice']}) {event_form.cleaned_data['day']}",
+                    f"{event_form.fields['day'].label}: ({choice}) {event_form.cleaned_data['day']}",
                 )
 
             if "city" in event_form.changed_data:
@@ -1177,8 +1185,10 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                choice = self.result_choice(event_form.cleaned_data["city_choice"])
+
                 results.append(
-                    f"{event_form.fields['city'].label}: ({event_form.cleaned_data['city_choice']}) {search_filters.get_city(event_form.cleaned_data['city'])}",
+                    f"{event_form.fields['city'].label}: ({choice}) {filters.get_city(event_form.cleaned_data['city'])}",
                 )
 
             if "state" in event_form.changed_data:
@@ -1190,8 +1200,10 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                choice = self.result_choice(event_form.cleaned_data["state_choice"])
+
                 results.append(
-                    f"{event_form.fields['state'].label}: ({event_form.cleaned_data['state_choice']}) {search_filters.get_state(event_form.cleaned_data['state'])}",
+                    f"{event_form.fields['state'].label}: ({choice}) {filters.get_state(event_form.cleaned_data['state'])}",
                 )
 
             if "country" in event_form.changed_data:
@@ -1202,8 +1214,11 @@ class AdvancedSearchResults(View):
                     ),
                     Q.AND,
                 )
+
+                choice = self.result_choice(event_form.cleaned_data["country_choice"])
+
                 results.append(
-                    f"{event_form.fields['country'].label}: ({event_form.cleaned_data['country_choice']}) {search_filters.get_country(event_form.cleaned_data['country'])}",
+                    f"{event_form.fields['country'].label}: ({choice}) {filters.get_country(event_form.cleaned_data['country'])}",
                 )
 
             if "tour" in event_form.changed_data:
@@ -1215,8 +1230,10 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                choice = self.result_choice(event_form.cleaned_data["tour_choice"])
+
                 results.append(
-                    f"{event_form.fields['tour'].label}: ({event_form.cleaned_data['tour_choice']}) {search_filters.get_tour(event_form.cleaned_data['tour'])}",
+                    f"{event_form.fields['tour'].label}: ({choice}) {filters.get_tour(event_form.cleaned_data['tour'])}",
                 )
 
             # musician and band query a different model, and have to be handled separately
@@ -1234,8 +1251,10 @@ class AdvancedSearchResults(View):
 
                 event_filter.add(Q(id__in=events), Q.AND)
 
+                choice = self.result_choice(event_form.cleaned_data["musician_choice"])
+
                 results.append(
-                    f"{event_form.fields['musician'].label}: ({event_form.cleaned_data['musician_choice']}) {search_filters.get_relation(event_form.cleaned_data['musician'])}",
+                    f"{event_form.fields['musician'].label}: ({choice}) {filters.get_relation(event_form.cleaned_data['musician'])}",
                 )
 
             if "band" in event_form.changed_data:
@@ -1250,8 +1269,10 @@ class AdvancedSearchResults(View):
 
                 event_filter.add(Q(id__in=events), Q.AND)
 
+                choice = self.result_choice(event_form.cleaned_data["band_choice"])
+
                 results.append(
-                    f"{event_form.fields['band'].label}: ({event_form.cleaned_data['band_choice']}) {search_filters.get_band(event_form.cleaned_data['band'])}",
+                    f"{event_form.fields['band'].label}: ({choice}) {filters.get_band(event_form.cleaned_data['band'])}",
                 )
 
             if "day_of_week" in event_form.changed_data:
@@ -1263,37 +1284,33 @@ class AdvancedSearchResults(View):
                     Q.AND,
                 )
 
+                choice = self.result_choice(event_form.cleaned_data["dow_choice"])
+
                 results.append(
-                    f"{event_form.fields['day_of_week'].label}: ({event_form.cleaned_data['dow_choice']}) {search_filters.get_day_from_num(event_form.cleaned_data['day_of_week'])}",
+                    f"{event_form.fields['day_of_week'].label}: ({choice}) {filters.get_day_from_num(event_form.cleaned_data['day_of_week'])}",
                 )
 
         event_results = []
         setlist_event_filter = Q()
 
-        valid_set_names = [
-            "Show",
-            "Set 1",
-            "Set 2",
-            "Encore",
-            "Pre-Show",
-            "Post-Show",
-        ]
-
         if formset.is_valid():
+            print(formset.cleaned_data)
             for form in formset.cleaned_data:
                 try:
                     song1 = models.Songs.objects.get(id=form["song1"])
-                    setlist_filter = Q(current__song__id=song1.id) & Q(
-                        current__set_name__in=valid_set_names,
+                    setlist_filter = Q(
+                        set_name__in=VALID_SET_NAMES,
+                    ) & Q(song=song1.id)
+
+                    song_events = models.Setlists.objects.filter(
+                        song__id=song1.id,
                     )
 
                     if form["position"] == "Followed By":
                         song2 = models.Songs.objects.get(id=form["song2"])
 
-                        followed_filter = Q(next__song__id=song2.id)
-
                         setlist_filter.add(
-                            self.check_field_choice(form["choice"], followed_filter),
+                            self.check_field_choice(form["choice"], Q(next=song2.id)),
                             Q.AND,
                         )
 
@@ -1301,44 +1318,20 @@ class AdvancedSearchResults(View):
                             f"{song1} ({form['choice']} followed by) {song2}",
                         )
 
-                        qs = models.SongsPage.objects.filter(
+                        qs = models.Songspagenew.objects.filter(
                             setlist_filter,
                         )
 
                         event_results.append(
-                            list(qs.values_list("current__event", flat=True)),
+                            list(qs.values_list("event", flat=True)),
                         )
 
                     elif form["position"] != "Anywhere":
                         # all others except anywhere and followed by
-                        setlist_filter = Q(
-                            set_name__in=valid_set_names,
-                        )
-
-                        song_events = models.Setlists.objects.filter(
-                            song__id=song1.id,
-                        )
-
-                        setlist_filter.add(
-                            self.check_field_choice(
-                                form["choice"],
-                                Q(song__id=song1.id),
-                            ),
-                            Q.AND,
-                        )
-
                         setlist_filter.add(
                             self.check_field_choice(
                                 form["choice"],
                                 Q(position=form["position"]),
-                            ),
-                            Q.AND,
-                        )
-
-                        setlist_filter.add(
-                            self.check_field_choice(
-                                form["choice"],
-                                Q(event__id__in=song_events.values("event__id")),
                             ),
                             Q.AND,
                         )
@@ -1353,14 +1346,6 @@ class AdvancedSearchResults(View):
 
                     else:
                         # anywhere
-                        setlist_filter = Q(
-                            set_name__in=valid_set_names,
-                        )
-
-                        song_events = models.Setlists.objects.filter(
-                            song__id=song1.id,
-                        )
-
                         setlist_filter.add(
                             self.check_field_choice(
                                 form["choice"],
@@ -1383,6 +1368,7 @@ class AdvancedSearchResults(View):
                             Q(id__in=list(set.union(*map(set, event_results)))),
                             Q.OR,
                         )
+
                     else:
                         # AND conjunction, events in all lists that get here
                         setlist_event_filter.add(
@@ -1405,7 +1391,6 @@ class AdvancedSearchResults(View):
                 "venue",
                 "artist",
                 "venue__city",
-                "venue__country",
                 "venue__city__country",
                 "tour",
             )
@@ -1413,6 +1398,7 @@ class AdvancedSearchResults(View):
                 "venue__city__state",
                 "venue__city__state__country",
             )
+            .order_by("id")
         )
 
         description = ""
@@ -1453,9 +1439,13 @@ class Relation(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Relations"
-        context["relations"] = models.Relations.objects.all().select_related(
-            "first",
-            "last",
+        context["relations"] = (
+            models.Relations.objects.all()
+            .select_related(
+                "first",
+                "last",
+            )
+            .order_by("name")
         )
         return context
 
@@ -1491,17 +1481,21 @@ class RelationDetail(TemplateView):
         )
 
         context["events"] = (
-            models.Onstage.objects.filter(relation=context["info"].id)
+            models.Events.objects.filter(
+                id__in=models.Onstage.objects.filter(
+                    relation=context["info"].id,
+                ).values("event__id"),
+            )
             .select_related(
-                "event__venue",
-                "event__artist",
-                "event__venue__city",
-                "event__venue__city__country",
-                "event__tour",
+                "venue",
+                "artist",
+                "venue__city",
+                "venue__city__country",
+                "tour",
             )
             .prefetch_related(
-                "event__venue__city__state",
-                "event__venue__city__state__country",
+                "venue__city__state",
+                "venue__city__state__country",
             )
             .order_by("id")
         )
@@ -1622,7 +1616,8 @@ class CityDetail(TemplateView):
                 category=F("song__category"),
             )
             .order_by(
-                "song_id",
+                "-plays",
+                "name",
             )
         )
         context["events"] = (
@@ -1669,15 +1664,19 @@ class StateDetail(TemplateView):
         context["info"] = get_object_or_404(self.queryset, id=self.kwargs["id"])
         context["title"] = f"{context['info']}"
 
-        context["events"] = models.Events.objects.filter(
-            venue__state=self.kwargs["id"],
-        ).select_related(
-            "venue__city",
-            "venue__city__state",
-            "venue__city__country",
-            "venue__country",
-            "artist",
-            "tour",
+        context["events"] = (
+            models.Events.objects.filter(
+                venue__state=self.kwargs["id"],
+            )
+            .select_related(
+                "venue__city",
+                "venue__city__state",
+                "venue__city__country",
+                "venue__country",
+                "artist",
+                "tour",
+            )
+            .order_by("id")
         )
 
         context["songs"] = (
@@ -1694,7 +1693,8 @@ class StateDetail(TemplateView):
                 category=F("song__category"),
             )
             .order_by(
-                "song_id",
+                "-plays",
+                "name",
             )
         )
 
@@ -1731,7 +1731,7 @@ class CountryDetail(TemplateView):
         context["title"] = f"{context['info']}"
 
         context["events"] = (
-            models.Events.objects.filter(venue__country=self.kwargs["id"])
+            models.Events.objects.filter(venue__country=context["info"].id)
             .select_related(
                 "artist",
                 "tour",
@@ -1740,15 +1740,13 @@ class CountryDetail(TemplateView):
             )
             .prefetch_related(
                 "venue__city__state",
-                "venue__state",
-                "venue__state__country",
             )
             .order_by("id")
         )
 
         context["songs"] = (
             models.Setlists.objects.filter(
-                event__venue__country__id=self.kwargs["id"],
+                event__id__in=context["events"].values("id"),
                 set_name__in=VALID_SET_NAMES,
             )
             .values(
@@ -1760,11 +1758,14 @@ class CountryDetail(TemplateView):
                 category=F("song__category"),
             )
             .order_by(
-                "song_id",
+                "-plays",
             )
         )
 
-        context["venues"] = models.Venues.objects.filter(country__id=self.kwargs["id"])
+        context["venues"] = models.Venues.objects.filter(
+            country__id=self.kwargs["id"],
+        ).order_by("name")
+
         return context
 
 
@@ -1842,7 +1843,8 @@ class RunDetail(TemplateView):
                 category=F("song__category"),
             )
             .order_by(
-                "song_id",
+                "-plays",
+                "name",
             )
         )
 
@@ -1858,7 +1860,7 @@ class TourLeg(TemplateView):
         context["legs"] = (
             models.TourLegs.objects.all()
             .select_related("first", "last")
-            .order_by("first")
+            .order_by("-last")
         )
         return context
 
@@ -1901,12 +1903,13 @@ class TourLegDetail(TemplateView):
                 category=F("song__category"),
             )
             .order_by(
-                "song_id",
+                "-plays",
+                "name",
             )
         )
         context["venues"] = models.Venues.objects.filter(
             id__in=context["events"].values_list("venue"),
-        )
+        ).order_by("name")
 
         return context
 

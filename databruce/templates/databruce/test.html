@@ -9,7 +9,7 @@
   <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
 {% endblock extrajs %}
 {% block content %}
-  <h4>Songs</h4>
+  <div class="text-2xl">Songs</div>
   <div class="table-responsive">
     <table id="myTable"
            width="100%"
@@ -34,7 +34,7 @@
     $(document).ready(function() {
       var table = $('#myTable').DataTable(
         {
-          layout: layout,
+          layout: getDatatableLayout(),
           columnControl: ['searchDropdown'],
           searchDelay: 0,
           serverSide: true,

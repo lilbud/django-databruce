@@ -1,20 +1,19 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
     Roadmap
 {% endblock title %}
 {% block content %}
     <div class="row justify-content-center" id="about">
-        <div class="col-lg-6">
+        <div class="col-lg-6 text-base">
             <div class="row">
-                <h4>
+                <div class="text-2xl">
                     <a href="{% url 'index' %}">Databruce</a> &gt; Roadmap
-                </h4>
+                </div>
             </div>
             <div class="row mb-3">
-                <h5>
+                <div class="text-xl">
                     This page is primarily to list things that I plan to do at some point. No ETA on any of these, and details for each are still in the air.
-                </h5>
+                </div>
             </div>
             <div class="row mb-3">
                 <p>
@@ -33,15 +32,15 @@
                     </li>
                 </ul>
                 <p>The following is also in the works.</p>
-                <h4>Bruce Website Archives</h4>
+                <div class="text-2xl">Bruce Website Archives</div>
                 <p>
                     A collection of Bruce-related sites I managed to preserve/archive. Some no longer exist, and others are no longer available in their original form. As I finalize this, more details will be available.
                 </p>
-                <h4>A Public API</h4>
+                <div class="text-2xl">A Public API</div>
                 <p>
                     I really don't know if/when this will happen, would have to figure out how to host it without killing my wallet in hosting fees.
                 </p>
-                <h4>Data Improvements</h4>
+                <div class="text-2xl">Data Improvements</div>
                 <p>
                     I want to add more detailed data in general. Things like having Venue locations, capacity, and even possibly ticket sales per show. Would have to find a data source for the latter.
                 </p>

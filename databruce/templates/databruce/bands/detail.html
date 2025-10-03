@@ -1,47 +1,13 @@
 {% extends "databruce/base.html" %}
-{% load filters %}
 {% block title %}
   Bands &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row mb-2">
-    <div class="col">
-      <h4>
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="text-2xl text-nowrap mb-3">
         <a href="{% url 'bands' %}">Bands</a> &gt; {{ info.name }}
-      </h4>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="col">
-            {% if info.mbid or info.brucebase_url %}
-              <div class="d-flex flex-row fs-6">
-                <div class="pe-2 fw-semibold">Links:</div>
-              </div>
-              <div class="d-flex flex-row fs-6">
-                <ul>
-                  {% if info.brucebase_url %}
-                    <li>
-                      <a href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
-                    </li>
-                  {% endif %}
-                  {% if info.mbid %}
-                    <li>
-                      <a href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
-                    </li>
-                  {% endif %}
-                </ul>
-              </div>
-            {% endif %}
-          </div>
-        </div>
       </div>
-    </div>
-  </div>
-  <div class="row-mb-4">
-    <div class="col">
       <div class="card">
         <div class="card-header">
           <ul class="nav nav-pills nav-fill" role="tablist">
@@ -65,51 +31,22 @@
                       aria-controls="pills-profile"
                       aria-selected="false">Members</button>
             </li>
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-links-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#links"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-links"
+                      aria-selected="false">Links</button>
+            </li>
           </ul>
         </div>
         <div class="card-body px-0">
           <div class="tab-content">
             <div id="events" class="tab-pane fade show active">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="eventTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Band</th>
-                      <th class="min-tablet-l">Venue</th>
-                      <th class="min-tablet-l">Location</th>
-                      <th class="min-tablet-l">Tour</th>
-                      <th class="min-tablet-l">Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in events %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          {% if event.venue.city %}
-                            <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% if event.tour %}
-                            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-wrap">{{ event.title|default_if_none:"" }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+              {% include "databruce/partials/event_table.html" with events=events %}
             </div>
             <div id="members" class="tab-pane fade">
               <div class="table-responsive">
@@ -133,27 +70,36 @@
                 </table>
               </div>
             </div>
+            <div id="links" class="tab-pane fade">
+              <ul>
+                {% if info.brucebase_url %}
+                  <li>
+                    <a href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
+                  </li>
+                {% endif %}
+                {% if info.mbid %}
+                  <li>
+                    <a href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
   <script>
-    // removes searchBuilder button, not needed for this.
-    layout.topEnd.features[1].buttons[0].config.columns = [1, 2, 3, 4];
-    
     $(document).ready(function () {
       new DataTable('#eventTable', {
-        searching: false,
-        layout: layout,
+        layout: getDatatableLayout([1,2,3,4]),
+        columnDefs: [
+          { targets: [0], type: 'date' }, //date
+        ],
       });
 
-      // removes searchBuilder button, not needed for this.
-      layout.topEnd.features[1].buttons.pop();
-
       new DataTable('#memberTable',{
-        layout: layout,
-        searching: false
+        layout: getDatatableLayout(),
       });
     });
   </script>

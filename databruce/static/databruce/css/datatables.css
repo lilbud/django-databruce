@@ -1,63 +1,47 @@
 /* Remove default content */
-table.dataTable thead .dt-column-order::before,
+/* table.dataTable thead .dt-column-order::before,
 table.dataTable thead .dt-column-order::after {
     content: "" !important;
     font-family: "bootstrap-icons";
     line-height: 0px !important;
-}
+} */
 
 /* up arrow */
-table.dataTable thead .dt-column-order::before {
+/* table.dataTable thead .dt-column-order::before {
     content: "\F148" !important;
-}
+} */
 
 /* down arrow */
-table.dataTable thead .dt-column-order::after {
+/* table.dataTable thead .dt-column-order::after {
     content: "\F128" !important;
-}
+} */
 
-.dt-orderable-asc span.dt-column-order:before,
+/* .dt-orderable-asc span.dt-column-order:before,
 .dt-orderable-asc span.dt-column-order:after,
 .dt-orderable-desc span.dt-column-order:before,
 .dt-orderable-desc span.dt-column-order:after {
     opacity: 0 !important;
-}
+} */
 
-.dt-ordering-asc span.dt-column-order:before,
+/* .dt-ordering-asc span.dt-column-order:before,
 .dt-ordering-desc span.dt-column-order:after {
     opacity: 1 !important;
-}
+} */
 
 th.text-center > div.dt-column-header {
     text-align: center !important;
 }
 
 /* disables hovering on set divider rows */
-table.table.dataTable.table-hover > tbody > tr > td.setHeader:hover {
+td.setHeader:hover {
 	box-shadow: none !important;
 }
 
 .setHeader {
     background-color: var(--background-500) !important;
-    font-size: 0.85rem !important;
 }
 
-/* table.dataTable>thead>tr>th,
-table.dataTable>tbody>tr>td {
-    padding-top: 0.125rem !important;
-    padding-bottom: 0.125rem !important;
-} */
-
-[data-bs-theme="dark"] table a {
-    color: var(--text-50) !important;
-}
-
-[data-bs-theme="light"] table a {
-    color: var(--text-900) !important;
-}
-
-table.dataTable>thead>tr>th,
-.setHeader {
+td.position {
     color: var(--text-50) !important;
 }
 
@@ -80,10 +64,15 @@ table.dataTable>thead>tr>th,
     margin-top: 0px !important;
 }
 
+/* hides button row if they're empty on mobile */
 div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-start:empty),
 div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     display: none !important;
     margin-top: 0px !important;
+}
+
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer {
+	flex-wrap: nowrap;
 }
 
 .dt-orderable-none span.dt-column-order {
@@ -98,10 +87,10 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 
 .table-responsive {
     padding: 0% !important;
-    border-radius: inherit !important;
+    border-radius: 0 !important;
 }
 
-#setlistTable_wrapper .dt-layout-table.mt-2 {
+#setlistTable_wrapper .dt-layout-table {
     margin-top: 0 !important;
 }
 
@@ -123,73 +112,127 @@ table {
 /* hides double header on some datatables */
 div.dt-scroll-body thead tr th
 {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-} 
+    padding: 0 inherit !important
+}
 
-table.dataTable>tbody>tr>td:first-child {
+.setHeader {
+    color: var(--text-50) !important;
     font-weight: 600 !important;
-}
-
-.position[class~="opener"][class~="closer"] {
-	color: var(--text-50) !important;
-}
-
-.showopener,
-.set2opener {
-    background-color: var(--secondary-700) !important;
-}
-
-.mainsetcloser,
-.set1closer {
-    background-color: var(--secondary-800) !important;
-}
-
-.encoreopener {
-    background-color: var(--accent-500) !important;
-}
-
-.showcloser {
-    background-color: var(--accent-600) !important;
-}
-
-table.dataTable > tbody > tr.child ul.dtr-details > li {
+    font-size: 0.8rem !important;
+    line-height: 0.7rem !important;
+    padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
 }
 
-table.dataTable > tbody > tr.child ul.dtr-details > li > span {
-    font-weight: normal !important;
+[data-bs-theme="light"] .setHeader {
+    background-color: var(--background-900) !important;
+}
+
+[data-bs-theme="dark"] .setHeader {
+    background-color: var(--background-400) !important;
+    color: var(--text-900) !important;
+}
+
+.showopener {
+    background-color: var(--secondary-700) !important;
+}
+
+.showcloser,
+.set1closer,
+.encoreopener {
+    background-color: var(--accent-700) !important;
+}
+
+.set2opener {
+    background-color: var(--secondary-800) !important;
+}
+
+.mainsetcloser {
+    background-color: var(--accent-600) !important;
 }
 
 table {
     width: 100% !important;
 }
 
-table tbody tr {
-    font-size: 0.8rem !important;
-    line-height: 1.2rem !important;
+table tbody tr td {
+    padding: 0.25rem 0.5rem !important;
 }
 
-table tbody tr td,
-table thead tr th {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+table th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    font-size: 0.875rem !important;
+}
+
+.dropdown-menu {
+    --bs-dropdown-min-width: 11rem;
+}
+
+.dt-type-date {
+    width: 8rem !important;
+    text-align: left !important;
+}
+
+.dt-type-numeric {
+    width: 1rem !important;
+    text-align: center !important;
+}
+
+.band {
+    width: 12rem !important;
+}
+
+.venue {
+    width: 14rem !important;
+}
+
+.location {
+    width: 12rem !important;
+}
+
+td {
+    white-space: nowrap !important;
+}
+
+/* Hide Calendar Popup, it is very finicky and doesn't like to be placed */
+div.dt-datetime {
+    display: none !important;
+}
+
+table.table.dataTable > tbody > tr:not([id*="snippet_head"]) {
+	background-color: transparent;
+}
+
+td[id*="snippet-head"],
+td[id*="snippet-foot"] {
+    border: none !important;
+    line-height: 0.7rem !important;
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
 }
 
-td a[href~="song"] {
-	text-wrap: nowrap !important;
+tr[id*="snippet-row"] td {
+    border: none !important;
 }
 
-.dt-column-title {
-    font-size: 0.875rem !important;
+[data-bs-theme="light"] td[id*="snippet"] {
+    background-color: var(--background-100) !important;
 }
 
-table th {
+[data-bs-theme="light"] tr[id*="snippet-row"] td {
+    background-color: var(--background-50) !important;
+}
+
+[data-bs-theme="dark"] tr[id*="snippet-row"] td {
+    background-color: var(--background-700) !important;
+}
+
+[data-bs-theme="dark"] td[id*="snippet"] {
     background-color: var(--background-600) !important;
 }
 
-.mt-0\.5 {
-    padding-top: 0.125rem !important
+tr[id*="snippet"]:hover *,
+td[id*="snippet"]:hover {
+    box-shadow: none !important;
 }
