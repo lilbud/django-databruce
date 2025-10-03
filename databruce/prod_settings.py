@@ -96,5 +96,14 @@ CACHES = {
     },
 }
 
+ADMINS = [("Brian", os.getenv("EMAIL"))]
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.mailgun.org"
+EMAIL_HOST_USER = os.getenv("MAILGUN_EMAIL")
+EMAIL_HOST_PASSWORD = os.getenv("MAILGUN_PASSWORD")
+EMAIL_PORT = 2525
+SERVER_EMAIL = os.getenv("MAILGUN_EMAIL")
+DEFAULT_FROM_EMAIL = f"Databruce {os.getenv('MAILGUN_EMAIL')}"
 
 RATELIMIT_USE_CACHE = "default"
