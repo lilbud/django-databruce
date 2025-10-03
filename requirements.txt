@@ -8,4 +8,5 @@ django-filter==24.3
 psycopg[binary,pool]
 requests
 django-link-shortener
+django-browser-reload
 django-ratelimit
