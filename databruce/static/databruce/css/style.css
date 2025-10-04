@@ -329,8 +329,9 @@ td .badge {
     color: var(--primary-500) !important;
 }
 
-table {
+.dataTable {
     width: 100% !important;
+    overflow-x:scroll !important;
 }
 
 /* #setlistTable thead tr:not(.setHeader) th:nth-child(1) {

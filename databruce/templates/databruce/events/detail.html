@@ -159,17 +159,17 @@
                     <table class="table table-hover display" id="setlistTable">
                       <thead>
                         <tr>
-                          <th class="all text-center songnum">#</th>
-                          <th class="all">Song</th>
+                          <th class="all songnum text-nowrap text-center">#</th>
+                          <th class="all text-nowrap">Song</th>
                           {% if event.tour.id != 49 %}
-                            <th class="all text-center text-nowrap">
+                            <th class="all text-nowrap text-center">
                               Gap
                               <i class="bi bi-info-circle-fill"
                                  data-bs-toggle="tooltip"
                                  data-bs-html="true"
                                  data-bs-title="# of shows since last played"></i>
                             </th>
-                            <th class="all text-center">Tour</th>
+                            <th class="all text-nowrap text-center">Tour</th>
                             <th class="all text-nowrap text-center">Last Played</th>
                           {% endif %}
                         </tr>
@@ -232,23 +232,23 @@
                                   {% if song.sign_request %}<span class="badge text-bg-info">Sign Request</span>{% endif %}
                                   {% if song.nobruce %}<span class="badge text-bg-info">No Bruce</span>{% endif %}
                                   {% if song.id in snippet_ids %}
-                                    <button class="btn btn-link float-end p-0 m-0"
+                                    <button class="btn btn-link float-end p-0 m-0 text-sm"
                                             onclick="show_note({{ song.id }})"
                                             data-bs-toggle="tooltip"
                                             data-bs-title="Show Snippets">
-                                      <i class="bi bi-music-note-beamed text-body"></i>
+                                      <i class="bi bi-music-note-beamed text-body text-sm"></i>
                                     </button>
                                   {% endif %}
                                 </span>
-                                <span class="text-xs fw-normal text-wrap me-2"
-                                      id="setlist_note_{{ song.id }}">
-                                  {% if song.id in note_ids %}
+                                {% if song.id in note_ids %}
+                                  <span class="text-xs fw-normal text-wrap me-2"
+                                        id="setlist_note_{{ song.id }}">
                                     <br>
                                     {% for note in notes_list %}
                                       {% if note.grouper == song.id %}{{ note.list|setlist_note|safe }}{% endif %}
                                     {% endfor %}
-                                  {% endif %}
-                                </span>
+                                  </span>
+                                {% endif %}
                               </td>
                               {% if event.tour.id != 49 %}
                                 <td class="text-nowrap text-center {% if notes_list %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
@@ -541,8 +541,8 @@
       var layout = getDatatableLayout();
       layout.topStart = 'pageLength';
 
-      var columns = [{ target: 0, width: '1rem' }];
-      columns.push({ target: 1, width: '20rem' });
+      var columns = [{ targets: [0], width: '1rem' }];
+      columns.push({ targets: [1], width: 'auto' });
 
       {% if event.tour.id != 49 %}
         columns.push({ targets: [2,3], width: '5rem' });
@@ -567,11 +567,11 @@
           new DataTable('#setlistTable', {
             layout: layout,
             paging: false,
-            scrollX: true,
+            scrollX: false,
             searching: false,
             autoWidth: false,
             ordering: false,
-            responsive: false,
+            responsive: true,
             columnDefs: columns,
           });
 
