@@ -13,12 +13,12 @@
   <thead>
     <tr class="custom">
       <th class="all" scope="col">Name</th>
-      <th class="all" scope="col">
-        <i class="bi bi-file-earmark-check"
+      <th class="min-tablet-l" scope="col">
+        <i class="bi bi-file-earmark-check d-none d-lg-block"
            data-bs-toggle="tooltip"
            data-bs-placement="top"
            data-bs-title="Has Lyrics"></i>
-        <div class="d-none">Has Lyrics</div>
+        <span class="d-inline d-lg-none">Has Lyrics:</span>
       </th>
       <th class="min-tablet-l" scope="col">Original Artist</th>
       <th class="min-tablet-l" scope="col">Category</th>
@@ -37,13 +37,13 @@
         </td>
         <td class="icon text-center align-middle">
           {% if song.lyrics %}
-            <i class="bi bi-file-earmark-check"
+            <i class="bi bi-file-earmark-check d-none d-lg-block"
                data-bs-toggle="tooltip"
                data-bs-placement="top"
                data-bs-title="Has Lyrics"></i>
-            <div class="d-none">True</div>
+            <div class="d-inline d-lg-none">True</div>
           {% else %}
-            <div class="d-none">False</div>
+            <div class="d-inline d-lg-none">False</div>
           {% endif %}
         </td>
         <td class="text-nowrap">{{ song.original_artist }}</td>

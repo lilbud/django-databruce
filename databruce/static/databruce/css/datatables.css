@@ -41,6 +41,11 @@ tr.res-child:hover {
     box-shadow: none !important;
 }
 
+tr.res-child > td:first {
+    width: 2rem;
+    font-weight: bold;
+}
+
 .setHeader {
     background-color: var(--background-500) !important;
 }
@@ -102,11 +107,25 @@ table.dataTable div.dt-column-header {
     flex-direction: row !important;
 }
 
-div.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
-    width: 700px !important;
-    right: 3vw !important;
+div.dropdown-menu.dt-button-collection.dtb-collection-closeable {
     z-index: 9999;
-    position: fixed;
+    left: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.dtsb-title {
+    font-size: 0.875rem !important;
+}
+
+.dtsb-button {
+    font-size: 0.875rem !important;
+    margin: auto !important;
+}
+
+.dtsb-dropDown,
+.dtsb-inputCont {
+    margin-bottom: 0.25rem !important;
 }
 
 table {

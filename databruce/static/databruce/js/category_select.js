@@ -16,7 +16,7 @@ function categorySelect(column, label, values) {
     var dropdown = document.createElement('div');
 
     // dropdown label
-    $(select).attr('for', 'select').addClass('me-2 text-sm').text(`${label}:`);
+    $(select).attr('for', 'select').addClass('me-2 text-sm my-auto').text(`${label}:`);
 
     // button group
     $(btn_group).addClass('btn-group').attr('id', 'select');

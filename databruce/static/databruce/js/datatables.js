@@ -1,7 +1,7 @@
 var layout = {
   topEnd: {
     features: [
-      { div: { id: "dropdown-container", className: "mr-6 d-none d-lg-inline" } },
+      { div: { id: "dropdown-container", className: "mx-auto mb-2 mb-lg-0" } },
       {
         search: true
       },
@@ -45,9 +45,16 @@ $.extend(true, DataTable.defaults, {
         renderer: function ( api, rowIdx, columns ) {
             var data = $.map( columns, function ( col, i ) {
                 if (col.hidden && col.data != '') {
+                    // selectively add a trailing colon if there isn't one
+                    if (col.title.includes(":")) {
+                      var title = col.title
+                    } else {
+                      var title = `${col.title}:`
+                    };
+
                     return '<tr class="res-child" data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">'+
-                        '<td>'+col.title+':'+'</td> '+
-                        '<td>'+col.data+'</td>'+
+                        '<td class="text-nowrap" style="width: 3rem; font-weight: bold;">'+title+'</td>'+
+                        '<td class="text-wrap">'+col.data+'</td>'+
                     '</tr>';
                 }
             } ).join('');
@@ -67,7 +74,8 @@ $.extend(true, DataTable.defaults, {
   lengthMenu: [25, 50, 100],
   language: {
     searchBuilder: {
-      button: '&nbspFilter'
+      button: '&nbspFilter',
+      className: 'test',
     }
   },
   order: [],
@@ -91,12 +99,13 @@ function getDatatableLayout(columns) {
 
     var searchbuilder = {
       extend: 'searchBuilder',
-      action: function (e, dt, node, config) {
-        this.popover(config._searchBuilder.getNode(), {
-          collectionLayout: 'sbpopover'
-        })
-      },
-      className: "btn-sm btn-primary bi bi-search mb-1 mr-2 d-none d-lg-inline search",
+      // action: function (e, dt, node, config) {
+      //   this.popover(config._searchBuilder.getNode(), {
+      //     collectionLayout: 'sbpopover',
+      //     id: 'TEST',
+      //   })
+      // },
+      className: "btn-sm btn-primary bi bi-search mb-1 mr-2 d-lg-inline search",
       config: {
         depthLimit: 2,
         columns: columns,

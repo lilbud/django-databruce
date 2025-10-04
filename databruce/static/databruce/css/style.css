@@ -351,3 +351,9 @@ td .badge {
 #setlistTable thead tr:not(.setHeader) th:nth-child(5) {
     width: 7rem !important;
 } */
+
+.dt-buttons,
+#dropdown-container {
+    justify-content: center !important;
+    display: flex !important;
+}

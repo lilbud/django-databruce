@@ -28,13 +28,14 @@
               <thead>
                 <tr class="custom">
                   <th class="all" scope="col">Date</th>
-                  <th class="min-tablet-l icon text-center align-middle" scope="col">
-                    <i class="bi bi-file-earmark-check"
+                  <th class="min-tablet-l icon text-center text-nowrap align-middle d-none d-lg-block"
+                      scope="col">
+                    <i class="bi bi-file-earmark-check d-none d-lg-block"
                        data-bs-toggle="tooltip"
                        data-bs-placement="top"
                        data-bs-title="Has Setlist">
-                      <div class="d-none">Setlist</div>
                     </i>
+                    <span class="d-inline d-lg-none">Setlist:</span>
                   </th>
                   <th class="min-tablet-l" scope="col">Band</th>
                   <th class="min-tablet-l" scope="col">Venue</th>
@@ -55,13 +56,13 @@
                     </td>
                     <td class="icon text-center align-middle">
                       {% if event.setlist_certainty == "Confirmed" %}
-                        <i class="bi bi-file-earmark-check"
+                        <i class="bi bi-file-earmark-check d-none d-lg-block"
                            data-bs-toggle="tooltip"
                            data-bs-placement="top"
                            data-bs-title="Has Setlist"></i>
-                        <div class="d-none">True</div>
+                        <div class="d-lg-none">True</div>
                       {% else %}
-                        <div class="d-none">False</div>
+                        <div class="d-lg-none">False</div>
                       {% endif %}
                     </td>
                     <td class="text-nowrap">

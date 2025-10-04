@@ -163,7 +163,7 @@
                   <thead>
                     <tr>
                       <th class="all" scope="col">Date</th>
-                      <th class="all" scope="col">Act</th>
+                      <th class="min-tablet-l" scope="col">Act</th>
                       <th class="min-tablet-l" scope="col">Venue</th>
                       <th class="min-tablet-l" scope="col">Tour</th>
                       <th class="min-tablet-l" scope="col">Position</th>
@@ -171,7 +171,7 @@
                       <th class="min-tablet-l" scope="col">Set</th>
                       <th class="min-tablet-l" scope="col">Prev</th>
                       <th class="min-tablet-l" scope="col">Next</th>
-                      <th class="min-tablet-l text-nowrap" scope="col">Note</th>
+                      <th class="min-tablet-l" scope="col">Note</th>
                       <th class="min-tablet-l text-nowrap" scope="col">Public</th>
                     </tr>
                   </thead>
@@ -207,7 +207,7 @@
                             <a href="{% url "song_details" id=song.next %}">{{ song.next_name }}</a>
                           {% endif %}
                         </td>
-                        <td class="text-nowrap">{{ song.note|default_if_none:"" }}</td>
+                        <td class="text-wrap">{{ song.note|default_if_none:"" }}</td>
                         <td class="text-nowrap">{{ song.event.public }}</td>
                       </tr>
                     {% endfor %}
