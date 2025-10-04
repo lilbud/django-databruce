@@ -333,7 +333,7 @@ table {
     width: 100% !important;
 }
 
-#setlistTable thead tr:not(.setHeader) th:nth-child(1) {
+/* #setlistTable thead tr:not(.setHeader) th:nth-child(1) {
     width: 1rem !important;
 }
 
@@ -349,4 +349,4 @@ table {
 
 #setlistTable thead tr:not(.setHeader) th:nth-child(5) {
     width: 7rem !important;
-}
+} */
