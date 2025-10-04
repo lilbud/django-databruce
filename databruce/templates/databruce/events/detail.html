@@ -127,7 +127,7 @@
           <div class="row row-cols-1 g-2 ps-lg-0">
             <div class="col">
               {% if event.note %}
-                <div class="col-12d-md-block d-lg-none">
+                <div class="col-12 d-md-block d-lg-none">
                   <div class="card mb-2" id="notes-card">
                     <div class="card-header">
                       Event Notes
@@ -136,14 +136,16 @@
                       </div>
                     </div>
                     <div class="card-body text-xs">
-                      <div class="row">{{ event.note|note_format }}</div>
-                      <div class="row mt-1">
+                      <span>{{ event.note|note_format }}</span>
+                      <br>
+                      <br>
+                      <span>
                         <a href="#"
                            role="button"
                            class="btn-link text-reset fw-semibold mt-2 text-sm"
                            data-bs-toggle="modal"
                            data-bs-target="#notes-modal">See More</a>
-                      </div>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -185,7 +187,7 @@
                             <tr>
                               <td></td>
                               <td colspan="5">
-                                <span class="text-nowrap fw-medium text-sm align-middle">
+                                <span class="text-nowrap text-break fw-medium text-sm align-middle">
                                   <a class="me-1 align-middle"
                                      href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                 </span>
@@ -206,14 +208,14 @@
                           {% endfor %}
                         {% endif %}
                         {% for set in event_setlist %}
-                          <tr class="text-center">
+                          <tr class="text-center setHeader">
+                            <td class="d-none"></td>
                             <td class="setHeader {{ set.grouper|lower|cut:" " }}"
-                                colspan="{% if event.tour.id != 49 %}5{% else %}5{% endif %}">{{ set.grouper }}</td>
-                            <td class="setname d-none"></td>
+                                colspan="{% if event.tour.id != 49 %}5{% else %}3{% endif %}">{{ set.grouper }}</td>
                             {% if event.tour.id != 49 %}
-                              <td class="setname d-none"></td>
-                              <td class="setname d-none"></td>
-                              <td class="setname d-none"></td>
+                              <td class="d-none"></td>
+                              <td class="d-none"></td>
+                              <td class="d-none"></td>
                             {% endif %}
                           </tr>
                           {% for song in set.list %}
@@ -222,10 +224,9 @@
                                   {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
                                 {{ song.song_num|default_if_none:"" }}
                               </td>
-                              <td>
-                                <span class="text-nowrap fw-medium text-sm align-middle">
-                                  <a class="me-1 align-middle"
-                                     href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                              <td class="text-nowrap">
+                                <span class="fw-medium text-sm">
+                                  <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                   {% if song.segue %}<span class="fw-bold">&gt;</span>{% endif %}
                                   {% if song.instrumental %}<span class="badge text-bg-info">Instrumental</span>{% endif %}
                                   {% if song.sign_request %}<span class="badge text-bg-info">Sign Request</span>{% endif %}
@@ -560,7 +561,6 @@
         columns.push({ targets: [2,3], width: '4rem' });
         columns.push({ targets: [4], width: '8rem' });
       {% endif %}
-
       $(document).ready(function() {
           new DataTable('#setlistTable', {
             layout: layout,
@@ -569,7 +569,8 @@
             searching: false,
             autoWidth: false,
             ordering: false,
-            columnDefs: columns,
+            responsive: true,
+            //columnDefs: columns,
           });
 
           $('#userForm').submit(function(e) {

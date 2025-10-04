@@ -294,10 +294,6 @@ td .badge {
     text-decoration: none !important;
 }
 
-#setlistTable.dataTable th:last-child {
-    padding-right: 1rem !important;
-}
-
 .card-body:not(.p-0) {
     padding: 0.75rem !important;
 }
@@ -316,7 +312,9 @@ td .badge {
     bottom: 0 !important;
     position: relative !important;
     z-index: 10 !important;
-    margin: 1rem !important;
+    margin: 0.75rem !important;
+    margin-top: 3rem !important;
+    font-size: 0.675rem !important;
 }
 
 .padded-body {
@@ -329,4 +327,27 @@ td .badge {
 
 [data-bs-theme="dark"] #short-url {
     color: var(--primary-500) !important;
+}
+
+#setlistTable tbody tr td:nth-child(1) {
+    width: 1rem !important;
+}
+
+#setlistTable tbody tr td:nth-child(2) {
+    width: auto !important;
+    min-width: 15rem !important;
+}
+
+table {
+    width: 100% !important;
+}
+
+#setlistTable tbody tr:not(.setHeader) td:nth-child(3),
+#setlistTable tbody tr:not(.setHeader) td:nth-child(4)
+{
+    width: 5rem !important;
+}
+
+#setlistTable tbody tr:not(.setHeader) td:nth-child(5) {
+    width: 7rem !important;
 }
