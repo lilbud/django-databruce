@@ -162,15 +162,15 @@
                           <th class="all songnum text-nowrap text-center">#</th>
                           <th class="all text-nowrap">Song</th>
                           {% if event.tour.id != 49 %}
-                            <th class="all text-nowrap text-center">
+                            <th class="min-tablet-l text-nowrap text-center">
                               Gap
                               <i class="bi bi-info-circle-fill"
                                  data-bs-toggle="tooltip"
                                  data-bs-html="true"
                                  data-bs-title="# of shows since last played"></i>
                             </th>
-                            <th class="all text-nowrap text-center">Tour</th>
-                            <th class="all text-nowrap text-center">Last Played</th>
+                            <th class="min-tablet-l text-nowrap text-center">Tour</th>
+                            <th class="min-tablet-l text-nowrap text-center">Last Played</th>
                           {% endif %}
                         </tr>
                       </thead>
@@ -231,15 +231,15 @@
                                   {% if song.instrumental %}<span class="badge text-bg-info">Instrumental</span>{% endif %}
                                   {% if song.sign_request %}<span class="badge text-bg-info">Sign Request</span>{% endif %}
                                   {% if song.nobruce %}<span class="badge text-bg-info">No Bruce</span>{% endif %}
-                                  {% if song.id in snippet_ids %}
-                                    <button class="btn btn-link float-end p-0 m-0 text-sm"
-                                            onclick="show_note({{ song.id }})"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Show Snippets">
-                                      <i class="bi bi-music-note-beamed text-body text-sm"></i>
-                                    </button>
-                                  {% endif %}
                                 </span>
+                                {% if song.id in snippet_ids %}
+                                  <button class="btn btn-link float-end align-top p-0 m-0 text-sm"
+                                          onclick="show_note({{ song.id }})"
+                                          data-bs-toggle="tooltip"
+                                          data-bs-title="Show Snippets">
+                                    <i class="bi bi-music-note-beamed text-body text-sm"></i>
+                                  </button>
+                                {% endif %}
                                 {% if song.id in note_ids %}
                                   <span class="text-xs fw-normal text-wrap me-2"
                                         id="setlist_note_{{ song.id }}">
@@ -304,7 +304,7 @@
                                   {% for snip in snippet.list %}
                                     <tr id="snippet-row_{{ song.id }}"
                                         class="d-none snippet-row_{{ snippet.grouper }}">
-                                      <td class="text-sm songnum text-center">{{ snip.position }}</td>
+                                      <td id="snippetnum" class="text-sm songnum text-center">{{ snip.position }}</td>
                                       <td colspan="4">
                                         <span class="text-sm fw-medium">
                                           <a href="{% url "song_details" id=snip.snippet.id %}">{{ snip.snippet.name }}</a>
@@ -542,7 +542,7 @@
       layout.topStart = 'pageLength';
 
       var columns = [{ targets: [0], width: '1rem' }];
-      columns.push({ targets: [1], width: 'auto' });
+      columns.push({ targets: [1], width: '25rem' });
 
       {% if event.tour.id != 49 %}
         columns.push({ targets: [2,3], width: '5rem' });
@@ -564,15 +564,18 @@
       }
 
       $(document).ready(function() {
-          new DataTable('#setlistTable', {
+          var table = new DataTable('#setlistTable', {
             layout: layout,
             paging: false,
             scrollX: false,
             searching: false,
             autoWidth: false,
             ordering: false,
-            responsive: true,
             columnDefs: columns,
+          });
+
+          $('[id*=snippet]').each(function() {
+              $(this).removeClass('dtr-control');
           });
 
           $('#userForm').submit(function(e) {
@@ -601,6 +604,8 @@
                 },
               });
           });
-      })
+      });
+
+      
   </script>
 {% endblock content %}

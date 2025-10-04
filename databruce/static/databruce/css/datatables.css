@@ -37,6 +37,10 @@ td.setHeader:hover {
 	box-shadow: none !important;
 }
 
+tr.res-child:hover {
+    box-shadow: none !important;
+}
+
 .setHeader {
     background-color: var(--background-500) !important;
 }

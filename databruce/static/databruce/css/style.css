@@ -331,7 +331,7 @@ td .badge {
 
 .dataTable {
     width: 100% !important;
-    overflow-x:scroll !important;
+    overflow: auto !important;
 }
 
 /* #setlistTable thead tr:not(.setHeader) th:nth-child(1) {
