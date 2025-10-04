@@ -346,6 +346,7 @@ table {
 #setlistTable tbody tr:not(.setHeader) td:nth-child(4)
 {
     width: 5rem !important;
+    min-width: 1rem !important;
 }
 
 #setlistTable tbody tr:not(.setHeader) td:nth-child(5) {
