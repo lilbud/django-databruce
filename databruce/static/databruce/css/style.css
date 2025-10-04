@@ -329,24 +329,22 @@ td .badge {
     color: var(--primary-500) !important;
 }
 
-#setlistTable tbody tr td:nth-child(1) {
+table {
+    width: 100% !important;
+}
+
+#setlistTable tbody tr:not(.setHeader) td:nth-child(1) {
     width: 1rem !important;
 }
 
-#setlistTable tbody tr td:nth-child(2) {
-    width: auto !important;
-    min-width: 15rem !important;
-}
-
-table {
-    width: 100% !important;
+#setlistTable tbody tr:not(.setHeader) td:nth-child(2) {
+    min-width: 20rem !important;
 }
 
 #setlistTable tbody tr:not(.setHeader) td:nth-child(3),
 #setlistTable tbody tr:not(.setHeader) td:nth-child(4)
 {
     width: 5rem !important;
-    min-width: 1rem !important;
 }
 
 #setlistTable tbody tr:not(.setHeader) td:nth-child(5) {

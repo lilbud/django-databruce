@@ -555,12 +555,6 @@
         })
       }
 
-      var columns = [{ target: 0, width: '1rem' }];
-
-      {% if event.tour.id != 49 %}
-        columns.push({ targets: [2,3], width: '4rem' });
-        columns.push({ targets: [4], width: '8rem' });
-      {% endif %}
       $(document).ready(function() {
           new DataTable('#setlistTable', {
             layout: layout,
@@ -570,7 +564,6 @@
             autoWidth: false,
             ordering: false,
             responsive: true,
-            //columnDefs: columns,
           });
 
           $('#userForm').submit(function(e) {
