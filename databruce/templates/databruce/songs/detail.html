@@ -363,7 +363,7 @@
 
     $(document).ready(function () {
       new DataTable('#songTable', {
-        layout: getDatatableLayout(),
+        layout: getDatatableLayout([1,2,3,4,5,6,7,8]),
         pageLength: 50,
         columnDefs: [{ target: -1, visible: false },{ targets: [0], type: 'date' },],
         initComplete: function () {

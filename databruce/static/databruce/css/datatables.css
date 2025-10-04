@@ -107,6 +107,7 @@ table.dataTable div.dt-column-header {
     flex-direction: row !important;
 }
 
+/* searchbuilder customization */
 div.dropdown-menu.dt-button-collection.dtb-collection-closeable {
     z-index: 9999;
     left: 0 !important;
@@ -126,6 +127,7 @@ div.dropdown-menu.dt-button-collection.dtb-collection-closeable {
 .dtsb-dropDown,
 .dtsb-inputCont {
     margin-bottom: 0.25rem !important;
+    font-size: 0.875rem !important;
 }
 
 table {
@@ -258,4 +260,10 @@ tr[id*="snippet-row"] td {
 tr[id*="snippet"]:hover *,
 td[id*="snippet"]:hover {
     box-shadow: none !important;
+}
+
+@media (max-width: 768px) {
+    .dt-search {
+        margin-bottom: 0.5rem !important;
+    }
 }

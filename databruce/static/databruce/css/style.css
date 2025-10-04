@@ -305,6 +305,7 @@ td .badge {
 .btn-primary {
     background-color: var(--primary-600) !important;
     color: var(--text-50) !important;
+    border: 0px solid !important;
 }
 
 .footer {
@@ -333,24 +334,6 @@ td .badge {
     width: 100% !important;
     overflow: auto !important;
 }
-
-/* #setlistTable thead tr:not(.setHeader) th:nth-child(1) {
-    width: 1rem !important;
-}
-
-#setlistTable thead tr:not(.setHeader) th:nth-child(2) {
-    width: 20rem !important;
-}
-
-#setlistTable thead tr:not(.setHeader) th:nth-child(3),
-#setlistTable thead tr:not(.setHeader) th:nth-child(4)
-{
-    width: 5rem !important;
-}
-
-#setlistTable thead tr:not(.setHeader) th:nth-child(5) {
-    width: 7rem !important;
-} */
 
 .dt-buttons,
 #dropdown-container {
