@@ -333,20 +333,20 @@ table {
     width: 100% !important;
 }
 
-#setlistTable tbody tr:not(.setHeader) td:nth-child(1) {
+#setlistTable thead tr:not(.setHeader) th:nth-child(1) {
     width: 1rem !important;
 }
 
-#setlistTable tbody tr:not(.setHeader) td:nth-child(2) {
-    min-width: 20rem !important;
+#setlistTable thead tr:not(.setHeader) th:nth-child(2) {
+    width: 20rem !important;
 }
 
-#setlistTable tbody tr:not(.setHeader) td:nth-child(3),
-#setlistTable tbody tr:not(.setHeader) td:nth-child(4)
+#setlistTable thead tr:not(.setHeader) th:nth-child(3),
+#setlistTable thead tr:not(.setHeader) th:nth-child(4)
 {
     width: 5rem !important;
 }
 
-#setlistTable tbody tr:not(.setHeader) td:nth-child(5) {
+#setlistTable thead tr:not(.setHeader) th:nth-child(5) {
     width: 7rem !important;
 }

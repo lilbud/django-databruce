@@ -541,6 +541,15 @@
       var layout = getDatatableLayout();
       layout.topStart = 'pageLength';
 
+      var columns = [{ target: 0, width: '1rem' }];
+      columns.push({ target: 1, width: '20rem' });
+
+      {% if event.tour.id != 49 %}
+        columns.push({ targets: [2,3], width: '5rem' });
+        columns.push({ targets: [4], width: '7rem' });
+      {% endif %}
+
+
       function show_note(id) {
         $(`.snippet-row_${id}`).each(function() {
           if ($(this).hasClass('d-none')) {
@@ -559,11 +568,11 @@
           new DataTable('#setlistTable', {
             layout: layout,
             paging: false,
-            scrollX: false,
+            scrollX: true,
             searching: false,
             autoWidth: false,
             ordering: false,
-            responsive: true,
+            responsive: false,
           });
 
           $('#userForm').submit(function(e) {
