@@ -25,7 +25,7 @@ function categorySelect(column, label, values) {
     $('#dropdown-container').append(select).append(btn_group);
 
     // dropdown button
-    $(btn).addClass('btn btn-primary btn-sm mb-1 mr-2 dropdown-toggle').attr({'id': 'category-select-btn', 'type': 'button', 'data-bs-toggle': 'dropdown', 'aria-expanded': 'false'}).text(values[0].label);
+    $(btn).addClass('btn btn-primary btn-sm me-2 dropdown-toggle').attr({'id': 'category-select-btn', 'type': 'button', 'data-bs-toggle': 'dropdown', 'aria-expanded': 'false'}).text(values[0].label);
 
     // dropdown menu
     $(dropdown).addClass('dropdown-menu').attr('id', 'category-select');

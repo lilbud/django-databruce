@@ -1,7 +1,7 @@
 var layout = {
   topEnd: {
     features: [
-      { div: { id: "dropdown-container", className: "mx-auto mb-2 mb-lg-0" } },
+      { div: { id: "dropdown-container", className: "mx-auto my-2" } },
       {
         search: true
       },
@@ -11,12 +11,12 @@ var layout = {
     buttons: [
       {
         extend: 'pageLength',
-        className: 'btn btn-sm mb-1 mr-2 btn-primary ',
+        className: 'btn btn-sm btn-primary',
       },
       {
         extend: 'colvis',
         columns: 'th:nth-child(n+2)', //starts at second column
-        className: 'btn btn-sm mb-1 mr-2 btn-primary ',
+        className: 'btn btn-sm btn-primary',
       },
     ],
   },
@@ -99,13 +99,7 @@ function getDatatableLayout(columns) {
 
     var searchbuilder = {
       extend: 'searchBuilder',
-      // action: function (e, dt, node, config) {
-      //   this.popover(config._searchBuilder.getNode(), {
-      //     collectionLayout: 'sbpopover',
-      //     id: 'TEST',
-      //   })
-      // },
-      className: "btn-sm btn-primary bi bi-search mb-1 mr-2 d-lg-inline search",
+      className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
       config: {
         depthLimit: 2,
         columns: columns,

@@ -261,9 +261,3 @@ tr[id*="snippet"]:hover *,
 td[id*="snippet"]:hover {
     box-shadow: none !important;
 }
-
-@media (max-width: 768px) {
-    .dt-search {
-        margin-bottom: 0.5rem !important;
-    }
-}
