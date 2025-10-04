@@ -549,7 +549,6 @@
         columns.push({ targets: [4], width: '7rem' });
       {% endif %}
 
-
       function show_note(id) {
         $(`.snippet-row_${id}`).each(function() {
           if ($(this).hasClass('d-none')) {
@@ -573,6 +572,7 @@
             autoWidth: false,
             ordering: false,
             responsive: false,
+            columnDefs: columns,
           });
 
           $('#userForm').submit(function(e) {
