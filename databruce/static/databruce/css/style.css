@@ -7,6 +7,10 @@
     --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
 
+#logo {
+    filter: invert(100%);
+}
+
 .text-xs {
     font-size: 0.75rem;
     line-height: 1rem;

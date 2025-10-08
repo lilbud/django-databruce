@@ -3,47 +3,42 @@
   Events &gt; Search
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl text-nowrap mb-2">Setlist Notes Search</div>
-      <div class="text-base text-nowrap mb-3">
-        <span class="fw-semibold">Query:</span>
-        {{ query }}
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-hover display nowrap" id="table">
-              <thead>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl text-nowrap mb-2">Setlist Notes Search</div>
+    <div class="text-base text-nowrap mb-3">
+      <span class="fw-semibold">Query:</span>
+      {{ query }}
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover display nowrap" id="table">
+            <thead>
+              <tr>
+                <th class="all">Event</th>
+                <th class="all">Set</th>
+                <th class="all">Song</th>
+                <th class="all">Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for result in results %}
                 <tr>
-                  <th class="all">Event</th>
-                  <th class="all">Set</th>
-                  <th class="all">Song</th>
-                  <th class="all">Note</th>
+                  <td>
+                    <a href="{% url "event_details" id=result.event.id %}">{{ result.event.get_date }}</a>
+                  </td>
+                  <td>{{ result.set_name }}</td>
+                  <td>
+                    <a href="{% url "song_details" id=result.song.id %}">{{ result.song.name }}</a>
+                  </td>
+                  <td>{{ result.note|default_if_none:"" }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for result in results %}
-                  <tr>
-                    <td>
-                      <a href="{% url "event_details" id=result.event.id %}">{{ result.event.get_date }}</a>
-                    </td>
-                    <td>{{ result.set_name }}</td>
-                    <td>
-                      <a href="{% url "song_details" id=result.song.id %}">{{ result.song.name }}</a>
-                    </td>
-                    <td>{{ result.note|default_if_none:"" }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col"></div>
   </div>
   <script>
     $(document).ready(function () {

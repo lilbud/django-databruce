@@ -26,10 +26,14 @@ class AdvancedEventSearch(forms.Form):
     class FormChoiceSelect(forms.ChoiceField):
         def __init__(self, widget_id, *args, **kwargs):
             kwargs["initial"] = "is"
+            kwargs["label"] = ""
             kwargs["choices"] = [("is", "is"), ("not", "not")]
             kwargs["required"] = False
             kwargs["widget"] = forms.Select(
-                attrs={"class": "form-select form-select-sm", "id": widget_id},
+                attrs={
+                    "class": "form-select form-select-sm col-3",
+                    "id": widget_id,
+                },
             )
             super().__init__(*args, **kwargs)
 
@@ -131,7 +135,7 @@ class AdvancedEventSearch(forms.Form):
                 "name": "start_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control form-control-sm date-form",
+                "class": "form-control form-control-sm date-form col-6",
             },
         ),
     )
@@ -146,12 +150,10 @@ class AdvancedEventSearch(forms.Form):
                 "name": "end_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control form-control-sm date-form",
+                "class": "form-control form-control-sm date-form col-6",
             },
         ),
     )
-
-    month_choice = FormChoiceSelect(widget_id="monthChoice")
 
     month = forms.ChoiceField(
         label="Month",
@@ -162,8 +164,6 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    day_choice = FormChoiceSelect(widget_id="dayChoice")
-
     day = forms.ChoiceField(
         label="Day",
         choices=get_days(),
@@ -171,40 +171,40 @@ class AdvancedEventSearch(forms.Form):
         widget=forms.Select(attrs={"class": "form-select form-select-sm", "id": "day"}),
     )
 
-    dow_choice = FormChoiceSelect(widget_id="dowChoice")
+    day_of_week_choice = FormChoiceSelect(widget_id="dow_choice")
 
     day_of_week = forms.ChoiceField(
         label="Day of Week",
         choices=days_of_week,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "day-of-week"},
+            attrs={"class": "form-select form-select-sm", "id": "day_of_week"},
         ),
     )
 
-    city_choice = FormChoiceSelect(widget_id="cityChoice")
+    city_choice = FormChoiceSelect(widget_id="city_choice")
 
     city = forms.ChoiceField(
         label="City",
         required=False,
         choices=get_cities(),
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "citySelect"},
+            attrs={"class": "form-select form-select-sm select2", "id": "city"},
         ),
     )
 
-    state_choice = FormChoiceSelect(widget_id="stateChoice")
+    state_choice = FormChoiceSelect(widget_id="state_choice")
 
     state = forms.ChoiceField(
         label="State",
         choices=get_states(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "stateSelect"},
+            attrs={"class": "form-select form-select-sm select2", "id": "state"},
         ),
     )
 
-    country_choice = FormChoiceSelect(widget_id="countryChoice")
+    country_choice = FormChoiceSelect(widget_id="country_choice")
 
     country = forms.ChoiceField(
         label="Country",
@@ -213,23 +213,23 @@ class AdvancedEventSearch(forms.Form):
         widget=forms.Select(
             attrs={
                 "class": "form-select form-select-sm select2",
-                "id": "countrySelect",
+                "id": "country",
             },
         ),
     )
 
-    tour_choice = FormChoiceSelect(widget_id="tourChoice")
+    tour_choice = FormChoiceSelect(widget_id="tour_choice")
 
     tour = forms.ChoiceField(
         label="Tour",
         choices=get_tours(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "tourSelect"},
+            attrs={"class": "form-select form-select-sm select2", "id": "tour"},
         ),
     )
 
-    musician_choice = FormChoiceSelect(widget_id="musicianChoice")
+    musician_choice = FormChoiceSelect(widget_id="musician_choice")
 
     musician = forms.ChoiceField(
         label="Musician",
@@ -238,19 +238,19 @@ class AdvancedEventSearch(forms.Form):
         widget=forms.Select(
             attrs={
                 "class": "form-select form-select-sm select2",
-                "id": "musicianSelect",
+                "id": "musician",
             },
         ),
     )
 
-    band_choice = FormChoiceSelect(widget_id="dayChoice")
+    band_choice = FormChoiceSelect(widget_id="band_choice")
 
     band = forms.ChoiceField(
         label="Band",
         choices=get_bands(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "bandSelect"},
+            attrs={"class": "form-select form-select-sm select2", "id": "band"},
         ),
     )
 
@@ -260,7 +260,7 @@ class AdvancedEventSearch(forms.Form):
         initial="and",
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "conjunctionSelect"},
+            attrs={"class": "form-select form-select-sm", "id": "conjunction"},
         ),
     )
 
@@ -517,3 +517,65 @@ class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["username", "email"]
+
+
+class ContactForm(forms.Form):
+    def __init__(self, *args: dict, **kwargs: dict) -> None:
+        """Initialize form."""
+        super().__init__(*args, **kwargs)
+
+    subject = forms.ChoiceField(
+        label="Subject",
+        choices=[
+            ("problem", "Bug/Problem"),
+            ("suggestion", "Suggestion"),
+            ("comment", "Comment"),
+            ("comment", "Question"),
+        ],
+        required=True,
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm subject"},
+        ),
+    )
+
+    email = forms.EmailField(
+        label="Contact Email",
+        max_length=254,
+        required=True,
+        widget=forms.EmailInput(
+            attrs={
+                "autocomplete": "email",
+                "id": "email",
+                "type": "email",
+                "name": "email",
+                "class": "form-control form-control-sm",
+            },
+        ),
+    )
+
+    message = forms.CharField(
+        label="Message",
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                "id": "message",
+                "name": "message",
+                "placeholder": "Message",
+                "class": "form-control form-control-sm",
+            },
+        ),
+    )
+
+    verification = forms.CharField(
+        label="Verification",
+        required=True,
+        help_text="Enter the release year of Bruce's third album",
+        widget=forms.TextInput(
+            attrs={
+                "id": "verification",
+                "name": "verification",
+                "placeholder": "-",
+                "class": "form-control form-control-sm",
+            },
+        ),
+    )

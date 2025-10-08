@@ -3,55 +3,50 @@
   Tour Legs &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl mb-2">{{ info.name }}</div>
-      <div class="text-xl mb-2">
-        <div class="fw-semibold">Tour:</div>
-        <div>
-          <a href="{% url "tour_details" id=info.tour.id %}">{{ info.tour }}</a>
-        </div>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl mb-2">{{ info.name }}</div>
+    <div class="text-xl">
+      <div class="fw-semibold">Tour:</div>
+      <div>
+        <a href="{% url "tour_details" id=info.tour.id %}">{{ info.tour }}</a>
       </div>
-      <div class="card mt-3">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link active"
-                      id="pills-events-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#events"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-home"
-                      aria-selected="true">Events</button>
-            </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-songs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#songs"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
-            </li>
-          </ul>
-        </div>
-        <div class="card-body">
-          <div class="tab-content">
-            <div id="events" class="tab-pane fade show active">
-              {% include "databruce/partials/event_table.html" with events=events %}
-            </div>
-            <div id="songs" class="tab-pane fade">
-              {% include "databruce/partials/song_position_table.html" with songs=songs %}
-            </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-header">
+        <ul class="nav nav-pills nav-fill" role="tablist">
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-home"
+                    aria-selected="true">Events</button>
+          </li>
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-songs-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#songs"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-profile"
+                    aria-selected="false">Songs</button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body">
+        <div class="tab-content">
+          <div id="events" class="tab-pane fade show active">
+            {% include "databruce/partials/event_table.html" with events=events %}
+          </div>
+          <div id="songs" class="tab-pane fade">
+            {% include "databruce/partials/song_position_table.html" with songs=songs %}
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col"></div>
   </div>
   <script>
     $(document).ready(function () {

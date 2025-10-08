@@ -3,157 +3,155 @@
   Tours &gt; {{ tour.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl mb-3">
-        <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl mb-3">
+      <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-pills nav-fill" role="tablist">
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-home"
+                    aria-selected="true">Events</button>
+          </li>
+          {% if tour_legs %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link active"
-                      id="pills-events-tab"
+              <button class="nav-link"
+                      id="pills-legs-tab"
                       data-bs-toggle="pill"
-                      data-bs-target="#events"
+                      data-bs-target="#legs"
                       type="button"
                       role="tab"
-                      aria-controls="pills-home"
-                      aria-selected="true">Events</button>
+                      aria-controls="pills-profile"
+                      aria-selected="false">Legs</button>
             </li>
-            {% if tour_legs %}
-              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link"
-                        id="pills-legs-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#legs"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-profile"
-                        aria-selected="false">Legs</button>
-              </li>
-            {% endif %}
+          {% endif %}
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-songs-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#songs"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-profile"
+                    aria-selected="false">Songs</button>
+          </li>
+          {% if slots %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link"
                       id="pills-songs-tab"
                       data-bs-toggle="pill"
-                      data-bs-target="#songs"
+                      data-bs-target="#slots"
                       type="button"
                       role="tab"
                       aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
+                      aria-selected="false">Slots</button>
             </li>
-            {% if slots %}
-              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link"
-                        id="pills-songs-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#slots"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-profile"
-                        aria-selected="false">Slots</button>
-              </li>
-            {% endif %}
-          </ul>
-        </div>
-        <div class="card-body px-0">
-          <div class="tab-content">
-            <div id="events" class="tab-pane fade show active">
-              {% include "databruce/partials/event_table.html" with events=events %}
-            </div>
-            <div id="legs" class="tab-pane fade">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="tourLegs">
-                  <thead>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="card-body px-0">
+        <div class="tab-content">
+          <div id="events" class="tab-pane fade show active">
+            {% include "databruce/partials/event_table.html" with events=events %}
+          </div>
+          <div id="legs" class="tab-pane fade">
+            <div class="table-responsive">
+              <table class="table table-hover display" id="tourLegs">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col" class="text-center">Shows</th>
+                    <th scope="col" class="text-center">Songs</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for leg in tour_legs %}
                     <tr>
-                      <th scope="col">Name</th>
-                      <th scope="col" class="text-center">Shows</th>
-                      <th scope="col" class="text-center">Songs</th>
-                      <th scope="col">First</th>
-                      <th scope="col">Last</th>
-                      <th scope="col">Note</th>
+                      <td class="text-wrap">
+                        <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
+                      </td>
+                      <td class="text-center">{{ leg.num_shows }}</td>
+                      <td class="text-center">{{ leg.num_songs }}</td>
+                      <td class="text-nowrap">
+                        <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first.get_date }}</a>
+                      </td>
+                      <td class="text-nowrap">
+                        <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last.get_date }}</a>
+                      </td>
+                      <td class="text-wrap">{{ leg.note|default_if_none:"" }}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {% for leg in tour_legs %}
-                      <tr>
-                        <td class="text-wrap">
-                          <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
-                        </td>
-                        <td class="text-center">{{ leg.num_shows }}</td>
-                        <td class="text-center">{{ leg.num_songs }}</td>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first.get_date }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last.get_date }}</a>
-                        </td>
-                        <td class="text-wrap">{{ leg.note|default_if_none:"" }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
-            <div id="songs" class="tab-pane fade">
-              {% include "databruce/partials/song_position_table.html" with songs=songs %}
-            </div>
-            <div id="slots" class="tab-pane fade">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="tourSlots">
-                  <thead>
+          </div>
+          <div id="songs" class="tab-pane fade">
+            {% include "databruce/partials/song_position_table.html" with songs=songs %}
+          </div>
+          <div id="slots" class="tab-pane fade">
+            <div class="table-responsive">
+              <table class="table table-hover display" id="tourSlots">
+                <thead>
+                  <tr>
+                    <th class="text-nowrap all text-start">Event</th>
+                    <th class="text-nowrap all text-start text-50 showopener">Show Opener</th>
+                    <th class="text-nowrap all text-start text-50 set1closer">Set 1 Closer</th>
+                    <th class="text-nowrap all text-start text-50 set2opener">Set 2 Opener</th>
+                    <th class="text-nowrap all text-start text-50 mainsetcloser">Main Set Closer</th>
+                    <th class="text-nowrap all text-start text-50 encoreopener">Encore Opener</th>
+                    <th class="text-nowrap all text-start text-50 showcloser">Show Closer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for slot in slots %}
                     <tr>
-                      <th class="text-nowrap all text-start">Event</th>
-                      <th class="text-nowrap all text-start text-50 showopener">Show Opener</th>
-                      <th class="text-nowrap all text-start text-50 set1closer">Set 1 Closer</th>
-                      <th class="text-nowrap all text-start text-50 set2opener">Set 2 Opener</th>
-                      <th class="text-nowrap all text-start text-50 mainsetcloser">Main Set Closer</th>
-                      <th class="text-nowrap all text-start text-50 encoreopener">Encore Opener</th>
-                      <th class="text-nowrap all text-start text-50 showcloser">Show Closer</th>
+                      <td class="text-nowrap">
+                        <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event__id|get_date }}</a>
+                      </td>
+                      <td class="text-nowrap">
+                        {% if slot.show_opener_id %}
+                          <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
+                        {% endif %}
+                      </td>
+                      <td class="text-nowrap">
+                        {% if slot.set_1_closer_id %}
+                          <a href="{% url "song_details" id=slot.set_1_closer_id %}">{{ slot.set_1_closer_name }}</a>
+                        {% endif %}
+                      </td>
+                      <td class="text-nowrap">
+                        {% if slot.set_2_opener_id %}
+                          <a href="{% url "song_details" id=slot.set_2_opener_id %}">{{ slot.set_2_opener_name }}</a>
+                        {% endif %}
+                      </td>
+                      <td class="text-nowrap">
+                        {% if slot.main_set_closer_id %}
+                          <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
+                        {% endif %}
+                      </td>
+                      <td class="text-nowrap">
+                        {% if slot.encore_opener_id %}
+                          <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
+                        {% endif %}
+                      </td>
+                      <td class="text-nowrap">
+                        {% if slot.show_closer_id %}
+                          <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
+                        {% endif %}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {% for slot in slots %}
-                      <tr>
-                        <td class="text-nowrap">
-                          <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event__id|get_date }}</a>
-                        </td>
-                        <td class="text-nowrap">
-                          {% if slot.show_opener_id %}
-                            <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% if slot.set_1_closer_id %}
-                            <a href="{% url "song_details" id=slot.set_1_closer_id %}">{{ slot.set_1_closer_name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% if slot.set_2_opener_id %}
-                            <a href="{% url "song_details" id=slot.set_2_opener_id %}">{{ slot.set_2_opener_name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% if slot.main_set_closer_id %}
-                            <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% if slot.encore_opener_id %}
-                            <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
-                          {% endif %}
-                        </td>
-                        <td class="text-nowrap">
-                          {% if slot.show_closer_id %}
-                            <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
-                          {% endif %}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

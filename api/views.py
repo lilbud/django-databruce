@@ -84,13 +84,13 @@ class SongsPageViewSet(viewsets.ModelViewSet):
         song = self.request.query_params.get("id")
 
         if song is not None:
-            return models.SongsPage.objects.filter(id=song)
+            return models.Songspagenew.objects.filter(song=song)
 
-        return models.SongsPage.objects.all()
+        return models.Songspagenew.objects.all()
 
     serializer_class = serializers.SongsPageSerializer
     permission_classes = permission_classes
-    # filter_backends = [DatatablesFilterBackend]
+    # filter_backends = [DjangoFilterBackend]
     # filterset_class = SongsPageFilter
 
 

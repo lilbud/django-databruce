@@ -8,63 +8,67 @@
   <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="row mb-2" id="song-info">
-    <div class="text-2xl text-nowrap">{{ song_info.name }}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col">
-      <div class="text-xl">
-        {% if song_info.album %}
-          <div class="mb-3">
-            <div class="fw-semibold">Album</div>
-            <div>
-              <a href="{% url "release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
+  <div class="d-grid gap-0 row-gap-2">
+    <div class="row" id="song-info">
+      <div class="text-2xl text-nowrap">{{ song_info.name }}</div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="text-lg">
+          <div class="d-grid gap-0 row-gap-2">
+            {% if song_info.album %}
+              <div class="row">
+                <div class="fw-semibold">Album</div>
+                <div>
+                  <a href="{% url "release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
+                </div>
+              </div>
+            {% endif %}
+            <div class="row">
+              <div class="fw-semibold">Original Artist</div>
+              <div>{{ song_info.original_artist }}</div>
             </div>
           </div>
-        {% endif %}
-        <div>
-          <div class="fw-semibold">Original Artist</div>
-          <div>{{ song_info.original_artist }}</div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-2">
-    <div class="col">
-      <ul class="nav nav-pills items-end" role="tablist">
-        <button class="nav-link text-center mb-2 active"
-                data-bs-toggle="pill"
-                data-bs-target="#events"
-                aria-controls="pills-events">Performances</button>
-        {% if snippets %}
+    <div class="row">
+      <div class="col">
+        <ul class="nav nav-pills items-end" role="tablist">
+          <button class="nav-link text-center mb-2 active"
+                  data-bs-toggle="pill"
+                  data-bs-target="#events"
+                  aria-controls="pills-events">Performances</button>
+          {% if snippets %}
+            <button class="nav-link text-center mb-2"
+                    data-bs-toggle="pill"
+                    data-bs-target="#snippets"
+                    aria-controls="pills-snippets">Snippets</button>
+          {% endif %}
           <button class="nav-link text-center mb-2"
                   data-bs-toggle="pill"
-                  data-bs-target="#snippets"
-                  aria-controls="pills-snippets">Snippets</button>
-        {% endif %}
-        <button class="nav-link text-center mb-2"
-                data-bs-toggle="pill"
-                data-bs-target="#stats"
-                aria-controls="pills-stats">Stats</button>
-        <button class="nav-link text-center mb-2"
-                data-bs-toggle="pill"
-                data-bs-target="#yearstats"
-                aria-controls="pills-stats">Year by Year</button>
-        {% if lyrics %}
+                  data-bs-target="#stats"
+                  aria-controls="pills-stats">Stats</button>
           <button class="nav-link text-center mb-2"
                   data-bs-toggle="pill"
-                  data-bs-target="#lyrics"
-                  aria-controls="pills-stats">Lyrics</button>
-        {% endif %}
-        <button class="nav-link text-center mb-2"
-                data-bs-toggle="pill"
-                data-bs-target="#links"
-                aria-controls="pills-links">Links</button>
-      </ul>
+                  data-bs-target="#yearstats"
+                  aria-controls="pills-stats">Year by Year</button>
+          {% if lyrics %}
+            <button class="nav-link text-center mb-2"
+                    data-bs-toggle="pill"
+                    data-bs-target="#lyrics"
+                    aria-controls="pills-stats">Lyrics</button>
+          {% endif %}
+          <button class="nav-link text-center mb-2"
+                  data-bs-toggle="pill"
+                  data-bs-target="#links"
+                  aria-controls="pills-links">Links</button>
+        </ul>
+      </div>
     </div>
   </div>
-  <div class="row justify-content-center">
-    <div class="col">
+  <div class="row">
+    <div class="col-12 mx-auto">
       <div class="tab-content">
         <div id="stats" class="tab-pane fade">
           <div class="card mb-3">

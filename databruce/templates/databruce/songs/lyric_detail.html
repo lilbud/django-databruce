@@ -3,23 +3,27 @@
     Lyrics for "{{ song_info.name }}"
 {% endblock title %}
 {% block content %}
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-8">
-            <div class="text-2xl">
-                <a href="{% url "song_details" id=song_info.id %}">{{ song_info.name }}</a>
-            </div>
-            <div class="text-base">
-                <div class="fw-semibold">Source:</div>
-                {{ lyrics.source }}
-                <div class="fw-semibold mt-2">Language:</div>
-                {{ lyrics.language }}
-                {% if lyrics.note %}
-                    <div class="fw-semibold mt-2">Notes:</div>
-                    {{ lyrics.note }}
-                {% endif %}
-            </div>
-            <hr>
-            <div class="text-sm">{{ lyrics.text|linebreaks }}</div>
+    <div class="col-12 col-lg-8 mx-auto">
+        <div class="text-2xl">
+            <a href="{% url "song_details" id=song_info.id %}">{{ song_info.name }}</a>
         </div>
+        <div class="text-base d-grid row-gap-2">
+            <div class="row">
+                <div class="fw-semibold">Source:</div>
+                <div>{{ lyrics.source }}</div>
+            </div>
+            <div class="row">
+                <div class="fw-semibold">Language:</div>
+                <div>{{ lyrics.language }}</div>
+            </div>
+            {% if lyrics.note %}
+                <div class="row">
+                    <div class="fw-semibold">Notes:</div>
+                    <div>{{ lyrics.note }}</div>
+                </div>
+            {% endif %}
+        </div>
+        <hr>
+        <div class="text-sm">{{ lyrics.text|linebreaks }}</div>
     </div>
 {% endblock content %}

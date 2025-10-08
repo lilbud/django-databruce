@@ -207,31 +207,8 @@ class TourLegsSerializer(serializers.ModelSerializer):
 
 
 class SongsPageSerializer(serializers.ModelSerializer):
-    prev = SetlistSerializer()
-    current = SetlistSerializer()
-    band = serializers.SerializerMethodField()
-    next = SetlistSerializer()
-
-    # date, band, venue, tour, position, gap, set, note
-
-    def get_band(self, obj):
-        try:
-            return obj.current.event.band.name
-        except:
-            return ""
-
-    def get_prev(self, obj):
-        try:
-            return obj.prev.song.name
-        except AttributeError:
-            return ""
-
-    def get_next(self, obj):
-        try:
-            return obj.next.song.name
-        except AttributeError:
-            return ""
+    event = EventsSerializer()
 
     class Meta:
-        model = models.SongsPage
+        model = models.Songspagenew
         fields = "__all__"

@@ -40,6 +40,11 @@ urlpatterns = [
         name="profile",
     ),
     path(
+        "contact/",
+        views.Contact.as_view(),
+        name="contact",
+    ),
+    path(
         "settings/",
         views.UserSettings.as_view(),
         name="settings",
@@ -68,8 +73,8 @@ urlpatterns = [
         auth_views.PasswordResetView.as_view(
             template_name="users/reset_password.html",
             success_url=reverse_lazy("password_reset_done"),
-            email_template_name="users/reset_password_email.html",
-            subject_template_name="users/signup_confirm_subject.txt",
+            email_template_name="databruce/email/reset_password_email.html",
+            subject_template_name="users/reset_password_confirm_subject.txt",
         ),
         name="password_reset",
     ),

@@ -3,147 +3,145 @@
   Profile
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center mb-3">
-    <div class="col-12 col-lg-8">
-      <div class="row mb-4">
-        <div class="col">
-          {% if user_info.username == user.username %}
-            <div class="text-2xl">Your Profile</div>
-          {% else %}
-            <div class="text-2xl">{{ user_info.username|title }}'s Profile</div>
-          {% endif %}
-        </div>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="row mb-4">
+      <div class="col">
+        {% if user_info.username == user.username %}
+          <div class="text-2xl">Your Profile</div>
+        {% else %}
+          <div class="text-2xl">{{ user_info.username|title }}'s Profile</div>
+        {% endif %}
       </div>
-      <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item {% if user_songs %}me-1 me-lg-2{% endif %} mb-2 mb-lg-0"
-                role="presentation">
-              <button class="nav-link active"
-                      id="pills-events-tab"
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-pills nav-fill" role="tablist">
+          <li class="nav-item {% if user_songs %}me-1 me-lg-2{% endif %} mb-2 mb-lg-0"
+              role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-home"
+                    aria-selected="true">Shows</button>
+          </li>
+          {% if user_songs %}
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-songs-tab"
                       data-bs-toggle="pill"
-                      data-bs-target="#events"
+                      data-bs-target="#songs"
                       type="button"
                       role="tab"
-                      aria-controls="pills-home"
-                      aria-selected="true">Shows</button>
+                      aria-controls="pills-profile"
+                      aria-selected="false">Songs</button>
             </li>
-            {% if user_songs %}
-              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link"
-                        id="pills-songs-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#songs"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-profile"
-                        aria-selected="false">Songs</button>
-              </li>
-            {% endif %}
-          </ul>
-        </div>
-        <div class="card-body px-0">
-          <div class="tab-content">
-            <div id="events" class="tab-pane fade show active">
-              <div class="text-lg pb-2">
-                {% if user_info.username == user.username %}
-                  Shows that you have seen
-                {% else %}
-                  Shows that {{ user_info.username|title }} has seen
-                {% endif %}
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover display" id="eventTable">
-                  <thead>
-                    <tr>
-                      <th class="all" scope="col">Date</th>
-                      <th class="all" scope="col">Band</th>
-                      <th class="all" scope="col">Venue</th>
-                      <th class="all" scope="col">Location</th>
-                      <th class="all" scope="col">Tour</th>
-                      <th class="all" scope="col">Detail</th>
-                      <th class="all" scope="col">Remove</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for event in user_shows %}
-                      {% with event=event.event %}
-                        <tr>
-                          <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
-                            <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                          </td>
-                          <td class="text-nowrap">
-                            <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
-                          </td>
-                          <td class="text-nowrap">
-                            <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
-                          </td>
-                          <td class="text-nowrap">
-                            {% if event.venue.city %}
-                              <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                            {% endif %}
-                          </td>
-                          <td class="text-nowrap">
-                            {% if event.tour %}
-                              <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-                            {% endif %}
-                          </td>
-                          <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
-                          <td class="text-nowrap">
-                            {% if user_info.id == user.id or user.is_superuser %}
-                              <form method="post" action="{% url "remove_show" %}">
-                                <input type="hidden" name="event" value="{{ event.id }}">
-                                {% csrf_token %}
-                                <button id="submit-button"
-                                        type="submit"
-                                        name="submit"
-                                        class="btn btn-sm btn-danger text-xs">
-                                  <i class="bi bi-x-lg"></i>
-                                </button>
-                              </form>
-                            {% endif %}
-                          </td>
-                        </tr>
-                      {% endwith %}
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="card-body px-0">
+        <div class="tab-content">
+          <div id="events" class="tab-pane fade show active">
+            <div class="text-lg pb-2">
+              {% if user_info.username == user.username %}
+                Shows that you have seen
+              {% else %}
+                Shows that {{ user_info.username|title }} has seen
+              {% endif %}
             </div>
-            <div id="songs" class="tab-pane fade">
-              <div class="text-lg pb-2">
-                {% if user_info.username == user.username %}
-                  Songs that you have seen
-                {% else %}
-                  Songs that {{ user_info.username|title }} has seen
-                {% endif %}
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover display" id="songTable">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Song Name</th>
-                      <th>Category</th>
-                      <th class="text-center">First Seen</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for song in user_seen %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="eventTable">
+                <thead>
+                  <tr>
+                    <th class="all" scope="col">Date</th>
+                    <th class="all" scope="col">Band</th>
+                    <th class="all" scope="col">Venue</th>
+                    <th class="all" scope="col">Location</th>
+                    <th class="all" scope="col">Tour</th>
+                    <th class="all" scope="col">Detail</th>
+                    <th class="all" scope="col">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for event in user_shows %}
+                    {% with event=event.event %}
                       <tr>
-                        <td class="text-center">{{ song.count }}</td>
-                        <td>
-                          <a href="{% url "song_details" id=song.song %}">{{ song.name }}</a>
+                        <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
+                          <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                         </td>
-                        <td>{{ song.category }}</td>
-                        <td class="text-center">
-                          <a href="{% url "event_details" id=song.first %}">{{ song.first|get_date }}</a>
+                        <td class="text-nowrap">
+                          <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                        </td>
+                        <td class="text-nowrap">
+                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+                        </td>
+                        <td class="text-nowrap">
+                          {% if event.venue.city %}
+                            <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                          {% endif %}
+                        </td>
+                        <td class="text-nowrap">
+                          {% if event.tour %}
+                            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                          {% endif %}
+                        </td>
+                        <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
+                        <td class="text-nowrap">
+                          {% if user_info.id == user.id or user.is_superuser %}
+                            <form method="post" action="{% url "remove_show" %}">
+                              <input type="hidden" name="event" value="{{ event.id }}">
+                              {% csrf_token %}
+                              <button id="submit-button"
+                                      type="submit"
+                                      name="submit"
+                                      class="btn btn-sm btn-danger text-xs">
+                                <i class="bi bi-x-lg"></i>
+                              </button>
+                            </form>
+                          {% endif %}
                         </td>
                       </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+                    {% endwith %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="songs" class="tab-pane fade">
+            <div class="text-lg pb-2">
+              {% if user_info.username == user.username %}
+                Songs that you have seen
+              {% else %}
+                Songs that {{ user_info.username|title }} has seen
+              {% endif %}
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover display" id="songTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Song Name</th>
+                    <th>Category</th>
+                    <th class="text-center">First Seen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for song in user_seen %}
+                    <tr>
+                      <td class="text-center">{{ song.count }}</td>
+                      <td>
+                        <a href="{% url "song_details" id=song.song %}">{{ song.name }}</a>
+                      </td>
+                      <td>{{ song.category }}</td>
+                      <td class="text-center">
+                        <a href="{% url "event_details" id=song.first %}">{{ song.first|get_date }}</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -151,93 +149,91 @@
     </div>
   </div>
   {% if user_songs %}
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-8">
-        <div class="row mb-2">
-          <div class="col">
-            <div class="text-2xl">Stats</div>
-          </div>
+    <div class="col-12 col-lg-8 mx-auto">
+      <div class="row mb-2">
+        <div class="col">
+          <div class="text-2xl">Stats</div>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <ul class="nav nav-pills nav-fill" role="tablist">
-              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link active"
-                        id="pills-events-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#mostplayed"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-home"
-                        aria-selected="true">Most Played Not Seen</button>
-              </li>
-              <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link"
-                        id="pills-songs-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#rare"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-profile"
-                        aria-selected="false">Rare Songs</button>
-              </li>
-            </ul>
-          </div>
-          <div class="card-body px-0">
-            <div class="tab-content">
-              <div id="mostplayed" class="tab-pane show active fade">
-                <div class="row mb-2">
-                  <div class="text-lg pb-2">Most commonly played songs not seen</div>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="notSeenTable">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Song Name</th>
-                        <th>Category</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for song in user_not_seen %}
-                        <tr>
-                          <td class="text-center">{{ song.num_plays_public }}</td>
-                          <td>
-                            <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
-                          </td>
-                          <td>{{ song.category }}</td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-pills nav-fill" role="tablist">
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link active"
+                      id="pills-events-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#mostplayed"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-home"
+                      aria-selected="true">Most Played Not Seen</button>
+            </li>
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-songs-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#rare"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Rare Songs</button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body px-0">
+          <div class="tab-content">
+            <div id="mostplayed" class="tab-pane show active fade">
+              <div class="row mb-2">
+                <div class="text-lg pb-2">Most commonly played songs not seen</div>
               </div>
-              <div id="rare" class="tab-pane fade">
-                <div class="row mb-2">
-                  <div class="text-lg pb-2">Songs seen with 100 plays or less</div>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="rareTable">
-                    <thead>
+              <div class="table-responsive">
+                <table class="table table-hover display" id="notSeenTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Song Name</th>
+                      <th>Category</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for song in user_not_seen %}
                       <tr>
-                        <th>#</th>
-                        <th>Song Name</th>
-                        <th>Category</th>
+                        <td class="text-center">{{ song.num_plays_public }}</td>
+                        <td>
+                          <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
+                        </td>
+                        <td>{{ song.category }}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {% for song in user_rare_songs %}
-                        <tr>
-                          <td class="text-center">{{ song.num_plays_public }}</td>
-                          <td>
-                            <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
-                          </td>
-                          <td>{{ song.category }}</td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="rare" class="tab-pane fade">
+              <div class="row mb-2">
+                <div class="text-lg pb-2">Songs seen with 100 plays or less</div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover display" id="rareTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Song Name</th>
+                      <th>Category</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for song in user_rare_songs %}
+                      <tr>
+                        <td class="text-center">{{ song.num_plays_public }}</td>
+                        <td>
+                          <a href="{% url "song_details" id=song.id %}">{{ song.name }}</a>
+                        </td>
+                        <td>{{ song.category }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

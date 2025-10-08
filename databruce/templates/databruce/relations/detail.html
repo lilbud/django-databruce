@@ -3,68 +3,66 @@
   Relations &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl text-nowrap mb-3">
-        <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
-      </div>
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex flex-row mb-0 text-base">
-            <div class="pe-2 fw-semibold">Appeared With:</div>
-            <div>
-              {% for band in bands %}
-                <a href="{% url "band_details" id=band.band.id %}">{{ band.band.name }}</a>
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            </div>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl text-nowrap mb-3">
+      <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
+    </div>
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex flex-row mb-0 text-sm">
+          <div class="pe-2 fw-semibold text-nowrap">Appeared With:</div>
+          <div>
+            {% for band in bands %}
+              <a href="{% url "band_details" id=band.band.id %}">{{ band.band.name }}</a>
+              {% if not forloop.last %},{% endif %}
+            {% endfor %}
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link active"
-                      id="pills-events-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#events"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-home"
-                      aria-selected="true">Events</button>
-            </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-links-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#links"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-links"
-                      aria-selected="false">Links</button>
-            </li>
-          </ul>
-        </div>
-        <div class="card-body px-0">
-          <div class="tab-content">
-            <div id="events" class="tab-pane fade show active">
-              {% include "databruce/partials/event_table.html" with events=events %}
-            </div>
-            <div id="links" class="tab-pane fade">
-              <ul>
-                {% if info.brucebase_url %}
-                  <li>
-                    <a href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
-                  </li>
-                {% endif %}
-                {% if info.mbid %}
-                  <li>
-                    <a href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
-                  </li>
-                {% endif %}
-              </ul>
-            </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-pills nav-fill" role="tablist">
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-home"
+                    aria-selected="true">Events</button>
+          </li>
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-links-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#links"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-links"
+                    aria-selected="false">Links</button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body px-0">
+        <div class="tab-content">
+          <div id="events" class="tab-pane fade show active">
+            {% include "databruce/partials/event_table.html" with events=events %}
+          </div>
+          <div id="links" class="tab-pane fade">
+            <ul>
+              {% if info.brucebase_url %}
+                <li>
+                  <a href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
+                </li>
+              {% endif %}
+              {% if info.mbid %}
+                <li>
+                  <a href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
+                </li>
+              {% endif %}
+            </ul>
           </div>
         </div>
       </div>

@@ -80,11 +80,11 @@
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-2 bd-gutter flex-wrap flex-xl-nowrap">
         <a class="p-0 mx-0 mx-lg-3 d-none d-xl-block" href="{% url 'index' %}">
-          <img height="16px"
-               class="my-1"
+          <img height="18px"
+               class="my-auto"
                width="auto"
                id="logo"
-               src="{% static 'databruce/img/logo.svg' %}"
+               src="{% static 'databruce/img/logo-new.svg' %}"
                alt="">
         </a>
         <button class="btn btn-sm d-xl-none d-block dropdown-toggle me-auto py-0"
@@ -97,11 +97,11 @@
           <i class="bi bi-list text-xl fw-semibold"></i>
         </button>
         <a class="d-block d-xl-none" href="{% url 'index' %}">
-          <img height="16px"
-               class="my-1"
+          <img height="18px"
+               class="my-auto"
                width="auto"
                id="logo"
-               src="{% static 'databruce/img/logo.svg' %}"
+               src="{% static 'databruce/img/logo-new.svg' %}"
                alt="">
         </a>
         {% if user.is_authenticated %}
@@ -275,6 +275,9 @@
                 <li>
                   <a class="dropdown-item" href="{% url 'roadmap' %}">Roadmap</a>
                 </li>
+                <li>
+                  <a class="dropdown-item" href="{% url "contact" %}">Contact Us</a>
+                </li>
               </ul>
             </li>
           </ul>
@@ -387,16 +390,14 @@
     </nav>
     <div class="padded-body">
       <div class="container-fluid">
-        <div class="row justify-content-center my-3">
-          <div class="col-12">
-            {% block content %}
-            {% endblock content %}
-          </div>
+        <div class="col-12 my-3">
+          {% block content %}
+          {% endblock content %}
         </div>
       </div>
     </div>
     <div class="footer">
-      <div class="col-12 col-lg-8 mx-auto">
+      <div class="col-12 mx-auto">
         <div class="card">
           <div class="card-body text-center">
             Copyright ©2025, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.

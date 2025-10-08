@@ -3,9 +3,9 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-xxl-8">
-      <div class="row mb-2">
+  <div class="col-12 col-xxl-8 mx-auto">
+    <div class="d-grid gap-0 row-gap-2">
+      <div class="row">
         <div class="col">
           <div class="float-end text-base">
             {% if user.is_superuser %}
@@ -30,7 +30,7 @@
           </div>
         </div>
       </div>
-      <div class="row mb-2">
+      <div class="row">
         <div class="col">
           <div class="card" id="eventInfo">
             <div class="card-body">

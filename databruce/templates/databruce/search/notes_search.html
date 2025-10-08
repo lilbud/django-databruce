@@ -3,24 +3,22 @@
   Events &gt; Search
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl text-nowrap">Setlist Notes Search</div>
-      <div class="text-base text-nowrap mb-3">Search the various setlist notes for a given (case-insensitive) query.</div>
-      <form action="{% url 'note_search' %}" method="post" id="search-form">
-        {% csrf_token %}
-        <div class="row mb-4">{{ form }}</div>
-        <div class="row">
-          <div class="col-1">
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <button id="submit-button"
-                      type="submit"
-                      name="submit"
-                      class="btn btn-success">Go</button>
-            </div>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl text-nowrap">Setlist Notes Search</div>
+    <div class="text-base text-nowrap mb-3">Search the various setlist notes for a given (case-insensitive) query.</div>
+    <form action="{% url 'note_search' %}" method="post" id="search-form">
+      {% csrf_token %}
+      <div class="row mb-4">{{ form }}</div>
+      <div class="row">
+        <div class="col-1">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button id="submit-button"
+                    type="submit"
+                    name="submit"
+                    class="btn btn-success">Go</button>
           </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 {% endblock content %}

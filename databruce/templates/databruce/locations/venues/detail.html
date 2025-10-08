@@ -3,76 +3,71 @@
   Venues &gt; {{ venue_info }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl text-nowrap mb-3">
-        <a href="{% url "venues" %}">Venues</a> &gt;
-        {{ venue_info }}
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl text-nowrap mb-3">
+      <a href="{% url "venues" %}">Venues</a> &gt;
+      {{ venue_info }}
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-pills nav-fill" role="tablist">
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-home"
+                    aria-selected="true">Events</button>
+          </li>
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-songs-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#songs"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-profile"
+                    aria-selected="false">Songs</button>
+          </li>
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-links-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#links"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-links"
+                    aria-selected="false">Links</button>
+          </li>
+        </ul>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link active"
-                      id="pills-events-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#events"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-home"
-                      aria-selected="true">Events</button>
-            </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-songs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#songs"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
-            </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-links-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#links"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-links"
-                      aria-selected="false">Links</button>
-            </li>
-          </ul>
-        </div>
-        <div class="card-body px-0">
-          <div class="tab-content">
-            <div id="events" class="tab-pane fade show active">
-              {% include "databruce/partials/event_table.html" with events=events %}
-            </div>
-            <div id="songs" class="tab-pane fade">
-              {% include "databruce/partials/song_position_table.html" with songs=songs %}
-            </div>
-            <div id="links" class="tab-pane fade">
-              <ul>
-                {% if venue_info.brucebase_url %}
-                  <li>
-                    <a href="https://brucebase.wikidot.com/venue:{{ venue_info.brucebase_url }}">Brucebase</a>
-                  </li>
-                {% endif %}
-                {% if venue_info.mbid %}
-                  <li>
-                    <a href="https://musicbrainz.org/place/{{ venue_info.mbid }}">Musicbrainz</a>
-                  </li>
-                {% endif %}
-              </ul>
-            </div>
+      <div class="card-body px-0">
+        <div class="tab-content">
+          <div id="events" class="tab-pane fade show active">
+            {% include "databruce/partials/event_table.html" with events=events %}
+          </div>
+          <div id="songs" class="tab-pane fade">
+            {% include "databruce/partials/song_position_table.html" with songs=songs %}
+          </div>
+          <div id="links" class="tab-pane fade">
+            <ul>
+              {% if venue_info.brucebase_url %}
+                <li>
+                  <a href="https://brucebase.wikidot.com/venue:{{ venue_info.brucebase_url }}">Brucebase</a>
+                </li>
+              {% endif %}
+              {% if venue_info.mbid %}
+                <li>
+                  <a href="https://musicbrainz.org/place/{{ venue_info.mbid }}">Musicbrainz</a>
+                </li>
+              {% endif %}
+            </ul>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row mb-4">
-    <div class="col"></div>
   </div>
   <script>
     $(document).ready(function () {

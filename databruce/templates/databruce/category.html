@@ -2,21 +2,19 @@
 {% block title %}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="mb-3">
-        {% block info_row %}
-        {% endblock info_row %}
-      </div>
-      <div class="card">
-        <div class="card-body px-0">
-          <div class="table-responsive">
-            <table class="table table-hover display"
-                   id="{% spaceless %}{% block table_id %}{% endblock table_id %}{% endspaceless %}">
-              {% block table %}
-              {% endblock table %}
-            </table>
-          </div>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="mb-3">
+      {% block info_row %}
+      {% endblock info_row %}
+    </div>
+    <div class="card">
+      <div class="card-body px-0">
+        <div class="table-responsive">
+          <table class="table table-hover display"
+                 id="{% spaceless %}{% block table_id %}{% endblock table_id %}{% endspaceless %}">
+            {% block table %}
+            {% endblock table %}
+          </table>
         </div>
       </div>
     </div>

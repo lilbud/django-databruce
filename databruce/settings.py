@@ -162,6 +162,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
 }
 
+DEFAULT_FROM_EMAIL = "admin@databruce.com"
+NOTIFY_EMAIL = "databrucedb@gmail.com"
 
 try:
     from .local_settings import *  # noqa: F403

@@ -3,99 +3,97 @@
   Releases &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="text-2xl text-nowrap mb-2">{{ info.name }}</div>
-      <div class="text-base">{{ info.note|default_if_none:"" }}</div>
-      <div class="text-lg mb-2">
-        <div class="mb-1">
-          <div class="fw-semibold">Release Date</div>
-          <div>{{ info.date }}</div>
+  <div class="col-12 col-lg-8 mx-auto">
+    <div class="text-2xl text-nowrap mb-2">{{ info.name }}</div>
+    <div class="text-base">{{ info.note|default_if_none:"" }}</div>
+    <div class="text-lg mb-2 d-grid gap-0 row-gap-1">
+      <div class="row">
+        <div class="fw-semibold">Release Date</div>
+        <div>{{ info.date }}</div>
+      </div>
+      <div class="row">
+        <div class="fw-semibold">Type</div>
+        <div>{{ info.type }}</div>
+      </div>
+      {% if info.event %}
+        <div class="row">
+          <div class="fw-semibold">Event Date</div>
+          <div>
+            <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
+          </div>
         </div>
-        <div class="mb-0">
-          <div class="fw-semibold">Type</div>
-          <div>{{ info.type }}</div>
-        </div>
-        {% if info.event %}
-          <div class="mt-1">
-            <div class="fw-semibold">Event Date</div>
-            <div>
-              <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-pills nav-fill" role="tablist">
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-songs-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#songs"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-profile"
+                    aria-selected="false">Songs</button>
+          </li>
+          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-links-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#links"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-links"
+                    aria-selected="false">Links</button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body px-0">
+        <div class="tab-content">
+          <div id="songs" class="tab-pane fade show active">
+            <div class="table-responsive">
+              <table class="table table-hover display nowrap" id="tracksTable">
+                <thead>
+                  <tr class="header">
+                    <th scope="col">#</th>
+                    <th scope="col">Plays</th>
+                    <th scope="col">Song</th>
+                    <th scope="col">Length</th>
+                    <th scope="col">Event Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for track in tracks %}
+                    <tr>
+                      <td>{{ track.track }}</td>
+                      <td>{{ track.song.num_plays_public }}</td>
+                      <td>
+                        <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
+                      </td>
+                      <td>
+                        {% if track.song.length %}{{ track.song.length|date:"i:s" }}{% endif %}
+                      </td>
+                      <td data-sort="{{ track.event.get_date }}"
+                          data-filter="{{ track.event.get_date }}">
+                        {% if track.event %}
+                          <a href="{% url "event_details" id=track.event.id %}">{{ track.event.get_date }}</a>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
-        {% endif %}
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <ul class="nav nav-pills nav-fill" role="tablist">
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link active"
-                      id="pills-songs-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#songs"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
-            </li>
-            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-              <button class="nav-link"
-                      id="pills-links-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#links"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-links"
-                      aria-selected="false">Links</button>
-            </li>
-          </ul>
-        </div>
-        <div class="card-body px-0">
-          <div class="tab-content">
-            <div id="songs" class="tab-pane fade show active">
-              <div class="table-responsive">
-                <table class="table table-hover display nowrap" id="tracksTable">
-                  <thead>
-                    <tr class="header">
-                      <th scope="col">#</th>
-                      <th scope="col">Plays</th>
-                      <th scope="col">Song</th>
-                      <th scope="col">Length</th>
-                      <th scope="col">Event Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for track in tracks %}
-                      <tr>
-                        <td>{{ track.track }}</td>
-                        <td>{{ track.song.num_plays_public }}</td>
-                        <td>
-                          <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
-                        </td>
-                        <td>
-                          {% if track.song.length %}{{ track.song.length|date:"i:s" }}{% endif %}
-                        </td>
-                        <td data-sort="{{ track.event.get_date }}"
-                            data-filter="{{ track.event.get_date }}">
-                          {% if track.event %}
-                            <a href="{% url "event_details" id=track.event.id %}">{{ track.event.get_date }}</a>
-                          {% endif %}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div id="links" class="tab-pane fade">
-              <ul>
-                {% if info.mbid %}
-                  <li>
-                    <a href="https://musicbrainz.org/release/{{ info.mbid }}">Musicbrainz</a>
-                  </li>
-                {% endif %}
-              </ul>
-            </div>
+          <div id="links" class="tab-pane fade">
+            <ul>
+              {% if info.mbid %}
+                <li>
+                  <a href="https://musicbrainz.org/release/{{ info.mbid }}">Musicbrainz</a>
+                </li>
+              {% endif %}
+            </ul>
           </div>
         </div>
       </div>

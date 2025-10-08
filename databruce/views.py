@@ -1055,6 +1055,61 @@ class TourDetail(TemplateView):
         return context
 
 
+class Contact(View):
+    form_class = forms.ContactForm
+    template_name = "databruce/contact.html"
+
+    def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        return render(
+            request,
+            self.template_name,
+            context={"form": self.form_class()},
+        )
+
+    def post(self, request: HttpRequest):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            print(form.cleaned_data)
+
+            if form.cleaned_data["verification"] == "1975":
+                use_https = False
+
+                context = {
+                    "email": form.cleaned_data["email"],
+                    "subject": form.cleaned_data["subject"],
+                    "message": form.cleaned_data["message"],
+                    "protocol": "https" if use_https else "http",
+                }
+
+                body = loader.render_to_string(
+                    "databruce/email/contact_email.html",
+                    context,
+                )
+
+                # send_mail(
+                #     subject=form.cleaned_data["subject"],
+                #     message=body,
+                #     from_email=settings.DEFAULT_FROM_EMAIL,
+                #     recipient_list=[settings.NOTIFY_EMAIL],
+                # )
+
+                messages.success(request, "Message Sent")
+
+                return redirect(reverse("contact"))
+
+            messages.error(request, "Incorrect verification answer")
+            return render(
+                request,
+                template_name=self.template_name,
+                context={"form": form, "verification_err": True},
+            )
+
+        messages.error(request, "Message not sent, see errors below")
+
+        return render(request, template_name=self.template_name, context={"form": form})
+
+
 class SetlistNotesSearch(View):
     form_class = forms.SetlistNoteSearch
 
@@ -1132,6 +1187,7 @@ class AdvancedSearchResults(View):
         results = []
 
         if event_form.is_valid():
+            print(event_form.cleaned_data)
             event_filter = Q(date__gte=event_form.cleaned_data["first_date"]) & Q(
                 date__lte=event_form.cleaned_data["last_date"],
             )
@@ -1148,32 +1204,22 @@ class AdvancedSearchResults(View):
 
             if "month" in event_form.changed_data:
                 event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["month_choice"],
-                        Q(date__month=event_form.cleaned_data["month"]),
-                    ),
+                    Q(date__month=event_form.cleaned_data["month"]),
                     Q.AND,
                 )
 
-                choice = self.result_choice(event_form.cleaned_data["month_choice"])
-
                 results.append(
-                    f"{event_form.fields['month'].label}: ({choice}) {filters.get_month_from_num(event_form.cleaned_data['month'])}",
+                    f"{event_form.fields['month'].label}: {filters.get_month_from_num(event_form.cleaned_data['month'])}",
                 )
 
             if "day" in event_form.changed_data:
                 event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["day_choice"],
-                        Q(date__day=event_form.cleaned_data["day"]),
-                    ),
+                    Q(date__day=event_form.cleaned_data["day"]),
                     Q.AND,
                 )
 
-                choice = self.result_choice(event_form.cleaned_data["day_choice"])
-
                 results.append(
-                    f"{event_form.fields['day'].label}: ({choice}) {event_form.cleaned_data['day']}",
+                    f"{event_form.fields['day'].label}: {event_form.cleaned_data['day']}",
                 )
 
             if "city" in event_form.changed_data:

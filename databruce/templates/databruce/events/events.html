@@ -3,89 +3,87 @@
   Events
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-xl-8">
-      <div class="d-flex justify-content-between mb-3">
-        <div class="text-2xl">Events</div>
-        <div class="float-end" id="year-select">
-          <button class="btn btn-primary dropdown-toggle"
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false">{{ year }}</button>
-          <ul class="dropdown-menu">
-            {% for i in years %}
-              <li>
-                <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+  <div class="col-12 col-xl-8 mx-auto">
+    <div class="d-flex justify-content-between mb-3">
+      <div class="text-2xl">Events</div>
+      <div class="float-end" id="year-select">
+        <button class="btn btn-primary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">{{ year }}</button>
+        <ul class="dropdown-menu">
+          {% for i in years %}
+            <li>
+              <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
+            </li>
+          {% endfor %}
+        </ul>
       </div>
-      <div class="card">
-        <div class="card-body px-0">
-          <div class="table-responsive">
-            <table class="table table-hover display" id="eventTable">
-              <thead>
-                <tr class="custom">
-                  <th class="all" scope="col">Date</th>
-                  <th class="min-tablet-l icon text-center text-nowrap align-middle d-none d-lg-block"
-                      scope="col">
-                    <i class="bi bi-file-earmark-check d-none d-lg-block"
-                       data-bs-toggle="tooltip"
-                       data-bs-placement="top"
-                       data-bs-title="Has Setlist">
-                    </i>
-                    <span class="d-inline d-lg-none">Setlist:</span>
-                  </th>
-                  <th class="min-tablet-l" scope="col">Band</th>
-                  <th class="min-tablet-l" scope="col">Venue</th>
-                  <th class="min-tablet-l" scope="col">Location</th>
-                  <th class="min-tablet-l" scope="col">Tour</th>
-                  <th class="min-tablet-l" scope="col">Detail</th>
-                  <th class="min-tablet-l" scope="col">Public</th>
+    </div>
+    <div class="card">
+      <div class="card-body px-0">
+        <div class="table-responsive">
+          <table class="table table-hover display" id="eventTable">
+            <thead>
+              <tr class="custom">
+                <th class="all" scope="col">Date</th>
+                <th class="min-tablet-l icon text-center text-nowrap align-middle d-none d-lg-block"
+                    scope="col">
+                  <i class="bi bi-file-earmark-check d-none d-lg-block"
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="top"
+                     data-bs-title="Has Setlist">
+                  </i>
+                  <span class="d-inline d-lg-none">Setlist:</span>
+                </th>
+                <th class="min-tablet-l" scope="col">Band</th>
+                <th class="min-tablet-l" scope="col">Venue</th>
+                <th class="min-tablet-l" scope="col">Location</th>
+                <th class="min-tablet-l" scope="col">Tour</th>
+                <th class="min-tablet-l" scope="col">Detail</th>
+                <th class="min-tablet-l" scope="col">Public</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in event_info %}
+                <tr>
+                  <td scope="row"
+                      class="text-nowrap"
+                      data-sort="{{ event.get_date }}"
+                      data-filter="{{ event.get_date }}">
+                    <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                  </td>
+                  <td class="icon text-center align-middle">
+                    {% if event.setlist_certainty == "Confirmed" %}
+                      <i class="bi bi-file-earmark-check d-none d-lg-block"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-title="Has Setlist"></i>
+                      <div class="d-lg-none">True</div>
+                    {% else %}
+                      <div class="d-lg-none">False</div>
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">
+                    <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
+                  </td>
+                  <td class="text-nowrap">
+                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+                  </td>
+                  <td class="text-nowrap">
+                    {% if event.venue.city %}
+                      <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">
+                    <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
+                  </td>
+                  <td class="text-nowrap">{{ event.title|default_if_none:""|safe }}</td>
+                  <td>{{ event.public|default_if_none:"" }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for event in event_info %}
-                  <tr>
-                    <td scope="row"
-                        class="text-nowrap"
-                        data-sort="{{ event.get_date }}"
-                        data-filter="{{ event.get_date }}">
-                      <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                    </td>
-                    <td class="icon text-center align-middle">
-                      {% if event.setlist_certainty == "Confirmed" %}
-                        <i class="bi bi-file-earmark-check d-none d-lg-block"
-                           data-bs-toggle="tooltip"
-                           data-bs-placement="top"
-                           data-bs-title="Has Setlist"></i>
-                        <div class="d-lg-none">True</div>
-                      {% else %}
-                        <div class="d-lg-none">False</div>
-                      {% endif %}
-                    </td>
-                    <td class="text-nowrap">
-                      <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
-                    </td>
-                    <td class="text-nowrap">
-                      <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
-                    </td>
-                    <td class="text-nowrap">
-                      {% if event.venue.city %}
-                        <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
-                      {% endif %}
-                    </td>
-                    <td class="text-nowrap">
-                      <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
-                    </td>
-                    <td class="text-nowrap">{{ event.title|default_if_none:""|safe }}</td>
-                    <td>{{ event.public|default_if_none:"" }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

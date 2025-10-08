@@ -3,43 +3,41 @@
   Profile Settings
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="row mb-4">
-        <div class="text-2xl">User Settings</div>
-      </div>
-      <div class="card mb-3">
-        <div class="card-header">Update Profile</div>
-        <div class="card-body">
-          {% if messages %}
-            <div class="row mb-3">
-              <div class="col">
-                {% for message in messages %}
-                  <div class="card text-bg-{% if message.tags == 'success' %}success{% else %}danger{% endif %}">
-                    <div class="card-body">{{ message|safe }}</div>
-                  </div>
-                {% endfor %}
-              </div>
+  <div class="col-12 col-lg-6 mx-auto">
+    <div class="row mb-4">
+      <div class="text-2xl">User Settings</div>
+    </div>
+    <div class="card mb-3">
+      <div class="card-header">Update Profile</div>
+      <div class="card-body">
+        {% if messages %}
+          <div class="row mb-3">
+            <div class="col">
+              {% for message in messages %}
+                <div class="card text-bg-{% if message.tags == 'success' %}success{% else %}danger{% endif %}">
+                  <div class="card-body">{{ message|safe }}</div>
+                </div>
+              {% endfor %}
             </div>
-          {% endif %}
-          <form method="post" id="profileForm" action="{% url "settings" %}">
-            {% csrf_token %}
-            <div class="mb-3">
-              {{ form.username.errors }}
-              <label class="form-label" for="username">Username:</label>
-              {{ form.username }}
-            </div>
-            <div class="mb-3">
-              {{ form.email.errors }}
-              <label class="form-label" for="email">Email:</label>
-              {{ form.email }}
-            </div>
-            <button id="submit-button"
-                    type="submit"
-                    name="submit"
-                    class="btn btn-sm btn-success">Update</button>
-          </form>
-        </div>
+          </div>
+        {% endif %}
+        <form method="post" id="profileForm" action="{% url "settings" %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            {{ form.username.errors }}
+            <label class="form-label" for="username">Username:</label>
+            {{ form.username }}
+          </div>
+          <div class="mb-3">
+            {{ form.email.errors }}
+            <label class="form-label" for="email">Email:</label>
+            {{ form.email }}
+          </div>
+          <button id="submit-button"
+                  type="submit"
+                  name="submit"
+                  class="btn btn-sm btn-success">Update</button>
+        </form>
       </div>
     </div>
   </div>
