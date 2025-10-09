@@ -10,7 +10,7 @@ var selectOptions = {
 };
 
 // this counter updates when a row is added or removed, used to set row/field specific IDs.
-var song_count = -1;
+const totalForms = document.getElementById("id_form-TOTAL_FORMS");
 
 /**
  * Adjusts conjunctions between song rows.
@@ -46,10 +46,23 @@ function adjust_conjunctions() {
  * @param {object} button - rows remove button, used to find parent search row.
  */
 function removeForm(e) {
+    // remove last song row
     $(e).closest('.song-row').remove();
-    song_count -= 1;
+
+    // increment value of management form total count
+    totalForms.value--;
     
     adjust_conjunctions();
+}
+
+function positionChange(row, select) {
+    // show/hide the song2 field when position = followed_by
+    if ($(select).val() == "followed_by") {
+        row.find(`[id*=song2]`).parent().show();
+        row.find(`[id*=song2]`).select2(selectOptions);
+    } else {
+        row.find(`[id*=song2]`).parent().hide();
+    }
 }
 
 /**
@@ -57,7 +70,7 @@ function removeForm(e) {
  */
 function addForm() {
     // row count for setting IDs
-    song_count += 1;
+    var count = totalForms.value;
 
     // grab hidden "template" row and add to search container
     $("#setlist-search").append($("#new_row").html());
@@ -65,38 +78,37 @@ function addForm() {
     var row = $('#setlist-search').find('.song-row').last();
 
     // remove display none and show the new row
-    row.attr('id', `song-row-${song_count}`).removeClass("d-none");
+    row.attr('id', `song-row-${count}`).removeClass("d-none");
 
     // adding incremented ids to fields
-    row.find('[class*=choice]').attr("id", `form-${song_count}-choice`);
-    row.find('[class*=song1]').attr("id", `form-${song_count}-song1`).select2(selectOptions);
-    row.find('[class*=position]').attr("id", `form-${song_count}-position`);
-    row.find('[class*=song2]').attr("id", `form-${song_count}-song2`).parent().hide();
+    row.find('.choice').attr({'id': `id_form-${count}-choice`, 'name':`form-${count}-choice`});
+    row.find('.song1').attr({'id': `id_form-${count}-song1`, 'name':`form-${count}-song1`}).select2(selectOptions);
+    row.find('.position').attr({'id': `id_form-${count}-position`, 'name':`form-${count}-position`});
+    row.find('.song2').attr({'id': `id_form-${count}-song2`, 'name':`form-${count}-song2`}).parent().hide();
 
-    // show/hide the song2 field when position = followed_by
-    row.find('[class*=position]').change(function () {
-        if ($(this).val() == "followed_by") {
-            row.find(`#form-${song_count}-song2`).parent().show();
-            row.find(`#form-${song_count}-song2`).select2(selectOptions);
-        } else {
-            row.find(`#form-${song_count}-song2`).parent().hide();
-        }
+    $('.position').change(function () {
+        positionChange(row, this);
     });
-
+   
     adjust_conjunctions();
+
+    // increment value of management form total count
+    totalForms.value++;
 };
 
-$(document).ready(function () {  
-  // add first form
-  addForm();
 
-  adjust_conjunctions();
 
-  $('#conjunctionSelect').change(function() {
-      adjust_conjunctions();
-  });
-  
-  $('.select2').each(function() {
-    $(this).select2(selectOptions);
-  });
+$(document).ready(function () {
+    var row = $('#setlist-search').find('.song-row').last();
+
+    row.find('.song2').parent().hide();
+    row.find('.song1').select2(selectOptions);
+
+    $('[class*=position]').change(function () {
+        positionChange(row, this);
+    });
+
+    $('#conjunctionSelect').change(function() {
+        adjust_conjunctions();
+    });
 });

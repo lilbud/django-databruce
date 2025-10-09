@@ -260,7 +260,7 @@ class AdvancedEventSearch(forms.Form):
         initial="and",
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "conjunction"},
+            attrs={"class": "form-select form-select-sm", "id": "conjunctionSelect"},
         ),
     )
 
@@ -327,7 +327,7 @@ class SetlistSearch(forms.Form):
         choices=songs,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm song1"},
+            attrs={"class": "form-select form-select-sm song1 select2"},
         ),
     )
 
@@ -373,7 +373,7 @@ class SetlistSearch(forms.Form):
         required=False,
         widget=forms.Select(
             attrs={
-                "class": "form-select form-select-sm song2",
+                "class": "form-select form-select-sm song2 select2",
             },
         ),
     )

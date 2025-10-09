@@ -85,7 +85,7 @@
           <div class="col-4 col-lg-1">{{ form.conjunction }}</div>
         </div>
         {{ formset.management_form }}
-        <div id="setlist-search" class="mb-4 col"></div>
+        <div id="setlist-search" class="mb-4 col">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
         <div class="row" id="form-buttons">
           <div class="mx-auto">
             <div class="btn-group mx-auto" role="group" aria-label="Basic example">

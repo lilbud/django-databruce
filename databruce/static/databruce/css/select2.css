@@ -44,11 +44,23 @@ html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .se
     color: var(--bs-body-color) !important;
 }
 
-.select2-results__option--highlighted,
-.select2-results__option--selected {
+html[data-bs-theme="dark"] .select2-results__option--highlighted,
+html[data-bs-theme="dark"] .select2-results__option--selected {
     color: var(--bs-body-color) !important;
     background-color: var(--primary-700) !important;
 }
+
+html[data-bs-theme="light"] .select2-results__option--highlighted,
+html[data-bs-theme="light"] .select2-results__option--selected {
+    color: var(--text-50) !important;
+    background-color: var(--primary-600) !important;
+}
+
+/* html[data-bs-theme="dark"] .select2-results__option--highlighted,
+html[data-bs-theme="dark"] .select2-results__option--selected {
+    color: var(--bs-body-color) !important;
+    background-color: var(--primary-700) !important;
+} */
 
 .select2.select2-container.select2-container--bootstrap-5 {
     width: auto !important;

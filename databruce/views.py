@@ -485,7 +485,6 @@ class EventDetail(TemplateView):
         context["setlist"] = setlist.exclude(set_name="Soundcheck")
 
         context["soundcheck"] = setlist.filter(set_name="Soundcheck")
-        print(context["soundcheck"])
 
         onstage = (
             models.Onstage.objects.filter(event__id=context["event"].id)
@@ -585,7 +584,6 @@ class EventDetail(TemplateView):
                     output_field=IntegerField(),
                 ),
             )
-            # print(context["album_breakdown"])
 
         return context
 
@@ -1070,8 +1068,6 @@ class Contact(View):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            print(form.cleaned_data)
-
             if form.cleaned_data["verification"] == "1975":
                 use_https = False
 
@@ -1150,7 +1146,7 @@ class AdvancedSearch(View):
         form = self.form_class()
 
         setlist_formset = self.formset_class(
-            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "1"},
+            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "0"},
         )
 
         return render(
@@ -1187,7 +1183,6 @@ class AdvancedSearchResults(View):
         results = []
 
         if event_form.is_valid():
-            print(event_form.cleaned_data)
             event_filter = Q(date__gte=event_form.cleaned_data["first_date"]) & Q(
                 date__lte=event_form.cleaned_data["last_date"],
             )
@@ -1340,7 +1335,6 @@ class AdvancedSearchResults(View):
         setlist_event_filter = Q()
 
         if formset.is_valid():
-            print(formset.cleaned_data)
             for form in formset.cleaned_data:
                 try:
                     song1 = models.Songs.objects.get(id=form["song1"])
@@ -1364,14 +1358,6 @@ class AdvancedSearchResults(View):
                             f"{song1} ({form['choice']} followed by) {song2}",
                         )
 
-                        qs = models.Songspagenew.objects.filter(
-                            setlist_filter,
-                        )
-
-                        event_results.append(
-                            list(qs.values_list("event", flat=True)),
-                        )
-
                     elif form["position"] != "Anywhere":
                         # all others except anywhere and followed by
                         setlist_filter.add(
@@ -1386,10 +1372,6 @@ class AdvancedSearchResults(View):
                             f"{song1} ({form['choice']} {form['position']})",
                         )
 
-                        event_results.append(
-                            list(song_events.values_list("event__id", flat=True)),
-                        )
-
                     else:
                         # anywhere
                         setlist_filter.add(
@@ -1400,13 +1382,19 @@ class AdvancedSearchResults(View):
                             Q.AND,
                         )
 
-                        event_results.append(
-                            list(song_events.values_list("event__id", flat=True)),
-                        )
-
                         song_results.append(
                             f"{song1} ({form['choice']} anywhere)",
                         )
+
+                    qs = models.Songspagenew.objects.filter(
+                        setlist_filter,
+                    )
+
+                    events_list = qs.values_list("event__id", flat=True)
+
+                    event_results.append(list(events_list))
+
+                    print(len(events_list))
 
                     # AND conjunction, events in all lists that get here
                     if event_form.cleaned_data["conjunction"] == "or":
