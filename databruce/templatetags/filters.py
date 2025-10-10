@@ -89,13 +89,6 @@ def get_day_from_num(num: int):
         5: "Thursday",
         6: "Friday",
         7: "Saturday",
-        8: "Not Sunday",
-        9: "Not Monday",
-        10: "Not Tuesday",
-        11: "Not Wednesday",
-        12: "Not Thursday",
-        13: "Not Friday",
-        14: "Not Saturday",
     }
 
     return days.get(int(num))

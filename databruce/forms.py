@@ -8,6 +8,7 @@ from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.db.models import F
 
 from . import models
 
@@ -265,9 +266,12 @@ class AdvancedEventSearch(forms.Form):
     )
 
     def clean_first_date(self):
+        data = {"id": datetime.date(1965, 1, 1), "value": datetime.date(1965, 1, 1)}
+
         if self.cleaned_data["first_date"]:
+            # partial date
             if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["first_date"]):
-                return (
+                data["value"] = (
                     datetime.datetime.strptime(
                         self.cleaned_data["first_date"],
                         "%Y-%m",
@@ -276,16 +280,23 @@ class AdvancedEventSearch(forms.Form):
                     .date()
                 )
 
+            # specific date
             if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["first_date"]):
-                return datetime.datetime.strptime(
+                data["value"] = datetime.datetime.strptime(
                     self.cleaned_data["first_date"],
                     "%Y-%m-%d",
                 ).date()
 
-        return datetime.datetime.strptime("1965-01-01", "%Y-%m-%d").date()
+        return data
 
     def clean_last_date(self):
+        data = {
+            "id": self.cleaned_data["last_date"],
+            "value": self.cleaned_data["last_date"],
+        }
+
         if self.cleaned_data["last_date"]:
+            # partial date
             if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["last_date"]):
                 dt = datetime.datetime.strptime(
                     self.cleaned_data["last_date"],
@@ -294,15 +305,161 @@ class AdvancedEventSearch(forms.Form):
 
                 last = calendar.monthrange(dt.year, dt.month)[1]
 
-                return dt.replace(day=last).date()
+                data["value"] = dt.replace(day=last).date()
 
+            # specific date
             if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["last_date"]):
-                return datetime.datetime.strptime(
+                data["value"] = datetime.datetime.strptime(
                     self.cleaned_data["last_date"],
                     "%Y-%m-%d",
                 ).date()
+        else:
+            data["value"] = datetime.date(DATE.year, 12, 31)
 
-        return datetime.datetime.strptime(f"{DATE.year}-12-31", "%Y-%m-%d").date()
+        return data
+
+    def clean_month(self):
+        data = {
+            "id": self.cleaned_data["month"],
+            "value": self.cleaned_data["month"],
+        }
+
+        if self.cleaned_data["month"]:
+            data["value"] = calendar.month_name[int(self.cleaned_data["month"])]
+
+        return data
+
+    def clean_day(self):
+        return {
+            "id": self.cleaned_data["day"],
+            "value": self.cleaned_data["day"],
+        }
+
+    def clean_city(self):
+        data = {
+            "id": self.cleaned_data["city"],
+            "value": self.cleaned_data["city"],
+        }
+
+        if self.cleaned_data["city"]:
+            data = (
+                models.Cities.objects.filter(id=self.cleaned_data["city"])
+                .annotate(
+                    value=F("name"),
+                )
+                .values("id", "value")
+                .first()
+            )
+
+        return data
+
+    def clean_state(self):
+        data = {
+            "id": self.cleaned_data["state"],
+            "value": self.cleaned_data["state"],
+        }
+
+        if self.cleaned_data["state"]:
+            data = (
+                models.States.objects.filter(id=self.cleaned_data["state"])
+                .annotate(
+                    value=F("name"),
+                )
+                .values("id", "value")
+                .first()
+            )
+
+        return data
+
+    def clean_country(self):
+        data = {
+            "id": self.cleaned_data["country"],
+            "value": self.cleaned_data["country"],
+        }
+        if self.cleaned_data["country"]:
+            data = (
+                models.States.objects.filter(id=self.cleaned_data["country"])
+                .annotate(
+                    value=F("name"),
+                )
+                .values("id", "value")
+                .first()
+            )
+
+        return data
+
+    def clean_tour(self):
+        data = {
+            "id": self.cleaned_data["tour"],
+            "value": self.cleaned_data["tour"],
+        }
+
+        if self.cleaned_data["tour"]:
+            data = (
+                models.Tours.objects.filter(id=self.cleaned_data["tour"])
+                .annotate(
+                    value=F("name"),
+                )
+                .values("id", "value")
+                .first()
+            )
+
+        return data
+
+    def clean_musician(self):
+        data = {
+            "id": self.cleaned_data["musician"],
+            "value": self.cleaned_data["musician"],
+        }
+
+        if self.cleaned_data["musician"]:
+            data = (
+                models.Relations.objects.filter(id=self.cleaned_data["musician"])
+                .annotate(
+                    value=F("name"),
+                )
+                .values("id", "value")
+                .first()
+            )
+
+        return data
+
+    def clean_band(self):
+        data = {
+            "id": self.cleaned_data["band"],
+            "value": self.cleaned_data["band"],
+        }
+
+        if self.cleaned_data["band"]:
+            data = (
+                models.Bands.objects.filter(id=self.cleaned_data["band"])
+                .annotate(value=F("name"))
+                .values("id", "value")
+                .first()
+            )
+
+        return data
+
+    def clean_day_of_week(self):
+        data = {
+            "id": self.cleaned_data["day_of_week"],
+            "value": self.cleaned_data["day_of_week"],
+        }
+
+        if self.cleaned_data["day_of_week"]:
+            days = {
+                1: "Sunday",
+                2: "Monday",
+                3: "Tuesday",
+                4: "Wednesday",
+                5: "Thursday",
+                6: "Friday",
+                7: "Saturday",
+            }
+
+            data["value"] = days.get(int(self.cleaned_data["day_of_week"]))
+
+        return data
 
 
 class SetlistSearch(forms.Form):

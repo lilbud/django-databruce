@@ -101,6 +101,10 @@ function addForm() {
 $(document).ready(function () {
     var row = $('#setlist-search').find('.song-row').last();
 
+    $('.select2').each(function() {
+        $(this).select2(selectOptions);
+    });
+
     row.find('.song2').parent().hide();
     row.find('.song1').select2(selectOptions);
 

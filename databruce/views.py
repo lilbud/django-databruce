@@ -14,6 +14,7 @@ from django.contrib.auth.tokens import (
 )
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.mail import send_mail
 from django.db.models import (
     Case,
     Count,
@@ -41,8 +42,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from shortener import shortener
 
-from . import forms, models
-from .templatetags import filters
+from . import forms, models, settings
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -1083,12 +1083,12 @@ class Contact(View):
                     context,
                 )
 
-                # send_mail(
-                #     subject=form.cleaned_data["subject"],
-                #     message=body,
-                #     from_email=settings.DEFAULT_FROM_EMAIL,
-                #     recipient_list=[settings.NOTIFY_EMAIL],
-                # )
+                send_mail(
+                    subject=form.cleaned_data["subject"],
+                    message=body,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[settings.NOTIFY_EMAIL],
+                )
 
                 messages.success(request, "Message Sent")
 
@@ -1142,6 +1142,9 @@ class AdvancedSearch(View):
     formset_class = formset_factory(forms.SetlistSearch)
     date = datetime.datetime.today()
 
+    start_date = datetime.date(year=1965, month=1, day=1)
+    end_date = datetime.datetime.today().date()
+
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()
 
@@ -1169,253 +1172,130 @@ class AdvancedSearchResults(View):
 
         return field_filter
 
-    def result_choice(self, choice: str) -> str:
-        """Return IS/NOT depending on field value. Used for result display."""
-        if choice:
-            return choice
-
-        return "is"
-
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         event_form = self.form_class(request.GET)
         formset = self.formset_class(data=request.GET)
+        queryset = models.Songspagenew.objects.all().select_related("event")
+
         song_results = []
         results = []
+        event_results = []
+
+        setlist_event_filter = Q()
+        event_filter = Q()
 
         if event_form.is_valid():
-            event_filter = Q(date__gte=event_form.cleaned_data["first_date"]) & Q(
-                date__lte=event_form.cleaned_data["last_date"],
-            )
+            data = event_form.cleaned_data
 
-            if "first_date" in event_form.changed_data:
-                results.append(
-                    f"{event_form.fields['first_date'].label}: {event_form.cleaned_data['first_date']}",
-                )
+            lookups = {
+                "first_date": Q(date__gte=data["first_date"]["id"]),
+                "last_date": Q(date__lte=data["last_date"]["id"]),
+                "month": Q(date__month=data["month"]["id"]),
+                "day": Q(date__day=data["day"]["id"]),
+                "city": Q(venue__city__id=data["city"]["id"]),
+                "state": Q(venue__state__id=data["state"]["id"]),
+                "country": Q(venue__country__id=data["country"]["id"]),
+                "tour": Q(tour__id=data["tour"]["id"]),
+                "musician": Q(relation__id=data["musician"]["id"]),
+                "band": Q(band__id=data["band"]["id"]),
+                "day_of_week": Q(date__week_day=data["day_of_week"]["id"]),
+            }
 
-            if "last_date" in event_form.changed_data:
-                results.append(
-                    f"{event_form.fields['last_date'].label}: {event_form.cleaned_data['last_date']}",
-                )
+            fields = [
+                x
+                for x in event_form.changed_data
+                if "_choice" not in x and x != "conjunction"
+            ]
 
-            if "month" in event_form.changed_data:
-                event_filter.add(
-                    Q(date__month=event_form.cleaned_data["month"]),
-                    Q.AND,
-                )
+            for field in fields:
+                try:  # fields that have an optional "choice" qualifier
+                    choice = data[f"{field}_choice"]
 
-                results.append(
-                    f"{event_form.fields['month'].label}: {filters.get_month_from_num(event_form.cleaned_data['month'])}",
-                )
+                    filter_to_add = self.check_field_choice(
+                        choice,
+                        lookups[field],
+                    )
 
-            if "day" in event_form.changed_data:
-                event_filter.add(
-                    Q(date__day=event_form.cleaned_data["day"]),
-                    Q.AND,
-                )
+                    if field in ("musician", "band"):
+                        filter = self.check_field_choice(choice, lookups[field])
+                        events = models.Onstage.objects.filter(filter).values(
+                            "event_id",
+                        )
+                        filter_to_add = Q(id__in=events)
 
-                results.append(
-                    f"{event_form.fields['day'].label}: {event_form.cleaned_data['day']}",
-                )
+                    event_filter &= filter_to_add
 
-            if "city" in event_form.changed_data:
-                event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["city_choice"],
-                        Q(venue__city__id=event_form.cleaned_data["city"]),
-                    ),
-                    Q.AND,
-                )
+                    result = f"{event_form.fields[field].label}: ({choice}) {data[field]['value']}"
 
-                choice = self.result_choice(event_form.cleaned_data["city_choice"])
+                except KeyError:
+                    event_filter &= lookups[field]
+                    result = f"{event_form.fields[field].label}: {data[field]['value']}"
 
-                results.append(
-                    f"{event_form.fields['city'].label}: ({choice}) {filters.get_city(event_form.cleaned_data['city'])}",
-                )
-
-            if "state" in event_form.changed_data:
-                event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["state_choice"],
-                        Q(venue__state__id=event_form.cleaned_data["state"]),
-                    ),
-                    Q.AND,
-                )
-
-                choice = self.result_choice(event_form.cleaned_data["state_choice"])
-
-                results.append(
-                    f"{event_form.fields['state'].label}: ({choice}) {filters.get_state(event_form.cleaned_data['state'])}",
-                )
-
-            if "country" in event_form.changed_data:
-                event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["country_choice"],
-                        Q(venue__country__id=event_form.cleaned_data["country"]),
-                    ),
-                    Q.AND,
-                )
-
-                choice = self.result_choice(event_form.cleaned_data["country_choice"])
-
-                results.append(
-                    f"{event_form.fields['country'].label}: ({choice}) {filters.get_country(event_form.cleaned_data['country'])}",
-                )
-
-            if "tour" in event_form.changed_data:
-                event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["tour_choice"],
-                        Q(tour__id=event_form.cleaned_data["tour"]),
-                    ),
-                    Q.AND,
-                )
-
-                choice = self.result_choice(event_form.cleaned_data["tour_choice"])
-
-                results.append(
-                    f"{event_form.fields['tour'].label}: ({choice}) {filters.get_tour(event_form.cleaned_data['tour'])}",
-                )
-
-            # musician and band query a different model, and have to be handled separately
-            # I tried combining these into one Q filter, and it would instead look for events
-            # where MUSICIAN was listed as part of BAND, rather than events with both which is the intended result
-            if "musician" in event_form.changed_data:
-                filter = self.check_field_choice(
-                    event_form.cleaned_data["musician_choice"],
-                    Q(relation__id=event_form.cleaned_data["musician"]),
-                )
-
-                events = models.Onstage.objects.filter(
-                    filter,
-                ).values_list("event")
-
-                event_filter.add(Q(id__in=events), Q.AND)
-
-                choice = self.result_choice(event_form.cleaned_data["musician_choice"])
-
-                results.append(
-                    f"{event_form.fields['musician'].label}: ({choice}) {filters.get_relation(event_form.cleaned_data['musician'])}",
-                )
-
-            if "band" in event_form.changed_data:
-                filter = self.check_field_choice(
-                    event_form.cleaned_data["band_choice"],
-                    Q(band__id=event_form.cleaned_data["band"]),
-                )
-
-                events = models.Onstage.objects.filter(
-                    filter,
-                ).values_list("event")
-
-                event_filter.add(Q(id__in=events), Q.AND)
-
-                choice = self.result_choice(event_form.cleaned_data["band_choice"])
-
-                results.append(
-                    f"{event_form.fields['band'].label}: ({choice}) {filters.get_band(event_form.cleaned_data['band'])}",
-                )
-
-            if "day_of_week" in event_form.changed_data:
-                event_filter.add(
-                    self.check_field_choice(
-                        event_form.cleaned_data["dow_choice"],
-                        Q(date__week_day=event_form.cleaned_data["day_of_week"]),
-                    ),
-                    Q.AND,
-                )
-
-                choice = self.result_choice(event_form.cleaned_data["dow_choice"])
-
-                results.append(
-                    f"{event_form.fields['day_of_week'].label}: ({choice}) {filters.get_day_from_num(event_form.cleaned_data['day_of_week'])}",
-                )
-
-        event_results = []
-        setlist_event_filter = Q()
+                results.append(result)
 
         if formset.is_valid():
             for form in formset.cleaned_data:
-                try:
-                    song1 = models.Songs.objects.get(id=form["song1"])
-                    setlist_filter = Q(
-                        set_name__in=VALID_SET_NAMES,
-                    ) & Q(song=song1.id)
+                song1 = models.Songs.objects.get(id=form["song1"]).name
 
-                    song_events = models.Setlists.objects.filter(
-                        song__id=song1.id,
-                    )
+                setlist_filter = Q(set_name__in=VALID_SET_NAMES)
 
-                    if form["position"] == "Followed By":
-                        song2 = models.Songs.objects.get(id=form["song2"])
+                match form["position"]:
+                    case "Followed By":
+                        song2 = models.Songs.objects.get(id=form["song2"]).name
 
-                        setlist_filter.add(
-                            self.check_field_choice(form["choice"], Q(next=song2.id)),
-                            Q.AND,
+                        setlist_filter &= Q(song=form["song1"])
+                        setlist_filter &= self.check_field_choice(
+                            form["choice"],
+                            Q(next=form["song2"]),
                         )
 
                         song_results.append(
                             f"{song1} ({form['choice']} followed by) {song2}",
                         )
 
-                    elif form["position"] != "Anywhere":
+                    case "Anywhere":
+                        song_events = queryset.filter(
+                            song=form["song1"],
+                        ).select_related("event")
+
+                        setlist_filter &= self.check_field_choice(
+                            form["choice"],
+                            Q(event__id__in=song_events.values("event__id")),
+                        )
+
+                        song_results.append(
+                            f"{song1} ({form['choice']} anywhere)",
+                        )
+                    case _:
                         # all others except anywhere and followed by
-                        setlist_filter.add(
-                            self.check_field_choice(
-                                form["choice"],
-                                Q(position=form["position"]),
-                            ),
-                            Q.AND,
+                        setlist_filter &= Q(song=form["song1"])
+                        setlist_filter &= self.check_field_choice(
+                            form["choice"],
+                            Q(position=form["position"]),
                         )
 
                         song_results.append(
                             f"{song1} ({form['choice']} {form['position']})",
                         )
 
-                    else:
-                        # anywhere
-                        setlist_filter.add(
-                            self.check_field_choice(
-                                form["choice"],
-                                Q(event__id__in=song_events.values("event__id")),
-                            ),
-                            Q.AND,
-                        )
+                qs = queryset.filter(
+                    setlist_filter,
+                )
 
-                        song_results.append(
-                            f"{song1} ({form['choice']} anywhere)",
-                        )
+                event_results.append(list(qs.values_list("event__id", flat=True)))
 
-                    qs = models.Songspagenew.objects.filter(
-                        setlist_filter,
-                    )
+        match data["conjunction"]:
+            case "or":
+                setlist_event_filter.add(
+                    Q(id__in=list(set.union(*map(set, event_results)))),
+                    Q.OR,
+                )
 
-                    events_list = qs.values_list("event__id", flat=True)
-
-                    event_results.append(list(events_list))
-
-                    print(len(events_list))
-
-                    # AND conjunction, events in all lists that get here
-                    if event_form.cleaned_data["conjunction"] == "or":
-                        setlist_event_filter.add(
-                            Q(id__in=list(set.union(*map(set, event_results)))),
-                            Q.OR,
-                        )
-
-                    else:
-                        # AND conjunction, events in all lists that get here
-                        setlist_event_filter.add(
-                            Q(
-                                id__in=list(
-                                    set.intersection(*map(set, event_results)),
-                                ),
-                            ),
-                            Q.AND,
-                        )
-
-                except ValueError:
-                    break
+            case "and":
+                setlist_event_filter.add(
+                    Q(id__in=list(set.intersection(*map(set, event_results)))),
+                    Q.AND,
+                )
 
         result = (
             models.Events.objects.filter(
@@ -1435,13 +1315,10 @@ class AdvancedSearchResults(View):
             .order_by("id")
         )
 
+        # Used to set opengraph description text
         description = ""
-
-        if results:
-            description += ", ".join(results)
-
-        if song_results:
-            description += f"Songs: {', '.join(song_results)}"
+        description += ", ".join(results)
+        description += f"Songs: {', '.join(song_results)}"
 
         return render(
             request=request,
@@ -1452,6 +1329,7 @@ class AdvancedSearchResults(View):
                 "description": description,
                 "results": results,
                 "song_results": song_results,
+                "form": event_form,
             },
         )
 
