@@ -46,6 +46,8 @@ tr.res-child > td:first {
     font-weight: bold;
 }
 
+
+
 .setHeader {
     background-color: var(--background-500) !important;
 }
@@ -216,9 +218,9 @@ table th {
     width: 12rem !important;
 }
 
-td {
+/* td {
     white-space: nowrap !important;
-}
+} */
 
 /* Hide Calendar Popup, it is very finicky and doesn't like to be placed */
 div.dt-datetime {

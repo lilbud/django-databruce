@@ -54,7 +54,7 @@ $.extend(true, DataTable.defaults, {
 
                     return '<tr class="res-child" data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">'+
                         '<td class="text-nowrap" style="width: 3rem; font-weight: bold;">'+title+'</td>'+
-                        '<td class="text-wrap">'+col.data+'</td>'+
+                        '<td class="text-nowrap">'+col.data+'</td>'+
                     '</tr>';
                 }
             } ).join('');
