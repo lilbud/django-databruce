@@ -130,10 +130,10 @@ button.nav-link.active,
     border-bottom: none !important;
 }
 
-.card-header *,
+/* .card-header *,
 .card-footer * {
     vertical-align: middle !important;
-}
+} */
 
 .card-header,
 .card-footer {
