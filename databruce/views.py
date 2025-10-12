@@ -1223,7 +1223,7 @@ class AdvancedSearchResults(View):
                         )
                         filter_to_add = Q(id__in=events)
 
-                    event_filter &= filter_to_add
+                    event_filter &= self.check_field_choice(choice, filter_to_add)
 
                     result = f"{event_form.fields[field].label}: ({choice}) {data[field]['value']}"
 
@@ -1256,6 +1256,7 @@ class AdvancedSearchResults(View):
                     case "Anywhere":
                         song_events = queryset.filter(
                             song=form["song1"],
+                            set_name__in=VALID_SET_NAMES,
                         ).select_related("event")
 
                         setlist_filter &= self.check_field_choice(

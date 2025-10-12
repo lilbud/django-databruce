@@ -79,7 +79,7 @@ class AdvancedEventSearch(forms.Form):
             [
                 (item.id, item)
                 for item in models.Cities.objects.all()
-                .select_related("state", "country")
+                .prefetch_related("state", "country")
                 .order_by("name")
             ],
         )
