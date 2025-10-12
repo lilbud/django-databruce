@@ -149,8 +149,8 @@
           </li>
         {% endif %}
         <div class="navbar-collapse collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto my-3 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-2">
-            <li class="nav-item dropdown">
+          <ul class="navbar-nav me-auto my-3 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-1">
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
@@ -164,7 +164,7 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
@@ -178,7 +178,7 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
@@ -192,11 +192,14 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Locations</button>
+            <li class="nav-item my-auto">
+              <a class="btn btn-sm btn-link"
+                 role="button"
+                 type="button"
+                 href="{% url 'venues' %}">Venues</a>
+            </li>
+            {% comment %} <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Locations</button>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
@@ -211,8 +214,8 @@
                   <a class="dropdown-item" href="{% url 'countries' %}">Countries</a>
                 </li>
               </ul>
-            </li>
-            <li class="nav-item dropdown">
+            </li> {% endcomment %}
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
@@ -226,7 +229,7 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
@@ -243,21 +246,21 @@
                 </li>
               </ul>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
                       aria-expanded="false">Search</button>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Event Search</a>
+                  <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Search</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Notes Search</a>
+                  <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Note Search</a>
                 </li>
               </ul>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown my-auto">
               <button class="btn btn-sm dropdown-toggle"
                       role="button"
                       data-bs-toggle="dropdown"
@@ -332,7 +335,7 @@
                 </ul>
               </li>
             {% else %}
-              <li class="nav-item mx-lg-3 ms-auto d-none d-xl-inline mb-0">
+              <li class="nav-item mx-lg-2 ms-auto d-none d-xl-inline mb-0">
                 <a class="btn btn-sm btn-link"
                    role="button"
                    type="button"

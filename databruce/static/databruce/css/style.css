@@ -130,11 +130,6 @@ button.nav-link.active,
     border-bottom: none !important;
 }
 
-/* .card-header *,
-.card-footer * {
-    vertical-align: middle !important;
-} */
-
 .card-header,
 .card-footer {
     font-size: 1rem !important;
@@ -176,12 +171,7 @@ button.nav-link:not(.active, #bd-theme) {
 }
 
 .navbar .btn {
-    /* box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.2); */
     color: var(--text-50) !important;
-}
-
-.navbar .btn:hover {
-    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 1280px) {
