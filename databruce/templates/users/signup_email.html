@@ -1,17 +1,10 @@
 {% load i18n %}
 {% autoescape off %}
-    {% blocktranslate %}
-        Hello from {{ site_name }}!
-
-        You are receiving this email because user {{ user.get_username }} has given your email address to register an account on {{ domain }}. 
-
-        Your email verification is listed below, either click on the below link or copy/paste the link in another window.
-
-        The below link will expire in 3 days.
-
-        {{ protocol }}://{{ domain }}{% url "signup_confirm" uidb64=uid token=token %}
-
-        Thanks!
-        The Databruce Team
-    {% endblocktranslate %}
+    {% blocktranslate %}Hello from {{ site_name }}!{% endblocktranslate %}
+    {% blocktranslate %}You are receiving this email because user {{ user.get_username }} has given your email address to register an account on {{ domain }}.{% endblocktranslate %}
+    {% blocktranslate %}Your email verification is listed below, either click on the below link or copy/paste the link in another window.{% endblocktranslate %}
+    {% blocktranslate %}The below link will expire in 3 days.{% endblocktranslate %}
+    {{ protocol }}://{{ domain }}{% url "signup_confirm" uidb64=uid token=token %}
+    {% blocktranslate %}Thanks!{% endblocktranslate %}
+    {% blocktranslate %}The Databruce Team{% endblocktranslate %}
 {% endautoescape %}
