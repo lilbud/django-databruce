@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
   <head>
+    {% load i18n %}
     {% load static %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,7 +12,8 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:title" content="{{ title|default_if_none:"Databruce" }}">
+    <meta property="og:title"
+          content="{% blocktranslate %}{{ title|default_if_none:"Databruce" }}{% endblocktranslate %}">
     <meta property="og:site_name" content="Databruce">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">

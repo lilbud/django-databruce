@@ -27,7 +27,7 @@ urlpatterns = [
     path("", include("api.urls")),
     path("benner/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
-    # path("test/", views.Test.as_view(), name="test"),
+    path("test/", views.Test.as_view(), name="test"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "login/",
@@ -51,23 +51,26 @@ urlpatterns = [
     ),
     path(
         "logout/",
-        auth_views.LogoutView.as_view(template_name="users/logout.html"),
+        auth_views.LogoutView.as_view(
+            template_name="users/logout.html",
+            next_page=reverse_lazy("login"),
+        ),
         name="logout",
     ),
-    path(
-        "password_change/",
-        auth_views.PasswordChangeView.as_view(
-            template_name="users/change_password.html",
-        ),
-        name="password_change",
-    ),
-    path(
-        "password_change/done/",
-        auth_views.PasswordChangeDoneView.as_view(
-            template_name="users/change_password_done.html",
-        ),
-        name="password_change_done",
-    ),
+    # path(
+    #     "password_change/",
+    #     auth_views.PasswordChangeView.as_view(
+    #         template_name="users/change_password.html",
+    #     ),
+    #     name="password_change",
+    # ),
+    # path(
+    #     "password_change/done/",
+    #     auth_views.PasswordChangeDoneView.as_view(
+    #         template_name="users/change_password_done.html",
+    #     ),
+    #     name="password_change_done",
+    # ),
     path(
         "password_reset/",
         auth_views.PasswordResetView.as_view(
@@ -170,12 +173,12 @@ urlpatterns = [
     path("releases/nugs", views.NugsRelease.as_view(), name="nugs"),
     path("releases/bootleg", views.Bootleg.as_view(), name="bootlegs"),
     path(
-        "accounts/profile/add-show/",
+        "profile/add-show/",
         views.UserAddRemoveShow.as_view(),
         name="add_show",
     ),
     path(
-        "accounts/profile/remove-show/",
+        "profile/remove-show/",
         views.UserRemoveShow.as_view(),
         name="remove_show",
     ),

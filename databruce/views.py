@@ -261,10 +261,8 @@ class SignUp(TemplateView):
             user.save()
 
             current_site = get_current_site(request)
-            use_https = False
+            use_https = True
             extra_email_context = None
-            subject_template_name = "users/signup_confirm_subject.txt"
-            email_template_name = "users/signup_email.html"
 
             context = {
                 "email": user.email,
@@ -276,18 +274,6 @@ class SignUp(TemplateView):
                 "protocol": "https" if use_https else "http",
                 **(extra_email_context or {}),
             }
-
-            subject = "".join(
-                loader.render_to_string(subject_template_name, context).splitlines(),
-            )
-            body = loader.render_to_string(email_template_name, context)
-
-            # send_mail(
-            #     subject=subject,
-            #     message=body,
-            #     from_email=os.getenv("MAILGUN_EMAIL"),
-            #     recipient_list=[user.email],
-            # )
 
             self.send_mail(
                 context=context,

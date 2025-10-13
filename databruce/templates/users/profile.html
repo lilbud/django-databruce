@@ -1,15 +1,17 @@
 {% extends "databruce/base.html" %}
+{% load i18n %}
 {% block title %}
   Profile
 {% endblock title %}
 {% block content %}
+  {% translate user_info.username as username %}
   <div class="col-12 col-lg-8 mx-auto">
     <div class="row mb-4">
       <div class="col">
-        {% if user_info.username == user.username %}
-          <div class="text-2xl">Your Profile</div>
+        {% if user_info.id == user.id %}
+          <div class="text-2xl">{% translate "Your Profile" %}</div>
         {% else %}
-          <div class="text-2xl">{{ user_info.username|title }}'s Profile</div>
+          <div class="text-2xl">{{ username }}'s Profile</div>
         {% endif %}
       </div>
     </div>
@@ -25,7 +27,7 @@
                     type="button"
                     role="tab"
                     aria-controls="pills-home"
-                    aria-selected="true">Shows</button>
+                    aria-selected="true">{% translate "Shows" %}</button>
           </li>
           {% if user_songs %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
@@ -36,7 +38,7 @@
                       type="button"
                       role="tab"
                       aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
+                      aria-selected="false">{% translate "Songs" %}</button>
             </li>
           {% endif %}
         </ul>
@@ -45,10 +47,12 @@
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">
             <div class="text-lg pb-2">
-              {% if user_info.username == user.username %}
-                Shows that you have seen
+              {% if user_info.id == user.id %}
+                {% translate "Shows that you have seen" %}
               {% else %}
-                Shows that {{ user_info.username|title }} has seen
+                {% translate "Shows that" %}
+                {{ username }}
+                {% translate "has seen" %}
               {% endif %}
             </div>
             <div class="table-responsive">
@@ -111,10 +115,12 @@
           </div>
           <div id="songs" class="tab-pane fade">
             <div class="text-lg pb-2">
-              {% if user_info.username == user.username %}
-                Songs that you have seen
+              {% if user_info.id == user.id %}
+                {% translate "Songs that you have seen" %}
               {% else %}
-                Songs that {{ user_info.username|title }} has seen
+                {% translate "Songs that" %}
+                {{ username }}
+                {% translate "has seen" %}
               {% endif %}
             </div>
             <div class="table-responsive">
@@ -152,7 +158,7 @@
     <div class="col-12 col-lg-8 mx-auto">
       <div class="row mb-2">
         <div class="col">
-          <div class="text-2xl">Stats</div>
+          <div class="text-2xl">{% translate "Stats" %}</div>
         </div>
       </div>
       <div class="card">
@@ -166,7 +172,7 @@
                       type="button"
                       role="tab"
                       aria-controls="pills-home"
-                      aria-selected="true">Most Played Not Seen</button>
+                      aria-selected="true">{% translate "Most Played Not Seen" %}</button>
             </li>
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link"
@@ -176,7 +182,7 @@
                       type="button"
                       role="tab"
                       aria-controls="pills-profile"
-                      aria-selected="false">Rare Songs</button>
+                      aria-selected="false">{% translate "Rare Songs" %}</button>
             </li>
           </ul>
         </div>
@@ -211,7 +217,7 @@
             </div>
             <div id="rare" class="tab-pane fade">
               <div class="row mb-2">
-                <div class="text-lg pb-2">Songs seen with 100 plays or less</div>
+                <div class="text-lg pb-2">{% translate "Songs seen with 100 plays or less" %}</div>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover display" id="rareTable">

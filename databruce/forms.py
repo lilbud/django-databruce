@@ -607,22 +607,31 @@ class SetlistNoteSearch(forms.Form):
 
 
 class UserForm(UserCreationForm):
-    username = forms.CharField(widget=forms.TextInput())
+    username = forms.CharField(
+        label="Username",
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control form-control-sm"}),
+    )
+
     email = forms.EmailField(
         max_length=254,
-        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
+        required=True,
+        widget=forms.EmailInput(
+            attrs={"autocomplete": "email", "class": "form-control form-control-sm"},
+        ),
     )
 
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(),
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
         help_text=password_validation.password_validators_help_text_html(),
     )
 
     password2 = forms.CharField(
+        required=True,
         label="Enter the same password as before, for verification.",
-        widget=forms.PasswordInput(),
-        help_text=password_validation.password_validators_help_text_html(),
+        widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
     )
 
     class Meta:
@@ -647,12 +656,13 @@ class UpdateUserForm(forms.ModelForm):
 
     username = forms.CharField(
         label="Username:",
+        required=True,
         widget=forms.TextInput(
             attrs={
                 "id": "username",
                 "type": "text",
                 "name": "username",
-                "class": "form-control mb-3",
+                "class": "form-control form-control-sm",
             },
         ),
     )
@@ -660,13 +670,14 @@ class UpdateUserForm(forms.ModelForm):
     email = forms.EmailField(
         label="Email:",
         max_length=254,
+        required=True,
         widget=forms.EmailInput(
             attrs={
                 "autocomplete": "email",
                 "id": "email",
                 "type": "email",
                 "name": "email",
-                "class": "form-control mb-3",
+                "class": "form-control form-control-sm",
             },
         ),
     )

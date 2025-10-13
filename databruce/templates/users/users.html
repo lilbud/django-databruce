@@ -1,10 +1,11 @@
 {% extends "databruce/category.html" %}
+{% load i18n %}
 {% block title %}
   Users
 {% endblock title %}
 {% block info_row %}
-  <div class="text-2xl">Users</div>
-  <div class="text-base">All active users on the site.</div>
+  <div class="text-2xl">{% translate "Users" %}</div>
+  <div class="text-base">{% translate "All active users on the site." %}</div>
 {% endblock info_row %}
 {% block table_id %}
   userTable

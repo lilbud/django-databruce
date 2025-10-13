@@ -1,46 +1,41 @@
 {% extends "databruce/base.html" %}
+{% load i18n %}
 {% block title %}
     Create Account
 {% endblock title %}
 {% block content %}
-    <div class="card">
-        <div class="card-header">Create Account</div>
+    <div class="card col-12 col-lg-4 mx-auto">
+        <div class="card-header">{% translate "Create Account" %}</div>
         <div class="card-body">
             <form method="post" action="{% url "signup" %}">
                 {% csrf_token %}
                 <div class="col">{{ form.non_field_errors }}</div>
-                <div class="fieldWrapper mb-3">
-                    {{ form.username.errors }}
-                    <label class="form-label" for="{{ form.username.id_for_label }}">Username:</label>
-                    <input type="text" class="form-control" name="username" id="username">
-                </div>
-                <div class="fieldWrapper mb-3">
-                    {{ form.email.errors }}
-                    <label class="form-label" for="{{ form.email.id_for_label }}">Email Address:</label>
-                    <input type="email" class="form-control" name="email" id="email">
-                </div>
-                <div class="fieldWrapper mb-3">
-                    {{ form.password1.errors }}
-                    <label class="form-label" for="{{ form.password1.id_for_label }}">Password:</label>
-                    <input type="password" class="form-control" name="password1" id="password1">
-                    {% if form.password1.help_text %}
-                        <div class="help my-3"
-                             {% if form.password1.id_for_label %}id="{{ form.password1.id_for_label }}_helptext"{% endif %}>
-                            {{ form.password1.help_text|safe }}
+                {% for field in form %}
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+                            {% if field.errors %}
+                                <br>
+                                <span class="text-sm text-danger">
+                                    {% for error in field.errors %}
+                                        {% translate error %}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                            <div>{{ field }}</div>
+                            {% if field.help_text %}
+                                <div class="my-2 text-sm" id="{{ field.id_for_label }}_helptext">
+                                    {% blocktranslate %}
+                                    {{ field.help_text|safe }}
+                                    {% endblocktranslate %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                <div class="fieldWrapper mb-3">
-                    <label class="form-label" for="{{ form.password2.id_for_label }}">
-                        Enter the same password as before, for verification.:
-                    </label>
-                    <input type="password" class="form-control" name="password2" id="password2">
-                    <br>
-                    {{ form.password2.errors }}
-                </div>
+                    </div>
+                {% endfor %}
                 <div class="row">
                     <div class="col-12">
-                        <button class="btn btn-primary" type="submit">Create Account</button>
+                        <button class="btn btn-sm btn-primary" type="submit">{% translate "Create Account" %}</button>
                     </div>
                 </div>
             </form>

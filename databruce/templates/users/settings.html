@@ -1,21 +1,22 @@
 {% extends "databruce/base.html" %}
+{% load i18n %}
 {% block title %}
   Profile Settings
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-lg-6 mx-auto">
+  <div class="col-12 col-lg-4 mx-auto">
     <div class="row mb-4">
-      <div class="text-2xl">User Settings</div>
+      <div class="text-2xl">{% translate "User Settings" %}</div>
     </div>
     <div class="card mb-3">
-      <div class="card-header">Update Profile</div>
+      <div class="card-header">{% translate "Update Profile" %}</div>
       <div class="card-body">
         {% if messages %}
           <div class="row mb-3">
             <div class="col">
               {% for message in messages %}
                 <div class="card text-bg-{% if message.tags == 'success' %}success{% else %}danger{% endif %}">
-                  <div class="card-body">{{ message|safe }}</div>
+                  <div class="card-body">{% translate message %}</div>
                 </div>
               {% endfor %}
             </div>
@@ -23,20 +24,28 @@
         {% endif %}
         <form method="post" id="profileForm" action="{% url "settings" %}">
           {% csrf_token %}
-          <div class="mb-3">
-            {{ form.username.errors }}
-            <label class="form-label" for="username">Username:</label>
-            {{ form.username }}
+          {% for field in form %}
+            <div class="row mb-2">
+              <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+              {% if field.errors %}
+                <br>
+                <span class="text-sm text-danger">
+                  {% for error in field.errors %}
+                    {% translate error %}
+                  {% endfor %}
+                </span>
+              {% endif %}
+              <div class="mx-auto">{{ field }}</div>
+            </div>
+          {% endfor %}
+          <div class="row mt-3">
+            <div class="col-12">
+              <button id="submit-button"
+                      type="submit"
+                      name="submit"
+                      class="btn btn-sm btn-success">{% translate "Update" %}</button>
+            </div>
           </div>
-          <div class="mb-3">
-            {{ form.email.errors }}
-            <label class="form-label" for="email">Email:</label>
-            {{ form.email }}
-          </div>
-          <button id="submit-button"
-                  type="submit"
-                  name="submit"
-                  class="btn btn-sm btn-success">Update</button>
         </form>
       </div>
     </div>
