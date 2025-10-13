@@ -4,14 +4,21 @@
     Account Created
 {% endblock title %}
 {% block content %}
-    <div class="card">
+    <div class="card col-12 col-lg-4 mx-auto">
         <div class="card-header">{% translate "Account Created" %}</div>
         <div class="card-body">
-            {% translate "Your account has been created successfully. We've emailed you a link to activate your account, you should receive it shortly. Make sure to check your spam folder." %}
-            {% translate "If you don't receive an email within a few hours, send an email to databrucedb@gmail.com with the email and username you registered with." %}
+            <div class="row mb-3">
+                <div class="col text-sm">
+                    {% translate "Your account has been created successfully. We've emailed you a link to activate your account, you should receive it shortly. Make sure to check your spam folder." %}
+                    {% translate "If you don't receive an email within a few hours, send an email to databrucedb@gmail.com with the email and username you registered with." %}
+                </div>
+            </div>
             <div class="row">
                 <div class="col-12">
-                    <a href="{% url "login" %}">{% translate "Login" %}</a>
+                    <a class="btn btn-sm btn-primary"
+                       href="{% url "login" %}"
+                       role="button"
+                       type="button">{% translate "Login" %}</a>
                 </div>
             </div>
         </div>

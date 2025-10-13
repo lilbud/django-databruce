@@ -109,6 +109,11 @@ urlpatterns = [
         name="signup",
     ),
     path(
+        "signup/done/",
+        views.SignUpDone.as_view(),
+        name="signup_done",
+    ),
+    path(
         "signup/<uidb64>/<token>/",
         views.SignUpConfirm.as_view(),
         name="signup_confirm",

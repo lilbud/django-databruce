@@ -281,7 +281,7 @@ class SignUp(TemplateView):
                 to_email=user.email,
             )
 
-            return redirect(reverse("login"))
+            return redirect(reverse("signup_done"))
 
         return render(request, template_name=self.template_name, context={"form": form})
 
