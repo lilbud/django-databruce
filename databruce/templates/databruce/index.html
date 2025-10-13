@@ -11,6 +11,20 @@
       <div class="text-base">A Bruce Springsteen concert database</div>
     </div>
   </div>
+  {% if not user.is_authenticated %}
+    <div class="row my-3">
+      <div class="col">
+        <a href="{% url "login" %}"
+           type="button"
+           role="button"
+           class="btn btn-primary">Login</a>
+        <a href="{% url "signup" %}"
+           type="button"
+           role="button"
+           class="btn btn-primary">Create Account</a>
+      </div>
+    </div>
+  {% endif %}
   <div class="row mb-4">
     <div class="col-12 col-md-6 col-lg-4 px-2">
       <div class="card mb-3">
