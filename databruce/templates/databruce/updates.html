@@ -3,7 +3,7 @@
   Updates
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-md-6">
+  <div class="col-12 col-lg-8 text-sm mx-auto">
     <div class="row mb-2">
       <div class="text-2xl">
         <a href="{% url 'index' %}">Databruce</a> &gt; Updates
@@ -29,7 +29,8 @@
                 <td>{{ item.created_at|date:'Y-m-d' }}</td>
                 <td>
                   {% if item.view %}
-                    {{ item.msg }} <a href="{% url item.view id=item.item_id %}">{{ item.value }}</a>
+                    {{ item.msg }} <a class="text-reset update-link"
+    href="{% url item.view id=item.item_id %}">{{ item.value }}</a>
                   {% else %}
                     {{ item.msg }}
                   {% endif %}

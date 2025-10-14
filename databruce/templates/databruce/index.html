@@ -4,7 +4,6 @@
 {% endblock title %}
 {% load static %}
 {% block content %}
-  {% regroup events by artist as events_list %}
   <div class="row mb-3">
     <div class="col">
       <div class="text-3xl">Welcome to Databruce!</div>
@@ -46,7 +45,7 @@
       </div>
       <div class="card mb-3 mb-lg-0 d-none d-lg-block">
         <div class="card-header">
-          <span class="text-base">Recent Updates</span>
+          <span class="text-base">Recent Site Updates</span>
           <span class="text-sm">(<a class="text-reset" href="{% url 'updates' %}">see more</a>)</span>
         </div>
         <div class="card-body px-3">
@@ -55,11 +54,8 @@
             {% timezone "America/New_York" %}
             {% for item in updates %}
               <li>
-                {% if item.view %}
-                  {{ item.msg }} <a class="update-link" href="{% url item.view id=item.item_id %}">{{ item.value }}</a> ({{ item.created_at|date:'m/d' }})
-                {% else %}
-                  {{ item.msg }} ({{ item.created_at|date:'m/d' }})
-                {% endif %}
+                {{ item.description }}
+                ({{ item.created_at|date:'m/d' }})
               </li>
             {% endfor %}
           {% endtimezone %}
@@ -71,16 +67,16 @@
     <div class="card mb-3 mb-lg-0">
       <div class="card-header">Most Recent Show</div>
       <div class="card-body p-0">
-        {% if latest_event.event.title %}<div class="text-sm px-2 pt-2 pb-0">{{ latest_event.event.title }}</div>{% endif %}
-        <div class="px-2 py-2">
-          {% with first=latest_event.event %}
+        {% with first=latest_event %}
+          <div class="text-sm px-2 pt-2 pb-0">{{ first.title|default_if_none:"" }}</div>
+          <div class="px-2 py-2">
             <div class="row">
               <a class="fw-medium text-sm text-reset"
-                 href="{% url "event_details" id=first.id %}">{{ first }} - {{ first.venue.city }}</a>
+                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue.get_name }}</a>
             </div>
             <div class="row">
               <a class="text-reset text-sm"
-                 href="{% url 'band_details' id=first.artist.id %}">{{ first.artist }}</a>
+                 href="{% url 'band_details' id=first.artist.id %}">{{ first.artist.name }}</a>
             </div>
           {% endwith %}
         </div>
@@ -114,7 +110,6 @@
                       </td>
                     </tr>
                   {% endfor %}
-                  {% comment %} <hr class="my-0"> {% endcomment %}
                 {% endfor %}
               </tbody>
             </table>
@@ -148,7 +143,7 @@
                         <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}, {{ event.venue.city }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -158,37 +153,39 @@
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="card h-100">
-          <div class="card-header">Upcoming Events</div>
-          <div class="card-body p-0">
-            <div class="table-responsive index">
-              <table class="table table-hover display" id="upcomingTable">
-                <thead>
-                  <tr>
-                    <th class="d-none">Date</th>
-                    <th class="d-none">Location</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for event in upcoming %}
+      {% if upcoming %}
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-header">Upcoming Events</div>
+            <div class="card-body p-0">
+              <div class="table-responsive index">
+                <table class="table table-hover display" id="upcomingTable">
+                  <thead>
                     <tr>
-                      <td class="text-nowrap"
-                          data-sort="{{ event.get_date }}"
-                          data-filter="{{ event.get_date }}">
-                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                      </td>
-                      <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}, {{ event.venue.city }}</a>
-                      </td>
+                      <th class="d-none">Date</th>
+                      <th class="d-none">Location</th>
                     </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {% for event in upcoming %}
+                      <tr>
+                        <td class="text-nowrap"
+                            data-sort="{{ event.get_date }}"
+                            data-filter="{{ event.get_date }}">
+                          <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                        </td>
+                        <td class="text-wrap">
+                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      {% endif %}
       <div class="col">
         <div class="card h-100">
           <div class="card-header">
@@ -215,7 +212,7 @@
                         <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}, {{ event.venue.city }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
                       </td>
                     </tr>
                   {% endfor %}

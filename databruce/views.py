@@ -59,22 +59,17 @@ VALID_SET_NAMES = [
 
 class Index(TemplateView):
     template_name = "databruce/index.html"
-    queryset = (
-        models.Events.objects.all()
-        .select_related(
-            "artist",
-            "venue",
-            "venue__city",
-            "venue__city__country",
-            "venue__country",
-        )
-        .prefetch_related("venue__city__state", "venue__state")
+
+    queryset = models.Events.objects.all().select_related(
+        "artist",
+        "venue",
     )
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Home"
         context["date"] = datetime.datetime.today()
+
         context["events"] = self.queryset.filter(
             date__month=datetime.datetime.today().month,
             date__day=datetime.datetime.today().day,
@@ -88,28 +83,23 @@ class Index(TemplateView):
             date__gt=datetime.datetime.today(),
         ).order_by("id")[:5]
 
-        context["updates"] = models.Updates.objects.filter(
-            created_at__gte=f"{datetime.datetime.today().date().year}-01-01",
-        ).order_by("-created_at")[:10]
+        context["updates"] = models.SiteUpdates.objects.all().order_by("-created_at")[
+            :10
+        ]
 
-        context["latest_event"] = (
+        context["latest_setlist"] = (
             models.Setlists.objects.all()
-            .select_related(
-                "event",
-                "event__artist",
-                "event__venue",
-                "event__venue__city",
-                "event__venue__city__country",
-            )
-            .prefetch_related(
-                "event__venue__city__state",
-            )
-            .order_by("-event")
+            .select_related("event")
+            .order_by("-event__id")
             .first()
         )
 
+        context["latest_event"] = self.queryset.filter(
+            id=context["latest_setlist"].event.id,
+        ).first()
+
         context["latest_show"] = (
-            models.Setlists.objects.filter(event__id=context["latest_event"].event.id)
+            models.Setlists.objects.filter(event__id=context["latest_event"].id)
             .annotate(
                 separator=Case(When(segue=True, then=Value(">"))),
             )
@@ -879,7 +869,7 @@ class EventSearch(TemplateView):
                     "id",
                 )
 
-            if len(result) == 1:
+            if result.count() == 1:
                 return redirect(f"/events/{result.first().id}")
 
             return render(
@@ -972,7 +962,7 @@ class TourDetail(TemplateView):
             )
         )
 
-        if len(context["songs"]) > 0:
+        if context["songs"].count() > 0:
             context["slots"] = (
                 models.Setlists.objects.filter(
                     event__tour__id=context["tour"].id,

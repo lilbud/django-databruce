@@ -1556,6 +1556,18 @@ class Updates(models.Model):
         db_table = "updates"
 
 
+class SiteUpdates(models.Model):
+    id = models.AutoField(primary_key=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    uuid = models.UUIDField(default=uuid4, editable=False)
+
+    class Meta:
+        managed = False
+        db_table = "update_table"
+
+
 class Songspagenew(models.Model):
     id = models.AutoField(primary_key=True)
     song = models.IntegerField(blank=True, null=True, db_column="song_id")

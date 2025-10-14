@@ -316,11 +316,13 @@ td .badge {
     min-height: calc(100vh - 5em) !important;
 }
 
-[data-bs-theme="light"] #short-url {
+[data-bs-theme="light"] #short-url, 
+[data-bs-theme="light"] .update-link {
     color: var(--primary-600) !important;
 }
 
-[data-bs-theme="dark"] #short-url {
+[data-bs-theme="dark"] #short-url,
+[data-bs-theme="dark"] .update-link {
     color: var(--primary-500) !important;
 }
 
