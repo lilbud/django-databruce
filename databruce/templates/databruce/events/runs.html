@@ -34,7 +34,7 @@
           <a href="{% url "band_details" id=run.band.id %}">{{ run.band.name }}</a>
         </td>
         <td class="text-nowrap">
-          <a href="{% url "venue_details" id=run.venue.id %}">{{ run.venue.name }}</a>
+          <a href="{% url "venue_details" id=run.venue.id %}">{{ run.venue.get_name }}</a>
         </td>
         <td class="text-nowrap">
           <a href="{% url "city_details" id=run.venue.city.id %}">{{ run.venue.city }}</a>

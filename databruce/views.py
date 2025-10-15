@@ -1692,8 +1692,9 @@ class EventRun(TemplateView):
                 "venue__city__state",
                 "venue__city__state__country",
             )
-            .order_by("first")
+            .order_by("first__id")
         )
+
         return context
 
 
@@ -1706,6 +1707,8 @@ class RunDetail(TemplateView):
             "last",
             "band",
             "venue",
+            "venue__city",
+            "venue__city__country",
         )
         .order_by("first")
     )

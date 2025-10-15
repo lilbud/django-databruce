@@ -336,3 +336,12 @@ td .badge {
     justify-content: center !important;
     display: flex !important;
 }
+
+.page-item:not(.active) > button.page-link {
+    color: var(--primary-600) !important;
+}
+
+.page-item.active > button.page-link {
+    background-color: var(--primary-600) !important;
+    color: var(--text-50) !important;
+}
