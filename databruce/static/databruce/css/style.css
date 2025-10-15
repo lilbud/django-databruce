@@ -317,12 +317,14 @@ td .badge {
 }
 
 [data-bs-theme="light"] #short-url, 
-[data-bs-theme="light"] .update-link {
+[data-bs-theme="light"] .update-link,
+[data-bs-theme="light"] .page-item:not(.active) > button.page-link {
     color: var(--primary-600) !important;
 }
 
 [data-bs-theme="dark"] #short-url,
-[data-bs-theme="dark"] .update-link {
+[data-bs-theme="dark"] .update-link,
+[data-bs-theme="dark"] .page-item:not(.active) > button.page-link {
     color: var(--primary-500) !important;
 }
 
@@ -335,10 +337,6 @@ td .badge {
 #dropdown-container {
     justify-content: center !important;
     display: flex !important;
-}
-
-.page-item:not(.active) > button.page-link {
-    color: var(--primary-600) !important;
 }
 
 .page-item.active > button.page-link {
