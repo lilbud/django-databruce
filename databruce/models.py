@@ -746,6 +746,22 @@ class Events(models.Model):
 
         return event
 
+    def get_last(self):
+        return (
+            Events.objects.select_related("venue", "artist")
+            .filter(id__lt=self.id)
+            .order_by("-id")
+            .first()
+        )
+
+    def get_next(self):
+        return (
+            Events.objects.select_related("venue", "artist")
+            .filter(id__gt=self.id)
+            .order_by("id")
+            .first()
+        )
+
 
 class NugsReleases(models.Model):
     id = models.AutoField(primary_key=True)

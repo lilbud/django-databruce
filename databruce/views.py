@@ -12,22 +12,14 @@ from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import (
     default_token_generator,
 )
+from django.contrib.postgres.aggregates import ArrayAgg, JSONBAgg
+from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import send_mail
-from django.db.models import (
-    Case,
-    Count,
-    ExpressionWrapper,
-    F,
-    IntegerField,
-    Max,
-    Min,
-    Q,
-    Value,
-    When,
-)
-from django.db.models.functions import TruncYear
+from django.db import models as dj_models
+from django.db.models import Case, F, Q, Subquery, Value, When
+from django.db.models.functions import JSONObject, TruncYear
 from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -101,7 +93,9 @@ class Index(TemplateView):
         context["latest_show"] = (
             models.Setlists.objects.filter(event__id=context["latest_event"].id)
             .annotate(
-                separator=Case(When(segue=True, then=Value(">"))),
+                separator=dj_models.Case(
+                    dj_models.When(segue=True, then=dj_models.Value(">")),
+                ),
             )
             .select_related("song")
             .order_by("song_num")
@@ -117,9 +111,7 @@ class Song(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Songs"
         context["songs"] = (
-            models.Songs.objects.all()
-            .prefetch_related("first", "last")
-            .order_by("name")
+            models.Songs.objects.all().select_related("first", "last").order_by("name")
         )
 
         return context
@@ -202,10 +194,10 @@ class UserProfile(TemplateView):
                 context["user_songs"]
                 .values("song")
                 .annotate(
-                    name=F("song__name"),
-                    count=Count("event"),
-                    first=Min("event__id"),
-                    category=F("song__category"),
+                    name=dj_models.F("song__name"),
+                    count=dj_models.Count("event"),
+                    first=dj_models.Min("event__id"),
+                    category=dj_models.F("song__category"),
                 )
                 .order_by("-count", "name")
             )
@@ -458,14 +450,76 @@ class EventDetail(TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["event"] = self.queryset.filter(id=self.kwargs["id"]).first()
+
+        # nugs = models.NugsReleases.objects.filter(
+        #     event=dj_models.OuterRef("id"),
+        # ).values("url")
+
+        archive = models.ArchiveLinks.objects.filter(
+            event=dj_models.OuterRef("id"),
+        ).values("url")
+
+        bootleg = models.Bootlegs.objects.filter(
+            event=dj_models.OuterRef("id"),
+        ).values("id")
+
+        context["official"] = (
+            models.ReleaseTracks.objects.filter(
+                event__id=self.kwargs["id"],
+            )
+            .distinct("release__id")
+            .select_related("release")
+            .order_by("release__id")
+        )
+
+        context["event"] = (
+            models.Events.objects.select_related(
+                "venue",
+                "artist",
+                "venue__city",
+                "venue__city__country",
+                "tour",
+            )
+            .annotate(
+                archive=ArraySubquery(archive),
+                boot=ArraySubquery(bootleg),
+            )
+            .prefetch_related("venue__city__state", "venue__city__state__country")
+            .get(id=self.kwargs["id"])
+        )
 
         context["title"] = f"{context['event']} {context['event'].venue}"
+
+        notes = models.SetlistNotes.objects.filter(
+            id=dj_models.OuterRef("pk"),
+        ).select_related("event", "setlist")
+
+        snippets = (
+            models.Snippets.objects.select_related("snippet", "setlist")
+            .filter(
+                setlist=dj_models.OuterRef("pk"),
+            )
+            .values(
+                json=JSONObject(
+                    id="snippet__id",
+                    name="snippet__name",
+                    note="note",
+                    position="position",
+                    setlist="setlist__id",
+                ),
+            )
+        )
 
         setlist = (
             models.Setlists.objects.filter(event__id=context["event"].id)
             .annotate(
-                separator=Case(When(segue=True, then=Value(">"))),
+                separator=dj_models.Case(
+                    dj_models.When(segue=True, then=dj_models.Value(">")),
+                ),
+                snote=ArraySubquery(notes.values("note")),
+                snippet_list=ArraySubquery(
+                    snippets,
+                ),
             )
             .select_related("song", "event")
             .prefetch_related("ltp")
@@ -474,77 +528,38 @@ class EventDetail(TemplateView):
 
         context["setlist"] = setlist.exclude(set_name="Soundcheck")
 
-        context["soundcheck"] = setlist.filter(set_name="Soundcheck")
+        if "Soundcheck" in context["setlist"].values("set_name"):
+            context["soundcheck"] = models.Setlists.objects.filter(
+                event__id=context["event"].id,
+                set_name="Soundcheck",
+            ).select_related("song")
 
         onstage = (
-            models.Onstage.objects.filter(event__id=context["event"].id)
+            models.Onstage.objects.filter(event=context["event"].id)
             .select_related("relation")
+            .prefetch_related("band")
             .order_by("band_id", "relation__name")
         )
 
-        context["musicians"] = onstage.filter(band=None)
+        context["onstage"] = onstage.filter(band=None)
 
-        context["bands"] = onstage.exclude(band=None).select_related("band")
-
-        if context["setlist"]:
-            context["notes"] = models.SetlistNotes.objects.filter(
-                event__id=context["event"].id,
-            ).select_related("id", "event")
-
-            context["note_ids"] = context["notes"].values_list("id", flat=True)
-
-            context["snippets"] = (
-                models.Snippets.objects.filter(
-                    setlist__id__in=context["setlist"].values("id"),
-                )
-                .select_related("setlist", "snippet")
-                .order_by("position")
-            )
-
-            context["snippet_ids"] = context["snippets"].values_list(
-                "setlist__id",
-                flat=True,
-            )
-
-        context["prev_event"] = self.queryset.filter(id__lt=context["event"].id).last()
-        context["next_event"] = self.queryset.filter(id__gt=context["event"].id).first()
-
-        if not context["prev_event"]:
-            context["prev_event"] = self.queryset.last()
-
-        if not context["next_event"]:
-            context["next_event"] = self.queryset.first()
-
-        context["official"] = (
-            models.ReleaseTracks.objects.filter(
-                event__id=context["event"].id,
-            )
-            .distinct("release__id")
-            .select_related("release")
-            .order_by("release__id")
-        )
-
-        context["bootleg"] = models.Bootlegs.objects.filter(
-            event__id=context["event"].id,
-        )
-        context["archive"] = models.ArchiveLinks.objects.filter(
-            event__id=context["event"].id,
-        ).distinct("url")
-
-        context["nugs"] = models.NugsReleases.objects.filter(
-            event__id=context["event"].id,
-        ).first()
+        context["bands"] = onstage.exclude(band=None)
 
         if self.request.user.is_authenticated:
-            context["user_shows"] = models.UserAttendedShows.objects.filter(
-                user=self.request.user.id,
-                event=context["event"].id,
-            ).values_list("event__id", flat=True)
+            context["user_attended"] = models.UserAttendedShows.objects.filter(
+                dj_models.Exists(
+                    user__id=self.request.user.id,
+                    event__id=self.kwargs["id"],
+                ),
+            )
+
+            print(context["user_attended"])
 
         context["user_count"] = models.UserAttendedShows.objects.filter(
             event=context["event"].id,
         ).count()
 
+        # CURRENT BELOW
         context["setlist_unique"] = (
             context["setlist"]
             .filter(
@@ -558,20 +573,24 @@ class EventDetail(TemplateView):
                 id__in=context["setlist_unique"].values("song__id"),
             )
             .values("category", "album")
-            .annotate(num=Count("id"))
+            .annotate(num=dj_models.Count("id"))
             .order_by("-num")
         )
 
         if context["album_breakdown"]:
             context["album_max"] = context["album_breakdown"].aggregate(
-                max=Max("num"),
+                max=dj_models.Max("num"),
             )
 
             context["album_breakdown"] = context["album_breakdown"].annotate(
-                max=Value(context["album_max"]["max"]),
-                percent=ExpressionWrapper(
-                    (F("num") / Value(1.0 * context["album_max"]["max"])) * 100,
-                    output_field=IntegerField(),
+                max=dj_models.Value(context["album_max"]["max"]),
+                percent=dj_models.ExpressionWrapper(
+                    (
+                        dj_models.F("num")
+                        / dj_models.Value(1.0 * context["album_max"]["max"])
+                    )
+                    * 100,
+                    output_field=dj_models.IntegerField(),
                 ),
             )
 
@@ -616,11 +635,14 @@ class Venue(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Venues"
+
         context["venues"] = (
             models.Venues.objects.all()
             .order_by("name")
-            .select_related("city", "state", "country", "first", "last")
+            .select_related("city", "country", "first", "last")
+            .prefetch_related("state")
         )
+
         return context
 
 
@@ -664,9 +686,9 @@ class VenueDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
@@ -748,8 +770,8 @@ class SongDetail(TemplateView):
             .exclude(position=None)
             .values("position")
             .annotate(
-                count=Count("position"),
-                num=Min("song_num"),
+                count=dj_models.Count("position"),
+                num=dj_models.Min("song_num"),
             )
         ).order_by("num")
 
@@ -765,7 +787,7 @@ class SongDetail(TemplateView):
             .order_by("setlist__event", "position")
         )
 
-        filter = Q(event_certainty__in=["Confirmed", "Probable"])
+        filter = dj_models.Q(event_certainty__in=["Confirmed", "Probable"])
 
         if context["song_info"].num_plays_public > 0:
             context["year_stats"] = (
@@ -778,20 +800,20 @@ class SongDetail(TemplateView):
                 )
                 .values("year")
                 .annotate(
-                    event_count=Count(
+                    event_count=dj_models.Count(
                         "event_id",
                         distinct=True,
-                        filter=Q(set_name__in=VALID_SET_NAMES),
+                        filter=dj_models.Q(set_name__in=VALID_SET_NAMES),
                     ),
                 )
                 .order_by("year")
             )
 
             filter.add(
-                Q(
+                dj_models.Q(
                     id__gt=context["song_info"].first.id,
                 ),
-                Q.AND,
+                dj_models.Q.AND,
             )
 
             context["events_since_premiere"] = models.Events.objects.filter(
@@ -939,10 +961,10 @@ class TourDetail(TemplateView):
                 .select_related("first", "last")
             )
 
-        songfilter = Q(event__tour__id=context["tour"].id)
+        songfilter = dj_models.Q(event__tour__id=context["tour"].id)
 
         if context["tour"].id != 49:
-            songfilter.add(Q(set_name__in=VALID_SET_NAMES), Q.AND)
+            songfilter.add(dj_models.Q(set_name__in=VALID_SET_NAMES), dj_models.Q.AND)
 
         context["songs"] = (
             models.Setlists.objects.filter(
@@ -952,9 +974,9 @@ class TourDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
@@ -971,69 +993,99 @@ class TourDetail(TemplateView):
                 .exclude(position=None)
                 .values("event__id")
                 .annotate(
-                    show_opener_id=Min(
-                        Case(
-                            When(position="Show Opener", then=F("song")),
-                        ),
-                    ),
-                    show_opener_name=Min(
-                        Case(
-                            When(position="Show Opener", then=F("song__name")),
-                        ),
-                    ),
-                    set_1_closer_id=Min(
-                        Case(
-                            When(position="Set 1 Closer", then=F("song")),
-                        ),
-                    ),
-                    set_1_closer_name=Min(
-                        Case(
-                            When(position="Set 1 Closer", then=F("song__name")),
-                        ),
-                    ),
-                    set_2_opener_id=Min(
-                        Case(
-                            When(position="Set 2 Opener", then=F("song")),
-                        ),
-                    ),
-                    set_2_opener_name=Min(
-                        Case(
-                            When(position="Set 2 Opener", then=F("song__name")),
-                        ),
-                    ),
-                    main_set_closer_id=Min(
-                        Case(
-                            When(position="Main Set Closer", then=F("song")),
-                        ),
-                    ),
-                    main_set_closer_name=Min(
-                        Case(
-                            When(position="Main Set Closer", then=F("song__name")),
-                        ),
-                    ),
-                    encore_opener_id=Min(
-                        Case(
-                            When(position="Encore Opener", then=F("song")),
-                        ),
-                    ),
-                    encore_opener_name=Min(
-                        Case(
-                            When(position="Encore Opener", then=F("song__name")),
-                        ),
-                    ),
-                    show_closer_id=Min(
-                        Case(
-                            When(
-                                position="Show Closer",
-                                then=F("song"),
+                    show_opener_id=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Show Opener",
+                                then=dj_models.F("song"),
                             ),
                         ),
                     ),
-                    show_closer_name=Min(
-                        Case(
-                            When(
+                    show_opener_name=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Show Opener",
+                                then=dj_models.F("song__name"),
+                            ),
+                        ),
+                    ),
+                    set_1_closer_id=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Set 1 Closer",
+                                then=dj_models.F("song"),
+                            ),
+                        ),
+                    ),
+                    set_1_closer_name=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Set 1 Closer",
+                                then=dj_models.F("song__name"),
+                            ),
+                        ),
+                    ),
+                    set_2_opener_id=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Set 2 Opener",
+                                then=dj_models.F("song"),
+                            ),
+                        ),
+                    ),
+                    set_2_opener_name=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Set 2 Opener",
+                                then=dj_models.F("song__name"),
+                            ),
+                        ),
+                    ),
+                    main_set_closer_id=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Main Set Closer",
+                                then=dj_models.F("song"),
+                            ),
+                        ),
+                    ),
+                    main_set_closer_name=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Main Set Closer",
+                                then=dj_models.F("song__name"),
+                            ),
+                        ),
+                    ),
+                    encore_opener_id=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Encore Opener",
+                                then=dj_models.F("song"),
+                            ),
+                        ),
+                    ),
+                    encore_opener_name=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Encore Opener",
+                                then=dj_models.F("song__name"),
+                            ),
+                        ),
+                    ),
+                    show_closer_id=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
                                 position="Show Closer",
-                                then=F("song__name"),
+                                then=dj_models.F("song"),
+                            ),
+                        ),
+                    ),
+                    show_closer_name=dj_models.Min(
+                        dj_models.Case(
+                            dj_models.When(
+                                position="Show Closer",
+                                then=dj_models.F("song__name"),
                             ),
                         ),
                     ),
@@ -1155,7 +1207,7 @@ class AdvancedSearchResults(View):
     formset_class = formset_factory(forms.SetlistSearch)
     date = datetime.datetime.today()
 
-    def check_field_choice(self, choice: str, field_filter: Q) -> Q:
+    def check_field_choice(self, choice: str, field_filter: dj_models.Q) -> dj_models.Q:
         """Every field has a IS/NOT choice on it. Depending on that choice, the filter can be negated or not. This checks for that value and returns the correct filter."""
         if choice == "not":
             return ~field_filter
@@ -1171,24 +1223,24 @@ class AdvancedSearchResults(View):
         results = []
         event_results = []
 
-        setlist_event_filter = Q()
-        event_filter = Q()
+        setlist_event_filter = dj_models.Q()
+        event_filter = dj_models.Q()
 
         if event_form.is_valid():
             data = event_form.cleaned_data
 
             lookups = {
-                "first_date": Q(date__gte=data["first_date"]["id"]),
-                "last_date": Q(date__lte=data["last_date"]["id"]),
-                "month": Q(date__month=data["month"]["id"]),
-                "day": Q(date__day=data["day"]["id"]),
-                "city": Q(venue__city__id=data["city"]["id"]),
-                "state": Q(venue__state__id=data["state"]["id"]),
-                "country": Q(venue__country__id=data["country"]["id"]),
-                "tour": Q(tour__id=data["tour"]["id"]),
-                "musician": Q(relation__id=data["musician"]["id"]),
-                "band": Q(band__id=data["band"]["id"]),
-                "day_of_week": Q(date__week_day=data["day_of_week"]["id"]),
+                "first_date": dj_models.Q(date__gte=data["first_date"]["id"]),
+                "last_date": dj_models.Q(date__lte=data["last_date"]["id"]),
+                "month": dj_models.Q(date__month=data["month"]["id"]),
+                "day": dj_models.Q(date__day=data["day"]["id"]),
+                "city": dj_models.Q(venue__city__id=data["city"]["id"]),
+                "state": dj_models.Q(venue__state__id=data["state"]["id"]),
+                "country": dj_models.Q(venue__country__id=data["country"]["id"]),
+                "tour": dj_models.Q(tour__id=data["tour"]["id"]),
+                "musician": dj_models.Q(relation__id=data["musician"]["id"]),
+                "band": dj_models.Q(band__id=data["band"]["id"]),
+                "day_of_week": dj_models.Q(date__week_day=data["day_of_week"]["id"]),
             }
 
             fields = [
@@ -1211,7 +1263,7 @@ class AdvancedSearchResults(View):
                         events = models.Onstage.objects.filter(filter).values(
                             "event_id",
                         )
-                        filter_to_add = Q(id__in=events)
+                        filter_to_add = dj_models.Q(id__in=events)
 
                     event_filter &= self.check_field_choice(choice, filter_to_add)
 
@@ -1227,16 +1279,16 @@ class AdvancedSearchResults(View):
             for form in formset.cleaned_data:
                 song1 = models.Songs.objects.get(id=form["song1"]).name
 
-                setlist_filter = Q(set_name__in=VALID_SET_NAMES)
+                setlist_filter = dj_models.Q(set_name__in=VALID_SET_NAMES)
 
                 match form["position"]:
                     case "Followed By":
                         song2 = models.Songs.objects.get(id=form["song2"]).name
 
-                        setlist_filter &= Q(song=form["song1"])
+                        setlist_filter &= dj_models.Q(song=form["song1"])
                         setlist_filter &= self.check_field_choice(
                             form["choice"],
-                            Q(next=form["song2"]),
+                            dj_models.Q(next=form["song2"]),
                         )
 
                         song_results.append(
@@ -1251,7 +1303,7 @@ class AdvancedSearchResults(View):
 
                         setlist_filter &= self.check_field_choice(
                             form["choice"],
-                            Q(event__id__in=song_events.values("event__id")),
+                            dj_models.Q(event__id__in=song_events.values("event__id")),
                         )
 
                         song_results.append(
@@ -1259,10 +1311,10 @@ class AdvancedSearchResults(View):
                         )
                     case _:
                         # all others except anywhere and followed by
-                        setlist_filter &= Q(song=form["song1"])
+                        setlist_filter &= dj_models.Q(song=form["song1"])
                         setlist_filter &= self.check_field_choice(
                             form["choice"],
-                            Q(position=form["position"]),
+                            dj_models.Q(position=form["position"]),
                         )
 
                         song_results.append(
@@ -1278,14 +1330,16 @@ class AdvancedSearchResults(View):
         match data["conjunction"]:
             case "or":
                 setlist_event_filter.add(
-                    Q(id__in=list(set.union(*map(set, event_results)))),
-                    Q.OR,
+                    dj_models.Q(id__in=list(set.union(*map(set, event_results)))),
+                    dj_models.Q.OR,
                 )
 
             case "and":
                 setlist_event_filter.add(
-                    Q(id__in=list(set.intersection(*map(set, event_results)))),
-                    Q.AND,
+                    dj_models.Q(
+                        id__in=list(set.intersection(*map(set, event_results))),
+                    ),
+                    dj_models.Q.AND,
                 )
 
         result = (
@@ -1514,9 +1568,9 @@ class CityDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
@@ -1591,9 +1645,9 @@ class StateDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
@@ -1656,9 +1710,9 @@ class CountryDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
@@ -1710,6 +1764,7 @@ class RunDetail(TemplateView):
             "venue__city",
             "venue__city__country",
         )
+        .prefetch_related("venue__city__state")
         .order_by("first")
     )
 
@@ -1744,9 +1799,9 @@ class RunDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
@@ -1765,7 +1820,7 @@ class TourLeg(TemplateView):
         context["title"] = "Tour Legs"
         context["legs"] = (
             models.TourLegs.objects.all()
-            .select_related("first", "last")
+            .select_related("first", "last", "tour")
             .order_by("-last")
         )
         return context
@@ -1804,9 +1859,9 @@ class TourLegDetail(TemplateView):
                 "song_id",
             )
             .annotate(
-                plays=Count("event_id"),
-                name=F("song__name"),
-                category=F("song__category"),
+                plays=dj_models.Count("event_id"),
+                name=dj_models.F("song__name"),
+                category=dj_models.F("song__category"),
             )
             .order_by(
                 "-plays",
