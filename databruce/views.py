@@ -547,11 +547,9 @@ class EventDetail(TemplateView):
 
         if self.request.user.is_authenticated:
             context["user_attended"] = models.UserAttendedShows.objects.filter(
-                dj_models.Exists(
-                    user__id=self.request.user.id,
-                    event__id=self.kwargs["id"],
-                ),
-            )
+                user=self.request.user.id,
+                event=self.kwargs["id"],
+            ).exists()
 
             print(context["user_attended"])
 
