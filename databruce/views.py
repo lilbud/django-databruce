@@ -561,7 +561,8 @@ class EventDetail(TemplateView):
 
         # CURRENT BELOW
         context["setlist_unique"] = (
-            context["setlist"]
+            models.Setlists.objects.filter(event=self.kwargs["id"])
+            .select_related("song")
             .filter(
                 set_name__in=VALID_SET_NAMES,
             )

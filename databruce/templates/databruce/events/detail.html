@@ -411,52 +411,52 @@
                   </div>
                 </div>
               </div>
-            </div>
-          {% endif %}
-          {% if official or archive %}
-            <div class="col">
-              <div class="card" id="links-card">
-                <div class="card-header">
-                  Links
-                  <div class="float-end">
-                    <i class="bi bi-link-45deg"></i>
+            {% endif %}
+            {% if official or event.archive %}
+              <div class="col">
+                <div class="card" id="links-card">
+                  <div class="card-header">
+                    Links
+                    <div class="float-end">
+                      <i class="bi bi-link-45deg"></i>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <ul class="ps-3 text-xs">
+                      {% if official %}
+                        {% for rel in official %}
+                          <li>
+                            <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
+                          </li>
+                        {% endfor %}
+                      {% endif %}
+                      {% if event.boot %}
+                        <li>
+                          <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                    {% if event.archive %}
+                      <div class="text-sm fw-semibold">
+                        Radio Nowhere @ Archive.org
+                        <i class="bi bi-info-circle-fill"
+                           data-bs-toggle="tooltip"
+                           data-bs-html="true"
+                           data-bs-title="An archive.org collection of Bruce bootlegs maintained by me"></i>
+                      </div>
+                      <ul class="ps-3 text-xs">
+                        {% for rel in event.archive %}
+                          <li>
+                            <a href="https://archive.org/details/{{ rel }}">{{ rel }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="card-body">
-                  <ul class="ps-3 text-xs">
-                    {% if official %}
-                      {% for rel in official %}
-                        <li>
-                          <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
-                        </li>
-                      {% endfor %}
-                    {% endif %}
-                    {% if event.boot %}
-                      <li>
-                        <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
-                      </li>
-                    {% endif %}
-                  </ul>
-                  {% if event.archive %}
-                    <div class="text-sm fw-semibold">
-                      Radio Nowhere @ Archive.org
-                      <i class="bi bi-info-circle-fill"
-                         data-bs-toggle="tooltip"
-                         data-bs-html="true"
-                         data-bs-title="An archive.org collection of Bruce bootlegs maintained by me"></i>
-                    </div>
-                    <ul class="ps-3 text-xs">
-                      {% for rel in event.archive %}
-                        <li>
-                          <a href="https://archive.org/details/{{ rel }}">{{ rel }}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% endif %}
-                </div>
               </div>
-            </div>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
