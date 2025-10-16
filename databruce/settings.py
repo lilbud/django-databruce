@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "shortener",
-    "crispy_forms",
+    "compressor",
 ]
 
 SITE_ID = 1
@@ -165,6 +165,15 @@ REST_FRAMEWORK = {
 
 DEFAULT_FROM_EMAIL = "admin@databruce.com"
 NOTIFY_EMAIL = "databrucedb@gmail.com"
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
 
 try:
     from .local_settings import *  # noqa: F403

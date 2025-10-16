@@ -56,12 +56,6 @@ html[data-bs-theme="light"] .select2-results__option--selected {
     background-color: var(--primary-600) !important;
 }
 
-/* html[data-bs-theme="dark"] .select2-results__option--highlighted,
-html[data-bs-theme="dark"] .select2-results__option--selected {
-    color: var(--bs-body-color) !important;
-    background-color: var(--primary-700) !important;
-} */
-
 .select2.select2-container.select2-container--bootstrap-5 {
     width: auto !important;
 }

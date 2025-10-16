@@ -1,9 +1,8 @@
 import calendar
 import datetime
 import re
+from typing import Any
 
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Reset, Submit
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import UserCreationForm
@@ -16,16 +15,11 @@ DATE = datetime.datetime.today()
 
 
 class AdvancedEventSearch(forms.Form):
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, D107
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-
-        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
-        self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
 
     class FormChoiceSelect(forms.ChoiceField):
-        def __init__(self, widget_id, *args, **kwargs):
+        def __init__(self, widget_id, *args: tuple, **kwargs: dict[str, Any]) -> None:
             kwargs["initial"] = "is"
             kwargs["label"] = ""
             kwargs["choices"] = [("is", "is"), ("not", "not")]
@@ -466,10 +460,6 @@ class SetlistSearch(forms.Form):
     def __init__(self, *args: dict, **kwargs: dict) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
-        self.helper.add_input(Reset("reset", "Clear", css_class="btn-secondary"))
 
     songs = [("", "")]
 
@@ -563,9 +553,6 @@ class EventSearch(forms.Form):
     def __init__(self, *args: dict, **kwargs: dict) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "get"
-        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
 
     date = forms.CharField(
         label="",
@@ -587,9 +574,6 @@ class SetlistNoteSearch(forms.Form):
     def __init__(self, *args: dict, **kwargs: dict) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.add_input(Submit("submit", "Go", css_class="btn-primary"))
 
     query = forms.CharField(
         label="",
@@ -648,11 +632,6 @@ class UpdateUserForm(forms.ModelForm):
     def __init__(self, *args: dict, **kwargs: dict) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.add_input(
-            Submit("submit", "Update", css_class="btn btn-sm btn-success"),
-        )
 
     username = forms.CharField(
         label="Username:",

@@ -7,8 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "django==5.1.7",
     "django-browser-reload>=1.20.0",
-    # "django-autocomplete-light>=3.12.1",
-    "django-crispy-forms==2.3",
+    "django-compressor>=4.5.1",
     "django-debug-toolbar==5.1.0",
     "django-filter==24.3",
     "django-link-shortener>=1.0.1",
