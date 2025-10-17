@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "shortener",
-    "compressor",
+    # "compressor",
 ]
 
 SITE_ID = 1
@@ -172,8 +172,8 @@ STATICFILES_FINDERS = [
     "compressor.finders.CompressorFinder",
 ]
 
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+# COMPRESS_ENABLED = True
+# COMPRESS_OFFLINE = True
 
 try:
     from .local_settings import *  # noqa: F403
