@@ -457,6 +457,9 @@ class VenuesText(models.Model):
         primary_key=True,
         db_column="id",
     )
+
+    name = models.TextField()
+    location = models.TextField()
     formatted_loc = models.TextField()
 
     class Meta:

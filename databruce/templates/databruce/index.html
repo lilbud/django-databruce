@@ -72,11 +72,11 @@
           <div class="px-2 py-2">
             <div class="row">
               <a class="fw-medium text-sm text-reset"
-                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue.get_name }}</a>
+                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue_info.value }}</a>
             </div>
             <div class="row">
               <a class="text-reset text-sm"
-                 href="{% url 'band_details' id=first.artist.id %}">{{ first.artist.name }}</a>
+                 href="{% url 'band_details' id=first.band.id %}">{{ first.band.name }}</a>
             </div>
           {% endwith %}
         </div>
@@ -104,7 +104,8 @@
                       </td>
                       <td class="py-1">
                         <span class="text-nowrap">
-                          <a class="fw-semibold" href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                          <a class="fw-semibold"
+                             href="{% url "song_details" id=song.song_info.id %}">{{ song.song_info.name }}</a>
                           {% if song.segue %}{{ song.separator }}{% endif %}
                         </span>
                       </td>
@@ -143,7 +144,7 @@
                         <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                        <a href="{% url "venue_details" id=event.venue_info.id %}">{{ event.venue_info.value }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -175,7 +176,7 @@
                           <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                         </td>
                         <td class="text-wrap">
-                          <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                          <a href="{% url "venue_details" id=event.venue_info.id %}">{{ event.venue_info.name }}</a>
                         </td>
                       </tr>
                     {% endfor %}
@@ -212,7 +213,7 @@
                         <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
                       </td>
                       <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                        <a href="{% url "venue_details" id=event.venue_info.id %}">{{ event.venue_info.value }}</a>
                       </td>
                     </tr>
                   {% endfor %}

@@ -372,7 +372,7 @@ class AdvancedEventSearch(forms.Form):
         }
         if self.cleaned_data["country"]:
             data = (
-                models.States.objects.filter(id=self.cleaned_data["country"])
+                models.Countries.objects.filter(id=self.cleaned_data["country"])
                 .annotate(
                     value=F("name"),
                 )

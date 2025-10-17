@@ -65,10 +65,10 @@
                     {% endif %}
                   </td>
                   <td class="text-nowrap">
-                    <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name|default_if_none:"" }}</a>
+                    <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
                   </td>
                   <td class="text-nowrap">
-                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.name }}</a>
+                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
                   </td>
                   <td class="text-nowrap">
                     {% if event.venue.city %}

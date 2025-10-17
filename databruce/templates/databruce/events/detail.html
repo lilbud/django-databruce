@@ -156,13 +156,19 @@
               {% endif %}
               <div class="card">
                 <div class="card-body p-0 setlist">
+                  <div class="d-none" id="setlist_copy">
+                    {{ setlist_copy|join:'<br>' }}
+                  </div>
                   {% regroup setlist by set_name as event_setlist %}
                   <div class="table-responsive">
                     <table class="table table-hover display" id="setlistTable">
                       <thead>
                         <tr>
                           <th class="all songnum text-nowrap text-center">#</th>
-                          <th class="all text-nowrap">Song</th>
+                          <th class="all text-nowrap">
+                            Song
+                            <a id="copySetlist" href="#" class="text-reset text-primary-500 ms-4">Copy Setlist</a>
+                          </th>
                           {% if event.tour.id != 49 %}
                             <th class="min-tablet-l text-nowrap text-center">
                               Gap
@@ -219,7 +225,7 @@
                                   {{ song.song_num|default_if_none:"" }}
                                 </td>
                                 <td class="text-nowrap">
-                                  <span class="fw-medium text-sm">
+                                  <span class="fw-medium text-sm" id="song">
                                     <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
                                     {% if song.segue %}<span class="fw-bold">&gt;</span>{% endif %}
                                     {% if song.instrumental %}<span class="badge text-bg-info">Instrumental</span>{% endif %}
@@ -567,6 +573,20 @@
               $(this).removeClass('dtr-control');
           });
 
+          // code adapted from stackoverflow
+          $('#copySetlist').click(function() {
+            var $temp = $("<textarea>");
+            $("body").append($temp);
+            var x = $('#setlist_copy').html().trim().replace(/<br>/g, '\n').replace(/<\/?[^>]+>/g, '');
+            $temp.val(x).select();
+            document.execCommand("copy");
+            $temp.remove();
+
+            console.log(x);
+
+            $(this).text('Setlist Copied');
+          })
+
           $('#userForm').submit(function(e) {
               e.preventDefault();
               var serializedData = $(this).serialize();
@@ -596,5 +616,5 @@
       });
 
       
-  </script>
+</script>
 {% endblock content %}
