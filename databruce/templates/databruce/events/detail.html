@@ -8,29 +8,33 @@
       <div class="row">
         <div class="col">
           <div class="float-end text-base">
+            {% if event.get_last %}
+              {% with last=event.get_last %}
+                <a class="btn btn-sm btn-secondary"
+                   role="button"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   data-bs-html="true"
+                   data-bs-title="<div>{{ last.get_date }}<br>{{ last.artist }}<br>{{ last.venue.get_name }}</div>"
+                   href="{% url "event_details" id=last.id %}">&lt; Prev</a>
+              {% endwith %}
+            {% endif %}
             {% if user.is_superuser %}
               <a class="btn btn-sm btn-danger"
                  role="button"
                  href="{% url "admin:index" %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
             {% endif %}
-            {% with last=event.get_last %}
-              <a class="btn btn-sm btn-secondary"
-                 role="button"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-html="true"
-                 data-bs-title="<div>{{ last.get_date }}<br>{{ last.artist }}<br>{{ last.venue.get_name }}</div>"
-                 href="{% url "event_details" id=last.id %}">&lt; Prev</a>
-            {% endwith %}
-            {% with next=event.get_next %}
-              <a class="btn btn-sm btn-secondary"
-                 role="button"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-html="true"
-                 data-bs-title="<div>{{ next.get_date }}<br>{{ next.artist }}<br>{{ next.venue.get_name }}</div>"
-                 href="{% url "event_details" id=next.id %}">Next &gt;</a>
-            {% endwith %}
+            {% if event.get_next %}
+              {% with next=event.get_next %}
+                <a class="btn btn-sm btn-secondary"
+                   role="button"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   data-bs-html="true"
+                   data-bs-title="<div>{{ next.get_date }}<br>{{ next.artist }}<br>{{ next.venue.get_name }}</div>"
+                   href="{% url "event_details" id=next.id %}">Next &gt;</a>
+              {% endwith %}
+            {% endif %}
           </div>
         </div>
       </div>
@@ -140,21 +144,56 @@
                       </div>
                     </div>
                     <div class="card-body text-xs">
-                      <span>{{ event.note|note_format }}</span>
-                      <br>
-                      <br>
-                      <span>
+                      <div>{{ event.note|note_format|safe }}</div>
+                      <div class="row mt-1">
                         <a href="#"
                            role="button"
                            class="btn-link text-reset fw-semibold mt-2 text-sm"
                            data-bs-toggle="modal"
                            data-bs-target="#notes-modal">See More</a>
-                      </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               {% endif %}
               <div class="card">
+                <div class="card-header">
+                  <div class="d-flex justify-content-between">
+                    <span>Setlist</span>
+                    <span class="text-sm my-auto"
+                          data-bs-toggle="tooltip"
+                          data-bs-html="true"
+                          data-bs-title="Setlist Options">
+                      <a role="button"
+                         class="btn btn-sm btn-primary"
+                         data-bs-toggle="collapse"
+                         href="#options">
+                        <i class="bi bi-sliders"></i>
+                      </a>
+                    </span>
+                  </div>
+                  <div class="row mx-auto">
+                    <div class="collapse px-0 mt-2" id="options">
+                      <div class="row mb-2">
+                        <div class="col">
+                          <div class="form-check-reverse form-switch">
+                            <label class="form-check-label float-start pe-2" for="note-toggle">Show All Notes</label>
+                            <input class="form-check-input float-start"
+                                   type="checkbox"
+                                   role="switch"
+                                   id="note-toggle"
+                                   autocomplete="off">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="card-body p-0 setlist">
                   <div class="d-none" id="setlist_copy">
                     {{ setlist_copy|join:'<br>' }}
@@ -167,7 +206,7 @@
                           <th class="all songnum text-nowrap text-center">#</th>
                           <th class="all text-nowrap">
                             Song
-                            <a id="copySetlist" href="#" class="text-reset text-primary-500 ms-4">Copy Setlist</a>
+                            {% comment %} <a id="copySetlist" href="#" class="text-reset text-primary-500 ms-4">Copy Setlist</a> {% endcomment %}
                           </th>
                           {% if event.tour.id != 49 %}
                             <th class="min-tablet-l text-nowrap text-center">
@@ -189,12 +228,11 @@
                             <td class="d-none"></td>
                             <td class="d-none"></td>
                             <td class="d-none"></td>
-                            <td class="d-none"></td>
                           </tr>
                           {% for song in soundcheck %}
                             <tr>
                               <td></td>
-                              <td colspan="5">
+                              <td colspan="6">
                                 <span class="text-nowrap text-break fw-medium text-sm align-middle">
                                   <a class="me-1 align-middle"
                                      href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
@@ -225,29 +263,39 @@
                                   {{ song.song_num|default_if_none:"" }}
                                 </td>
                                 <td class="text-nowrap">
-                                  <span class="fw-medium text-sm" id="song">
-                                    <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
-                                    {% if song.segue %}<span class="fw-bold">&gt;</span>{% endif %}
-                                    {% if song.instrumental %}<span class="badge text-bg-info">Instrumental</span>{% endif %}
-                                    {% if song.sign_request %}<span class="badge text-bg-info">Sign Request</span>{% endif %}
-                                    {% if song.nobruce %}<span class="badge text-bg-info">No Bruce</span>{% endif %}
-                                  </span>
-                                  {% if song.snippet_list %}
-                                    <button class="btn btn-link float-end align-top p-0 m-0 text-sm"
-                                            onclick="show_note({{ song.id }})"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-title="Show Snippets">
-                                      <i class="bi bi-music-note-beamed text-body text-sm"></i>
-                                    </button>
-                                  {% endif %}
+                                  <div class="row p-0 m-0">
+                                    <span class="fw-medium text-sm m-0 p-0" id="song">
+                                      <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                                      {% if song.segue %}<span class="fw-bold">&gt;</span>{% endif %}
+                                      {% if song.instrumental %}<span class="badge text-bg-info">Instrumental</span>{% endif %}
+                                      {% if song.sign_request %}<span class="badge text-bg-info">Sign Request</span>{% endif %}
+                                      {% if song.nobruce %}<span class="badge text-bg-info">No Bruce</span>{% endif %}
+                                      <div id="button-container" class="float-end p-0 m-0">
+                                        {% if notes %}
+                                          <button class="btn btn-link p-0 m-0 text-sm d-inline"
+                                                  onclick="show_note({{ song.id }})"
+                                                  data-bs-toggle="tooltip"
+                                                  data-bs-title="Show Note">
+                                            <i class="bi bi-sticky-fill text-body text-sm"></i>
+                                          </button>
+                                        {% endif %}
+                                        {% comment %} {% if song.snippet_list %}
+                                          <button class="btn btn-link p-0 m-0 text-sm" onclick="show_snippet({{ song.id }})" data-bs-toggle="tooltip" data-bs-title="Show Snippets">
+                                            <i class="bi bi-music-note-beamed text-body text-sm"></i>
+                                          </button>
+                                        {% endif %} {% endcomment %}
+                                      </div>
+                                    </span>
+                                  </div>
                                   {% if notes %}
-                                    <br>
-                                    <span class="text-xs fw-normal text-wrap me-2"
-                                          id="setlist_note_{{ song.id }}">{{ notes|join:'; ' }}</span>
+                                    <div class="row m-0 p-0">
+                                      <span class="text-xs fw-normal text-wrap d-none setlist_note mt-1 px-0"
+                                            id="setlist_note_{{ song.id }}">{{ notes|join:'; ' }}</span>
+                                    </div>
                                   {% endif %}
                                 </td>
                                 {% if event.tour.id != 49 %}
-                                  <td class="text-nowrap text-center {% if notes_list %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
+                                  <td class="text-nowrap text-center {% if notes %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
                                       id="gap">
                                     {% if song.debut and not song.premiere %}
                                       <span class="badge bg-primary-700"
@@ -265,7 +313,7 @@
                                       <span class="fw-normal">{{ song.last|default_if_none:"" }}</span>
                                     {% endif %}
                                   </td>
-                                  <td class="text-nowrap text-center {% if notes_list %}align-top{% else %}align-middle{% endif %} fw-normal text-sm">
+                                  <td class="text-nowrap text-center {% if notes %}align-top{% else %}align-middle{% endif %} fw-normal text-sm">
                                     {% if song.tour_num %}
                                       {% if song.tour_num == song.tour_total and song.tour_total == 1 %}
                                         <span data-bs-toggle="tooltip"
@@ -280,7 +328,7 @@
                                       {% endif %}
                                     {% endif %}
                                   </td>
-                                  <td class="text-nowrap text-center fw-medium text-sm {% if notes_list %}align-top{% else %}align-middle{% endif %}">
+                                  <td class="text-nowrap text-center fw-medium text-sm {% if notes %}align-top{% else %}align-middle{% endif %}">
                                     {% if song.ltp %}
                                       <a href="{% url "event_details" id=song.ltp.id %}">{{ song.ltp }}</a>
                                     {% endif %}
@@ -288,19 +336,18 @@
                                 {% endif %}
                               </tr>
                             {% endwith %}
-                            {% if song.snippet_list %}
+                            {% comment %} {% if song.snippet_list %}
                               <tr class="text-center">
-                                <td id="snippet-head_{{ song.id }}" class="d-none" colspan="5">Snippets</td>
+                                <td id="snippet-head_{{ song.id }}" class="d-none no-col-control" colspan="5">Snippets</td>
                                 <td class="d-none"></td>
                                 <td class="d-none"></td>
                                 <td class="d-none"></td>
                                 <td class="d-none"></td>
                               </tr>
                               {% for snippet in song.snippet_list %}
-                                <tr id="snippet-row_{{ song.id }}"
-                                    class="d-none snippet-row_{{ snippet.setlist }}">
-                                  <td id="snippetnum" class="text-sm songnum text-center">{{ snippet.position }}</td>
-                                  <td colspan="4">
+                                <tr id="snippet-row_{{ song.id }}" class="d-none snippet-row_{{ snippet.setlist }}">
+                                  <td id="snippetnum" class="text-sm songnum text-center no-col-control">{{ snippet.position }}</td>
+                                  <td colspan="4" class="no-col-control">
                                     <span class="text-sm fw-medium">
                                       <a href="{% url "song_details" id=snippet.id %}">{{ snippet.name }}</a>
                                     </span>
@@ -314,7 +361,14 @@
                                   <td class="d-none"></td>
                                 </tr>
                               {% endfor %}
-                            {% endif %}
+                              <tr class="text-center">
+                                <td id="snippet-foot_{{ song.id }}" class="d-none no-col-control" colspan="5"></td>
+                                <td class="d-none"></td>
+                                <td class="d-none"></td>
+                                <td class="d-none"></td>
+                                <td class="d-none"></td>
+                              </tr>
+                            {% endif %} {% endcomment %}
                           {% endfor %}
                         {% endfor %}
                       </tbody>
@@ -328,7 +382,7 @@
         <div class="col-12 {% if setlist %}col-lg-3 ps-lg-0{% endif %} order-2 ps-sm-2">
           <div class="row row-cols-1 g-2 ps-lg-0">
             {% if event.note %}
-              <div class="col-12 d-none d-md-block">
+              <div class="col-12 d-none d-lg-block">
                 <div class="card" id="notes-card">
                   <div class="card-header">
                     Event Notes
@@ -337,7 +391,7 @@
                     </div>
                   </div>
                   <div class="card-body text-xs">
-                    <div>{{ event.note|note_format }}</div>
+                    <div>{{ event.note|note_format|safe }}</div>
                     <div class="row mt-1">
                       <a href="#"
                          role="button"
@@ -537,14 +591,17 @@
       layout.topStart = 'pageLength';
 
       var columns = [{ targets: [0], width: '1rem' }];
-      columns.push({ targets: [1], width: '25rem' });
 
       {% if event.tour.id != 49 %}
-        columns.push({ targets: [2,3], width: '5rem' });
-        columns.push({ targets: [4], width: '7rem' });
+        columns.push({ targets: [2,3], width: '4rem' });
+        columns.push({ targets: [4], width: '8rem' });
       {% endif %}
 
-      function show_note(id) {
+      function show_snippet(id) {
+        // removes child row controls from snippet rows as there are none
+        $('#snippetnum').removeClass('dtr-control');
+        $('[id*=snippet-]').removeClass('dtr-control');
+
         $(`.snippet-row_${id}`).each(function() {
           if ($(this).hasClass('d-none')) {
             $(this).removeClass('d-none');
@@ -556,8 +613,40 @@
             $(`#snippet-foot_${id}`).addClass('d-none');
           }
         })
-      }
+      };
 
+      function show_note(id) {
+        $(`#setlist_note_${id}`).each(function() {
+          if ($(this).hasClass('d-none')) {
+            $(this).removeClass('d-none');
+          } else {
+            $(this).addClass('d-none');
+          }
+        })
+      };
+
+      {% comment %} function child_row_note() {
+        // if you think this makes no sense, you'd be correct
+        // however, this bit of code is the only way to have
+        // the song note appear in the child row
+        $('tr.dt-hasChild.dtr-expanded').each(function() {
+          var row = this;
+
+          if ($(this).find('[id*=setlist_note]')) {
+            var note = $(this).find('[id*=setlist_note]').text();
+            
+            if (note != '') {
+              var table = $(row).next('tr.child').find('table');
+              var new_row = $(table).find('tr').first().clone();
+
+              $(new_row).find('td').first().text('Note:')
+              $(new_row).find('td').last().text(note)
+
+              $(new_row).appendTo(table)
+            };
+          };
+        });
+}; {% endcomment %}
       $(document).ready(function() {
           var table = new DataTable('#setlistTable', {
             layout: layout,
@@ -569,12 +658,14 @@
             columnDefs: columns,
           });
 
-          $('[id*=snippet]').each(function() {
-              $(this).removeClass('dtr-control');
-          });
+          // remove child row control from snippet rows
+
 
           // code adapted from stackoverflow
           $('#copySetlist').click(function() {
+            var btn = this;
+
+
             var $temp = $("<textarea>");
             $("body").append($temp);
             var x = $('#setlist_copy').html().trim().replace(/<br>/g, '\n').replace(/<\/?[^>]+>/g, '');
@@ -584,8 +675,26 @@
 
             console.log(x);
 
-            $(this).text('Setlist Copied');
+            $(btn).text('Setlist Copied');
+            $(btn).removeClass('btn-primary').addClass('btn-success');
+
+            setTimeout(function() {
+              $(btn).removeClass('btn-success').addClass('btn-primary');
+              $(btn).text('Copy Setlist');
+            }, 3000);
           })
+
+          $('#note-toggle').on('click', function() {
+            if ($(this).is(':checked')) {
+              $('span[id*=setlist_note]').each(function() {
+                $(this).removeClass('d-none');
+              });
+            } else {
+              $('span[id*=setlist_note]').each(function() {
+                $(this).addClass('d-none');
+              });
+            }
+          });
 
           $('#userForm').submit(function(e) {
               e.preventDefault();

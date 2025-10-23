@@ -37,9 +37,6 @@ $.extend(true, DataTable.defaults, {
   searching: true,
   fixedHeader: true,
   responsive: {
-    // details: {
-    //   display: $.fn.dataTable.Responsive.display.childRowImmediate,
-    // }
     details: {
       display: $.fn.dataTable.Responsive.display.childRowImmediate,
         renderer: function ( api, rowIdx, columns ) {
@@ -53,8 +50,8 @@ $.extend(true, DataTable.defaults, {
                     };
 
                     return '<tr class="res-child" data-dt-row="'+col.rowIndex+'" data-dt-column="'+col.columnIndex+'">'+
-                        '<td class="text-nowrap" style="width: 3rem; font-weight: bold;">'+title+'</td>'+
-                        '<td class="text-nowrap">'+col.data+'</td>'+
+                        '<td class="text-nowrap fw-bold" style="width: 3rem;">'+title+'</td>'+
+                        '<td class="text-wrap">'+col.data+'</td>'+
                     '</tr>';
                 }
             } ).join('');
@@ -64,12 +61,9 @@ $.extend(true, DataTable.defaults, {
                 false;
         }
     }
-
   },
   info: true,
   scrollX: true,
-  // scrollY: '50vh',
-  // scrollCollapse: true,
   pageLength: 50,
   lengthMenu: [25, 50, 100],
   language: {
@@ -101,8 +95,9 @@ function getDatatableLayout(columns) {
       extend: 'searchBuilder',
       className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
       config: {
-        depthLimit: 2,
+        depthLimit: 1,
         columns: columns,
+        liveSearch: false,
       },
     };
 

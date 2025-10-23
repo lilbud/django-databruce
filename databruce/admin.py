@@ -64,6 +64,7 @@ class BandAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
     list_display_links = ["id"]
     list_select_related = ["first", "last"]
+    ordering = ("name",)
 
 
 @admin.register(models.Guests)
@@ -140,6 +141,7 @@ class SongAdmin(admin.ModelAdmin):
     search_fields = ["name", "original_artist"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
+    ordering = ("name",)
 
 
 @admin.register(models.Setlists)
@@ -157,6 +159,7 @@ class OnstageAdmin(admin.ModelAdmin):
     list_select_related = True
     list_display = ["id", "event", "relation__name", "band__name"]
     list_display_links = ["id", "event", "relation__name", "band__name"]
+    ordering = ("relation__name",)
 
 
 @admin.register(models.Relations)
@@ -164,6 +167,7 @@ class RelationAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
+    ordering = ("name",)
 
 
 @admin.register(models.ReleaseTracks)
@@ -220,12 +224,16 @@ class StateAdmin(admin.ModelAdmin):
     list_display_links = ["id", "country", "first", "last"]
 
 
+from django.db.models import Q
+
+
 @admin.register(models.Tours)
 class TourAdmin(admin.ModelAdmin):
-    search_fields = ["name", "band"]
+    search_fields = ["name"]
     list_select_related = ["first", "band", "last"]
     list_display = ["id", "name", "band", "first", "last"]
     list_display_links = ["id", "band", "first", "last"]
+    ordering = ("name",)
 
 
 @admin.register(models.TourLegs)
@@ -234,6 +242,7 @@ class TourLegAdmin(admin.ModelAdmin):
     list_select_related = ["first", "last", "tour"]
     list_display = ["id", "tour", "name", "first", "last"]
     list_display_links = ["id", "tour", "first", "last"]
+    ordering = ("name",)
 
 
 @admin.register(models.Venues)
@@ -250,6 +259,20 @@ class VenueAdmin(admin.ModelAdmin):
         "country__name",
     ]
 
+    def get_search_results(self, request, queryset, search_term):
+        queryset, may_have_duplicates = super().get_search_results(
+            request,
+            queryset,
+            search_term,
+        )
+        try:
+            search_term_as_int = int(search_term)
+        except ValueError:
+            pass
+        else:
+            queryset |= self.model.objects.filter(age=search_term_as_int)
+        return queryset, may_have_duplicates
+
     autocomplete_fields = ["city", "state"]
 
     list_display_links = [
@@ -261,6 +284,7 @@ class VenueAdmin(admin.ModelAdmin):
         "state__name",
         "country__name",
     ]
+    ordering = ("name",)
 
 
 @admin.register(models.Runs)

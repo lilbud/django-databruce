@@ -149,4 +149,9 @@ def make_ordinal(n: int):
 @register.filter(name="note_format")
 def event_note_format(note: str) -> str:
     """Cuts note at first paragraph boundary."""
-    return note.splitlines()[0]
+    md = MarkdownIt()
+
+    if len(note.splitlines()) > 1:
+        return md.render(note.splitlines()[0])
+
+    return md.render(note)

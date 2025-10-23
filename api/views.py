@@ -1,3 +1,5 @@
+import json
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -52,46 +54,106 @@ class CitiesViewSet(viewsets.ModelViewSet):
     ordering = ["name", "first", "last"]
 
 
-# from django_filters import filters as djfilters
-# from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
-# from rest_framework_datatables.django_filters.filters import GlobalFilter
-# from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
-
-
-# class GlobalCharFilter(GlobalFilter, djfilters.CharFilter):
-#     pass
-
-
-# class SongsPageFilter(DatatablesFilterSet):
-#     """Filter name, artist and genre by name with icontains"""
-
-#     prev = GlobalCharFilter(field_name="prev__song__name", lookup_expr="icontains")
-#     next = GlobalCharFilter(field_name="next__song__name", lookup_expr="icontains")
-#     venue = GlobalCharFilter(
-#         field_name="current__event__venue__name",
-#         lookup_expr="icontains",
-#     )
-
-#     class Meta:
-#         model = models.SongsPage
-#         fields = "__all__"
+from django.core.exceptions import FieldError
+from django.db.models import Q
+from rest_framework import filters as dj_filters
+from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
 
 
 class SongsPageViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
+    from querystring_parser import parser
+
+    def create_filter(
+        self,
+        column: str,
+        condition: str,
+        value: str = "",
+        value2: str = "",
+    ):
+        filter_types = {
+            "=": Q(**{f"{column}__iexact": value}),
+            "!=": ~Q(**{f"{column}__iexact": value}),
+            "starts": Q(**{f"{column}__istartswith": value}),
+            "!starts": ~Q(**{f"{column}__istartswith": value}),
+            "contains": Q(**{f"{column}__icontains": value}),
+            "!contains": ~Q(**{f"{column}__icontains": value}),
+            "ends": Q(**{f"{column}__iendswith": value}),
+            "!ends": ~Q(**{f"{column}__iendswith": value}),
+            "null": Q(**{f"{column}__exact": ""}) | Q(**{f"{column}__isnull": True}),
+            "!null": ~Q(**{f"{column}__exact": ""}) & Q(**{f"{column}__isnull": False}),
+            "<": Q(**{f"{column}__lt": value}),
+            "<=": Q(**{f"{column}__lte": value}),
+            ">=": Q(**{f"{column}__gte": value}),
+            ">": Q(**{f"{column}__gt": value}),
+            "between": Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
+            "!between": ~Q(
+                Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
+            ),
+        }
+
+        return filter_types.get(condition)
+
     def get_queryset(self):
-        song = self.request.query_params.get("id")
+        filter = Q()
+        post_dict = self.parser.parse(self.request.GET.urlencode())
 
-        if song is not None:
-            return models.Songspagenew.objects.filter(song=song)
+        song = post_dict.get("song")
 
-        return models.Songspagenew.objects.all()
+        qs = models.Songspagenew.objects.select_related(
+            "event",
+        ).filter(song=song)
+
+        try:
+            search = post_dict["searchBuilder"]["criteria"]
+
+            for item in search:
+                param = search[item]
+
+                print(param)
+
+                data = next(
+                    item["name"]
+                    for item in dict(post_dict["columns"]).values()
+                    if item["data"] == param["origData"]
+                )
+
+                try:
+                    search_filter = self.create_filter(
+                        column=data,
+                        value=param["value1"],
+                        value2=param["value2"],
+                        condition=param["condition"],
+                    )
+                except KeyError:
+                    search_filter = self.create_filter(
+                        column=data,
+                        condition=param["condition"],
+                    )
+
+                if post_dict["searchBuilder"]["logic"] == "AND":
+                    filter.add(
+                        search_filter,
+                        Q.AND,
+                    )
+                else:
+                    filter.add(
+                        search_filter,
+                        Q.OR,
+                    )
+
+            print(filter)
+
+            return qs.filter(filter).order_by("event")
+        except KeyError as e:
+            print(e)
+            return qs.order_by("event")
 
     serializer_class = serializers.SongsPageSerializer
-    permission_classes = permission_classes
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_class = SongsPageFilter
+    # permission_classes = permission_classes
+    # filter_backends = (DatatablesFilterBackend,)
+    # filterset_class = filters.SongsPageFilter
 
 
 class ContinentsViewSet(viewsets.ModelViewSet):

@@ -124,8 +124,6 @@ class Index(TemplateView):
             .order_by("song_num")
         )
 
-        print(context["latest_event"])
-
         return context
 
 
@@ -167,7 +165,55 @@ class Test(TemplateView):
     template_name = "databruce/test.html"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
-        return super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+
+        context["event"] = (
+            models.Setlists.objects.filter(event__tour=32)
+            .order_by("event__id")
+            .distinct("event__id")
+            .values("event")
+        )
+
+        context["songs"] = (
+            models.Setlists.objects.order_by("event__id", "song_num")
+            .filter(event__tour=32)
+            .exclude(
+                position__isnull=True,
+            )
+            .values("event", "position")
+            .distinct("event__id", "song_num", "position")
+            .annotate(
+                # show_opener=Case(
+                #     When(
+                #         Q(position="Show Opener"),
+                #         then=Subquery(
+                #             models.Songs.objects.filter(
+                #                 id=OuterRef("song"),
+                #             ).values(json=JSONObject(id="id", name="name")),
+                #         ),
+                #     ),
+                # ),
+                # show_closer=Case(
+                #     When(
+                #         Q(position="Show Closer"),
+                #         then=Subquery(
+                #             models.Songs.objects.filter(
+                #                 id=OuterRef("song"),
+                #             ).values(json=JSONObject(id="id", name="name")),
+                #         ),
+                #     ),
+                # ),
+                song=Subquery(
+                    models.Songs.objects.filter(
+                        id=OuterRef("song"),
+                    ).values(json=JSONObject(id="id", name="name")),
+                ),
+            )
+        )
+
+        print(context["songs"])
+
+        return context
 
 
 class Users(TemplateView):
@@ -516,7 +562,8 @@ class EventDetail(TemplateView):
         ).select_related("event", "setlist")
 
         snippets = (
-            models.Snippets.objects.select_related("snippet", "setlist")
+            models.Snippets.objects.order_by("position")
+            .select_related("snippet", "setlist")
             .filter(
                 setlist=OuterRef("pk"),
             )
@@ -544,21 +591,23 @@ class EventDetail(TemplateView):
             )
             .select_related("song", "event")
             .prefetch_related("ltp")
+        )
+
+        context["setlist"] = setlist.exclude(set_name="Soundcheck").order_by("song_num")
+
+        context["setlist_copy"] = (
+            setlist.exclude(set_name="Soundcheck")
             .order_by("song_num")
+            .values_list(
+                "song__name",
+                flat=True,
+            )
         )
 
-        context["setlist"] = setlist.exclude(set_name="Soundcheck")
-
-        context["setlist_copy"] = setlist.exclude(set_name="Soundcheck").values_list(
-            "song__name",
-            flat=True,
-        )
-
-        if "Soundcheck" in context["setlist"].values("set_name"):
-            context["soundcheck"] = models.Setlists.objects.filter(
-                event__id=context["event"].id,
-                set_name="Soundcheck",
-            ).select_related("song")
+        context["soundcheck"] = models.Setlists.objects.filter(
+            event__id=context["event"].id,
+            set_name="Soundcheck",
+        ).select_related("song")
 
         onstage = (
             models.Onstage.objects.filter(event=context["event"].id)
@@ -576,8 +625,6 @@ class EventDetail(TemplateView):
                 user=self.request.user.id,
                 event=self.kwargs["id"],
             ).exists()
-
-            print(context["user_attended"])
 
         context["user_count"] = models.UserAttendedShows.objects.filter(
             event=context["event"].id,
@@ -765,14 +812,6 @@ class SongDetail(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["songs"] = (
-            models.Songspagenew.objects.filter(
-                song=self.kwargs["id"],
-            )
-            .select_related("event")
-            .order_by("event", "num")
-        )
-
         context["song_info"] = (
             models.Songs.objects.filter(id=self.kwargs["id"])
             .prefetch_related(
@@ -786,18 +825,20 @@ class SongDetail(TemplateView):
         context["setlists"] = models.Setlists.objects.filter(
             song__id=self.kwargs["id"],
         ).annotate(
-            public_count=SubqueryCount(
+            public=SubqueryCount(
                 models.Setlists.objects.filter(
                     song=OuterRef("song"),
                     set_name__in=VALID_SET_NAMES,
                 ),
             ),
-            private_count=SubqueryCount(
+            private=SubqueryCount(
                 models.Setlists.objects.filter(
                     song=OuterRef("song"),
                 ).exclude(set_name__in=VALID_SET_NAMES),
             ),
         )
+
+        context["counts"] = context["setlists"].values("public", "private")[0]
 
         context["positions"] = (
             context["setlists"]
@@ -819,7 +860,7 @@ class SongDetail(TemplateView):
                 snippet=self.kwargs["id"],
             )
             .select_related("setlist", "setlist__event", "snippet", "setlist__song")
-            .order_by("setlist__event", "position")
+            .order_by("position")
         )
 
         filter = Q(event_certainty__in=["Confirmed", "Probable"])

@@ -1,6 +1,8 @@
 from django.db.models import Q
 from django_filters import rest_framework as filters
 
+from databruce import models
+
 
 class ArchiveFilter(filters.FilterSet):
     event = filters.CharFilter(field_name="event")
@@ -103,15 +105,17 @@ class ReleaseFilter(filters.FilterSet):
     type = filters.CharFilter(lookup_expr="icontains")
 
 
-class SongsPageFilter(filters.FilterSet):
-    id = filters.NumberFilter(
-        field_name="id",
+class SongsPageFilter(DatatablesFilterSet):
+    """Filter name, artist and genre by name with icontains"""
+
+    song = filters.NumberFilter(
+        field_name="song",
         lookup_expr="exact",
     )
-    date = filters.DateFilter(
-        field_name="current__event__date",
-        lookup_expr="icontains",
-    )
+
+    class Meta:
+        model = models.Songspagenew
+        fields = "__all__"
 
 
 class SetlistFilter(filters.FilterSet):

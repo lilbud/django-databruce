@@ -63,31 +63,39 @@ a:link,
     text-decoration: none !important;
 }
 
-[data-bs-theme="light"] a.update-link {
-    color: var(--primary-600) !important;
+a:hover,
+.btn-link:hover {
+    text-decoration: underline !important;
 }
 
-[data-bs-theme="dark"] a.update-link {
-    color: var(--primary-500) !important;
+[data-bs-theme="light"] {
+    #short-url, 
+    a.update-link,
+    .page-item:not(.active) > button.page-link {
+        color: var(--primary-600) !important;
+    }
+}
+
+[data-bs-theme="dark"] {
+    #short-url,
+    a.update-link,
+    .page-item:not(.active) > button.page-link {
+        color: var(--primary-500) !important;
+    }
 }
 
 .dropdown-item:active {
     background-color: var(--primary-500) !important;
 }
 
-a:hover,
-.btn-link:hover {
-    text-decoration: underline !important;
-}
-
 /* navbar stuff */
 .navbar {
     background-color: var(--primary-700) !important;
-}
 
-.navbar .nav-link {
-    color: var(--text-50) !important;
-    font-size: 0.875rem !important;
+    .nav-link {
+        color: var(--text-50) !important;
+        font-size: 0.875rem !important;
+    }
 }
 
 /* card */
@@ -106,11 +114,11 @@ a:hover,
 
 .card-body {
     overflow: clip !important;
-}
 
-.card-body :not(*),
-.card-body .table-responsive {
-    border-radius: var(--bs-border-radius) !important;
+    :not(*),
+    .table-responsive {
+        border-radius: var(--bs-border-radius) !important;
+    }
 }
 
 button.nav-link.active,
@@ -123,10 +131,6 @@ button.nav-link.active,
 .card-footer {
     padding: 0.5rem 0.75rem !important;
     border-bottom: none !important;
-}
-
-.card-header,
-.card-footer {
     font-size: 1rem !important;
 }
 
@@ -194,7 +198,6 @@ nav ul {
 
 button {
     vertical-align: middle !important;
-    /* color: var(--text-50) !important; */
     border: 0 !important;
 }
 
@@ -309,18 +312,6 @@ td .badge {
 
 .padded-body {
     min-height: calc(100vh - 5em) !important;
-}
-
-[data-bs-theme="light"] #short-url, 
-[data-bs-theme="light"] .update-link,
-[data-bs-theme="light"] .page-item:not(.active) > button.page-link {
-    color: var(--primary-600) !important;
-}
-
-[data-bs-theme="dark"] #short-url,
-[data-bs-theme="dark"] .update-link,
-[data-bs-theme="dark"] .page-item:not(.active) > button.page-link {
-    color: var(--primary-500) !important;
 }
 
 .dataTable {

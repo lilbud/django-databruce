@@ -1151,7 +1151,7 @@ class Setlists(models.Model):
         managed = False
         db_table = "setlists"
         verbose_name_plural = "setlists"
-        unique_together = (("event_id", "song_num", "set_name", "song_id"),)
+        # unique_together = (("event_id", "set_name", "song_id"),)
         ordering = ("-event_id", "song_num")
 
     def __str__(self) -> str:
@@ -1589,8 +1589,11 @@ class SiteUpdates(models.Model):
 
 class Songspagenew(models.Model):
     id = models.AutoField(primary_key=True)
+
     song = models.IntegerField(blank=True, null=True, db_column="song_id")
+
     num = models.IntegerField(blank=True, null=True, db_column="song_num")
+
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
@@ -1599,6 +1602,7 @@ class Songspagenew(models.Model):
         db_column="event_id",
         related_name="page_events",
     )
+
     artist = models.IntegerField(blank=True, null=True, db_column="artist_id")
     artist_name = models.TextField(blank=True, null=True)  # noqa: DJ001
     venue = models.IntegerField(blank=True, null=True, db_column="venue_id")

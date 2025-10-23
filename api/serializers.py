@@ -25,14 +25,14 @@ class BandsSerializer(serializers.ModelSerializer):
 class VenuesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Venues
-        fields = "__all__"
+        fields = ["id", "name"]
 
 
 class EventsSerializer(serializers.ModelSerializer):
     date = serializers.SerializerMethodField()
-    venue = serializers.SerializerMethodField()
-    artist = serializers.SerializerMethodField()
-    tour = serializers.SerializerMethodField()
+    # venue = VenuesSerializer()
+    # artist = BandsSerializer()
+    # tour = ToursSerializer()
 
     def get_date(self, obj):
         """Get event date, falling back to the event_id if no date."""
@@ -46,23 +46,10 @@ class EventsSerializer(serializers.ModelSerializer):
 
         return f"<a href='{reverse('event_details', kwargs={'id': obj.id})}'>{date}</a>"
 
-    def get_venue(self, obj):
-        name = obj.venue.name
-
-        if obj.venue.detail:
-            name = f"{obj.venue.name}, {obj.venue.detail}"
-
-        return f"<a href='{reverse('venue_details', kwargs={'id': obj.venue.id})}'>{name}</a>"
-
-    def get_artist(self, obj):
-        return obj.artist.name
-
-    def get_tour(self, obj):
-        return obj.tour.name
-
     class Meta:
         model = models.Events
-        fields = ["date", "venue", "artist", "tour"]
+        fields = ["date", "public"]
+        read_only_fields = fields
 
 
 class ArchiveLinksSerializer(serializers.ModelSerializer):
@@ -139,8 +126,6 @@ from django.utils.html import format_html
 
 
 class SongsSerializer(serializers.ModelSerializer):
-    first = EventsSerializer()
-    last = EventsSerializer()
     name = serializers.SerializerMethodField()
 
     def get_name(self, obj):
@@ -157,7 +142,8 @@ class SongsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Songs
-        fields = "__all__"
+        fields = ["id", "name"]
+        read_only_fields = fields
 
 
 class ReleaseTracksSerializer(serializers.ModelSerializer):
@@ -207,8 +193,45 @@ class TourLegsSerializer(serializers.ModelSerializer):
 
 
 class SongsPageSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    song = serializers.IntegerField()
+    num = serializers.IntegerField()
     event = EventsSerializer()
+    artist = serializers.IntegerField()
+    artist_name = serializers.CharField()
+    venue = serializers.IntegerField()
+    venue_name = serializers.CharField()
+    tour = serializers.IntegerField()
+    tour_name = serializers.CharField()
+    position = serializers.CharField()
+    gap = serializers.IntegerField()
+    set_name = serializers.CharField()
+    prev = serializers.IntegerField()
+    prev_name = serializers.CharField()
+    next = serializers.IntegerField()
+    next_name = serializers.CharField()
+    note = serializers.CharField()
 
     class Meta:
         model = models.Songspagenew
-        fields = "__all__"
+        fields = [
+            "id",
+            "song",
+            "num",
+            "event",
+            "artist",
+            "artist_name",
+            "venue",
+            "venue_name",
+            "tour",
+            "tour_name",
+            "position",
+            "gap",
+            "set_name",
+            "prev",
+            "prev_name",
+            "next",
+            "next_name",
+            "note",
+        ]
+        # read_only_fields = fields

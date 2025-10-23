@@ -9,7 +9,7 @@
  *
  * @returns {none} None, simply adds the dropdown.
  */
-function categorySelect(column, label, values) {
+function categorySelect(label, values) {
     var select = document.createElement('label');
     var btn_group = document.createElement('div');
     var btn = document.createElement('btn');
@@ -19,7 +19,7 @@ function categorySelect(column, label, values) {
     $(select).attr('for', 'select').addClass('me-2 text-sm my-auto').text(`${label}:`);
 
     // button group
-    $(btn_group).addClass('btn-group').attr('id', 'select');
+    $(btn_group).attr('id', 'select');
 
     // add label and button group to dropdown
     $('#dropdown-container').append(select).append(btn_group);
@@ -34,26 +34,10 @@ function categorySelect(column, label, values) {
     $('#select').append(btn).append(dropdown);
 
     for (let i in values) {
-        var item = document.createElement('a');
+        var item = document.createElement('btn');
 
-        $(item).addClass('dropdown-item dt-button').attr({'href': '#', 'value': values[i].value}).text(values[i].label);
+        $(item).addClass('btn dropdown-item dt-button').attr({'value': values[i].value}).text(values[i].label);
 
         $('#category-select').append(item);
-
-        $('#category-select .dropdown-item.dt-button').on('click', function() {
-            // removes active check from all buttons
-            $('#category-select .dropdown-item.dt-button').each(function() {
-                $('.check').remove();
-            });
-
-            // gets value attribute and searches last column
-            column.search($(this).attr('value'), {regex: true}).draw();
-
-            // sets button text to selected
-            $('#category-select-btn').text($(this).text());
-
-            // adds check to actively filtered value
-            $(this).append('<div class="float-end check">✓</div>');
-        });
     };
-}
+};

@@ -15,7 +15,7 @@
     <div class="row">
       <div class="col">
         <div class="text-lg">
-          <div class="d-grid gap-0 row-gap-2">
+          <div class="d-grid gap-0 row-gap-1">
             {% if song_info.album %}
               <div class="row">
                 <div class="fw-semibold">Album</div>
@@ -27,6 +27,34 @@
             <div class="row">
               <div class="fw-semibold">Original Artist</div>
               <div>{{ song_info.original_artist }}</div>
+            </div>
+            <div class="row">
+              <div class="col col-lg-1">
+                <div class="fw-semibold">
+                  Public:
+                  <i class="bi bi-info-circle-fill"
+                     data-bs-toggle="tooltip"
+                     data-bs-html="true"
+                     data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
+                </div>
+                <div>{{ counts.public }}</div>
+              </div>
+              <div class="col col-lg-1">
+                <div class="fw-semibold">
+                  Private:
+                  <i class="bi bi-info-circle-fill"
+                     data-bs-toggle="tooltip"
+                     data-bs-html="true"
+                     data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
+                </div>
+                <div>{{ counts.private }}</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="fw-semibold">Last Played:</div>
+              <div>
+                <a href="{% url "event_details" id=song_info.last.id %}">{{ song_info.last.get_date }}</a>
+              </div>
             </div>
           </div>
         </div>
@@ -88,7 +116,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
                           </div>
-                          <div class="text-xl">{{ setlists.public_count }}</div>
+                          <div class="text-xl">{{ counts.public }}</div>
                         </div>
                       </div>
                     </div>
@@ -102,7 +130,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
                           </div>
-                          <div class="text-xl">{{ setlists.private_count }}</div>
+                          <div class="text-xl">{{ counts.private }}</div>
                         </div>
                       </div>
                     </div>
@@ -179,12 +207,10 @@
                       <th class="min-tablet-l text-nowrap" scope="col">Public</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  {% comment %} <tbody>
                     {% for song in songs %}
                       <tr>
-                        <td class="text-nowrap"
-                            data-sort="{{ song.event.get_date }}"
-                            data-filter="{{ song.event.get_date }}">
+                        <td class="text-nowrap" data-sort="{{ song.event.get_date }}" data-filter="{{ song.event.get_date }}">
                           <a href="{% url "event_details" id=song.event.id %}">{{ song.event.get_date }}</a>
                         </td>
                         <td class="text-nowrap">
@@ -215,7 +241,7 @@
                         <td class="text-nowrap">{{ song.event.public }}</td>
                       </tr>
                     {% endfor %}
-                  </tbody>
+                  </tbody> {% endcomment %}
                 </table>
               </div>
             </div>
@@ -366,22 +392,113 @@
     });
 
     $(document).ready(function () {
-      new DataTable('#songTable', {
-        layout: getDatatableLayout([1,2,3,4,5,6,7,8]),
-        pageLength: 50,
-        columnDefs: [{ target: -1, visible: false },{ targets: [0], type: 'date' },],
-        initComplete: function () {
-          this.api()
-          .columns([-1])
-            .every(function () {
-              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+      var table = $('#songTable').DataTable(
+        {
+          layout: getDatatableLayout([0,1,2,3,4,5,6,7,8]),
+          serverSide: true,
+          processing: true,
+          ajax: {
+            'url': '/api/v1/songspage/?song={{ song_info.id }}&format=datatables&keep=prev_name,next_name,venue_name,artist_name,tour_name,public',
+          },
+          columnDefs: [
+            { "defaultContent": "", "type": 'text', "targets": [1,2,3,4,6,7,8,9] },
+            { target: -1, visible: false },
+            { targets: [0], type: 'date' },
+            { targets: [5], type: 'num' },
+          ],
+          columns: [
+            {'data': 'event.date', 'name': 'event__date'},
+            {
+              'data': 'artist',
+              'name': 'artist_name',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return '<a href="/bands/' + row.artist + '">'+ row.artist_name +'</a>';
+                  } else if (type == 'filter') {
+                    return 'artist_name';
+                  };
+              },
+            },
+            {
+              'data': 'venue',
+              'name': 'venue_name',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return '<a href="/venues/' + row.venue + '">'+ row.venue_name +'</a>';
+                  } else if (type == 'filter') {
+                    return 'venue_name';
+                  };
+              },
+            },
+            {
+              'data': 'tour',
+              'name': 'tour_name',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return '<a href="/tours/' + row.tour + '">'+ row.tour_name +'</a>';
+                  } else if (type == 'filter') {
+                    return 'tour_name';
+                  };
+              },
+            },
+            {'data': 'position', 'name': 'position'},
+            {'data': 'gap', 'name': 'gap' },
+            {'data': 'set_name', 'name': 'set_name'},
+            {
+              'data': 'prev',
+              'name': 'prev_name',
+              'render': function (data, type, row, meta) {
+                  if (data != null) {
+                    if (type === 'display') {
+                      return '<a href="/songs/' + row.prev + '">'+ row.prev_name +'</a>';
+                    } else if (type == 'filter') {
+                      return 'prev_name';
+                    };
+                  };
+              },
+            },
+            {
+              'data': 'next',
+              'name': 'next_name',
+              'render': function (data, type, row, meta) {
+                  if (data != null) {
+                    if (type === 'display') {
+                      return '<a href="/songs/' + row.next + '">'+ row.next_name +'</a>';
+                    } else if (type == 'filter') {
+                      return 'next_name';
+                    };
+                  };
+              },
+            },
+            {'data': 'note', 'name': 'note'},
+            {'data': 'event.public', 'name': 'event.public'},
+          ],
+          
+          initComplete: function (settings, json) {
+            categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+          
+            $('#category-select .dropdown-item.dt-button').on('click', function() {
+              table.column(-1).search($(this).attr('value'), {regex: true}).draw();
+
+              // remove checks from all items
+              $(this).parent().find('.dropdown-item').each(function(){
+                $('.check').remove();
+              });
+
+              // set select text to current value
+              $('#category-select-btn').text($(this).text());
+
+              // add check to selected
+              $(this).append('<div class="float-end check">✓</div>');
             });
-        },
-      });
+          },
+        }
+      );
 
       new DataTable('#snippetTable', {
         layout: getDatatableLayout(),
       });
+
     });
   </script>
 {% endblock content %}
