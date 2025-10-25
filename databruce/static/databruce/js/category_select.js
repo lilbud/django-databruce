@@ -1,5 +1,5 @@
 /**
- * Create category selector for datatable filtering.
+ * Create category selector for filtering datatables.
  * Created this to simplify adding a category selector to tables,
  * rather than having to manually add the code on each.
  *
