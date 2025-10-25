@@ -1,8 +1,13 @@
 import json
 
+from django.core.exceptions import FieldError
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
+from querystring_parser import parser
+from rest_framework import filters as dj_filters
 from rest_framework import permissions, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
 
 from api import filters, serializers
 from databruce import models
@@ -54,16 +59,8 @@ class CitiesViewSet(viewsets.ModelViewSet):
     ordering = ["name", "first", "last"]
 
 
-from django.core.exceptions import FieldError
-from django.db.models import Q
-from rest_framework import filters as dj_filters
-from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
-
-
 class SongsPageViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
-
-    from querystring_parser import parser
 
     def create_filter(
         self,
@@ -97,7 +94,7 @@ class SongsPageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         filter = Q()
-        post_dict = self.parser.parse(self.request.GET.urlencode())
+        post_dict = parser.parse(self.request.GET.urlencode())
 
         song = post_dict.get("song")
 
