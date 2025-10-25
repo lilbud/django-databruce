@@ -34,10 +34,27 @@ function categorySelect(label, values) {
     $('#select').append(btn).append(dropdown);
 
     for (let i in values) {
-        var item = document.createElement('btn');
+        var item = document.createElement('a');
 
-        $(item).addClass('btn dropdown-item dt-button').attr({'value': values[i].value}).text(values[i].label);
+        $(item).addClass('dropdown-item dt-button pe-auto').attr({'value': values[i].value, 'href':'#'}).text(values[i].label);
 
         $('#category-select').append(item);
     };
 };
+
+function categorySearch(column) {
+    $('#category-select .dropdown-item.dt-button').on('click', function() {
+        column.search($(this).attr('value'), {regex: true}).draw();
+
+        // remove checks from all items
+        $(this).parent().find('.dropdown-item').each(function(){
+            $('.check').remove();
+        });
+
+        // set select text to current value
+        $('#category-select-btn').text($(this).text());
+
+        // add check to selected
+        $(this).append('<div class="float-end check">✓</div>');
+    });
+}

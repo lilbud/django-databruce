@@ -475,21 +475,12 @@
           ],
           
           initComplete: function (settings, json) {
-            categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+            categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]);
           
-            $('#category-select .dropdown-item.dt-button').on('click', function() {
-              table.column(-1).search($(this).attr('value'), {regex: true}).draw();
-
-              // remove checks from all items
-              $(this).parent().find('.dropdown-item').each(function(){
-                $('.check').remove();
-              });
-
-              // set select text to current value
-              $('#category-select-btn').text($(this).text());
-
-              // add check to selected
-              $(this).append('<div class="float-end check">✓</div>');
+            this.api()
+            .columns([6])
+            .every(function () {
+              categorySearch(this);
             });
           },
         }

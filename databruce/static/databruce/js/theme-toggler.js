@@ -48,7 +48,7 @@
 
     btnToActive.classList.add('active')
     btnToActive.setAttribute('aria-pressed', 'true')
-    activeThemeIcon.className = `${iconOfActiveBtn} my-1 theme-icon-active`
+    activeThemeIcon.className = `bi bi-circle-half my-1 theme-icon-active`
     const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
     themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
 

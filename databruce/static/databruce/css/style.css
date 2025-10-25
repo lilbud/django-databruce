@@ -52,11 +52,49 @@
 }
 
 body {
+    background-color: var(--base-100);
+    color: var(--base-content) !important;
     font-size: 0.75rem !important;
     font-family: "Rubik", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+    border-color: inherit !important;
 }
+
+.card {
+    border-color: var(--base-200) !important;
+}
+
+.card-body,
+th,
+td,
+.modal-body,
+.list-group-item {
+    background-color: var(--base-200) !important;
+    color: var(--base-content) !important;
+    border-color: var(--base-300) !important;
+}
+
+.card-header,
+#stats .row .card-body,
+.modal-header {
+    background-color: var(--base-300) !important;
+    color: var(--base-content) !important;
+    border-color: var(--base-300) !important;
+}
+
+.dropdown-menu {
+    background-color: var(--base-300) !important;
+    
+    .dropdown-item {
+        color: var(--base-content) !important;
+    }
+}
+
+/* .dtb-collection-closeable {
+    background-color: var(--neutral) !important;
+    color: var(--neutral-content) !important;
+} */
 
 a:link,
 .btn-link {
@@ -68,34 +106,60 @@ a:hover,
     text-decoration: underline !important;
 }
 
-[data-bs-theme="light"] {
-    #short-url, 
-    a.update-link,
-    .page-item:not(.active) > button.page-link {
-        color: var(--primary-600) !important;
-    }
+.navbar {
+    border-bottom: none !important;
 }
 
-[data-bs-theme="dark"] {
-    #short-url,
-    a.update-link,
-    .page-item:not(.active) > button.page-link {
-        color: var(--primary-500) !important;
-    }
+.progress {
+    background-color: var(--base-300) !important;
 }
 
-.dropdown-item:active {
-    background-color: var(--primary-500) !important;
+.navbar,
+.progress-bar,
+button.nav-link.active,
+.dropdown-item:hover,
+.dropdown-item.active,
+.list-group-item.active,
+.ui-state-active:hover,
+.ui-state-active,
+.ui-button:active,
+.btn-primary,
+.page-item > button.page-link,
+.navbar .nav-item {
+    background-color: var(--primary) !important;
+    color: var(--primary-content) !important;
+}
+
+.navbar .nav-link,
+.progress-bar,
+button.nav-link:not(.active, #bd-theme),
+.navbar .btn,
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item.active,
+button#addshow.active,
+button#usercount.active,
+.btn-primary,
+.page-item > button.page-link {
+    color: var(--primary-content) !important;
+}
+
+.form-select {
+    height: 31px !important; /* stupid, but apparently needed because select2 fields are bigger for no reason */
+}
+
+.form-control, .form-select {
+    background-color: var(--base-300) !important;
+    color: var(--base-content) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.form-control::placeholder {
+    color: var(--base-content) !important;
 }
 
 /* navbar stuff */
-.navbar {
-    background-color: var(--primary-700) !important;
-
-    .nav-link {
-        color: var(--text-50) !important;
-        font-size: 0.875rem !important;
-    }
+.navbar .nav-link {
+    font-size: 0.875rem !important;
 }
 
 /* card */
@@ -108,20 +172,16 @@ a:hover,
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
+.card-header {
+    border-color: var(--base-300) !important;
+}
+
 .card {
     border-radius: var(--bs-border-radius) !important;
+    border-color: var(--base-300) !important;
+    background-color: transparent;
 }
 
-.card-body {
-    overflow: clip !important;
-
-    :not(*),
-    .table-responsive {
-        border-radius: var(--bs-border-radius) !important;
-    }
-}
-
-button.nav-link.active,
 .card-header,
 .card-footer {
     font-weight: 600 !important;
@@ -130,7 +190,7 @@ button.nav-link.active,
 .card-header,
 .card-footer {
     padding: 0.5rem 0.75rem !important;
-    border-bottom: none !important;
+    /* border-bottom: none !important; */
     font-size: 1rem !important;
 }
 
@@ -143,18 +203,13 @@ button.nav-link {
     font-size: 0.875rem !important;
 }
 
-.progress-bar {
-    background-color: var(--primary-600) !important;
-    color: var(--text-50) !important;
-}
-
-button.nav-link.active {
-    background-color: var(--primary-600) !important;
-}
-
 button.nav-link:not(.active, #bd-theme) {
-    background-color: var(--background-500) !important;
-    color: var(--text-50) !important;
+    background-color: var(--base-content) !important;
+    /* color: var(--base-content) !important; */
+}
+
+.dtsb-searchBuilder {
+	color: var(--base-content) !important;
 }
 
 #year-select .dropdown-menu {
@@ -165,12 +220,8 @@ button.nav-link:not(.active, #bd-theme) {
 .badge:hover,
 .dropdown-toggle:hover,
 .nav-link:hover,
-.btn:hover {
+.btn:not(.dropdown-item):hover {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
-}
-
-.navbar .btn {
-    color: var(--text-50) !important;
 }
 
 @media (max-width: 1280px) {
@@ -187,8 +238,6 @@ nav ul {
 .dropdown-menu .dropdown-item:hover,
 .dropdown-menu .dropdown-item.active
 {
-    background-color: var(--primary-600) !important;
-    color: var(--text-50) !important;
     text-decoration: none !important;
 }
 
@@ -201,12 +250,14 @@ button {
     border: 0 !important;
 }
 
-button#addshow.active {
-    background-color: var(--accent-500) !important;
+button#usercount {
+    pointer-events: none !important;
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
+button#addshow.active,
 button#usercount.active {
-    background-color: var(--accent-600) !important;
+    background-color: var(--accent) !important;
 }
 
 .badge .bi,
@@ -229,8 +280,7 @@ th .bi {
 }
 
 .list-group-item.active {
-    background-color: var(--primary-700) !important;
-    border-color: var(--primary-700) !important;
+    border-color: var(--primary-content) !important;
 }
 
 ul.nav-pills>.nav-link:not(:last-child) {
@@ -256,8 +306,7 @@ ul.nav-pills>.nav-link:last-child {
 .ui-state-active:hover,
 .ui-state-active,
 .ui-button:active {
-    background-color: var(--primary-700) !important;
-    border-color: var(--primary-700) !important;
+    border-color: var(--primary-content) !important;
 }
 
 .ui-widget.ui-widget-content {
@@ -278,7 +327,8 @@ td .badge {
     font-size: 0.75rem !important;
 }
 
-.card-body:has(.table) {
+.card-body,
+td {
     overflow: clip !important;
 }
 
@@ -295,9 +345,7 @@ td .badge {
 }
 
 .btn-primary {
-    background-color: var(--primary-600) !important;
-    color: var(--text-50) !important;
-    border: 0px solid !important;
+    border-color: var(--base-300) !important;
 }
 
 .footer {
@@ -326,6 +374,5 @@ td .badge {
 }
 
 .page-item.active > button.page-link {
-    background-color: var(--primary-600) !important;
-    color: var(--text-50) !important;
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.3);
 }

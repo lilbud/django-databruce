@@ -29,7 +29,7 @@
                 <td>{{ item.created_at|date:'Y-m-d' }}</td>
                 <td>
                   {% if item.view %}
-                    {{ item.msg }} <a class="text-reset update-link"
+                    {{ item.msg }} <a class="text-reset fw-medium"
     href="{% url item.view id=item.item_id %}">{{ item.value }}</a>
                   {% else %}
                     {{ item.msg }}

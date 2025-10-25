@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between mb-3">
       <div class="text-2xl">Events</div>
       <div class="float-end" id="year-select">
-        <button class="btn btn-primary dropdown-toggle"
+        <button class="btn btn-sm btn-primary dropdown-toggle"
                 type="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false">{{ year }}</button>
@@ -98,10 +98,12 @@
         { targets: [-1], visible: false },
       ],
       initComplete: function () {
+        categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+
         this.api()
           .columns([-1])
           .every(function () {
-            categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+            categorySearch(this);
           });
       },
     });

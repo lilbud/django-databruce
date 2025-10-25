@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" data-bs-theme="synthwave">
   <head>
     {% load i18n %}
     {% load static %}
@@ -308,7 +308,7 @@
                         aria-expanded="false">Profile</button>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>
-                    <div class="text-sm px-4 py-1">
+                    <div class="text-sm px-4 py-1 dropdown-item pe-none">
                       Hello {{ user }}
                       {% if user.is_superuser %}
                         (Admin)
@@ -366,7 +366,6 @@
                           class="dropdown-item d-flex align-items-center active"
                           data-bs-theme-value="light"
                           aria-pressed="true">
-                    <i class="bi bi-sun-fill me-2" aria-hidden="true"></i>
                     Light
                     <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
                   </button>
@@ -376,8 +375,16 @@
                           class="dropdown-item d-flex align-items-center"
                           data-bs-theme-value="dark"
                           aria-pressed="false">
-                    <i class="bi bi-moon-stars-fill me-2" aria-hidden="true"></i>
                     Dark
+                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
+                  </button>
+                </li>
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center"
+                          data-bs-theme-value="synthwave"
+                          aria-pressed="false">
+                    Synthwave
                     <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
                   </button>
                 </li>
@@ -386,7 +393,6 @@
                           class="dropdown-item d-flex align-items-center"
                           data-bs-theme-value="auto"
                           aria-pressed="false">
-                    <i class="bi bi-circle-half me-2" aria-hidden="true"></i>
                     Auto
                     <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
                   </button>

@@ -80,10 +80,12 @@
         { targets: [1], orderable: false },
       ],
       initComplete: function () {
+        categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Originals', 'value': 'Originals'}, {'label': 'Covers', 'value': 'Covers'}]);
+
         this.api()
           .columns([3])
           .every(function () {
-              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Originals', 'value': 'Originals'}, {'label': 'Covers', 'value': 'Covers'}]);
+            categorySearch(this);
           });
       },
     });

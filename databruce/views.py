@@ -1057,14 +1057,19 @@ class TourDetail(TemplateView):
         )
 
         if context["songs"].count() > 0:
-            slots = models.Setlists.objects.filter(
-                event__tour__id=context["tour"].id,
-                set_name__in=VALID_SET_NAMES,
-                position__isnull=False,
-            )
+            # slots = models.Setlists.objects.filter(
+            #     event__tour__id=context["tour"].id,
+            #     set_name__in=VALID_SET_NAMES,
+            #     position__isnull=False,
+            # )
 
             context["slots"] = (
-                slots.exclude(position=None)
+                models.Setlists.objects.filter(
+                    event__tour__id=context["tour"].id,
+                    set_name__in=VALID_SET_NAMES,
+                    position__isnull=False,
+                )
+                .exclude(position=None)
                 .values("event__id")
                 .annotate(
                     show_opener_id=Min(
@@ -1167,7 +1172,9 @@ class TourDetail(TemplateView):
                 .order_by("event")
             )
 
-            context["sets"] = slots.values_list("position")
+            print(context["slots"])
+
+            context["sets"] = context["slots"].values_list("position")
 
         return context
 
@@ -1268,7 +1275,7 @@ class AdvancedSearch(View):
         form = self.form_class()
 
         setlist_formset = self.formset_class(
-            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "0"},
+            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "1"},
         )
 
         return render(
@@ -1354,70 +1361,76 @@ class AdvancedSearchResults(View):
 
         if formset.is_valid():
             for form in formset.cleaned_data:
-                song1 = models.Songs.objects.get(id=form["song1"]).name
+                try:
+                    song1 = models.Songs.objects.get(id=form["song1"]).name
 
-                setlist_filter = Q(set_name__in=VALID_SET_NAMES)
+                    setlist_filter = Q(set_name__in=VALID_SET_NAMES)
 
-                match form["position"]:
-                    case "Followed By":
-                        song2 = models.Songs.objects.get(id=form["song2"]).name
+                    match form["position"]:
+                        case "Followed By":
+                            song2 = models.Songs.objects.get(id=form["song2"]).name
 
-                        setlist_filter &= Q(song=form["song1"])
-                        setlist_filter &= self.check_field_choice(
-                            form["choice"],
-                            Q(next=form["song2"]),
-                        )
+                            setlist_filter &= Q(song=form["song1"])
+                            setlist_filter &= self.check_field_choice(
+                                form["choice"],
+                                Q(next=form["song2"]),
+                            )
 
-                        song_results.append(
-                            f"{song1} ({form['choice']} followed by) {song2}",
-                        )
+                            song_results.append(
+                                f"{song1} ({form['choice']} followed by) {song2}",
+                            )
 
-                    case "Anywhere":
-                        song_events = queryset.filter(
-                            song=form["song1"],
-                            set_name__in=VALID_SET_NAMES,
-                        ).select_related("event")
+                        case "Anywhere":
+                            song_events = queryset.filter(
+                                song=form["song1"],
+                                set_name__in=VALID_SET_NAMES,
+                            ).select_related("event")
 
-                        setlist_filter &= self.check_field_choice(
-                            form["choice"],
-                            Q(event__id__in=song_events.values("event__id")),
-                        )
+                            setlist_filter &= self.check_field_choice(
+                                form["choice"],
+                                Q(event__id__in=song_events.values("event__id")),
+                            )
 
-                        song_results.append(
-                            f"{song1} ({form['choice']} anywhere)",
-                        )
-                    case _:
-                        # all others except anywhere and followed by
-                        setlist_filter &= Q(song=form["song1"])
-                        setlist_filter &= self.check_field_choice(
-                            form["choice"],
-                            Q(position=form["position"]),
-                        )
+                            song_results.append(
+                                f"{song1} ({form['choice']} anywhere)",
+                            )
+                        case _:
+                            # all others except anywhere and followed by
+                            setlist_filter &= Q(song=form["song1"])
+                            setlist_filter &= self.check_field_choice(
+                                form["choice"],
+                                Q(position=form["position"]),
+                            )
 
-                        song_results.append(
-                            f"{song1} ({form['choice']} {form['position']})",
-                        )
+                            song_results.append(
+                                f"{song1} ({form['choice']} {form['position']})",
+                            )
 
-                qs = queryset.filter(
-                    setlist_filter,
-                )
+                    qs = queryset.filter(
+                        setlist_filter,
+                    )
 
-                event_results.append(list(qs.values_list("event__id", flat=True)))
+                    event_results.append(list(qs.values_list("event__id", flat=True)))
 
-        match data["conjunction"]:
-            case "or":
-                setlist_event_filter.add(
-                    Q(id__in=list(set.union(*map(set, event_results)))),
-                    Q.OR,
-                )
+                    match data["conjunction"]:
+                        case "or":
+                            setlist_event_filter.add(
+                                Q(id__in=list(set.union(*map(set, event_results)))),
+                                Q.OR,
+                            )
 
-            case "and":
-                setlist_event_filter.add(
-                    Q(
-                        id__in=list(set.intersection(*map(set, event_results))),
-                    ),
-                    Q.AND,
-                )
+                        case "and":
+                            setlist_event_filter.add(
+                                Q(
+                                    id__in=list(
+                                        set.intersection(*map(set, event_results))
+                                    ),
+                                ),
+                                Q.AND,
+                            )
+
+                except ValueError:
+                    break
 
         result = (
             models.Events.objects.filter(

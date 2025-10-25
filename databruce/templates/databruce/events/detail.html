@@ -59,13 +59,13 @@
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
-                      <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge bg-primary-700 fw-medium">{{ event.tour }}</span></a>
+                      <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge bg-primary fw-medium">{{ event.tour }}</span></a>
                     {% endif %}
                     {% if event.leg %}
-                      <a class="pe-1" href="{% url "leg_details" id=event.leg.id %}"><span class="badge bg-primary-700 fw-medium">{{ event.leg }}</span></a>
+                      <a class="pe-1" href="{% url "leg_details" id=event.leg.id %}"><span class="badge bg-primary fw-medium">{{ event.leg }}</span></a>
                     {% endif %}
                     {% if event.run %}
-                      <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge bg-primary-700 fw-medium">{{ event.run }}</span></a>
+                      <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge bg-primary fw-medium">{{ event.run }}</span></a>
                     {% endif %}
                   </div>
                   {% if event.brucebase_url or nugs %}
@@ -97,20 +97,22 @@
                       <input type="hidden" name="event" value="{{ event.id }}">
                       <input type="hidden" name="user" value="{{ user.id }}">
                       {% csrf_token %}
-                      <div class="btn-group" role="group" aria-label="Basic example">
+                      <div class="btn-group input-group input-group-sm"
+                           role="group"
+                           aria-label="Basic example">
                         <button id="addshow"
                                 type="submit"
                                 name="submit"
-                                class="btn btn-sm btn-secondary text-nowrap {% if event.id in user_shows %}active{% endif %}">
+                                class="btn btn-sm text-nowrap {% if user_attended %}btn-primary active{% else %}btn-secondary{% endif %}">
                           <span class="pe-1" id="star">
-                            {% if event.id in user_shows %}
+                            {% if user_attended %}
                               <i class="bi bi-star-fill"></i>
                             {% else %}
                               <i class="bi bi-star"></i>
                             {% endif %}
                           </span>
                           <span id="attended">
-                            {% if event.id in user_shows %}
+                            {% if user_attended %}
                               Attended
                             {% else %}
                               Attended?
@@ -119,8 +121,10 @@
                         </button>
                         <button type="button"
                                 id="usercount"
-                                class="btn btn-sm btn-secondary {% if event.id in user_shows %}active{% endif %}"
-                                disabled>{{ user_count|default_if_none:"0" }}</button>
+                                class="btn btn-sm btn-secondary {% if user_attended %}active{% endif %}">
+                          {{ user_count|default_if_none:"0" }}
+                        </button>
+                        {% comment %} <span class="input-group-text" id="usercount">{{ user_count|default_if_none:"0" }}</span> {% endcomment %}
                       </div>
                     </form>
                   {% endif %}
@@ -165,15 +169,15 @@
                           data-bs-html="true"
                           data-bs-title="Setlist Options">
                       <a role="button"
-                         class="btn btn-sm btn-primary"
+                         class="btn btn-sm btn-primary px-1 py-0"
                          data-bs-toggle="collapse"
                          href="#options">
-                        <i class="bi bi-sliders"></i>
+                        <i class="bi bi-gear-fill text-sm"></i>
                       </a>
                     </span>
                   </div>
                   <div class="row mx-auto">
-                    <div class="collapse px-0 mt-2" id="options">
+                    <div class="row collapse px-0 mt-2" id="options">
                       <div class="row mb-2">
                         <div class="col">
                           <div class="form-check-reverse form-switch">
@@ -206,7 +210,7 @@
                           <th class="all songnum text-nowrap text-center">#</th>
                           <th class="all text-nowrap">
                             Song
-                            {% comment %} <a id="copySetlist" href="#" class="text-reset text-primary-500 ms-4">Copy Setlist</a> {% endcomment %}
+                            {% comment %} <a id="copySetlist" href="#" class="text-reset text-primary ms-4">Copy Setlist</a> {% endcomment %}
                           </th>
                           {% if event.tour.id != 49 %}
                             <th class="min-tablet-l text-nowrap text-center">
@@ -225,6 +229,7 @@
                         {% if soundcheck %}
                           <tr class="text-center">
                             <td class="setHeader soundcheck" colspan="5">Soundcheck</td>
+                            <td class="d-none"></td>
                             <td class="d-none"></td>
                             <td class="d-none"></td>
                             <td class="d-none"></td>
@@ -276,14 +281,9 @@
                                                   onclick="show_note({{ song.id }})"
                                                   data-bs-toggle="tooltip"
                                                   data-bs-title="Show Note">
-                                            <i class="bi bi-sticky-fill text-body text-sm"></i>
+                                            <i class="bi bi-sticky-fill text-primary text-sm"></i>
                                           </button>
                                         {% endif %}
-                                        {% comment %} {% if song.snippet_list %}
-                                          <button class="btn btn-link p-0 m-0 text-sm" onclick="show_snippet({{ song.id }})" data-bs-toggle="tooltip" data-bs-title="Show Snippets">
-                                            <i class="bi bi-music-note-beamed text-body text-sm"></i>
-                                          </button>
-                                        {% endif %} {% endcomment %}
                                       </div>
                                     </span>
                                   </div>
@@ -298,7 +298,7 @@
                                   <td class="text-nowrap text-center {% if notes %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
                                       id="gap">
                                     {% if song.debut and not song.premiere %}
-                                      <span class="badge bg-primary-700"
+                                      <span class="badge bg-primary"
                                             data-bs-toggle="tooltip"
                                             data-bs-title="Tour Debut">
                                         {% if song.last %}{{ song.last }}, TD{% endif %}
@@ -306,7 +306,7 @@
                                     {% elif song.last >= 50 %}
                                       <span data-bs-toggle="tooltip"
                                             data-bs-title="≥50 shows since last played"
-                                            class="badge bg-primary-700">{{ song.last }}, Bustout</span>
+                                            class="badge bg-primary">{{ song.last }}, Bustout</span>
                                     {% elif song.premiere %}
                                       <span class="fw-normal">First</span>
                                     {% else %}
@@ -318,11 +318,11 @@
                                       {% if song.tour_num == song.tour_total and song.tour_total == 1 %}
                                         <span data-bs-toggle="tooltip"
                                               data-bs-title="Only Tour Performance"
-                                              class="badge bg-secondary-700">{{ song.tour_num }} of {{ song.tour_total }}</span>
+                                              class="badge bg-secondary">{{ song.tour_num }} of {{ song.tour_total }}</span>
                                       {% elif song.tour_num == song.tour_total and song.tour_total > 1 %}
                                         <span data-bs-toggle="tooltip"
                                               data-bs-title="Final Tour Performance"
-                                              class="badge bg-accent-500">{{ song.tour_num }} of {{ song.tour_total }}</span>
+                                              class="badge bg-accent">{{ song.tour_num }} of {{ song.tour_total }}</span>
                                       {% else %}
                                         {{ song.tour_num }} of {{ song.tour_total }}
                                       {% endif %}
@@ -336,39 +336,6 @@
                                 {% endif %}
                               </tr>
                             {% endwith %}
-                            {% comment %} {% if song.snippet_list %}
-                              <tr class="text-center">
-                                <td id="snippet-head_{{ song.id }}" class="d-none no-col-control" colspan="5">Snippets</td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                              </tr>
-                              {% for snippet in song.snippet_list %}
-                                <tr id="snippet-row_{{ song.id }}" class="d-none snippet-row_{{ snippet.setlist }}">
-                                  <td id="snippetnum" class="text-sm songnum text-center no-col-control">{{ snippet.position }}</td>
-                                  <td colspan="4" class="no-col-control">
-                                    <span class="text-sm fw-medium">
-                                      <a href="{% url "song_details" id=snippet.id %}">{{ snippet.name }}</a>
-                                    </span>
-                                    {% if snippet.note %}
-                                      <br>
-                                      <span class="text-xs">{{ snippet.note }}</span>
-                                    {% endif %}
-                                  </td>
-                                  <td class="d-none"></td>
-                                  <td class="d-none"></td>
-                                  <td class="d-none"></td>
-                                </tr>
-                              {% endfor %}
-                              <tr class="text-center">
-                                <td id="snippet-foot_{{ song.id }}" class="d-none no-col-control" colspan="5"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                              </tr>
-                            {% endif %} {% endcomment %}
                           {% endfor %}
                         {% endfor %}
                       </tbody>
