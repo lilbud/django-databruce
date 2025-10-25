@@ -159,7 +159,9 @@ REST_FRAMEWORK = {
         "rest_framework_datatables.filters.DatatablesFilterBackend",
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework_datatables.pagination.DatatablesPageNumberPagination",
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAdminUser"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+    ],
     "PAGE_SIZE": 50,
 }
 
