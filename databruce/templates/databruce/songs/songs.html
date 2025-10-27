@@ -72,22 +72,16 @@
 {% block scripts %}
   <script>
   $(document).ready(function () {
+    var layout = getDatatableLayout([1,2,3,4,5,6,7,8]);
+    dtCategorySelect(layout, 3, [{'label': 'All', 'value': '.*'}, {'label': 'Originals', 'value': 'Originals'}, {'label': 'Covers', 'value': 'Covers'}])
+
     new DataTable('#songsTable', {
-      layout: getDatatableLayout([1, 2, 3, 4, 5, 6, 7, 8]),
+      layout: layout,
       columnDefs: [
         { type: 'date', targets: [4, 5] },
         { targets: [6,7,8], width: "1rem" },
         { targets: [1], orderable: false },
       ],
-      initComplete: function () {
-        categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Originals', 'value': 'Originals'}, {'label': 'Covers', 'value': 'Covers'}]);
-
-        this.api()
-          .columns([3])
-          .every(function () {
-            categorySearch(this);
-          });
-      },
     });
   });
   </script>

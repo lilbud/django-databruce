@@ -1167,6 +1167,34 @@ class Setlists(models.Model):
 
         return ""
 
+    VALID_SET_NAMES = [
+        "Show",
+        "Set 1",
+        "Set 2",
+        "Encore",
+        "Pre-Show",
+        "Post-Show",
+    ]
+
+    def get_prev(self) -> str:
+        return (
+            Setlists.objects.select_related("song", "event")
+            .filter(
+                song=self.song.id,
+                set_name__in=self.VALID_SET_NAMES,
+            )
+            .exclude(id=self.id)
+            .order_by("event", "song_num")
+            .values("event")
+            .last()
+        )
+
+    def get_gap(self) -> int:
+        return SongGaps.objects.get(id=self.id).last
+
+    def get_tour_count(self) -> dict:
+        return TourCounts.objects.filter(id=self.id).values("num", "total")
+
 
 class SetlistsBySetAndDate(models.Model):
     id = models.AutoField(primary_key=True)
@@ -1222,10 +1250,25 @@ class Snippets(models.Model):
 
 
 class SongGaps(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        to_field="id",
+        db_column="event_id",
+        related_name="event",
+    )
     event_num = models.IntegerField(blank=True, default=None)
     last = models.TextField(blank=True, default=None)
     next = models.TextField(blank=True, default=None)
-    last_time_played = models.TextField(blank=True, default=None)
+
+    last_show = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        to_field="id",
+        related_name="last_event",
+        db_column="last_time_played",
+    )
 
     class Meta:
         managed = False  # Created from a view. Don't remove.
@@ -1621,3 +1664,16 @@ class Songspagenew(models.Model):
     class Meta:
         managed = False
         db_table = "songspagenew"
+
+
+class TourCounts(models.Model):
+    id = models.IntegerField(primary_key=True)
+    event = models.TextField(db_column="event_id")
+    song = models.IntegerField(db_column="song_id")
+    tour = models.IntegerField(db_column="tour_id")
+    num = models.IntegerField()
+    total = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = "tour_counts"

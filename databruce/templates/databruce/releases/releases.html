@@ -36,15 +36,11 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
+      var layout = getDatatableLayout();
+      dtCategorySelect(layout, -2, [{'label': 'All', 'value': '.*'}, {'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}]);
+
       new DataTable('#releasesTable', {
-        layout: getDatatableLayout(),
-        initComplete: function () {
-          this.api()
-          .columns([-2])
-          .every(function () {
-            categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}]);
-          });
-        },
+        layout: layout,
       });
     });
   </script>

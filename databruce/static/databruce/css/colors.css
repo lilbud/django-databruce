@@ -1,11 +1,4 @@
 :root {
-  /* https://www.realtimecolors.com/?colors=ffffff-22262a-035d8e-00e1ff-fc965f&fonts=Inter-Inter */
-	/* --base-content: #f2f2f2; */
-	--background: #717f8e;
-	--primary: #0483c8;
-	--secondary: #008799;
-	--accent: #fa5b05;
-
   --font-heading: "Cabin", sans-serif;
   --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
@@ -15,10 +8,26 @@
   --base-200: #F8F8F8;
   --base-300: #EEEEEE;
   --base-content: #000000;
+  --primary: #0483c8;
   --primary-content: #FFFFFF;
+  --secondary: #008799;
+  --secondary-content: #FFFFFF;
+  --success: #198754;
+  --success-content: #FFFFFF;
+  --danger: #dc3545;
+  --danger-content: #FFFFFF;
+  --info: #0dcaf0;
+  --info-content: #000000;
+  --accent: #fa5b05;
   --accent-content: #421104;
+  --border: #464e55;
+  --neutral: #000000;
+  --neutral-content: #E4E4E7;
 
-  --border: #464e55; 
+  /* Arrow for form select fields, set stroke to base-content above */
+  .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  }
 }
 
 [data-bs-theme="dark"] {
@@ -26,9 +35,26 @@
   --base-200: #191E24;
   --base-300: #15191E;
   --base-content: #ecf9ff;
+  --primary: #0483c8;
   --primary-content: #edf1fe;
+  --secondary: #008799;
+  --secondary-content: #000000;
+  --success: #198754;
+  --success-content: #002d2c;
+  --danger: #dc3545;
+  --danger-content: #201047;
+  --info: #0dcaf0;
+  --info-content: #042e49;
+  --accent: #fa5b05;
+  --accent-content: #421104;
+  --border: #464e55;
+  --neutral: #000000;
+  --neutral-content: #E4E4E7;
 
-  --border: #464e55; 
+  /* Arrow for form select fields, set stroke to base-content above */
+  .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ECF9FF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  }
 }
 
 [data-bs-theme="synthwave"] {
@@ -50,6 +76,11 @@
     --info-content: #042e49;
     --neutral: #422ad5;
     --neutral-content: #c6d2ff;
+
+    /* Arrow for form select fields, set stroke to base-content above */
+    .form-select {
+      --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a1b1ff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    }
 }
 
 /* Primary */
@@ -72,7 +103,7 @@
 
 /* Secondary */
 .text-secondary {
-  color: var(--secondary) !important;
+  color: var(--secondary-content) !important;
 }
 
 .bg-secondary {
@@ -88,13 +119,13 @@
   background-color: var(--accent) !important;
 }
 
-/* [class*="success"] {
+[class*="success"] {
   background-color: var(--success) !important;
   color: var(--success-content) !important;
   border-color: var(--success-content) !important;
-} */
+}
 
-/* [class*="secondary"] {
+[class*="secondary"] {
   background-color: var(--secondary) !important;
   color: var(--secondary-content) !important;
   border-color: var(--secondary-content) !important;
@@ -104,4 +135,4 @@
   background-color: var(--danger) !important;
   color: var(--danger-content) !important;
   border-color: var(--danger-content) !important;
-} */
+}

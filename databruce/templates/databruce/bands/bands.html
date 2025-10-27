@@ -42,20 +42,17 @@
 {% block scripts %}
   <script>
   $(document).ready(function () {
+
+    var layout = getDatatableLayout([0,1,2,3]);
+    dtCategorySelect(layout, -1, [{'label': 'All', 'value': '.*'}, {'label': 'Bruce Bands', 'value': 'True'}, {'label': 'Guests', 'value': 'False'}]);
+
     new DataTable('#bandTable', {
-      layout: getDatatableLayout([0,1,2,3]),
+      layout: layout,
       columnDefs: [
         { target: -1, visible: false },
         { type: 'date', targets: [2, 3] },
         { type: 'num', targets: [0], width: '1rem' },
       ],
-      initComplete: function () {
-        this.api()
-          .columns([-1])
-          .every(function () {
-              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Bruce Bands', 'value': 'True'}, {'label': 'Guests', 'value': 'False'}]);
-          });
-      },
     });
   });
   </script>

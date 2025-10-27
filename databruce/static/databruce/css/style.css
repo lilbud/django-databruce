@@ -76,6 +76,7 @@ td,
 }
 
 .card-header,
+.card-footer,
 #stats .row .card-body,
 .modal-header {
     background-color: var(--base-300) !important;
@@ -91,10 +92,10 @@ td,
     }
 }
 
-/* .dtb-collection-closeable {
-    background-color: var(--neutral) !important;
-    color: var(--neutral-content) !important;
-} */
+.form-check-input:checked {
+	background-color: var(--primary);
+	border-color: var(--primary);
+}
 
 a:link,
 .btn-link {
@@ -114,6 +115,12 @@ a:hover,
     background-color: var(--base-300) !important;
 }
 
+.page-item > button.page-link {
+    background-color: var(--primary) !important;
+    color: var(--primary-content) !important;
+    border-color: var(--primary-content) !important;
+}
+
 .navbar,
 .progress-bar,
 button.nav-link.active,
@@ -124,7 +131,6 @@ button.nav-link.active,
 .ui-state-active,
 .ui-button:active,
 .btn-primary,
-.page-item > button.page-link,
 .navbar .nav-item {
     background-color: var(--primary) !important;
     color: var(--primary-content) !important;
@@ -145,12 +151,19 @@ button#usercount.active,
 
 .form-select {
     height: 31px !important; /* stupid, but apparently needed because select2 fields are bigger for no reason */
+    background-color: var(--base-300) !important;
 }
 
-.form-control, .form-select {
+.form-control, .form-select:not(.dtsb-dropDown) {
     background-color: var(--base-300) !important;
     color: var(--base-content) !important;
-    border: 1px solid var(--border) !important;
+    border: thin solid var(--base-content) !important;
+}
+
+.dtb-collection-closeable {
+    background-color: var(--base-300) !important;
+    color: var(--neutral-content) !important;
+    padding: 1rem !important
 }
 
 .form-control::placeholder {
@@ -190,7 +203,6 @@ button#usercount.active,
 .card-header,
 .card-footer {
     padding: 0.5rem 0.75rem !important;
-    /* border-bottom: none !important; */
     font-size: 1rem !important;
 }
 
@@ -204,8 +216,9 @@ button.nav-link {
 }
 
 button.nav-link:not(.active, #bd-theme) {
-    background-color: var(--base-content) !important;
-    /* color: var(--base-content) !important; */
+    background-color: var(--base-300) !important;
+    color: var(--base-content) !important;
+    border: 1px solid var(--base-content) !important;
 }
 
 .dtsb-searchBuilder {
@@ -245,9 +258,16 @@ nav ul {
     font-size: .875rem !important;
 }
 
+.navbar .btn {
+    border: 0 !important;
+}
+
 button {
     vertical-align: middle !important;
-    border: 0 !important;
+}
+
+button:not(.dropdown-item) {
+    border: thin solid var(--primary-content) !important;
 }
 
 button#usercount {

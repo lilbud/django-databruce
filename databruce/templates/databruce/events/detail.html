@@ -74,7 +74,7 @@
                         <a id="eventlink"
                            class="pe-1"
                            href="https://brucebase.wikidot.com/{{ event.id|brucebase_url }}">
-                          <span class="badge text-bg-secondary eventlink">
+                          <span class="badge bg-secondary text-secondary eventlink">
                             <i class="bi bi-link-45deg pe-1"></i>
                             <span>Brucebase</span>
                           </span>
@@ -82,7 +82,7 @@
                       {% endif %}
                       {% if event.nugs %}
                         <a class="pe-1" id="eventlink" href="{{ event.nugs }}">
-                          <span class="badge text-bg-secondary eventlink">
+                          <span class="badge bg-secondary text-secondary eventlink">
                             <i class="bi bi-headphones pe-1"></i>
                             <span>Nugs</span>
                           </span>
@@ -161,7 +161,7 @@
                 </div>
               {% endif %}
               {% if setlist %}
-                <div class="card">
+                <div class="card mb-md-2">
                   <div class="card-header">
                     <div class="d-flex justify-content-between">
                       <span>Setlist</span>
@@ -331,8 +331,9 @@
                                     </td>
                                     <td class="text-nowrap text-center fw-medium text-sm {% if notes %}align-top{% else %}align-middle{% endif %}">
                                       {% if song.ltp %}
-                                        <a href="{% url "event_details" id=song.ltp.id %}">{{ song.ltp }}</a>
+                                        <a href="{% url "event_details" id=song.ltp.id %}">{{ song.ltp.get_date }}</a>
                                       {% endif %}
+                                      {% comment %} {{ song.get_prev }} {% endcomment %}
                                     </td>
                                   {% endif %}
                                 </tr>
@@ -655,10 +656,12 @@
 
           $('#note-toggle').on('click', function() {
             if ($(this).is(':checked')) {
+
               $('span[id*=setlist_note]').each(function() {
                 $(this).removeClass('d-none');
               });
             } else {
+
               $('span[id*=setlist_note]').each(function() {
                 $(this).addClass('d-none');
               });

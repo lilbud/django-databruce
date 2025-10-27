@@ -559,7 +559,7 @@ class EventDetail(TemplateView):
 
         notes = models.SetlistNotes.objects.filter(
             id=OuterRef("pk"),
-        ).select_related("event", "setlist")
+        ).select_related("event", "id")
 
         snippets = (
             models.Snippets.objects.order_by("position")
@@ -578,6 +578,25 @@ class EventDetail(TemplateView):
             )
         )
 
+        song_gap = (
+            models.SongGaps.objects.prefetch_related("last_show")
+            .filter(event=context["event"].id)
+            .values(
+                json=JSONObject(
+                    last_event="last_show__id",
+                    last_date="last_show__date",
+                    last="last",
+                ),
+            )
+        )
+
+        tour_count = models.TourCounts.objects.filter(event=context["event"].id).values(
+            json=JSONObject(
+                num="num",
+                total="total",
+            ),
+        )
+
         setlist = (
             models.Setlists.objects.filter(event__id=context["event"].id)
             .annotate(
@@ -588,6 +607,10 @@ class EventDetail(TemplateView):
                 snippet_list=ArraySubquery(
                     snippets,
                 ),
+                # gap=Subquery(
+                #     song_gap.filter(id=OuterRef("id")),
+                # ),
+                # tour=Subquery(tour_count.filter(id=OuterRef("id"))),
             )
             .select_related("song", "event")
             .prefetch_related("ltp")
@@ -1423,7 +1446,7 @@ class AdvancedSearchResults(View):
                             setlist_event_filter.add(
                                 Q(
                                     id__in=list(
-                                        set.intersection(*map(set, event_results))
+                                        set.intersection(*map(set, event_results)),
                                     ),
                                 ),
                                 Q.AND,

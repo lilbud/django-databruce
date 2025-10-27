@@ -3,7 +3,6 @@
   <head>
     {% load i18n %}
     {% load static %}
-    {% comment %} {% load compress %} {% endcomment %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="A Springsteen Setlist Database">
@@ -64,19 +63,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
           rel="stylesheet">
     <!--Static-->
-    {% comment %} {% compress css %} {% endcomment %}
     <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/preflight.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/datatables.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
-    {% comment %} {% endcompress %} {% endcomment %}
     <!-- Other -->
-    {% comment %} {% compress js %} {% endcomment %}
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
-    <script src="{% static 'databruce/js/category_select.js' %}"></script>
+    {% comment %} <script src="{% static 'databruce/js/category_select.js' %}"></script> {% endcomment %}
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
-    {% comment %} {% endcompress %} {% endcomment %}
     {% block extrastyle %}
     {% endblock extrastyle %}
     {% block extrajs %}
@@ -454,8 +449,7 @@
           $($.fn.dataTable.tables(true)).DataTable().responsive.recalc().columns.adjust();
           toolTips();
         };
-
-
+      
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

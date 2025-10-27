@@ -62,32 +62,32 @@
     </div>
     <div class="row">
       <div class="col">
-        <ul class="nav nav-pills items-end" role="tablist">
-          <button class="nav-link text-center mb-2 active"
+        <ul class="nav nav-pills items-end mb-2" role="tablist">
+          <button class="nav-link text-center active"
                   data-bs-toggle="pill"
                   data-bs-target="#events"
                   aria-controls="pills-events">Performances</button>
           {% if snippets %}
-            <button class="nav-link text-center mb-2"
+            <button class="nav-link text-center"
                     data-bs-toggle="pill"
                     data-bs-target="#snippets"
                     aria-controls="pills-snippets">Snippets</button>
           {% endif %}
-          <button class="nav-link text-center mb-2"
+          <button class="nav-link text-center"
                   data-bs-toggle="pill"
                   data-bs-target="#stats"
                   aria-controls="pills-stats">Stats</button>
-          <button class="nav-link text-center mb-2"
+          <button class="nav-link text-center"
                   data-bs-toggle="pill"
                   data-bs-target="#yearstats"
                   aria-controls="pills-stats">Year by Year</button>
           {% if lyrics %}
-            <button class="nav-link text-center mb-2"
+            <button class="nav-link text-center"
                     data-bs-toggle="pill"
                     data-bs-target="#lyrics"
                     aria-controls="pills-stats">Lyrics</button>
           {% endif %}
-          <button class="nav-link text-center mb-2"
+          <button class="nav-link text-center"
                   data-bs-toggle="pill"
                   data-bs-target="#links"
                   aria-controls="pills-links">Links</button>
@@ -392,9 +392,13 @@
     });
 
     $(document).ready(function () {
+
+      var layout = getDatatableLayout([0,1,2,3,4,5,6,7,8]);
+      dtCategorySelect(layout, 6, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}])
+
       var table = $('#songTable').DataTable(
         {
-          layout: getDatatableLayout([0,1,2,3,4,5,6,7,8]),
+          layout: layout,
           serverSide: true,
           processing: true,
           ajax: {
@@ -473,16 +477,6 @@
             {'data': 'note', 'name': 'note'},
             {'data': 'event.public', 'name': 'event.public'},
           ],
-          
-          initComplete: function (settings, json) {
-            categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]);
-          
-            this.api()
-            .columns([6])
-            .every(function () {
-              categorySearch(this);
-            });
-          },
         }
       );
 

@@ -58,18 +58,14 @@
 {% block scripts %}
   <script>
   $(document).ready(function () {
+    var layout = getDatatableLayout();
+    dtCategorySelect(layout, -1, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+
     new DataTable('#eventTable', {
       layout: getDatatableLayout(),
       columnDefs: [
         { target: -1, visible: false }
       ],
-      initComplete: function () {
-        this.api()
-          .columns([-1])
-          .every(function () {
-              categorySelect(this, 'Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
-          });
-      },
     });
   })
   </script>

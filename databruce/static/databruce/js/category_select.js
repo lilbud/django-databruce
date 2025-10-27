@@ -12,23 +12,23 @@
 function categorySelect(label, values) {
     var select = document.createElement('label');
     var btn_group = document.createElement('div');
-    var btn = document.createElement('btn');
+    var btn = document.createElement('button');
     var dropdown = document.createElement('div');
 
     // dropdown label
     $(select).attr('for', 'select').addClass('me-2 text-sm my-auto').text(`${label}:`);
 
     // button group
-    $(btn_group).attr('id', 'select');
+    $(btn_group).attr('id', 'select').addClass('dt-buttons btn-group');
 
     // add label and button group to dropdown
     $('#dropdown-container').append(select).append(btn_group);
 
     // dropdown button
-    $(btn).addClass('btn btn-primary btn-sm me-2 dropdown-toggle').attr({'id': 'category-select-btn', 'type': 'button', 'data-bs-toggle': 'dropdown', 'aria-expanded': 'false'}).text(values[0].label);
+    $(btn).addClass('btn btn-primary btn-sm me-2 dropdown-toggle buttons-collection').attr({'id': 'category-select-btn', 'type': 'button', 'data-bs-toggle': 'dropdown', 'aria-expanded': 'false'}).text(values[0].label);
 
     // dropdown menu
-    $(dropdown).addClass('dropdown-menu').attr('id', 'category-select');
+    $(dropdown).addClass('dropdown-menu dt-button-collection').attr('id', 'category-select');
 
     // add dropdown menu to button
     $('#select').append(btn).append(dropdown);

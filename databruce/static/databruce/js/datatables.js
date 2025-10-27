@@ -1,10 +1,25 @@
 var layout = {
   topEnd: {
     features: [
-      { div: { id: "dropdown-container", className: "mx-auto my-2" } },
-      {
-        search: true
+      { div: { 
+          id: "dropdown",
+          className: "mx-auto my-2 text-sm",
+          text: 'Category:',   
+        },
+        buttons: [
+          { extend: 'collection',
+            text: 'All',
+            name: 'category-select',
+            className: 'btn btn-sm btn-primary',
+            buttons: []
+          }
+        ],
       },
+
+      {
+        search: true,
+      },
+
     ],
   },
   topStart: {
@@ -17,8 +32,8 @@ var layout = {
         extend: 'colvis',
         columns: 'th:nth-child(n+2)', //starts at second column
         className: 'btn btn-sm btn-primary',
-      },
-    ],
+      }
+    ]
   },
   bottomEnd: {
     paging: {
@@ -32,6 +47,7 @@ DataTable.type('num-fmt', 'className', 'dt-center');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.datetime('YYYYMMDD');
+DataTable.Buttons.defaults.dom.button.className = 'btn';
 
 $.extend(true, DataTable.defaults, {
   searching: true,
@@ -89,8 +105,6 @@ $(document).ready(function () {
 
 function getDatatableLayout(columns) {
   if (columns) {
-    layout.topEnd.features[1]['buttons'] = [];
-
     var searchbuilder = {
       extend: 'searchBuilder',
       className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
@@ -101,8 +115,22 @@ function getDatatableLayout(columns) {
       },
     };
 
-    layout.topEnd.features[1].buttons[0] = searchbuilder;
+    layout.topEnd.features.push({'buttons': [searchbuilder]});
   };
 
   return layout;
 };
+
+function dtCategorySelect(layout, column_idx, values) {
+  for (let i in values) {
+      var button = {
+        text: values[i].label,
+        className: 'category-btn',
+        action: function (e, dt, node, config) {
+          dt.column(column_idx).search(values[i].value, {regex: true}).draw();
+          node.parents('.btn-group').find('.dropdown-toggle').text(values[i].label);
+        },
+      };
+      layout.topEnd.features[0].buttons[0].buttons.push(button);
+  };
+}

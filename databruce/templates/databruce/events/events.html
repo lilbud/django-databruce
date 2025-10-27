@@ -90,22 +90,17 @@
   </div>
   <script>
   $(document).ready(function () {
-    new DataTable('#eventTable', {
-      layout: getDatatableLayout([1,2,3,4]),
+
+    var layout = getDatatableLayout([1,2,3,4]);
+    dtCategorySelect(layout, -1, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+
+    var table = new DataTable('#eventTable', {
+      layout: layout,
       columnDefs: [
         { targets: [1], orderable: false },
         { targets: [0], type: 'date' },
         { targets: [-1], visible: false },
       ],
-      initComplete: function () {
-        categorySelect('Category', [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
-
-        this.api()
-          .columns([-1])
-          .every(function () {
-            categorySearch(this);
-          });
-      },
     });
 
     $(function(){
