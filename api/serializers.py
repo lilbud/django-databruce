@@ -156,8 +156,7 @@ class ArchiveLinksSerializer(serializers.ModelSerializer):
 
 class EventRunSerializer(serializers.ModelSerializer):
     band = BandsSerializer()
-    venue = VenuesSerializer()
-    location = CitiesSerializer(source="venue.city")
+    venue = VenuesTextSerializer()
     first = EventsSerializer()
     last = EventsSerializer()
 
@@ -168,7 +167,6 @@ class EventRunSerializer(serializers.ModelSerializer):
             "name",
             "band",
             "venue",
-            "location",
             "first",
             "last",
             "num_shows",

@@ -539,60 +539,42 @@ class EventRunViewSet(viewsets.ModelViewSet):
             .select_related(
                 "band",
                 "venue",
-                "venue__city",
                 "first__venue",
-                "first__venue__city",
                 "first__tour",
                 "first__artist",
                 "first",
                 "last",
                 "last__venue",
-                "last__venue__city",
                 "last__tour",
                 "last__artist",
-            )
-            .prefetch_related(
-                "first__venue__city__state",
-                "last__venue__city__state",
-                "venue__city__state",
             )
             .order_by("first")
         )
 
+        # ordering
         try:
-            for item in dict(query_params["columns"]):
-                column = query_params["columns"][item]
-
-                if column["search"]["value"] != "":
-                    filter.add(
-                        Q(**{f"{column['name']}__regex": column["search"]["value"]}),
-                        Q.AND,
-                    )
-
-                if query_params["search"]["value"] != "":
-                    filter.add(
-                        Q(
-                            **{
-                                f"{column['name']}__icontains": query_params["search"][
-                                    "value"
-                                ],
-                            },
-                        ),
-                        Q.OR,
-                    )
+            order_params = filters.order_queryset(query_params["order"])
+            qs = qs.order_by(*order_params)
         except KeyError:
-            pass
+            qs = qs.order_by("id")
 
-        try:
-            criteria = query_params["searchBuilder"]["criteria"]
-
+        try:  # noqa: SIM105
+            # searching
             filter.add(
-                filters.queryset_sb_filter(query_params, criteria, filter),
+                filters.search_queryset(
+                    query_params,
+                    query_params["search"]["value"],
+                ),
                 Q.AND,
             )
-
         except KeyError:
             pass
+
+        # searchbuilder
+        filter.add(
+            filters.queryset_sb_filter(query_params),
+            Q.AND,
+        )
 
         return qs.filter(filter)
 

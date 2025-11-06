@@ -1477,7 +1477,7 @@ class Runs(models.Model):
         null=True,
     )
     venue = models.ForeignKey(
-        Venues,
+        VenuesText,
         models.DO_NOTHING,
         db_column="venue",
         blank=True,
