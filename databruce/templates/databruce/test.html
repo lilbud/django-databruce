@@ -11,5 +11,112 @@
 {% endblock extrajs %}
 {% block content %}
   <div class="text-2xl">Songs</div>
-  {{ songs }}
+  <table>
+    <thead>
+      <th>Date</th>
+      <th>Act</th>
+      <th>Venue</th>
+      <th>Tour</th>
+      <th>Position</th>
+      <th>Gap</th>
+      <th>Set</th>
+      <th>Prev</th>
+      <th>Next</th>
+      <th>Note</th>
+    </thead>
+    {% comment %} <tbody>
+      {% for song in songs %}
+        <tr>
+          <td>{{ song.event }}</td>
+          <td>{{ song.event.artist }}</td>
+          <td>{{ song.venue.name }}</td>
+          <td>{{ song.event.tour }}</td>
+          <td>{{ song.position|default_if_none:"" }}</td>
+          <td>{{ song.last|default_if_none:"" }}</td>
+          <td>{{ song.set_name }}</td>
+          <td>
+            {% if song.prev_song %}{{ song.prev_song.name }}{% endif %}
+          </td>
+          <td>
+            {% if song.next_song %}{{ song.next_song.name }}{% endif %}
+          </td>
+          <td>{{ song.note|default_if_none:"" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody> {% endcomment %}
+  </table>
+  <script>
+    $(document).ready(function () {
+        let ctx = document.getElementById("chart").getContext("2d");
+        Chart.defaults.color = '#999';
+
+        let chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [{% for year in year_stats %}{{year.year|date:"Y"}},{% endfor %}],
+            datasets: [
+                {
+                  label: "Events",
+                  backgroundColor: "#0369a1",
+                  borderColor: "#417690",
+                  color: "#ffffff",
+                  data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
+                }
+            ]
+          },
+          options: {
+            responsive: true,
+            title: {
+                text: "Plays by Year",
+                display: true
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: '#5e5e5e',
+                },
+              },
+              x:{ 
+                grid: {
+                  color: '#5e5e5e',
+                },
+              }
+            },
+          },
+        });
+    });
+
+    $(document).ready(function () {
+
+      var layout = getDatatableLayout([0,1,2,3,4,5,6,7,8]);
+
+
+      var table = $('#songTable').DataTable(
+        {
+          //layout: layout,
+          serverSide: true,
+          processing: true,
+          ajax: {
+            'url': '/api/v1/songspage/?song={{ song_info.id }}&format=datatables',
+          },
+          columnDefs: [
+            { "defaultContent": "", "type": 'text', "targets": [0,1,2,3,4,6,7,8,9] },
+          ],
+          columns: [
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+            {'data': 'note', 'name': 'note'},
+          ],
+        }
+      );
+    });
+  </script>
 {% endblock content %}

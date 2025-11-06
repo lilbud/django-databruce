@@ -130,9 +130,9 @@ class EventAdmin(admin.ModelAdmin):
         "date",
     ]
     autocomplete_fields = ["venue", "artist", "tour", "run", "leg", "nugs_id"]
-    list_select_related = True
-    list_display = ["id", "date", "venue"]
-    list_display_links = ["id", "venue"]
+
+    list_display = ["id", "date"]
+    list_display_links = ["id"]
     inlines = [SetlistInline, OnstageInline]
 
 
@@ -306,5 +306,5 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(models.VenuesText)
 class VenuesTextAdmin(admin.ModelAdmin):
-    search_fields = ["formatted_loc"]
-    list_display = ["id", "formatted_loc"]
+    search_fields = ["formatted"]
+    list_display = ["id", "formatted"]

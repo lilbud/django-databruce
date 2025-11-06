@@ -221,6 +221,14 @@ button.nav-link:not(.active, #bd-theme) {
     border: 1px solid var(--base-content) !important;
 }
 
+button[class*='primary'] {
+    border: 1px solid var(--primary) !important;
+}
+
+button[class*='success'] {
+    border: 1px solid var(--success) !important;
+}
+
 .dtsb-searchBuilder {
 	color: var(--base-content) !important;
 }
@@ -266,9 +274,9 @@ button {
     vertical-align: middle !important;
 }
 
-button:not(.dropdown-item) {
+/* button:not(.dropdown-item) {
     border: thin solid var(--primary-content) !important;
-}
+} */
 
 button#usercount {
     pointer-events: none !important;
@@ -364,10 +372,6 @@ td {
     font-size: 0.875rem !important;
 }
 
-.btn-primary {
-    border-color: var(--base-300) !important;
-}
-
 .footer {
     clear: both !important;
     bottom: 0 !important;
@@ -395,4 +399,9 @@ td {
 
 .page-item.active > button.page-link {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.3);
+}
+
+#notes-card > .card-body p a {
+    text-decoration: underline !important;
+    color: var(--primary) !important;
 }

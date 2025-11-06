@@ -201,9 +201,9 @@ table th {
 }
 
 /* Hide Calendar Popup, it is very finicky and doesn't like to be placed */
-div.dt-datetime {
+/* div.dt-datetime {
     display: none !important;
-}
+} */
 
 td[id*="snippet-head"],
 td[id*="snippet-foot"] {

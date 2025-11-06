@@ -68,7 +68,7 @@ class Index(TemplateView):
     queryset = models.Events.objects.all().annotate(
         venue_info=Subquery(
             models.VenuesText.objects.filter(id=OuterRef("venue")).values(
-                json=JSONObject(id="id", value="formatted_loc"),
+                json=JSONObject(id="id", value="formatted"),
             ),
         ),
         band=Subquery(
@@ -167,51 +167,35 @@ class Test(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["event"] = (
-            models.Setlists.objects.filter(event__tour=32)
-            .order_by("event__id")
-            .distinct("event__id")
-            .values("event")
-        )
+        setlist = models.Setlists.objects.filter(
+            set_name=OuterRef("set_name"),
+            event__id=OuterRef("event__id"),
+        ).select_related("song")
 
         context["songs"] = (
-            models.Setlists.objects.order_by("event__id", "song_num")
-            .filter(event__tour=32)
-            .exclude(
-                position__isnull=True,
+            models.Setlists.objects.select_related("event", "song")
+            .filter(
+                song=164,
             )
-            .values("event", "position")
-            .distinct("event__id", "song_num", "position")
             .annotate(
-                # show_opener=Case(
-                #     When(
-                #         Q(position="Show Opener"),
-                #         then=Subquery(
-                #             models.Songs.objects.filter(
-                #                 id=OuterRef("song"),
-                #             ).values(json=JSONObject(id="id", name="name")),
-                #         ),
-                #     ),
-                # ),
-                # show_closer=Case(
-                #     When(
-                #         Q(position="Show Closer"),
-                #         then=Subquery(
-                #             models.Songs.objects.filter(
-                #                 id=OuterRef("song"),
-                #             ).values(json=JSONObject(id="id", name="name")),
-                #         ),
-                #     ),
-                # ),
-                song=Subquery(
-                    models.Songs.objects.filter(
-                        id=OuterRef("song"),
+                venue=Subquery(
+                    models.VenuesText.objects.filter(
+                        id=OuterRef("event__venue"),
                     ).values(json=JSONObject(id="id", name="name")),
                 ),
+                prev_song=Subquery(
+                    setlist.filter(song_num__lt=OuterRef("song_num"))
+                    .order_by("-song_num", "-event")
+                    .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                ),
+                next_song=Subquery(
+                    setlist.filter(song_num__gt=OuterRef("song_num"))
+                    .order_by("event", "song_num")
+                    .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                ),
             )
+            .order_by("event", "song_num")
         )
-
-        print(context["songs"])
 
         return context
 
@@ -509,15 +493,11 @@ class UserAddRemoveShow(View):
         return JsonResponse(result)
 
 
+from collections import namedtuple
+
+
 class EventDetail(TemplateView):
     template_name = "databruce/events/detail.html"
-    queryset = models.Events.objects.select_related(
-        "venue",
-        "artist",
-        "venue__city",
-        "venue__city__country",
-        "tour",
-    ).prefetch_related("venue__city__state", "venue__city__state__country")
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
@@ -530,32 +510,46 @@ class EventDetail(TemplateView):
             event=OuterRef("id"),
         ).values("id")
 
+        context["event"] = (
+            models.Events.objects.filter(id=self.kwargs["id"])
+            .select_related(
+                "venue",
+                "venue__id",
+                "artist",
+                "tour",
+            )
+            .annotate(
+                # venue_loc=Subquery(
+                #     models.VenuesText.objects.filter(id=OuterRef("venue")).values(
+                #         json=JSONObject(id="id", name="formatted"),
+                #     ),
+                # ),
+                tourleg=Subquery(
+                    models.TourLegs.objects.filter(id=OuterRef("leg")).values(
+                        json=JSONObject(id="id", name="name"),
+                    ),
+                ),
+                eventrun=Subquery(
+                    models.Runs.objects.filter(id=OuterRef("run")).values(
+                        json=JSONObject(id="id", name="name"),
+                    ),
+                ),
+                archive=ArraySubquery(archive),
+                boot=ArraySubquery(bootleg),
+            )
+        ).first()
+
         context["official"] = (
             models.ReleaseTracks.objects.filter(
                 event__id=self.kwargs["id"],
             )
             .distinct("release__id")
             .select_related("release")
+            .prefetch_related("event")
             .order_by("release__id")
         )
 
-        context["event"] = (
-            models.Events.objects.select_related(
-                "venue",
-                "artist",
-                "venue__city",
-                "venue__city__country",
-                "tour",
-            )
-            .annotate(
-                archive=ArraySubquery(archive),
-                boot=ArraySubquery(bootleg),
-            )
-            .prefetch_related("venue__city__state", "venue__city__state__country")
-            .get(id=self.kwargs["id"])
-        )
-
-        context["title"] = f"{context['event']} {context['event'].venue}"
+        context["title"] = f"{context['event']} {context['event'].venue.name}"
 
         notes = models.SetlistNotes.objects.filter(
             id=OuterRef("pk"),
@@ -578,39 +572,16 @@ class EventDetail(TemplateView):
             )
         )
 
-        song_gap = (
-            models.SongGaps.objects.prefetch_related("last_show")
-            .filter(event=context["event"].id)
-            .values(
-                json=JSONObject(
-                    last_event="last_show__id",
-                    last_date="last_show__date",
-                    last="last",
-                ),
-            )
-        )
-
-        tour_count = models.TourCounts.objects.filter(event=context["event"].id).values(
-            json=JSONObject(
-                num="num",
-                total="total",
-            ),
-        )
-
         setlist = (
             models.Setlists.objects.filter(event__id=context["event"].id)
             .annotate(
                 separator=Case(
                     When(segue=True, then=Value(">")),
                 ),
-                snote=ArraySubquery(notes.values("note")),
-                snippet_list=ArraySubquery(
-                    snippets,
-                ),
-                # gap=Subquery(
-                #     song_gap.filter(id=OuterRef("id")),
+                notes=ArraySubquery(notes.values("note")),
+                # snippet_list=ArraySubquery(
+                #     snippets,
                 # ),
-                # tour=Subquery(tour_count.filter(id=OuterRef("id"))),
             )
             .select_related("song", "event")
             .prefetch_related("ltp")
@@ -618,13 +589,9 @@ class EventDetail(TemplateView):
 
         context["setlist"] = setlist.exclude(set_name="Soundcheck").order_by("song_num")
 
-        context["setlist_copy"] = (
-            setlist.exclude(set_name="Soundcheck")
-            .order_by("song_num")
-            .values_list(
-                "song__name",
-                flat=True,
-            )
+        context["setlist_copy"] = context["setlist"].values_list(
+            "song__name",
+            flat=True,
         )
 
         context["soundcheck"] = models.Setlists.objects.filter(
@@ -647,7 +614,7 @@ class EventDetail(TemplateView):
             context["user_attended"] = models.UserAttendedShows.objects.filter(
                 user=self.request.user.id,
                 event=self.kwargs["id"],
-            ).exists()
+            )
 
         context["user_count"] = models.UserAttendedShows.objects.filter(
             event=context["event"].id,
@@ -761,9 +728,19 @@ class VenueDetail(TemplateView):
             .order_by("id")
         )
 
-        context["venue_info"] = models.VenuesText.objects.filter(
-            id=self.kwargs["id"],
-        ).first()
+        context["venue_info"] = (
+            models.Venues.objects.filter(
+                id=self.kwargs["id"],
+            )
+            .annotate(
+                formatted=Subquery(
+                    models.VenuesText.objects.filter(id=OuterRef("id")).values(
+                        "formatted",
+                    ),
+                ),
+            )
+            .first()
+        )
 
         context["title"] = f"{context['venue_info'].name}"
 
@@ -878,13 +855,11 @@ class SongDetail(TemplateView):
             song__id=self.kwargs["id"],
         ).order_by("id")
 
-        context["snippets"] = (
-            models.Snippets.objects.filter(
-                snippet=self.kwargs["id"],
-            )
-            .select_related("setlist", "setlist__event", "snippet", "setlist__song")
-            .order_by("position")
-        )
+        snippets = models.Snippets.objects.filter(
+            snippet=self.kwargs["id"],
+        ).order_by("position")
+
+        context["snippet_count"] = snippets.count()
 
         filter = Q(event_certainty__in=["Confirmed", "Probable"])
 

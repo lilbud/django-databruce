@@ -1,7 +1,24 @@
 import json
 
+from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import FieldError
-from django.db.models import Q
+from django.db.models import (
+    Case,
+    CharField,
+    Count,
+    ExpressionWrapper,
+    F,
+    IntegerField,
+    Max,
+    Min,
+    OuterRef,
+    PositiveIntegerField,
+    Q,
+    Subquery,
+    Value,
+    When,
+)
+from django.db.models.functions import Coalesce, JSONObject, TruncYear
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
 from rest_framework import filters as dj_filters
@@ -62,95 +79,77 @@ class CitiesViewSet(viewsets.ModelViewSet):
 class SongsPageViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    def create_filter(
-        self,
-        column: str,
-        condition: str,
-        value: str = "",
-        value2: str = "",
-    ):
-        filter_types = {
-            "=": Q(**{f"{column}__iexact": value}),
-            "!=": ~Q(**{f"{column}__iexact": value}),
-            "starts": Q(**{f"{column}__istartswith": value}),
-            "!starts": ~Q(**{f"{column}__istartswith": value}),
-            "contains": Q(**{f"{column}__icontains": value}),
-            "!contains": ~Q(**{f"{column}__icontains": value}),
-            "ends": Q(**{f"{column}__iendswith": value}),
-            "!ends": ~Q(**{f"{column}__iendswith": value}),
-            "null": Q(**{f"{column}__exact": ""}) | Q(**{f"{column}__isnull": True}),
-            "!null": ~Q(**{f"{column}__exact": ""}) & Q(**{f"{column}__isnull": False}),
-            "<": Q(**{f"{column}__lt": value}),
-            "<=": Q(**{f"{column}__lte": value}),
-            ">=": Q(**{f"{column}__gte": value}),
-            ">": Q(**{f"{column}__gt": value}),
-            "between": Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
-            "!between": ~Q(
-                Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
-            ),
-        }
-
-        return filter_types.get(condition)
-
     def get_queryset(self):
         filter = Q()
-        post_dict = parser.parse(self.request.GET.urlencode())
+        query_params = parser.parse(self.request.GET.urlencode())
 
-        song = post_dict.get("song")
+        song = query_params.get("song")
 
-        qs = models.Songspagenew.objects.select_related(
-            "event",
-        ).filter(song=song)
+        setlist = models.Setlists.objects.filter(
+            set_name=OuterRef("set_name"),
+            event__id=OuterRef("event__id"),
+        ).select_related("song")
 
+        qs = (
+            models.Setlists.objects.select_related(
+                "event",
+                "song",
+                "event__tour",
+                "event__artist",
+                "event__venue",
+            )
+            .prefetch_related("song__first", "song__last")
+            .filter(
+                song=song,
+            )
+            .annotate(
+                venue=Subquery(
+                    models.VenuesText.objects.filter(
+                        id=OuterRef("event__venue"),
+                    ).values(json=JSONObject(id="id", name="formatted")),
+                ),
+                prev_song=Subquery(
+                    setlist.filter(song_num__lt=OuterRef("song_num"))
+                    .order_by("-song_num", "-event")
+                    .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                ),
+                next_song=Subquery(
+                    setlist.filter(song_num__gt=OuterRef("song_num"))
+                    .order_by("event", "song_num")
+                    .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                ),
+            )
+            .order_by("event", "song_num")
+        )
+
+        # ordering
         try:
-            search = post_dict["searchBuilder"]["criteria"]
+            order_params = filters.order_queryset(query_params["order"])
+            qs = qs.order_by(*order_params)
+        except KeyError:
+            qs = qs.order_by("event", "song_num")
 
-            for item in search:
-                param = search[item]
+        try:  # noqa: SIM105
+            # searching
+            filter.add(
+                filters.search_queryset(
+                    query_params["columns"],
+                    query_params["search"]["value"],
+                ),
+                Q.AND,
+            )
+        except KeyError:
+            pass
 
-                print(param)
+        # searchbuilder
+        filter.add(
+            filters.queryset_sb_filter(query_params),
+            Q.AND,
+        )
 
-                data = next(
-                    item["name"]
-                    for item in dict(post_dict["columns"]).values()
-                    if item["data"] == param["origData"]
-                )
-
-                try:
-                    search_filter = self.create_filter(
-                        column=data,
-                        value=param["value1"],
-                        value2=param["value2"],
-                        condition=param["condition"],
-                    )
-                except KeyError:
-                    search_filter = self.create_filter(
-                        column=data,
-                        condition=param["condition"],
-                    )
-
-                if post_dict["searchBuilder"]["logic"] == "AND":
-                    filter.add(
-                        search_filter,
-                        Q.AND,
-                    )
-                else:
-                    filter.add(
-                        search_filter,
-                        Q.OR,
-                    )
-
-            print(filter)
-
-            return qs.filter(filter).order_by("event")
-        except KeyError as e:
-            print(e)
-            return qs.order_by("event")
+        return qs.filter(filter)
 
     serializer_class = serializers.SongsPageSerializer
-    # permission_classes = permission_classes
-    # filter_backends = (DatatablesFilterBackend,)
-    # filterset_class = filters.SongsPageFilter
 
 
 class ContinentsViewSet(viewsets.ModelViewSet):
@@ -193,8 +192,7 @@ class VenuesTextViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.VenuesTextSerializer
     permission_classes = permission_classes
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    # filterset_class = filters.VenuesTextFilter
-    ordering = ["formatted_loc"]
+    ordering = ["formatted"]
 
 
 class VenuesViewSet(viewsets.ModelViewSet):
@@ -211,12 +209,84 @@ class VenuesViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.Events.objects.all()
+    def get_queryset(self):
+        filter = Q()
+        query_params = parser.parse(self.request.GET.urlencode())
+
+        event = query_params.get("year")
+
+        qs = (
+            models.Events.objects.annotate(
+                setlist=Case(
+                    When(
+                        setlist_certainty__in=["Probable", "Confirmed"],
+                        then=F("setlist_certainty"),
+                    ),
+                    default=None,
+                ),
+            )
+            .filter(id__startswith=event)
+            .select_related("venue", "artist", "tour")
+        )
+
+        # ordering
+        try:
+            order_params = filters.order_queryset(query_params["order"])
+            qs = qs.order_by(*order_params)
+        except KeyError:
+            qs = qs.order_by("id")
+
+        try:  # noqa: SIM105
+            # searching
+            filter.add(
+                filters.search_queryset(
+                    query_params["columns"],
+                    query_params["search"]["value"],
+                ),
+                Q.AND,
+            )
+        except KeyError:
+            pass
+
+        # searchbuilder
+        filter.add(
+            filters.queryset_sb_filter(query_params),
+            Q.AND,
+        )
+
+        # for item in dict(query_params["columns"]):
+        #     column = query_params["columns"][item]
+
+        #     if column["search"]["value"] != "":
+        #         filter.add(
+        #             Q(**{f"{column['name']}__regex": column["search"]["value"]}),
+        #             Q.AND,
+        #         )
+
+        #     if query_params["search"]["value"] != "":
+        #         filter.add(
+        #             Q(
+        #                 **{
+        #                     f"{column['name']}__icontains": query_params["search"][
+        #                         "value"
+        #                     ],
+        #                 },
+        #             ),
+        #             Q.OR,
+        #         )
+
+        # try:
+        #     criteria = query_params["searchBuilder"]["criteria"]
+        #     filter.add(
+        #         filters.queryset_sb_filter(query_params, criteria, filter),
+        #         Q.AND,
+        #     )
+        # except KeyError:
+        #     pass
+
+        return qs.filter(filter)
+
     serializer_class = serializers.EventsSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = filters.EventsFilter
-    ordering_fields = ["id", "date"]
-    permission_classes = permission_classes
 
 
 class NugsViewSet(viewsets.ModelViewSet):
@@ -289,7 +359,6 @@ class SetlistViewSet(viewsets.ModelViewSet):
     queryset = models.Setlists.objects.all()
     serializer_class = serializers.SetlistSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    # filterset_class = filters.SetlistFilter
     permission_classes = permission_classes
     filterset_fields = ["song", "event"]
 
@@ -297,11 +366,46 @@ class SetlistViewSet(viewsets.ModelViewSet):
 class SnippetViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.Snippets.objects.all()
+    def get_queryset(self):
+        filter = Q()
+        query_params = parser.parse(self.request.GET.urlencode())
+
+        song = query_params.get("song")
+
+        qs = (
+            models.Snippets.objects.filter(snippet=song)
+            .select_related("snippet")
+            .order_by("setlist__event")
+        )
+
+        # ordering
+        try:
+            order_params = filters.order_queryset(query_params["order"])
+            qs = qs.order_by(*order_params)
+        except KeyError:
+            qs = qs.order_by("setlist__event")
+
+        try:  # noqa: SIM105
+            # searching
+            filter.add(
+                filters.search_queryset(
+                    query_params["columns"],
+                    query_params["search"]["value"],
+                ),
+                Q.AND,
+            )
+        except KeyError:
+            pass
+
+        # searchbuilder
+        filter.add(
+            filters.queryset_sb_filter(query_params),
+            Q.AND,
+        )
+
+        return qs.filter(filter)
+
     serializer_class = serializers.SnippetSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = filters.SnippetFilter
-    permission_classes = permission_classes
 
 
 class StatesViewSet(viewsets.ModelViewSet):
@@ -317,19 +421,102 @@ class StatesViewSet(viewsets.ModelViewSet):
 class SongsViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.Songs.objects.all()
+    def get_queryset(self):
+        filter = Q()
+        query_params = parser.parse(self.request.GET.urlencode())
+
+        qs = (
+            models.Songs.objects.all()
+            .order_by("name")
+            .prefetch_related(
+                "first",
+                "last",
+                "first__artist",
+                "first__tour",
+                "last__artist",
+                "last__tour",
+            )
+        )
+
+        # ordering
+        try:
+            order_params = filters.order_queryset(query_params["order"])
+            qs = qs.order_by(*order_params)
+        except KeyError:
+            qs = qs.order_by("name")
+
+        try:  # noqa: SIM105
+            # searching
+            filter.add(
+                filters.search_queryset(
+                    query_params,
+                    query_params["search"]["value"],
+                ),
+                Q.AND,
+            )
+        except KeyError:
+            pass
+
+        # searchbuilder
+        filter.add(
+            filters.queryset_sb_filter(query_params),
+            Q.AND,
+        )
+
+        return qs.filter(filter)
+
     serializer_class = serializers.SongsSerializer
-    permission_classes = permission_classes
 
 
 class ToursViewSet(viewsets.ModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.Tours.objects.all()
+    def get_queryset(self):
+        filter = Q()
+        query_params = parser.parse(self.request.GET.urlencode())
+
+        qs = (
+            models.Tours.objects.all()
+            .select_related(
+                "first",
+                "last",
+                "band",
+                "first__artist",
+                "first__tour",
+                "last__artist",
+                "last__tour",
+            )
+            .order_by("-last")
+        )
+
+        # ordering
+        try:
+            order_params = filters.order_queryset(query_params["order"])
+            qs = qs.order_by(*order_params)
+        except KeyError:
+            qs = qs.order_by("id")
+
+        try:  # noqa: SIM105
+            # searching
+            filter.add(
+                filters.search_queryset(
+                    query_params,
+                    query_params["search"]["value"],
+                ),
+                Q.AND,
+            )
+        except KeyError:
+            pass
+
+        # searchbuilder
+        filter.add(
+            filters.queryset_sb_filter(query_params),
+            Q.AND,
+        )
+
+        return qs.filter(filter)
+
     serializer_class = serializers.ToursSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = filters.TourFilter
-    permission_classes = permission_classes
 
 
 class TourLegsViewSet(viewsets.ModelViewSet):
@@ -340,3 +527,73 @@ class TourLegsViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = filters.TourLegFilter
     permission_classes = permission_classes
+
+
+class EventRunViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        filter = Q()
+        query_params = parser.parse(self.request.GET.urlencode())
+
+        qs = (
+            models.Runs.objects.all()
+            .select_related(
+                "band",
+                "venue",
+                "venue__city",
+                "first__venue",
+                "first__venue__city",
+                "first__tour",
+                "first__artist",
+                "first",
+                "last",
+                "last__venue",
+                "last__venue__city",
+                "last__tour",
+                "last__artist",
+            )
+            .prefetch_related(
+                "first__venue__city__state",
+                "last__venue__city__state",
+                "venue__city__state",
+            )
+            .order_by("first")
+        )
+
+        try:
+            for item in dict(query_params["columns"]):
+                column = query_params["columns"][item]
+
+                if column["search"]["value"] != "":
+                    filter.add(
+                        Q(**{f"{column['name']}__regex": column["search"]["value"]}),
+                        Q.AND,
+                    )
+
+                if query_params["search"]["value"] != "":
+                    filter.add(
+                        Q(
+                            **{
+                                f"{column['name']}__icontains": query_params["search"][
+                                    "value"
+                                ],
+                            },
+                        ),
+                        Q.OR,
+                    )
+        except KeyError:
+            pass
+
+        try:
+            criteria = query_params["searchBuilder"]["criteria"]
+
+            filter.add(
+                filters.queryset_sb_filter(query_params, criteria, filter),
+                Q.AND,
+            )
+
+        except KeyError:
+            pass
+
+        return qs.filter(filter)
+
+    serializer_class = serializers.EventRunSerializer

@@ -9,7 +9,7 @@ ignore = [
     "F401",    # missing imports
     "RUF001", # ambiguous-unicode-character-string
     "N813",   # imports not as camelcase
-    # "E501", # line too long
+    "E501", # line too long
     "DTZ002", # timezone
     "ANN201",
     "D103",

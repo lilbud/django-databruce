@@ -1,7 +1,152 @@
-from django.db.models import Q
+import datetime
+
+from django.db.models import F, Manager, Q, QuerySet
+from django.db.models.manager import BaseManager
 from django_filters import rest_framework as filters
 
 from databruce import models
+
+
+def sb_filter_types(
+    column: str,
+    condition: str,
+    value: str = "",
+    value2: str = "",
+    type: str = "",
+):
+    filter_types = {
+        "=": Q(**{f"{column}__iexact": value}),
+        "!=": ~Q(**{f"{column}__iexact": value}),
+        "starts": Q(**{f"{column}__istartswith": value}),
+        "!starts": ~Q(**{f"{column}__istartswith": value}),
+        "contains": Q(**{f"{column}__icontains": value}),
+        "!contains": ~Q(**{f"{column}__icontains": value}),
+        "ends": Q(**{f"{column}__iendswith": value}),
+        "!ends": ~Q(**{f"{column}__iendswith": value}),
+        "null": Q(**{f"{column}__exact": ""}) | Q(**{f"{column}__isnull": True}),
+        "!null": ~Q(**{f"{column}__exact": ""}) & Q(**{f"{column}__isnull": False}),
+        "<": Q(**{f"{column}__lt": value}),
+        "<=": Q(**{f"{column}__lte": value}),
+        ">=": Q(**{f"{column}__gte": value}),
+        ">": Q(**{f"{column}__gt": value}),
+        "between": Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
+        "!between": ~Q(
+            Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
+        ),
+    }
+
+    if type == "num":
+        filter_types["null"] = Q(**{f"{column}__isnull": True})
+        filter_types["!null"] = Q(**{f"{column}__isnull": False})
+
+    return filter_types.get(condition)
+
+
+def queryset_sb_filter(query_params: dict) -> Q:
+    """Create filter using searchbuilder query params.
+
+    This is a server side version of the searchbuilder
+    filtering usually done in DOM.
+    """
+    filter = Q()
+
+    try:
+        criteria = query_params["searchBuilder"]["criteria"]
+
+        for item in criteria:
+            param = criteria[item]
+
+            data = next(
+                item["name"]
+                for item in dict(query_params["columns"]).values()
+                if item["data"] == param["origData"]
+            )
+
+            if param["condition"] in ["between", "!between"]:
+                search_filter = sb_filter_types(
+                    column=data,
+                    value=param["value1"],
+                    value2=param["value2"],
+                    condition=param["condition"],
+                    type=param["type"],
+                )
+            elif param["condition"] in ["null", "!null"]:
+                search_filter = sb_filter_types(
+                    column=data,
+                    condition=param["condition"],
+                    type=param["type"],
+                )
+            else:
+                search_filter = sb_filter_types(
+                    column=data,
+                    value=param["value1"],
+                    condition=param["condition"],
+                    type=param["type"],
+                )
+
+            if query_params["searchBuilder"]["logic"] == "AND":
+                filter.add(
+                    search_filter,
+                    Q.AND,
+                )
+            else:
+                filter.add(
+                    search_filter,
+                    Q.OR,
+                )
+
+    except KeyError:
+        pass
+
+    return filter
+
+
+def order_queryset(order: dict):
+    order_params = []
+
+    for i in order:
+        dir = order[i]["dir"]
+        column = order[i]["name"]
+
+        if dir == "asc":
+            order_params.append(F(f"{column}").asc(nulls_last=True))
+        else:
+            order_params.append(F(f"{column}").desc(nulls_last=True))
+
+    return order_params
+
+
+def search_queryset(params: dict, search_query: str = ""):
+    filter = Q()
+    columns = params["columns"]
+
+    for item in columns:
+        column = columns[item]
+        search_type = "icontains"
+
+        if column["search"]["value"]:
+            query = column["search"]["value"]
+
+            if column["search"]["regex"] == "true":
+                search_type = "iregex"
+
+            filter.add(
+                Q(**{f"{column['name']}__{search_type}": query}),
+                Q.AND,
+            )
+
+        if search_query != "":
+            if params["search"]["regex"] == "true":
+                search_type = "iregex"
+
+            filter.add(
+                Q(**{f"{column['name']}__{search_type}": search_query}),
+                Q.OR,
+            )
+
+    print(filter)
+
+    return filter
 
 
 class ArchiveFilter(filters.FilterSet):
@@ -86,36 +231,9 @@ class ReleaseTracksFilter(filters.FilterSet):
     release = filters.CharFilter(field_name="release__name", lookup_expr="icontains")
 
 
-from rest_framework_datatables.django_filters.filters import GlobalFilter
-from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
-
-
-class GlobalCharFilter(GlobalFilter, filters.CharFilter):
-    pass
-
-
-class SongsFilter(DatatablesFilterSet):
-    name = GlobalCharFilter(field_name="name", lookup_expr="icontains")
-    first = GlobalCharFilter(lookup_expr="icontains")
-    last = GlobalCharFilter(lookup_expr="icontains")
-
-
 class ReleaseFilter(filters.FilterSet):
     name = filters.CharFilter(lookup_expr="icontains")
     type = filters.CharFilter(lookup_expr="icontains")
-
-
-class SongsPageFilter(DatatablesFilterSet):
-    """Filter name, artist and genre by name with icontains"""
-
-    song = filters.NumberFilter(
-        field_name="song",
-        lookup_expr="exact",
-    )
-
-    class Meta:
-        model = models.Songspagenew
-        fields = "__all__"
 
 
 class SetlistFilter(filters.FilterSet):

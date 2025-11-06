@@ -2,7 +2,7 @@ var layout = {
   topEnd: {
     features: [
       { div: { 
-          id: "dropdown",
+          id: "dropdown-label",
           className: "mx-auto my-2 text-sm",
           text: 'Category:',   
         },
@@ -10,16 +10,15 @@ var layout = {
           { extend: 'collection',
             text: 'All',
             name: 'category-select',
-            className: 'btn btn-sm btn-primary',
+            id: "dropdown-btn",
+            className: 'btn btn-sm btn-primary category-btn',
             buttons: []
           }
         ],
       },
-
       {
         search: true,
       },
-
     ],
   },
   topStart: {
@@ -103,7 +102,7 @@ $(document).ready(function () {
   });
 });
 
-function getDatatableLayout(columns) {
+function getDatatableLayout(columns, category) {
   if (columns) {
     var searchbuilder = {
       extend: 'searchBuilder',
@@ -114,8 +113,12 @@ function getDatatableLayout(columns) {
         liveSearch: false,
       },
     };
-
+    
     layout.topEnd.features.push({'buttons': [searchbuilder]});
+  };
+
+  if (!category) {
+    layout.topEnd.features.splice(0, 1);
   };
 
   return layout;
@@ -131,6 +134,7 @@ function dtCategorySelect(layout, column_idx, values) {
           node.parents('.btn-group').find('.dropdown-toggle').text(values[i].label);
         },
       };
+
       layout.topEnd.features[0].buttons[0].buttons.push(button);
   };
 }

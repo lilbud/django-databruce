@@ -67,7 +67,7 @@
                   data-bs-toggle="pill"
                   data-bs-target="#events"
                   aria-controls="pills-events">Performances</button>
-          {% if snippets %}
+          {% if snippet_count > 0 %}
             <button class="nav-link text-center"
                     data-bs-toggle="pill"
                     data-bs-target="#snippets"
@@ -144,7 +144,7 @@
                                data-bs-html="true"
                                data-bs-title="Number of times a song was included as part of another."></i>
                           </div>
-                          <div class="text-xl">{{ snippets.count }}</div>
+                          <div class="text-xl">{{ snippet_count }}</div>
                         </div>
                       </div>
                     </div>
@@ -261,7 +261,7 @@
                         <th>Note</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    {% comment %} <tbody>
                       {% for snippet in snippets %}
                         <tr>
                           <td>
@@ -273,7 +273,7 @@
                           <td>{{ snippet.note|default_if_none:"" }}</td>
                         </tr>
                       {% endfor %}
-                    </tbody>
+                    </tbody> {% endcomment %}
                   </table>
                 </div>
               {% endif %}
@@ -332,7 +332,8 @@
                     {% if lyric.language != 'English' %}
                       <div class="text-base">
                         <li>
-                          <a class=" " href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.language }}
+                          <a class=" " href="{% url "lyric_detail" id=lyric.uuid %}">
+                            {{ lyric.language }}
                             {% if lyric.note %}[{{ lyric.note }}]{% endif %}
                           </a>
                         </li>
@@ -393,8 +394,10 @@
 
     $(document).ready(function () {
 
-      var layout = getDatatableLayout([0,1,2,3,4,5,6,7,8]);
-      dtCategorySelect(layout, 6, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}])
+      var layout = getDatatableLayout([0,1,2,3,4,5,6,7,8], true);
+      var categories = [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]
+      
+      dtCategorySelect(layout, 6, categories);
 
       var table = $('#songTable').DataTable(
         {
@@ -402,22 +405,30 @@
           serverSide: true,
           processing: true,
           ajax: {
-            'url': '/api/v1/songspage/?song={{ song_info.id }}&format=datatables&keep=prev_name,next_name,venue_name,artist_name,tour_name,public',
+            'url': '/api/v1/songspage/?song={{ song_info.id }}&format=datatables',
           },
           columnDefs: [
-            { "defaultContent": "", "type": 'text', "targets": [1,2,3,4,6,7,8,9] },
-            { target: -1, visible: false },
-            { targets: [0], type: 'date' },
-            { targets: [5], type: 'num' },
+            { "defaultContent": "", "type": 'text', "targets": [0,1,2,3,4,6,7,8,9] },
+            { 'targets': [-1], 'visible': false },
           ],
           columns: [
-            {'data': 'event.date', 'name': 'event__date'},
             {
-              'data': 'artist',
-              'name': 'artist_name',
+              'data': 'event.date',
+              'name': 'event__date',
               'render': function (data, type, row, meta) {
                   if (type === 'display') {
-                    return '<a href="/bands/' + row.artist + '">'+ row.artist_name +'</a>';
+                    return '<a href="/events/' + row.event.id + '">'+ row.event.date +'</a>';
+                  } else if (type == 'filter') {
+                    return 'event__date';
+                  };
+              },
+            },
+            {
+              'data': 'event.artist',
+              'name': 'event__artist__name',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return '<a href="/bands/' + data.id + '">'+ data.name +'</a>';
                   } else if (type == 'filter') {
                     return 'artist_name';
                   };
@@ -425,36 +436,36 @@
             },
             {
               'data': 'venue',
-              'name': 'venue_name',
+              'name': 'event__venue__name',
               'render': function (data, type, row, meta) {
                   if (type === 'display') {
-                    return '<a href="/venues/' + row.venue + '">'+ row.venue_name +'</a>';
+                    return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
                   } else if (type == 'filter') {
                     return 'venue_name';
                   };
               },
             },
             {
-              'data': 'tour',
-              'name': 'tour_name',
+              'data': 'event.tour',
+              'name': 'event__tour__name',
               'render': function (data, type, row, meta) {
                   if (type === 'display') {
-                    return '<a href="/tours/' + row.tour + '">'+ row.tour_name +'</a>';
+                    return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
                   } else if (type == 'filter') {
                     return 'tour_name';
                   };
               },
             },
             {'data': 'position', 'name': 'position'},
-            {'data': 'gap', 'name': 'gap' },
+            {'data': 'last', 'name': 'last' },
             {'data': 'set_name', 'name': 'set_name'},
             {
-              'data': 'prev',
-              'name': 'prev_name',
+              'data': 'prev_song',
+              'name': 'prev_song__name',
               'render': function (data, type, row, meta) {
                   if (data != null) {
                     if (type === 'display') {
-                      return '<a href="/songs/' + row.prev + '">'+ row.prev_name +'</a>';
+                      return '<a href="/songs/' + data.id + '">'+ data.name +'</a>';
                     } else if (type == 'filter') {
                       return 'prev_name';
                     };
@@ -462,12 +473,12 @@
               },
             },
             {
-              'data': 'next',
-              'name': 'next_name',
+              'data': 'next_song',
+              'name': 'next_song__name',
               'render': function (data, type, row, meta) {
                   if (data != null) {
                     if (type === 'display') {
-                      return '<a href="/songs/' + row.next + '">'+ row.next_name +'</a>';
+                      return '<a href="/songs/' + data.id + '">'+ data.name +'</a>';
                     } else if (type == 'filter') {
                       return 'next_name';
                     };
@@ -475,15 +486,43 @@
               },
             },
             {'data': 'note', 'name': 'note'},
-            {'data': 'event.public', 'name': 'event.public'},
+            {'data': 'event.public', 'name': 'event__public'},
           ],
         }
       );
 
       new DataTable('#snippetTable', {
         layout: getDatatableLayout(),
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/snippets/?song={{ song_info.id }}&format=datatables',
+        },
+        columnDefs: [
+          { "defaultContent": "", "type": 'text', "targets": '_all' },
+        ],
+        columns: [
+          {
+            'data': 'setlist.event',
+            'name': 'setlist__event__date',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
+              }
+            },
+          },
+          {
+            'data': 'setlist.song',
+            'name': 'setlist__song__name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/songs/' + data.id + '">'+ data.name +'</a>';
+              }
+            },
+          },
+          {'data': 'note', 'name': 'note'},
+        ]
       });
-
     });
   </script>
 {% endblock content %}

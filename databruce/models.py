@@ -6,6 +6,8 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 
+import datetime
+import re
 from uuid import uuid4
 
 from django.db import models
@@ -458,9 +460,9 @@ class VenuesText(models.Model):
         db_column="id",
     )
 
-    name = models.TextField()
-    location = models.TextField()
-    formatted_loc = models.TextField()
+    name = models.TextField(blank=True, default=None)
+    location = models.TextField(blank=True, default=None)
+    formatted = models.TextField(blank=True, default=None, db_column="formatted_loc")
 
     class Meta:
         managed = False
@@ -468,7 +470,7 @@ class VenuesText(models.Model):
         verbose_name_plural = "venues_text"
 
     def __str__(self) -> str:
-        return self.formatted_loc
+        return self.formatted
 
 
 class Venues(models.Model):
@@ -516,6 +518,7 @@ class Venues(models.Model):
 
     num_events = models.IntegerField(default=0)
     aliases = models.TextField(blank=True, default=None)
+    note = models.TextField(blank=True, default=None)
     mbid = models.UUIDField(default=None, editable=False)
 
     first = models.ForeignKey(
@@ -547,6 +550,12 @@ class Venues(models.Model):
     def __str__(self) -> str:
         name = self.name
 
+        if self.id == 351:
+            name = "Pierre's Good Citizens Ballpark"
+
+        if self.id == 2040:
+            name = "The Big Joint"
+
         if self.detail:
             name = f"{self.name}, {self.detail}"
 
@@ -556,10 +565,18 @@ class Venues(models.Model):
         return name
 
     def get_name(self) -> str:
-        if self.detail:
-            return f"{self.name}, {self.detail}"
+        name = self.name
 
-        return self.name
+        if self.id == 351:
+            name = "Pierre's Good Citizens Ballpark (Citizens Bank Park)"
+
+        if self.id == 2040:
+            name = "The Big Joint (Wells Fargo Center)"
+
+        if self.detail:
+            return f"{name}, {self.detail}"
+
+        return name
 
 
 class SetlistsByDate(models.Model):
@@ -607,7 +624,7 @@ class Events(models.Model):
     brucebase_url = models.TextField(blank=True, default=None)
 
     venue = models.ForeignKey(
-        to=Venues,
+        to=VenuesText,
         on_delete=models.DO_NOTHING,
         related_name="event_venue",
         db_column="venue_id",
@@ -994,7 +1011,7 @@ class SetlistNotes(models.Model):
 class Songs(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    brucebase_url = models.TextField(unique=True)
+    brucebase_url = models.TextField(blank=True, default=None)
     name = models.TextField(
         blank=True,
         default=None,
@@ -1152,20 +1169,21 @@ class Setlists(models.Model):
         db_table = "setlists"
         verbose_name_plural = "setlists"
         # unique_together = (("event_id", "set_name", "song_id"),)
-        ordering = ("-event_id", "song_num")
+        # ordering = ("-event_id", "song_num")
 
     def __str__(self) -> str:
         return f"{self.event.id} - {self.set_name} - {self.song} ({self.id})"
 
-    def notes(self) -> str:
-        noteslist = list(
-            SetlistNotes.objects.filter(id=self.id).values_list("note", flat=True),
-        )
+    # def notes(self) -> str:
+    #     noteslist = list(
+    #         SetlistNotes.objects.filter(id=self.id).values_list("note", flat=True),
+    #     )
 
-        if noteslist:
-            return "; ".join(noteslist)
+    #     if noteslist:
+    #         print(noteslist)
+    #         return "; ".join(noteslist)
 
-        return ""
+    #     return None
 
     VALID_SET_NAMES = [
         "Show",
@@ -1176,7 +1194,19 @@ class Setlists(models.Model):
         "Post-Show",
     ]
 
-    def get_prev(self) -> str:
+    def get_prev(self):
+        return (
+            Setlists.objects.select_related("song", "event")
+            .filter(
+                set_name=self.set_name,
+                event=self.event,
+                song_num__lt=self.song_num,
+            )
+            .order_by("event", "song_num")
+            .last()
+        )
+
+    def get_ltp(self) -> str:
         return (
             Setlists.objects.select_related("song", "event")
             .filter(
@@ -1185,7 +1215,6 @@ class Setlists(models.Model):
             )
             .exclude(id=self.id)
             .order_by("event", "song_num")
-            .values("event")
             .last()
         )
 
@@ -1653,7 +1682,7 @@ class Songspagenew(models.Model):
     tour = models.IntegerField(blank=True, null=True, db_column="tour_id")
     tour_name = models.TextField(blank=True, null=True)  # noqa: DJ001
     position = models.TextField(blank=True, null=True)  # noqa: DJ001
-    gap = models.IntegerField(blank=True, null=True)
+    gap = models.IntegerField(null=True, default=0)
     set_name = models.TextField(blank=True, null=True)  # noqa: DJ001
     prev = models.IntegerField(blank=True, null=True, db_column="prev_id")
     prev_name = models.TextField(blank=True, null=True)  # noqa: DJ001

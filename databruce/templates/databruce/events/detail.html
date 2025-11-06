@@ -8,33 +8,33 @@
       <div class="row">
         <div class="col">
           <div class="float-end text-base">
-            {% if event.get_last %}
-              {% with last=event.get_last %}
+            {% with last=event.get_last %}
+              {% if last %}
                 <a class="btn btn-sm btn-secondary"
                    role="button"
                    data-bs-toggle="tooltip"
                    data-bs-placement="top"
                    data-bs-html="true"
-                   data-bs-title="<div>{{ last.get_date }}<br>{{ last.artist }}<br>{{ last.venue.get_name }}</div>"
+                   data-bs-title="<div>{{ last.get_date }}<br>{{ last.artist }}<br>{{ last.venue.name }}</div>"
                    href="{% url "event_details" id=last.id %}">&lt; Prev</a>
-              {% endwith %}
-            {% endif %}
+              {% endif %}
+            {% endwith %}
             {% if user.is_superuser %}
               <a class="btn btn-sm btn-danger"
                  role="button"
                  href="{% url "admin:index" %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
             {% endif %}
-            {% if event.get_next %}
-              {% with next=event.get_next %}
+            {% with next=event.get_next %}
+              {% if next %}
                 <a class="btn btn-sm btn-secondary"
                    role="button"
                    data-bs-toggle="tooltip"
                    data-bs-placement="top"
                    data-bs-html="true"
-                   data-bs-title="<div>{{ next.get_date }}<br>{{ next.artist }}<br>{{ next.venue.get_name }}</div>"
+                   data-bs-title="<div>{{ next.get_date }}<br>{{ next.artist }}<br>{{ next.venue.name }}</div>"
                    href="{% url "event_details" id=next.id %}">Next &gt;</a>
-              {% endwith %}
-            {% endif %}
+              {% endif %}
+            {% endwith %}
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@
             <div class="card-body">
               <div class="d-flex flex-wrap">
                 <div class="flex-grow-1 mb-4 mb-xl-0">
-                  {% if event.title %}<div id="title" class="text-nowrap mb-1 text-sm">{{ event.title }}</div>{% endif %}
+                  {% if event.title %}<div id="title" class="text-nowrap mb-1 text-sm">{{ event.title|markdown|safe }}</div>{% endif %}
                   <div class="text-nowrap text-xl">
                     <span class="fw-semibold" id="date">{{ event.get_date }}</span>
                     <a class="fw-medium"
@@ -55,17 +55,18 @@
                     <div class="text-nowrap text-secondary-emphasis">This is a placeholder date, actual date unknown.</div>
                   {% endif %}
                   <div class="text-base">
-                    <a class="text-reset" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                    <a class="text-reset"
+                       href="{% url "venue_details" id=event.venue.id.id %}">{{ event.venue.formatted }}</a>
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
                       <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge bg-primary fw-medium">{{ event.tour }}</span></a>
                     {% endif %}
-                    {% if event.leg %}
-                      <a class="pe-1" href="{% url "leg_details" id=event.leg.id %}"><span class="badge bg-primary fw-medium">{{ event.leg }}</span></a>
+                    {% if event.tourleg %}
+                      <a class="pe-1" href="{% url "leg_details" id=event.tourleg.id %}"><span class="badge bg-primary fw-medium">{{ event.tourleg.name }}</span></a>
                     {% endif %}
-                    {% if event.run %}
-                      <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge bg-primary fw-medium">{{ event.run }}</span></a>
+                    {% if event.eventrun %}
+                      <a class="pe-1" href="{% url "run_details" id=event.eventrun.id %}"><span class="badge bg-primary fw-medium">{{ event.eventrun.name }}</span></a>
                     {% endif %}
                   </div>
                   {% if event.brucebase_url or nugs %}
@@ -262,7 +263,7 @@
                               {% endif %}
                             </tr>
                             {% for song in set.list %}
-                              {% with notes=song.snote %}
+                              {% with notes=song.notes %}
                                 <tr>
                                   <td class="text-center {% if notes_list %}align-top{% else %}align-middle{% endif %} text-sm songnum {% if song.position and song.position != song.set_name %}position {{ song.position|lower|cut:" " }}{% endif %}"
                                       {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
@@ -290,7 +291,7 @@
                                     </div>
                                     {% if notes %}
                                       <div class="row m-0 p-0">
-                                        <span class="text-xs fw-normal text-wrap d-none setlist_note mt-1 px-0"
+                                        <span class="text-xs fw-normal text-wrap d-none setlist_note mt-0 px-0"
                                               id="setlist_note_{{ song.id }}">{{ notes|join:'; ' }}</span>
                                       </div>
                                     {% endif %}
@@ -360,7 +361,7 @@
                       <i class="bi bi-pencil"></i>
                     </div>
                   </div>
-                  <div class="card-body text-xs">
+                  <div class="card-body text-sm">
                     <div>{{ event.note|note_format|safe }}</div>
                     <div class="row mt-1">
                       <a href="#"
@@ -373,7 +374,7 @@
                 </div>
               </div>
             {% endif %}
-            {% if onstage or bands %}
+            {% if onstage %}
               <div class="col">
                 <div class="card" id="onstage">
                   <div class="card-header">
@@ -383,6 +384,12 @@
                     </div>
                   </div>
                   <div class="card-body">
+                    {% for band in onstage %}
+                      {% if band.band %}
+                        <a class="fw-bold text-reset text-sm"
+                           href="{% url "band_details" id=band.band.id %}">{{ band.band.name }}</a>
+                      {% endif %}
+                    {% endfor %}
                     {% if onstage %}
                       <ul class="mb-2">
                         {% for member in onstage %}
