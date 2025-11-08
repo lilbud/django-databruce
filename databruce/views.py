@@ -1964,6 +1964,15 @@ class NugsRelease(TemplateView):
             .select_related(
                 "event",
                 "event__venue",
+                "event__venue__first",
+                "event__venue__last",
+                "event__venue__state",
+                "event__venue__country",
+            )
+            .prefetch_related(
+                "event__venue__city",
+                "event__venue__city__state",
+                "event__venue__city__country",
             )
             .order_by("date")
         )
