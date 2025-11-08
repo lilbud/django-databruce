@@ -159,7 +159,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
-    "PAGE_SIZE": 50,
+    "PAGE_SIZE": 100,
 }
 
 DEFAULT_FROM_EMAIL = "admin@databruce.com"

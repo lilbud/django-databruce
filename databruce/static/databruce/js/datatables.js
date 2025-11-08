@@ -79,8 +79,9 @@ $.extend(true, DataTable.defaults, {
     }
   },
   info: true,
-  scrollX: true,
-  pageLength: 50,
+  scrollX: false,
+  scrollY: false,
+  pageLength: 100,
   lengthMenu: [25, 50, 100],
   language: {
     searchBuilder: {
