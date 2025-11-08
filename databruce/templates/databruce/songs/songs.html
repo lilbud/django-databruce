@@ -107,12 +107,12 @@
         {'data': 'original_artist', 'name': 'original_artist'},
         {'data': 'category', 'name': 'category'},
         {
-          'data': 'first',
+          'data': 'first.date',
           'name': 'first__date',
           'render': function (data, type, row, meta) {
               if (type === 'display') {
                 if (data) {
-                  return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
+                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
                 }
                 return null
               } else if (type == 'filter') {
@@ -121,12 +121,12 @@
           },
         },
         {
-          'data': 'last',
+          'data': 'last.date',
           'name': 'last__date',
           'render': function (data, type, row, meta) {
               if (type === 'display') {
                 if (data) {
-                  return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
+                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
                 }
                 return null
               } else if (type == 'filter') {

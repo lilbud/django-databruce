@@ -20,7 +20,7 @@
       <th scope="col" class="min-tablet-l">Note</th>
     </tr>
   </thead>
-  <tbody>
+  {% comment %} <tbody>
     {% for leg in legs %}
       <tr>
         <td class="text-nowrap">
@@ -29,12 +29,10 @@
         <td class="text-nowrap">
           <a href="{% url "tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
         </td>
-        <td data-sort="{{ leg.first.get_date }}"
-            data-filter="{{ leg.first.get_date }}">
+        <td data-sort="{{ leg.first.get_date }}" data-filter="{{ leg.first.get_date }}">
           <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first.get_date }}</a>
         </td>
-        <td data-sort="{{ leg.last.get_date }}"
-            data-filter="{{ leg.last.get_date }}">
+        <td data-sort="{{ leg.last.get_date }}" data-filter="{{ leg.last.get_date }}">
           <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last.get_date }}</a>
         </td>
         <td class="text-center">{{ leg.num_shows }}</td>
@@ -42,14 +40,66 @@
         <td class="text-nowrap">{{ leg.note|default_if_none:"" }}</td>
       </tr>
     {% endfor %}
-  </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
     new DataTable('#tourLegTable', {
       layout: getDatatableLayout([1, 2, 3, 4, 5, 6]),
-      columnDefs: [{ type: 'date', targets: [2, 3] }]
+      serverSide: true,
+      processing: true,
+      ajax: {
+        'url': '/api/v1/tour_legs/?format=datatables&keep=id',
+      },
+      columnDefs: [
+        { targets: [4, 5], width: '6rem' },
+      ],
+      columns: [
+        {
+          'data': 'name',
+          'name': 'name',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/tours/legs/' + row.id + '">'+ data +'</a>';
+            } else if (type == 'filter') {
+              return 'name';
+            };
+          },
+        },
+        {
+          'data': 'tour',
+          'name': 'tour__name',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
+            } else if (type == 'filter') {
+              return 'name';
+            };
+          },
+        },
+        {
+          'data': 'first.date',
+          'name': 'first__id',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            }
+          },
+        },
+        {
+          'data': 'last.date',
+          'name': 'last__id',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            }
+          },
+        },
+        {'data': 'num_shows', 'name': 'num_shows'},
+        {'data': 'num_songs', 'name': 'num_songs'},
+        {'data': 'note', 'name': 'note'},
+      ]
     });
   });
   </script>

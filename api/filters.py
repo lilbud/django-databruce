@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.db.models import F, Manager, Q, QuerySet
 from django.db.models.manager import BaseManager
@@ -95,6 +96,14 @@ def queryset_sb_filter(query_params: dict) -> Q:
                     Q.OR,
                 )
 
+            if "date" in data:
+                name = re.sub("__date", "__early_late", data)
+
+                filter.add(
+                    Q(**{f"{name}__icontains": param["value1"]}),
+                    Q.OR,
+                )
+
     except KeyError:
         pass
 
@@ -144,7 +153,13 @@ def search_queryset(params: dict, search_query: str = ""):
                 Q.OR,
             )
 
-    print(filter)
+            if "date" in column["name"]:
+                name = re.sub("__date", "__early_late", column["name"])
+
+                filter.add(
+                    Q(**{f"{name}__{search_type}": search_query}),
+                    Q.OR,
+                )
 
     return filter
 
@@ -197,24 +212,14 @@ class VenuesFilter(filters.FilterSet):
 
 
 class EventsFilter(filters.FilterSet):
-    date = filters.CharFilter("event_date")
-    venue = filters.CharFilter(field_name="venue__name", lookup_expr="icontains")
-    city = filters.CharFilter(field_name="venue__city__name", lookup_expr="icontains")
-    state = filters.CharFilter(method="state_filter")
-    country = filters.CharFilter(method="country_filter")
+    year = filters.CharFilter(field_name="id", lookup_expr="startswith")
+    venue = filters.NumberFilter(field_name="venue__id", lookup_expr="exact")
+    artist = filters.NumberFilter(field_name="artist__id", lookup_expr="exact")
+    tour = filters.NumberFilter(field_name="tour__id", lookup_expr="exact")
 
-    def state_filter(self, queryset, value):
-        return queryset.filter(
-            Q(venue__state__name__icontains=value)
-            | Q(venue__state__abbrev__iexact=value),
-        )
-
-    def country_filter(self, queryset, value):
-        return queryset.filter(
-            Q(venue__country__name__icontains=value)
-            | Q(venue__country__alpha_2__iexact=value)
-            | Q(venue__country__alpha_3__iexact=value),
-        )
+    class Meta:
+        model = models.Events
+        fields = ["venue", "artist", "tour"]
 
 
 class OnstageFilter(filters.FilterSet):

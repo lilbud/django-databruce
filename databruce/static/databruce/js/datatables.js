@@ -42,11 +42,12 @@ var layout = {
 };
 
 DataTable.type('num', 'className', 'dt-center');
-DataTable.type('num-fmt', 'className', 'dt-center');
+DataTable.type('string', 'className', 'dt-left text-nowrap');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
-DataTable.datetime('YYYYMMDD');
 DataTable.Buttons.defaults.dom.button.className = 'btn';
+DataTable.defaults.column.defaultContent = '';
+
 
 $.extend(true, DataTable.defaults, {
   searching: true,
@@ -113,7 +114,7 @@ function getDatatableLayout(columns, category) {
         liveSearch: false,
       },
     };
-    
+
     layout.topEnd.features.push({'buttons': [searchbuilder]});
   };
 

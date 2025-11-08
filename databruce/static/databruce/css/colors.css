@@ -119,13 +119,18 @@
   background-color: var(--accent) !important;
 }
 
+/* nugs */
+.bg-nugs {
+  background-color: #9f37f2 !important;
+}
+
 [class*="success"] {
   background-color: var(--success) !important;
   color: var(--success-content) !important;
   border-color: var(--success-content) !important;
 }
 
-[class*="secondary"] {
+[class*="bg-secondary"] {
   background-color: var(--secondary) !important;
   color: var(--secondary-content) !important;
   border-color: var(--secondary-content) !important;

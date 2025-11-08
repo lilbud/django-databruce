@@ -82,25 +82,21 @@
           },
         },
         { 
-          'data': 'first',
-          'name': 'first__date',
+          'data': 'first.date',
+          'name': 'first__id',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
-              return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
-            } else if (type == 'filter') {
-              return 'first__date';
-            };
+              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            }
           },          
         },
         { 
-          'data': 'last',
-          'name': 'last__date',
+          'data': 'last.date',
+          'name': 'last__id',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
-              return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
-            } else if (type == 'filter') {
-              return 'last__date';
-            };
+              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            }
           },          
         },
         { 'data': 'num_shows', 'name': 'num_shows' },

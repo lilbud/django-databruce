@@ -88,23 +88,18 @@
         'url': '/api/v1/events/?year={{ year }}&format=datatables&keep=id,early_late,public',
       },
       columnDefs: [
-        { "defaultContent": "", "type": 'text', "targets": [0,1,2,3,4,5,6] },
         { targets: [1], orderable: false, className: 'text-center text-sm'},
-        { targets: [0], type: 'date', className: 'text-nowrap'},
+        { targets: [0], type: 'date'},
         { targets: [-1], visible: false },
       ],
       columns:[
         {
           'data': 'date',
-          'name': 'date',
+          'name': 'id',
           'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var date = row.early_late ? `${row.date} (${row.early_late})` : row.date
-                
-                return '<a href="/events/' + row.id + '">'+ date +'</a>';
-              } else if (type == 'filter') {
-                return 'date';
-              };
+                return '<a href="/events/' + row.id + '">'+ data.display +'</a>';
+              }
           },
         },
         {
@@ -112,11 +107,8 @@
           'name': 'setlist',
           'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var setlist = row.setlist ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
-                return setlist
-              } else if (type === 'filter') {
-                return 'setlist';
-              };
+                return row.setlist ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
+              }
           },
         },
         {
@@ -125,14 +117,36 @@
           'render': function (data, type, row, meta) {
               if (type === 'display' && row.artist) {
                 return '<a href="/bands/' + row.artist.id + '">'+ row.artist.name +'</a>';
-              } else if (type === 'filter') {
-                return 'artist__name';
-              };
+              }
           },
         },
-        {'data': 'venue.name', 'name': 'venue__name'},
-        {'data': 'venue.location', 'name': 'venue__location'},
-        {'data': 'tour.name', 'name': 'tour__name'},
+        {
+          'data': 'venue',
+          'name': 'venue__name',
+          'render': function (data, type, row, meta) {
+              if (type === 'display' && row.artist) {
+                return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+              }
+          },
+        },
+        {
+          'data': 'venue.city',
+          'name': 'venue__city__name',
+          'render': function (data, type, row, meta) {
+              if (type === 'display' && row.artist) {
+                return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
+              }
+          },
+        },
+        {
+          'data': 'tour',
+          'name': 'tour__name',
+          'render': function (data, type, row, meta) {
+              if (type === 'display' && row.artist) {
+                return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
+              }
+          },
+        },
         {'data': 'title', 'name': 'title'},
         {'data': 'public', 'name': 'public'},
       ],
@@ -142,7 +156,6 @@
       // bind change event to select
       $('#year_select').on('change', function () {
           var url = $(this).val() // get selected value
-          console.log(url);
           if (url) { // require a URL
               window.location = url; // redirect
           }

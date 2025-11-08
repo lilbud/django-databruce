@@ -63,7 +63,7 @@
   <script>
   $(document).ready(function () {
     new DataTable('#venueTable', {
-      layout:getDatatableLayout(),
+      layout: getDatatableLayout([0,1,2,3,4,5,6], false),
       columnDefs: [{ type: 'date', targets: [5,6] }]
     })
   })

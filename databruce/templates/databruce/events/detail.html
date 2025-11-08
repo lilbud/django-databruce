@@ -55,8 +55,7 @@
                     <div class="text-nowrap text-secondary-emphasis">This is a placeholder date, actual date unknown.</div>
                   {% endif %}
                   <div class="text-base">
-                    <a class="text-reset"
-                       href="{% url "venue_details" id=event.venue.id.id %}">{{ event.venue.formatted }}</a>
+                    <a class="text-reset" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
@@ -82,8 +81,8 @@
                         </a>
                       {% endif %}
                       {% if event.nugs %}
-                        <a class="pe-1" id="eventlink" href="{{ event.nugs }}">
-                          <span class="badge bg-secondary text-secondary eventlink">
+                        <a class="pe-1" id="eventlink" href="{{ event.nugs.url }}">
+                          <span class="badge bg-nugs text-secondary">
                             <i class="bi bi-headphones pe-1"></i>
                             <span>Nugs</span>
                           </span>
@@ -230,7 +229,7 @@
                         <tbody>
                           {% if soundcheck %}
                             <tr class="text-center">
-                              <td class="setHeader soundcheck" colspan="5">Soundcheck</td>
+                              <td class="setHeader text-center soundcheck" colspan="5">Soundcheck</td>
                               <td class="d-none"></td>
                               <td class="d-none"></td>
                               <td class="d-none"></td>

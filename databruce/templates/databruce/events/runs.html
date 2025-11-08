@@ -17,6 +17,7 @@
       <th class="all" scope="col">Name</th>
       <th class="min-tablet-l" scope="col">Band</th>
       <th class="min-tablet-l" scope="col">Venue</th>
+      <th class="min-tablet-l" scope="col">Location</th>
       <th scope="col" class="all">Events</th>
       <th scope="col" class="all">Songs</th>
       <th class="min-tablet-l" scope="col">First</th>
@@ -27,7 +28,7 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout([1, 2, 3, 4, 5, 6, 7], false);
+      var layout = getDatatableLayout([1, 2, 3, 4, 5, 6, 7, 8], false);
 
       new DataTable('#runTable', {
           layout: layout,
@@ -36,10 +37,6 @@
           ajax: {
             'url': '/api/v1/runs/?format=datatables&keep=id',
           },
-          columnDefs: [
-            { "defaultContent": "", "type": 'text', "targets": '_all' },
-            { targets: [3,4], className: 'text-center'},
-          ],
           columns: [
             {
               'data': 'name',
@@ -47,9 +44,7 @@
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return '<a href="/events/runs/' + row.id + '">'+ row.name +'</a>';
-                } else if (type == 'filter') {
-                  return 'name';
-                };
+                }
               },
             },
             {
@@ -66,33 +61,38 @@
               'name': 'venue__name',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
-                  return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
+                  return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+                };
+              },
+            },
+            {
+              'data': 'venue.city',
+              'name': 'venue__city__name',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
                 };
               },
             },
             {'data': 'num_shows', 'name': 'num_shows'},
             {'data': 'num_songs', 'name': 'num_songs'},
             {
-              'data': 'first',
+              'data': 'first.date',
               'name': 'first__date',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
-                  return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
-                } else if (type === 'filter') {
-                  return 'first__date'
-                };
+                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                }
               },              
             },
             {
-              'data': 'last',
+              'data': 'last.date',
               'name': 'last__date',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
-                  return '<a href="/events/' + data.id + '">'+ data.date +'</a>';
-                } else if (type === 'filter') {
-                  return 'last__date'
-                };
-              },          
+                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                }
+              },
             },
           ],
       });

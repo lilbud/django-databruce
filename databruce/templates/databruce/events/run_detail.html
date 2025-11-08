@@ -36,10 +36,47 @@
       <div class="card-body px-0">
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">
-            {% include "databruce/partials/event_table.html" with events=events %}
+            {% comment %} {% include "databruce/partials/event_table.html" with events=events %} {% endcomment %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="eventTable">
+                <thead>
+                  <tr class="custom">
+                    <th class="all" scope="col">Date</th>
+                    <th class="min-tablet-l" scope="col">Setlist</th>
+                    <th class="min-tablet-l" scope="col">Band</th>
+                    <th class="min-tablet-l" scope="col">Venue</th>
+                    <th class="min-tablet-l" scope="col">Location</th>
+                    <th class="min-tablet-l" scope="col">Tour</th>
+                    <th class="min-tablet-l" scope="col">Detail</th>
+                    <th class="min-tablet-l" scope="col">Public</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
           </div>
           <div id="songs" class="tab-pane fade">
-            {% include "databruce/partials/song_position_table.html" with songs=songs %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="songTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Song</th>
+                    <th>Category</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for song in songs %}
+                    <tr>
+                      <td>{{ song.plays }}</td>
+                      <td>
+                        <a href="{% url "song_details" id=song.song_id %}">{{ song.name }}</a>
+                      </td>
+                      <td>{{ song.category }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -47,19 +84,91 @@
   </div>
   <script>
     $(document).ready(function () {
+
+      var layout = getDatatableLayout([2,3,4,5,6,7], true);
+      dtCategorySelect(layout, 7, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]);
+
       new DataTable('#eventTable', {
-        layout: getDatatableLayout(),
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/events/?run={{ info.id }}&format=datatables&keep=id,early_late,public',
+        },
         columnDefs: [
-          { targets: [1], width: '10rem' }, //band
-          { targets: [0], type: 'date' }, //band
-          { targets: [2, 3], width: '14rem' }, //venue, location
+          { targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem'},
+          { targets: [0], type: 'date'},
+          { targets: [-1], visible: false },
+        ],
+        columns: [
+            {
+            'data': 'date',
+            'name': 'id',
+            'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return '<a href="/events/' + row.id + '">'+ data.display +'</a>';
+                }
+            },
+          },
+          {
+            'data': 'setlist',
+            'name': 'setlist',
+            'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return row.setlist ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
+                }
+            },
+          },
+          {
+            'data': 'artist.name',
+            'name': 'artist__name',
+            'render': function (data, type, row, meta) {
+                if (type === 'display' && row.artist) {
+                  return '<a href="/bands/' + row.artist.id + '">'+ row.artist.name +'</a>';
+                }
+            },
+          },
+          {
+            'data': 'venue',
+            'name': 'venue__name',
+            'render': function (data, type, row, meta) {
+                if (type === 'display' && row.artist) {
+                  return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+                }
+            },
+          },
+          {
+            'data': 'venue.city',
+            'name': 'venue__city__name',
+            'render': function (data, type, row, meta) {
+                if (type === 'display' && row.artist) {
+                  return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
+                }
+            },
+          },
+          {
+            'data': 'tour',
+            'name': 'tour__name',
+            'render': function (data, type, row, meta) {
+                if (type === 'display' && row.artist) {
+                  return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
+                }
+            },
+          },
+          {'data': 'title', 'name': 'title'},
+          {'data': 'public', 'name': 'public'},
         ],
       });
 
+      // for reasons unknown, an extra non-functioning searchbuilder button is added
+      // this removes that single button.
+      layout.topEnd.features.pop();
+
       new DataTable('#songTable', {
-        layout: getDatatableLayout([1,2]),
+        layout: getDatatableLayout([0,2], false),
+        searching: true,
         columnDefs: [
-          { targets: 0, width: '1rem' },
+          { targets: 0, width: '1rem', type: 'num' },
         ],
       });
     })

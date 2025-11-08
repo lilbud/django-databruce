@@ -510,11 +510,14 @@ class EventDetail(TemplateView):
             event=OuterRef("id"),
         ).values("id")
 
+        nugs = models.NugsReleases.objects.filter(
+            event=OuterRef("id"),
+        ).values(json=JSONObject(id="id", url="url"))
+
         context["event"] = (
             models.Events.objects.filter(id=self.kwargs["id"])
             .select_related(
                 "venue",
-                "venue__id",
                 "artist",
                 "tour",
             )
@@ -536,6 +539,7 @@ class EventDetail(TemplateView):
                 ),
                 archive=ArraySubquery(archive),
                 boot=ArraySubquery(bootleg),
+                nugs=Subquery(nugs),
             )
         ).first()
 
@@ -935,16 +939,10 @@ def event_search(request: HttpRequest):
 class EventSearch(TemplateView):
     template_name = "databruce/search/search.html"
     form = forms.EventSearch
-    queryset = (
-        models.Events.objects.all()
-        .select_related(
-            "venue",
-            "venue__city",
-            "venue__city__country",
-            "artist",
-            "tour",
-        )
-        .prefetch_related("venue__city__state")
+    queryset = models.Events.objects.all().select_related(
+        "venue",
+        "artist",
+        "tour",
     )
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
@@ -1316,9 +1314,9 @@ class AdvancedSearchResults(View):
                 "last_date": Q(date__lte=data["last_date"]["id"]),
                 "month": Q(date__month=data["month"]["id"]),
                 "day": Q(date__day=data["day"]["id"]),
-                "city": Q(venue__city__id=data["city"]["id"]),
-                "state": Q(venue__state__id=data["state"]["id"]),
-                "country": Q(venue__country__id=data["country"]["id"]),
+                "city": Q(venue__id__city__id=data["city"]["id"]),
+                "state": Q(venue__id__state__id=data["state"]["id"]),
+                "country": Q(venue__id__country__id=data["country"]["id"]),
                 "tour": Q(tour__id=data["tour"]["id"]),
                 "musician": Q(relation__id=data["musician"]["id"]),
                 "band": Q(band__id=data["band"]["id"]),
@@ -1437,13 +1435,7 @@ class AdvancedSearchResults(View):
             .select_related(
                 "venue",
                 "artist",
-                "venue__city",
-                "venue__city__country",
                 "tour",
-            )
-            .prefetch_related(
-                "venue__city__state",
-                "venue__city__state__country",
             )
             .order_by("id")
         )
@@ -1972,12 +1964,6 @@ class NugsRelease(TemplateView):
             .select_related(
                 "event",
                 "event__venue",
-                "event__venue__city",
-                "event__venue__city__country",
-            )
-            .prefetch_related(
-                "event__venue__city__state",
-                "event__venue__city__state__country",
             )
             .order_by("date")
         )

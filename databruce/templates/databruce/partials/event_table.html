@@ -20,13 +20,9 @@
                         <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
                     </td>
                     <td class="text-nowrap">
-                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                        <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                     </td>
-                    <td class="text-nowrap">
-                        {% if event.venue.city %}
-                            <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
-                        {% endif %}
-                    </td>
+                    <td class="text-nowrap">{{ event.venue.location }}</td>
                     <td class="text-nowrap">
                         {% if event.tour %}
                             <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>

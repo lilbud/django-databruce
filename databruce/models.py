@@ -624,7 +624,7 @@ class Events(models.Model):
     brucebase_url = models.TextField(blank=True, default=None)
 
     venue = models.ForeignKey(
-        to=VenuesText,
+        to=Venues,
         on_delete=models.DO_NOTHING,
         related_name="event_venue",
         db_column="venue_id",
@@ -1477,7 +1477,7 @@ class Runs(models.Model):
         null=True,
     )
     venue = models.ForeignKey(
-        VenuesText,
+        Venues,
         models.DO_NOTHING,
         db_column="venue",
         blank=True,
