@@ -88,9 +88,7 @@
           'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return '<a href="/songs/' + row.id + '">'+ data +'</a>';
-              } else if (type == 'filter') {
-                return 'date';
-              };
+              }
           },
         },
         {
@@ -99,9 +97,7 @@
           'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return row.lyrics ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
-              } else if (type === 'filter') {
-                return 'lyrics';
-              };
+              }
           },          
         },
         {'data': 'original_artist', 'name': 'original_artist'},
@@ -115,9 +111,7 @@
                   return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
                 }
                 return null
-              } else if (type == 'filter') {
-                return 'first__date';
-              };
+              }
           },
         },
         {
@@ -129,9 +123,7 @@
                   return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
                 }
                 return null
-              } else if (type == 'filter') {
-                return 'last__date';
-              };
+              }
           },        
         },
         {'data': 'num_plays_public', 'name': 'num_plays_public'},

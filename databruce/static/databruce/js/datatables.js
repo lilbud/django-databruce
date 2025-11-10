@@ -48,7 +48,6 @@ DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
 
-
 $.extend(true, DataTable.defaults, {
   searching: true,
   fixedHeader: true,
@@ -81,6 +80,7 @@ $.extend(true, DataTable.defaults, {
   info: true,
   scrollX: false,
   scrollY: false,
+  autoWidth: false,
   pageLength: 100,
   lengthMenu: [25, 50, 100],
   language: {

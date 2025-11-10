@@ -51,10 +51,12 @@
               </div>
             </div>
             <div class="row">
-              <div class="fw-semibold">Last Played:</div>
-              <div>
-                <a href="{% url "event_details" id=song_info.last.id %}">{{ song_info.last.get_date }}</a>
-              </div>
+              {% if song_info.last %}
+                <div class="fw-semibold">Last Played:</div>
+                <div>
+                  <a href="{% url "event_details" id=song_info.last.id %}">{{ song_info.last.get_date }}</a>
+                </div>
+              {% endif %}
             </div>
           </div>
         </div>

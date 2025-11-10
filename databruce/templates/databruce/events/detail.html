@@ -209,20 +209,20 @@
                         <thead>
                           <tr>
                             <th class="all songnum text-nowrap text-center">#</th>
-                            <th class="all text-nowrap">
+                            <th class="all text-nowrap song-name">
                               Song
                               {% comment %} <a id="copySetlist" href="#" class="text-reset text-primary ms-4">Copy Setlist</a> {% endcomment %}
                             </th>
                             {% if event.tour.id != 49 %}
-                              <th class="min-tablet-l text-nowrap text-center">
+                              <th class="min-tablet-l text-nowrap text-center gap">
                                 Gap
                                 <i class="bi bi-info-circle-fill"
                                    data-bs-toggle="tooltip"
                                    data-bs-html="true"
                                    data-bs-title="# of shows since last played"></i>
                               </th>
-                              <th class="min-tablet-l text-nowrap text-center">Tour</th>
-                              <th class="min-tablet-l text-nowrap text-center">Last Played</th>
+                              <th class="min-tablet-l text-nowrap text-center tour-count">Tour</th>
+                              <th class="min-tablet-l text-nowrap text-center ltp">Last Played</th>
                             {% endif %}
                           </tr>
                         </thead>
@@ -296,7 +296,7 @@
                                     {% endif %}
                                   </td>
                                   {% if event.tour.id != 49 %}
-                                    <td class="text-nowrap text-center {% if notes %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
+                                    <td class="text-nowrap text-center song-name {% if notes %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
                                         id="gap">
                                       {% if song.debut and not song.premiere %}
                                         <span class="badge bg-primary"
@@ -314,7 +314,7 @@
                                         <span class="fw-normal">{{ song.last|default_if_none:"" }}</span>
                                       {% endif %}
                                     </td>
-                                    <td class="text-nowrap text-center {% if notes %}align-top{% else %}align-middle{% endif %} fw-normal text-sm">
+                                    <td class="text-nowrap text-center tour-count {% if notes %}align-top{% else %}align-middle{% endif %} fw-normal text-sm">
                                       {% if song.tour_num %}
                                         {% if song.tour_num == song.tour_total and song.tour_total == 1 %}
                                           <span data-bs-toggle="tooltip"
@@ -329,7 +329,7 @@
                                         {% endif %}
                                       {% endif %}
                                     </td>
-                                    <td class="text-nowrap text-center fw-medium text-sm {% if notes %}align-top{% else %}align-middle{% endif %}">
+                                    <td class="text-nowrap text-center fw-medium text-sm ltp {% if notes %}align-top{% else %}align-middle{% endif %}">
                                       {% if song.ltp %}
                                         <a href="{% url "event_details" id=song.ltp.id %}">{{ song.ltp.get_date }}</a>
                                       {% endif %}
@@ -569,7 +569,7 @@
       var columns = [{ targets: [0], width: '1rem' }];
 
       {% if event.tour.id != 49 %}
-        columns.push({ targets: [2,3], width: '4rem' });
+        columns.push({ targets: [2,3], width: '5rem' });
         columns.push({ targets: [4], width: '8rem' });
       {% endif %}
 
@@ -627,20 +627,16 @@
           var table = new DataTable('#setlistTable', {
             layout: layout,
             paging: false,
-            scrollX: false,
             searching: false,
-            autoWidth: false,
             ordering: false,
             columnDefs: columns,
           });
 
           // remove child row control from snippet rows
 
-
           // code adapted from stackoverflow
           $('#copySetlist').click(function() {
             var btn = this;
-
 
             var $temp = $("<textarea>");
             $("body").append($temp);

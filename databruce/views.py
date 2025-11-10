@@ -842,7 +842,10 @@ class SongDetail(TemplateView):
             ),
         )
 
-        context["counts"] = context["setlists"].values("public", "private")[0]
+        try:
+            context["counts"] = context["setlists"].values("public", "private")[0]
+        except IndexError:
+            context["counts"] = {"public": 0, "private": 0}
 
         context["positions"] = (
             context["setlists"]

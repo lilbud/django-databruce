@@ -86,15 +86,16 @@
             <table class="table table-hover display" id="setlistTable">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th class="songnum">#</th>
                   <th>Song</th>
                 </tr>
               </thead>
               <tbody>
                 {% for set in event_setlist %}
                   <tr class="text-center">
-                    <td class="setHeader {{ set.grouper|lower|cut:" " }}" colspan="2">{{ set.grouper }}</td>
-                    <td class="setname d-none"></td>
+                    <td class="setHeader text-center {{ set.grouper|lower|cut:" " }}"
+                        colspan="3">{{ set.grouper }}</td>
+                    <td class="d-none"></td>
                   </tr>
                   {% for song in set.list %}
                     <tr class="p-0">
@@ -228,7 +229,7 @@
 </div>
 <script>
     var layout = getDatatableLayout();
-    layout.topStart = 'pageLength';
+    {% comment %} layout.topStart = 'pageLength'; {% endcomment %}
 
     $(document).ready(function () {
       new DataTable('#otdTable', {
@@ -238,7 +239,7 @@
           scrollX: false,
           paging: false,
           ordering: false,
-          columnDefs: [{ targets: 0, width: '8rem' }],
+          columns: [{ targets: [0], width: '6rem' }],
       });
 
       new DataTable('#recentTable', {
@@ -248,9 +249,9 @@
           searching: false,
           scrollX: false,
           ordering: false,
-          columnDefs: [{ targets: 0, width: '8rem' }],
+          columns: [{ targets: [0], width: '8rem' }],
       });
-
+      /*
       new DataTable('#upcomingTable', {
           layout: layout,
           autoWidth: false,
@@ -258,8 +259,9 @@
           searching: false,
           scrollX: false,
           ordering: false,
-          columnDefs: [{ targets: 0, width: '8rem' }],
+          columns: [{ targets: 0, width: '8rem' }],
       });
+      */
 
       new DataTable('#setlistTable', {
           layout: layout,
@@ -268,7 +270,7 @@
           scrollX: false,
           searching: false,
           ordering: false,
-          columnDefs: [{ targets: 0, width: '2rem' }],
+          columns: [{ targets: [0], width: '1rem' }];
       });
     })
 </script>
