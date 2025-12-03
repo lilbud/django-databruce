@@ -453,7 +453,7 @@ class States(models.Model):
 
 
 class VenuesText(models.Model):
-    id = models.ForeignKey(
+    id = models.OneToOneField(
         "Venues",
         on_delete=models.DO_NOTHING,
         primary_key=True,
@@ -476,7 +476,7 @@ class VenuesText(models.Model):
 class Venues(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    brucebase_url = models.TextField(unique=True, blank=True, default=None)
+    brucebase_url = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     detail = models.TextField(blank=True, default=None)
 
@@ -852,6 +852,7 @@ class Relations(models.Model):
         default=None,
     )
     aliases = models.TextField(blank=True, default=None)
+    nickname = models.TextField(blank=True, default=None)
 
     instruments = models.TextField(blank=True, default=None)
 
@@ -911,6 +912,13 @@ class ReleaseTracks(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     release = models.ForeignKey("Releases", models.DO_NOTHING, db_column="release_id")
+    discnum = models.IntegerField(db_column="disc_num")
+    discid = models.ForeignKey(
+        "ReleaseDiscs",
+        to_field="uuid",
+        on_delete=models.DO_NOTHING,
+        db_column="disc_id",
+    )
     track = models.IntegerField(db_column="track_num")
 
     song = models.ForeignKey(
@@ -921,7 +929,7 @@ class ReleaseTracks(models.Model):
         default=None,
     )
 
-    event = models.ForeignKey(Events, models.DO_NOTHING)
+    event = models.ForeignKey(Events, models.DO_NOTHING, blank=True, default=None)
     note = models.TextField(blank=True, default=None)
 
     setlist = models.ForeignKey(
@@ -935,6 +943,7 @@ class ReleaseTracks(models.Model):
 
     updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    length = models.TimeField(blank=True, default=None)
 
     class Meta:
         managed = False
@@ -960,6 +969,8 @@ class Releases(models.Model):
         models.DO_NOTHING,
         related_name="release_event",
         db_column="event_id",
+        default=None,
+        blank=True,
     )
     updated_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -1635,7 +1646,7 @@ class Lyrics(models.Model):
 
 class Updates(models.Model):
     id = models.AutoField(primary_key=True)
-    item_id = models.IntegerField(blank=True, null=True)
+    item_id = models.TextField(blank=True, null=True)
     item = models.TextField(blank=True, null=True)  # noqa: DJ001
     value = models.TextField(blank=True, null=True, db_column="to_value")  # noqa: DJ001
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -1706,3 +1717,117 @@ class TourCounts(models.Model):
     class Meta:
         managed = False
         db_table = "tour_counts"
+
+
+class OnstageBandMembers(models.Model):
+    id = models.IntegerField(primary_key=True)
+    relation = models.ForeignKey(Relations, models.DO_NOTHING, db_column="relation_id")
+    band = models.ForeignKey(Bands, models.DO_NOTHING, db_column="band_id")
+    first = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        related_name="onstagebandfirst",
+        db_column="first",
+    )
+    last = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        related_name="onstagebandlast",
+        db_column="last",
+    )
+
+    class Meta:
+        managed = False
+        db_table = "onstage_band_members"
+
+
+class ReleaseDiscs(models.Model):
+    id = models.AutoField(primary_key=True)
+    release = models.ForeignKey(Releases, models.DO_NOTHING)
+    disc_num = models.IntegerField()
+    name = models.TextField(blank=False, null=False)
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "release_discs"
+
+
+class SetlistEntries(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        db_column="event_id",
+    )
+
+    show_opener = models.ForeignKey(
+        to=Songs,
+        on_delete=models.DO_NOTHING,
+        related_name="show_opener",
+        db_column="show_opener",
+    )
+
+    s1_closer = models.ForeignKey(
+        to=Songs,
+        on_delete=models.DO_NOTHING,
+        related_name="s1_closer",
+        db_column="s1_closer",
+    )
+
+    s2_opener = models.ForeignKey(
+        to=Songs,
+        on_delete=models.DO_NOTHING,
+        related_name="s2_opener",
+        db_column="s2_opener",
+    )
+
+    main_closer = models.ForeignKey(
+        to=Songs,
+        on_delete=models.DO_NOTHING,
+        related_name="main_closer",
+        db_column="main_closer",
+    )
+
+    encore_opener = models.ForeignKey(
+        to=Songs,
+        on_delete=models.DO_NOTHING,
+        related_name="encore_opener",
+        db_column="encore_opener",
+    )
+
+    show_closer = models.ForeignKey(
+        to=Songs,
+        on_delete=models.DO_NOTHING,
+        related_name="show_closer",
+        db_column="show_closer",
+    )
+
+    class Meta:
+        managed = False
+        db_table = "setlist_entries"
+
+
+class Notes(models.Model):
+    id = models.AutoField(primary_key=True)
+    event = models.ForeignKey(Events, on_delete=models.CASCADE, db_column="event_id")
+    num = models.IntegerField()
+    note = models.TextField()
+    gap = models.TextField(blank=True, null=True)  # noqa: DJ001
+    last = models.TextField(blank=True, null=True)  # noqa: DJ001
+    last_date = models.TextField(blank=True, null=True)  # noqa: DJ001
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    setlist = models.ForeignKey(
+        Setlists,
+        on_delete=models.CASCADE,
+        db_column="setlist_id",
+    )
+
+    class Meta:
+        managed = False
+        db_table = "notes"

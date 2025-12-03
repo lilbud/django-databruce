@@ -65,11 +65,11 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer {
     border-radius: 0 !important;
 }
 
-tr:last-child > td:first-child {
+td:has(:not(table)) > tr:last-child > td:first-child {
     border-bottom-left-radius: var(--bs-border-radius) !important;
 }
 
-tr:last-child > td:last-child {
+td:has(:not(table)) > tr:last-child > td:first-child {
     border-bottom-right-radius: var(--bs-border-radius) !important;
 }
 
@@ -118,12 +118,11 @@ div.dt-scroll-body thead tr th
     color: var(--base-content) !important;
     font-weight: 600 !important;
     font-size: 0.8rem !important;
-    line-height: 0.7rem !important;
+    line-height: 1 !important;
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
-}
-
-.setHeader {
+    /* position: relative; */
+    vertical-align: middle !important;
     background-color: #717f8e !important;
     color: #ffffff !important;
 }
@@ -142,20 +141,20 @@ div.dt-scroll-body thead tr th
 }
 
 .set1closer,
-.mainsetcloser,
-.encoreopener,
-.showcloser,
-.setHeader.encore {
+.mainsetcloser {
     background-color: var(--accent) !important;
     color: var(--accent-content) !important;
 }
 
-table {
-    width: 100% !important;
+.encoreopener,
+.setHeader.encore,
+.showcloser {
+    background-color: var(--danger) !important;
+    color: var(--danger-content) !important;
 }
 
-table tbody tr td {
-    padding: 0.25rem 0.5rem !important;
+table {
+    width: 100% !important;
 }
 
 table th {
@@ -190,16 +189,16 @@ table th {
     width: 12rem !important;
 }
 
-.songnum {
-    width: 1rem !important;
-}
-
-@media only screen and (max-width: 768px) {
+/* @media only screen and (max-width: 768px) {
     .songnum {
         width: 4rem !important;
         height: 1rem !important;
     }
-}
+} */
+
+/* td.songnum, span.songnum {
+    line-height: 1 !important;
+} */
 
 /* Hide Calendar Popup, it is very finicky and doesn't like to be placed */
 /* div.dt-datetime {
@@ -243,4 +242,85 @@ div.dt-button-background {
 .dropdown-menu {
     background-color: rgba(255, 255, 255, 0.2) !important;
     backdrop-filter: blur(0);
+}
+
+td > table > tbody > tr > td:first-child {
+    border-bottom-left-radius: 0% !important;
+}
+
+td[colspan="5"]:not(.setHeader) {
+    padding: 0% !important;
+}
+
+:not(td) > table tbody tr td:not(.fc-day, [role="presentation"]) {
+    padding: 0.25rem 0.5rem !important;
+}
+
+/* td.songnum {
+    padding: 0.25rem 0.25rem !important;
+} */
+
+td[colspan="5"] tr:hover td {
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.075);
+}
+
+#setlistTable td:nth-child(1) {
+    width: 30px !important;
+}
+
+#setlistTable td:nth-child(2) {
+   min-width: 350px !important;
+   max-width: 400px !important;
+}
+
+#setlistTable td:nth-child(5) {
+    width: 50px !important;
+    padding: 0.25rem 0.75rem !important;
+}
+
+#setlistTable td:nth-child(6) {
+    width: 150px !important;
+}
+
+#setlistTable td:nth-child(3), 
+#setlistTable td:nth-child(4) {
+    width: 50px !important;
+}
+
+/* .dt-scroll-body thead {
+    display: none !important
+} */
+
+.note-button {
+    height: 1rem !important;
+    display: inline-block !important;
+}
+
+.col > .setlist_note {
+    line-height: 1rem !important;
+}
+
+@media only screen and (min-width: 768px) {
+    tr.child {
+        display: none !important;
+    }
+}
+
+#onstageTable tr > td:empty {
+    display: none !important
+}
+
+.card-body tbody th:last-child {
+    border-bottom: 0 !important;
+}
+
+.card-body tbody .dtrg-group th {
+    padding: 0 0.25rem 0.25rem 0 !important;
+}
+
+@media only screen and (min-width: 768px) {
+    td > .badge {
+        vertical-align: middle;
+        margin-top: -0.35em;
+    }
 }

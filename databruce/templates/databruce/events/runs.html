@@ -4,9 +4,7 @@
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Event Runs</div>
-  <div class="text-base">
-    A 'run' is multiple events at the same venue by the same band. I largely based this off of Jerrybase.
-  </div>
+  <div class="text-base">A 'run' is multiple events at the same venue by the same band, usually consecutive.</div>
 {% endblock info_row %}
 {% block table_id %}
   runTable
@@ -28,21 +26,27 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout([1, 2, 3, 4, 5, 6, 7, 8], false);
+      var layout = getDatatableLayout({columns: [1, 2, 3, 4, 5, 6, 7, 8], category: false});
 
-      new DataTable('#runTable', {
+      var table = new DataTable('#runTable', {
           layout: layout,
           serverSide: true,
           processing: true,
+          scrollY: '60vh',
           ajax: {
             'url': '/api/v1/runs/?format=datatables&keep=id',
           },
+          columnDefs: [
+            { targets: "_all", className: 'text-wrap text-xs'},
+            { targets: [4,5], className: 'text-center'},
+          ],
           columns: [
             {
               'data': 'name',
               'name': 'name',
+              'width': '18rem',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
+                if (type === 'display' && data) {
                   return '<a href="/events/runs/' + row.id + '">'+ row.name +'</a>';
                 }
               },
@@ -50,46 +54,52 @@
             {
               'data': 'band',
               'name': 'band__name',
+              'width': '12rem',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
+                if (type === 'display' && data) {
                   return '<a href="/bands/' + data.id + '">'+ data.name +'</a>';
-                };
+                }
               },
             },
             {
               'data': 'venue',
               'name': 'venue__name',
+              'width': '12rem',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
+                if (type === 'display' && data) {
                   return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
-                };
+                }
               },
             },
             {
               'data': 'venue.city',
-              'name': 'venue__city__name',
+              'name': 'venue__city__name, venue__state__abbrev, venue__country__name',
+              'width': '12rem',
+              'className': 'text-nowrap',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
-                };
+                if (type === 'display' && data) {
+                  return '<a href="/cities/' + data.id + '">'+ data.display +'</a>';
+                }
               },
             },
-            {'data': 'num_shows', 'name': 'num_shows'},
-            {'data': 'num_songs', 'name': 'num_songs'},
+            {'data': 'num_shows', 'name': 'num_shows', 'width': '1rem' },
+            {'data': 'num_songs', 'name': 'num_songs','width': '1rem' },
             {
               'data': 'first.date',
-              'name': 'first__date',
+              'name': 'first__id, first__early_late',
+              'width': '8rem',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
+                if (type === 'display' && data) {
                   return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
                 }
-              },              
+              },
             },
             {
               'data': 'last.date',
-              'name': 'last__date',
+              'name': 'last__id, last__early_late',
+              'width': '8rem',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
+                if (type === 'display' && data) {
                   return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
                 }
               },

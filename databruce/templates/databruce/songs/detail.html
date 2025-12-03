@@ -10,7 +10,7 @@
 {% block content %}
   <div class="d-grid gap-0 row-gap-2">
     <div class="row" id="song-info">
-      <div class="text-2xl text-nowrap">{{ song_info.name }}</div>
+      <div class="text-2xl text-wrap">{{ song_info.name }}</div>
     </div>
     <div class="row">
       <div class="col">
@@ -65,31 +65,31 @@
     <div class="row">
       <div class="col">
         <ul class="nav nav-pills items-end mb-2" role="tablist">
-          <button class="nav-link text-center active"
+          <button class="nav-link text-center active mb-1 mb-md-0"
                   data-bs-toggle="pill"
                   data-bs-target="#events"
                   aria-controls="pills-events">Performances</button>
           {% if snippet_count > 0 %}
-            <button class="nav-link text-center"
+            <button class="nav-link text-center mb-1 mb-md-0"
                     data-bs-toggle="pill"
                     data-bs-target="#snippets"
                     aria-controls="pills-snippets">Snippets</button>
           {% endif %}
-          <button class="nav-link text-center"
+          <button class="nav-link text-center mb-1 mb-md-0"
                   data-bs-toggle="pill"
                   data-bs-target="#stats"
                   aria-controls="pills-stats">Stats</button>
-          <button class="nav-link text-center"
+          <button class="nav-link text-center mb-1 mb-md-0"
                   data-bs-toggle="pill"
                   data-bs-target="#yearstats"
                   aria-controls="pills-stats">Year by Year</button>
           {% if lyrics %}
-            <button class="nav-link text-center"
+            <button class="nav-link text-center mb-1 mb-md-0"
                     data-bs-toggle="pill"
                     data-bs-target="#lyrics"
                     aria-controls="pills-stats">Lyrics</button>
           {% endif %}
-          <button class="nav-link text-center"
+          <button class="nav-link text-center mb-1 mb-md-0"
                   data-bs-toggle="pill"
                   data-bs-target="#links"
                   aria-controls="pills-links">Links</button>
@@ -198,7 +198,7 @@
                     <tr>
                       <th class="all" scope="col">Date</th>
                       <th class="min-tablet-l" scope="col">Act</th>
-                      <th class="min-tablet-l" scope="col">Venue</th>
+                      <th class="all" scope="col">Venue</th>
                       <th class="min-tablet-l" scope="col">Location</th>
                       <th class="min-tablet-l" scope="col">Tour</th>
                       <th class="min-tablet-l" scope="col">Position</th>
@@ -308,6 +308,11 @@
         let ctx = document.getElementById("chart").getContext("2d");
         Chart.defaults.color = '#999';
 
+        var style = getComputedStyle(document.body);
+        var primCol = style.getPropertyValue('--primary');
+
+        console.log(primCol);
+
         let chart = new Chart(ctx, {
           type: "bar",
           data: {
@@ -315,8 +320,8 @@
             datasets: [
                 {
                   label: "Events",
-                  backgroundColor: "#0369a1",
-                  borderColor: "#417690",
+                  backgroundColor: `${primCol}`,
+                  borderColor: `${primCol}`,
                   color: "#ffffff",
                   data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
                 }
@@ -339,18 +344,19 @@
                 grid: {
                   color: '#5e5e5e',
                 },
-              }
+              },
             },
           },
         });
+
     });
 
     $(document).ready(function () {
 
-      var layout = getDatatableLayout([0,1,2,3,4,5,6,7,8,9,10], true);
-      var categories = [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]
+      var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7,8,9,10], category: true});
+      var categories = [{'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]
       
-      dtCategorySelect(layout, 7, categories);
+      dtCategorySelect({layout: layout, column_idx: 7, values: categories});
 
       new DataTable('#songTable', {
         layout: layout,
@@ -361,11 +367,13 @@
         },
         columnDefs: [
           { 'targets': [-1], 'visible': false },
+          { 'targets': '_all', 'className': 'text-wrap', defaultContent: '' },
         ],
         columns: [
           {
             'data': 'event.date',
-            'name': 'event__date',
+            'name': 'event__id',
+            'width': '8rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
@@ -375,6 +383,7 @@
           {
             'data': 'event.artist',
             'name': 'event__artist__name',
+            'width': '14rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return '<a href="/bands/' + data.id + '">'+ data.name +'</a>';
@@ -383,7 +392,8 @@
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__name',
+            'name': 'event__venue__name, event__venue__detail',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
@@ -392,28 +402,31 @@
           },
           {
             'data': 'event.venue.city',
-            'name': 'event__venue__city__name',
+            'name': 'event__venue__city__name, event__venue__state__abbrev, event__venue__country__name',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
-                }
+              if (type === 'display') {
+                return '<a href="/cities/' + data.id + '">'+ data.display +'</a>';
+              };
             },
           },
           {
             'data': 'event.tour',
             'name': 'event__tour__name',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
-                }
+              if (type === 'display') {
+                return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
+              }
             },
           },
-          {'data': 'position', 'name': 'position'},
-          {'data': 'last', 'name': 'last' },
-          {'data': 'set_name', 'name': 'set_name'},
+          {'data': 'position', 'name': 'position', 'width': '6rem',},
+          {'data': 'last', 'name': 'last', 'width': '1rem', },
+          {'data': 'set_name', 'name': 'set_name', 'width': '4rem',},
           {
             'data': 'prev_song',
             'name': 'prev_song__name',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (data != null) {
                   if (type === 'display') {
@@ -425,6 +438,7 @@
           {
             'data': 'next_song',
             'name': 'next_song__name',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (data != null) {
                   if (type === 'display') {
@@ -438,7 +452,7 @@
         ]
       });
 
-      var layout = getDatatableLayout([0,1,2], false);
+      var layout = getDatatableLayout({columns: [0,1,2], category: false});
       // for reasons unknown, an extra non-functioning searchbuilder button is added
       // this removes that single button.
       layout.topEnd.features.pop();
@@ -448,12 +462,12 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/snippets/?song={{ song_info.id }}&format=datatables',
+          'url': '/api/v1/snippets/?snippet={{ song_info.id }}&format=datatables',
         },
         columns: [
           {
             'data': 'setlist.event.date',
-            'name': 'setlist__event__date',
+            'name': 'setlist__event__id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return '<a href="/events/' + data.id + '">'+ data.display +'</a>';

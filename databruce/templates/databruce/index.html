@@ -3,6 +3,8 @@
   Home
 {% endblock title %}
 {% load static %}
+{% block extrajs %}
+{% endblock extrajs %}
 {% block content %}
   <div class="row mb-3">
     <div class="col">
@@ -67,21 +69,20 @@
     <div class="card mb-3 mb-lg-0">
       <div class="card-header">Most Recent Show</div>
       <div class="card-body p-0">
-        {% with first=latest_event %}
+        {% with first=latest_setlist.event %}
           <div class="text-sm px-2 pt-2 pb-0">{{ first.title|default_if_none:"" }}</div>
           <div class="px-2 py-2">
             <div class="row">
               <a class="fw-medium text-sm text-reset"
-                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue_info.value }}</a>
+                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue }}</a>
             </div>
             <div class="row">
               <a class="text-reset text-sm"
-                 href="{% url 'band_details' id=first.band.id %}">{{ first.band.name }}</a>
+                 href="{% url 'band_details' id=first.artist.id %}">{{ first.artist.name }}</a>
             </div>
           {% endwith %}
         </div>
-        {% if latest_show %}
-          {% regroup latest_show by set_name as event_setlist %}
+        {% if latest_setlist %}
           <div class="table-responsive">
             <table class="table table-hover display" id="setlistTable">
               <thead>
@@ -90,30 +91,6 @@
                   <th>Song</th>
                 </tr>
               </thead>
-              <tbody>
-                {% for set in event_setlist %}
-                  <tr class="text-center">
-                    <td class="setHeader text-center {{ set.grouper|lower|cut:" " }}"
-                        colspan="3">{{ set.grouper }}</td>
-                    <td class="d-none"></td>
-                  </tr>
-                  {% for song in set.list %}
-                    <tr class="p-0">
-                      <td class="text-center songnum {% if song.position and song.position != song.set_name %}position {{ song.position|lower|cut:" " }}{% endif %}"
-                          {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
-                        {{ song.song_num }}
-                      </td>
-                      <td class="py-1">
-                        <span class="text-nowrap">
-                          <a class="fw-semibold"
-                             href="{% url "song_details" id=song.song_info.id %}">{{ song.song_info.name }}</a>
-                          {% if song.segue %}{{ song.separator }}{% endif %}
-                        </span>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                {% endfor %}
-              </tbody>
             </table>
           </div>
         {% else %}
@@ -132,24 +109,10 @@
               <table class="table table-hover display" id="recentTable">
                 <thead>
                   <tr>
-                    <th class="d-none">Date</th>
-                    <th class="d-none">Location</th>
+                    <th>Date</th>
+                    <th>Location</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {% for event in recent %}
-                    <tr>
-                      <td class="text-nowrap"
-                          data-sort="{{ event.get_date }}"
-                          data-filter="{{ event.get_date }}">
-                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                      </td>
-                      <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue_info.id %}">{{ event.venue_info.value }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
               </table>
             </div>
           </div>
@@ -164,24 +127,10 @@
                 <table class="table table-hover display" id="upcomingTable">
                   <thead>
                     <tr>
-                      <th class="d-none">Date</th>
-                      <th class="d-none">Location</th>
+                      <th>Date</th>
+                      <th>Location</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {% for event in upcoming %}
-                      <tr>
-                        <td class="text-nowrap"
-                            data-sort="{{ event.get_date }}"
-                            data-filter="{{ event.get_date }}">
-                          <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                        </td>
-                        <td class="text-wrap">
-                          <a href="{% url "venue_details" id=event.venue_info.id %}">{{ event.venue_info.name }}</a>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
                 </table>
               </div>
             </div>
@@ -201,24 +150,10 @@
               <table class="table table-hover display" id="otdTable">
                 <thead>
                   <tr>
-                    <th class="d-none">Date</th>
-                    <th class="d-none">Location</th>
+                    <th>Date</th>
+                    <th>Location</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {% for event in events %}
-                    <tr>
-                      <td class="text-nowrap"
-                          data-sort="{{ event.get_date }}"
-                          data-filter="{{ event.get_date }}">
-                        <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                      </td>
-                      <td class="text-wrap">
-                        <a href="{% url "venue_details" id=event.venue_info.id %}">{{ event.venue_info.value }}</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
               </table>
             </div>
           </div>
@@ -228,49 +163,152 @@
   </div>
 </div>
 <script>
-    var layout = getDatatableLayout();
-    {% comment %} layout.topStart = 'pageLength'; {% endcomment %}
+    var layout = getDatatableLayout({columns: false, category: false});
+    layout.topStart = 'pageLength';
 
     $(document).ready(function () {
       new DataTable('#otdTable', {
           layout: layout,
-          autoWidth: false,
           searching: false,
-          scrollX: false,
           paging: false,
           ordering: false,
-          columns: [{ targets: [0], width: '6rem' }],
+          serverSide: true,
+          processing: true,
+          ajax: {
+            'url': '/api/v1/index/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&format=datatables&limit=5',
+          },
+          columns: [
+            {
+              'data': 'date',
+              'name': 'id',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                }
+              },
+            },
+            {
+              'data': 'venue',
+              'name': 'venue__name, venue__detail',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
+                  }
+              },
+            },
+          ],
+          columnDefs: [{ targets: [0], width: '6rem', type: 'text' },],
       });
 
       new DataTable('#recentTable', {
           layout: layout,
-          autoWidth: false,
-          paging: false,
           searching: false,
-          scrollX: false,
-          ordering: false,
-          columns: [{ targets: [0], width: '8rem' }],
-      });
-      /*
-      new DataTable('#upcomingTable', {
-          layout: layout,
-          autoWidth: false,
           paging: false,
-          searching: false,
-          scrollX: false,
           ordering: false,
-          columns: [{ targets: 0, width: '8rem' }],
+          serverSide: true,
+          processing: true,
+          ajax: {
+            'url': '/api/v1/index/?recent=true&format=datatables&limit=5',
+          },
+          columns: [
+            {
+              'data': 'date',
+              'name': 'id',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                }
+              },
+            },
+            {
+              'data': 'venue',
+              'name': 'venue__name, venue__detail',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
+                  }
+              },
+            },
+          ],
+          columnDefs: [{ targets: [0], width: '6rem', type: 'text' },],
       });
-      */
 
       new DataTable('#setlistTable', {
-          layout: layout,
-          autoWidth: false,
-          paging: false,
-          scrollX: false,
-          searching: false,
-          ordering: false,
-          columns: [{ targets: [0], width: '1rem' }];
+        layout: layout,
+        paging: false,
+        searching: false,
+        ordering: false,
+        ajax: '/api/v1/event_setlist/?event={{ latest_setlist.event.id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        serverSide: true,
+        processing: true,
+        columnDefs: [{ targets: [0], width: '1rem' },],
+        rowGroup: {
+            dataSrc: 'set_name',
+            className: 'text-center setHeader',
+        },
+        columns: [
+          { 
+            'data': 'song_num',
+            'className': 'dt-center all',
+            'width': '1rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && row.position) {
+                var position = row.position.replaceAll(' ', '').toLowerCase();
+
+                return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum text-sm ${position}'>${data}</span>`
+              } else if (!data) {
+                return ''
+              } else {
+                return `<span class='songnum text-sm'>${data}</span>`
+              }
+            },
+          },
+          {
+            'data': 'song',
+            'name': 'song__name',
+            'className': 'all',
+            'width': '10rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
+
+                song = row.segue ? `${song} >` : song;
+
+                var badge = $('<span />').addClass('ms-2 badge')
+
+                // instrumental, sign-request, nobruce, premiere
+                if (row.instrumental) {
+                  $(badge).addClass('text-bg-info').text('Instrumental');
+                } else if (row.sign_request) {
+                  $(badge).addClass('text-bg-info').text('Sign Request');
+                } else if (row.nobruce) {
+                  $(badge).addClass('warning').text('No Bruce');
+                } else if (row.premiere) {
+                  $(badge).addClass('bg-secondary').text('Premiere');
+                }
+
+                return badge ? song + $(badge).prop('outerHTML') : song;
+              }
+            },
+            },
+          ],
+          initComplete: function(settings, json) {
+            var dt = this.api();
+
+            $('.setHeader').each(function() {
+              var row = $(this).children('th');
+              var name = $(row).text().replaceAll(' ', '').toLowerCase();
+              $(row).addClass(name).addClass('setHeader');
+            });
+
+            $('span.songnum').each(function() {
+              var cell = this.closest('td')
+              $(cell).addClass(this.className).text($(this).text());
+
+              $(cell).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', this.getAttribute('data-bs-title'))
+              $(cell).tooltip();
+            });
+          }
       });
     })
 </script>

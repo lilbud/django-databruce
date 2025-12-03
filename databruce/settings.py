@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "django_filters",
     "shortener",
     # "compressor",
+    "dal",
+    "dal_select2",
 ]
 
 SITE_ID = 1
@@ -168,11 +170,7 @@ NOTIFY_EMAIL = "databrucedb@gmail.com"
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    # "compressor.finders.CompressorFinder",
 ]
-
-# COMPRESS_ENABLED = True
-# COMPRESS_OFFLINE = True
 
 try:
     from .local_settings import *  # noqa: F403

@@ -45,18 +45,37 @@
       <div class="card-body px-0">
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">
-            {% include "databruce/partials/event_table.html" with events=events %}
+            {% comment %} {% include "databruce/partials/event_table.html" with events=events %} {% endcomment %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="eventTable">
+                <thead>
+                  <tr class="custom">
+                    <th class="all" scope="col">Date</th>
+                    <th class="min-tablet-l" scope="col">Setlist</th>
+                    <th class="min-tablet-l" scope="col">Band</th>
+                    <th class="min-tablet-l" scope="col">Venue</th>
+                    <th class="min-tablet-l" scope="col">Location</th>
+                    <th class="min-tablet-l" scope="col">Tour</th>
+                    <th class="min-tablet-l" scope="col">Detail</th>
+                    <th class="min-tablet-l" scope="col">Public</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
           </div>
           <div id="members" class="tab-pane fade">
             <div class="table-responsive">
               <table class="table table-hover display" id="memberTable">
                 <thead>
                   <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Instruments</th>
+                    <th class="all text-center" scope="col">Count</th>
+                    <th class="all" scope="col">Name</th>
+                    <th class="min-tablet-l" scope="col">Instruments</th>
+                    <th class="min-tablet-l" scope="col">First</th>
+                    <th class="min-tablet-l" scope="col">Last</th>
                   </tr>
                 </thead>
-                <tbody>
+                {% comment %} <tbody>
                   {% for member in members %}
                     <tr>
                       <td>
@@ -65,7 +84,7 @@
                       <td>{{ member.relation.instruments|default_if_none:"" }}</td>
                     </tr>
                   {% endfor %}
-                </tbody>
+                </tbody> {% endcomment %}
               </table>
             </div>
           </div>
@@ -89,15 +108,60 @@
   </div>
   <script>
     $(document).ready(function () {
+      var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
+      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]});
+
       new DataTable('#eventTable', {
-        layout: getDatatableLayout([1,2,3,4]),
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/onstage_events/?band={{ info.id }}&format=datatables',
+        },
         columnDefs: [
-          { targets: [0], type: 'date' }, //date
+          {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},
+          {targets: [-1], visible: false }
         ],
+        columns: event_table_columns,
       });
 
       new DataTable('#memberTable',{
-        layout: getDatatableLayout(),
+        layout: getDatatableLayout({category: false}),
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/onstageband/?band={{ info.id }}&format=datatables',
+        },
+        columns: [
+          { 'data': 'count', 'name': 'count' },
+          { 
+            'data': 'relation', 'name': 'relation__name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/relations/' + data.id + '">' + data.name + '</a>';
+              }
+            },
+          },
+          { 'data': 'relation.instruments', 'name': 'relation__instruments' },
+          { 
+            'data': 'first.date',
+            'name': 'first__id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+              }
+            },
+          },
+          { 
+            'data': 'last.date',
+            'name': 'last__id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+              }
+            },          
+          },
+        ],
       });
     });
   </script>

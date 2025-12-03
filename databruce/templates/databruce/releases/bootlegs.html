@@ -1,61 +1,94 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-    Bootlegs
+  Bootlegs
 {% endblock title %}
 {% block info_row %}
-    <div class="text-2xl">Bootlegs</div>
-    <div class="text-base">
-        <p>
-            Unofficial releases from over the years. All of this information was largely sourced from <a href="https://www.springsteenlyrics.com/">SpringsteenLyrics</a>. Many of these are also available on Archive.org under my Radio Nowhere collection. Only live bootlegs are listed here.
-            To keep this page from taking forever to load, only bootlegs that I've uploaded to Archive are showing currently. Still working on matching them all up, so it might take a bit.
-        </p>
-    </div>
+  <div class="text-2xl">Bootlegs</div>
+  <div class="text-base">
+    <p>
+      Unofficial releases from over the years. All of this information was largely sourced from <a href="https://www.springsteenlyrics.com/">SpringsteenLyrics</a>. Many of these are also available on Archive.org under my Radio Nowhere collection. Only live bootlegs are listed here.
+      To keep this page from taking forever to load, only bootlegs that I've uploaded to Archive are showing currently. Still working on matching them all up, so it might take a bit.
+    </p>
+  </div>
 {% endblock info_row %}
 {% block table_id %}
-    releasesTable
+  releasesTable
 {% endblock table_id %}
 {% block table %}
-    <thead>
-        <tr>
-            <th class="all">Title</th>
-            <th class="all">Label</th>
-            <th class="all">Source</th>
-            <th class="all">Type</th>
-            <th class="all">Event</th>
-            <th class="all">Archive</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for boot in bootlegs %}
-            <tr>
-                <td>
-                    <a href="https://www.springsteenlyrics.com/bootlegs.php?item={{ boot.slid }}">{{ boot.title }}</a>
-                </td>
-                <td>{{ boot.label|default_if_none:"" }}</td>
-                <td>{{ boot.source|default_if_none:"" }}</td>
-                <td>{{ boot.type|default_if_none:"" }}</td>
-                <td data-sort="{{ boot.event.get_date }}"
-                    data-filter="{{ boot.event.get_date }}">
-                    {% if boot.event %}
-                        <a href="{% url "event_details" id=boot.event.id %}">{{ boot.event.get_date }}</a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if boot.archive %}<a href="https://archive.org/details/{{ boot.archive.url }}">Link</a>{% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th class="all">Title</th>
+      <th class="min-tablet-l">Label</th>
+      <th class="min-tablet-l">Source</th>
+      <th class="min-tablet-l">Type</th>
+      <th class="min-tablet-l">Event</th>
+      <th class="min-tablet-l">Archive</th>
+    </tr>
+  </thead>
+  {% comment %} <tbody> {% endcomment %}
+  {% comment %} {% for boot in bootlegs %}
+      <tr>
+        <td>
+          <a href="https://www.springsteenlyrics.com/bootlegs.php?item={{ boot.slid }}">{{ boot.title }}</a>
+        </td>
+        <td>{{ boot.label|default_if_none:"" }}</td>
+        <td>{{ boot.source|default_if_none:"" }}</td>
+        <td>{{ boot.type|default_if_none:"" }}</td>
+        <td data-sort="{{ boot.event.get_date }}" data-filter="{{ boot.event.get_date }}">
+          {% if boot.event %}
+            <a href="{% url "event_details" id=boot.event.id %}">{{ boot.event.get_date }}</a>
+          {% endif %}
+        </td>
+        <td>
+          {% if boot.archive %}<a href="https://archive.org/details/{{ boot.archive.url }}">Link</a>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
-    <script>
+  <script>
     $(document).ready(function () {
       new DataTable('#releasesTable', {
-        layout: getDatatableLayout([1,2,3,4]),
-        columnDefs: [
-            { type: 'date', targets: [4] },
+        layout: getDatatableLayout({columns: [1,2,3,4]}),
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/bootlegs/?archive=false&format=datatables&keep=slid',
+        },
+        columns: [
+          {
+            'data': 'title',
+            'name': 'title',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="https://www.springsteenlyrics.com/bootlegs.php?item=' + row.slid + '">'+ data +'</a>';
+              }
+            },
+          },
+          {'data': 'label', 'name': 'label'},
+          {'data': 'source', 'name': 'source'},
+          {'data': 'type', 'name': 'type'},
+          {
+            'data': 'event.date',
+            'name': 'event__id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            },
+          },
+          {
+            'data': 'archive.url',
+            'name': 'archive__url',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="https://archive.org/details/' + data + '">Archive.org</a>';
+              }
+            },         
+          },
         ]
       });
     });
-    </script>
+  </script>
 {% endblock scripts %}

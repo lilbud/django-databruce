@@ -13,6 +13,7 @@
   <thead>
     <tr class="custom">
       <th class="all" scope="col">Date</th>
+      <th class="min-tablet-l" scope="col">Setlist</th>
       <th class="min-tablet-l" scope="col">Band</th>
       <th class="all" scope="col">Venue</th>
       <th class="min-tablet-l" scope="col">Location</th>
@@ -21,7 +22,7 @@
       <th class="min-tablet-l" scope="col">Public</th>
     </tr>
   </thead>
-  <tbody>
+  {% comment %} <tbody>
     {% for event in events %}
       <tr>
         <td scope="row" class="text-nowrap">
@@ -53,19 +54,26 @@
         <td>{{ event.public|default_if_none:'' }}</td>
       </tr>
     {% endfor %}
-  </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout();
-    dtCategorySelect(layout, -1, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]);
+    var layout = getDatatableLayout({category: true});
+    dtCategorySelect({layout: layout, column_idx: 6, values: [{'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]});
 
     new DataTable('#eventTable', {
-      layout: getDatatableLayout(),
+      layout: layout,
+      serverSide: true,
+      processing: true,
+      ajax: {
+        'url': '/api/v1/events/?date={{ request.GET.date }}&format=datatables',
+      },
       columnDefs: [
-        { target: -1, visible: false }
+        { targets: [1], orderable: false, className: 'text-center text-sm'},
+        { targets: [-1], visible: false },
       ],
+      columns: event_table_columns,
     });
   })
   </script>

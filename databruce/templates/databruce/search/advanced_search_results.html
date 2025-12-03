@@ -49,7 +49,62 @@
       </div>
     </div>
     <div class="card">
-      <div class="card-body px-0">{% include "databruce/partials/event_table.html" with events=events %}</div>
+      <div class="card-body px-0">
+        {% comment %} {% include "databruce/partials/event_table.html" with events=events %} {% endcomment %}
+        <div class="table-responsive">
+          <table class="table table-hover display" id="eventTable">
+            <thead>
+              <tr class="custom">
+                <th class="all" scope="col">Date</th>
+                <th class="min-tablet-l" scope="col">Setlist</th>
+                <th class="min-tablet-l" scope="col">Band</th>
+                <th class="min-tablet-l" scope="col">Venue</th>
+                <th class="min-tablet-l" scope="col">Location</th>
+                <th class="min-tablet-l" scope="col">Tour</th>
+                <th class="min-tablet-l" scope="col">Detail</th>
+                <th class="min-tablet-l" scope="col">Public</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in events %}
+                <tr>
+                  <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
+                    <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                  </td>
+                  <td class="text-nowrap">
+                    {% if event.setlist %}
+                      <i class="bi bi-file-earmark-check d-none d-md-block"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-title="Has Setlist"></i>
+                      <div class="d-inline d-md-none">True</div>
+                    {% else %}
+                      <div class="d-inline d-md-none">False</div>
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">
+                    <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
+                  </td>
+                  <td class="text-nowrap">
+                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
+                  </td>
+                  <td class="text-nowrap">
+                    {% if event.venue.city %}
+                      <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city }}</a>
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">
+                    {% if event.tour %}
+                      <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
   <script>
@@ -60,11 +115,37 @@
     };
 
     $(document).ready(function () {
+      /*
       new DataTable('#eventTable', {
-        layout: getDatatableLayout([1,2,3,4]),
+        layout: getDatatableLayout({columns: [2,3,4,5,6,7], category: true}),
         columnDefs: [
-          { targets: [1], width: '1rem', orderable: false },
+          { targets: [1], orderable: false, className: 'text-center text-sm'},
+          { targets: [-1], visible: false },
         ],
+      });
+      */
+
+      const urlParams = new URLSearchParams(window.location.search).toString();
+      var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
+      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]});
+
+      new DataTable('#eventTable', {
+        layout: layout,
+        columnDefs: [
+          { targets: [1], orderable: false, className: 'text-center text-sm'},
+          { targets: [-1], visible: false },
+        ],
+        /*
+        serverSide: true,
+        processing: true,
+        ajax: {
+          url: '/api/v1/advanced_search/?format=datatables',
+          data: {
+            'param': urlParams,
+          },
+        },
+        columns: event_table_columns,
+        */
       });
 
       $('button#short-url').click(function () {

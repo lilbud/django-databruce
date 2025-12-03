@@ -14,14 +14,14 @@
     <tr>
       <th class="text-center all" scope="col">#</th>
       <th class="all" scope="col">Name</th>
-      <th class="all" scope="col">City</th>
+      <th class="min-tablet-l" scope="col">City</th>
       <th class="min-tablet-l" scope="col">State</th>
       <th class="min-tablet-l" scope="col">Country</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
     </tr>
   </thead>
-  <tbody>
+  {% comment %} <tbody>
     {% for venue in venues %}
       <tr>
         <td class="text-center">{{ venue.num_events }}</td>
@@ -43,29 +43,110 @@
             <a href="{% url "country_details" id=venue.country.id %}">{{ venue.country }}</a>
           {% endif %}
         </td>
-        <td data-sort="{{ venue.first.get_date }}"
-            data-filter="{{ venue.first.get_date }}">
+        <td data-sort="{{ venue.first.get_date }}" data-filter="{{ venue.first.get_date }}">
           {% if venue.first %}
             <a href="{% url "event_details" id=venue.first.id %}">{{ venue.first.get_date }}</a>
           {% endif %}
         </td>
-        <td data-sort="{{ venue.last.get_date }}"
-            data-filter="{{ venue.last.get_date }}">
+        <td data-sort="{{ venue.last.get_date }}" data-filter="{{ venue.last.get_date }}">
           {% if venue.last %}
             <a href="{% url "event_details" id=venue.last.id %}">{{ venue.last.get_date }}</a>
           {% endif %}
         </td>
       </tr>
     {% endfor %}
-  </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
     new DataTable('#venueTable', {
-      layout: getDatatableLayout([0,1,2,3,4,5,6], false),
-      columnDefs: [{ type: 'date', targets: [5,6] }]
-    })
-  })
+      layout: getDatatableLayout({columns: [0,1,2,3,4,5,6], category: false}),
+      serverSide: true,
+      processing: true,
+      scrollY: '60vh',
+      ajax: {
+        'url': '/api/v1/venues/?format=datatables&keep=id',
+      },
+      columnDefs: [
+        { 'targets': [0], 'width': '1rem' },
+        { 'targets': '_all', 'className': 'text-wrap', defaultContent: '' },
+      ],
+      columns: [
+        {'data': 'num_events', 'name': 'num_events', 'width': '1rem' },
+        {
+          'data': 'name',
+          'name': 'name, detail',
+          'width': '12rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/venues/' + row.id + '">'+ data +'</a>';
+            }
+          },
+        },
+        {
+          'data': 'city',
+          'name': 'city__name, city__aliases',
+          'width': '10rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              if (data) {
+                return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
+              }
+            }
+          },
+        },
+        {
+          'data': 'state', 
+          'name': 'state__name, state__abbrev',
+          'width': '8rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              if (data) {
+                return '<a href="/states/' + data.id + '">'+ data.name +'</a>';
+              }
+            }
+          },       
+        },
+        {
+          'data': 'country',
+          'name': 'country__name, country__alpha_2, country__alpha_3',
+          'width': '10rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              if (data) {
+                return '<a href="/countries/' + data.id + '">'+ data.name +'</a>';
+              }
+            }
+          },        
+        },
+        {
+          'data': 'first.date', 
+          'name': 'first__id, first__early_late',
+          'width': '8rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              if (data) {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            }
+          },
+        },
+        {
+          'data': 'last.date', 
+          'name': 'last__id, last__early_late',
+          'width': '8rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              if (data) {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            }
+          },
+        },
+      ],
+
+    });
+  });
   </script>
 {% endblock scripts %}

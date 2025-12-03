@@ -5,9 +5,9 @@
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
     <div class="text-2xl text-nowrap">Setlist Notes Search</div>
-    <div class="text-base text-nowrap mb-3">Search the various setlist notes for a given (case-insensitive) query.</div>
-    <form action="{% url 'note_search' %}" method="post" id="search-form">
-      {% csrf_token %}
+    <div class="text-base text-wrap mb-3">Search the various setlist notes for a given (case-insensitive) query.</div>
+    <form action="{% url 'note_search' %}" method="get" id="search-form">
+      {% comment %} {% csrf_token %} {% endcomment %}
       <div class="row mb-4">{{ form }}</div>
       <div class="row">
         <div class="col-1">

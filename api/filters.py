@@ -3,17 +3,20 @@ import re
 
 from django.db.models import F, Manager, Q, QuerySet
 from django.db.models.manager import BaseManager
+from django.http import HttpRequest
 from django_filters import rest_framework as filters
+from querystring_parser import parser
+from rest_framework.filters import BaseFilterBackend
 
 from databruce import models
 
 
-def sb_filter_types(
+def get_sb_filter(
     column: str,
     condition: str,
     value: str = "",
     value2: str = "",
-    type: str = "",
+    type: str = "",  # noqa: A002
 ):
     filter_types = {
         "=": Q(**{f"{column}__iexact": value}),
@@ -43,125 +46,299 @@ def sb_filter_types(
     return filter_types.get(condition)
 
 
-def queryset_sb_filter(query_params: dict) -> Q:
-    """Create filter using searchbuilder query params.
+from django.http import QueryDict
 
-    This is a server side version of the searchbuilder
-    filtering usually done in DOM.
-    """
-    filter = Q()
 
-    try:
-        criteria = query_params["searchBuilder"]["criteria"]
+class AdvFilter(BaseFilterBackend):
+    def lookups(self, param: str, value: str):
+        lookups = {
+            "first_date": Q(date__gte=value),
+            "last_date": Q(date__lte=value),
+            "month": Q(date__month=value),
+            "day": Q(date__day=value),
+            "city": Q(venue__city__id=value),
+            "state": Q(venue__state__id=value),
+            "country": Q(venue__country__id=value),
+            "tour": Q(tour__id=value),
+            "musician": Q(relation__id=value),
+            "band": Q(band__id=value),
+            "day_of_week": Q(date__week_day=value),
+        }
 
-        for item in criteria:
-            param = criteria[item]
+        return lookups.get(param)
 
-            data = next(
-                item["name"]
-                for item in dict(query_params["columns"]).values()
-                if item["data"] == param["origData"]
+    positions = {
+        "anywhere": "Anywhere",
+        "followed_by": "Followed By",
+        "show_opener": "Show Opener",
+        "in_show": "Show",
+        "in_set_one": "Set 1",
+        "set_one_opener": "Set 1 Opener",
+        "set_one_closer": "Set 1 Closer",
+        "in_set_two": "Set 2",
+        "set_two_opener": "Set 2 Opener",
+        "set_two_closer": "Set 2 Closer",
+        "main_set_closer": "Main Set Closer",
+        "encore_opener": "Encore Opener",
+        "in_encore": "Encore",
+        "in_preshow": "Pre-Show",
+        "in_recording": "Recording",
+        "in_soundcheck": "Soundcheck",
+        "show_closer": "Show Closer",
+    }
+
+    def filter_queryset(self, request, queryset, view):
+        params = QueryDict(request.GET["param"])
+        event_filter = Q()
+        setlist_event_filter = Q()
+        event_results = []
+
+        print(params)
+
+        total_setlist_forms = int(params.get("form-TOTAL_FORMS", "0"))
+        initial_setlist_forms = int(
+            params.get("form-INITIAL_FORMS", "0"),
+        )
+        event_params = [
+            item
+            for item in params
+            if not re.match(r"form-(\d)?|^.*_choice$", item) and params[item] != ""
+        ]
+
+        setlist_params = [item for item in params if re.match(r"form-\d", item)]
+
+        for item in event_params:
+            lookup = self.lookups(item, params[item])
+
+            if lookup:
+                if item in ("musician", "band"):
+                    events = models.Onstage.objects.filter(lookup)
+                    lookup = Q(id__in=events.values("event__id"))
+
+                try:
+                    if params[f"{item}_choice"] == "is":
+                        event_filter.add(lookup, Q.AND)
+                    elif params[f"{item}_choice"] == "not":
+                        event_filter.add(~lookup, Q.AND)
+                except KeyError:
+                    event_filter.add(lookup, Q.AND)
+
+        for i in range(total_setlist_forms):
+            song1 = params.get(f"form-{i}-song1")
+            choice = params.get(f"form-{i}-choice")  # is/not
+            position = params.get(f"form-{i}-position")
+            song2 = params.get(f"form-{i}-song2")
+
+            filter = Q(song=song1)
+
+            match position:
+                case "anywhere":
+                    if choice != "is":
+                        filter = ~Q(song=song1)
+                case "followed_by":
+                    if choice == "is":
+                        filter &= Q(next=song2)
+                    else:
+                        filter &= ~Q(next=song2)
+                case _:
+                    position = self.positions.get(position)
+
+                    if choice == "is":
+                        filter &= Q(position=position)
+                    else:
+                        filter &= ~Q(position=position)
+
+            events = models.Songspagenew.objects.filter(filter).select_related(
+                "event",
             )
 
-            if param["condition"] in ["between", "!between"]:
-                search_filter = sb_filter_types(
-                    column=data,
-                    value=param["value1"],
-                    value2=param["value2"],
-                    condition=param["condition"],
-                    type=param["type"],
-                )
-            elif param["condition"] in ["null", "!null"]:
-                search_filter = sb_filter_types(
-                    column=data,
-                    condition=param["condition"],
-                    type=param["type"],
-                )
-            else:
-                search_filter = sb_filter_types(
-                    column=data,
-                    value=param["value1"],
-                    condition=param["condition"],
-                    type=param["type"],
-                )
+            event_results.append(list(events.values_list("event__id", flat=True)))
 
-            if query_params["searchBuilder"]["logic"] == "AND":
-                filter.add(
-                    search_filter,
-                    Q.AND,
-                )
-            else:
-                filter.add(
-                    search_filter,
-                    Q.OR,
-                )
+            match params["conjunction"]:
+                case "or":
+                    setlist_event_filter.add(
+                        Q(
+                            id__in=list(
+                                set.union(
+                                    *map(
+                                        set,
+                                        event_results,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Q.OR,
+                    )
 
-            if "date" in data:
-                name = re.sub("__date", "__early_late", data)
+                case "and":
+                    setlist_event_filter.add(
+                        Q(
+                            id__in=list(
+                                set.intersection(
+                                    *map(
+                                        set,
+                                        event_results,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Q.AND,
+                    )
 
-                filter.add(
-                    Q(**{f"{name}__icontains": param["value1"]}),
-                    Q.OR,
-                )
+            # event_filter.add(Q(id__in=events.values("event__id")), Q.AND)
 
-    except KeyError:
-        pass
-
-    return filter
+        return queryset.filter(event_filter & setlist_event_filter)
 
 
-def order_queryset(order: dict):
-    order_params = []
+class DTFilter(BaseFilterBackend):
+    def get_searching(self, params):
+        filter = Q()
+        search_filter = Q()
 
-    for i in order:
-        dir = order[i]["dir"]
-        column = order[i]["name"]
-
-        if dir == "asc":
-            order_params.append(F(f"{column}").asc(nulls_last=True))
-        else:
-            order_params.append(F(f"{column}").desc(nulls_last=True))
-
-    return order_params
-
-
-def search_queryset(params: dict, search_query: str = ""):
-    filter = Q()
-    columns = params["columns"]
-
-    for item in columns:
-        column = columns[item]
         search_type = "icontains"
 
-        if column["search"]["value"]:
-            query = column["search"]["value"]
+        try:
+            for f in params["columns"].values():
+                fields = [n.replace(".", "__").strip() for n in f["data"].split(",")]
 
-            if column["search"]["regex"] == "true":
-                search_type = "iregex"
+                if f["name"]:
+                    fields = [n.strip() for n in f["name"].split(",")]
 
-            filter.add(
-                Q(**{f"{column['name']}__{search_type}": query}),
-                Q.AND,
-            )
+                if f["searchable"] != "false":
+                    for field in fields:
+                        if f["search"]["regex"] == "true":
+                            search_type = "iregex"
 
-        if search_query != "":
-            if params["search"]["regex"] == "true":
-                search_type = "iregex"
+                        if f["search"]["value"]:
+                            filter.add(
+                                Q(**{f"{field}__{search_type}": f["search"]["value"]}),
+                                Q.OR,
+                            )
 
-            filter.add(
-                Q(**{f"{column['name']}__{search_type}": search_query}),
-                Q.OR,
-            )
+                        try:
+                            re.compile(params["search"]["value"])
+                            search_type = "iregex"
+                        except re.error:
+                            search_type = "icontains"
 
-            if "date" in column["name"]:
-                name = re.sub("__date", "__early_late", column["name"])
+                        if params["search"]["value"]:
+                            search_filter.add(
+                                Q(
+                                    **{
+                                        f"{field}__{search_type}": params["search"][
+                                            "value"
+                                        ],
+                                    },
+                                ),
+                                Q.OR,
+                            )
 
-                filter.add(
-                    Q(**{f"{name}__{search_type}": search_query}),
-                    Q.OR,
+            filter.add(search_filter, Q.AND)
+
+        except KeyError:
+            pass
+
+        return filter
+
+    def get_ordering(self, params):
+        order = []
+
+        try:
+            for item in params["order"].values():
+                field = item["name"].split(",")[0].strip()
+
+                if item["dir"] == "asc":
+                    order.append(F(f"{field}").asc(nulls_last=True))
+                else:
+                    order.append(F(f"{field}").desc(nulls_last=True))
+
+        except KeyError:
+            pass
+
+        return order
+
+    def get_searchbuilder(self, params):
+        filter = Q()
+
+        try:
+            criteria = params["searchBuilder"]["criteria"]
+
+            for param in criteria.values():
+                name = next(
+                    item["name"]
+                    for item in params["columns"].values()
+                    if item["data"] == param["origData"]
                 )
 
-    return filter
+                # if name isn't present, use data instead
+                if not name:
+                    name = next(
+                        item["data"]
+                        for item in params["columns"].values()
+                        if item["data"] == param["origData"]
+                    )
+
+                fields = [i.strip() for i in name.split(",")]
+
+                for field in fields:
+                    search_filter = Q()
+
+                    if "between" in param["condition"]:
+                        field_filter = get_sb_filter(
+                            column=field,
+                            value=param["value1"],
+                            value2=param["value2"],
+                            condition=param["condition"],
+                            type=param["type"],
+                        )
+                    elif "null" in param["condition"]:
+                        field_filter = get_sb_filter(
+                            column=field,
+                            condition=param["condition"],
+                            type=param["type"],
+                        )
+                    else:
+                        field_filter = get_sb_filter(
+                            column=field,
+                            value=param["value1"],
+                            condition=param["condition"],
+                            type=param["type"],
+                        )
+
+                    search_filter.add(field_filter, Q.OR)
+
+                if params["searchBuilder"]["logic"] == "AND":
+                    filter.add(
+                        search_filter,
+                        Q.AND,
+                    )
+                else:
+                    filter.add(
+                        search_filter,
+                        Q.OR,
+                    )
+        except KeyError:
+            pass
+        else:
+            return filter
+
+    def filter_queryset(self, request, queryset, view):
+        params = parser.parse(request.GET.urlencode())
+
+        ordering = self.get_ordering(params)
+        q = self.get_searching(params)
+        sb = self.get_searchbuilder(params)
+
+        if q:
+            queryset = queryset.filter(q)
+
+        if ordering:
+            queryset = queryset.order_by(*ordering)
+
+        if sb:
+            queryset = queryset.filter(sb)
+
+        return queryset
 
 
 class ArchiveFilter(filters.FilterSet):
@@ -170,16 +347,16 @@ class ArchiveFilter(filters.FilterSet):
 
 
 class BootlegFilter(filters.FilterSet):
-    date = filters.CharFilter(field_name="event__event_date")
-    title = filters.CharFilter(lookup_expr="icontains")
-    label = filters.CharFilter(lookup_expr="icontains")
-    source = filters.CharFilter(lookup_expr="icontains")
-    type = filters.CharFilter(lookup_expr="icontains")
+    archive = filters.BooleanFilter(field_name="archive", lookup_expr="isnull")
 
 
 class CitiesFilter(filters.FilterSet):
+    id = filters.NumberFilter(lookup_expr="exact")
     name = filters.CharFilter(lookup_expr="icontains")
-    state = filters.CharFilter(field_name="state__name", lookup_expr="icontains")
+
+
+class EventSetlistFilter(filters.FilterSet):
+    id = filters.CharFilter(lookup_expr="exact")
 
 
 class CoversFilter(filters.FilterSet):
@@ -193,47 +370,85 @@ class VenuesFilter(filters.FilterSet):
     state = filters.CharFilter(method="state_filter")
     country = filters.CharFilter(method="country_filter")
 
-    def name_filter(self, queryset, value):
-        return queryset.filter(
-            Q(name__icontains=value) | Q(aliases__icontains=value),
-        )
 
-    def state_filter(self, queryset, value):
-        return queryset.filter(
-            Q(state__name__icontains=value) | Q(state__abbrev__iexact=value),
-        )
+class IndexFilter(filters.FilterSet):
+    date = filters.CharFilter(field_name="date", lookup_expr="startswith")
+    month = filters.CharFilter(field_name="date__month", lookup_expr="exact")
+    day = filters.CharFilter(field_name="date__day", lookup_expr="exact")
+    # upcoming = filters.BooleanFilter(field_name="date", lookup_expr="gte")
+    # recent = filters.BooleanFilter(field_name="date", lookup_expr="lte")
 
-    def country_filter(self, queryset, value):
-        return queryset.filter(
-            Q(country__name__icontains=value)
-            | Q(country__alpha_2__iexact=value)
-            | Q(country__alpha_3__iexact=value),
-        )
+
+class EventRunFilter(filters.FilterSet):
+    start = filters.DateTimeFilter(field_name="first__date", lookup_expr="gte")
+    end = filters.DateTimeFilter(field_name="last__date", lookup_expr="lte")
+    id = filters.NumberFilter(lookup_expr="exact")
+
+    class Meta:
+        model = models.Runs
+        fields = ["start", "end", "id"]
 
 
 class EventsFilter(filters.FilterSet):
-    year = filters.CharFilter(field_name="id", lookup_expr="startswith")
+    year = filters.CharFilter(
+        field_name="id",
+        lookup_expr="startswith",
+        label="year",
+    )
+
+    start_date = filters.DateTimeFilter(field_name="date", lookup_expr="gte")
+    end_date = filters.DateTimeFilter(field_name="date", lookup_expr="lte")
+
+    date = filters.CharFilter(field_name="date", lookup_expr="startswith")
+    month = filters.CharFilter(
+        field_name="date__month",
+        lookup_expr="exact",
+        label="month",
+    )
+    day = filters.CharFilter(field_name="date__day", lookup_expr="exact", label="day")
     venue = filters.NumberFilter(field_name="venue__id", lookup_expr="exact")
+    city = filters.NumberFilter(field_name="venue__city__id", lookup_expr="exact")
+    state = filters.NumberFilter(field_name="venue__state__id", lookup_expr="exact")
+    country = filters.NumberFilter(field_name="venue__country__id", lookup_expr="exact")
+    run = filters.NumberFilter(field_name="run__id", lookup_expr="exact")
     artist = filters.NumberFilter(field_name="artist__id", lookup_expr="exact")
     tour = filters.NumberFilter(field_name="tour__id", lookup_expr="exact")
+    leg = filters.NumberFilter(field_name="leg__id", lookup_expr="exact")
 
     class Meta:
         model = models.Events
-        fields = ["venue", "artist", "tour"]
+        fields = [
+            "year",
+            "date",
+            "month",
+            "day",
+            "venue",
+            "city",
+            "state",
+            "country",
+            "run",
+            "artist",
+            "tour",
+            "leg",
+        ]
 
 
 class OnstageFilter(filters.FilterSet):
-    relation = filters.CharFilter(field_name="relation__name", lookup_expr="icontains")
-    event = filters.CharFilter(method="event_filter")
-
-    def event_filter(self, queryset, value):
-        return queryset.filter(
-            Q(event__id__iexact=value) | Q(event__event_date__iexact=value),
-        )
+    relation = filters.NumberFilter(field_name="relation__id", lookup_expr="exact")
+    band = filters.NumberFilter(field_name="band__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
 
 
 class ReleaseTracksFilter(filters.FilterSet):
-    release = filters.CharFilter(field_name="release__name", lookup_expr="icontains")
+    release = filters.CharFilter(field_name="release__id", lookup_expr="exact")
+
+
+class RelationFilter(filters.FilterSet):
+    name = filters.CharFilter(lookup_expr="icontains")
+
+
+class BandsFilter(filters.FilterSet):
+    name = filters.CharFilter(lookup_expr="icontains")
 
 
 class ReleaseFilter(filters.FilterSet):
@@ -242,44 +457,79 @@ class ReleaseFilter(filters.FilterSet):
 
 
 class SetlistFilter(filters.FilterSet):
-    event = filters.CharFilter()
-    date = filters.CharFilter(field_name="event__event_date", lookup_expr="icontains")
-    song = filters.CharFilter(method="song_filter")
+    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    run = filters.CharFilter(field_name="event__run__id", lookup_expr="exact")
+    leg = filters.CharFilter(field_name="event__leg__id", lookup_expr="exact")
+    tour = filters.CharFilter(field_name="event__tour__id", lookup_expr="exact")
+    song = filters.CharFilter(field_name="song__id", lookup_expr="exact")
+    venue = filters.CharFilter(field_name="event__venue__id", lookup_expr="exact")
+    city = filters.CharFilter(field_name="event__venue__city__id", lookup_expr="exact")
+    state = filters.CharFilter(
+        field_name="event__venue__state__id",
+        lookup_expr="exact",
+    )
+    country = filters.CharFilter(
+        field_name="event__venue__country__id",
+        lookup_expr="exact",
+    )
 
-    def song_filter(self, queryset, value):
-        return queryset.filter(
-            song=value,
-        )
+    class Meta:
+        model = models.Setlists
+        fields = "__all__"
+
+
+class SetlistEntryFilter(filters.FilterSet):
+    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    run = filters.CharFilter(field_name="event__run__id", lookup_expr="exact")
+    leg = filters.CharFilter(field_name="event__leg__id", lookup_expr="exact")
+    tour = filters.CharFilter(field_name="event__tour__id", lookup_expr="exact")
+    venue = filters.CharFilter(field_name="event__venue__id", lookup_expr="exact")
+    city = filters.CharFilter(field_name="event__venue__city__id", lookup_expr="exact")
+    state = filters.CharFilter(
+        field_name="event__venue__state__id",
+        lookup_expr="exact",
+    )
+    country = filters.CharFilter(
+        field_name="event__venue__country__id",
+        lookup_expr="exact",
+    )
 
 
 class SnippetFilter(filters.FilterSet):
-    song = filters.CharFilter(field_name="setlist__song__song_name")
-    snippet = filters.CharFilter(field_name="snippet__name")
-    event = filters.CharFilter(field_name="setlist__event")
+    snippet = filters.NumberFilter(field_name="snippet__id", lookup_expr="exact")
 
 
 class StateFilter(filters.FilterSet):
-    name = filters.CharFilter(method="state_filter")
-    country = filters.CharFilter(method="country_filter")
+    id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="icontains")
 
-    def state_filter(self, queryset, value):
-        return queryset.filter(
-            Q(name__icontains=value) | Q(state_abbrev__iexact=value),
-        )
 
-    def country_filter(self, queryset, value):
-        return queryset.filter(
-            Q(country__name__icontains=value)
-            | Q(country__alpha_2__iexact=value)
-            | Q(country__alpha_3__iexact=value),
-        )
+class CountryFilter(filters.FilterSet):
+    id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="icontains")
 
 
 class TourFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="tour_name", lookup_expr="icontains")
+    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     band = filters.CharFilter(field_name="band__name", lookup_expr="icontains")
 
 
 class TourLegFilter(filters.FilterSet):
-    tour = filters.CharFilter(field_name="tour__name", lookup_expr="icontains")
-    name = filters.CharFilter()
+    tour = filters.NumberFilter(field_name="tour__id", lookup_expr="exact")
+
+
+from django.core.exceptions import FieldError
+
+
+class SongsPageFilter(filters.FilterSet):
+    song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
+
+
+class SongsFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+
+
+class SetlistNoteFilter(filters.FilterSet):
+    id = filters.NumberFilter(field_name="setlist__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    note = filters.CharFilter(lookup_expr="icontains")

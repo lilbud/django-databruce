@@ -1,25 +1,25 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-    Nugs Releases
+  Nugs Releases
 {% endblock title %}
 {% block info_row %}
-    <div class="text-2xl">Nugs Releases</div>
-    <div class="text-base">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
+  <div class="text-2xl">Nugs Releases</div>
+  <div class="text-base">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
 {% endblock info_row %}
 {% block table_id %}
-    releasesTable
+  releasesTable
 {% endblock table_id %}
 {% block table %}
-    <thead>
-        <tr class="header">
-            <th>Release Date</th>
-            <th>Event</th>
-            <th>Venue</th>
-            <th>Location</th>
-            <th>Link</th>
-        </tr>
-    </thead>
-    <tbody>
+  <thead>
+    <tr class="header">
+      <th class="min-tablet-l">Release Date</th>
+      <th class="all">Event</th>
+      <th class="min-tablet-l">Venue</th>
+      <th class="min-tablet-l">Location</th>
+      <th class="min-tablet-l">Link</th>
+    </tr>
+  </thead>
+  {% comment %} <tbody>
         {% for release in releases %}
             <tr>
                 <td>{{ release.date|default_if_none:""|date:"Y-m-d" }}</td>
@@ -39,14 +39,59 @@
                 </td>
             </tr>
         {% endfor %}
-    </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
-    <script>
+  <script>
     $(document).ready(function () {
       new DataTable('#releasesTable', {
-        layout: getDatatableLayout(),
+        layout: getDatatableLayout({columns: [0,1,2,3,4]}),
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/nugs_releases/?format=datatables&keep=id,name',
+        },
+        columns: [
+          {'data': 'date', 'name': 'date'},
+          {
+            'data': 'event.date',
+            'name': 'event__id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            },
+          },
+          {
+            'data': 'venue',
+            'name': 'event__venue__name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+              }
+            },            
+          },
+          {
+            'data': 'venue.city',
+            'name': 'event__venue__city__name, event__venue__city__state__abbrev',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/cities/' + data.id + '">'+ data.display +'</a>';
+              }
+            },            
+          },
+          
+          {
+            'data': 'url',
+            'name': 'url',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="' + data + '">'+ row.name +'</a>';
+              }
+            },
+          },
+        ]
       });
     });
-    </script>
+  </script>
 {% endblock scripts %}

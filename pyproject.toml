@@ -6,10 +6,12 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "django==5.1.7",
+    "django-autocomplete-light>=3.12.1",
     "django-browser-reload>=1.20.0",
     "django-compressor>=4.5.1",
     "django-debug-toolbar==5.1.0",
     "django-filter==24.3",
+    "django-group-by>=0.3.1",
     "django-link-shortener>=1.0.1",
     "django-ratelimit>=4.1.0",
     # "django-select2>=8.4.0",
@@ -21,6 +23,7 @@ dependencies = [
     "markdown-it-py>=4.0.0",
     "psycopg[binary,pool]",
     "python-dotenv==1.1.0",
+    "python-slugify>=8.0.4",
     "querystring-parser>=1.2.4",
     "requests>=2.32.4",
 ]

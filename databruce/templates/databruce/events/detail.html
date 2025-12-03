@@ -43,29 +43,29 @@
           <div class="card" id="eventInfo">
             <div class="card-body">
               <div class="d-flex flex-wrap">
-                <div class="flex-grow-1 mb-4 mb-xl-0">
+                <div class="flex-grow-1 w-75 mb-2 mb-xl-0">
                   {% if event.title %}<div id="title" class="text-nowrap mb-1 text-sm">{{ event.title|markdown|safe }}</div>{% endif %}
                   <div class="text-nowrap text-xl">
-                    <span class="fw-semibold" id="date">{{ event.get_date }}</span>
-                    <a class="fw-medium"
+                    <span id="date">{{ event.get_date }}</span>
+                    <a class="fw-semibold"
                        href="{% url "band_details" id=event.artist.id %}"
                        id="artist">{{ event.artist }}</a>
                   </div>
                   {% if not event.date %}
                     <div class="text-nowrap text-secondary-emphasis">This is a placeholder date, actual date unknown.</div>
                   {% endif %}
-                  <div class="text-base">
-                    <a class="text-reset" href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                  <div class="text-base fw-semibold">
+                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
                       <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge bg-primary fw-medium">{{ event.tour }}</span></a>
                     {% endif %}
-                    {% if event.tourleg %}
-                      <a class="pe-1" href="{% url "leg_details" id=event.tourleg.id %}"><span class="badge bg-primary fw-medium">{{ event.tourleg.name }}</span></a>
+                    {% if event.leg %}
+                      <a class="pe-1" href="{% url "leg_details" id=event.leg.id %}"><span class="badge bg-primary fw-medium">{{ event.leg.name }}</span></a>
                     {% endif %}
-                    {% if event.eventrun %}
-                      <a class="pe-1" href="{% url "run_details" id=event.eventrun.id %}"><span class="badge bg-primary fw-medium">{{ event.eventrun.name }}</span></a>
+                    {% if event.run %}
+                      <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge bg-primary fw-medium">{{ event.run.name }}</span></a>
                     {% endif %}
                   </div>
                   {% if event.brucebase_url or nugs %}
@@ -91,7 +91,7 @@
                     </div>
                   {% endif %}
                 </div>
-                <div>
+                <div class="flex-shrink-1">
                   {% if user.is_authenticated and event.public %}
                     <form method="post" id="userForm">
                       <input type="hidden" name="event" value="{{ event.id }}">
@@ -152,7 +152,7 @@
                       <div class="row mt-1">
                         <a href="#"
                            role="button"
-                           class="btn-link text-reset fw-semibold mt-2 text-sm"
+                           class="btn-link text-primary fw-semibold mt-2 text-sm"
                            data-bs-toggle="modal"
                            data-bs-target="#notes-modal">See More</a>
                       </div>
@@ -160,8 +160,8 @@
                   </div>
                 </div>
               {% endif %}
-              {% if setlist %}
-                <div class="card mb-md-2">
+              {% if setlist_exists %}
+                <div class="card">
                   <div class="card-header">
                     <div class="d-flex justify-content-between">
                       <span>Setlist</span>
@@ -177,170 +177,29 @@
                         </a>
                       </span>
                     </div>
-                    <div class="row mx-auto">
-                      <div class="row collapse px-0 mt-2" id="options">
-                        <div class="row mb-2">
-                          <div class="col">
-                            <div class="form-check-reverse form-switch">
-                              <label class="form-check-label float-start pe-2" for="note-toggle">Show All Notes</label>
-                              <input class="form-check-input float-start"
-                                     type="checkbox"
-                                     role="switch"
-                                     id="note-toggle"
-                                     autocomplete="off">
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col">
-                            <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-                          </div>
+                    <div class="row collapse px-0 mt-2" id="options">
+                      <div class="row">
+                        <div class="col">
+                          <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="card-body p-0 setlist">
+                  <div class="card-body p-0">
                     <div class="d-none" id="setlist_copy">
                       {{ setlist_copy|join:'<br>' }}
                     </div>
-                    {% regroup setlist by set_name as event_setlist %}
                     <div class="table-responsive">
-                      <table class="table table-hover display" id="setlistTable">
+                      <table class="table table-hover display wrap" id="setlistTable">
                         <thead>
-                          <tr>
-                            <th class="all songnum text-nowrap text-center">#</th>
-                            <th class="all text-nowrap song-name">
-                              Song
-                              {% comment %} <a id="copySetlist" href="#" class="text-reset text-primary ms-4">Copy Setlist</a> {% endcomment %}
-                            </th>
-                            {% if event.tour.id != 49 %}
-                              <th class="min-tablet-l text-nowrap text-center gap">
-                                Gap
-                                <i class="bi bi-info-circle-fill"
-                                   data-bs-toggle="tooltip"
-                                   data-bs-html="true"
-                                   data-bs-title="# of shows since last played"></i>
-                              </th>
-                              <th class="min-tablet-l text-nowrap text-center tour-count">Tour</th>
-                              <th class="min-tablet-l text-nowrap text-center ltp">Last Played</th>
-                            {% endif %}
-                          </tr>
+                          <th class="all">#</th>
+                          <th class="all">Song</th>
+                          <th class="none">Position</th>
+                          <th class="min-tablet-l">Gap</th>
+                          <th class="min-tablet-l">Tour</th>
+                          <th class="min-tablet-l">Last</th>
+                          <th class="min-tablet-l">Notes</th>
                         </thead>
-                        <tbody>
-                          {% if soundcheck %}
-                            <tr class="text-center">
-                              <td class="setHeader text-center soundcheck" colspan="5">Soundcheck</td>
-                              <td class="d-none"></td>
-                              <td class="d-none"></td>
-                              <td class="d-none"></td>
-                              <td class="d-none"></td>
-                            </tr>
-                            {% for song in soundcheck %}
-                              <tr>
-                                <td></td>
-                                <td colspan="6">
-                                  <span class="text-nowrap text-break fw-medium text-sm align-middle">
-                                    <a class="me-1 align-middle"
-                                       href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
-                                  </span>
-                                </td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                              </tr>
-                            {% endfor %}
-                          {% endif %}
-                          {% for set in event_setlist %}
-                            <tr class="text-center setHeader">
-                              <td class="d-none"></td>
-                              <td class="setHeader {{ set.grouper|lower|cut:" " }}"
-                                  colspan="{% if event.tour.id != 49 %}5{% else %}3{% endif %}">{{ set.grouper }}</td>
-                              {% if event.tour.id != 49 %}
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                                <td class="d-none"></td>
-                              {% endif %}
-                            </tr>
-                            {% for song in set.list %}
-                              {% with notes=song.notes %}
-                                <tr>
-                                  <td class="text-center {% if notes_list %}align-top{% else %}align-middle{% endif %} text-sm songnum {% if song.position and song.position != song.set_name %}position {{ song.position|lower|cut:" " }}{% endif %}"
-                                      {% if song.position %}data-bs-toggle="tooltip" data-bs-title="{{ song.position }}"{% endif %}>
-                                    {{ song.song_num|default_if_none:"" }}
-                                  </td>
-                                  <td class="text-nowrap">
-                                    <div class="row p-0 m-0">
-                                      <span class="fw-medium text-sm m-0 p-0" id="song">
-                                        <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
-                                        {% if song.segue %}<span class="fw-bold">&gt;</span>{% endif %}
-                                        {% if song.instrumental %}<span class="badge text-bg-info">Instrumental</span>{% endif %}
-                                        {% if song.sign_request %}<span class="badge text-bg-info">Sign Request</span>{% endif %}
-                                        {% if song.nobruce %}<span class="badge text-bg-info">No Bruce</span>{% endif %}
-                                        <div id="button-container" class="float-end p-0 m-0">
-                                          {% if notes %}
-                                            <button class="btn btn-link p-0 m-0 text-sm d-inline"
-                                                    onclick="show_note({{ song.id }})"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-title="Show Note">
-                                              <i class="bi bi-sticky-fill text-primary text-sm"></i>
-                                            </button>
-                                          {% endif %}
-                                        </div>
-                                      </span>
-                                    </div>
-                                    {% if notes %}
-                                      <div class="row m-0 p-0">
-                                        <span class="text-xs fw-normal text-wrap d-none setlist_note mt-0 px-0"
-                                              id="setlist_note_{{ song.id }}">{{ notes|join:'; ' }}</span>
-                                      </div>
-                                    {% endif %}
-                                  </td>
-                                  {% if event.tour.id != 49 %}
-                                    <td class="text-nowrap text-center song-name {% if notes %}align-top{% else %}align-middle{% endif %} fw-medium text-sm"
-                                        id="gap">
-                                      {% if song.debut and not song.premiere %}
-                                        <span class="badge bg-primary"
-                                              data-bs-toggle="tooltip"
-                                              data-bs-title="Tour Debut">
-                                          {% if song.last %}{{ song.last }}, TD{% endif %}
-                                        </span>
-                                      {% elif song.last >= 50 %}
-                                        <span data-bs-toggle="tooltip"
-                                              data-bs-title="≥50 shows since last played"
-                                              class="badge bg-primary">{{ song.last }}, Bustout</span>
-                                      {% elif song.premiere %}
-                                        <span class="fw-normal">First</span>
-                                      {% else %}
-                                        <span class="fw-normal">{{ song.last|default_if_none:"" }}</span>
-                                      {% endif %}
-                                    </td>
-                                    <td class="text-nowrap text-center tour-count {% if notes %}align-top{% else %}align-middle{% endif %} fw-normal text-sm">
-                                      {% if song.tour_num %}
-                                        {% if song.tour_num == song.tour_total and song.tour_total == 1 %}
-                                          <span data-bs-toggle="tooltip"
-                                                data-bs-title="Only Tour Performance"
-                                                class="badge bg-secondary">{{ song.tour_num }} of {{ song.tour_total }}</span>
-                                        {% elif song.tour_num == song.tour_total and song.tour_total > 1 %}
-                                          <span data-bs-toggle="tooltip"
-                                                data-bs-title="Final Tour Performance"
-                                                class="badge bg-accent">{{ song.tour_num }} of {{ song.tour_total }}</span>
-                                        {% else %}
-                                          {{ song.tour_num }} of {{ song.tour_total }}
-                                        {% endif %}
-                                      {% endif %}
-                                    </td>
-                                    <td class="text-nowrap text-center fw-medium text-sm ltp {% if notes %}align-top{% else %}align-middle{% endif %}">
-                                      {% if song.ltp %}
-                                        <a href="{% url "event_details" id=song.ltp.id %}">{{ song.ltp.get_date }}</a>
-                                      {% endif %}
-                                      {% comment %} {{ song.get_prev }} {% endcomment %}
-                                    </td>
-                                  {% endif %}
-                                </tr>
-                              {% endwith %}
-                            {% endfor %}
-                          {% endfor %}
-                        </tbody>
                       </table>
                     </div>
                   </div>
@@ -349,8 +208,8 @@
             </div>
           </div>
         </div>
-        <div class="col-12 {% if setlist %}col-lg-3 ps-lg-0{% endif %} order-2">
-          <div class="row row-cols-1 g-2 ps-lg-0">
+        <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-3 ps-lg-0{% endif %} order-2">
+          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0">
             {% if event.note %}
               <div class="col-12 d-none d-lg-block">
                 <div class="card" id="notes-card">
@@ -365,7 +224,7 @@
                     <div class="row mt-1">
                       <a href="#"
                          role="button"
-                         class="btn-link text-reset fw-semibold mt-2 text-sm"
+                         class="btn-link text-primary fw-semibold mt-2 text-sm"
                          data-bs-toggle="modal"
                          data-bs-target="#notes-modal">See More</a>
                     </div>
@@ -375,43 +234,21 @@
             {% endif %}
             {% if onstage %}
               <div class="col">
-                <div class="card" id="onstage">
+                <div class="card">
                   <div class="card-header">
                     Performers
                     <div class="float-end">
                       <i class="bi bi-person"></i>
                     </div>
                   </div>
-                  <div class="card-body">
-                    {% for band in onstage %}
-                      {% if band.band %}
-                        <a class="fw-bold text-reset text-sm"
-                           href="{% url "band_details" id=band.band.id %}">{{ band.band.name }}</a>
-                      {% endif %}
-                    {% endfor %}
-                    {% if onstage %}
-                      <ul class="mb-2">
-                        {% for member in onstage %}
-                          <li class="text-sm">
-                            <a href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    {% endif %}
-                    {% if bands %}
-                      {% regroup bands by band as bands_list %}
-                      {% for band in bands_list %}
-                        <a class="fw-bold text-reset text-sm"
-                           href="{% url "band_details" id=band.grouper.id %}">{{ band.grouper }}</a>
-                        <ul>
-                          {% for member in band.list %}
-                            <li class="text-sm">
-                              <a href="{% url "relation_details" id=member.relation.id %}">{{ member.relation.name }}</a>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      {% endfor %}
-                    {% endif %}
+                  <div class="card-body p-1">
+                    <div class="table-responsive">
+                      <table class="table display" id="onstageTable">
+                        <thead>
+                          <th class="d-none">#</th>
+                        </thead>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -420,7 +257,7 @@
               <div class="col">
                 <div class="card">
                   <div class="card-header align-middle">
-                    Album Breakdown
+                    Albums
                     <button class="btn btn-sm btn-success float-end text-xs"
                             data-bs-toggle="modal"
                             data-bs-target="#album-breakdown-modal"
@@ -517,9 +354,10 @@
             <ul class="list-group mb-3" id="breakdown">
               {% for album in album_breakdown %}
                 <li class="list-group-item active px-2 py-1">
-                  <div class="mb-0 fw-bold text-reset text-base">
+                  <div class="mb-0 fw-bold text-reset text-primary-content text-base">
                     {% if album.album %}
-                      <a class="text-reset" href="{% url "release_details" id=album.album %}">{{ album.category }}</a>
+                      <a class="text-primary-content"
+                         href="{% url "release_details" id=album.album %}">{{ album.category }}</a>
                     {% else %}
                       {{ album.category }}
                     {% endif %}
@@ -563,76 +401,173 @@
     </div>
   {% endif %}
   <script>
-      var layout = getDatatableLayout();
-      layout.topStart = 'pageLength';
+      var layout = getDatatableLayout({columns: false, category: false});
 
-      var columns = [{ targets: [0], width: '1rem' }];
-
-      {% if event.tour.id != 49 %}
-        columns.push({ targets: [2,3], width: '5rem' });
-        columns.push({ targets: [4], width: '8rem' });
-      {% endif %}
-
-      function show_snippet(id) {
-        // removes child row controls from snippet rows as there are none
-        $('#snippetnum').removeClass('dtr-control');
-        $('[id*=snippet-]').removeClass('dtr-control');
-
-        $(`.snippet-row_${id}`).each(function() {
-          if ($(this).hasClass('d-none')) {
-            $(this).removeClass('d-none');
-            $(`#snippet-head_${id}`).removeClass('d-none');
-            $(`#snippet-foot_${id}`).removeClass('d-none');
-          } else {
-            $(this).addClass('d-none');
-            $(`#snippet-head_${id}`).addClass('d-none');
-            $(`#snippet-foot_${id}`).addClass('d-none');
-          }
-        })
-      };
-
-      function show_note(id) {
-        $(`#setlist_note_${id}`).each(function() {
-          if ($(this).hasClass('d-none')) {
-            $(this).removeClass('d-none');
-          } else {
-            $(this).addClass('d-none');
-          }
-        })
-      };
-
-      {% comment %} function child_row_note() {
-        // if you think this makes no sense, you'd be correct
-        // however, this bit of code is the only way to have
-        // the song note appear in the child row
-        $('tr.dt-hasChild.dtr-expanded').each(function() {
-          var row = this;
-
-          if ($(this).find('[id*=setlist_note]')) {
-            var note = $(this).find('[id*=setlist_note]').text();
-            
-            if (note != '') {
-              var table = $(row).next('tr.child').find('table');
-              var new_row = $(table).find('tr').first().clone();
-
-              $(new_row).find('td').first().text('Note:')
-              $(new_row).find('td').last().text(note)
-
-              $(new_row).appendTo(table)
-            };
-          };
-        });
-}; {% endcomment %}
       $(document).ready(function() {
-          var table = new DataTable('#setlistTable', {
-            layout: layout,
-            paging: false,
-            searching: false,
-            ordering: false,
-            columnDefs: columns,
-          });
+        var table = $('#setlistTable').DataTable(
+        {
+          layout: layout,
+          serverSide: true,
+          processing: true,
+          paging: false,
+          //scrollY: false,
+          //scrollCollapse: true,
+          searching: false,
+          ordering: false,
+          ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+          columnDefs: [
+            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-tablet-l' },
+            { targets: [0], type: 'text', className: 'songnum align-middle p-0', width: '30px' },
+          ],
+          rowGroup: {
+              dataSrc: 'set_name',
+              className: 'text-center setHeader',
+          },
+          columns: [
+            { 
+              'data': 'song_num',
+              'className': 'dt-center all',
+              'width': '1rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display' && row.position) {
+                  var position = row.position.replaceAll(' ', '').toLowerCase();
 
-          // remove child row control from snippet rows
+                  return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum text-sm ${position}'>${data}</span>`
+                } else if (!data) {
+                  return ''
+                } else {
+                  return `<span class='songnum text-sm'>${data}</span>`
+                }
+              },
+            },
+            {
+              'data': 'song',
+              'name': 'song__name',
+              'className': 'all',
+              'width': '10rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
+
+                  song = row.segue ? `${song} >` : song;
+
+                  var badge = $('<span />').addClass('ms-2 badge')
+
+                  // instrumental, sign-request, nobruce, premiere
+                  if (row.instrumental) {
+                    $(badge).addClass('text-bg-info').text('Instrumental');
+                  } else if (row.sign_request) {
+                    $(badge).addClass('text-bg-info').text('Sign Request');
+                  } else if (row.nobruce) {
+                    $(badge).addClass('warning').text('No Bruce');
+                  } else if (row.premiere) {
+                    $(badge).addClass('bg-secondary').text('Premiere');
+                  }
+
+                  return badge ? song + $(badge).prop('outerHTML') : song;
+                }
+              },
+             },
+             {
+              'data': 'position',
+              'name': 'position',
+              'className': 'text-nowrap none',
+              'width': '10rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display' && data) {
+                  return data
+                }
+              },
+            },
+            {
+              'data': 'last', 
+              'className': 'dt-center min-tablet-l',
+              'width': '3rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  if (data >= 50 && !row.debut) {
+                    return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="≥50 shows on current tour since last played">${data + ', Bustout'}</span>`;
+                  } else if (row.debut && !row.premiere) {
+                    return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">${data + ', TD'}</span>`;
+                  } else {
+                    return row.last;
+                  }
+                }
+              },
+            },
+            {
+              'data': 'tour_num',
+              'className': 'dt-center min-tablet-l',
+              'width': '3rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display' && data) {
+                  var num = data;
+                  var total = row.tour_total;
+
+                  if (num == total && total == 1) {
+                    return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Only Tour Performance">Only</span>`
+                  } else if (num == total && total > 1) {
+                    return `<span class="badge bg-accent" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Final Tour Performance<br>(${num}/${total})">Last</span>`
+                  } else if (row.premiere) {
+                    return ''
+                  } else {
+                    return `${num}/${total}`
+                  }
+                }
+              },
+             },
+            {
+              'data': 'ltp.date',
+              'name': 'ltp__id',
+              'className': 'dt-center min-tablet-l',
+              'width': '8rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
+                }
+              },
+            },
+            {
+              'data': 'notes',
+              'name': 'notes',
+              'className': 'min-tablet-l text-wrap',
+              'width': '15rem',
+              'render': function (data, type, row, meta) {
+                if (type === 'display' && data && data != null) {
+
+      
+
+                  return data ? `<span class="text-xs fw-light">${data.join('; ')}</span>` : '';
+                }
+              },
+            },
+          ],
+          initComplete: function(settings, json) {
+            var dt = this.api();
+
+            $('.setHeader').each(function() {
+              var row = $(this).children('th');
+              var name = $(row).text().replaceAll(' ', '').toLowerCase();
+              $(row).addClass(name).addClass('setHeader');
+            })
+
+            $('span.songnum').each(function() {
+              var cell = this.closest('td')
+              $(cell).addClass(this.className).text($(this).text());
+
+              $(cell).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', this.getAttribute('data-bs-title'))
+              $(cell).tooltip();
+            });
+          }
+        });
+
+        $('th.setHeader').each(function(){
+          $(this).removeClass('setHeader');
+        });
+
+        $('.card tr td.dt-empty').each(function() {
+
+        })
 
           // code adapted from stackoverflow
           $('#copySetlist').click(function() {
@@ -655,20 +590,6 @@
               $(btn).text('Copy Setlist');
             }, 3000);
           })
-
-          $('#note-toggle').on('click', function() {
-            if ($(this).is(':checked')) {
-
-              $('span[id*=setlist_note]').each(function() {
-                $(this).removeClass('d-none');
-              });
-            } else {
-
-              $('span[id*=setlist_note]').each(function() {
-                $(this).addClass('d-none');
-              });
-            }
-          });
 
           $('#userForm').submit(function(e) {
               e.preventDefault();
@@ -695,6 +616,37 @@
                   };
                 },
               });
+          });
+
+        var table = $('#onstageTable').DataTable(
+          {
+            layout: layout,
+            serverSide: true,
+            processing: true,
+            paging: false,
+            searching: false,
+            ordering: false,
+            ajax: {
+              'url': '/api/v1/onstage/?event={{ id }}&format=datatables&keep=band,relation,event',
+            },
+            rowGroup: {
+              dataSrc: function(row) {
+                return row.band ? `<a href="/bands/${row.band.id}">${row.band.name}</a>` : '';
+              },
+              startRender: function (rows, group) {
+                var ul = $('<ul />');
+
+                $(rows.data()).each(function() {
+                  $(`<li class="text-reset fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
+                });
+
+                return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');
+              }
+            },
+            initComplete: function (){
+              $('tr:empty').remove();
+              //$('#loading-spinner').hide();
+            }
           });
       });
 

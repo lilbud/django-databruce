@@ -42,6 +42,33 @@ class SetlistInline(admin.TabularInline):
     extra = 0
 
 
+class ReleaseTrackInline(admin.TabularInline):
+    model = models.ReleaseTracks
+
+    def get_queryset(self, request):
+        base_qs = super().get_queryset(request)
+        return (
+            base_qs.select_related("song", "release")
+            .prefetch_related("setlist", "event")
+            .order_by("discnum", "track")
+        )
+
+    autocomplete_fields = ["song", "setlist", "event"]
+    list_select_related = ["song", "release"]
+    fields = [
+        "discnum",
+        "track",
+        "song",
+        "event",
+        "setlist",
+        "length",
+        "note",
+    ]
+    fk_name = "release"
+    ordering = ("track",)
+    extra = 0
+
+
 @admin.register(models.ArchiveLinks)
 class ArchiveAdmin(admin.ModelAdmin):
     search_fields = ["event"]
@@ -180,9 +207,15 @@ class ReleaseTrackAdmin(admin.ModelAdmin):
 
 @admin.register(models.Releases)
 class ReleaseAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        base_qs = super().get_queryset(request)
+        return base_qs.prefetch_related("event")
+
     search_fields = ["name", "type"]
     list_display = ["id", "name", "type", "date"]
     list_display_links = ["id"]
+    autocomplete_fields = ["event"]
+    inlines = [ReleaseTrackInline]
 
 
 @admin.register(models.Snippets)
@@ -231,6 +264,7 @@ from django.db.models import Q
 class TourAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_select_related = ["first", "band", "last"]
+    autocomplete_fields = ["first", "last"]
     list_display = ["id", "name", "band", "first", "last"]
     list_display_links = ["id", "band", "first", "last"]
     ordering = ("name",)

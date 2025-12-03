@@ -1,7 +1,7 @@
 /* Select 2 bootstrap-5 theme override */
 .select2-container--bootstrap-5 .select2-selection {
     background-color: var(--base-300) !important;
-    border: 1px solid var(--base-content) !important;
+    /* border: 1px solid var(--base-content) !important; */
 }
 
 .select2-container--bootstrap-5 .select2-selection--single {
@@ -52,7 +52,9 @@
     width: auto !important;
 }
 
-.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted {
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted,
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected
+{
 	color: var(--primary-content) !important;
 	background-color: var(--primary) !important;
     border-radius: var(--bs-border-radius) !important;

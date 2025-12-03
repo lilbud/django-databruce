@@ -1,50 +1,58 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-    Lyrics
+  Lyrics
 {% endblock title %}
 {% block info_row %}
-    <div class="text-2xl">Lyrics</div>
-    <div class="text-base">Lyrics for many of Bruce's songs.</div>
-    <div class="text-base">
-        English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
-        The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
-        I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
-        Credit to each translator provided when it was listed in the original files.
-    </div>
+  <div class="text-2xl">Lyrics</div>
+  <div class="text-base">Lyrics for many of Bruce's songs.</div>
+  <div class="text-base">
+    English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
+    The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
+    I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
+    Credit to each translator provided when it was listed in the original files.
+  </div>
 {% endblock info_row %}
 {% block table_id %}
-    lyricTable
+  lyricTable
 {% endblock table_id %}
 {% block table %}
-    <thead>
-        <tr>
-            <th>Song</th>
-            <th>Version</th>
-            <th>Source</th>
-            <th>Language</th>
-            <th>Note</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for lyric in lyrics %}
-            <tr>
-                <td>
-                    <a href="{% url "lyric_detail" id=lyric.uuid %}">{{ lyric.song.name }}</a>
-                </td>
-                <td>{{ lyric.version }}</td>
-                <td>{{ lyric.source }}</td>
-                <td>{{ lyric.language }}</td>
-                <td>{{ lyric.note|default_if_none:"" }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Song</th>
+      <th>Version</th>
+      <th>Source</th>
+      <th>Language</th>
+      <th>Note</th>
+    </tr>
+  </thead>
 {% endblock table %}
 {% block scripts %}
-    <script>
+  <script>
         $(document).ready(function () {
             new DataTable('#lyricTable', {
-                layout: getDatatableLayout([1,2,3,4,5]),
+                layout: getDatatableLayout({columns: [1,2,3,4,5]}),
+                serverSide: true,
+                processing: true,
+                ajax: {
+                  'url': '/api/v1/lyrics/?format=datatables&keep=uuid',
+                },
+                columns: [
+                  {
+                    'data': 'song.name',
+                    'name': 'song__name',
+                    'render': function (data, type, row, meta) {
+                        console.log(row)
+                        if (type === 'display') {
+                            return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
+                        }
+                    },
+                  },
+                  {'data': 'version', 'name': 'version'},
+                  {'data': 'source', 'name': 'source'},
+                  {'data': 'language', 'name': 'language'},
+                  {'data': 'note', 'name': 'note'},
+                ]
             });
         });
-    </script>
+  </script>
 {% endblock scripts %}

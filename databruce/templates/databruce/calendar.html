@@ -1,0 +1,125 @@
+{% extends "databruce/base.html" %}
+{% block extrajs %}
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          validRange: {
+            start: '1965-06-01',
+            end: new Date().toISOString(),
+          },
+          fixedWeekCount: false,
+          initialDate: '{{ start_date }}',
+          schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+          dayMinWidth: 100,
+          height: 768,
+          contentHeight: 768,
+          headerToolbar: {
+            start: 'title',
+            center: '',
+            end: 'prev,next'
+          },
+          themeSystem: 'bootstrap5',
+          eventSources: [
+            function(info, successCallback, failureCallback) {
+              fetch(`/api/v1/events/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
+              .then((resp) => resp.json())
+              .then(function(data) {
+                var eventsList = [];
+
+                $(data.results).each(function (i, val){
+                  var title = `${val.artist.name}: ${val.venue.formatted}`
+
+                  if (val.early_late) {
+                    title += ` (${val.early_late})`
+                  }
+
+                  eventsList.push(
+                    {
+                      title: title,
+                      start: val.date.filter,
+                      url: `/events/${val.id}`,
+                      allDay: false,
+                      className: 'text-wrap',
+                    }
+                  )
+                })
+                successCallback(eventsList);
+              })
+            },
+            function (info, successCallback, failureCallback) {
+              fetch(`/api/v1/runs/?format=json&start=${info.start.toISOString()}&end=${info.end.toISOString()}`)
+              .then((resp) => resp.json())
+              .then(function(data){
+                var eventsList = [];
+
+                $(data.results).each(function (i, val){
+                  eventsList.push(
+                    {
+                      title: val.name,
+                      start: val.first.date.filter,
+                      end: `${val.last.date.filter}T23:59:59`,
+                      url: `/runs/${val.id}`,
+                      backgroundColor: 'var(--secondary)',
+                      borderColor: 'var(--secondary)',
+                      className: 'text-wrap',
+                    }
+                  )
+                })
+                successCallback(eventsList);
+              })
+            },
+          ],
+
+          eventContent: function( info ) {
+            return {html: info.event.title};
+          }
+        });
+        calendar.render();
+
+        $('#year-select > button').text(calendar.getDate().getFullYear())
+      });
+  </script>
+{% endblock extrajs %}
+{% load static %}
+{% block title %}
+  Event Calendar
+{% endblock title %}
+{% block content %}
+  <div class="row justify-content-center py-3">
+    <div class="col-12 col-md-10">
+      <div class="text-2xl mb-3">
+        Event Calendar
+        <div id="year-select" class="d-inline">
+          <button class="btn btn-sm btn-primary dropdown-toggle"
+                  type="button"
+                  id="my-button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">{{ start_date }}</button>
+          <ul class="dropdown-menu">
+            {% for i in years %}
+              <li>
+                <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="text-base"></div>
+      <div id="calendar"></div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      var date = new Date();
+
+      let currentMonth = (date.getMonth()+1).toString().padStart(2,"0");
+      let currentDay = date.getDate().toString().padStart(2,"0");
+
+      $(`td[data-date$='${currentMonth}-${currentDay}']`).addClass('today');
+    });
+
+  </script>
+{% endblock content %}

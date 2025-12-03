@@ -117,6 +117,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-autocomplete-light"
+version = "3.12.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bc/49/fd4705cd96f313d858f9a8c5fce1c33f1f61adb6b25acc92a924acf0a305/django_autocomplete_light-3.12.1.tar.gz", hash = "sha256:50f7b83681feec6491c38e6114d7a4fe80f9e99a8cc6c8458a3e7bb137ad6b1d", size = 296420 }
+
+[[package]]
 name = "django-browser-reload"
 version = "1.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -150,10 +159,12 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "django-autocomplete-light" },
     { name = "django-browser-reload" },
     { name = "django-compressor" },
     { name = "django-debug-toolbar" },
     { name = "django-filter" },
+    { name = "django-group-by" },
     { name = "django-link-shortener" },
     { name = "django-ratelimit" },
     { name = "djangorestframework" },
@@ -163,6 +174,7 @@ dependencies = [
     { name = "markdown-it-py" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "python-dotenv" },
+    { name = "python-slugify" },
     { name = "querystring-parser" },
     { name = "requests" },
 ]
@@ -170,10 +182,12 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = "==5.1.7" },
+    { name = "django-autocomplete-light", specifier = ">=3.12.1" },
     { name = "django-browser-reload", specifier = ">=1.20.0" },
     { name = "django-compressor", specifier = ">=4.5.1" },
     { name = "django-debug-toolbar", specifier = "==5.1.0" },
     { name = "django-filter", specifier = "==24.3" },
+    { name = "django-group-by", specifier = ">=0.3.1" },
     { name = "django-link-shortener", specifier = ">=1.0.1" },
     { name = "django-ratelimit", specifier = ">=4.1.0" },
     { name = "djangorestframework", specifier = "==3.15.2" },
@@ -183,6 +197,7 @@ requires-dist = [
     { name = "markdown-it-py", specifier = ">=4.0.0" },
     { name = "psycopg", extras = ["binary", "pool"] },
     { name = "python-dotenv", specifier = "==1.1.0" },
+    { name = "python-slugify", specifier = ">=8.0.4" },
     { name = "querystring-parser", specifier = ">=1.2.4" },
     { name = "requests", specifier = ">=2.32.4" },
 ]
@@ -210,6 +225,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/50/bc/dc19ae39c235332926dd0efe0951f663fa1a9fc6be8430737ff7fd566b20/django_filter-24.3.tar.gz", hash = "sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3", size = 144444 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/09/b1/92f1c30b47c1ebf510c35a2ccad9448f73437e5891bbd2b4febe357cc3de/django_filter-24.3-py3-none-any.whl", hash = "sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64", size = 95011 },
+]
+
+[[package]]
+name = "django-group-by"
+version = "0.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/0a/b98b8fbb9cd8879e13b5bfebcdda90e5d2490b90bacfd272dbfc6f7d6ad7/django_group_by-0.3.1.tar.gz", hash = "sha256:4f1a17b61c7d16924a1c7afcea3ceb42c217c5c845fd03ad6e54fda4b6c710db", size = 5456 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/ea/e44706b97580d021d6e175c2a186e05c6eb05ae8b034cc3d490b99b32862/django_group_by-0.3.1-py2.py3-none-any.whl", hash = "sha256:b4e554c0eb9eed39c0cdc64de20fa7b2906ad92408d6a47b5bc55764711fc2e5", size = 8616 },
 ]
 
 [[package]]
@@ -436,6 +460,18 @@ wheels = [
 ]
 
 [[package]]
+name = "python-slugify"
+version = "8.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "text-unidecode" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/87/c7/5e1547c44e31da50a460df93af11a535ace568ef89d7a811069ead340c4a/python-slugify-8.0.4.tar.gz", hash = "sha256:59202371d1d05b54a9e7720c5e038f928f45daaffe41dd10822f3907b937c856", size = 10921 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/62/02da182e544a51a5c3ccf4b03ab79df279f9c60c5e82d5e8bec7ca26ac11/python_slugify-8.0.4-py2.py3-none-any.whl", hash = "sha256:276540b79961052b66b7d116620b36518847f52d5fd9e3a70164fc8c50faa6b8", size = 10051 },
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -570,6 +606,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e5/40/edede8dd6977b0d3da179a342c198ed100dd2aba4be081861ee5911e4da4/sqlparse-0.5.3.tar.gz", hash = "sha256:09f67787f56a0b16ecdbde1bfc7f5d9c3371ca683cfeaa8e6ff60b4807ec9272", size = 84999 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a9/5c/bfd6bd0bf979426d405cc6e71eceb8701b148b16c21d2dc3c261efc61c7b/sqlparse-0.5.3-py3-none-any.whl", hash = "sha256:cf2196ed3418f3ba5de6af7e82c694a9fbdbfecccdfc72e281548517081f16ca", size = 44415 },
+]
+
+[[package]]
+name = "text-unidecode"
+version = "1.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ab/e2/e9a00f0ccb71718418230718b3d900e71a5d16e701a3dae079a21e9cd8f8/text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93", size = 76885 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/a5/c0b6468d3824fe3fde30dbb5e1f687b291608f9473681bbf7dabbf5a87d7/text_unidecode-1.3-py2.py3-none-any.whl", hash = "sha256:1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8", size = 78154 },
 ]
 
 [[package]]

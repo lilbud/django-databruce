@@ -16,35 +16,71 @@
       <th class="all">Name</th>
       <th class="min-tablet-l">First</th>
       <th class="min-tablet-l">Last</th>
+      <th class="min-tablet-l">Instruments</th>
+      <th class="min-tablet-l">Aliases</th>
     </tr>
   </thead>
-  <tbody>
+  {% comment %} <tbody>
     {% for relation in relations %}
       <tr>
         <td>{{ relation.appearances }}</td>
         <td>
           <a href="{% url "relation_details" id=relation.id %}">{{ relation }}</a>
         </td>
-        <td data-sort="{{ relation.first.get_date }}"
-            data-filter="{{ relation.first.get_date }}">
+        <td data-sort="{{ relation.first.get_date }}" data-filter="{{ relation.first.get_date }}">
           <a href="{% url "event_details" id=relation.last.id %}">{{ relation.first.get_date }}</a>
         </td>
-        <td data-sort="{{ relation.last.get_date }}"
-            data-filter="{{ relation.last.get_date }}">
+        <td data-sort="{{ relation.last.get_date }}" data-filter="{{ relation.last.get_date }}">
           <a href="{% url "event_details" id=relation.last.id %}">{{ relation.last.get_date }}</a>
         </td>
       </tr>
     {% endfor %}
-  </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
     $(document).ready(function () {
       new DataTable('#relationsTable', {
-        layout: getDatatableLayout(),
+        layout: getDatatableLayout({columns: [0,1,2,3,4]}),
         columnDefs: [
-          { type: 'date', targets: [2, 3] },
           { targets: [0], width: '1rem' },
+        ],
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/relations/?format=datatables&keep=id',
+        },
+        columns: [
+          {'data': 'count', 'name': 'appearances'},
+          {
+            'data': 'name',
+            'name': 'name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/relations/' + row.id + '">'+ data +'</a>';
+              }     
+            },
+          },
+          {
+            'data': 'first.date',
+            'name': 'first__id, first__early_late',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }     
+            },          
+          },
+          {
+            'data': 'last.date',
+            'name': 'last__id, last__early_late',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            },
+          },
+          {'data': 'instruments', 'name': 'instruments'},
+          {'data': 'nickname', 'name': 'nickname, aliases'},
         ]
       });
     });

@@ -12,15 +12,15 @@
 {% block table %}
   <thead>
     <tr>
-      <th class="text-center" scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">State</th>
-      <th scope="col">Country</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
+      <th class="text-center all" scope="col">Events</th>
+      <th class="text-center all" scope="col">Name</th>
+      <th class="min-tablet-l" scope="col">State</th>
+      <th class="min-tablet-l" scope="col">Country</th>
+      <th class="min-tablet-l" scope="col">First</th>
+      <th class="min-tablet-l" scope="col">Last</th>
     </tr>
   </thead>
-  <tbody>
+  {% comment %} <tbody>
     {% for city in cities %}
       <tr>
         <td class="text-center">{{ city.num_events }}</td>
@@ -37,26 +37,76 @@
             <a href="{% url "country_details" id=city.country.id %}">{{ city.country.name }}</a>
           {% endif %}
         </td>
-        <td data-sort="{{ city.first.get_date }}"
-            data-filter="{{ city.first.get_date }}">
+        <td data-sort="{{ city.first.get_date }}" data-filter="{{ city.first.get_date }}">
           <a href="{% url "event_details" id=city.first.id %}">{{ city.first }}</a>
         </td>
-        <td data-sort="{{ city.last.get_date }}"
-            data-filter="{{ city.last.get_date }}">
+        <td data-sort="{{ city.last.get_date }}" data-filter="{{ city.last.get_date }}">
           <a href="{% url "event_details" id=city.last.id %}">{{ city.last }}</a>
         </td>
       </tr>
     {% endfor %}
-  </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
     new DataTable('#cityTable', {
-      layout: getDatatableLayout([0,2,3,4,5]),
+      layout: getDatatableLayout({columns: [0,2,3,4,5]}),
+      serverSide: true,
+      processing: true,
+      ajax: {
+        'url': '/api/v1/cities/?format=datatables&keep=id',
+      },
       columnDefs: [
         { width: '1rem', targets: [0] },
-        { type: 'date', targets: [4, 5] },
+      ],
+      columns: [ // num, name, state, country, first, last
+        {'data': 'count', 'name': 'count'},
+        {
+          'data': 'name',
+          'name': 'name',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/cities/' + row.id + '">'+ row.name +'</a>';
+            }
+          },
+        },
+        {
+          'data': 'state',
+          'name': 'state__name, state__abbrev',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return '<a href="/states/' + data.id + '">'+ data.name +'</a>';
+            }
+          },
+        },
+        {
+          'data': 'country',
+          'name': 'country__name',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return '<a href="/countries/' + data.id + '">'+ data.name +'</a>';
+            }
+          },
+        },
+        {
+          'data': 'first.date',
+          'name': 'first__id',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            }
+          },
+        },
+        {
+          'data': 'last.date',
+          'name': 'last__id',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            }
+          },
+        },
       ]
     });
   });

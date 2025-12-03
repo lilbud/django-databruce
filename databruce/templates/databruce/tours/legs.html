@@ -15,45 +15,28 @@
       <th class="all" scope="col">Tour</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
-      <th scope="col" class="text-center all">Shows</th>
-      <th scope="col" class="text-center all">Songs</th>
+      <th scope="col" class="text-center min-tablet-l">Shows</th>
+      <th scope="col" class="text-center min-tablet-l">Songs</th>
       <th scope="col" class="min-tablet-l">Note</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-    {% for leg in legs %}
-      <tr>
-        <td class="text-nowrap">
-          <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
-        </td>
-        <td class="text-nowrap">
-          <a href="{% url "tour_details" id=leg.tour.id %}">{{ leg.tour.name }}</a>
-        </td>
-        <td data-sort="{{ leg.first.get_date }}" data-filter="{{ leg.first.get_date }}">
-          <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first.get_date }}</a>
-        </td>
-        <td data-sort="{{ leg.last.get_date }}" data-filter="{{ leg.last.get_date }}">
-          <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last.get_date }}</a>
-        </td>
-        <td class="text-center">{{ leg.num_shows }}</td>
-        <td class="text-center">{{ leg.num_songs }}</td>
-        <td class="text-nowrap">{{ leg.note|default_if_none:"" }}</td>
-      </tr>
-    {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
     new DataTable('#tourLegTable', {
-      layout: getDatatableLayout([1, 2, 3, 4, 5, 6]),
+      layout: getDatatableLayout({columns: [1, 2, 3, 4, 5, 6], category: false}),
       serverSide: true,
       processing: true,
+      scrollY: '60vh',
       ajax: {
         'url': '/api/v1/tour_legs/?format=datatables&keep=id',
       },
       columnDefs: [
-        { targets: [4, 5], width: '6rem' },
+        { targets: [0,1], width: '12rem' },
+        { targets: [2, 3], width: '6rem' },
+        { targets: [4, 5], width: '1rem' },
+        { targets: [-1], width: '12rem' },
       ],
       columns: [
         {
@@ -80,7 +63,7 @@
         },
         {
           'data': 'first.date',
-          'name': 'first__id',
+          'name': 'first__id, first__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
@@ -89,7 +72,7 @@
         },
         {
           'data': 'last.date',
-          'name': 'last__id',
+          'name': 'last__id, last__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/events/' + data.id + '">'+ data.display +'</a>';

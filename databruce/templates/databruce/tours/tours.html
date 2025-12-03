@@ -13,11 +13,11 @@
     <tr class="header">
       <th class="all" scope="col">Name</th>
       <th class="all" scope="col">Band</th>
-      <th class="min-tablet" scope="col">First</th>
-      <th class="min-tablet" scope="col">Last</th>
-      <th scope="col" class="text-center all">Shows</th>
-      <th scope="col" class="text-center min-tablet">Songs</th>
-      <th scope="col" class="text-center min-tablet">Legs</th>
+      <th class="min-tablet-l" scope="col">First</th>
+      <th class="min-tablet-l" scope="col">Last</th>
+      <th scope="col" class="text-center min-tablet-l">Shows</th>
+      <th scope="col" class="text-center min-tablet-l">Songs</th>
+      <th scope="col" class="text-center min-tablet-l">Legs</th>
     </tr>
   </thead>
   {% comment %} <tbody>
@@ -46,9 +46,11 @@
   <script>
   $(document).ready(function () {
     new DataTable('#tourTable', {
-      layout: getDatatableLayout([1, 2, 3, 4, 5, 6]),
+      layout: getDatatableLayout({columns: [1, 2, 3, 4, 5, 6]}),
       serverSide: true,
       processing: true,
+      scrollY: '60vh',
+      scrollCollapse: true,
       ajax: {
         'url': '/api/v1/tours/?format=datatables&keep=id',
       },
@@ -62,6 +64,7 @@
         {
           'data': 'name',
           'name': 'name',
+          'width': '10rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/tours/' + row.id + '">'+ row.name +'</a>';
@@ -73,6 +76,7 @@
         { 
           'data': 'band',
           'name': 'band__name',
+          'width': '10rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/bands/' + data.id + '">'+ data.name +'</a>';
@@ -83,7 +87,8 @@
         },
         { 
           'data': 'first.date',
-          'name': 'first__id',
+          'name': 'first__id, first__early_late',
+          'width': '6rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
@@ -92,16 +97,17 @@
         },
         { 
           'data': 'last.date',
-          'name': 'last__id',
+          'name': 'last__id, last__early_late',
+          'width': '6rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
             }
           },          
         },
-        { 'data': 'num_shows', 'name': 'num_shows' },
-        { 'data': 'num_songs', 'name': 'num_songs' },
-        { 'data': 'num_legs', 'name': 'num_legs' },
+        { 'data': 'num_shows', 'name': 'num_shows', 'width': '1rem' },
+        { 'data': 'num_songs', 'name': 'num_songs', 'width': '1rem'  },
+        { 'data': 'num_legs', 'name': 'num_legs', 'width': '1rem'  },
       ]
     });
   });

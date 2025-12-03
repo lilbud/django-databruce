@@ -59,7 +59,6 @@
       <div class="card-body px-0">
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">
-            {% comment %} {% include "databruce/partials/event_table.html" with events=events %} {% endcomment %}
             <div class="table-responsive">
               <table class="table table-hover display" id="eventTable">
                 <thead>
@@ -67,7 +66,7 @@
                     <th class="all" scope="col">Date</th>
                     <th class="min-tablet-l" scope="col">Setlist</th>
                     <th class="min-tablet-l" scope="col">Band</th>
-                    <th class="min-tablet-l" scope="col">Venue</th>
+                    <th class="all" scope="col">Venue</th>
                     <th class="min-tablet-l" scope="col">Location</th>
                     <th class="min-tablet-l" scope="col">Tour</th>
                     <th class="min-tablet-l" scope="col">Detail</th>
@@ -79,94 +78,48 @@
           </div>
           <div id="legs" class="tab-pane fade">
             <div class="table-responsive">
-              <table class="table table-hover display" id="tourLegs">
+              <table class="table table-hover display" id="legTable">
                 <thead>
                   <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col" class="text-center">Shows</th>
-                    <th scope="col" class="text-center">Songs</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Note</th>
+                    <th scope="col" class="all">Name</th>
+                    <th scope="col" class="text-center min-tablet-l">Shows</th>
+                    <th scope="col" class="text-center min-tablet-l">Songs</th>
+                    <th scope="col" class="text-center min-tablet-l">First</th>
+                    <th scope="col" class="text-center min-tablet-l">Last</th>
+                    <th scope="col" class="text-center min-tablet-l">Note</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {% for leg in tour_legs %}
-                    <tr>
-                      <td class="text-wrap">
-                        <a href="{% url "leg_details" id=leg.id %}">{{ leg.name }}</a>
-                      </td>
-                      <td class="text-center">{{ leg.num_shows }}</td>
-                      <td class="text-center">{{ leg.num_songs }}</td>
-                      <td class="text-nowrap">
-                        <a href="{% url "event_details" id=leg.first.id %}">{{ leg.first.get_date }}</a>
-                      </td>
-                      <td class="text-nowrap">
-                        <a href="{% url "event_details" id=leg.last.id %}">{{ leg.last.get_date }}</a>
-                      </td>
-                      <td class="text-wrap">{{ leg.note|default_if_none:"" }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
               </table>
             </div>
           </div>
           <div id="songs" class="tab-pane fade">
-            {% include "databruce/partials/song_position_table.html" with songs=songs %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="songTable">
+                <thead>
+                  <tr>
+                    <th class="text-center min-tablet-l">Plays</th>
+                    <th class="all">Song</th>
+                    <th class="min-tablet-l">Category</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
           </div>
           <div id="slots" class="tab-pane fade">
             <div class="table-responsive">
-              <table class="table table-hover display" id="tourSlots">
+              <table class="table table-hover display" id="slotTable">
                 <thead>
                   <tr>
                     <th class="text-nowrap all text-start">Event</th>
-                    <th class="text-nowrap all text-start showopener">Show Opener</th>
-                    <th class="text-nowrap all text-start set1closer">Set 1 Closer</th>
-                    <th class="text-nowrap all text-start set2opener">Set 2 Opener</th>
-                    <th class="text-nowrap all text-start mainsetcloser">Main Set Closer</th>
-                    <th class="text-nowrap all text-start encoreopener">Encore Opener</th>
-                    <th class="text-nowrap all text-start showcloser">Show Closer</th>
+                    <th class="text-nowrap all text-wrap text-start">Location</th>
+                    <th class="text-nowrap min-tablet-l text-start showopener">Show Opener</th>
+                    <th class="text-nowrap min-tablet-l text-start set1closer">Set 1 Closer</th>
+                    <th class="text-nowrap min-tablet-l text-start set2opener">Set 2 Opener</th>
+                    <th class="text-nowrap min-tablet-l text-start mainsetcloser">Main Set Closer</th>
+                    <th class="text-nowrap min-tablet-l text-start encoreopener">Encore Opener</th>
+                    <th class="text-nowrap min-tablet-l text-start showcloser">Show Closer</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {% for slot in slots %}
-                    <tr>
-                      <td class="text-nowrap">
-                        <a href="{% url "event_details" id=slot.event__id %}">{{ slot.event__id|get_date }}</a>
-                      </td>
-                      <td class="text-nowrap">
-                        {% if slot.show_opener_id %}
-                          <a href="{% url "song_details" id=slot.show_opener_id %}">{{ slot.show_opener_name }}</a>
-                        {% endif %}
-                      </td>
-                      <td class="text-nowrap">
-                        {% if slot.set_1_closer_id %}
-                          <a href="{% url "song_details" id=slot.set_1_closer_id %}">{{ slot.set_1_closer_name }}</a>
-                        {% endif %}
-                      </td>
-                      <td class="text-nowrap">
-                        {% if slot.set_2_opener_id %}
-                          <a href="{% url "song_details" id=slot.set_2_opener_id %}">{{ slot.set_2_opener_name }}</a>
-                        {% endif %}
-                      </td>
-                      <td class="text-nowrap">
-                        {% if slot.main_set_closer_id %}
-                          <a href="{% url "song_details" id=slot.main_set_closer_id %}">{{ slot.main_set_closer_name }}</a>
-                        {% endif %}
-                      </td>
-                      <td class="text-nowrap">
-                        {% if slot.encore_opener_id %}
-                          <a href="{% url "song_details" id=slot.encore_opener_id %}">{{ slot.encore_opener_name }}</a>
-                        {% endif %}
-                      </td>
-                      <td class="text-nowrap">
-                        {% if slot.show_closer_id %}
-                          <a href="{% url "song_details" id=slot.show_closer_id %}">{{ slot.show_closer_name }}</a>
-                        {% endif %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
               </table>
             </div>
           </div>
@@ -176,25 +129,59 @@
   </div>
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout([2,3,4,5,6,7], true);
-      dtCategorySelect(layout, 7, [{'label': 'All', 'value': '.*'}, {'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]);
+      layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
+      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]});
 
       new DataTable('#eventTable', {
         layout: layout,
         serverSide: true,
+        autoWidth: false,
         processing: true,
+        scrollY: '60vh',
         ajax: {
           'url': '/api/v1/events/?tour={{ tour.id }}&format=datatables&keep=id,early_late,public',
         },
         columnDefs: [
-          { targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem'},
-          { targets: [0], type: 'date'},
+          { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', searchable: false},
+          { targets: [0], className: 'text-nowrap'},
           { targets: [-1], visible: false },
         ],
+        columns: event_table_columns,
+      });
+
+      new DataTable('#slotTable', {
+        layout: getDatatableLayout({category: false}),
+        serverSide: true,
+        processing: true,
+        autoWidth: false,
+        scrollY: '60vh',
+        ajax: {
+          'url': '/api/v1/setlist_entries/?tour={{ tour.id }}&format=datatables',
+        },
+        columns: setlist_slots
+      });
+
+      new DataTable('#legTable', {
+        layout: getDatatableLayout({category: false}),
+        serverSide: true,
+        processing: true,
+        autoWidth: false,
+        scrollY: '60vh',
+        ajax: {
+          'url': '/api/v1/tour_legs/?tour={{ tour.id }}&format=datatables&keep=id,early_late,public',
+        },
+        columnDefs: [
+          { targets: [1,2], className: 'text-center text-xs', width: '1rem'},
+          { targets: '_all', className: 'text-nowrap text-xs' },
+        ],
         columns: [
-            {
-            'data': 'date',
-            'name': 'id',
+          {'data': 'name', 'name': 'name', 'width': '12rem'},
+          {'data': 'num_shows', 'name': 'num_shows', 'width': '1rem'},
+          {'data': 'num_songs', 'name': 'num_songs', 'width': '1rem'},
+          {
+            'data': 'first.date',
+            'name': 'first__id, first__early_late',
+            'width': '6rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return '<a href="/events/' + row.id + '">'+ data.display +'</a>';
@@ -202,71 +189,34 @@
             },
           },
           {
-            'data': 'setlist',
-            'name': 'setlist',
+            'data': 'last.date',
+            'name': 'last__id, last__early_late',
+            'width': '6rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
-                  return row.setlist ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
+                  return '<a href="/events/' + row.id + '">'+ data.display +'</a>';
                 }
-            },
+            },          
           },
-          {
-            'data': 'artist.name',
-            'name': 'artist__name',
-            'render': function (data, type, row, meta) {
-                if (type === 'display' && row.artist) {
-                  return '<a href="/bands/' + row.artist.id + '">'+ row.artist.name +'</a>';
-                }
-            },
-          },
-          {
-            'data': 'venue',
-            'name': 'venue__name',
-            'render': function (data, type, row, meta) {
-                if (type === 'display' && row.artist) {
-                  return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
-                }
-            },
-          },
-          {
-            'data': 'venue.city',
-            'name': 'venue__city__name',
-            'render': function (data, type, row, meta) {
-                if (type === 'display' && row.artist) {
-                  return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
-                }
-            },
-          },
-          {
-            'data': 'tour',
-            'name': 'tour__name',
-            'render': function (data, type, row, meta) {
-                if (type === 'display' && row.artist) {
-                  return '<a href="/tours/' + data.id + '">'+ data.name +'</a>';
-                }
-            },
-          },
-          {'data': 'title', 'name': 'title'},
-          {'data': 'public', 'name': 'public'},
-        ],
-      });
-
-      new DataTable('#tourSlots', {
-        layout: getDatatableLayout(),
-        ordering: false,
-        columnDefs: [
-          { target: 0, type: 'date' },
-          { targets: [1, 2, 3, 4, 5, 6], width: '15%' },
-        ],
-      });
-
-      new DataTable('#tourLegs', {
-        layout: getDatatableLayout([0, 2]),
+          {'data': 'note', 'name': 'note'},
+        ]
       });
 
       new DataTable('#songTable', {
-        layout: getDatatableLayout([0, 2]),
+        layout: getDatatableLayout({category: false}),
+        serverSide: true,
+        processing: true,
+        scrollY: '60vh',
+        ajax: {
+          'url': '/api/v1/setlists/?tour={{ tour.id }}&format=datatables&keep=songid',
+        },
+        columnDefs: [
+          { targets: [0], className: 'text-center text-xs', width: '1rem'},
+          { targets: '_all', className: 'text-nowrap text-xs' },
+        ],
+        columns: song_table_columns,
       });
+      
     });
 
   </script>

@@ -1,42 +1,24 @@
-/* Remove default content */
-table.dataTable thead .dt-column-order::before,
-table.dataTable thead .dt-column-order::after {
-    content: "" !important;
-    font-family: "bootstrap-icons";
-    line-height: 0px !important;
+th.text-center > div.dt-column-header {
+    text-align: center !important;
 }
 
-/* up arrow */
-table.dataTable thead .dt-column-order::before {
-    content: "\F148" !important;
+/* disables hovering on set divider rows */
+td.setHeader:hover {
+	box-shadow: none !important;
 }
 
-/* down arrow */
-table.dataTable thead .dt-column-order::after {
-    content: "\F128" !important;
+tr.res-child:hover {
+    box-shadow: none !important;
 }
 
-.dt-column-title,
-.dt-column-order {
-    color: var(--bs-light) !important;
+tr.res-child > td:first {
+    width: 2rem;
+    font-weight: bold;
 }
 
-.dt-orderable-asc span.dt-column-order:before,
-.dt-orderable-asc span.dt-column-order:after,
-.dt-orderable-desc span.dt-column-order:before,
-.dt-orderable-desc span.dt-column-order:after {
-    opacity: 0 !important;
-}
-
-.dt-ordering-asc span.dt-column-order:before,
-.dt-ordering-desc span.dt-column-order:after {
-    opacity: 1 !important;
-}
-
-.dt-container label,
-.dt-info {
-    font-size: .85rem;
-}
+/* td.position {
+    color: var(--base-content) !important;
+} */
 
 @media only screen and (max-width: 768px) {
     .dt-layout-full {
@@ -53,19 +35,19 @@ table.dataTable thead .dt-column-order::after {
     padding-right: 0 !important;
 }
 
-.dt-buttons>button {
-    margin-bottom: 0px !important;
-    border: 1px solid var(--bs-border-color) !important;
-}
-
 .index .dt-layout-table {
     margin-top: 0px !important;
 }
 
+/* hides button row if they're empty on mobile */
 div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-start:empty),
 div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     display: none !important;
     margin-top: 0px !important;
+}
+
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer {
+	flex-wrap: nowrap;
 }
 
 .dt-orderable-none span.dt-column-order {
@@ -80,39 +62,265 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
 
 .table-responsive {
     padding: 0% !important;
-    border-radius: inherit !important;
+    border-radius: 0 !important;
 }
 
-#setlistTable_wrapper .dt-layout-table.mt-2 {
+td:has(:not(table)) > tr:last-child > td:first-child {
+    border-bottom-left-radius: var(--bs-border-radius) !important;
+}
+
+td:has(:not(table)) > tr:last-child > td:first-child {
+    border-bottom-right-radius: var(--bs-border-radius) !important;
+}
+
+#setlistTable_wrapper .dt-layout-table {
     margin-top: 0 !important;
-}
-
-.dt-datetime-calendar > table {
-    table-layout: fixed;
-}
-
-.dt-datetime-calendar > table > tbody > tr > td,
-.dt-datetime-calendar > table > thead > tr > th
-{
-    padding: 0% !important;
-}
-
-div.dt-datetime {
-    top: 57.6px !important;
-    left: 1562.33px !important;
 }
 
 table.dataTable div.dt-column-header {
     flex-direction: row !important;
 }
 
-table.dataTable thead th,
+/* searchbuilder customization */
+div.dropdown-menu.dt-button-collection.dtb-collection-closeable {
+    z-index: 9999;
+    left: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.dtsb-title {
+    font-size: 0.875rem !important;
+}
+
+.dtsb-button {
+    font-size: 0.875rem !important;
+    margin: auto !important;
+}
+
+.dtsb-dropDown,
+.dtsb-inputCont {
+    margin-bottom: 0.25rem !important;
+    font-size: 0.875rem !important;
+}
+
+table {
+    border-collapse: collapse !important;
+}
+
+/* hides double header on some datatables */
+div.dt-scroll-body thead tr th
+{
+    padding: 0 inherit !important
+}
+
+.setHeader {
+    color: var(--base-content) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    line-height: 1 !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    /* position: relative; */
+    vertical-align: middle !important;
+    background-color: #717f8e !important;
+    color: #ffffff !important;
+}
+
+.showopener,
+.setHeader.set1,
+.setHeader.show * {
+    background-color: var(--primary) !important;
+    color: var(--primary-content) !important;
+}
+
+.set2opener,
+.setHeader.set2 {
+    background-color: var(--secondary) !important;
+    color: var(--secondary-content) !important;
+}
+
+.set1closer,
+.mainsetcloser {
+    background-color: var(--accent) !important;
+    color: var(--accent-content) !important;
+}
+
+.encoreopener,
+.setHeader.encore *,
+.showcloser {
+    background-color: var(--danger) !important;
+    color: var(--danger-content) !important;
+}
+
+table {
+    width: 100% !important;
+}
+
+table th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    font-size: 0.875rem !important;
+}
+
+.dropdown-menu {
+    --bs-dropdown-min-width: 11rem;
+}
+
 .dt-type-date {
+    width: 8rem !important;
     text-align: left !important;
 }
 
-div.dropdown-menu.dt-button-collection.sbpopover.dtb-collection-closeable {
-    width: 700px !important;
-    left: calc(100vw - 60vw) !important;
-    top: 2vh !important;
+.dt-type-numeric {
+    width: 1rem !important;
+    text-align: center !important;
+}
+
+.band {
+    width: 12rem !important;
+}
+
+.venue {
+    width: 14rem !important;
+}
+
+.location {
+    width: 12rem !important;
+}
+
+/* @media only screen and (max-width: 768px) {
+    .songnum {
+        width: 4rem !important;
+        height: 1rem !important;
+    }
+} */
+
+/* td.songnum, span.songnum {
+    line-height: 1 !important;
+} */
+
+/* Hide Calendar Popup, it is very finicky and doesn't like to be placed */
+/* div.dt-datetime {
+    display: none !important;
+} */
+
+td[id*="snippet-head"],
+td[id*="snippet-foot"] {
+    border: none !important;
+    line-height: 0.7rem !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+tr[id*="snippet-row"] td {
+    border: none !important;
+}
+
+tr[id*="snippet"]:hover *,
+td[id*="snippet"]:hover {
+    box-shadow: none !important;
+}
+
+.dtsb-button {
+    background-color: var(--primary) !important;
+    color: var(--primary-content) !important;
+}
+
+div.dt-button-background {
+	position: fixed;
+	top: 0;
+    margin: 0 !important;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.7);
+	background: radial-gradient(ellipse farthest-corner at center, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+	z-index: 999;
+}
+
+.dropdown-menu {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(0);
+}
+
+td > table > tbody > tr > td:first-child {
+    border-bottom-left-radius: 0% !important;
+}
+
+td[colspan="5"]:not(.setHeader) {
+    padding: 0% !important;
+}
+
+:not(td) > table tbody tr td:not(.fc-day, [role="presentation"]) {
+    padding: 0.25rem 0.5rem !important;
+}
+
+/* td.songnum {
+    padding: 0.25rem 0.25rem !important;
+} */
+
+td[colspan="5"] tr:hover td {
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.075);
+}
+
+#setlistTable td:nth-child(1) {
+    width: 30px !important;
+}
+
+#setlistTable td:nth-child(2) {
+   min-width: 350px !important;
+   max-width: 400px !important;
+}
+
+#setlistTable td:nth-child(5) {
+    width: 50px !important;
+    padding: 0.25rem 0.75rem !important;
+}
+
+#setlistTable td:nth-child(6) {
+    width: 150px !important;
+}
+
+#setlistTable td:nth-child(3), 
+#setlistTable td:nth-child(4) {
+    width: 50px !important;
+}
+
+/* .dt-scroll-body thead {
+    display: none !important
+} */
+
+.note-button {
+    height: 1rem !important;
+    display: inline-block !important;
+}
+
+.col > .setlist_note {
+    line-height: 1rem !important;
+}
+
+@media only screen and (min-width: 768px) {
+    tr.child {
+        display: none !important;
+    }
+}
+
+#onstageTable tr > td:empty {
+    display: none !important
+}
+
+.card-body tbody th:last-child {
+    border-bottom: 0 !important;
+}
+
+.card-body tbody .dtrg-group th {
+    padding: 0 0.25rem 0.25rem 0 !important;
+}
+
+@media only screen and (min-width: 768px) {
+    td > .badge {
+        vertical-align: middle;
+        margin-top: -0.35em;
+    }
 }

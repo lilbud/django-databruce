@@ -28,6 +28,7 @@ urlpatterns = [
     path("benner/", admin.site.urls),
     path("event_autocomplete", views.event_search, name="events_auto"),
     path("test/", views.Test.as_view(), name="test"),
+    path("calendar/", views.Calendar.as_view(), name="calendar"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "login/",
@@ -109,6 +110,11 @@ urlpatterns = [
         name="signup",
     ),
     path(
+        "city_auto/",
+        views.CityAutocomplete.as_view(),
+        name="city_auto",
+    ),
+    path(
         "signup/done/",
         views.SignUpDone.as_view(),
         name="signup_done",
@@ -159,6 +165,11 @@ urlpatterns = [
         views.SetlistNotesSearch.as_view(),
         name="note_search",
     ),
+    path(
+        "notes_search_results/",
+        views.SetlistNotesSearchResults.as_view(),
+        name="note_search_results",
+    ),
     path("relations", views.Relation.as_view(), name="relations"),
     path("relations/<int:id>", views.RelationDetail.as_view(), name="relation_details"),
     path("bands", views.Band.as_view(), name="bands"),
@@ -176,7 +187,7 @@ urlpatterns = [
     path("tours/legs", views.TourLeg.as_view(), name="tour_legs"),
     path("tours/legs/<int:id>", views.TourLegDetail.as_view(), name="leg_details"),
     path("releases/nugs", views.NugsRelease.as_view(), name="nugs"),
-    path("releases/bootleg", views.Bootleg.as_view(), name="bootlegs"),
+    path("releases/bootlegs", views.Bootleg.as_view(), name="bootlegs"),
     path(
         "profile/add-show/",
         views.UserAddRemoveShow.as_view(),

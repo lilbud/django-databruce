@@ -15,26 +15,28 @@
           <table class="table table-hover display nowrap" id="table">
             <thead>
               <tr>
-                <th class="all">Event</th>
-                <th class="all">Set</th>
-                <th class="all">Song</th>
-                <th class="all">Note</th>
+                <th scope="col" class="all">Event</th>
+                <th scope="col" class="min-tablet-l">Venue</th>
+                <th scope="col" class="min-tablet-l">Set</th>
+                <th scope="col" class="min-tablet-l">Song</th>
+                <th scope="col" class="min-tablet-l">Note</th>
               </tr>
             </thead>
-            <tbody>
-              {% for result in results %}
+            {% comment %} <tbody>
+              {% for item in results %}
                 <tr>
                   <td>
-                    <a href="{% url "event_details" id=result.event.id %}">{{ result.event.get_date }}</a>
+                    <a href="{% url "event_details" id=item.event.id %}">{{ item.event.get_date }}</a>
                   </td>
-                  <td>{{ result.set_name }}</td>
+                  <td>{{ item.event.venue.get_name }}</td>
+                  <td>{{ item.id.set_name }}</td>
                   <td>
-                    <a href="{% url "song_details" id=result.song.id %}">{{ result.song.name }}</a>
+                    <a href="{% url "song_details" id=item.id.song.id %}">{{ item.id.song.name }}</a>
                   </td>
-                  <td>{{ result.note|default_if_none:"" }}</td>
+                  <td>{{ item.note|default_if_none:"" }}</td>
                 </tr>
               {% endfor %}
-            </tbody>
+            </tbody> {% endcomment %}
           </table>
         </div>
       </div>
@@ -43,10 +45,59 @@
   <script>
     $(document).ready(function () {
       new DataTable('#table', {
-        layout: getDatatableLayout(),
+        layout: getDatatableLayout({category: false}),
+        serverSide: true,
+        processing: true,
+        scrollY: '60vh',
+        ajax: {
+          'url': '/api/v1/setlist_notes/?note={{ query }}&format=datatables&keep=id,early_late,public',
+        },
         columnDefs: [
-          { targets: [0], type: 'date' },
+          { targets: '_all', className: 'text-wrap text-xs', defaultContent: '' },
         ],
+        columns: [
+          {
+            'data': 'event.date',
+            'name': 'event__id, event__early_late',
+            'className': 'text-nowrap all',
+            'width': '8rem',
+            'type': 'text',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+              }
+            },
+          },
+          {
+            'data': 'event.venue',
+            'name': 'event__venue__name, venue__detail',
+            'className': 'text-nowrap all',
+            'width': '12rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
+              }
+            },
+          },
+          {
+            'data': 'setlist.set_name',
+            'name': 'setlist__set_name',
+            'className': 'text-nowrap',
+            'width': '8rem',
+          },
+          {
+            'data': 'setlist.song',
+            'name': 'setlist__song__name',
+            'className': 'text-nowrap',
+            'width': '12rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/songs/' + data.id + '">' + data.name + '</a>';
+              }
+            },
+          },
+          {'data': 'note', 'name': 'note', 'className': 'text-nowrap', 'width': '15rem'},
+        ]
       })
     })
   </script>

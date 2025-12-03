@@ -1,183 +1,182 @@
 :root {
-    /* https://www.realtimecolors.com/?colors=ffffff-22262a-035d8e-00e1ff-fc965f&fonts=Inter-Inter */
-
-	--text-50: #f2f2f2;
-	--text-100: #e6e6e6;
-	--text-200: #cccccc;
-	--text-300: #b3b3b3;
-	--text-400: #999999;
-	--text-500: #808080;
-	--text-600: #666666;
-	--text-700: #4d4d4d;
-	--text-800: #333333;
-	--text-900: #1a1a1a;
-	--text-950: #0d0d0d;
-
-	--background-50: #f1f2f4;
-	--background-100: #e3e6e8;
-	--background-200: #c6ccd2;
-	--background-300: #aab3bb;
-	--background-400: #8e99a4;
-	--background-500: #717f8e;
-	--background-600: #5b6671;
-	--background-700: #444c55;
-	--background-800: #2d3339;
-	--background-900: #17191c;
-	--background-950: #0b0d0e;
-
-	--primary-50: #e6f6fe;
-	--primary-100: #cdedfe;
-	--primary-200: #9bdbfd;
-	--primary-300: #69c9fc;
-	--primary-400: #37b6fb;
-	--primary-500: #05a4fa;
-	--primary-600: #0483c8;
-	--primary-700: #036396;
-	--primary-800: #024264;
-	--primary-900: #012132;
-	--primary-950: #011019;
-
-	--secondary-50: #e5fcff;
-	--secondary-100: #ccf9ff;
-	--secondary-200: #99f3ff;
-	--secondary-300: #66edff;
-	--secondary-400: #33e7ff;
-	--secondary-500: #00e1ff;
-	--secondary-600: #00b4cc;
-	--secondary-700: #008799;
-	--secondary-800: #005a66;
-	--secondary-900: #002d33;
-	--secondary-950: #00171a;
-
-	--accent-50: #feefe6;
-	--accent-100: #fedecd;
-	--accent-200: #fdbd9b;
-	--accent-300: #fc9c69;
-	--accent-400: #fb7c37;
-	--accent-500: #fa5b05;
-	--accent-600: #c84904;
-	--accent-700: #963603;
-	--accent-800: #642402;
-	--accent-900: #321201;
-	--accent-950: #190901;
-
-    --font-heading: "Cabin", sans-serif;
-    --font-body: "IBM Plex Sans Hebrew", sans-serif;
-    --bs-dropdown-link-active-bg: #0369a1;
-    --progress-bar-bg: #27272a;
+  --font-heading: "Cabin", sans-serif;
+  --font-body: "IBM Plex Sans Hebrew", sans-serif;
 }
 
-.tour23,
-.bitusa,
-.greetings,
-.magic,
-.tunnel,
-.sessions,
-.dream,
-.tour92,
-.wrecking {
-    color: white !important;
+[data-bs-theme="light"] {
+  --base-100: #FFFFFF;
+  --base-200: #F8F8F8;
+  --base-300: #EEEEEE;
+  --base-content: #18181b;
+  --primary: #0483c8;
+  --primary-content: #FFFFFF;
+  --secondary: #008799;
+  --secondary-content: #FFFFFF;
+  --success: #00d390;
+  --success-content: #005d39;
+  --danger: #ff627d;
+  --danger-content: #FFFFFF;
+  --info: #00bafe;
+  --info-content: #000000;
+  --accent: #fa5b05;
+  --accent-content: #FFFFFF;
+  --border: #464e55;
+  --neutral: #000000;
+  --neutral-content: #E4E4E7;
+  --warning: #fcb700;
+  --warning-content: #793205;
+
+  /* Arrow for form select fields, set stroke to base-content above */
+  .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  }
 }
 
-.btr,
-.darkness,
-.devils,
-.hh,
-.joad,
-.rising,
-.river,
-.chicago,
-.shuffle {
-    color: black !important;
+[data-bs-theme="dark"] {
+  --base-100: #1d232a;
+  --base-200: #191e24;
+  --base-300: #15191e;
+  --base-content: #ecf9ff;
+  --primary: #0483c8;
+  --primary-content: #edf1fe;
+  --secondary: #008799;
+  --secondary-content: #000000;
+  --success: #00d390;
+  --success-content: #004c39;
+  --danger: #ff627d;
+  --danger-content: #4d0218;
+  --info: #00bafe;
+  --info-content: #042e49;
+  --accent: #fa5b05;
+  --accent-content: #421104;
+  --border: #464e55;
+  --neutral: #000000;
+  --neutral-content: #E4E4E7;
+  --warning: #fcb700;
+  --warning-content: #793205;
+
+  /* Arrow for form select fields, set stroke to base-content above */
+  .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ECF9FF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  }
 }
 
-.tour23 {
-    background-color: #c86327 !important;
+[data-bs-theme="synthwave"] {
+    --base-100: #09002f;
+    --base-200: #120b3d;
+    --base-300: #1c184b;
+    --base-content: #a1b1ff;
+    --primary: #f861b4;
+    --primary-content: #500323;
+    --secondary: #71d1fe;
+    --secondary-content: #042e49;
+    --accent: #ff8904;
+    --accent-content: #421104;
+    --success: #00d3bb;
+    --success-content: #002d2c;
+    --danger: #ec8c78;
+    --danger-content: #201047;
+    --info: #00bafe;
+    --info-content: #042e49;
+    --neutral: #422ad5;
+    --neutral-content: #c6d2ff;
+    --warning: #fede1c;
+    --warning-content: #733e0a;
+
+    /* Arrow for form select fields, set stroke to base-content above */
+    .form-select {
+      --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a1b1ff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    }
 }
 
-.bitusa {
-    background-color: #a43134 !important;
+[data-bs-theme="frappe"] {
+	  --base-100: #303446;
+	  --base-200: #292c3c;
+	  --base-300: #232634;
+    --base-content: #c6d0f5;
+    --primary: #babbf1;
+    --primary-content: #292c3c;
+    --secondary: #414559;
+    --secondary-content: #c6d0f5;
+    --accent: #f2d5cf;
+    --accent-content: #292c3c;
+    --success: #a6d189;
+    --success-content: #303446;
+    --danger: #e5c890;
+    --danger-content: #303446;
+    --info: #99d1db;
+    --info-content:  #292c3c;
+    --neutral: #838ba7;
+    --neutral-content: #292c3c;
+    --warning: #e6c88e;
+    --warning-content: #292c3c;
+
+    /* Arrow for form select fields, set stroke to base-content above */
+    .form-select {
+      --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c6d0f5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    }
 }
 
-.btr {
-    background-color: #ffffff !important;
+/* Primary */
+.text-primary {
+  color: var(--primary) !important;
 }
 
-.darkness {
-    background-color: #d7b79d !important;
+.text-primary-content {
+  color: var(--primary-content) !important;
 }
 
-.devils {
-    background-color: #cd9f69 !important;
-
+.bg-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-content) !important;
 }
 
-.greetings {
-    background-color: #dd3b64 !important;
+/* Secondary */
+.text-secondary {
+  color: var(--secondary-content) !important;
 }
 
-.hh {
-    background-color: #e0ae64 !important;
+.bg-secondary {
+  background-color: var(--secondary) !important;
 }
 
-.magic {
-    background-color: #752418 !important;
+/* Accent */
+.text-accent {
+  color: var(--accent) !important;
 }
 
-.joad {
-    background-color: #efbd5a !important;
+.bg-accent {
+  background-color: var(--accent) !important;
+  color: var(--accent-content) !important;
 }
 
-.rising {
-    background-color: #e59750 !important;
+/* nugs */
+.bg-nugs {
+  background-color: #b585db !important;
+  color: white !important;
 }
 
-.river {
-    background-color: #4ebcc3 !important;
+[class*="success"] {
+  background-color: var(--success) !important;
+  color: var(--success-content) !important;
+  border-color: var(--success) !important;
 }
 
-.sessions {
-    background-color: #edb22b !important;
+[class*="warning"] {
+  background-color: var(--warning) !important;
+  color: var(--warning-content) !important;
+  border-color: var(--warning) !important;
 }
 
-.shuffle {
-    background-color: #c89c6c !important;
+[class*="bg-secondary"] {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-content) !important;
+  border-color: var(--secondary) !important;
 }
 
-.tunnel {
-    background-color: black !important;
+[class*="danger"]:not(i) {
+  background-color: var(--danger) !important;
+  color: var(--danger-content) !important;
+  border-color: var(--danger) !important;
 }
 
-.dream {
-    background-color: #3b497c !important;
-}
-
-.tour92 {
-    background-color: #da3931 !important;
-}
-
-.wrecking {
-    background-color: #85080d !important;
-}
-
-.chicago {
-    background-color: #e8daa9 !important;
-}
-
-.position-showopener,
-.position-set2opener {
-    background-color: var(--secondary-700) !important;
-}
-
-.position-mainsetcloser,
-.position-set1closer {
-    background-color: var(--secondary-800) !important;
-}
-
-.position-encoreopener {
-    background-color: var(--accent-600) !important;
-}
-
-.position-showcloser {
-    background-color: var(--accent-700) !important;
-}

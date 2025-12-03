@@ -14,33 +14,36 @@
     <tr class="header">
       <th class="all" scope="col">Name</th>
       <th class="min-tablet-l" scope="col">Date</th>
-      <th class="all" scope="col">Type</th>
-      <th class="min-tablet-l" scope="col">Links</th>
+      <th class="min-tablet-l" scope="col">Type</th>
     </tr>
   </thead>
-  <tbody>
-    {% for release in releases %}
-      <tr>
-        <td>
-          <a href="{% url "release_details" id=release.id %}">{{ release.name }}</a>
-        </td>
-        <td>{{ release.date|date:'Y-m-d' }}</td>
-        <td>{{ release.type }}</td>
-        <td>
-          {% if release.mbid %}<a href="https://musicbrainz.org/release/{{ release.mbid }}">Musicbrainz</a>{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout();
-      dtCategorySelect(layout, -2, [{'label': 'All', 'value': '.*'}, {'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}]);
+      var layout = getDatatableLayout({columns: [0,1,2], category: true});
+      dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}]});
 
       new DataTable('#releasesTable', {
         layout: layout,
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/releases/?format=datatables&keep=id',
+        },
+        columns: [
+          {
+            'data': 'name',
+            'name': 'name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/releases/' + row.id + '">'+ data +'</a>';
+              }
+            },
+          },
+          {'data': 'date', 'name': 'date'},
+          {'data': 'type', 'name': 'type'},
+        ]
       });
     });
   </script>

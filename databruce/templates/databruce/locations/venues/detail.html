@@ -58,10 +58,36 @@
       <div class="card-body px-0">
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">
-            {% include "databruce/partials/event_table.html" with events=events %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="eventTable">
+                <thead>
+                  <tr class="custom">
+                    <th class="all" scope="col">Date</th>
+                    <th class="min-tablet-l" scope="col">Setlist</th>
+                    <th class="min-tablet-l" scope="col">Band</th>
+                    <th class="min-tablet-l" scope="col">Venue</th>
+                    <th class="min-tablet-l" scope="col">Location</th>
+                    <th class="min-tablet-l" scope="col">Tour</th>
+                    <th class="min-tablet-l" scope="col">Detail</th>
+                    <th class="min-tablet-l" scope="col">Public</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
           </div>
           <div id="songs" class="tab-pane fade">
-            {% include "databruce/partials/song_position_table.html" with songs=songs %}
+            {% comment %} {% include "databruce/partials/song_position_table.html" with songs=songs %} {% endcomment %}
+            <div class="table-responsive">
+              <table class="table table-hover display" id="songTable">
+                <thead>
+                  <tr>
+                    <th class="min-tablet-l">Plays</th>
+                    <th class="all">Song</th>
+                    <th class="min-tablet-l">Category</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
           </div>
           <div id="links" class="tab-pane fade">
             <ul>
@@ -83,15 +109,33 @@
   </div>
   <script>
     $(document).ready(function () {
+
+      var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
+      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]});
+
       new DataTable('#eventTable', {
-        layout: getDatatableLayout([1,2,3,4]),
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        scrollY: '60vh',
+        ajax: {
+          'url': '/api/v1/events/?venue={{ venue_info.id }}&format=datatables&keep=id',
+        },
         columnDefs: [
-          { type: 'date', targets: [0] },
-        ]
+          {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},
+          {targets: [-1], visible: false }
+        ],
+        columns: event_table_columns,
       });
 
       new DataTable('#songTable', {
-        layout: getDatatableLayout(),
+        layout: getDatatableLayout({category: false}),
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/setlists/?venue={{ venue_info.id }}&format=datatables',
+        },
+        columns: song_table_columns,
       });
     })
   </script>

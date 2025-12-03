@@ -13,3 +13,5 @@ django-ratelimit
 markdown-it-py
 django_compressor
 querystring_parser
+python-slugify
+django-group-by

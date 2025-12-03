@@ -1,122 +1,116 @@
 {% extends "databruce/base.html" %}
+{% block extrajs %}
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          validRange: {
+            start: '1965-06-01',
+            end: new Date().toISOString(),
+          },
+          fixedWeekCount: false,
+          initialDate: '{{ request.GET.start }}',
+          schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+          dayMinWidth: 100,
+          height: 768,
+          contentHeight: 768,
+          headerToolbar: {
+            start: 'title',
+            center: '',
+            end: 'prev,next'
+          },
+          themeSystem: 'bootstrap5',
+          eventSources: [
+            function(info, successCallback, failureCallback) {
+              fetch(`/api/v1/events/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
+              .then((resp) => resp.json())
+              .then(function(data) {
+                var eventsList = [];
+
+                $(data.results).each(function (i, val){
+                  var title = `${val.artist.name}: ${val.venue.formatted}`
+
+                  if (val.early_late) {
+                    var title = `${val.artist.name}: ${val.venue.formatted} (${val.early_late})`
+                  }
+
+                  eventsList.push(
+                    {
+                      title: title,
+                      start: val.date.filter,
+                      url: `/events/${val.id}`,
+                      allDay: false,
+                      className: 'text-wrap',
+                    }
+                  )
+                })
+
+                if (!Array.isArray(eventsList) || !eventsList.length) {
+                  failureCallback(eventsList);
+                } else {
+                  successCallback(eventsList);
+                }
+
+              })
+            },
+            function (info, successCallback, failureCallback) {
+              fetch(`/api/v1/runs/?format=json&start=${info.start.toISOString()}&end=${info.end.toISOString()}`)
+              .then((resp) => resp.json())
+              .then(function(data){
+                var eventsList = [];
+
+                $(data.results).each(function (i, val){
+                  eventsList.push(
+                    {
+                      title: val.name,
+                      start: val.first.date.filter,
+                      end: `${val.last.date.filter}T23:59:59`,
+                      url: `/runs/${val.id}`,
+                      backgroundColor: 'var(--secondary)',
+                      borderColor: 'var(--secondary)',
+                      className: 'text-wrap',
+                    }
+                  )
+                })
+
+                if (!Array.isArray(eventsList) || !eventsList.length) {
+                  failureCallback(eventsList);
+                } else {
+                  successCallback(eventsList);
+                }
+              })
+            },
+          ],
+
+          eventContent: function( info ) {
+            return {html: info.event.title};
+          }
+        });
+        calendar.render();
+      });
+  </script>
+{% endblock extrajs %}
 {% load static %}
 {% block title %}
   Test
 {% endblock title %}
-{% block extrajs %}
-  <link href="https://cdn.datatables.net/columncontrol/1.0.7/css/columnControl.dataTables.min.css"
-        rel="stylesheet">
-  <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
-{% endblock extrajs %}
 {% block content %}
-  <div class="text-2xl">Songs</div>
-  <table>
-    <thead>
-      <th>Date</th>
-      <th>Act</th>
-      <th>Venue</th>
-      <th>Tour</th>
-      <th>Position</th>
-      <th>Gap</th>
-      <th>Set</th>
-      <th>Prev</th>
-      <th>Next</th>
-      <th>Note</th>
-    </thead>
-    {% comment %} <tbody>
-      {% for song in songs %}
-        <tr>
-          <td>{{ song.event }}</td>
-          <td>{{ song.event.artist }}</td>
-          <td>{{ song.venue.name }}</td>
-          <td>{{ song.event.tour }}</td>
-          <td>{{ song.position|default_if_none:"" }}</td>
-          <td>{{ song.last|default_if_none:"" }}</td>
-          <td>{{ song.set_name }}</td>
-          <td>
-            {% if song.prev_song %}{{ song.prev_song.name }}{% endif %}
-          </td>
-          <td>
-            {% if song.next_song %}{{ song.next_song.name }}{% endif %}
-          </td>
-          <td>{{ song.note|default_if_none:"" }}</td>
-        </tr>
-      {% endfor %}
-    </tbody> {% endcomment %}
-  </table>
+  <div class="row justify-content-center py-3">
+    <div class="col-12 col-md-10">
+      <div id="calendar"></div>
+    </div>
+  </div>
   <script>
     $(document).ready(function () {
-        let ctx = document.getElementById("chart").getContext("2d");
-        Chart.defaults.color = '#999';
+      var date = new Date();
 
-        let chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: [{% for year in year_stats %}{{year.year|date:"Y"}},{% endfor %}],
-            datasets: [
-                {
-                  label: "Events",
-                  backgroundColor: "#0369a1",
-                  borderColor: "#417690",
-                  color: "#ffffff",
-                  data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
-                }
-            ]
-          },
-          options: {
-            responsive: true,
-            title: {
-                text: "Plays by Year",
-                display: true
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                grid: {
-                  color: '#5e5e5e',
-                },
-              },
-              x:{ 
-                grid: {
-                  color: '#5e5e5e',
-                },
-              }
-            },
-          },
-        });
+      let currentMonth = (date.getMonth()+1).toString().padStart(2,"0");
+      let currentDay = date.getDate().toString().padStart(2,"0");
+
+      $(`td[data-date$='${currentMonth}-${currentDay}']`).addClass('today');
     });
 
-    $(document).ready(function () {
-
-      var layout = getDatatableLayout([0,1,2,3,4,5,6,7,8]);
-
-
-      var table = $('#songTable').DataTable(
-        {
-          //layout: layout,
-          serverSide: true,
-          processing: true,
-          ajax: {
-            'url': '/api/v1/songspage/?song={{ song_info.id }}&format=datatables',
-          },
-          columnDefs: [
-            { "defaultContent": "", "type": 'text', "targets": [0,1,2,3,4,6,7,8,9] },
-          ],
-          columns: [
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-            {'data': 'note', 'name': 'note'},
-          ],
-        }
-      );
-    });
   </script>
 {% endblock content %}

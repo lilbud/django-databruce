@@ -1,57 +1,61 @@
 /* Select 2 bootstrap-5 theme override */
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
-    border: 1px solid #495057;
+.select2-container--bootstrap-5 .select2-selection {
+    background-color: var(--base-300) !important;
+    /* border: 1px solid var(--base-content) !important; */
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single {
+.select2-container--bootstrap-5 .select2-selection--single {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
-    color: #dee2e6 !important;
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: var(--base-content) !important;
 }
 
-* html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
-    color: #dee2e6 !important;
+* .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+    color: var(--base-content) !important;
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
-    border: 1px solid var(--bs-gray-600);
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+    border: 1px solid var(--base-300);
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
-    color: #dee2e6 !important;
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
+    color: var(--base-content)!important;
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
-    color: var(--bs-body-color) !important;
-    border: 1px solid #495057 !important;
+.select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
+    background-color: var(--base-100) !important;
+    color: var(--base-content) !important;
+    border-color: var(--base-300) !important;
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown {
-    color: var(--bs-body-color) !important;
-    border: 1px solid #495057 !important;
+.select2-container--bootstrap-5 .select2-dropdown {
+    color: var(--base-content) !important;
+    background-color: var(--base-200) !important;
 }
 
-html[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[role=group] .select2-results__group {
-    color: var(--bs-secondary-color) !important;
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[role=group] .select2-results__group {
+    color: var(--base-content) !important;
 }
 
 .select2-results__option.select2-results__message {
-    color: var(--bs-body-color) !important;
+    color: var(--base-content) !important;
 }
 
-.select2-results__option--highlighted,
 .select2-results__option--selected {
-    color: var(--bs-body-color) !important;
-}
-
-.ui-autocomplete {
-    border: 1px solid var(--bs-border-color) !important;
-    color: var(--bs-body-color) !important;
-    z-index: 9999;
+    color: var(--base-content) !important;
+    background-color: var(--primary) !important;
 }
 
 .select2.select2-container.select2-container--bootstrap-5 {
     width: auto !important;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted,
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected
+{
+	color: var(--primary-content) !important;
+	background-color: var(--primary) !important;
+    border-radius: var(--bs-border-radius) !important;
 }

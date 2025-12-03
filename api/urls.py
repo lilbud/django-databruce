@@ -21,6 +21,11 @@ router.register(r"events/<int:year>", views.EventViewSet, basename="event_year")
 router.register(r"nugs_releases", views.NugsViewSet, basename="nugs_release")
 router.register(r"relations", views.RelationsViewSet, basename="relation")
 router.register(r"onstage", views.OnstageViewSet, basename="onstage")
+router.register(
+    r"onstage_events",
+    views.OnstageEventsViewSet,
+    basename="onstage_events",
+)
 router.register(r"onstageband", views.OnstageBandViewSet, basename="onstageband")
 router.register(
     r"release_tracks",
@@ -35,6 +40,43 @@ router.register(r"songs", views.SongsViewSet, basename="songs")
 router.register(r"tours", views.ToursViewSet, basename="tour")
 router.register(r"tour_legs", views.TourLegsViewSet, basename="tour_leg")
 router.register(r"songspage", views.SongsPageViewSet, basename="songs_page")
+router.register(r"lyrics", views.LyricsViewSet, basename="lyrics")
+router.register(
+    r"setlist_entries",
+    views.SetlistEntriesViewSet,
+    basename="setlist_entries",
+)
+router.register(
+    r"advanced_search",
+    views.AdvancedSearch,
+    basename="advanced_search",
+)
+router.register(
+    r"index",
+    views.IndexViewSet,
+    basename="index",
+)
+router.register(
+    r"event_setlist",
+    views.EventSetlist,
+    basename="event_setlist",
+)
+router.register(
+    r"setlist_notes",
+    views.SetlistNotesViewSet,
+    basename="setlist_notes",
+)
+router.register(
+    r"updates",
+    views.UpdatesViewSet,
+    basename="updates",
+)
+router.register(
+    r"calendar",
+    views.EventCalendar,
+    basename="calendar",
+)
+
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [

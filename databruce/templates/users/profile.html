@@ -250,19 +250,19 @@
   <script>
       $(document).ready(function() {
           new DataTable('#eventTable', {
-            layout: getDatatableLayout(),
+            layout: getDatatableLayout({category: false}),
           });
 
           new DataTable('#songTable', {
-            layout: getDatatableLayout([0,2,3]),
+            layout: getDatatableLayout({columns: [0,2,3]}),
           });
 
           new DataTable('#notSeenTable', {
-            layout: getDatatableLayout([0,2]),
+            layout: getDatatableLayout({columns: [0,2]}),
           });
 
           new DataTable('#rareTable', {
-            layout: getDatatableLayout([0,2]),
+            layout: getDatatableLayout({columns: [0,2]}),
           });
       })
   </script>

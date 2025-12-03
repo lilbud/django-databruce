@@ -18,33 +18,65 @@
       <th>Last</th>
     </tr>
   </thead>
-  <tbody>
+  {% comment %} <tbody>
     {% for country in countries %}
       <tr>
         <td class="text-center">{{ country.num_events }}</td>
         <td>
           <a href="{% url "country_details" id=country.id %}">{{ country }}</a>
         </td>
-        <td data-sort="{{ country.first.get_date }}"
-            data-filter="{{ country.first.get_date }}">
+        <td data-sort="{{ country.first.get_date }}" data-filter="{{ country.first.get_date }}">
           <a href="{% url "event_details" id=country.first.id %}">{{ country.first.get_date }}</a>
         </td>
-        <td data-sort="{{ country.last.get_date }}"
-            data-filter="{{ country.last.get_date }}">
+        <td data-sort="{{ country.last.get_date }}" data-filter="{{ country.last.get_date }}">
           <a href="{% url "event_details" id=country.last.id %}">{{ country.last.get_date }}</a>
         </td>
       </tr>
     {% endfor %}
-  </tbody>
+  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
     $(document).ready(function () {
       new DataTable('#countryTable', {  
-        layout: getDatatableLayout([0,1,2,3]),
+        layout: getDatatableLayout({columns: [0,1,2,3]}),
+        serverSide: true,
+        processing: true,
+        ajax: {
+          'url': '/api/v1/countries/?format=datatables&keep=id',
+        },
         columnDefs: [
           { width: '1rem', targets: [0] },
-          { type: 'date', targets: [2,3] },
+        ],
+        columns: [ // num, name, state, country, first, last
+          {'data': 'count', 'name': 'count'},
+          {
+            'data': 'name',
+            'name': 'name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/countries/' + row.id + '">'+ row.name +'</a>';
+              }
+            },
+          },
+          {
+            'data': 'first.date',
+            'name': 'first__id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            },
+          },
+          {
+            'data': 'last.date',
+            'name': 'last__id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              }
+            },
+          },
         ]
       })
     })

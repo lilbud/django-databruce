@@ -3,10 +3,12 @@ import datetime
 import re
 from typing import Any
 
+from dal import autocomplete
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core import validators
 from django.db.models import F
 
 from . import models
@@ -58,8 +60,7 @@ class AdvancedEventSearch(forms.Form):
 
         states.extend(
             models.States.objects.all()
-            .prefetch_related("country")
-            .distinct("name")
+            .select_related("country")
             .order_by("name")
             .values_list("id", "name"),
         )
@@ -73,7 +74,8 @@ class AdvancedEventSearch(forms.Form):
             [
                 (item.id, item)
                 for item in models.Cities.objects.all()
-                .prefetch_related("state", "country")
+                .prefetch_related("state", "state__country")
+                .select_related("country")
                 .order_by("name")
             ],
         )
@@ -127,7 +129,7 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "id": "start_date",
                 "type": "search",
-                "name": "start_date",
+                "name": "event_start_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
                 "class": "form-control form-control-sm date-form col-6",
@@ -142,7 +144,7 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "id": "end_date",
                 "type": "search",
-                "name": "end_date",
+                "name": "event_end_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
                 "class": "form-control form-control-sm date-form col-6",
@@ -155,7 +157,11 @@ class AdvancedEventSearch(forms.Form):
         choices=get_months(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "month"},
+            attrs={
+                "class": "form-select form-select-sm",
+                "id": "month",
+                "name": "event_month",
+            },
         ),
     )
 
@@ -163,7 +169,13 @@ class AdvancedEventSearch(forms.Form):
         label="Day",
         choices=get_days(),
         required=False,
-        widget=forms.Select(attrs={"class": "form-select form-select-sm", "id": "day"}),
+        widget=forms.Select(
+            attrs={
+                "class": "form-select form-select-sm",
+                "id": "day",
+                "name": "event_day",
+            },
+        ),
     )
 
     day_of_week_choice = FormChoiceSelect(widget_id="dow_choice")
@@ -173,79 +185,112 @@ class AdvancedEventSearch(forms.Form):
         choices=days_of_week,
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "day_of_week"},
+            attrs={
+                "class": "form-select form-select-sm",
+                "id": "day_of_week",
+                "name": "event_day_of_week",
+            },
         ),
     )
 
     city_choice = FormChoiceSelect(widget_id="city_choice")
 
-    city = forms.ChoiceField(
+    # city = forms.ModelChoiceField(
+    #     label="City",
+    #     required=False,
+    #     queryset=models.Cities.objects.all()
+    #     .prefetch_related("state", "state__country")
+    #     .select_related("country")
+    #     .order_by("name"),
+    #     widget=forms.Select(
+    #         attrs={
+    #             "class": "form-select form-select-sm select2",
+    #             "id": "city",
+    #             "name": "event_city",
+    #         },
+    #     ),
+    # )
+    #
+
+    city = forms.CharField(
         label="City",
         required=False,
-        choices=get_cities(),
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "city"},
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "city",
+                "name": "event_city",
+            },
         ),
     )
 
     state_choice = FormChoiceSelect(widget_id="state_choice")
 
-    state = forms.ChoiceField(
+    state = forms.CharField(
         label="State",
-        choices=get_states(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "state"},
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "state",
+                "name": "event_state",
+            },
         ),
     )
 
     country_choice = FormChoiceSelect(widget_id="country_choice")
 
-    country = forms.ChoiceField(
+    country = forms.CharField(
         label="Country",
-        choices=get_countries(),
         required=False,
         widget=forms.Select(
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "country",
+                "name": "event_country",
             },
         ),
     )
 
     tour_choice = FormChoiceSelect(widget_id="tour_choice")
 
-    tour = forms.ChoiceField(
+    tour = forms.CharField(
         label="Tour",
-        choices=get_tours(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "tour"},
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "tour",
+                "name": "event_tour",
+            },
         ),
     )
 
     musician_choice = FormChoiceSelect(widget_id="musician_choice")
 
-    musician = forms.ChoiceField(
+    musician = forms.CharField(
         label="Musician",
-        choices=get_musicians(),
         required=False,
         widget=forms.Select(
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "musician",
+                "name": "event_musician",
             },
         ),
     )
 
     band_choice = FormChoiceSelect(widget_id="band_choice")
 
-    band = forms.ChoiceField(
+    band = forms.CharField(
         label="Band",
-        choices=get_bands(),
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "band"},
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "band",
+                "name": "event_band",
+            },
         ),
     )
 
@@ -255,17 +300,25 @@ class AdvancedEventSearch(forms.Form):
         initial="and",
         required=False,
         widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "conjunctionSelect"},
+            attrs={
+                "class": "form-select form-select-sm",
+                "id": "conjunctionSelect",
+                "name": "setlist_conjunction",
+            },
         ),
     )
 
     def clean_first_date(self):
-        data = {"id": datetime.date(1965, 1, 1), "value": datetime.date(1965, 1, 1)}
+        # the first year tracked in the database is 1965, so that is the start date
+        data = {
+            "id": self.cleaned_data["first_date"],
+            "value": datetime.date(1965, 1, 1),
+        }
 
         if self.cleaned_data["first_date"]:
-            # partial date
+            # partial date, get first of month
             if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["first_date"]):
-                data["value"] = (
+                return (
                     datetime.datetime.strptime(
                         self.cleaned_data["first_date"],
                         "%Y-%m",
@@ -276,7 +329,7 @@ class AdvancedEventSearch(forms.Form):
 
             # specific date
             if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["first_date"]):
-                data["value"] = datetime.datetime.strptime(
+                return datetime.datetime.strptime(
                     self.cleaned_data["first_date"],
                     "%Y-%m-%d",
                 ).date()
@@ -284,9 +337,10 @@ class AdvancedEventSearch(forms.Form):
         return data
 
     def clean_last_date(self):
+        # default end date is last day of current year
         data = {
             "id": self.cleaned_data["last_date"],
-            "value": self.cleaned_data["last_date"],
+            "value": datetime.date(DATE.year, 12, 31),
         }
 
         if self.cleaned_data["last_date"]:
@@ -307,8 +361,6 @@ class AdvancedEventSearch(forms.Form):
                     self.cleaned_data["last_date"],
                     "%Y-%m-%d",
                 ).date()
-        else:
-            data["value"] = datetime.date(DATE.year, 12, 31)
 
         return data
 
@@ -323,12 +375,6 @@ class AdvancedEventSearch(forms.Form):
 
         return data
 
-    def clean_day(self):
-        return {
-            "id": self.cleaned_data["day"],
-            "value": self.cleaned_data["day"],
-        }
-
     def clean_city(self):
         data = {
             "id": self.cleaned_data["city"],
@@ -336,12 +382,12 @@ class AdvancedEventSearch(forms.Form):
         }
 
         if self.cleaned_data["city"]:
-            data = (
+            return (
                 models.Cities.objects.filter(id=self.cleaned_data["city"])
-                .annotate(
+                .values(
+                    "id",
                     value=F("name"),
                 )
-                .values("id", "value")
                 .first()
             )
 
@@ -354,12 +400,12 @@ class AdvancedEventSearch(forms.Form):
         }
 
         if self.cleaned_data["state"]:
-            data = (
+            return (
                 models.States.objects.filter(id=self.cleaned_data["state"])
-                .annotate(
+                .values(
+                    "id",
                     value=F("name"),
                 )
-                .values("id", "value")
                 .first()
             )
 
@@ -370,13 +416,14 @@ class AdvancedEventSearch(forms.Form):
             "id": self.cleaned_data["country"],
             "value": self.cleaned_data["country"],
         }
+
         if self.cleaned_data["country"]:
-            data = (
+            return (
                 models.Countries.objects.filter(id=self.cleaned_data["country"])
-                .annotate(
+                .values(
+                    "id",
                     value=F("name"),
                 )
-                .values("id", "value")
                 .first()
             )
 
@@ -389,12 +436,12 @@ class AdvancedEventSearch(forms.Form):
         }
 
         if self.cleaned_data["tour"]:
-            data = (
+            return (
                 models.Tours.objects.filter(id=self.cleaned_data["tour"])
-                .annotate(
+                .values(
+                    "id",
                     value=F("name"),
                 )
-                .values("id", "value")
                 .first()
             )
 
@@ -407,12 +454,12 @@ class AdvancedEventSearch(forms.Form):
         }
 
         if self.cleaned_data["musician"]:
-            data = (
+            return (
                 models.Relations.objects.filter(id=self.cleaned_data["musician"])
-                .annotate(
+                .values(
+                    "id",
                     value=F("name"),
                 )
-                .values("id", "value")
                 .first()
             )
 
@@ -425,10 +472,12 @@ class AdvancedEventSearch(forms.Form):
         }
 
         if self.cleaned_data["band"]:
-            data = (
+            return (
                 models.Bands.objects.filter(id=self.cleaned_data["band"])
-                .annotate(value=F("name"))
-                .values("id", "value")
+                .values(
+                    "id",
+                    value=F("name"),
+                )
                 .first()
             )
 
@@ -461,17 +510,8 @@ class SetlistSearch(forms.Form):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    songs = [("", "")]
-
-    songs.extend(
-        models.Songs.objects.filter(num_plays_public__gte=1)
-        .order_by("name")
-        .values_list("id", "name"),
-    )
-
-    song1 = forms.ChoiceField(
+    song1 = forms.CharField(
         label="Song:",
-        choices=songs,
         required=False,
         widget=forms.Select(
             attrs={"class": "form-select form-select-sm song1 select2"},
@@ -514,9 +554,8 @@ class SetlistSearch(forms.Form):
         ),
     )
 
-    song2 = forms.ChoiceField(
+    song2 = forms.CharField(
         label="",
-        choices=songs,
         required=False,
         widget=forms.Select(
             attrs={
@@ -524,6 +563,42 @@ class SetlistSearch(forms.Form):
             },
         ),
     )
+
+    def clean_song1(self):
+        data = {
+            "id": self.cleaned_data["song1"],
+            "value": self.cleaned_data["song1"],
+        }
+
+        if self.cleaned_data["song1"]:
+            return (
+                models.Songs.objects.filter(id=self.cleaned_data["song1"])
+                .values(
+                    "id",
+                    value=F("name"),
+                )
+                .first()
+            )
+
+        return data
+
+    def clean_song2(self):
+        data = {
+            "id": self.cleaned_data["song2"],
+            "value": self.cleaned_data["song2"],
+        }
+
+        if self.cleaned_data["song2"]:
+            return (
+                models.Songs.objects.filter(id=self.cleaned_data["song2"])
+                .values(
+                    "id",
+                    value=F("name"),
+                )
+                .first()
+            )
+
+        return data
 
     def clean_position(self):
         positions = {

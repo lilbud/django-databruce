@@ -19,7 +19,7 @@
         <div class="row">
           <div class="fw-semibold">Event Date</div>
           <div>
-            <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue }}, {{ info.event.venue.city }}</a>
+            <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue.get_name }}, {{ info.event.venue.city }}</a>
           </div>
         </div>
       {% endif %}
@@ -53,36 +53,48 @@
         <div class="tab-content">
           <div id="songs" class="tab-pane fade show active">
             <div class="table-responsive">
-              <table class="table table-hover display nowrap" id="tracksTable">
+              <table class="table table-hover display" id="tracksTable">
                 <thead>
                   <tr class="header">
-                    <th scope="col">#</th>
-                    <th scope="col">Plays</th>
-                    <th scope="col">Song</th>
-                    <th scope="col">Length</th>
-                    <th scope="col">Event Date</th>
+                    {% comment %} <th scope="col">Disc</th> {% endcomment %}
+                    <th class="all" scope="col">Track</th>
+                    <th class="all" scope="col">Song</th>
+                    <th class="all" scope="col">Length</th>
+                    <th class="min-tablet-l" scope="col">Event Date</th>
+                    <th class="min-tablet-l" scope="col">Note</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {% for track in tracks %}
-                    <tr>
-                      <td>{{ track.track }}</td>
-                      <td>{{ track.song.num_plays_public }}</td>
-                      <td>
-                        <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
-                      </td>
-                      <td>
-                        {% if track.song.length %}{{ track.song.length|date:"i:s" }}{% endif %}
-                      </td>
-                      <td data-sort="{{ track.event.get_date }}"
-                          data-filter="{{ track.event.get_date }}">
-                        {% if track.event %}
-                          <a href="{% url "event_details" id=track.event.id %}">{{ track.event.get_date }}</a>
-                        {% endif %}
-                      </td>
-                    </tr>
+                {% comment %} <tbody>
+                  {% regroup tracks by discid.name as disc_list %}
+                  {% for disc in disc_list %}
+                    {% if disc.grouper %}
+                      <tr class="setHeader">
+                        <td colspan='5' class="text-sm py-1 text-center setHeader py-1 fw-medium">
+                          Disc {{ forloop.counter }}: {{ disc.grouper }}
+                        </td>
+                        <td class="d-none bg-primary"></td>
+                        <td class="d-none bg-primary"></td>
+                        <td class="d-none bg-primary"></td>
+                        <td class="d-none bg-primary"></td>
+                      </tr>
+                    {% endif %}
+                    {% for track in disc.list %}
+                      <tr>
+                        <td>{{ track.track }}</td>
+                        <td>
+                          <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
+                        </td>
+                        <td>{{ track.length|date:"i:s" }}</td>
+                        <td>
+                          {% if track.event %}
+                            <a href="{% url "event_details" id=track.event.id %}">{{ track.event.get_date }}</a>
+                          {% endif %}
+                        </td>
+                        <td>{{ track.note|default_if_none:"" }}</td>
+                      </tr>
+                    {% endfor %}
                   {% endfor %}
-                </tbody>
+                </tbody> {% endcomment %}
               </table>
             </div>
           </div>
@@ -102,12 +114,55 @@
   <script>
   $(document).ready(function () {
     new DataTable('#tracksTable', {
-      layout: getDatatableLayout([-1]),
+      layout: getDatatableLayout({columns: false, category: false}),
+      ordering: true,
+      serverSide: true,
+      processing: true,
+      responsive: true,
+      scrollX: false,
+      ajax: '/api/v1/release_tracks/?release={{ info.id }}&format=datatables&keep=id,disc',
+      rowGroup: {
+        emptyDataGroup: '',
+        dataSrc: function(row) {
+          if (row.disc) {
+            return `Disc ${row.disc.disc_num}: ${row.disc.name}`;
+
+          }
+        },
+        className: 'setHeader text-center show'
+      },
       columnDefs: [
-        { targets: [0,1], width: '1rem' },
-        { targets: [3], width: '2rem' },
-        { targets: [-1], width: '8rem' },
+        { orderSequence: ['desc', 'asc', ''], targets: '_all', type: 'text' },
+        { targets: [0], type: 'text', className: 'songnum align-middle text-center p-0 text-sm', width: '30px' },
+        { targets: [1], type: 'text', width: '300px' },
+
       ],
+      columns: [
+        {'data': 'track', 'name': 'track' },
+        {
+          'data': 'song',
+          'name': 'song',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return '<a class="fw-medium text-sm" href="/songs/' + data.id + '">'+ data.name +'</a>';
+            }
+          },
+        },
+        {'data': 'length', 'name': 'length' },
+        {
+          'data': 'event.date',
+          'name': 'event',
+          'render': function (data, type, row, meta) {
+            if (type === 'display') {
+              return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
+            }
+          },
+        },
+        {'data': 'note', 'name': 'note' },
+      ],
+      initComplete: function(){
+        $('tr.setHeader > th:empty').remove();
+      }
     });
   });
   </script>
