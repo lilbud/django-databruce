@@ -95,11 +95,11 @@ body {
     border-radius: var(--bs-border-radius) !important;
 }
 
-.card:not(:has(.card-header)) > .card-body {
+.card:not(:has(.card-header, .card-footer)) > .card-body {
     border-radius: var(--bs-border-radius) !important;
 }
 
-.card-body {
+.card:not(:has(.card-footer)) > .card-body {
     border-bottom-left-radius: var(--bs-border-radius) !important;
     border-bottom-right-radius: var(--bs-border-radius) !important;
 }
@@ -109,7 +109,6 @@ th,
 td:not(.fc-day),
 .modal-body,
 .list-group-item,
-.card-header,
 .card-footer,
 #stats .row .card-body,
 .modal-header {
@@ -119,7 +118,9 @@ td:not(.fc-day),
 }
 
 .card-header {
-    background-color: var(--base-200) !important;
+    background-color: var(--base-300) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
 }
 
 .dropdown-menu {
