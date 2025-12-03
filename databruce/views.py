@@ -150,7 +150,8 @@ class Calendar(TemplateView):
 
         try:
             if re.search(
-                r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$", self.request.GET["start"]
+                r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
+                self.request.GET["start"],
             ):
                 context["start_date"] = self.request.GET["start"]
         except MultiValueDictKeyError:
@@ -1944,19 +1945,3 @@ class Updates(TemplateView):
         context["updates"] = models.Updates.objects.all().order_by("-created_at")
 
         return context
-
-
-from dal import autocomplete
-
-
-class CityAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        qs = models.Cities.objects.all()
-
-        print(self.q)
-
-        if self.q:
-            qs = qs.filter(name__istartswith=self.q)
-            print(qs)
-
-        return qs

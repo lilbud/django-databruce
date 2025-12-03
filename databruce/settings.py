@@ -40,9 +40,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "shortener",
-    # "compressor",
-    "dal",
-    "dal_select2",
 ]
 
 SITE_ID = 1

@@ -110,11 +110,6 @@ urlpatterns = [
         name="signup",
     ),
     path(
-        "city_auto/",
-        views.CityAutocomplete.as_view(),
-        name="city_auto",
-    ),
-    path(
         "signup/done/",
         views.SignUpDone.as_view(),
         name="signup_done",
