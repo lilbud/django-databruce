@@ -1185,7 +1185,10 @@ class AdvancedSearch(View):
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()
-        setlist_formset = self.formset_class()
+
+        setlist_formset = self.formset_class(
+            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "1"},
+        )
 
         return render(
             request,
@@ -1248,7 +1251,6 @@ class AdvancedSearchResults(View):
             ]
 
             for field in fields:
-                print(data[field])
                 try:  # fields that have an optional "choice" qualifier
                     choice = data[f"{field}_choice"]
 
@@ -1283,10 +1285,8 @@ class AdvancedSearchResults(View):
         if formset.is_valid():
             for form in formset.cleaned_data:
                 setlist_filter = Q()
-                print(form)
 
                 try:
-                    # song1 = models.Songs.objects.get(id=form["song1"]).name
                     song1 = form["song1"]["value"]
 
                     match form["position"]:
@@ -1329,21 +1329,21 @@ class AdvancedSearchResults(View):
 
                     event_results.append(list(qs.values_list("event__id", flat=True)))
 
+                    match data["conjunction"]:
+                        case "or":
+                            setlist_event_filter |= Q(
+                                id__in=list(set.union(*map(set, event_results))),
+                            )
+
+                        case "and":
+                            setlist_event_filter &= Q(
+                                id__in=list(set.intersection(*map(set, event_results))),
+                            )
+
                 except ValueError:
                     break
                 except AttributeError:
                     break
-
-        match data["conjunction"]:
-            case "or":
-                setlist_event_filter |= Q(
-                    id__in=list(set.union(*map(set, event_results))),
-                )
-
-            case "and":
-                setlist_event_filter &= Q(
-                    id__in=list(set.intersection(*map(set, event_results))),
-                )
 
         result = (
             models.Events.objects.filter(
@@ -1373,6 +1373,10 @@ class AdvancedSearchResults(View):
             )
             .order_by("id")
         )
+
+        # song results sometimes gets populated even when none
+        if song_results == [" (is anywhere)"]:
+            song_results = []
 
         # Used to set opengraph description text
         description = ""

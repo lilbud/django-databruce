@@ -564,8 +564,8 @@ class SetlistSearch(forms.Form):
 
     def clean_song1(self):
         data = {
-            "id": self.cleaned_data["song1"],
-            "value": self.cleaned_data["song1"],
+            "id": "",
+            "value": "",
         }
 
         if self.cleaned_data["song1"]:
@@ -582,8 +582,8 @@ class SetlistSearch(forms.Form):
 
     def clean_song2(self):
         data = {
-            "id": self.cleaned_data["song2"],
-            "value": self.cleaned_data["song2"],
+            "id": "",
+            "value": "",
         }
 
         if self.cleaned_data["song2"]:
