@@ -59,8 +59,9 @@
               if (type === 'display' && data) {
                 if (row.view) {
                   return `${data} <a class='text-reset fw-medium text-accent' href='/${row.view}/${row.item_id}'>${row.value}</a>`
-
                 }
+
+                return data
               }
             },
           },

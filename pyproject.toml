@@ -1,23 +1,17 @@
 [project]
 name = "django-databruce"
-version = "0.1.0"
+version = "1.1.1"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "django==5.1.7",
-    "django-autocomplete-light>=3.12.1",
+    "django==5.2.9",
     "django-browser-reload>=1.20.0",
-    "django-compressor>=4.5.1",
     "django-debug-toolbar==5.1.0",
-    "django-filter==24.3",
-    "django-group-by>=0.3.1",
+    "django-filter==25.2",
     "django-link-shortener>=1.0.1",
-    "django-ratelimit>=4.1.0",
-    # "django-select2>=8.4.0",
-    "djangorestframework==3.15.2",
+    "djangorestframework==3.16.1",
     "djangorestframework-datatables==0.7.2",
-    # "djangorestframework-datatables==0.7.2",
     "djlint>=1.36.4",
     "markdown==3.7",
     "markdown-it-py>=4.0.0",

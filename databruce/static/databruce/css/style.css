@@ -104,7 +104,6 @@ body {
     border-bottom-right-radius: var(--bs-border-radius) !important;
 }
 
-.card-body,
 th,
 td:not(.fc-day),
 .modal-body,
@@ -112,6 +111,12 @@ td:not(.fc-day),
 .card-footer,
 #stats .row .card-body,
 .modal-header {
+    background-color: var(--base-100) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
+}
+
+.card-body:not(.success, .warning, .danger, .info) {
     background-color: var(--base-100) !important;
     color: var(--base-content) !important;
     border-color: var(--border) !important;
@@ -514,7 +519,7 @@ th[role="presentation"] {
         cursor: pointer;
     }
 
-    .dataTable tbody tr:not(.child) > td:nth-last-child(1 of :not(.dtr-hidden))::after {
+    /* .dataTable tbody tr:not(.child) > td:nth-last-child(1 of :not(.dtr-hidden))::after {
         content: "\F22D";
         font-size: 1rem !important;
         font-family:'Bootstrap-icons';
@@ -526,5 +531,9 @@ th[role="presentation"] {
         font-size: 1rem !important;
         font-family:'Bootstrap-icons';
         float: right;
-    }
+    } */
+}
+
+td.child a {
+    color: var(--primary) !important;
 }

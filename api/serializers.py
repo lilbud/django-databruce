@@ -219,6 +219,7 @@ class VenuesSerializer(serializers.ModelSerializer):
     first = RestrictedEventsSerializer(required=False)
     last = RestrictedEventsSerializer(required=False)
     formatted = serializers.SerializerMethodField()
+    text = serializers.SerializerMethodField(method_name="get_name")
 
     def get_name(self, obj):
         if obj.detail:
@@ -351,6 +352,7 @@ class EventsSerializer(serializers.ModelSerializer):
     run = RestrictedEventRunSerializer(required=False)
     setlist = serializers.SerializerMethodField(method_name="has_setlist")
     setlist_songs = serializers.JSONField
+    public = serializers.BooleanField()
 
     def sort_id(self, obj):
         return int(str(obj.id).replace("-", ""))

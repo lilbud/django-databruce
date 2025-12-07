@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import itertools
 import json
 import logging
 import os
@@ -85,17 +86,14 @@ class Index(TemplateView):
             :10
         ]
 
-        context["latest_setlist"] = (
-            models.Setlists.objects.all()
-            .select_related(
-                "event__venue",
-                "event__artist",
-                "event__venue__city",
-                "event__venue__city__country",
+        context["latest_event"] = (
+            models.Events.objects.select_related(
+                "artist",
+                "venue",
+                "venue__city",
             )
-            .prefetch_related("event__venue__city__state")
-            .order_by("-event")
-            .first()
+            .prefetch_related("venue__city__state")
+            .get(id="20130508-01")
         )
 
         return context
@@ -198,6 +196,15 @@ class UserProfile(TemplateView):
             )
             .prefetch_related(
                 "event__venue__city__state",
+            )
+            .annotate(
+                setlist=Case(
+                    When(
+                        Q(event__setlist_certainty__in=["Confirmed", "Probable"]),
+                        then=True,
+                    ),
+                    default=False,
+                ),
             )
         )
 
@@ -564,10 +571,17 @@ class EventDetail(TemplateView):
 
         # context["setlist"] = setlist.exclude(set_name="Soundcheck").order_by("song_num")
 
-        # context["setlist_copy"] = context["setlist"].values_list(
-        #     "song__name",
-        #     flat=True,
-        # )
+        context["setlist_copy"] = (
+            models.Setlists.objects.filter(
+                event__id=context["event"].id,
+                song_num__isnull=False,
+            )
+            .order_by("song_num")
+            .values_list(
+                "song__name",
+                flat=True,
+            )
+        )
 
         # context["soundcheck"] = models.Setlists.objects.filter(
         #     event__id=context["event"].id,
@@ -1030,7 +1044,6 @@ class TourDetail(TemplateView):
                 )
                 .order_by("event")
             )
-            print()
 
         return context
 
@@ -1180,14 +1193,16 @@ class AdvancedSearch(View):
     formset_class = formset_factory(forms.SetlistSearch)
     date = datetime.datetime.today()
 
-    # start_date = datetime.date(year=1965, month=1, day=1)
-    # end_date = datetime.datetime.today().date()
-
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()
 
         setlist_formset = self.formset_class(
-            {"form-TOTAL_FORMS": "1", "form-INITIAL_FORMS": "1"},
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "0",
+                "form-0-choice": "is",
+                "form-0-position": "anywhere",
+            },
         )
 
         return render(
@@ -1210,39 +1225,73 @@ class AdvancedSearchResults(View):
 
         return field_filter
 
+    def get_lookup(self, data: dict, field: dict) -> dict:
+        fields = {
+            "first_date": "date__gte",
+            "last_date": "date__lte",
+            "month": "date__month",
+            "day": "date__day",
+            "venue": "venue__id",
+            "city": "venue__city__id",
+            "state": "venue__state__id",
+            "country": "venue__country__id",
+            "tour": "tour__id",
+            "musician": "relation__id",
+            "band": "band__id",
+            "day_of_week": "date__week_day",
+        }
+
+        lookup = fields.get(field)
+
+        if lookup:
+            try:
+                return Q(**{f"{lookup}": data[field].id})
+            except AttributeError:
+                return Q(**{f"{lookup}": data[field]["id"]})
+            except TypeError:
+                return None
+
+        return None
+
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         event_form = self.form_class(request.GET)
         formset = self.formset_class(request.GET)
 
-        queryset = (
-            models.Songspagenew.objects.all()
-            .select_related("event")
-            .filter(set_name__in=VALID_SET_NAMES)
+        setlist = models.Setlists.objects.filter(
+            set_name=OuterRef("set_name"),
+            event__id=OuterRef("event__id"),
+        ).select_related("song")
+
+        setlist_qs = (
+            models.Setlists.objects.filter(
+                set_name__in=VALID_SET_NAMES,
+            )
+            .select_related("event", "song")
+            .annotate(
+                next_song=Subquery(
+                    setlist.filter(song_num__gt=OuterRef("song_num"))
+                    .order_by("event", "song_num")
+                    .values("song__id")[:1],
+                ),
+            )
         )
 
         song_results = []
-        results = []
         event_results = []
+        event_list = []
+        display_fields = []
+
+        setlist = ""
 
         setlist_event_filter = Q()
         event_filter = Q()
 
-        if event_form.is_valid():
-            data = event_form.cleaned_data
+        if not event_form.has_changed() and not formset.has_changed():
+            messages.warning(request, "Please fill out at least one field")
+            return redirect(reverse("adv_search"))
 
-            lookups = {
-                "first_date": Q(date__gte=data["first_date"]["id"]),
-                "last_date": Q(date__lte=data["last_date"]["id"]),
-                "month": Q(date__month=data["month"]["id"]),
-                "day": Q(date__day=data["day"]),
-                "city": Q(venue__city__id=data["city"]["id"]),
-                "state": Q(venue__state__id=data["state"]["id"]),
-                "country": Q(venue__country__id=data["country"]["id"]),
-                "tour": Q(tour__id=data["tour"]["id"]),
-                "musician": Q(relation__id=data["musician"]["id"]),
-                "band": Q(band__id=data["band"]["id"]),
-                "day_of_week": Q(date__week_day=data["day_of_week"]["id"]),
-            }
+        if event_form.is_valid() and event_form.has_changed():
+            data = event_form.cleaned_data
 
             fields = [
                 x
@@ -1251,39 +1300,48 @@ class AdvancedSearchResults(View):
             ]
 
             for field in fields:
-                try:  # fields that have an optional "choice" qualifier
-                    choice = data[f"{field}_choice"]
+                display = {
+                    "label": event_form[field].label,
+                    "data": data[field],
+                }
 
-                    filter_to_add = self.check_field_choice(
-                        choice,
-                        lookups[field],
-                    )
+                try:
+                    choice = data[f"{field}_choice"]
+                    lookup = self.get_lookup(data, field)
+
+                    display["choice"] = choice
+
+                    filter_to_add = self.check_field_choice(choice, lookup)
 
                     if field in ("musician", "band"):
-                        filter = self.check_field_choice(choice, lookups[field])
-                        events = models.Onstage.objects.filter(filter).values(
+                        events = models.Onstage.objects.filter(filter_to_add).values(
                             "event_id",
                         )
                         filter_to_add = Q(id__in=events)
 
                     event_filter &= self.check_field_choice(choice, filter_to_add)
-
-                    result = f"{event_form.fields[field].label}: ({choice}) {data[field]['value']}"
-
                 except KeyError:
-                    event_filter &= lookups[field]
+                    event_filter &= self.get_lookup(data, field)
 
-                    try:
-                        result = (
-                            f"{event_form.fields[field].label}: {data[field]['value']}"
-                        )
-                    except TypeError:
-                        result = f"{event_form.fields[field].label}: {data[field]}"
+                display_fields.append(display)
 
-                results.append(result)
+        if formset.is_valid() and formset.has_changed():
+            setlist = formset.cleaned_data
+            form_fields = []
 
-        if formset.is_valid():
             for form in formset.cleaned_data:
+                form_fields.append(form)
+
+                if form["choice"] == "not" and form["position"] == "Followed By":
+                    f = {
+                        "song1": form["song2"],
+                        "choice": "is",
+                        "position": "Anywhere",
+                        "hidden": "true",
+                    }
+                    form_fields.append(f)
+
+            for form in form_fields:
                 setlist_filter = Q()
 
                 try:
@@ -1293,11 +1351,18 @@ class AdvancedSearchResults(View):
                         case "Followed By":
                             song2 = form["song2"]["value"]
 
-                            setlist_filter = Q(song=form["song1"]["id"])
-
-                            setlist_filter &= self.check_field_choice(
+                            song2_filter = self.check_field_choice(
                                 form["choice"],
-                                Q(next=form["song2"]["id"]),
+                                Q(next_song=form["song2"]["id"]),
+                            )
+
+                            setlist_filter = Q(
+                                Q(song=form["song1"]["id"]) & song2_filter,
+                            )
+
+                            events = setlist_qs.filter(setlist_filter).values_list(
+                                "event__id",
+                                flat=True,
                             )
 
                             song_results.append(
@@ -1305,45 +1370,63 @@ class AdvancedSearchResults(View):
                             )
 
                         case "Anywhere":
-                            setlist_filter &= Q(song=form["song1"]["id"])
-
-                            song_results.append(
-                                f"{song1} ({form['choice']} anywhere)",
+                            setlist_filter = self.check_field_choice(
+                                form["choice"],
+                                Q(song__id=form["song1"]["id"]),
                             )
+
+                            events = setlist_qs.filter(setlist_filter).values_list(
+                                "event__id",
+                                flat=True,
+                            )
+
+                            try:
+                                if not form["hidden"]:
+                                    song_results.append(
+                                        f"{song1} ({form['choice']} anywhere)",
+                                    )
+                            except KeyError:
+                                song_results.append(
+                                    f"{song1} ({form['choice']} anywhere)",
+                                )
                         case _:
                             # all others except anywhere and followed by
-                            setlist_filter &= Q(song=form["song1"]["id"])
-
-                            setlist_filter &= self.check_field_choice(
+                            position_filter = self.check_field_choice(
                                 form["choice"],
                                 Q(position=form["position"]),
+                            )
+
+                            setlist_filter = Q(
+                                Q(song__id=form["song1"]["id"]) & position_filter,
+                            )
+
+                            events = setlist_qs.filter(setlist_filter).values_list(
+                                "event__id",
+                                flat=True,
                             )
 
                             song_results.append(
                                 f"{song1} ({form['choice']} {form['position']})",
                             )
 
-                    qs = queryset.filter(
-                        setlist_filter,
-                    )
+                    event_results.append(list(events))
 
-                    event_results.append(list(qs.values_list("event__id", flat=True)))
-
-                    match data["conjunction"]:
+                    match event_form.cleaned_data["conjunction"]:
                         case "or":
-                            setlist_event_filter |= Q(
-                                id__in=list(set.union(*map(set, event_results))),
-                            )
+                            event_list = list(set.union(*map(set, event_results)))
 
                         case "and":
-                            setlist_event_filter &= Q(
-                                id__in=list(set.intersection(*map(set, event_results))),
+                            event_list = list(
+                                set.intersection(*map(set, event_results)),
                             )
 
                 except ValueError:
                     break
                 except AttributeError:
                     break
+
+        if event_list:
+            setlist_event_filter = Q(id__in=event_list)
 
         result = (
             models.Events.objects.filter(
@@ -1355,15 +1438,14 @@ class AdvancedSearchResults(View):
                 "venue__last",
                 "venue__state",
                 "venue__country",
+                "venue__city",
+                "venue__city__country",
                 "artist",
                 "tour",
             )
             .prefetch_related(
-                "run",
-                "venue__city",
                 "venue__city__state",
                 "venue__city__state__country",
-                "venue__city__country",
             )
             .annotate(
                 setlist=Case(
@@ -1374,25 +1456,22 @@ class AdvancedSearchResults(View):
             .order_by("id")
         )
 
-        # song results sometimes gets populated even when none
-        if song_results == [" (is anywhere)"]:
-            song_results = []
-
-        # Used to set opengraph description text
         description = ""
-        description += ", ".join(results)
+        description += ",".join(
+            [f"{item['label']}: {item['data']}" for item in display_fields],
+        )
         description += f"Songs: {', '.join(song_results)}"
 
         return render(
             request=request,
             template_name=self.template_name,
             context={
-                "events": result.order_by("id"),
                 "title": "Advanced Search",
+                "events": result,
                 "description": description,
-                "results": results,
-                "song_results": song_results,
-                "form": event_form,
+                "conjunction": event_form.cleaned_data["conjunction"],
+                "setlist_form": setlist,
+                "display_fields": display_fields,
             },
         )
 

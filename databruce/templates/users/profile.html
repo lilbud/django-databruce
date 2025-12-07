@@ -6,7 +6,7 @@
 {% block content %}
   {% translate user_info.username as username %}
   <div class="col-12 col-xxl-8 mx-auto">
-    <div class="row mb-4">
+    <div class="row mb-3">
       <div class="col">
         {% if user_info.id == user.id %}
           <div class="text-2xl">{% translate "Your Profile" %}</div>
@@ -15,7 +15,7 @@
         {% endif %}
       </div>
     </div>
-    <div class="card">
+    <div class="card mb-3">
       <div class="card-header">
         <ul class="nav nav-pills nav-fill" role="tablist">
           <li class="nav-item {% if user_songs %}me-1 me-lg-2{% endif %} mb-2 mb-lg-0"
@@ -59,13 +59,15 @@
               <table class="table table-hover display" id="eventTable">
                 <thead>
                   <tr>
-                    <th class="all" scope="col">Date</th>
-                    <th class="all" scope="col">Band</th>
-                    <th class="all" scope="col">Venue</th>
-                    <th class="all" scope="col">Location</th>
-                    <th class="all" scope="col">Tour</th>
-                    <th class="all" scope="col">Detail</th>
-                    <th class="all" scope="col">Remove</th>
+                    <th class="all">Date</th>
+                    <th class="min-tablet-l">Setlist</th>
+                    <th class="min-tablet-l">Band</th>
+                    <th class="min-tablet-l">Venue</th>
+                    <th class="min-tablet-l">Location</th>
+                    <th class="min-tablet-l">Tour</th>
+                    <th class="min-tablet-l">Detail</th>
+                    <th class="min-tablet-l">Public</th>
+                    {% comment %} <th class="min-tablet-l" scope="col">Remove</th> {% endcomment %}
                   </tr>
                 </thead>
                 <tbody>
@@ -74,6 +76,17 @@
                       <tr>
                         <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
                           <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                        </td>
+                        <td class="icon text-center align-middle">
+                          {% if event.setlist_certainty == "Confirmed" %}
+                            <i class="bi bi-file-earmark-check d-none d-md-block"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               data-bs-title="Has Setlist"></i>
+                            <div class="d-inline d-md-none">True</div>
+                          {% else %}
+                            <div class="d-inline d-md-none">False</div>
+                          {% endif %}
                         </td>
                         <td class="text-nowrap">
                           <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist }}</a>
@@ -92,20 +105,7 @@
                           {% endif %}
                         </td>
                         <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
-                        <td class="text-nowrap">
-                          {% if user_info.id == user.id or user.is_superuser %}
-                            <form method="post" action="{% url "remove_show" %}">
-                              <input type="hidden" name="event" value="{{ event.id }}">
-                              {% csrf_token %}
-                              <button id="submit-button"
-                                      type="submit"
-                                      name="submit"
-                                      class="btn btn-sm btn-danger text-xs">
-                                <i class="bi bi-x-lg"></i>
-                              </button>
-                            </form>
-                          {% endif %}
-                        </td>
+                        <td class="text-nowrap">{{ event.public }}</td>
                       </tr>
                     {% endwith %}
                   {% endfor %}
@@ -127,10 +127,10 @@
               <table class="table table-hover display" id="songTable">
                 <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Song Name</th>
-                    <th>Category</th>
-                    <th class="text-center">First Seen</th>
+                    <th class="all">Count</th>
+                    <th class="all">Name</th>
+                    <th class="min-tablet-l">Category</th>
+                    <th class="min-tablet-l text-center">First Seen</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,9 +196,9 @@
                 <table class="table table-hover display" id="notSeenTable">
                   <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Song Name</th>
-                      <th>Category</th>
+                      <th class="all">Count</th>
+                      <th class="all">Name</th>
+                      <th class="min-tablet-l">Category</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -223,9 +223,9 @@
                 <table class="table table-hover display" id="rareTable">
                   <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Song Name</th>
-                      <th>Category</th>
+                      <th class="all">Count</th>
+                      <th class="all">Name</th>
+                      <th class="min-tablet-l">Category</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,18 +251,42 @@
       $(document).ready(function() {
           new DataTable('#eventTable', {
             layout: getDatatableLayout({category: false}),
+            scrollY: '30vh',
+            columnDefs: [
+              {target: [0], width: '8rem' },
+              {target: [1], width: '1rem', className: 'text-center', orderable: false, searchable: false },
+              {target: [2,3,4,5,6], width: '12rem' },
+              {target: [7], width: '15rem' },
+              {target: [-1], visible: false }
+            ],
           });
 
           new DataTable('#songTable', {
             layout: getDatatableLayout({columns: [0,2,3]}),
+            scrollY: '30vh',
+            columnDefs: [
+              {target: [0], width: '1rem' },
+              {target: [1,2], width: '15rem' },
+              {target: [3], width: '8rem' },
+            ]
           });
 
           new DataTable('#notSeenTable', {
             layout: getDatatableLayout({columns: [0,2]}),
+            scrollY: '30vh',
+            columnDefs: [
+              {target: [0], width: '1rem' },
+              {target: [1,2], width: '15rem' },
+            ]
           });
 
           new DataTable('#rareTable', {
             layout: getDatatableLayout({columns: [0,2]}),
+            scrollY: '30vh',
+            columnDefs: [
+              {target: [0], width: '1rem' },
+              {target: [1,2], width: '15rem' },
+            ]
           });
       })
   </script>

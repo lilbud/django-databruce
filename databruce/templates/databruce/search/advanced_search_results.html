@@ -20,29 +20,26 @@
       <div class="card-body text-sm">
         <div id="row">
           <div class="d-flex flex-column">
-            {% if song_results %}
-              <span>
-                <div class="pe-2 fw-semibold">Songs:</div>
-                <div>
-                  {% for result in song_results %}
-                    <div class="d-flex flex-row">{{ result }}</div>
-                    {% if not forloop.last %}
-                      <div class="d-flex flex-row">
-                        <span class="text-uppercase">{{ request.GET.conjunction }}</span>
-                      </div>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              </span>
+            {% if setlist_form %}
+              <div class="pe-2 fw-semibold">Songs:</div>
+              {% for form in setlist_form %}
+                {{ form.song1.value|default_if_none:form.song1 }} ({{ form.choice }} {{ form.position }})
+                {% if form.song2 %}{{ form.song2.value|default_if_none:form.song2 }}{% endif %}
+                {% if not forloop.last %}
+                  <br>
+                  {{ conjunction|upper }}
+                  <br>
+                {% endif %}
+              {% endfor %}
             {% endif %}
-            {% if results %}
-              <span>
-                {% for result in results %}
-                  <div class="d-flex flex-row">
-                    <div>{{ result }}</div>
-                  </div>
-                {% endfor %}
-              </span>
+            {% if display_fields %}
+              {% for field in display_fields %}
+                <div>
+                  <span class="pe-2 fw-semibold">{{ field.label }}:</span>
+                  {% if field.choice %}({{ field.choice }}){% endif %}
+                  {{ field.data.value|default:field.data }}
+                </div>
+              {% endfor %}
             {% endif %}
           </div>
         </div>
@@ -50,19 +47,18 @@
     </div>
     <div class="card">
       <div class="card-body px-0">
-        {% comment %} {% include "databruce/partials/event_table.html" with events=events %} {% endcomment %}
         <div class="table-responsive">
           <table class="table table-hover display" id="eventTable">
             <thead>
               <tr class="custom">
-                <th class="all" scope="col">Date</th>
-                <th class="min-tablet-l" scope="col">Setlist</th>
-                <th class="min-tablet-l" scope="col">Band</th>
-                <th class="min-tablet-l" scope="col">Venue</th>
-                <th class="min-tablet-l" scope="col">Location</th>
-                <th class="min-tablet-l" scope="col">Tour</th>
-                <th class="min-tablet-l" scope="col">Detail</th>
-                <th class="min-tablet-l" scope="col">Public</th>
+                <th class="all">Date</th>
+                <th class="min-tablet-l">Setlist</th>
+                <th class="min-tablet-l">Band</th>
+                <th class="min-tablet-l">Venue</th>
+                <th class="min-tablet-l">Location</th>
+                <th class="min-tablet-l">Tour</th>
+                <th class="min-tablet-l">Detail</th>
+                <th class="min-tablet-l">Public</th>
               </tr>
             </thead>
             <tbody>
@@ -115,39 +111,22 @@
     };
 
     $(document).ready(function () {
-      /*
-      new DataTable('#eventTable', {
-        layout: getDatatableLayout({columns: [2,3,4,5,6,7], category: true}),
-        columnDefs: [
-          { targets: [1], orderable: false, className: 'text-center text-sm'},
-          { targets: [-1], visible: false },
-        ],
-      });
-      */
 
-      const urlParams = new URLSearchParams(window.location.search).toString();
+      var urlParams = new URLSearchParams(window.location.search);
       var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
       dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]});
 
       new DataTable('#eventTable', {
         layout: layout,
         columnDefs: [
-          { targets: [1], orderable: false, className: 'text-center text-sm'},
+          { targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem'},
           { targets: [-1], visible: false },
+          { targets: [0], width: '8rem', className:'text-nowrap' },
+          { targets: [2,3,4,5], width: '12rem' },
+          { targets: [6], width: '15rem' },
         ],
-        /*
-        serverSide: true,
-        processing: true,
-        ajax: {
-          url: '/api/v1/advanced_search/?format=datatables',
-          data: {
-            'param': urlParams,
-          },
-        },
-        columns: event_table_columns,
-        */
       });
-
+      
       $('button#short-url').click(function () {
         var received_data  = "{{ request.build_absolute_uri|safe }}"
         

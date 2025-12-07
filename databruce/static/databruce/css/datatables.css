@@ -248,7 +248,7 @@ td > table > tbody > tr > td:first-child {
     border-bottom-left-radius: 0% !important;
 }
 
-td[colspan="5"]:not(.setHeader) {
+td[colspan="5"]:not(.setHeader,.child) {
     padding: 0% !important;
 }
 

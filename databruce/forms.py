@@ -193,23 +193,6 @@ class AdvancedEventSearch(forms.Form):
 
     city_choice = FormChoiceSelect(widget_id="city_choice")
 
-    # city = forms.ModelChoiceField(
-    #     label="City",
-    #     required=False,
-    #     queryset=models.Cities.objects.all()
-    #     .prefetch_related("state", "state__country")
-    #     .select_related("country")
-    #     .order_by("name"),
-    #     widget=forms.Select(
-    #         attrs={
-    #             "class": "form-select form-select-sm select2",
-    #             "id": "city",
-    #             "name": "event_city",
-    #         },
-    #     ),
-    # )
-    #
-
     city = forms.CharField(
         label="City",
         required=False,
@@ -246,6 +229,20 @@ class AdvancedEventSearch(forms.Form):
                 "class": "form-select form-select-sm select2",
                 "id": "country",
                 "name": "event_country",
+            },
+        ),
+    )
+
+    venue_choice = FormChoiceSelect(widget_id="venue_choice")
+
+    venue = forms.CharField(
+        label="Venue",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "venue",
+                "name": "event_venue",
             },
         ),
     )
@@ -308,39 +305,36 @@ class AdvancedEventSearch(forms.Form):
 
     def clean_first_date(self):
         # the first year tracked in the database is 1965, so that is the start date
-        data = {
-            "id": self.cleaned_data["first_date"],
-            "value": datetime.date(1965, 1, 1),
-        }
-
         if self.cleaned_data["first_date"]:
             # partial date, get first of month
             if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["first_date"]):
-                return (
-                    datetime.datetime.strptime(
-                        self.cleaned_data["first_date"],
-                        "%Y-%m",
-                    )
+                date = (
+                    datetime.datetime.strptime(self.cleaned_data["first_date"], "%Y-%m")
                     .replace(day=1)
                     .date()
                 )
 
+                return {
+                    "id": date,
+                    "value": date.strftime("%Y-%m-%d"),
+                }
+
             # specific date
             if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["first_date"]):
-                return datetime.datetime.strptime(
+                date = datetime.datetime.strptime(
                     self.cleaned_data["first_date"],
                     "%Y-%m-%d",
                 ).date()
 
-        return data
+                return {
+                    "id": date,
+                    "value": date.strftime("%Y-%m-%d"),
+                }
+
+        return None
 
     def clean_last_date(self):
         # default end date is last day of current year
-        data = {
-            "id": self.cleaned_data["last_date"],
-            "value": datetime.date(DATE.year, 12, 31),
-        }
-
         if self.cleaned_data["last_date"]:
             # partial date
             if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["last_date"]):
@@ -351,142 +345,83 @@ class AdvancedEventSearch(forms.Form):
 
                 last = calendar.monthrange(dt.year, dt.month)[1]
 
-                data["value"] = dt.replace(day=last).date()
+                return {
+                    "id": dt.replace(day=last).date(),
+                    "value": dt.replace(day=last).date().strftime("%Y-%m-%d"),
+                }
 
             # specific date
             if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["last_date"]):
-                data["value"] = datetime.datetime.strptime(
+                date = datetime.datetime.strptime(
                     self.cleaned_data["last_date"],
                     "%Y-%m-%d",
                 ).date()
 
-        return data
+                return {
+                    "id": date,
+                    "value": date.strftime("%Y-%m-%d"),
+                }
+
+        return None
 
     def clean_month(self):
-        data = {
-            "id": self.cleaned_data["month"],
-            "value": self.cleaned_data["month"],
-        }
-
         if self.cleaned_data["month"]:
-            data["value"] = calendar.month_name[int(self.cleaned_data["month"])]
+            return {
+                "id": self.cleaned_data["month"],
+                "value": calendar.month_name[int(self.cleaned_data["month"])],
+            }
 
-        return data
+        return None
 
     def clean_city(self):
-        data = {
-            "id": self.cleaned_data["city"],
-            "value": self.cleaned_data["city"],
-        }
-
         if self.cleaned_data["city"]:
-            return (
-                models.Cities.objects.filter(id=self.cleaned_data["city"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return models.Cities.objects.get(id=self.cleaned_data["city"])
 
-        return data
+        return None
 
     def clean_state(self):
-        data = {
-            "id": self.cleaned_data["state"],
-            "value": self.cleaned_data["state"],
-        }
-
         if self.cleaned_data["state"]:
-            return (
-                models.States.objects.filter(id=self.cleaned_data["state"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return models.States.objects.get(id=self.cleaned_data["state"])
 
-        return data
+        return None
 
     def clean_country(self):
-        data = {
-            "id": self.cleaned_data["country"],
-            "value": self.cleaned_data["country"],
-        }
-
         if self.cleaned_data["country"]:
-            return (
-                models.Countries.objects.filter(id=self.cleaned_data["country"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return models.Countries.objects.get(id=self.cleaned_data["country"])
 
-        return data
+        return None
+
+    def clean_venue(self):
+        if self.cleaned_data["venue"]:
+            return models.Venues.objects.get(id=self.cleaned_data["venue"])
+
+        return None
 
     def clean_tour(self):
-        data = {
-            "id": self.cleaned_data["tour"],
-            "value": self.cleaned_data["tour"],
-        }
-
         if self.cleaned_data["tour"]:
-            return (
-                models.Tours.objects.filter(id=self.cleaned_data["tour"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return models.Tours.objects.get(id=self.cleaned_data["tour"])
 
-        return data
+        return None
 
     def clean_musician(self):
-        data = {
-            "id": self.cleaned_data["musician"],
-            "value": self.cleaned_data["musician"],
-        }
-
         if self.cleaned_data["musician"]:
-            return (
-                models.Relations.objects.filter(id=self.cleaned_data["musician"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return models.Relations.objects.get(id=self.cleaned_data["musician"])
 
-        return data
+        return None
 
     def clean_band(self):
-        data = {
-            "id": self.cleaned_data["band"],
-            "value": self.cleaned_data["band"],
-        }
-
         if self.cleaned_data["band"]:
-            return (
-                models.Bands.objects.filter(id=self.cleaned_data["band"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return models.Bands.objects.get(id=self.cleaned_data["band"])
 
-        return data
+        return None
+
+    def clean_conjunction(self):
+        if self.cleaned_data["conjunction"]:
+            return self.cleaned_data["conjunction"]
+
+        return None
 
     def clean_day_of_week(self):
-        data = {
-            "id": self.cleaned_data["day_of_week"],
-            "value": self.cleaned_data["day_of_week"],
-        }
-
         if self.cleaned_data["day_of_week"]:
             days = {
                 1: "Sunday",
@@ -498,15 +433,38 @@ class AdvancedEventSearch(forms.Form):
                 7: "Saturday",
             }
 
-            data["value"] = days.get(int(self.cleaned_data["day_of_week"]))
+            return {
+                "id": self.cleaned_data["day_of_week"],
+                "value": days.get(int(self.cleaned_data["day_of_week"])),
+            }
 
-        return data
+        return None
+
+    def clean_day(self):
+        if self.cleaned_data["day"]:
+            return {
+                "id": self.cleaned_data["day"],
+                "value": self.cleaned_data["day"],
+            }
+
+        return None
 
 
 class SetlistSearch(forms.Form):
     def __init__(self, *args: dict, **kwargs: dict) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
+        self.empty_permitted = False
+
+    def clean(self):
+        """Check that the setlist form has at least song1 set."""
+        cleaned_data = super().clean()
+
+        if cleaned_data.get("song1") is not None:
+            return cleaned_data
+
+        msg = "Invalid value"
+        raise forms.ValidationError((msg), code="invalid")
 
     song1 = forms.CharField(
         label="Song:",
@@ -519,6 +477,7 @@ class SetlistSearch(forms.Form):
     choice = forms.ChoiceField(
         label=None,
         choices=[("is", "is"), ("not", "not")],
+        initial="is",
         required=False,
         widget=forms.Select(
             attrs={"class": "form-select form-select-sm choice"},
@@ -547,6 +506,7 @@ class SetlistSearch(forms.Form):
             ("show_closer", "Show Closer"),
         ],
         required=False,
+        initial="anywhere",
         widget=forms.Select(
             attrs={"class": "form-select form-select-sm position"},
         ),
@@ -562,41 +522,25 @@ class SetlistSearch(forms.Form):
         ),
     )
 
+    songs = dict(models.Songs.objects.all().values_list("id", "name"))
+
     def clean_song1(self):
-        data = {
-            "id": "",
-            "value": "",
-        }
-
         if self.cleaned_data["song1"]:
-            return (
-                models.Songs.objects.filter(id=self.cleaned_data["song1"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return {
+                "id": self.cleaned_data["song1"],
+                "value": self.songs.get(int(self.cleaned_data["song1"])),
+            }
 
-        return data
+        return None
 
     def clean_song2(self):
-        data = {
-            "id": "",
-            "value": "",
-        }
-
         if self.cleaned_data["song2"]:
-            return (
-                models.Songs.objects.filter(id=self.cleaned_data["song2"])
-                .values(
-                    "id",
-                    value=F("name"),
-                )
-                .first()
-            )
+            return {
+                "id": self.cleaned_data["song2"],
+                "value": self.songs.get(int(self.cleaned_data["song2"])),
+            }
 
-        return data
+        return None
 
     def clean_position(self):
         positions = {
@@ -618,8 +562,16 @@ class SetlistSearch(forms.Form):
             "in_soundcheck": "Soundcheck",
             "show_closer": "Show Closer",
         }
+        if self.cleaned_data["position"]:
+            return positions.get(self.cleaned_data["position"])
 
-        return positions.get(self.cleaned_data["position"])
+        return None
+
+    def clean_choice(self):
+        if self.cleaned_data["choice"]:
+            return self.cleaned_data["choice"]
+
+        return None
 
 
 class EventSearch(forms.Form):

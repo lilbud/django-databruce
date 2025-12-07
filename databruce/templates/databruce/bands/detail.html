@@ -68,7 +68,7 @@
               <table class="table table-hover display" id="memberTable">
                 <thead>
                   <tr>
-                    <th class="all text-center" scope="col">Count</th>
+                    <th class="all text-center" scope="col">Events</th>
                     <th class="all" scope="col">Name</th>
                     <th class="min-tablet-l" scope="col">Instruments</th>
                     <th class="min-tablet-l" scope="col">First</th>
@@ -132,6 +132,9 @@
         ajax: {
           'url': '/api/v1/onstageband/?band={{ info.id }}&format=datatables',
         },
+        columnDefs: [
+          {targets: [0], width: '1rem'},
+        ],
         columns: [
           { 'data': 'count', 'name': 'count' },
           { 

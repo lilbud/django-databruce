@@ -365,10 +365,8 @@ class CoversFilter(filters.FilterSet):
 
 
 class VenuesFilter(filters.FilterSet):
-    name = filters.CharFilter(method="name_filter")
+    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
     city = filters.CharFilter(field_name="city__name", lookup_expr="icontains")
-    state = filters.CharFilter(method="state_filter")
-    country = filters.CharFilter(method="country_filter")
 
 
 class IndexFilter(filters.FilterSet):
@@ -380,13 +378,17 @@ class IndexFilter(filters.FilterSet):
 
 
 class EventRunFilter(filters.FilterSet):
-    start = filters.DateTimeFilter(field_name="first__date", lookup_expr="gte")
-    end = filters.DateTimeFilter(field_name="last__date", lookup_expr="lte")
+    start_date = filters.DateTimeFilter(field_name="first__date", lookup_expr="gte")
+    end_date = filters.DateTimeFilter(field_name="last__date", lookup_expr="lte")
     id = filters.NumberFilter(lookup_expr="exact")
 
     class Meta:
         model = models.Runs
-        fields = ["start", "end", "id"]
+        fields = ["start_date", "end_date", "id"]
+
+
+class CharInFilter(filters.BaseInFilter, filters.CharFilter):
+    pass
 
 
 class EventsFilter(filters.FilterSet):
@@ -396,16 +398,20 @@ class EventsFilter(filters.FilterSet):
         label="year",
     )
 
+    id__in = CharInFilter(field_name="id", lookup_expr="in")
+
     start_date = filters.DateTimeFilter(field_name="date", lookup_expr="gte")
     end_date = filters.DateTimeFilter(field_name="date", lookup_expr="lte")
 
+    day_of_week = filters.NumberFilter(field_name="date__week_day", lookup_expr="exact")
+
     date = filters.CharFilter(field_name="date", lookup_expr="startswith")
-    month = filters.CharFilter(
+    month = filters.NumberFilter(
         field_name="date__month",
         lookup_expr="exact",
         label="month",
     )
-    day = filters.CharFilter(field_name="date__day", lookup_expr="exact", label="day")
+    day = filters.NumberFilter(field_name="date__day", lookup_expr="exact", label="day")
     venue = filters.NumberFilter(field_name="venue__id", lookup_expr="exact")
     city = filters.NumberFilter(field_name="venue__city__id", lookup_expr="exact")
     state = filters.NumberFilter(field_name="venue__state__id", lookup_expr="exact")
@@ -473,6 +479,14 @@ class SetlistFilter(filters.FilterSet):
         lookup_expr="exact",
     )
 
+    def filter_song_num(self, queryset, name, value):
+        lookup = f"{name}__isnull"
+        return queryset.filter(**{lookup: False})
+
+    song_num = filters.BooleanFilter(
+        method="filter_song_num",
+    )
+
     class Meta:
         model = models.Setlists
         fields = "__all__"
@@ -523,6 +537,7 @@ from django.core.exceptions import FieldError
 
 class SongsPageFilter(filters.FilterSet):
     song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
+    next = filters.NumberFilter(field_name="next_song", lookup_expr="exact")
 
 
 class SongsFilter(filters.FilterSet):

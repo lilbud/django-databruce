@@ -67,14 +67,14 @@
   </div>
   <div class="col-12 col-md-6 col-lg-4 px-2">
     <div class="card mb-3 mb-lg-0">
-      <div class="card-header">Most Recent Show</div>
+      <div class="card-header">Featured Show</div>
       <div class="card-body p-0">
-        {% with first=latest_setlist.event %}
+        {% with first=latest_event %}
           <div class="text-sm px-2 pt-2 pb-0">{{ first.title|default_if_none:"" }}</div>
           <div class="px-2 py-2">
             <div class="row">
               <a class="fw-medium text-sm text-reset"
-                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue }}</a>
+                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue }}, {{ first.venue.city }}</a>
             </div>
             <div class="row">
               <a class="text-reset text-sm"
@@ -82,7 +82,7 @@
             </div>
           {% endwith %}
         </div>
-        {% if latest_setlist %}
+        {% if latest_event %}
           <div class="table-responsive">
             <table class="table table-hover display" id="setlistTable">
               <thead>
@@ -238,10 +238,10 @@
         paging: false,
         searching: false,
         ordering: false,
-        ajax: '/api/v1/event_setlist/?event={{ latest_setlist.event.id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        ajax: '/api/v1/event_setlist/?event={{ latest_event.id }}&song_num=true&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
         serverSide: true,
         processing: true,
-        columnDefs: [{ targets: [0], width: '1rem' },],
+        columnDefs: [{ targets: [0], width: '1rem' }],
         rowGroup: {
             dataSrc: 'set_name',
             className: 'text-center setHeader',
@@ -249,7 +249,7 @@
         columns: [
           { 
             'data': 'song_num',
-            'className': 'dt-center all',
+            'className': 'dt-center all align-middle',
             'width': '1rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && row.position) {
@@ -266,15 +266,15 @@
           {
             'data': 'song',
             'name': 'song__name',
-            'className': 'all',
+            'className': 'all align-middle',
             'width': '10rem',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
+                var song = '<a class="fw-medium align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
 
                 song = row.segue ? `${song} >` : song;
 
-                var badge = $('<span />').addClass('ms-2 badge')
+                var badge = $('<span />').addClass('ms-2 badge my-auto')
 
                 // instrumental, sign-request, nobruce, premiere
                 if (row.instrumental) {

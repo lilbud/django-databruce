@@ -12,28 +12,12 @@
 {% block table %}
   <thead>
     <tr>
-      <th>#</th>
-      <th>Name</th>
-      <th>First</th>
-      <th>Last</th>
+      <th class="all">Events</th>
+      <th class="all">Name</th>
+      <th class="min-tablet-l">First</th>
+      <th class="min-tablet-l">Last</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-    {% for country in countries %}
-      <tr>
-        <td class="text-center">{{ country.num_events }}</td>
-        <td>
-          <a href="{% url "country_details" id=country.id %}">{{ country }}</a>
-        </td>
-        <td data-sort="{{ country.first.get_date }}" data-filter="{{ country.first.get_date }}">
-          <a href="{% url "event_details" id=country.first.id %}">{{ country.first.get_date }}</a>
-        </td>
-        <td data-sort="{{ country.last.get_date }}" data-filter="{{ country.last.get_date }}">
-          <a href="{% url "event_details" id=country.last.id %}">{{ country.last.get_date }}</a>
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>

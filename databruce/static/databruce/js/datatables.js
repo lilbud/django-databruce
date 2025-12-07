@@ -17,12 +17,12 @@ $.extend(true, DataTable.defaults, {
     details: {
       target: 'tr',
       type: 'column',
-      display: $.fn.dataTable.Responsive.display.childRow,
+      display: $.fn.dataTable.Responsive.display.childRowImmediate,
       renderer: function (api, rowIdx, columns) {
         let data = columns.map((col, i) => {
           var title = col.title.replaceAll(':', '') + ':';
 
-          return col.hidden && col.data ? `<div class="row res-child py-1 text-xs"><div class="col-4 align-top text-nowrap fw-bold">${title}</div><div class="col text-wrap">${col.data}</div></div>` : '';
+          return col.data || col.data === false ? `<div class="row res-child py-1 text-sm"><div class="col-4 align-top text-nowrap fw-bold">${title}</div><div class="col text-wrap">${col.data}</div></div>` : '';
         }).join('');
         return data ? $('<table />').append(data) : false;
       },
@@ -175,9 +175,8 @@ event_table_columns = [
     'name': 'id',
     'width': '8rem',
     'type': 'text',
-    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/events/' + data.id + '">' + data.display + '</a>';
       }
     },
@@ -188,18 +187,18 @@ event_table_columns = [
     'width': '1rem',
     'className': 'text-center',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
-        return row.setlist ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
+      if (type === 'display' && (row.setlist || row.setlist === false)) {
+        return row.setlist || row.setlist === false ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
       }
     },
   },
   {
-    'data': 'artist.name',
+    'data': 'artist',
     'name': 'artist__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && row.artist) {
-        return '<a href="/bands/' + row.artist.id + '">' + row.artist.name + '</a>';
+      if (type === 'display' && data) {
+        return '<a href="/bands/' + data.id + '">' + data.name + '</a>';
       }
     },
   },
@@ -207,9 +206,8 @@ event_table_columns = [
     'data': 'venue',
     'name': 'venue__name, venue__detail',
     'width': '12rem',
-    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && row.artist) {
+      if (type === 'display' && data) {
         return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
       }
     },
@@ -219,7 +217,7 @@ event_table_columns = [
     'name': 'venue__city__name, venue__state__abbrev, venue__country__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/cities/' + data.id + '">' + data.display + '</a>';
       };
     },
@@ -229,7 +227,7 @@ event_table_columns = [
     'name': 'tour__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && row.artist) {
+      if (type === 'display' && data) {
         return '<a href="/tours/' + data.id + '">' + data.name + '</a>';
       }
     },

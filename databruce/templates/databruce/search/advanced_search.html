@@ -1,6 +1,7 @@
 {% extends "databruce/base.html" %}
+{% load i18n %}
 {% block title %}
-  Events &gt; Search
+  Advanced Search
 {% endblock title %}
 {% block extrajs %}
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -20,7 +21,19 @@
       Likewise, entering '1975-02' for last will find events from before February 28th, 1975.
     </div>
     <hr>
+    {% if messages %}
+      <div class="row mb-3">
+        <div class="col">
+          {% for message in messages %}
+            <div class="card {{ message.tags }}">
+              <div class="card-body {{ message.tags }}">{{ message }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
     <form action="{% url 'adv_search_results' %}" method="get" id="search-form">
+      {% comment %} {% csrf_token %} {% endcomment %}
       <div class="row d-grid gap-0 row-gap-3">
         <div class="row row-cols-2 px-auto">
           <div class="col-6 col-lg-2 pe-2">
@@ -66,9 +79,15 @@
         </div>
         <div class="row">
           {{ form.country.errors }}
-          <label class="form-label text-sm">Country</label>
+          <label class="form-label text-sm">{{ form.country.label }}</label>
           <div class="col-3 col-lg-1 pe-1">{{ form.country_choice }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.country }}</div>
+        </div>
+        <div class="row">
+          {{ form.venue.errors }}
+          <label class="form-label text-sm">{{ form.venue.label }}</label>
+          <div class="col-3 col-lg-1 pe-1">{{ form.venue_choice }}</div>
+          <div class="col-9 col-lg-4 px-0">{{ form.venue }}</div>
         </div>
         <div class="row">
           {{ form.tour.errors }}

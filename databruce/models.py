@@ -259,14 +259,10 @@ class Cities(models.Model):
         unique_together = (("name", "state"),)
 
     def __str__(self) -> str:
-        try:
-            if self.country.name == "United States":
-                return f"{self.name}, {self.state.abbrev}"
+        if self.country.id in [6, 37] and self.state:
+            return f"{self.name}, {self.state.abbrev}"
 
-            return f"{self.name}, {self.state}"  # noqa: TRY300
-
-        except States.DoesNotExist:
-            return f"{self.name}, {self.country}"
+        return f"{self.name}, {self.country}"
 
 
 class Continents(models.Model):
@@ -447,9 +443,9 @@ class States(models.Model):
 
     def __str__(self) -> str:
         if self.country.id not in [2, 6, 37]:
-            return f"{self.name}, {self.country}"
+            return self.name
 
-        return self.name
+        return self.abbrev
 
 
 class VenuesText(models.Model):
@@ -558,9 +554,6 @@ class Venues(models.Model):
 
         if self.detail:
             name = f"{self.name}, {self.detail}"
-
-        if self.city:
-            name += f", {self.city}"
 
         return name
 
@@ -1135,6 +1128,7 @@ class Setlists(models.Model):
 
     song_num = models.IntegerField(
         default=1,
+        blank=True,
     )
 
     song = models.ForeignKey(
@@ -1179,22 +1173,9 @@ class Setlists(models.Model):
         managed = False
         db_table = "setlists"
         verbose_name_plural = "setlists"
-        # unique_together = (("event_id", "set_name", "song_id"),)
-        # ordering = ("-event_id", "song_num")
 
     def __str__(self) -> str:
         return f"{self.event.id} - {self.set_name} - {self.song} ({self.id})"
-
-    # def notes(self) -> str:
-    #     noteslist = list(
-    #         SetlistNotes.objects.filter(id=self.id).values_list("note", flat=True),
-    #     )
-
-    #     if noteslist:
-    #         print(noteslist)
-    #         return "; ".join(noteslist)
-
-    #     return None
 
     VALID_SET_NAMES = [
         "Show",

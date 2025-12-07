@@ -145,12 +145,12 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             prev_song=Subquery(
                 setlist.filter(song_num__lt=OuterRef("song_num"))
                 .order_by("-song_num", "-event")
-                .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                .values("song__id")[:1],
             ),
             next_song=Subquery(
                 setlist.filter(song_num__gt=OuterRef("song_num"))
                 .order_by("event", "song_num")
-                .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                .values("song__id")[:1],
             ),
         )
         .order_by("event", "song_num")
@@ -241,7 +241,7 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = serializers.VenuesSerializer
 
-    filter_backends = [filters.DTFilter]
+    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.VenuesFilter
 
 
