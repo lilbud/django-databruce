@@ -22,7 +22,7 @@ $.extend(true, DataTable.defaults, {
         let data = columns.map((col, i) => {
           var title = col.title.replaceAll(':', '') + ':';
 
-          return col.data || col.data === false ? `<div class="row res-child py-1 text-sm"><div class="col-4 align-top text-nowrap fw-bold">${title}</div><div class="col text-wrap">${col.data}</div></div>` : '';
+          return col.hidden && (col.data || col.data === false) ? `<div class="row res-child py-1 text-sm"><div class="col-3 align-top text-nowrap fw-bold">${title}</div><div class="col text-wrap">${col.data}</div></div>` : '';
         }).join('');
         return data ? $('<table />').append(data) : false;
       },

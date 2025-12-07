@@ -105,7 +105,7 @@ body {
 }
 
 th,
-td:not(.fc-day),
+td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
 .modal-body,
 .list-group-item,
 .card-footer,
@@ -126,6 +126,10 @@ td:not(.fc-day),
     background-color: var(--base-300) !important;
     color: var(--base-content) !important;
     border-color: var(--border) !important;
+}
+
+td.child, tr.child {
+    background-color: var(--base-300) !important;
 }
 
 .dropdown-menu {
@@ -515,25 +519,11 @@ th[role="presentation"] {
 }
 
 @media (max-width: 768px) {
-    td:hover {
+    tr:not(.hasChild,.child) > td:not(.child):hover {
         cursor: pointer;
     }
-
-    /* .dataTable tbody tr:not(.child) > td:nth-last-child(1 of :not(.dtr-hidden))::after {
-        content: "\F22D";
-        font-size: 1rem !important;
-        font-family:'Bootstrap-icons';
-        float: right;
-    }
-
-    .dataTable tbody .dt-hasChild.dtr-expanded > td:nth-last-child(1 of :not(.dtr-hidden))::after {
-        content: "\F229";
-        font-size: 1rem !important;
-        font-family:'Bootstrap-icons';
-        float: right;
-    } */
 }
 
-td.child a {
-    color: var(--primary) !important;
+td.child {
+    color: var(--base-content);
 }

@@ -87,7 +87,7 @@
             <table class="table table-hover display" id="setlistTable">
               <thead>
                 <tr>
-                  <th class="songnum">#</th>
+                  <th class="songnum text-xs">#</th>
                   <th>Song</th>
                 </tr>
               </thead>
@@ -249,7 +249,7 @@
         columns: [
           { 
             'data': 'song_num',
-            'className': 'dt-center all align-middle',
+            'className': 'dt-center all align-middle text-xs',
             'width': '1rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && row.position) {
@@ -270,7 +270,7 @@
             'width': '10rem',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var song = '<a class="fw-medium align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
+                var song = '<a class="fw-medium text-sm align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
 
                 song = row.segue ? `${song} >` : song;
 

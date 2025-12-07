@@ -7,9 +7,7 @@ td.setHeader:hover {
 	box-shadow: none !important;
 }
 
-tr.res-child:hover {
-    box-shadow: none !important;
-}
+
 
 tr.res-child > td:first {
     width: 2rem;
@@ -321,6 +319,25 @@ td[colspan="5"] tr:hover td {
 @media only screen and (min-width: 768px) {
     td > .badge {
         vertical-align: middle;
-        margin-top: -0.35em;
+        margin-top: -0.25em;
     }
+}
+/* 
+td.child {
+    background-color: #3a3f4b !important;
+} */
+
+.dt-hasChild td {
+    font-size: 0.875rem;
+}
+
+tr:not(.dt-hasChild,.child) td:hover,
+tr:not(.dt-hasChild,.child):hover {
+    cursor: default !important;
+}
+
+tr.res-child:hover,
+tr.child:hover,
+td.child:hover {
+    box-shadow: none !important;
 }

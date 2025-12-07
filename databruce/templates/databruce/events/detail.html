@@ -55,7 +55,7 @@
                     <div class="text-nowrap text-secondary-emphasis">This is a placeholder date, actual date unknown.</div>
                   {% endif %}
                   <div class="text-base fw-semibold">
-                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}</a>
+                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
