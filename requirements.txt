@@ -12,3 +12,4 @@ django-browser-reload
 markdown-it-py
 querystring_parser
 python-slugify
+gunicorn
