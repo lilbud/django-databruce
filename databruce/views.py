@@ -1,12 +1,9 @@
-import calendar
 import datetime
-import itertools
 import json
 import logging
 import os
 import re
 from typing import Any
-from urllib.parse import urlencode
 
 import requests
 from django.contrib import messages
@@ -658,8 +655,6 @@ class Event(TemplateView):
         .order_by("id")
     )
 
-    date = datetime.datetime.today()
-
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["title"] = "Events"
@@ -1191,7 +1186,6 @@ class SetlistNotesSearchResults(TemplateView):
 class AdvancedSearch(View):
     form_class = forms.AdvancedEventSearch
     formset_class = formset_factory(forms.SetlistSearch)
-    date = datetime.datetime.today()
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()
@@ -1216,7 +1210,6 @@ class AdvancedSearchResults(View):
     template_name = "databruce/search/advanced_search_results.html"
     form_class = forms.AdvancedEventSearch
     formset_class = formset_factory(forms.SetlistSearch)
-    date = datetime.datetime.today()
 
     def check_field_choice(self, choice: str, field_filter: Q) -> Q:
         """Every field has a IS/NOT choice on it. Depending on that choice, the filter can be negated or not. This checks for that value and returns the correct filter."""
