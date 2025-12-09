@@ -18,8 +18,10 @@ from django.db.models import (
     QuerySet,
     Subquery,
     When,
+    Window,
 )
 from django.db.models.functions import Coalesce, JSONObject
+from django.db.models.functions.window import Lag, Lead
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
 from rest_framework import permissions, viewsets
@@ -28,6 +30,8 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from api import filters, serializers
 from databruce import models
+
+from .selectors import get_band_members
 
 permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -145,12 +149,12 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             prev_song=Subquery(
                 setlist.filter(song_num__lt=OuterRef("song_num"))
                 .order_by("-song_num", "-event")
-                .values("song__id")[:1],
+                .values(json=JSONObject(id="song__id", name="song__name"))[:1],
             ),
             next_song=Subquery(
                 setlist.filter(song_num__gt=OuterRef("song_num"))
                 .order_by("event", "song_num")
-                .values("song__id")[:1],
+                .values(json=JSONObject(id="song__id", name="song__name"))[:1],
             ),
         )
         .order_by("event", "song_num")
@@ -380,7 +384,7 @@ class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
     )
 
     serializer_class = serializers.EventsSerializer
-    filter_backends = [DjangoFilterBackend, filters.AdvFilter, filters.DTFilter]
+    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.EventsFilter
 
 

@@ -27,8 +27,8 @@
     </div>
   {% endif %}
   <div class="row mb-4">
-    <div class="col-12 col-md-6 col-lg-4 px-2">
-      <div class="card mb-3">
+    <div class="col-12 col-md-6 col-lg-4 ps-2 pe-1">
+      <div class="card mb-2">
         <div class="card-body p-0">
           <img class="img-fluid card-img-top object-fit-cover"
                id="headimg"
@@ -39,10 +39,7 @@
         </div>
         <div class="card-footer">
           <span class="text-base">San Siro - July 3, 2025</span>
-          <span class="text-sm">
-            (photo by <a class="text-reset"
-    href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)
-          </span>
+          <span class="text-sm">(photo by <a class="text-reset"href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)</span>
         </div>
       </div>
       <div class="card mb-3 mb-lg-0 d-none d-lg-block">
@@ -65,8 +62,8 @@
       </div>
     </div>
   </div>
-  <div class="col-12 col-md-6 col-lg-4 px-2">
-    <div class="card mb-3 mb-lg-0">
+  <div class="col-12 col-md-6 col-lg-4 px-1">
+    <div class="card mb-2 mb-lg-0">
       <div class="card-header">Featured Show</div>
       <div class="card-body p-0">
         {% with first=latest_event %}
@@ -99,10 +96,10 @@
       </div>
     </div>
   </div>
-  <div class="col-12 col-md-6 col-lg-4 px-2">
-    <div class="row row-cols-1 row-cols-md-1 g-3 mb-4">
-      <div class="col">
-        <div class="card h-100">
+  <div class="col-12 col-md-6 col-lg-4 ps-1 pe-2">
+    <div class="row row-cols-1 row-cols-md-1 g-3 mb-2">
+      <div class="col mb-2">
+        <div class="card">
           <div class="card-header">Recent Events</div>
           <div class="card-body p-0">
             <div class="table-responsive index">
@@ -119,8 +116,8 @@
         </div>
       </div>
       {% if upcoming %}
-        <div class="col">
-          <div class="card h-100">
+        <div class="col mt-0">
+          <div class="card">
             <div class="card-header">Upcoming Events</div>
             <div class="card-body p-0">
               <div class="table-responsive index">
@@ -137,8 +134,8 @@
           </div>
         </div>
       {% endif %}
-      <div class="col">
-        <div class="card h-100">
+      <div class="col m-0">
+        <div class="card mt-0">
           <div class="card-header">
             <span class="text-base">On This Day</span>
             <span class="text-sm">(<a class="text-reset"
@@ -241,7 +238,6 @@
         ajax: '/api/v1/event_setlist/?event={{ latest_event.id }}&song_num=true&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
         serverSide: true,
         processing: true,
-        columnDefs: [{ targets: [0], width: '1rem' }],
         rowGroup: {
             dataSrc: 'set_name',
             className: 'text-center setHeader',
@@ -255,39 +251,25 @@
               if (type === 'display' && row.position) {
                 var position = row.position.replaceAll(' ', '').toLowerCase();
 
-                return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum text-sm ${position}'>${data}</span>`
+                return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum ${position}'>${data}</span>`
               } else if (!data) {
                 return ''
               } else {
-                return `<span class='songnum text-sm'>${data}</span>`
+                return `<span class='songnum'>${data}</span>`
               }
             },
           },
           {
             'data': 'song',
             'name': 'song__name',
-            'className': 'all align-middle',
-            'width': '10rem',
+            'className': 'all align-middle text-xs',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var song = '<a class="fw-medium text-sm align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
+                var song = '<a class="fw-medium  align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
 
-                song = row.segue ? `${song} >` : song;
+                return row.segue ? `${song} >` : song;
 
-                var badge = $('<span />').addClass('ms-2 badge my-auto')
 
-                // instrumental, sign-request, nobruce, premiere
-                if (row.instrumental) {
-                  $(badge).addClass('text-bg-info').text('Instrumental');
-                } else if (row.sign_request) {
-                  $(badge).addClass('text-bg-info').text('Sign Request');
-                } else if (row.nobruce) {
-                  $(badge).addClass('warning').text('No Bruce');
-                } else if (row.premiere) {
-                  $(badge).addClass('bg-secondary').text('Premiere');
-                }
-
-                return badge ? song + $(badge).prop('outerHTML') : song;
               }
             },
             },

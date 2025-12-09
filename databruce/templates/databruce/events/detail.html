@@ -2,6 +2,12 @@
 {% block title %}
   {{ title }}
 {% endblock title %}
+{% block extrajs %}
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
+          integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
+          crossorigin="anonymous"
+          async></script>
+{% endblock extrajs %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
     <div class="d-grid gap-0 row-gap-2">
@@ -45,7 +51,7 @@
               <div class="d-flex flex-wrap">
                 <div class="flex-grow-1 w-75 mb-2 mb-xl-0">
                   {% if event.title %}<div id="title" class="text-nowrap mb-1 text-sm">{{ event.title|markdown|safe }}</div>{% endif %}
-                  <div class="text-nowrap text-xl">
+                  <div class="text-wrap text-xl">
                     <span id="date">{{ event.get_date }}</span>
                     <a class="fw-semibold"
                        href="{% url "band_details" id=event.artist.id %}"
@@ -135,7 +141,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 col-lg-9 order-2 order-lg-1 pe-lg-2">
+        <div class="col-12 col-lg-10 order-2 order-lg-1 pe-lg-2">
           <div class="row row-cols-1 g-2">
             <div class="col">
               {% if event.note %}
@@ -194,7 +200,7 @@
                         <thead>
                           <th class="all">#</th>
                           <th class="all">Song</th>
-                          <th class="none">Position</th>
+                          {% comment %} <th class="none">Position</th> {% endcomment %}
                           <th class="min-tablet-l">Gap</th>
                           <th class="min-tablet-l">Tour</th>
                           <th class="min-tablet-l">Last</th>
@@ -208,10 +214,11 @@
             </div>
           </div>
         </div>
-        <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-3 ps-lg-0{% endif %} order-2">
-          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0">
+        <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-2 ps-lg-0{% endif %} order-2">
+          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
+               id="masonry-grid">
             {% if event.note %}
-              <div class="col-12 d-none d-lg-block">
+              <div class="col-12 d-none d-lg-block order-3">
                 <div class="card" id="notes-card">
                   <div class="card-header">
                     Event Notes
@@ -233,7 +240,7 @@
               </div>
             {% endif %}
             {% if onstage %}
-              <div class="col">
+              <div class="col order-1">
                 <div class="card">
                   <div class="card-header">
                     Performers
@@ -254,7 +261,7 @@
               </div>
             {% endif %}
             {% if album_breakdown %}
-              <div class="col">
+              <div class="col order-2">
                 <div class="card">
                   <div class="card-header align-middle">
                     Albums
@@ -263,18 +270,14 @@
                             data-bs-target="#album-breakdown-modal"
                             role="button">Breakdown</button>
                   </div>
-                  <div class="card-body p-3">
+                  <div class="card-body p-3" id="breakdown">
                     {% for album in album_breakdown %}
-                      <div class="row pb-1" id="album-breakdown">
+                      <div class="row pb-2 album-breakdown">
                         <div class="col">
-                          <div class="progress-label fw-semibold">{{ album.category }}</div>
-                          <div class="progress d-flex flex-row justify-content-between"
-                               role="progressbar"
-                               aria-label="Basic example"
-                               aria-valuenow="{{ album.num }}"
-                               aria-valuemin="0"
-                               aria-valuemax="{{ album.max }}">
-                            <div class="progress-bar" style="width: {{ album.percent }}%">
+                          <div class="progress-label text-xs fw-semibold">{{ album.category }}</div>
+                          <div class="progress d-flex flex-row justify-content-between">
+                            <div class="progress-bar"
+                                 style="width:{% widthratio album.percent album.max album.max %}%">
                               <span class="song-count fw-bold">{{ album.num }}</span>
                             </div>
                           </div>
@@ -286,7 +289,7 @@
               </div>
             {% endif %}
             {% if official or event.archive %}
-              <div class="col">
+              <div class="col order-4">
                 <div class="card" id="links-card">
                   <div class="card-header">
                     Links
@@ -295,36 +298,23 @@
                     </div>
                   </div>
                   <div class="card-body">
-                    <ul class="ps-3 text-xs">
+                    <ul class="ps-2 d-grid gap-0 row-gap-2">
                       {% if official %}
-                        {% for rel in official %}
-                          <li>
-                            <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
-                          </li>
-                        {% endfor %}
+                        <li>
+                          <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
+                        </li>
                       {% endif %}
                       {% if event.boot %}
                         <li>
                           <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
                         </li>
                       {% endif %}
+                      {% if event.archive %}
+                        <li>
+                          <a href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}">Radio Nowhere Archive</a>
+                        </li>
+                      {% endif %}
                     </ul>
-                    {% if event.archive %}
-                      <div class="text-sm fw-semibold">
-                        Radio Nowhere @ Archive.org
-                        <i class="bi bi-info-circle-fill"
-                           data-bs-toggle="tooltip"
-                           data-bs-html="true"
-                           data-bs-title="An archive.org collection of Bruce bootlegs maintained by me"></i>
-                      </div>
-                      <ul class="ps-3 text-xs">
-                        {% for rel in event.archive %}
-                          <li>
-                            <a href="https://archive.org/details/{{ rel }}">{{ rel }}</a>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    {% endif %}
                   </div>
                 </div>
               </div>
@@ -403,12 +393,27 @@
   <script>
       var layout = getDatatableLayout({columns: false, category: false});
 
+      function slugify(str) {
+        str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+        str = str.toLowerCase(); // convert string to lowercase
+        str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+                .replace(/\s+/g, '-') // replace spaces with hyphens
+                .replace(/-+/g, '-'); // remove consecutive hyphens
+        return str;
+      }
+
+      var isMobile = false;
+
       $(document).ready(function() {
         var table = $('#setlistTable').DataTable(
         {
           layout: layout,
           serverSide: true,
           processing: true,
+          //responsive: false,
+          //scrollX: true,
+          //scrollX: true,
+          autoWidth: true,
           paging: false,
           //scrollY: false,
           //scrollCollapse: true,
@@ -416,35 +421,44 @@
           ordering: false,
           ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
           columnDefs: [
-            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-tablet-l' },
-            { targets: [0], type: 'text', className: 'songnum align-middle p-0', width: '30px' },
+            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-tablet-l text-nowrap' },
+            { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
           ],
           rowGroup: {
               dataSrc: 'set_name',
               className: 'text-center setHeader',
           },
-          columns: [
-            { 
-              'data': 'song_num',
-              'className': 'dt-center all',
-              'width': '1rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && row.position) {
-                  var position = row.position.replaceAll(' ', '').toLowerCase();
+          createdRow: function (row, data, dataIndex) {
 
-                  return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum text-sm ${position}'>${data}</span>`
-                } else if (!data) {
-                  return ''
-                } else {
-                  return `<span class='songnum text-sm'>${data}</span>`
-                }
-              },
+            var sets = ['Show', 'Set 1', 'Set 2', 'Encore', 'Pre-Show', 'Post-Show']
+
+            if (sets.includes(data.set_name)){
+              var album = slugify(data.song.category);
+              $(row).attr('album', album);
+            }
+          },
+          columns: [
+          { 
+            'data': 'song_num',
+            'className': 'dt-center all',
+            'width': '1rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && row.position) {
+                var position = row.position.replaceAll(' ', '').toLowerCase();
+
+                return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum ${position}'>${data}</span>`
+              } else if (!data) {
+                return ''
+              } else {
+                return `<span class='songnum'>${data}</span>`
+              }
             },
+          },
             {
               'data': 'song',
               'name': 'song__name',
               'className': 'all',
-              'width': '10rem',
+              'width': '12rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
@@ -467,8 +481,8 @@
                   return badge ? song + $(badge).prop('outerHTML') : song;
                 }
               },
-             },
-             {
+            },
+            /*{
               'data': 'position',
               'name': 'position',
               'className': 'text-nowrap none',
@@ -478,7 +492,7 @@
                   return data
                 }
               },
-            },
+            },*/
             {
               'data': 'last', 
               'className': 'dt-center min-tablet-l',
@@ -520,7 +534,7 @@
               'data': 'ltp.date',
               'name': 'ltp__id',
               'className': 'dt-center min-tablet-l',
-              'width': '8rem',
+              'width': '6rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
@@ -530,12 +544,13 @@
             {
               'data': 'notes',
               'name': 'notes',
-              'className': 'min-tablet-l text-wrap',
-              'width': '15rem',
+              'className': 'min-tablet-l text-nowrap',
+              'width': '10rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data && data != null) {
-
-      
+                  $(data).each(function(i, e){
+                    data[i] = e.replaceAll('\'\'', '\'');
+                  })
 
                   return data ? `<span class="text-xs fw-light">${data.join('; ')}</span>` : '';
                 }
@@ -561,13 +576,14 @@
           }
         });
 
+        $( window ).on("resize", function() {
+          //isMobile = window.matchMedia("only screen and (max-width: 768px)").matches ? '94vw' : false;
+          $('#setlistTable').DataTable().columns.adjust();
+        });
+
         $('th.setHeader').each(function(){
           $(this).removeClass('setHeader');
         });
-
-        $('.card tr td.dt-empty').each(function() {
-
-        })
 
           // code adapted from stackoverflow
           $('#copySetlist').click(function() {
@@ -631,13 +647,13 @@
             },
             rowGroup: {
               dataSrc: function(row) {
-                return row.band ? `<a href="/bands/${row.band.id}">${row.band.name}</a>` : '';
+                return row.band ? `<a class="text-sm fw-medium" href="/bands/${row.band.id}">${row.band.name}</a>` : '';
               },
               startRender: function (rows, group) {
                 var ul = $('<ul />');
 
                 $(rows.data()).each(function() {
-                  $(`<li class="text-reset fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
+                  $(`<li class="text-reset text-sm fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
                 });
 
                 return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');
@@ -645,11 +661,32 @@
             },
             initComplete: function (){
               $('tr:empty').remove();
-              //$('#loading-spinner').hide();
             }
           });
       });
 
+      $(".row.album-breakdown").each(function(){
+        var album = slugify($(this).find('div.progress-label').text());
+
+        $(this).hover(function(){
+          $(this).css('cursor', "pointer")
+
+          $(`#setlistTable tbody tr[album]`).each(function(){
+            var row = this;
+            if ($(this).attr('album') == album) {
+              $(row).css('opacity', '1');
+              $(row).children('td').css('box-shadow', "inset 0 0 100px 100px rgba(4, 131, 200, 0.5)");
+            } else {
+              $(row).css('opacity', '0.4');
+            }
+          });
+
+        }, function(){
+          $(this).css("box-shadow", "none");   // Action on mouseleave
+          $(`tr`).css('opacity', '1');
+          $(`tr`).children('td').css('box-shadow', "none");
+        });
+      });
       
 </script>
 {% endblock content %}

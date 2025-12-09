@@ -422,7 +422,7 @@ class UserRemoveShow(View):
         ).delete()
 
         return redirect(
-            request.META.get("HTTP_REFERER", "redirect_if_referer_not_found"),
+            request.headers.get("referer", "redirect_if_referer_not_found"),
         )
 
 
@@ -617,7 +617,7 @@ class EventDetail(TemplateView):
             models.Songs.objects.filter(
                 id__in=context["setlist_unique"].values("song__id"),
             )
-            .values("category", "album")
+            .values("category")
             .annotate(num=Count("id"))
             .order_by("-num")
         )
@@ -662,9 +662,9 @@ class Event(TemplateView):
         try:
             context["year"] = self.kwargs["year"]
         except KeyError:
-            context["year"] = self.date.year
+            context["year"] = date.year
 
-        context["years"] = list(range(1965, self.date.year + 1))
+        context["years"] = list(range(1965, date.year + 1))
 
         context["event_info"] = self.queryset.filter(id__startswith=context["year"])
 
@@ -896,7 +896,7 @@ class SongDetail(TemplateView):
 def event_search(request: HttpRequest):
     data = None
 
-    if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
         q = request.GET.get("term", "")
         results = []
 

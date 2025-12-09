@@ -1,7 +1,8 @@
 import datetime
 import re
 
-from django.db.models import Count, F, PositiveIntegerField
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, F, OuterRef, PositiveIntegerField, Subquery
 from django.db.models.functions import JSONObject, TruncYear
 from django.urls import reverse
 from rest_framework import serializers
@@ -560,13 +561,13 @@ class OnstageRelationSerializer(serializers.ModelSerializer):
 
 
 class OnstageSerializer(serializers.ModelSerializer):
-    relation = RestrictedRelationsSerializer()
     event = RestrictedEventsSerializer()
+    relation = RestrictedRelationsSerializer()
     band = RestrictedBandsSerializer(required=False)
 
     class Meta:
         model = models.Onstage
-        fields = ["id", "event", "relation", "band"]
+        fields = "__all__"
 
 
 class ReleasesSerializer(serializers.ModelSerializer):
@@ -635,7 +636,7 @@ class SetlistSerializer(serializers.ModelSerializer):
     nobruce = serializers.BooleanField()
     sign_request = serializers.BooleanField()
     instrumental = serializers.BooleanField()
-    last = serializers.IntegerField()
+    # last = serializers.IntegerField(source="gap")
     notes = serializers.ListField(required=False, source="notes_list")
     # venue = VenuesSerializer(source="event.venue")
 

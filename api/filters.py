@@ -1,9 +1,6 @@
-import datetime
 import re
 
-from django.db.models import F, Manager, Q, QuerySet
-from django.db.models.manager import BaseManager
-from django.http import HttpRequest
+from django.db.models import F, Q
 from django_filters import rest_framework as filters
 from querystring_parser import parser
 from rest_framework.filters import BaseFilterBackend
@@ -44,150 +41,6 @@ def get_sb_filter(
         filter_types["!null"] = Q(**{f"{column}__isnull": False})
 
     return filter_types.get(condition)
-
-
-from django.http import QueryDict
-
-
-class AdvFilter(BaseFilterBackend):
-    def lookups(self, param: str, value: str):
-        lookups = {
-            "first_date": Q(date__gte=value),
-            "last_date": Q(date__lte=value),
-            "month": Q(date__month=value),
-            "day": Q(date__day=value),
-            "city": Q(venue__city__id=value),
-            "state": Q(venue__state__id=value),
-            "country": Q(venue__country__id=value),
-            "tour": Q(tour__id=value),
-            "musician": Q(relation__id=value),
-            "band": Q(band__id=value),
-            "day_of_week": Q(date__week_day=value),
-        }
-
-        return lookups.get(param)
-
-    positions = {
-        "anywhere": "Anywhere",
-        "followed_by": "Followed By",
-        "show_opener": "Show Opener",
-        "in_show": "Show",
-        "in_set_one": "Set 1",
-        "set_one_opener": "Set 1 Opener",
-        "set_one_closer": "Set 1 Closer",
-        "in_set_two": "Set 2",
-        "set_two_opener": "Set 2 Opener",
-        "set_two_closer": "Set 2 Closer",
-        "main_set_closer": "Main Set Closer",
-        "encore_opener": "Encore Opener",
-        "in_encore": "Encore",
-        "in_preshow": "Pre-Show",
-        "in_recording": "Recording",
-        "in_soundcheck": "Soundcheck",
-        "show_closer": "Show Closer",
-    }
-
-    def filter_queryset(self, request, queryset, view):
-        params = QueryDict(request.GET["param"])
-        event_filter = Q()
-        setlist_event_filter = Q()
-        event_results = []
-
-        print(params)
-
-        total_setlist_forms = int(params.get("form-TOTAL_FORMS", "0"))
-        initial_setlist_forms = int(
-            params.get("form-INITIAL_FORMS", "0"),
-        )
-        event_params = [
-            item
-            for item in params
-            if not re.match(r"form-(\d)?|^.*_choice$", item) and params[item] != ""
-        ]
-
-        setlist_params = [item for item in params if re.match(r"form-\d", item)]
-
-        for item in event_params:
-            lookup = self.lookups(item, params[item])
-
-            if lookup:
-                if item in ("musician", "band"):
-                    events = models.Onstage.objects.filter(lookup)
-                    lookup = Q(id__in=events.values("event__id"))
-
-                try:
-                    if params[f"{item}_choice"] == "is":
-                        event_filter.add(lookup, Q.AND)
-                    elif params[f"{item}_choice"] == "not":
-                        event_filter.add(~lookup, Q.AND)
-                except KeyError:
-                    event_filter.add(lookup, Q.AND)
-
-        for i in range(total_setlist_forms):
-            song1 = params.get(f"form-{i}-song1")
-            choice = params.get(f"form-{i}-choice")  # is/not
-            position = params.get(f"form-{i}-position")
-            song2 = params.get(f"form-{i}-song2")
-
-            filter = Q(song=song1)
-
-            match position:
-                case "anywhere":
-                    if choice != "is":
-                        filter = ~Q(song=song1)
-                case "followed_by":
-                    if choice == "is":
-                        filter &= Q(next=song2)
-                    else:
-                        filter &= ~Q(next=song2)
-                case _:
-                    position = self.positions.get(position)
-
-                    if choice == "is":
-                        filter &= Q(position=position)
-                    else:
-                        filter &= ~Q(position=position)
-
-            events = models.Songspagenew.objects.filter(filter).select_related(
-                "event",
-            )
-
-            event_results.append(list(events.values_list("event__id", flat=True)))
-
-            match params["conjunction"]:
-                case "or":
-                    setlist_event_filter.add(
-                        Q(
-                            id__in=list(
-                                set.union(
-                                    *map(
-                                        set,
-                                        event_results,
-                                    ),
-                                ),
-                            ),
-                        ),
-                        Q.OR,
-                    )
-
-                case "and":
-                    setlist_event_filter.add(
-                        Q(
-                            id__in=list(
-                                set.intersection(
-                                    *map(
-                                        set,
-                                        event_results,
-                                    ),
-                                ),
-                            ),
-                        ),
-                        Q.AND,
-                    )
-
-            # event_filter.add(Q(id__in=events.values("event__id")), Q.AND)
-
-        return queryset.filter(event_filter & setlist_event_filter)
 
 
 class DTFilter(BaseFilterBackend):
@@ -342,7 +195,7 @@ class DTFilter(BaseFilterBackend):
 
 
 class ArchiveFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event")
+    event = filters.CharFilter(field_name="event__id")
     date = filters.CharFilter(field_name="event__event_date")
 
 
@@ -352,7 +205,6 @@ class BootlegFilter(filters.FilterSet):
 
 class CitiesFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
-    name = filters.CharFilter(lookup_expr="icontains")
 
 
 class EventSetlistFilter(filters.FilterSet):
@@ -365,16 +217,14 @@ class CoversFilter(filters.FilterSet):
 
 
 class VenuesFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
-    city = filters.CharFilter(field_name="city__name", lookup_expr="icontains")
+    id = filters.CharFilter(lookup_expr="exact")
+    city = filters.CharFilter(field_name="city__id", lookup_expr="exact")
 
 
 class IndexFilter(filters.FilterSet):
     date = filters.CharFilter(field_name="date", lookup_expr="startswith")
     month = filters.CharFilter(field_name="date__month", lookup_expr="exact")
     day = filters.CharFilter(field_name="date__day", lookup_expr="exact")
-    # upcoming = filters.BooleanFilter(field_name="date", lookup_expr="gte")
-    # recent = filters.BooleanFilter(field_name="date", lookup_expr="lte")
 
 
 class EventRunFilter(filters.FilterSet):
@@ -450,31 +300,34 @@ class ReleaseTracksFilter(filters.FilterSet):
 
 
 class RelationFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr="icontains")
+    id = filters.NumberFilter(lookup_expr="exact")
 
 
 class BandsFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr="icontains")
+    id = filters.NumberFilter(lookup_expr="exact")
 
 
 class ReleaseFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr="icontains")
+    id = filters.NumberFilter(lookup_expr="exact")
     type = filters.CharFilter(lookup_expr="icontains")
 
 
 class SetlistFilter(filters.FilterSet):
     event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
-    run = filters.CharFilter(field_name="event__run__id", lookup_expr="exact")
-    leg = filters.CharFilter(field_name="event__leg__id", lookup_expr="exact")
-    tour = filters.CharFilter(field_name="event__tour__id", lookup_expr="exact")
-    song = filters.CharFilter(field_name="song__id", lookup_expr="exact")
-    venue = filters.CharFilter(field_name="event__venue__id", lookup_expr="exact")
-    city = filters.CharFilter(field_name="event__venue__city__id", lookup_expr="exact")
-    state = filters.CharFilter(
+    run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
+    leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
+    tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
+    song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
+    venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+    city = filters.NumberFilter(
+        field_name="event__venue__city__id",
+        lookup_expr="exact",
+    )
+    state = filters.NumberFilter(
         field_name="event__venue__state__id",
         lookup_expr="exact",
     )
-    country = filters.CharFilter(
+    country = filters.NumberFilter(
         field_name="event__venue__country__id",
         lookup_expr="exact",
     )
@@ -494,16 +347,19 @@ class SetlistFilter(filters.FilterSet):
 
 class SetlistEntryFilter(filters.FilterSet):
     event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
-    run = filters.CharFilter(field_name="event__run__id", lookup_expr="exact")
-    leg = filters.CharFilter(field_name="event__leg__id", lookup_expr="exact")
-    tour = filters.CharFilter(field_name="event__tour__id", lookup_expr="exact")
-    venue = filters.CharFilter(field_name="event__venue__id", lookup_expr="exact")
-    city = filters.CharFilter(field_name="event__venue__city__id", lookup_expr="exact")
-    state = filters.CharFilter(
+    run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
+    leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
+    tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
+    venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+    city = filters.NumberFilter(
+        field_name="event__venue__city__id",
+        lookup_expr="exact",
+    )
+    state = filters.NumberFilter(
         field_name="event__venue__state__id",
         lookup_expr="exact",
     )
-    country = filters.CharFilter(
+    country = filters.NumberFilter(
         field_name="event__venue__country__id",
         lookup_expr="exact",
     )
@@ -524,15 +380,13 @@ class CountryFilter(filters.FilterSet):
 
 
 class TourFilter(filters.FilterSet):
+    id = filters.NumberFilter(lookup_expr="exact")
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     band = filters.CharFilter(field_name="band__name", lookup_expr="icontains")
 
 
 class TourLegFilter(filters.FilterSet):
     tour = filters.NumberFilter(field_name="tour__id", lookup_expr="exact")
-
-
-from django.core.exceptions import FieldError
 
 
 class SongsPageFilter(filters.FilterSet):

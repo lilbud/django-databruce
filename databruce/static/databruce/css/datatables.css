@@ -262,13 +262,13 @@ td[colspan="5"] tr:hover td {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.075);
 }
 
-#setlistTable td:nth-child(1) {
+/* #setlistTable td:nth-child(1) {
     width: 30px !important;
 }
 
 #setlistTable td:nth-child(2) {
-   min-width: 350px !important;
-   max-width: 400px !important;
+min-width: 350px !important;
+max-width: 400px !important;
 }
 
 #setlistTable td:nth-child(5) {
@@ -283,7 +283,10 @@ td[colspan="5"] tr:hover td {
 #setlistTable td:nth-child(3), 
 #setlistTable td:nth-child(4) {
     width: 50px !important;
-}
+} */
+
+
+
 
 /* .dt-scroll-body thead {
     display: none !important
@@ -316,12 +319,12 @@ td[colspan="5"] tr:hover td {
     padding: 0 0.25rem 0.25rem 0 !important;
 }
 
-@media only screen and (min-width: 768px) {
+/* @media only screen and (min-width: 768px) {
     td > .badge {
         vertical-align: middle;
         margin-top: -0.25em;
     }
-}
+} */
 /* 
 td.child {
     background-color: #3a3f4b !important;
