@@ -98,11 +98,11 @@
     var table = new DataTable('#eventTable', {
       layout: layout,
       serverSide: true,
-      processing: true,
+      //processing: true,
       //responsive: false,
       //autoWidth: false,
       scrollY: '60vh',
-      scrollX: true,
+      //scrollX: true,
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=datatables&keep=id,early_late,public',
       },
