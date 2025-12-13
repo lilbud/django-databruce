@@ -135,7 +135,7 @@ td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
     border-color: var(--border) !important;
 }
 
-td.child, tr.child {
+td.child, tr.child, dl {
     background-color: var(--base-300) !important;
 }
 

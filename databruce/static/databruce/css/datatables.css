@@ -330,9 +330,9 @@ td.child {
     background-color: #3a3f4b !important;
 } */
 
-.dt-hasChild td {
+/* .dt-hasChild td {
     font-size: 0.875rem;
-}
+} */
 
 tr:not(.dt-hasChild,.child) td:hover,
 tr:not(.dt-hasChild,.child):hover {

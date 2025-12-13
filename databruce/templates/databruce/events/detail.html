@@ -218,7 +218,7 @@
           <div class="row row-cols-2 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
                id="masonry-grid">
             {% if event.note %}
-              <div class="col-12 d-none d-lg-block order-3">
+              <div class="col-12 d-none d-lg-block order-1">
                 <div class="card" id="notes-card">
                   <div class="card-header">
                     Event Notes
@@ -226,7 +226,7 @@
                       <i class="bi bi-pencil"></i>
                     </div>
                   </div>
-                  <div class="card-body text-sm">
+                  <div class="card-body text-xs">
                     <div>{{ event.note|note_format|safe }}</div>
                     <div class="row mt-1">
                       <a href="#"
@@ -240,7 +240,7 @@
               </div>
             {% endif %}
             {% if onstage %}
-              <div class="col order-1">
+              <div class="col order-2">
                 <div class="card">
                   <div class="card-header">
                     Performers
@@ -261,7 +261,7 @@
               </div>
             {% endif %}
             {% if album_breakdown %}
-              <div class="col order-2">
+              <div class="col order-3">
                 <div class="card">
                   <div class="card-header align-middle">
                     Albums
@@ -300,9 +300,11 @@
                   <div class="card-body">
                     <ul class="ps-2 d-grid gap-0 row-gap-2">
                       {% if official %}
-                        <li>
-                          <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
-                        </li>
+                        {% for rel in releases %}
+                          <li>
+                            <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
+                          </li>
+                        {% endfor %}
                       {% endif %}
                       {% if event.boot %}
                         <li>
