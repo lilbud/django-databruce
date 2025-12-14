@@ -1418,8 +1418,7 @@ class AdvancedSearchResults(View):
                 except AttributeError:
                     break
 
-        if event_list:
-            setlist_event_filter = Q(id__in=event_list)
+        setlist_event_filter = Q(id__in=event_list)
 
         result = (
             models.Events.objects.filter(
