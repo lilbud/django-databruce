@@ -538,3 +538,16 @@ th[role="presentation"] {
 td.child {
     color: var(--base-content);
 }
+
+.card#setlist-card {
+    /* overflow-x: clip !important; */
+    width: 100% !important;
+}
+
+#setlist-card table {
+    width: 100% !important;
+}
+
+body {
+    width: 100% !important;
+}

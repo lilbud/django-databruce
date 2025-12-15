@@ -50,7 +50,7 @@
             <div class="card-body">
               <div class="d-flex flex-wrap">
                 <div class="flex-grow-1 w-75 mb-2 mb-xl-0">
-                  {% if event.title %}<div id="title" class="text-nowrap mb-1 text-sm">{{ event.title|markdown|safe }}</div>{% endif %}
+                  {% if event.title %}<div id="title" class="text-wrap mb-1 text-sm">{{ event.title|markdown|safe }}</div>{% endif %}
                   <div class="text-wrap text-xl">
                     <span id="date">{{ event.get_date }}</span>
                     <a class="fw-semibold"
@@ -75,7 +75,7 @@
                     {% endif %}
                   </div>
                   {% if event.brucebase_url or nugs %}
-                    <div class="badge-row mt-2 pt-1 text-base">
+                    <div class="badge-row mt-3 text-base">
                       {% if event.brucebase_url %}
                         <a id="eventlink"
                            class="pe-1"
@@ -97,7 +97,7 @@
                     </div>
                   {% endif %}
                 </div>
-                <div class="flex-shrink-1">
+                <div class="flex-shrink-1 mt-2 mt-md-0">
                   {% if user.is_authenticated and event.public %}
                     <form method="post" id="userForm">
                       <input type="hidden" name="event" value="{{ event.id }}">
@@ -142,7 +142,7 @@
       </div>
       <div class="row">
         <div class="col-12 col-lg-10 order-2 order-lg-1 pe-lg-2">
-          <div class="row row-cols-1 g-2">
+          <div class="row row-cols-1 g-2 row-gap-2">
             <div class="col">
               {% if event.note %}
                 <div class="col-12 d-md-block d-lg-none">
@@ -154,20 +154,16 @@
                       </div>
                     </div>
                     <div class="card-body text-xs">
-                      <div>{{ event.note|note_format|safe }}</div>
-                      <div class="row mt-1">
-                        <a href="#"
-                           role="button"
-                           class="btn-link text-primary fw-semibold mt-2 text-sm"
-                           data-bs-toggle="modal"
-                           data-bs-target="#notes-modal">See More</a>
-                      </div>
+                      <div>{{ event.note|mdlink|safe }}</div>
+                      {% comment %} <div class="row mt-1">
+                        <a href="#" role="button" class="btn-link text-primary fw-semibold mt-2 text-sm" data-bs-toggle="modal" data-bs-target="#notes-modal">See More</a>
+                      </div> {% endcomment %}
                     </div>
                   </div>
                 </div>
               {% endif %}
               {% if setlist_exists %}
-                <div class="card">
+                <div class="card" id="setlist-card">
                   <div class="card-header">
                     <div class="d-flex justify-content-between">
                       <span>Setlist</span>
@@ -201,10 +197,10 @@
                           <th class="all">#</th>
                           <th class="all">Song</th>
                           {% comment %} <th class="none">Position</th> {% endcomment %}
-                          <th class="min-tablet-l">Gap</th>
-                          <th class="min-tablet-l">Tour</th>
-                          <th class="min-tablet-l">Last</th>
-                          <th class="min-tablet-l">Notes</th>
+                          <th class="min-desktop">Gap</th>
+                          <th class="min-desktop">Tour</th>
+                          <th class="min-desktop">Last</th>
+                          <th class="min-desktop">Notes</th>
                         </thead>
                       </table>
                     </div>
@@ -215,7 +211,7 @@
           </div>
         </div>
         <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-2 ps-lg-0{% endif %} order-2">
-          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
+          <div class="row row-cols-1 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
                id="masonry-grid">
             {% if event.note %}
               <div class="col-12 d-none d-lg-block order-1">
@@ -412,10 +408,11 @@
           layout: layout,
           serverSide: true,
           processing: true,
-          //responsive: false,
+          responsive: {
+            details: false,
+          },
           //scrollX: true,
-          //scrollX: true,
-          autoWidth: true,
+          //autoWidth: true,
           paging: false,
           //scrollY: false,
           //scrollCollapse: true,
@@ -423,7 +420,7 @@
           ordering: false,
           ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
           columnDefs: [
-            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-tablet-l text-nowrap' },
+            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop text-nowrap' },
             { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
           ],
           rowGroup: {
@@ -460,14 +457,14 @@
               'data': 'song',
               'name': 'song__name',
               'className': 'all',
-              'width': '12rem',
+              'width': '15rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
 
                   song = row.segue ? `${song} >` : song;
 
-                  var badge = $('<span />').addClass('ms-2 badge')
+                  var badge = $('<span />').addClass('ms-2 badge align-middle')
 
                   // instrumental, sign-request, nobruce, premiere
                   if (row.instrumental) {
@@ -477,34 +474,34 @@
                   } else if (row.nobruce) {
                     $(badge).addClass('warning').text('No Bruce');
                   } else if (row.premiere) {
-                    $(badge).addClass('bg-secondary').text('Premiere');
+                    $(badge).addClass('bg-secondary d-sm-flex d-md-none').text('Debut');
+                  } else if (row.debut && !row.premiere) {
+                    $(badge).addClass('bg-secondary d-sm-flex d-md-none').text('TD');
+                  } else if (row.last >= 50 && !row.debut) {
+                    $(badge).addClass('bg-secondary d-sm-flex d-md-none').text('Bustout');
+                  }
+
+                  if (row.notes) {
+                    var notes = `<span class="text-xs d-sm-table-cell d-md-none fw-light">${row.notes.join('; ')}</span>`
+                    return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes : song
                   }
 
                   return badge ? song + $(badge).prop('outerHTML') : song;
                 }
               },
             },
-            /*{
-              'data': 'position',
-              'name': 'position',
-              'className': 'text-nowrap none',
-              'width': '10rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return data
-                }
-              },
-            },*/
             {
               'data': 'last', 
-              'className': 'dt-center min-tablet-l',
-              'width': '3rem',
+              'className': 'dt-center min-desktop',
+              'width': '1rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   if (data >= 50 && !row.debut) {
                     return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="≥50 shows on current tour since last played">${data + ', Bustout'}</span>`;
                   } else if (row.debut && !row.premiere) {
                     return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">${data + ', TD'}</span>`;
+                  } else if (row.premiere) {
+                    return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="FTP">Debut</span>`;
                   } else {
                     return row.last;
                   }
@@ -513,8 +510,8 @@
             },
             {
               'data': 'tour_num',
-              'className': 'dt-center min-tablet-l',
-              'width': '3rem',
+              'className': 'dt-center min-desktop',
+              'width': '1rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
                   var num = data;
@@ -535,8 +532,8 @@
             {
               'data': 'ltp.date',
               'name': 'ltp__id',
-              'className': 'dt-center min-tablet-l',
-              'width': '6rem',
+              'className': 'dt-center min-desktop',
+              'width': '1rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
@@ -546,8 +543,8 @@
             {
               'data': 'notes',
               'name': 'notes',
-              'className': 'min-tablet-l text-nowrap',
-              'width': '10rem',
+              'className': 'min-desktop text-nowrap',
+              'width': '15rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data && data != null) {
                   $(data).each(function(i, e){
