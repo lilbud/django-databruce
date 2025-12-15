@@ -48,6 +48,22 @@
                                name="{{ form.password.name }}"
                                id="{{ form.password.name }}">
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-12 text-base">
+                            {% if form.remember_me.errors %}
+                                <br>
+                                <span class="text-sm text-danger">
+                                    {% for error in form.remember_me.errors %}
+                                        {% translate error %}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                            {{ form.remember_me }}
+                            <label class="form-label text-sm" for="{{ form.remember_me.id_for_label }}">
+                                {% translate form.remember_me.label %}
+                            </label>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-12">
                             <button class="btn btn-sm btn-primary" type="submit">{% translate "Login" %}</button>

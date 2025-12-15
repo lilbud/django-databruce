@@ -32,7 +32,7 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path(
         "login/",
-        auth_views.LoginView.as_view(template_name="users/login.html"),
+        views.Login.as_view(),
         name="login",
     ),
     path(

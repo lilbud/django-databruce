@@ -5,7 +5,10 @@ from typing import Any
 
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    UserCreationForm,
+)
 from django.contrib.auth.models import User
 from django.db.models import F
 
@@ -750,4 +753,12 @@ class ContactForm(forms.Form):
                 "class": "form-control form-control-sm",
             },
         ),
+    )
+
+
+class LoginForm(AuthenticationForm):
+    remember_me = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label="Remember Me?",
     )

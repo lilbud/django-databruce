@@ -8,10 +8,12 @@ from typing import Any
 import requests
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import (
     default_token_generator,
 )
+from django.contrib.auth.views import LoginView
 from django.contrib.postgres.aggregates import ArrayAgg, JSONBAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.sites.shortcuts import get_current_site
@@ -237,6 +239,29 @@ class UserProfile(TemplateView):
             ).order_by("num_plays_public", "name")
 
         return context
+
+
+# class Login(LoginView):
+#     """Display the login form and handle the login action."""
+
+#     template_name = "users/login.html"
+
+
+class Login(LoginView):
+    form_class = forms.LoginForm
+    template_name = "users/login.html"
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        remember_me = form.cleaned_data[
+            "remember_me"
+        ]  # get remember me data from cleaned_data of form
+        if not remember_me:
+            self.request.session.set_expiry(0)  # if remember me is
+            self.request.session.modified = True
+
+        self.request.session.set_expiry(1209600)
+        return super().form_valid(form)
 
 
 class SignUp(TemplateView):
