@@ -66,3 +66,4 @@ First public release of the site. Site was locked behind a login and accounts on
 # v1.1.2 (December XX, 2025)
 - (12/15) Added "Remember Me" check to the login form. This *should* keep you logged in for 2 weeks.
 - (12/17) Fixed table SearchBuilder. Moved to a bootstrap modal so it would stay on screen and not get cut off by table.
+- (12/17) Added tabs to event detail page. Main page is "overview", and the only other option is "notes". This will be the home of any extended notes/reviews/etc. about each show. Will pull from Ken's site, BTX Article Dump, Backstreets, and more. Feature will be modelled after Speedrun.com "News" tab with a card for each item. Most likely notes/reviews will be reproduced *with* proper credit and links if there are any.
