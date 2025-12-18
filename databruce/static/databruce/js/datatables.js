@@ -35,6 +35,7 @@ $.extend(true, DataTable.defaults, {
     searchBuilder: {
       button: '&nbspFilter',
       className: 'test',
+      title: '',
     }
   },
   order: [],
@@ -94,13 +95,30 @@ function getDatatableLayout({ columns = true, category = false }) {
   };
 
   var searchbuilder = {
-    extend: 'searchBuilder',
+    //extend: 'searchBuilder',
+    text: ' Filter',
     className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
     config: {
-      depthLimit: 1,
-      columns: columns,
       liveSearch: false,
+      columns: columns,
     },
+    attr: {
+      id: 'sbButton',
+      'data-bs-toggle': 'modal',
+      'data-bs-target': '#sbModal',
+    },
+    init: function() {
+      console.log(this);
+    },
+    action: function (e, dt, node, config, cb) {
+      new DataTable.SearchBuilder(dt, {
+        liveSearch: false,
+        columns: columns,
+        depthLimit: 1,
+      });
+
+      dt.searchBuilder.container().prependTo('#modal-body');
+    }
   };
 
   if (columns) {

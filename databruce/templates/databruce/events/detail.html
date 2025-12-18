@@ -137,186 +137,218 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12 col-lg-10 order-2 order-lg-1 pe-lg-2">
-          <div class="row row-cols-1 g-2 row-gap-2">
-            <div class="col">
-              {% if event.note %}
-                <div class="col-12 d-md-block d-lg-none">
-                  <div class="card mb-2" id="notes-card">
-                    <div class="card-header">
-                      Event Notes
-                      <div class="float-end">
-                        <i class="bi bi-pencil"></i>
-                      </div>
-                    </div>
-                    <div class="card-body text-xs">
-                      <div>{{ event.note|mdlink|safe }}</div>
-                      {% comment %} <div class="row mt-1">
-                        <a href="#" role="button" class="btn-link text-primary fw-semibold mt-2 text-sm" data-bs-toggle="modal" data-bs-target="#notes-modal">See More</a>
-                      </div> {% endcomment %}
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
-              {% if setlist_exists %}
-                <div class="card" id="setlist-card">
-                  <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                      <span>Setlist</span>
-                      <span class="text-sm my-auto"
-                            data-bs-toggle="tooltip"
-                            data-bs-html="true"
-                            data-bs-title="Setlist Options">
-                        <a role="button"
-                           class="btn btn-sm btn-primary px-1 py-0"
-                           data-bs-toggle="collapse"
-                           href="#options">
-                          <i class="bi bi-gear-fill text-sm"></i>
-                        </a>
-                      </span>
-                    </div>
-                    <div class="row collapse px-0 mt-2" id="options">
-                      <div class="row">
-                        <div class="col">
-                          <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-body p-0">
-                    <div class="d-none" id="setlist_copy">
-                      {{ setlist_copy|join:'<br>' }}
-                    </div>
-                    <div class="table-responsive">
-                      <table class="table table-hover display wrap" id="setlistTable">
-                        <thead>
-                          <th class="all">#</th>
-                          <th class="all">Song</th>
-                          {% comment %} <th class="none">Position</th> {% endcomment %}
-                          <th class="min-desktop">Gap</th>
-                          <th class="min-desktop">Tour</th>
-                          <th class="min-desktop">Last</th>
-                          <th class="min-desktop">Notes</th>
-                        </thead>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
+            <div class="card-footer">
+              <nav class="nav nav-underline px-2">
+                <a class="nav-link active text-sm"
+                   id="overview-tab"
+                   data-bs-toggle="pill"
+                   data-bs-target="#overview"
+                   type="button"
+                   role="tab"
+                   aria-controls="overview"
+                   aria-selected="true">Overview</a>
+                <a class="nav-link text-sm"
+                   id="notes-tab"
+                   data-bs-toggle="pill"
+                   data-bs-target="#notes"
+                   type="button"
+                   role="tab"
+                   aria-controls="notes"
+                   aria-selected="false">Notes</a>
+              </nav>
             </div>
           </div>
         </div>
-        <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-2 ps-lg-0{% endif %} order-2">
-          <div class="row row-cols-1 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
-               id="masonry-grid">
-            {% if event.note %}
-              <div class="col-12 d-none d-lg-block order-1">
-                <div class="card" id="notes-card">
-                  <div class="card-header">
-                    Event Notes
-                    <div class="float-end">
-                      <i class="bi bi-pencil"></i>
+      </div>
+      <div class="tab-content">
+        <div id="overview" class="tab-pane fade show active">
+          <div class="row">
+            <div class="col-12 col-lg-10 order-2 order-lg-1 pe-lg-2">
+              <div class="row row-cols-1 g-2 row-gap-2">
+                <div class="col">
+                  {% if event.note %}
+                    <div class="col-12 d-md-block d-lg-none">
+                      <div class="card mb-2" id="notes-card">
+                        <div class="card-header">
+                          Event Notes
+                          <div class="float-end">
+                            <i class="bi bi-pencil"></i>
+                          </div>
+                        </div>
+                        <div class="card-body text-xs">
+                          <div>{{ event.note|mdlink|safe }}</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="card-body text-xs">
-                    <div>{{ event.note|note_format|safe }}</div>
-                    <div class="row mt-1">
-                      <a href="#"
-                         role="button"
-                         class="btn-link text-primary fw-semibold mt-2 text-sm"
-                         data-bs-toggle="modal"
-                         data-bs-target="#notes-modal">See More</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
-            {% if onstage %}
-              <div class="col order-2">
-                <div class="card">
-                  <div class="card-header">
-                    Performers
-                    <div class="float-end">
-                      <i class="bi bi-person"></i>
-                    </div>
-                  </div>
-                  <div class="card-body p-1">
-                    <div class="table-responsive">
-                      <table class="table display" id="onstageTable">
-                        <thead>
-                          <th class="d-none">#</th>
-                        </thead>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
-            {% if album_breakdown %}
-              <div class="col order-3">
-                <div class="card">
-                  <div class="card-header align-middle">
-                    Albums
-                    <button class="btn btn-sm btn-success float-end text-xs"
-                            data-bs-toggle="modal"
-                            data-bs-target="#album-breakdown-modal"
-                            role="button">Breakdown</button>
-                  </div>
-                  <div class="card-body p-3" id="breakdown">
-                    {% for album in album_breakdown %}
-                      <div class="row pb-2 album-breakdown">
-                        <div class="col">
-                          <div class="progress-label text-xs fw-semibold">{{ album.category }}</div>
-                          <div class="progress d-flex flex-row justify-content-between">
-                            <div class="progress-bar"
-                                 style="width:{% widthratio album.percent album.max album.max %}%">
-                              <span class="song-count fw-bold">{{ album.num }}</span>
+                  {% endif %}
+                  {% if setlist_exists %}
+                    <div class="card" id="setlist-card">
+                      <div class="card-header">
+                        <div class="d-flex justify-content-between">
+                          <span>Setlist</span>
+                          <span class="text-sm my-auto"
+                                data-bs-toggle="tooltip"
+                                data-bs-html="true"
+                                data-bs-title="Setlist Options">
+                            <a role="button"
+                               class="btn btn-sm btn-primary px-1 py-0"
+                               data-bs-toggle="collapse"
+                               href="#options">
+                              <i class="bi bi-gear-fill text-sm"></i>
+                            </a>
+                          </span>
+                        </div>
+                        <div class="row collapse px-0 mt-2" id="options">
+                          <div class="row">
+                            <div class="col">
+                              <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
                             </div>
                           </div>
                         </div>
                       </div>
-                    {% endfor %}
-                  </div>
+                      <div class="card-body p-0">
+                        <div class="d-none" id="setlist_copy">
+                          {{ setlist_copy|join:'<br>' }}
+                        </div>
+                        <div class="table-responsive">
+                          <table class="table table-hover display wrap" id="setlistTable">
+                            <thead>
+                              <th class="all">#</th>
+                              <th class="all">Song</th>
+                              {% comment %} <th class="none">Position</th> {% endcomment %}
+                              <th class="min-desktop">Gap</th>
+                              <th class="min-desktop">Tour</th>
+                              <th class="min-desktop">Last</th>
+                              <th class="min-desktop">Notes</th>
+                            </thead>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
                 </div>
               </div>
-            {% endif %}
-            {% if official or event.archive %}
-              <div class="col order-4">
-                <div class="card" id="links-card">
-                  <div class="card-header">
-                    Links
-                    <div class="float-end">
-                      <i class="bi bi-link-45deg"></i>
+            </div>
+            <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-2 ps-lg-0{% endif %} order-2">
+              <div class="row row-cols-1 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
+                   id="masonry-grid">
+                {% if event.note %}
+                  <div class="col-12 d-none d-lg-block order-1">
+                    <div class="card" id="notes-card">
+                      <div class="card-header">
+                        Event Notes
+                        <div class="float-end">
+                          <i class="bi bi-pencil"></i>
+                        </div>
+                      </div>
+                      <div class="card-body text-xs">
+                        <div>{{ event.note|note_format|safe }}</div>
+                        <div class="row mt-1">
+                          <a href="#"
+                             role="button"
+                             class="btn-link text-primary fw-semibold mt-2 text-sm"
+                             data-bs-toggle="modal"
+                             data-bs-target="#notes-modal">See More</a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="card-body">
-                    <ul class="ps-2 d-grid gap-0 row-gap-2">
-                      {% if official %}
-                        {% for rel in releases %}
-                          <li>
-                            <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
-                          </li>
-                        {% endfor %}
-                      {% endif %}
-                      {% if event.boot %}
-                        <li>
-                          <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
-                        </li>
-                      {% endif %}
-                      {% if event.archive %}
-                        <li>
-                          <a href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}">Radio Nowhere Archive</a>
-                        </li>
-                      {% endif %}
-                    </ul>
+                {% endif %}
+                {% if onstage %}
+                  <div class="col order-2">
+                    <div class="card">
+                      <div class="card-header">
+                        Performers
+                        <div class="float-end">
+                          <i class="bi bi-person"></i>
+                        </div>
+                      </div>
+                      <div class="card-body p-1">
+                        <div class="table-responsive">
+                          <table class="table display" id="onstageTable">
+                            <thead>
+                              <th class="d-none">#</th>
+                            </thead>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                {% endif %}
+                {% if album_breakdown %}
+                  <div class="col order-3">
+                    <div class="card">
+                      <div class="card-header align-middle">
+                        Albums
+                        <button class="btn btn-sm btn-success float-end text-xs"
+                                data-bs-toggle="modal"
+                                data-bs-target="#album-breakdown-modal"
+                                role="button">Breakdown</button>
+                      </div>
+                      <div class="card-body p-3" id="breakdown">
+                        {% for album in album_breakdown %}
+                          <div class="row pb-2 album-breakdown">
+                            <div class="col">
+                              <div class="progress-label text-xs fw-semibold">{{ album.category }}</div>
+                              <div class="progress d-flex flex-row justify-content-between">
+                                <div class="progress-bar"
+                                     style="width:{% widthratio album.percent album.max album.max %}%">
+                                  <span class="song-count fw-bold">{{ album.num }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                {% if official or event.archive %}
+                  <div class="col order-4">
+                    <div class="card" id="links-card">
+                      <div class="card-header">
+                        Links
+                        <div class="float-end">
+                          <i class="bi bi-link-45deg"></i>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <ul class="ps-2 d-grid gap-0 row-gap-2">
+                          {% if official %}
+                            {% for rel in releases %}
+                              <li>
+                                <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
+                              </li>
+                            {% endfor %}
+                          {% endif %}
+                          {% if event.boot %}
+                            <li>
+                              <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
+                            </li>
+                          {% endif %}
+                          {% if event.archive %}
+                            <li>
+                              <a href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}">Radio Nowhere Archive</a>
+                            </li>
+                          {% endif %}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="notes" class="tab-pane fade">
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="fs-5">Notes Coming Soon</div>
                 </div>
               </div>
-            {% endif %}
+            </div>
           </div>
         </div>
       </div>
@@ -411,24 +443,25 @@
           responsive: {
             details: false,
           },
-          //scrollX: true,
-          //autoWidth: true,
+          autoWidth: false,
           paging: false,
-          //scrollY: false,
-          //scrollCollapse: true,
           searching: false,
+          //scrollX: true,
           ordering: false,
           ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
           columnDefs: [
-            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop text-nowrap' },
+            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop' },
             { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
+            { targets: [0], width: '1rem' },
+            { targets: [1], width: '20rem' },
+            { targets: [2,3], width: '3rem' },
+            { targets: [4], width: '6rem' },
           ],
           rowGroup: {
               dataSrc: 'set_name',
               className: 'text-center setHeader',
           },
           createdRow: function (row, data, dataIndex) {
-
             var sets = ['Show', 'Set 1', 'Set 2', 'Encore', 'Pre-Show', 'Post-Show']
 
             if (sets.includes(data.set_name)){
@@ -440,7 +473,7 @@
           { 
             'data': 'song_num',
             'className': 'dt-center all',
-            'width': '1rem',
+            //'width': '1rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && row.position) {
                 var position = row.position.replaceAll(' ', '').toLowerCase();
@@ -456,8 +489,8 @@
             {
               'data': 'song',
               'name': 'song__name',
-              'className': 'all',
-              'width': '15rem',
+              'className': 'all text-nowrap',
+              //'width': '12rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
@@ -482,7 +515,7 @@
                   }
 
                   if (row.notes) {
-                    var notes = `<span class="text-xs d-sm-table-cell d-md-none fw-light">${row.notes.join('; ')}</span>`
+                    var notes = `<span class="text-reset text-xs d-sm-table-cell text-wrap d-md-none fw-light">${row.notes.join('; ')}</span>`
                     return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes : song
                   }
 
@@ -493,7 +526,7 @@
             {
               'data': 'last', 
               'className': 'dt-center min-desktop',
-              'width': '1rem',
+              //'width': '4rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   if (data >= 50 && !row.debut) {
@@ -511,7 +544,7 @@
             {
               'data': 'tour_num',
               'className': 'dt-center min-desktop',
-              'width': '1rem',
+              //'width': '4rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
                   var num = data;
@@ -533,7 +566,7 @@
               'data': 'ltp.date',
               'name': 'ltp__id',
               'className': 'dt-center min-desktop',
-              'width': '1rem',
+              //'width': '6rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
@@ -543,15 +576,15 @@
             {
               'data': 'notes',
               'name': 'notes',
-              'className': 'min-desktop text-nowrap',
-              'width': '15rem',
+              'className': 'min-desktop',
+              //'width': '18rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data && data != null) {
                   $(data).each(function(i, e){
                     data[i] = e.replaceAll('\'\'', '\'');
                   })
 
-                  return data ? `<span class="text-xs fw-light">${data.join('; ')}</span>` : '';
+                  return data ? `<div class="text-xs text-wrap fw-light">${data.join('; ')}</div>` : '';
                 }
               },
             },

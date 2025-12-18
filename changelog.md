@@ -62,3 +62,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Updated Event Detail, songs in setlist are now highlighted when hovering over an album in the "breakdown" card. (Credit to Dripfield.pro)
 - Fixed Event Detail showing "null" for some gaps due to some shows not being counted
 - Updated Event Detail layout, setlist card is wider
+
+# v1.1.2 (December XX, 2025)
+- (12/15) Added "Remember Me" check to the login form. This *should* keep you logged in for 2 weeks.
+- (12/17) Fixed table SearchBuilder. Moved to a bootstrap modal so it would stay on screen and not get cut off by table.

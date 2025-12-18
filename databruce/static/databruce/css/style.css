@@ -135,6 +135,8 @@ td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
     border-color: var(--border) !important;
 }
 
+
+
 td.child, tr.child, dl {
     background-color: var(--base-300) !important;
 }
@@ -249,16 +251,27 @@ button#usercount.active,
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
-.card-header,
-.card-footer {
+.card-header,.card-footer {
     font-weight: 600 !important;
-}
-
-.card-header,
-.card-footer {
-    padding: 0.5rem 0.75rem !important;
     font-size: 1rem !important;
 }
+
+.card-header {
+    padding: 0.5rem 0.75rem !important;
+}
+
+.card-footer a:hover {
+    background-color: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+.card-footer {
+    padding: 0rem 0.5rem !important;
+    background-color: var(--base-300) !important;
+}
+
+
 
 .card-body :last-child:not(.dt-buttons button),
 .modal-body :last-child {
@@ -372,6 +385,14 @@ ul.nav-pills>.nav-link:not(:last-child) {
 
 ul.nav-pills>.nav-link:last-child {
     margin-right: 0 !important;
+}
+
+a.nav-link:not(.active) {
+    color: var(--primary-text) !important;
+}
+
+a.nav-link.active {
+    color: var(--base-content) !important;
 }
 
 /* jquery autocomplete styling */

@@ -47,7 +47,6 @@ class DTFilter(BaseFilterBackend):
     def get_searching(self, params):
         filter = Q()
         search_filter = Q()
-
         search_type = "icontains"
 
         try:
@@ -133,9 +132,9 @@ class DTFilter(BaseFilterBackend):
 
                 fields = [i.strip() for i in name.split(",")]
 
-                for field in fields:
-                    search_filter = Q()
+                search_filter = Q()
 
+                for field in fields:
                     if "between" in param["condition"]:
                         field_filter = get_sb_filter(
                             column=field,
