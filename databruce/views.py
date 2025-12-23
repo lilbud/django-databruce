@@ -1243,7 +1243,7 @@ class AdvancedSearchResults(View):
 
         return field_filter
 
-    def get_lookup(self, data: dict, field: dict) -> dict:
+    def get_lookup(self, data: dict, field: dict) -> Q | None:
         fields = {
             "first_date": "date__gte",
             "last_date": "date__lte",
@@ -1443,7 +1443,8 @@ class AdvancedSearchResults(View):
                 except AttributeError:
                     break
 
-        setlist_event_filter = Q(id__in=event_list)
+        if event_list:
+            setlist_event_filter = Q(id__in=event_list)
 
         result = (
             models.Events.objects.filter(

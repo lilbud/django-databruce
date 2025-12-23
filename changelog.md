@@ -63,7 +63,16 @@ First public release of the site. Site was locked behind a login and accounts on
 - Fixed Event Detail showing "null" for some gaps due to some shows not being counted
 - Updated Event Detail layout, setlist card is wider
 
-# v1.1.2 (December XX, 2025)
+# v1.1.2 (December 22, 2025)
+- (12/14) Added `changelog.md`, lists changes and versions. Versions prior to 1.1 were retroactively added, and shouldn't be considered accurate.
 - (12/15) Added "Remember Me" check to the login form. This *should* keep you logged in for 2 weeks.
 - (12/17) Fixed table SearchBuilder. Moved to a bootstrap modal so it would stay on screen and not get cut off by table.
-- (12/17) Added tabs to event detail page. Main page is "overview", and the only other option is "notes". This will be the home of any extended notes/reviews/etc. about each show. Will pull from Ken's site, BTX Article Dump, Backstreets, and more. Feature will be modelled after Speedrun.com "News" tab with a card for each item. Most likely notes/reviews will be reproduced *with* proper credit and links if there are any.
+- (12/17) Added tabs to event detail page. Main page is "overview", and the only other option is "notes". This will be the home of any extended notes/reviews/etc. about each show. Feature will be modelled after Speedrun.com "News" tab with a card for each item.
+- (12/19) Fixed advanced search fields not properly searching. Some filters were missing so no matter what was typed the result set wouldn't filter correctly.
+- (12/19) Added "First Friday" filter to the Nugs Releases page
+- (12/19) Nugs Releases now show time of release if it is known. Thanks to Kieran Lane who tracked times for many of these releases.
+- (12/19) SearchBuilder modal width fixed
+- (12/22) Responsive Child Rows removed as they make screen size changes incredibly slow. Now tables on mobile will only show the most important columns.
+- (12/22) "Setlist Slots" tables now fix date/location columns and have the positions scrollable.
+- (12/22) Mistakenly removed "Original Artist" column from songs table. This has been fixed.
+- (12/22) Fixed event table links not being clickable

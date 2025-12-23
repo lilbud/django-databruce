@@ -38,13 +38,13 @@
             <thead>
               <tr class="custom">
                 <th class="all">Date</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Setlist</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Band</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Venue</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Location</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Tour</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Detail</th>
-                <th class="d-none d-md-table-cell min-tablet-l">Public</th>
+                <th class="min-tablet-l">Setlist</th>
+                <th class="all">Band</th>
+                <th class="min-tablet-l">Venue</th>
+                <th class="all">Location</th>
+                <th class="min-tablet-l">Tour</th>
+                <th class="min-tablet-l">Detail</th>
+                <th class="min-tablet-l">Public</th>
               </tr>
             </thead>
             {% comment %} <tbody>
@@ -98,9 +98,6 @@
     var table = new DataTable('#eventTable', {
       layout: layout,
       serverSide: true,
-      //processing: true,
-      //responsive: false,
-      //autoWidth: false,
       scrollY: '60vh',
       //scrollX: true,
       ajax: {
@@ -109,53 +106,12 @@
       columnDefs: [
         { targets: [1], orderable: false, searchable: false, className: 'text-center text-xs', width: '1rem'},
         { targets: [0], type: 'date', className: 'all text-wrap text-xs'},
-        { targets: [1,2,3,4,5,6,7], className: 'text-wrap text-xs d-none d-md-table-cell min-tablet-l' },
+        { targets: [1,2,3,4,5,6,7], className: 'text-wrap text-xs min-tablet-l' },
         { targets: [-1], visible: false },
       ],
       columns: event_table_columns,
-      /*initComplete: function(){
-        var api = this.api();
-
-        api.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-          var row = table.row(rowIdx);
-          var childRow = $('<tr />').addClass('d-table-cell d-md-none child border-0');
-
-          row.columns().every(function(column_idx, tableLoop, colLoop){
-            var column = table.column(column_idx);
-            var cell = table.cell(rowIdx, column_idx);
-
-            if (column.visible() & !cell.node().classList.contains('all')) {
-              var title = `${column.title().replace(":","")}:`
-              var data = cell.render('display');
-
-              var div = $('<div />').addClass("row res-child border-0 text-sm px-0");
-              var columnCol = $('<div />').addClass("col-3 text-nowrap fw-bold mt-0");
-              var dataCol = $('<div />').addClass("col text-nowrap mt-0");
-
-              $(columnCol).html(title);
-              $(dataCol).html(data);
-
-              $(div).append(columnCol, dataCol);
-
-              $(childRow).append(div);
-            }
-          });
-
-          row.child(childRow).show();
-        });
-      },*/
+      
     });
-
-    /*
-    $('#eventTable').on('click', 'tbody tr.dt-hasChild > td', function(){
-      var child = $(this).closest('tr').next('tr.child');
-
-      if ($(child).hasClass('d-none')) {
-        $(child).removeClass('d-none');
-      } else {
-        $(child).addClass('d-none');
-      }
-    })*/
 
     $(function(){
       // bind change event to select
@@ -166,13 +122,6 @@
           }
           return false;
       });
-    });
-
-    $('#eventTable').on('click', 'tr td a', function(e) {
-        // Check if the link is within a child row
-        if ($(this).closest('tr').children('td.dtr-control')) {
-            e.preventDefault();
-        }
     });
   });
   </script>

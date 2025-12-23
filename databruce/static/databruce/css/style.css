@@ -572,3 +572,24 @@ td.child {
 body {
     width: 100% !important;
 }
+
+.modal-dialog {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    height: 50% !important;
+    max-height: 50% !important;
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 90%; /* Use max-width for responsiveness */
+        width: 90%; /* Optional: fallback or specific width if needed */
+    }
+}
+
+@media (min-width: 768px) {
+    .modal-dialog {
+        max-width: 40%; /* Use max-width for responsiveness */
+        width: 40%; /* Optional: fallback or specific width if needed */
+    }
+}

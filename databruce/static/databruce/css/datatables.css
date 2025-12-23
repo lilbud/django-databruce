@@ -112,7 +112,8 @@ div.dt-scroll-body thead tr th
     padding: 0 inherit !important
 }
 
-.setHeader {
+.setHeader,
+.setHeader > th {
     color: var(--base-content) !important;
     font-weight: 600 !important;
     font-size: 0.8rem !important;

@@ -13,20 +13,23 @@ $.extend(true, DataTable.defaults, {
   scrollX: false,
   //scrollY: '60vh',
   scrollCollapse: true,
-  responsive: {
-    details: {
-      target: 'tr',
-      type: 'column',
-      display: $.fn.dataTable.Responsive.display.childRowImmediate,
-      renderer: function (api, rowIdx, columns) {
-        let data = columns.map((col, i) => {
-          var title = col.title.replaceAll(':', '') + ':';
+  // responsive: {
+  //   details: {
+  //     target: 'tr',
+  //     type: 'column',
+  //     display: $.fn.dataTable.Responsive.display.childRowImmediate,
+  //     renderer: function (api, rowIdx, columns) {
+  //       let data = columns.map((col, i) => {
+  //         var title = col.title.replaceAll(':', '') + ':';
 
-          return col.hidden && (col.data || col.data === false) ? `<div class="row res-child py-1 text-sm"><div class="col-4 text-end fw-bold">${title}</div><div class="col text-wrap align-bottom">${col.data}</div></div>` : '';
-        }).join('');
-        return data ? $('<table />').append(data) : false;
-      },
-    },
+  //         return col.hidden && (col.data || col.data === false) ? `<div class="row res-child py-1 text-sm"><div class="col-4 text-end fw-bold">${title}</div><div class="col text-wrap align-bottom">${col.data}</div></div>` : '';
+  //       }).join('');
+  //       return data ? $('<table />').append(data) : false;
+  //     },
+  //   },
+  // },
+  responsive: {
+    details: false,
   },
   autoWidth: false,
   pageLength: 100,
@@ -258,7 +261,7 @@ setlist_slots = [
   {
     'data': 'event.date',
     'name': 'event__id, event__early_late',
-    'width': '8rem',
+    'width': '6rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {
@@ -269,7 +272,6 @@ setlist_slots = [
   {
     'data': 'event.venue',
     'name': 'event__venue__name, event__venue__detail',
-    'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {

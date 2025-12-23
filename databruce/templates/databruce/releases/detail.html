@@ -56,7 +56,6 @@
               <table class="table table-hover display" id="tracksTable">
                 <thead>
                   <tr class="header">
-                    {% comment %} <th scope="col">Disc</th> {% endcomment %}
                     <th class="all" scope="col">Track</th>
                     <th class="all" scope="col">Song</th>
                     <th class="all" scope="col">Length</th>
@@ -64,37 +63,6 @@
                     <th class="min-tablet-l" scope="col">Note</th>
                   </tr>
                 </thead>
-                {% comment %} <tbody>
-                  {% regroup tracks by discid.name as disc_list %}
-                  {% for disc in disc_list %}
-                    {% if disc.grouper %}
-                      <tr class="setHeader">
-                        <td colspan='5' class="text-sm py-1 text-center setHeader py-1 fw-medium">
-                          Disc {{ forloop.counter }}: {{ disc.grouper }}
-                        </td>
-                        <td class="d-none bg-primary"></td>
-                        <td class="d-none bg-primary"></td>
-                        <td class="d-none bg-primary"></td>
-                        <td class="d-none bg-primary"></td>
-                      </tr>
-                    {% endif %}
-                    {% for track in disc.list %}
-                      <tr>
-                        <td>{{ track.track }}</td>
-                        <td>
-                          <a href="{% url "song_details" id=track.song.id %}">{{ track.song.name }}</a>
-                        </td>
-                        <td>{{ track.length|date:"i:s" }}</td>
-                        <td>
-                          {% if track.event %}
-                            <a href="{% url "event_details" id=track.event.id %}">{{ track.event.get_date }}</a>
-                          {% endif %}
-                        </td>
-                        <td>{{ track.note|default_if_none:"" }}</td>
-                      </tr>
-                    {% endfor %}
-                  {% endfor %}
-                </tbody> {% endcomment %}
               </table>
             </div>
           </div>
@@ -126,10 +94,9 @@
         dataSrc: function(row) {
           if (row.disc) {
             return `Disc ${row.disc.disc_num}: ${row.disc.name}`;
-
           }
         },
-        className: 'setHeader text-center show'
+        className: 'setHeader bg-secondary text-center'
       },
       columnDefs: [
         { orderSequence: ['desc', 'asc', ''], targets: '_all', type: 'text' },

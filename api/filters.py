@@ -204,6 +204,7 @@ class BootlegFilter(filters.FilterSet):
 
 class CitiesFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="istartswith")
 
 
 class EventSetlistFilter(filters.FilterSet):
@@ -218,6 +219,7 @@ class CoversFilter(filters.FilterSet):
 class VenuesFilter(filters.FilterSet):
     id = filters.CharFilter(lookup_expr="exact")
     city = filters.CharFilter(field_name="city__id", lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="istartswith")
 
 
 class IndexFilter(filters.FilterSet):
@@ -300,10 +302,12 @@ class ReleaseTracksFilter(filters.FilterSet):
 
 class RelationFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="istartswith")
 
 
 class BandsFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="istartswith")
 
 
 class ReleaseFilter(filters.FilterSet):
@@ -370,17 +374,17 @@ class SnippetFilter(filters.FilterSet):
 
 class StateFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
-    name = filters.CharFilter(lookup_expr="icontains")
+    name = filters.CharFilter(lookup_expr="istartswith")
 
 
 class CountryFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
-    name = filters.CharFilter(lookup_expr="icontains")
+    name = filters.CharFilter(lookup_expr="istartswith")
 
 
 class TourFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
-    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
     band = filters.CharFilter(field_name="band__name", lookup_expr="icontains")
 
 
@@ -394,7 +398,7 @@ class SongsPageFilter(filters.FilterSet):
 
 
 class SongsFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
 
 
 class SetlistNoteFilter(filters.FilterSet):

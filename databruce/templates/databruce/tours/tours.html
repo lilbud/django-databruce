@@ -12,7 +12,7 @@
   <thead>
     <tr class="header">
       <th class="all" scope="col">Name</th>
-      <th class="min-tablet-l" scope="col">Band</th>
+      <th class="all" scope="col">Band</th>
       <th class="min-tablet-l" scope="col">First</th>
       <th class="min-tablet-l" scope="col">Last</th>
       <th scope="col" class="text-center min-tablet-l">Shows</th>
@@ -20,27 +20,6 @@
       <th scope="col" class="text-center min-tablet-l">Legs</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-    {% for tour in tours %}
-      <tr>
-        <td class="nowrap">
-          <a href="{% url "tour_details" id=tour.id %}">{{ tour.name }}</a>
-        </td>
-        <td class="nowrap">
-          <a href="{% url "band_details" id=tour.band.id %}">{{ tour.band.name }}</a>
-        </td>
-        <td data-sort="{{ tour.first.get_date }}" data-filter="{{ tour.first.get_date }}">
-          <a href="{% url "event_details" id=tour.first.id %}">{{ tour.first.get_date }}</a>
-        </td>
-        <td data-sort="{{ tour.last.get_date }}" data-filter="{{ tour.last.get_date }}">
-          <a href="{% url "event_details" id=tour.last.id %}">{{ tour.last.get_date }}</a>
-        </td>
-        <td class="text-center">{{ tour.num_shows }}</td>
-        <td class="text-center">{{ tour.num_songs }}</td>
-        <td class="text-center">{{ tour.num_legs }}</td>
-      </tr>
-    {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>

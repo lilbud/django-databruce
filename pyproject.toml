@@ -21,3 +21,17 @@ dependencies = [
     "querystring-parser>=1.2.4",
     "requests>=2.32.4",
 ]
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.2",
+]
+
+[tool.ty.rules]
+non-subscriptable = "ignore"
+possibly-missing-attribute = "ignore"
+invalid-argument-type="ignore"
+unresolved-attribute="ignore"
+no-matching-overload="ignore"
+unsupported-operator="ignore"
+unresolved-import="ignore"

@@ -146,7 +146,7 @@ class NugsAdmin(admin.ModelAdmin):
     autocomplete_fields = ["event"]
 
     list_select_related = ["event"]
-    list_display = ["id", "event", "url"]
+    list_display = ["id", "event", "url", "date"]
     list_display_links = ["id", "event"]
 
 

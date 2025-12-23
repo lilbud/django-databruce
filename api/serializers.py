@@ -491,8 +491,19 @@ class CoversSerializer(serializers.ModelSerializer):
 
 
 class NugsSerializer(serializers.ModelSerializer):
+    date = serializers.SerializerMethodField()
     event = RestrictedEventsSerializer()
     venue = VenuesSerializer(source="event.venue")
+
+    def get_date(self, obj):
+        date = obj.date.strftime(
+            "%Y-%m-%d [%a]",
+        )
+        time = obj.date.replace(tzinfo=datetime.timezone.utc).strftime(
+            "%I:%M:%S %p",
+        )
+
+        return {"date": date, "time": time}
 
     class Meta:
         model = models.NugsReleases

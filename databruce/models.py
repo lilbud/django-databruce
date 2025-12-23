@@ -762,10 +762,11 @@ class NugsReleases(BaseModel):
     uuid = models.UUIDField(default=uuid4, editable=False)
     nugs_id = models.IntegerField(blank=True, default=None)
     event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
-    date = models.DateField(blank=True, default=None, db_column="release_date")
+    date = models.DateTimeField(blank=True, default=None, db_column="release_date")
     url = models.TextField(blank=True, default=None, db_column="nugs_url")
     thumbnail = models.TextField(blank=True, default=None, db_column="thumbnail_url")
     name = models.TextField(blank=True, default=None)
+    first_friday = models.BooleanField(default=False, db_column="first_friday")
 
     class Meta:
         managed = False

@@ -4,7 +4,13 @@
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Nugs Releases</div>
-  <div class="text-base">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
+  <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
+  <div class="text-sm">
+    Hovering over Release Date will show time of release in UTC. Not all releases have times, only the bulk of the First Friday releases.
+  </div>
+  <div class="text-xs">
+    Times are approximate, and will show 12am as default. Thanks to <a class="text-primary" href="https://cantfindtickets.wordpress.com/">Kieran</a> for many of the release times, with some filled in by me.
+  </div>
 {% endblock info_row %}
 {% block table_id %}
   releasesTable
@@ -12,11 +18,12 @@
 {% block table %}
   <thead>
     <tr class="header">
-      <th class="min-tablet-l">Release Date</th>
+      <th class="all">Release Date</th>
       <th class="all">Event</th>
       <th class="min-tablet-l">Venue</th>
-      <th class="min-tablet-l">Location</th>
-      <th class="min-tablet-l">Link</th>
+      <th class="all">Location</th>
+      <th class="all">Link</th>
+      <th class="min-tablet-l">First Friday?</th>
     </tr>
   </thead>
   {% comment %} <tbody>
@@ -44,15 +51,34 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
+      var layout = getDatatableLayout({columns: [0,1,2,3,4,5], category: true});
+      dtCategorySelect({layout: layout, column_idx: 5, values: [{'label': 'First Friday', 'value': 'true'}, {'label': 'Not First Friday', 'value': 'false'}]});
+
       new DataTable('#releasesTable', {
-        layout: getDatatableLayout({columns: [0,1,2,3,4]}),
+        layout: layout,
         serverSide: true,
         processing: true,
+        responsive: {
+          details: false,
+        },
         ajax: {
           'url': '/api/v1/nugs_releases/?format=datatables&keep=id,name',
         },
+        columnDefs: [
+          { targets: [-1], visible: false },
+        ],
         columns: [
-          {'data': 'date', 'name': 'date', 'type': 'text'},
+          {
+            'data': 'date',
+            'name': 'date',
+            'className': 'text-nowrap',
+            'type': 'text',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return `<span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${data.time}">${data.date}</span>`
+              }
+            },
+          },
           {
             'data': 'event.date',
             'name': 'event__id',
@@ -67,7 +93,7 @@
             'name': 'event__venue__name',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+                return data.name;
               }
             },            
           },
@@ -76,17 +102,25 @@
             'name': 'event__venue__city__name, event__venue__city__state__abbrev',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return '<a href="/cities/' + data.id + '">'+ data.display +'</a>';
+                return data.display;
               }
             },            
           },
-          
           {
             'data': 'url',
             'name': 'url',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return '<a href="' + data + '">'+ row.name +'</a>';
+              }
+            },
+          },
+          {
+            'data': 'first_friday',
+            'name': 'first_friday',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return data;
               }
             },
           },
