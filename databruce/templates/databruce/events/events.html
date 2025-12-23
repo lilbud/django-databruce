@@ -47,39 +47,6 @@
                 <th class="min-tablet-l">Public</th>
               </tr>
             </thead>
-            {% comment %} <tbody>
-              {% for event in event_info %}
-                <tr>
-                  <td scope="row" class="text-nowrap" data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
-                    <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
-                  </td>
-                  <td class="icon text-center align-middle">
-                    {% if event.setlist_certainty == "Confirmed" %}
-                      <i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>
-                      <div class="d-inline d-md-none">True</div>
-                    {% else %}
-                      <div class="d-inline d-md-none">False</div>
-                    {% endif %}
-                  </td>
-                  <td class="text-nowrap">
-                    <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-                  </td>
-                  <td class="text-nowrap">
-                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue.get_name }}</a>
-                  </td>
-                  <td class="text-nowrap">
-                    {% if event.venue.city %}
-                      <a href="{% url "city_details" id=event.venue.city.id %}">{{ event.venue.city|default_if_none:"" }}</a>
-                    {% endif %}
-                  </td>
-                  <td class="text-nowrap">
-                    <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name|default_if_none:"" }}</a>
-                  </td>
-                  <td class="text-nowrap">{{ event.title|default_if_none:""|safe }}</td>
-                  <td>{{ event.public|default_if_none:"" }}</td>
-                </tr>
-              {% endfor %}
-            </tbody> {% endcomment %}
           </table>
         </div>
       </div>
@@ -87,11 +54,6 @@
   </div>
   <script>
   $(document).ready(function () {
-    
-    function render(columns) {
-      
-    }
-
     var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
     dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}]});
     const childRows = [];
@@ -110,7 +72,6 @@
         { targets: [-1], visible: false },
       ],
       columns: event_table_columns,
-      
     });
 
     $(function(){

@@ -141,7 +141,7 @@ function dtCategorySelect({ layout, column_idx, values }) {
   $(div).attr('id', 'dropdown-label');
   $(div).text('Category:');
 
-  var button = {
+  var all_button = {
     text: 'All',
     className: 'category-btn',
     action: function (e, dt, node, config) {
@@ -150,20 +150,21 @@ function dtCategorySelect({ layout, column_idx, values }) {
     },
   };
 
-  layout.topEnd.features[0].buttons[0].buttons = [button];
+  layout.topEnd.features[0].buttons[0].buttons = [all_button];
 
-  for (let i in values) {
+  values.forEach(element => {
     var button = {
-      text: values[i].label,
+      text: element.label,
       className: 'category-btn',
       action: function (e, dt, node, config) {
-        dt.column(column_idx).search(values[i].value, { regex: true }).draw();
-        node.parents('.btn-group').find('.dropdown-toggle').text(values[i].label);
+        dt.column(column_idx).search(element.value, { regex: true }).draw();
+        node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
       },
     };
 
     layout.topEnd.features[0].buttons[0].buttons.push(button);
-  };
+  });
+
 
   $(document).ready(function () {
     $(div).insertBefore($('.category-btn').parent('.btn-group'));
