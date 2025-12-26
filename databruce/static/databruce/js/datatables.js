@@ -11,25 +11,9 @@ $.extend(true, DataTable.defaults, {
   fixedHeader: true,
   info: true,
   scrollX: false,
-  //scrollY: '60vh',
   scrollCollapse: true,
-  // responsive: {
-  //   details: {
-  //     target: 'tr',
-  //     type: 'column',
-  //     display: $.fn.dataTable.Responsive.display.childRowImmediate,
-  //     renderer: function (api, rowIdx, columns) {
-  //       let data = columns.map((col, i) => {
-  //         var title = col.title.replaceAll(':', '') + ':';
-
-  //         return col.hidden && (col.data || col.data === false) ? `<div class="row res-child py-1 text-sm"><div class="col-4 text-end fw-bold">${title}</div><div class="col text-wrap align-bottom">${col.data}</div></div>` : '';
-  //       }).join('');
-  //       return data ? $('<table />').append(data) : false;
-  //     },
-  //   },
-  // },
   responsive: {
-    details: false,
+    details: false
   },
   autoWidth: false,
   pageLength: 100,
@@ -64,7 +48,9 @@ function getDatatableLayout({ columns = true, category = false }) {
               extend: 'collection',
               text: 'All',
               name: 'category-select',
-              id: "dropdown-btn",
+              attr: {
+                id: 'dropdown-btn',
+              },
               className: 'btn btn-sm btn-primary category-btn my-2',
               buttons: []
             }
@@ -98,7 +84,6 @@ function getDatatableLayout({ columns = true, category = false }) {
   };
 
   var searchbuilder = {
-    //extend: 'searchBuilder',
     text: ' Filter',
     className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
     config: {
@@ -135,12 +120,13 @@ function getDatatableLayout({ columns = true, category = false }) {
   return layout;
 };
 
-function dtCategorySelect({ layout, column_idx, values }) {
-  var div = document.createElement('div');
+function dtCategorySelect({ layout, column_idx, values, label=false }) {
+  var div = $('<div />')
   $(div).addClass('me-2 my-auto text-sm align-middle');
   $(div).attr('id', 'dropdown-label');
-  $(div).text('Category:');
 
+  $(div).text(`${label.replace(":", "")}:`);
+  
   var all_button = {
     text: 'All',
     className: 'category-btn',
@@ -165,12 +151,10 @@ function dtCategorySelect({ layout, column_idx, values }) {
     layout.topEnd.features[0].buttons[0].buttons.push(button);
   });
 
-
   $(document).ready(function () {
-    $(div).insertBefore($('.category-btn').parent('.btn-group'));
+    $(div).insertBefore($('#dropdown-btn').parent('.btn-group'));
+  })
 
-    $('#dropdown-label').siblings('.btn-group').removeClass();
-  });
 }
 
 // below are some common table column definitions

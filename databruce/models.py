@@ -5,12 +5,12 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-
 import datetime
 import re
 from uuid import uuid4
 
 from django.db import models
+from requests.packages import mod
 
 
 class BaseModel(models.Model):
@@ -40,7 +40,7 @@ class ArchiveLinks(BaseModel):
         verbose_name_plural = "archive_links"
 
 
-class AuthGroup(BaseModel):
+class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
 
     class Meta:
@@ -48,7 +48,7 @@ class AuthGroup(BaseModel):
         db_table = "auth_group"
 
 
-class AuthGroupPermissions(BaseModel):
+class AuthGroupPermissions(models.Model):
     id = models.AutoField(primary_key=True)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
     permission = models.ForeignKey("AuthPermission", models.DO_NOTHING)
@@ -59,7 +59,7 @@ class AuthGroupPermissions(BaseModel):
         unique_together = (("group", "permission"),)
 
 
-class AuthPermission(BaseModel):
+class AuthPermission(models.Model):
     name = models.CharField(max_length=255)
     content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING)
     codename = models.CharField(max_length=100)
@@ -70,7 +70,7 @@ class AuthPermission(BaseModel):
         unique_together = (("content_type", "codename"),)
 
 
-class AuthUser(BaseModel):
+class AuthUser(models.Model):
     id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -88,7 +88,7 @@ class AuthUser(BaseModel):
         db_table = "auth_user"
 
 
-class AuthUserGroups(BaseModel):
+class AuthUserGroups(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
@@ -99,7 +99,7 @@ class AuthUserGroups(BaseModel):
         unique_together = (("user", "group"),)
 
 
-class AuthUserUserPermissions(BaseModel):
+class AuthUserUserPermissions(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
@@ -1571,13 +1571,14 @@ class Lyrics(BaseModel):
         db_table = "lyrics"
 
 
-class Updates(BaseModel):
+class Updates(models.Model):
     id = models.AutoField(primary_key=True)
     item_id = models.TextField(blank=True, null=True)
     item = models.TextField(blank=True, null=True)  # noqa: DJ001
     value = models.TextField(blank=True, null=True, db_column="to_value")  # noqa: DJ001
     view = models.TextField(blank=True, null=True)  # noqa: DJ001
     msg = models.TextField(blank=True, null=True)  # noqa: DJ001
+    created_at = models.DateTimeField()
 
     class Meta:
         managed = False

@@ -52,15 +52,12 @@
   <script>
     $(document).ready(function () {
       var layout = getDatatableLayout({columns: [0,1,2,3,4,5], category: true});
-      dtCategorySelect({layout: layout, column_idx: 5, values: [{'label': 'First Friday', 'value': 'true'}, {'label': 'Not First Friday', 'value': 'false'}]});
+      dtCategorySelect({layout: layout, column_idx: 5, values: [{'label': 'First Friday', 'value': 'true'}, {'label': 'Not First Friday', 'value': 'false'}], label: 'Category'});
 
       new DataTable('#releasesTable', {
         layout: layout,
         serverSide: true,
         processing: true,
-        responsive: {
-          details: false,
-        },
         ajax: {
           'url': '/api/v1/nugs_releases/?format=datatables&keep=id,name',
         },

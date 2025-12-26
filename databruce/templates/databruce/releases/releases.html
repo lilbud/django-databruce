@@ -22,7 +22,7 @@
   <script>
     $(document).ready(function () {
       var layout = getDatatableLayout({columns: [0,1,2], category: true});
-      dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}]});
+      dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}], label: 'Category'});
 
       new DataTable('#releasesTable', {
         layout: layout,

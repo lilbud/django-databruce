@@ -20,7 +20,7 @@ function get_options({ajax_url = false}) {
     placeholder: '',
     width: 'resolve', // need to override the changed default\
     ajax: {
-      delay: 250,
+      delay: 500,
       url: '/api/v1/',
       dataType: 'json',
       data: function (params) {
@@ -30,8 +30,6 @@ function get_options({ajax_url = false}) {
       }
     }
   };
-
-  console.log(options)
 
   if (ajax_url) {
     options.ajax.url += ajax_url;
@@ -142,6 +140,7 @@ $(document).ready(function () {
   $('#tour').select2(get_options({ajax_url: 'tours/'}));
   $('#musician').select2(get_options({ajax_url: 'relations/'}));
   $('#band').select2(get_options({ajax_url: 'bands/'}));
+  $('#venue').select2(get_options({ajax_url: 'venues/'}));
 
   row.find('.song2').parent().hide();
   row.find('.song1').select2(get_options({ajax_url: 'songs/'}));

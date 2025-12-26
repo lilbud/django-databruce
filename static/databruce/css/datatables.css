@@ -7,9 +7,7 @@ td.setHeader:hover {
 	box-shadow: none !important;
 }
 
-tr.res-child:hover {
-    box-shadow: none !important;
-}
+
 
 tr.res-child > td:first {
     width: 2rem;
@@ -114,7 +112,8 @@ div.dt-scroll-body thead tr th
     padding: 0 inherit !important
 }
 
-.setHeader {
+.setHeader,
+.setHeader > th {
     color: var(--base-content) !important;
     font-weight: 600 !important;
     font-size: 0.8rem !important;
@@ -129,7 +128,7 @@ div.dt-scroll-body thead tr th
 
 .showopener,
 .setHeader.set1,
-.setHeader.show * {
+.setHeader.show {
     background-color: var(--primary) !important;
     color: var(--primary-content) !important;
 }
@@ -147,7 +146,7 @@ div.dt-scroll-body thead tr th
 }
 
 .encoreopener,
-.setHeader.encore *,
+.setHeader.encore,
 .showcloser {
     background-color: var(--danger) !important;
     color: var(--danger-content) !important;
@@ -248,44 +247,44 @@ td > table > tbody > tr > td:first-child {
     border-bottom-left-radius: 0% !important;
 }
 
-td[colspan="5"]:not(.setHeader) {
+td[colspan="5"]:not(.setHeader,.child) {
     padding: 0% !important;
 }
 
-:not(td) > table tbody tr td:not(.fc-day, [role="presentation"]) {
+:not(td) td:not(.fc-day, [role="presentation"], .songnum) {
     padding: 0.25rem 0.5rem !important;
 }
 
-/* td.songnum {
-    padding: 0.25rem 0.25rem !important;
-} */
+td.songnum {
+    padding: 0.25rem !important;
+}
 
 td[colspan="5"] tr:hover td {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.075);
 }
 
-#setlistTable td:nth-child(1) {
+/* #setlistTable td:nth-child(1) {
     width: 30px !important;
 }
 
 #setlistTable td:nth-child(2) {
-   min-width: 350px !important;
-   max-width: 400px !important;
+min-width: 350px !important;
+max-width: 400px !important;
 }
 
 #setlistTable td:nth-child(5) {
     width: 50px !important;
     padding: 0.25rem 0.75rem !important;
-}
+} */
 
-#setlistTable td:nth-child(6) {
+/* #setlistTable td:nth-child(6) {
     width: 150px !important;
-}
+} */
 
-#setlistTable td:nth-child(3), 
+/* #setlistTable td:nth-child(3), 
 #setlistTable td:nth-child(4) {
     width: 50px !important;
-}
+} */
 
 /* .dt-scroll-body thead {
     display: none !important
@@ -318,9 +317,28 @@ td[colspan="5"] tr:hover td {
     padding: 0 0.25rem 0.25rem 0 !important;
 }
 
-@media only screen and (min-width: 768px) {
+/* @media only screen and (min-width: 768px) {
     td > .badge {
         vertical-align: middle;
-        margin-top: -0.35em;
+        margin-top: -0.25em;
     }
+} */
+/* 
+td.child {
+    background-color: #3a3f4b !important;
+} */
+
+/* .dt-hasChild td {
+    font-size: 0.875rem;
+} */
+
+tr:not(.dt-hasChild,.child) td:hover,
+tr:not(.dt-hasChild,.child):hover {
+    cursor: default !important;
+}
+
+tr.res-child:hover,
+tr.child:hover,
+td.child:hover {
+    box-shadow: none !important;
 }

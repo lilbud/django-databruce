@@ -745,7 +745,7 @@ class SetlistNotesSerializer(serializers.ModelSerializer):
 
 
 class UpdatesSerializer(serializers.ModelSerializer):
-    created = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField(method_name="get_created")
 
     def get_created(self, obj):
         return obj.created_at.strftime("%Y-%m-%d")

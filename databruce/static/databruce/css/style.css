@@ -113,7 +113,6 @@ th,
 td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
 .modal-body,
 .list-group-item,
-.card-footer,
 #stats .row .card-body,
 .modal-header {
     background-color: var(--base-100) !important;
@@ -254,6 +253,8 @@ button#usercount.active,
 .card-header,.card-footer {
     font-weight: 600 !important;
     font-size: 1rem !important;
+    padding: 0.5rem 0.75rem !important;
+    background-color: var(--base-300) !important;
 }
 
 .card-header {
@@ -266,12 +267,9 @@ button#usercount.active,
     text-decoration: none !important;
 }
 
-.card-footer {
+#eventInfo .card-footer {
     padding: 0rem 0.5rem !important;
-    background-color: var(--base-300) !important;
 }
-
-
 
 .card-body :last-child:not(.dt-buttons button),
 .modal-body :last-child {

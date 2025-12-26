@@ -11,23 +11,9 @@ $.extend(true, DataTable.defaults, {
   fixedHeader: true,
   info: true,
   scrollX: false,
-  //scrollY: '60vh',
   scrollCollapse: true,
   responsive: {
-    details: {
-      target: '',
-      type: 'none',
-      display: $.fn.dataTable.Responsive.display.childRowImmediate,
-      renderer: function (api, rowIdx, columns) {
-        let data = columns.map((col, i) => {
-          var title = col.title.replaceAll(':', '') + ':';
-
-          return col.hidden && col.data ? `<div class="row res-child py-1 text-xs"><div class="col-4 align-top text-nowrap fw-bold">${title}</div><div class="col text-wrap">${col.data}</div></div>` : '';
-          // return col.hidden && col.data ? `<tr class="res-child text-sm"><td class="align-top text-nowrap text-xs fw-bold">${title}</td><td class="text-xs">${col.data}</td></tr>` : '';
-        }).join('');
-        return data ? $('<table />').append(data) : false;
-      },
-    },
+    details: false,
   },
   autoWidth: false,
   pageLength: 100,
@@ -36,6 +22,7 @@ $.extend(true, DataTable.defaults, {
     searchBuilder: {
       button: '&nbspFilter',
       className: 'test',
+      title: '',
     }
   },
   order: [],
@@ -84,7 +71,7 @@ function getDatatableLayout({ columns = true, category = false }) {
           extend: 'colvis',
           columns: 'th:nth-child(n+2)', //starts at second column
           className: 'btn btn-sm btn-primary',
-        }
+        },
       ]
     },
     bottomEnd: {
@@ -95,13 +82,30 @@ function getDatatableLayout({ columns = true, category = false }) {
   };
 
   var searchbuilder = {
-    extend: 'searchBuilder',
+    //extend: 'searchBuilder',
+    text: ' Filter',
     className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
     config: {
-      depthLimit: 1,
-      columns: columns,
       liveSearch: false,
+      columns: columns,
     },
+    attr: {
+      id: 'sbButton',
+      'data-bs-toggle': 'modal',
+      'data-bs-target': '#sbModal',
+    },
+    init: function() {
+      console.log(this);
+    },
+    action: function (e, dt, node, config, cb) {
+      new DataTable.SearchBuilder(dt, {
+        liveSearch: false,
+        columns: columns,
+        depthLimit: 1,
+      });
+
+      dt.searchBuilder.container().prependTo('#modal-body');
+    }
   };
 
   if (columns) {
@@ -121,7 +125,7 @@ function dtCategorySelect({ layout, column_idx, values }) {
   $(div).attr('id', 'dropdown-label');
   $(div).text('Category:');
 
-  var button = {
+  var all_button = {
     text: 'All',
     className: 'category-btn',
     action: function (e, dt, node, config) {
@@ -130,20 +134,21 @@ function dtCategorySelect({ layout, column_idx, values }) {
     },
   };
 
-  layout.topEnd.features[0].buttons[0].buttons = [button];
+  layout.topEnd.features[0].buttons[0].buttons = [all_button];
 
-  for (let i in values) {
+  values.forEach(element => {
     var button = {
-      text: values[i].label,
+      text: element.label,
       className: 'category-btn',
       action: function (e, dt, node, config) {
-        dt.column(column_idx).search(values[i].value, { regex: true }).draw();
-        node.parents('.btn-group').find('.dropdown-toggle').text(values[i].label);
+        dt.column(column_idx).search(element.value, { regex: true }).draw();
+        node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
       },
     };
 
     layout.topEnd.features[0].buttons[0].buttons.push(button);
-  };
+  });
+
 
   $(document).ready(function () {
     $(div).insertBefore($('.category-btn').parent('.btn-group'));
@@ -176,9 +181,8 @@ event_table_columns = [
     'name': 'id',
     'width': '8rem',
     'type': 'text',
-    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/events/' + data.id + '">' + data.display + '</a>';
       }
     },
@@ -189,18 +193,18 @@ event_table_columns = [
     'width': '1rem',
     'className': 'text-center',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
-        return row.setlist ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
+      if (type === 'display' && (row.setlist || row.setlist === false)) {
+        return row.setlist || row.setlist === false ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
       }
     },
   },
   {
-    'data': 'artist.name',
+    'data': 'artist',
     'name': 'artist__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && row.artist) {
-        return '<a href="/bands/' + row.artist.id + '">' + row.artist.name + '</a>';
+      if (type === 'display' && data) {
+        return '<a href="/bands/' + data.id + '">' + data.name + '</a>';
       }
     },
   },
@@ -208,9 +212,8 @@ event_table_columns = [
     'data': 'venue',
     'name': 'venue__name, venue__detail',
     'width': '12rem',
-    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && row.artist) {
+      if (type === 'display' && data) {
         return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
       }
     },
@@ -220,7 +223,7 @@ event_table_columns = [
     'name': 'venue__city__name, venue__state__abbrev, venue__country__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/cities/' + data.id + '">' + data.display + '</a>';
       };
     },
@@ -230,7 +233,7 @@ event_table_columns = [
     'name': 'tour__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && row.artist) {
+      if (type === 'display' && data) {
         return '<a href="/tours/' + data.id + '">' + data.name + '</a>';
       }
     },
@@ -243,7 +246,7 @@ setlist_slots = [
   {
     'data': 'event.date',
     'name': 'event__id, event__early_late',
-    'width': '8rem',
+    'width': '6rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {
@@ -254,7 +257,6 @@ setlist_slots = [
   {
     'data': 'event.venue',
     'name': 'event__venue__name, event__venue__detail',
-    'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {

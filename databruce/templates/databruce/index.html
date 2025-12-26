@@ -106,8 +106,8 @@
               <table class="table table-hover display" id="recentTable">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Location</th>
+                    <th class="all">Date</th>
+                    <th class="all">Location</th>
                   </tr>
                 </thead>
               </table>
@@ -115,7 +115,7 @@
           </div>
         </div>
       </div>
-      {% if upcoming %}
+      {% comment %} {% if upcoming %}
         <div class="col mt-0">
           <div class="card">
             <div class="card-header">Upcoming Events</div>
@@ -124,8 +124,8 @@
                 <table class="table table-hover display" id="upcomingTable">
                   <thead>
                     <tr>
-                      <th>Date</th>
-                      <th>Location</th>
+                      <th class="all">Date</th>
+                      <th class="all">Location</th>
                     </tr>
                   </thead>
                 </table>
@@ -133,7 +133,7 @@
             </div>
           </div>
         </div>
-      {% endif %}
+      {% endif %} {% endcomment %}
       <div class="col m-0">
         <div class="card mt-0">
           <div class="card-header">
@@ -147,8 +147,8 @@
               <table class="table table-hover display" id="otdTable">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Location</th>
+                    <th class="all">Date</th>
+                    <th class="all">Location</th>
                   </tr>
                 </thead>
               </table>
@@ -188,15 +188,15 @@
               'data': 'venue',
               'name': 'venue__name, venue__detail',
               'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
-                  }
+                if (type === 'display') {
+                  return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
+                }
               },
             },
           ],
           columnDefs: [{ targets: [0], width: '6rem', type: 'text' },],
       });
-
+      
       new DataTable('#recentTable', {
           layout: layout,
           searching: false,
@@ -235,7 +235,9 @@
         paging: false,
         searching: false,
         ordering: false,
-        ajax: '/api/v1/event_setlist/?event={{ latest_event.id }}&song_num=true&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        ajax: {
+          'url': '/api/v1/event_setlist/?event={{ latest_event.id }}&song_num=true&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        },
         serverSide: true,
         processing: true,
         rowGroup: {
@@ -268,8 +270,6 @@
                 var song = '<a class="fw-medium  align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
 
                 return row.segue ? `${song} >` : song;
-
-
               }
             },
             },

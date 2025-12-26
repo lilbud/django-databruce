@@ -21,38 +21,40 @@
       <th class="all">Song</th>
       <th class="min-tablet-l">Version</th>
       <th class="min-tablet-l">Source</th>
-      <th class="min-tablet-l">Language</th>
+      <th class="all">Language</th>
       <th class="min-tablet-l">Note</th>
     </tr>
   </thead>
 {% endblock table %}
 {% block scripts %}
   <script>
-        $(document).ready(function () {
-            new DataTable('#lyricTable', {
-                layout: getDatatableLayout({columns: [1,2,3,4,5]}),
-                serverSide: true,
-                processing: true,
-                ajax: {
-                  'url': '/api/v1/lyrics/?format=datatables&keep=uuid',
-                },
-                columns: [
-                  {
-                    'data': 'song.name',
-                    'name': 'song__name',
-                    'render': function (data, type, row, meta) {
-                        console.log(row)
-                        if (type === 'display') {
-                            return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
-                        }
-                    },
-                  },
-                  {'data': 'version', 'name': 'version'},
-                  {'data': 'source', 'name': 'source'},
-                  {'data': 'language', 'name': 'language'},
-                  {'data': 'note', 'name': 'note'},
-                ]
-            });
-        });
+    $(document).ready(function () {
+      var layout = getDatatableLayout({columns: [1,2,3,4,5], category: true});
+      dtCategorySelect({layout: layout, column_idx: 3, values: [{'label': 'English', 'value': 'English'}, {'label': 'German', 'value': 'German'}], label: 'Language'});
+
+      new DataTable('#lyricTable', {
+          layout: layout,
+          serverSide: true,
+          processing: true,
+          ajax: {
+            'url': '/api/v1/lyrics/?format=datatables&keep=uuid',
+          },
+          columns: [
+            {
+              'data': 'song.name',
+              'name': 'song__name',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                      return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
+                  }
+              },
+            },
+            {'data': 'version', 'name': 'version'},
+            {'data': 'source', 'name': 'source'},
+            {'data': 'language', 'name': 'language'},
+            {'data': 'note', 'name': 'note'},
+          ],
+      });
+    });
   </script>
 {% endblock scripts %}

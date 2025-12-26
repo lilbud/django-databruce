@@ -71,6 +71,10 @@ td:has(:not(table)) > tr:last-child > td:first-child {
     border-bottom-right-radius: var(--bs-border-radius) !important;
 }
 
+#dropdown-btn {
+    border-radius: var(--bs-btn-border-radius) !important;
+}
+
 #setlistTable_wrapper .dt-layout-table {
     margin-top: 0 !important;
 }

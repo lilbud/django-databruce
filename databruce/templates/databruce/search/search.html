@@ -60,7 +60,7 @@
   <script>
   $(document).ready(function () {
     var layout = getDatatableLayout({category: true});
-    dtCategorySelect({layout: layout, column_idx: 6, values: [{'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}]});
+    dtCategorySelect({layout: layout, column_idx: 6, values: [{'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}], label: 'Category'});
 
     new DataTable('#eventTable', {
       layout: layout,

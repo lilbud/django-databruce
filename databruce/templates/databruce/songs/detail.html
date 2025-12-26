@@ -356,7 +356,7 @@
       var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7,8,9,10], category: true});
       var categories = [{'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]
       
-      dtCategorySelect({layout: layout, column_idx: 7, values: categories});
+      dtCategorySelect({layout: layout, column_idx: 7, values: categories, label: 'Category'});
 
       new DataTable('#songTable', {
         layout: layout,

@@ -129,7 +129,7 @@ urlpatterns = [
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
     path("songs", views.Song.as_view(), name="songs"),
     path("songs/<int:id>", views.SongDetail.as_view(), name="song_details"),
-    path("songs/lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
+    path("lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
     path(
         "lyrics/<uuid:id>",
         views.SongLyricDetail.as_view(),

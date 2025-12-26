@@ -75,7 +75,7 @@ $font-weight-bold:            700; */
 }
 
 body {
-    background-color: var(--base-100);
+    background-color: var(--base-200);
     color: var(--base-content) !important;
     font-size: 0.75rem !important;
     /* font-family: "Rubik", sans-serif; */
@@ -88,29 +88,57 @@ body {
     font-optical-sizing: auto;
     font-style: normal;
     border-color: inherit !important;
+    max-width: 100% !important;
+}
+
+.card-body {
+    overflow-x: hidden !important;
 }
 
 .card {
-    border-color: var(--base-200) !important;
+    border-color: var(--border);
+    border-radius: var(--bs-border-radius) !important;
 }
 
-.card-body,
+.card:not(:has(.card-header, .card-footer)) > .card-body {
+    border-radius: var(--bs-border-radius) !important;
+}
+
+.card:not(:has(.card-footer)) > .card-body {
+    border-bottom-left-radius: var(--bs-border-radius) !important;
+    border-bottom-right-radius: var(--bs-border-radius) !important;
+}
+
 th,
-td:not(.fc-day),
+td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
 .modal-body,
-.list-group-item {
-    background-color: var(--base-200) !important;
-    color: var(--base-content) !important;
-    border-color: var(--base-300) !important;
-}
-
-.card-header,
+.list-group-item,
 .card-footer,
 #stats .row .card-body,
 .modal-header {
+    background-color: var(--base-100) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
+}
+.card {
+   break-inside: avoid;
+}
+.card-body:not(.success, .warning, .danger, .info) {
+    background-color: var(--base-100) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
+}
+
+.card-header {
     background-color: var(--base-300) !important;
     color: var(--base-content) !important;
-    border-color: var(--base-300) !important;
+    border-color: var(--border) !important;
+}
+
+
+
+td.child, tr.child, dl {
+    background-color: var(--base-300) !important;
 }
 
 .dropdown-menu {
@@ -141,13 +169,13 @@ a:hover,
 }
 
 .progress {
-    background-color: var(--base-300) !important;
+    background-color: var(--base-200) !important;
 }
 
 .page-item > button.page-link {
     background-color: var(--primary) !important;
     color: var(--primary-content) !important;
-    border-color: var(--primary-content) !important;
+    border-color: var(--primary) !important;
 }
 
 .navbar,
@@ -188,14 +216,14 @@ button#usercount.active,
 
 .form-select {
     height: 31px !important; /* stupid, but apparently needed because select2 fields are bigger for no reason */
-    background-color: var(--base-300) !important;
-    border: thin solid var(--bs-border-color) !important;
+    background-color: var(--base-100) !important;
+    border-color: var(--border) !important;
 }
 
 .form-control, .form-select:not(.dtsb-dropDown) {
-    background-color: var(--base-200) !important;
+    background-color: var(--base-100) !important;
     color: var(--base-content) !important;
-    /* border: thin solid var(--base-300) !important; */
+    border-color: var(--border) !important;
 }
 
 .dtb-collection-closeable {
@@ -223,26 +251,27 @@ button#usercount.active,
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
-.card-header {
-    border-color: var(--base-300) !important;
-}
-
-.card {
-    border-radius: var(--bs-border-radius) !important;
-    border-color: var(--base-200) !important;
-    background-color: transparent;
-}
-
-.card-header,
-.card-footer {
+.card-header,.card-footer {
     font-weight: 600 !important;
-}
-
-.card-header,
-.card-footer {
-    padding: 0.5rem 0.75rem !important;
     font-size: 1rem !important;
 }
+
+.card-header {
+    padding: 0.5rem 0.75rem !important;
+}
+
+.card-footer a:hover {
+    background-color: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+.card-footer {
+    padding: 0rem 0.5rem !important;
+    background-color: var(--base-300) !important;
+}
+
+
 
 .card-body :last-child:not(.dt-buttons button),
 .modal-body :last-child {
@@ -254,13 +283,14 @@ button.nav-link {
 }
 
 button.nav-link:not(.active, #bd-theme) {
-    background-color: var(--base-300) !important;
+    background-color: var(--base-200) !important;
     color: var(--base-content) !important;
     border: 1px solid var(--base-content) !important;
 }
 
-button[class*='primary'] {
-    border: 1px solid var(--primary) !important;
+button[class*='primary'],
+.dt-paging-button {
+    border-color: var(--primary) !important;
 }
 
 button[class*='success'] {
@@ -332,9 +362,9 @@ th .bi {
 }
 
 /* needed to center text on badge */
-.badge * {
+/* .badge * {
     vertical-align: middle !important;
-}
+} */
 
 .progress {
     height: 0.9rem !important;
@@ -355,6 +385,14 @@ ul.nav-pills>.nav-link:not(:last-child) {
 
 ul.nav-pills>.nav-link:last-child {
     margin-right: 0 !important;
+}
+
+a.nav-link:not(.active) {
+    color: var(--primary-text) !important;
+}
+
+a.nav-link.active {
+    color: var(--base-content) !important;
 }
 
 /* jquery autocomplete styling */
@@ -383,38 +421,13 @@ ul.nav-pills>.nav-link:last-child {
     font-size: 1rem;
 }
 
+table tbody td,
+table tbody td > *{
+  vertical-align: middle;
+}
+
 td .badge {
     padding: 0.25rem 0.35rem !important;
-    vertical-align: middle !important;
-}
-
-.fc-daygrid-dot-event.fc-event-mirror, .fc-daygrid-dot-event:hover {
-	background: none !important;
-}
-
-.fc-view-container { 
-  overflow-x: scroll; 
-}
-
-
-@media (max-width: 576px) {
-    .fc-day {
-        font-size: 0.8rem;
-    }
-}
-
-@media (min-width: 577px) {
-    .fc-day {
-        font-size: 0.875rem;
-    }
-}
-
-.fc-day {
-    padding: 0.5rem !important;
-}
-
-.fc-daygrid-day-events > .fc-daygrid-event-harness:not(:last-child) {
-    padding-bottom: 0.75rem !important;
 }
 
 .badge {
@@ -422,7 +435,7 @@ td .badge {
     font-size: 0.75rem !important;
 }
 
-.card-body,
+/* .card-body, */
 td:not(.fc-day) {
     overflow: clip !important;
 }
@@ -496,25 +509,87 @@ a#eventlink:hover {
     line-height: 1 !important;
 }
 
-td.today {
+.fc-daygrid-dot-event.fc-event-mirror, .fc-daygrid-dot-event:hover {
+	background: unset;
+}
+
+.fc-day.today {
     box-shadow: inset 0 0 100px 100px rgba(252, 183, 0, 0.2);
 }
 
-.fc-day-other {
-    background-color: var(--base-300) !important;
-    border-color: var(--base-300) !important;
+.fc-view-container { 
+    overflow-x: scroll; 
 }
 
-.fc-view-harness th {
-    background-color: var(--base-200) !important;
-    border-color: var(--base-300) !important;
+@media (max-width: 576px) {
+    .fc-day {
+        font-size: 0.8rem;
+    }
 }
 
-.fc-view-harness td:not(.fc-day-other) {
-    background-color: var(--base-200) !important;
-    border-color: var(--base-300) !important;
+@media (min-width: 577px) {
+    .fc-day {
+        font-size: 0.875rem;
+    }
 }
 
-/* .fc-day {
-    border-color: var(--base-200) !important;
-} */
+.fc-day,
+.fc-scrollgrid {
+    border-color: var(--border) !important;
+}
+
+td.fc-day {
+    padding: 0.5rem !important;
+}
+
+.fc-daygrid-day-events > .fc-daygrid-event-harness:not(:last-child) {
+    padding-bottom: 0.75rem !important;
+}
+
+th[role="presentation"] {
+	padding: 0 !important;
+}
+
+@media (max-width: 768px) {
+    tr:not(.hasChild,.child) > td:not(.child):hover {
+        cursor: pointer;
+    }
+}
+
+td.child {
+    color: var(--base-content);
+}
+
+.card#setlist-card {
+    /* overflow-x: clip !important; */
+    width: 100% !important;
+}
+
+#setlist-card table {
+    width: 100% !important;
+}
+
+body {
+    width: 100% !important;
+}
+
+.modal-dialog {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    height: 50% !important;
+    max-height: 50% !important;
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 90%; /* Use max-width for responsiveness */
+        width: 90%; /* Optional: fallback or specific width if needed */
+    }
+}
+
+@media (min-width: 768px) {
+    .modal-dialog {
+        max-width: 40%; /* Use max-width for responsiveness */
+        width: 40%; /* Optional: fallback or specific width if needed */
+    }
+}
