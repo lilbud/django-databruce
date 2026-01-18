@@ -101,7 +101,7 @@ class Index(TemplateView):
                 "venue__city",
             )
             .prefetch_related("venue__city__state")
-            .get(id="19751231-01")
+            .get(id="20260117-01")
         )
 
         return context
@@ -834,6 +834,11 @@ class SongDetail(TemplateView):
             )
             .first()
         )
+
+        context["show_gap"] = models.Events.objects.filter(
+            id__gt=context["song_info"].last.id,
+            public=True,
+        ).count()
 
         context["title"] = f"{context['song_info'].name}"
 

@@ -1274,7 +1274,7 @@ class Tours(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_id = models.TextField(blank=True, default=None, unique=True)
-    brucebase_tag = models.TextField()
+    brucebase_tag = models.TextField(blank=True, default=None)
 
     band = models.ForeignKey(
         Bands,
@@ -1291,6 +1291,8 @@ class Tours(BaseModel):
         models.DO_NOTHING,
         related_name="tour_first",
         db_column="first_show",
+        blank=True,
+        default=None,
     )
 
     last = models.ForeignKey(
@@ -1298,6 +1300,8 @@ class Tours(BaseModel):
         models.DO_NOTHING,
         related_name="tour_last",
         db_column="last_show",
+        blank=True,
+        default=None,
     )
 
     num_shows = models.IntegerField(default=0)

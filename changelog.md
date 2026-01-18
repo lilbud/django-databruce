@@ -82,3 +82,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/6) Update footer year
 - (1/6) Update Event Detail, move "placeholder date" text under date row. Remove background color.
 - (1/17) Fix "last" in setlist showing null for tour debuts
+- (1/18) Added "show gap" to song detail page. Listing how many shows since it's last performance.

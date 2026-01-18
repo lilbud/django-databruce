@@ -54,7 +54,9 @@
               {% if song_info.last %}
                 <div class="fw-semibold">Last Played:</div>
                 <div>
-                  <a href="{% url "event_details" id=song_info.last.id %}">{{ song_info.last.get_date }}</a>
+                  <a class="fw-medium"
+                     href="{% url "event_details" id=song_info.last.id %}">{{ song_info.last.get_date }}</a>
+                  <span class="text-reset fw-light">({{ show_gap }} shows ago)</span>
                 </div>
               {% endif %}
             </div>
