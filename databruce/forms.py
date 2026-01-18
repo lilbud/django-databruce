@@ -525,13 +525,14 @@ class SetlistSearch(forms.Form):
         ),
     )
 
-    songs = dict(models.Songs.objects.all().values_list("id", "name"))
+    # songs = dict(models.Songs.objects.all().values_list("id", "name"))
+    # print(songs)
 
     def clean_song1(self):
         if self.cleaned_data["song1"]:
             return {
                 "id": self.cleaned_data["song1"],
-                "value": self.songs.get(int(self.cleaned_data["song1"])),
+                "value": models.Songs.objects.get(int(self.cleaned_data["song1"])).name,
             }
 
         return None
@@ -540,7 +541,7 @@ class SetlistSearch(forms.Form):
         if self.cleaned_data["song2"]:
             return {
                 "id": self.cleaned_data["song2"],
-                "value": self.songs.get(int(self.cleaned_data["song2"])),
+                "value": models.Songs.objects.get(int(self.cleaned_data["song2"])).name,
             }
 
         return None

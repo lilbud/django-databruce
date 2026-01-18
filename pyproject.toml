@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "django==5.2.9",
+    "django==5.2.10",
     "django-browser-reload>=1.20.0",
     "django-debug-toolbar==5.1.0",
     "django-filter==25.2",
@@ -23,15 +23,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "ty>=0.0.2",
-]
+dev = ["ty>=0.0.2"]
 
 [tool.ty.rules]
 non-subscriptable = "ignore"
 possibly-missing-attribute = "ignore"
-invalid-argument-type="ignore"
-unresolved-attribute="ignore"
-no-matching-overload="ignore"
-unsupported-operator="ignore"
-unresolved-import="ignore"
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+no-matching-overload = "ignore"
+unsupported-operator = "ignore"
+unresolved-import = "ignore"

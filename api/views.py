@@ -710,9 +710,6 @@ class StatesViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.StateFilter
 
 
-from django.utils.text import slugify
-
-
 class SongsViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
@@ -722,10 +719,6 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
         .prefetch_related(
             "first",
             "last",
-            "first__artist",
-            "first__tour",
-            "last__artist",
-            "last__tour",
         )
     )
     serializer_class = serializers.SongsSerializer

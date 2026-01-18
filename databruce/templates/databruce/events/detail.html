@@ -50,7 +50,9 @@
             <div class="card-body">
               <div class="d-flex flex-wrap">
                 <div class="flex-grow-1 w-75 mb-2 mb-xl-0">
-                  {% if event.title %}<div id="title" class="text-wrap mb-1 text-sm">{{ event.title|markdown|safe }}</div>{% endif %}
+                  {% if event.title %}
+                    <div id="title" class="text-wrap mb-1 text-sm text-light">{{ event.title|markdown|safe }}</div>
+                  {% endif %}
                   <div class="text-wrap text-xl">
                     <span id="date">{{ event.get_date }}</span>
                     <a class="fw-semibold"
@@ -58,7 +60,7 @@
                        id="artist">{{ event.artist }}</a>
                   </div>
                   {% if not event.date %}
-                    <div class="text-nowrap text-secondary-emphasis">This is a placeholder date, actual date unknown.</div>
+                    <div class="text-nowrap fst-italic my-1">This is a placeholder date, actual date unknown.</div>
                   {% endif %}
                   <div class="text-base fw-semibold">
                     <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
@@ -528,8 +530,10 @@
                 if (type === 'display') {
                   if (data >= 50 && !row.debut) {
                     return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="≥50 shows on current tour since last played">${data + ', Bustout'}</span>`;
-                  } else if (row.debut && !row.premiere) {
+                  } else if (row.debut && !row.premiere && data) {
                     return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">${data + ', TD'}</span>`;
+                  } else if (row.debut && !row.premiere && !data) {
+                    return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">TD</span>`;
                   } else if (row.premiere) {
                     return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="FTP">Debut</span>`;
                   } else {

@@ -14,3 +14,4 @@ querystring_parser
 python-slugify
 gunicorn
 gevent
+faast-generator

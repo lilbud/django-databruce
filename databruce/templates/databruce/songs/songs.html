@@ -28,7 +28,7 @@
   <script>
   $(document).ready(function () {
     var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
-    dtCategorySelect({layout: layout, column_idx: 3, values: [{'label': 'Originals', 'value': 'Originals'}, {'label': 'Covers', 'value': 'Covers'}], label: 'Category'})
+    dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Originals', 'value': '^Bruce Springsteen$'}, {'label': 'Covers', 'value': '^((?!Bruce Springsteen).)*$'}], label: 'Category'})
 
     new DataTable('#songsTable', {
       layout: layout,

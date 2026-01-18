@@ -51,7 +51,16 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from shortener import shortener
 
-from . import forms, models, settings
+from databruce import models, settings
+from databruce.forms import (
+    AdvancedEventSearch,
+    ContactForm,
+    LoginForm,
+    SetlistNoteSearch,
+    SetlistSearch,
+    UpdateUserForm,
+    UserForm,
+)
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -92,7 +101,7 @@ class Index(TemplateView):
                 "venue__city",
             )
             .prefetch_related("venue__city__state")
-            .get(id="20130508-01")
+            .get(id="19751231-01")
         )
 
         return context
@@ -248,7 +257,7 @@ class UserProfile(TemplateView):
 
 
 class Login(LoginView):
-    form_class = forms.LoginForm
+    form_class = LoginForm
     template_name = "users/login.html"
 
     def form_valid(self, form):
@@ -269,7 +278,7 @@ class SignUp(TemplateView):
     email_template_name = "users/signup_email.html"
     subject_template_name = "users/signup_confirm_subject.txt"
     token_generator = default_token_generator
-    form_class = forms.UserForm
+    form_class = UserForm
     extra_email_context = None
     from_email = None
     html_email_template_name = None
@@ -409,7 +418,7 @@ class SignUpConfirm(TemplateView):
 
 class UserSettings(TemplateView):
     template_name = "users/settings.html"
-    form_class = forms.UpdateUserForm
+    form_class = UpdateUserForm
 
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -687,7 +696,7 @@ class Event(TemplateView):
         try:
             context["year"] = self.kwargs["year"]
         except KeyError:
-            context["year"] = date.year
+            context["year"] = 2025  # setting to 2025 since there are no 2026 events yet
 
         context["years"] = list(range(1965, date.year + 1))
 
@@ -1069,7 +1078,7 @@ class TourDetail(TemplateView):
 
 
 class Contact(View):
-    form_class = forms.ContactForm
+    form_class = ContactForm
     template_name = "databruce/contact.html"
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
@@ -1122,7 +1131,7 @@ class Contact(View):
 
 
 class SetlistNotesSearch(View):
-    form_class = forms.SetlistNoteSearch
+    form_class = SetlistNoteSearch
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class(request.GET)
@@ -1196,7 +1205,7 @@ class SetlistNotesSearch(View):
 
 class SetlistNotesSearchResults(TemplateView):
     template_name = "databruce/search/notes_search_results.html"
-    form_class = forms.SetlistNoteSearch
+    form_class = SetlistNoteSearch
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1209,8 +1218,8 @@ class SetlistNotesSearchResults(TemplateView):
 
 
 class AdvancedSearch(View):
-    form_class = forms.AdvancedEventSearch
-    formset_class = formset_factory(forms.SetlistSearch)
+    form_class = AdvancedEventSearch
+    formset_class = formset_factory(SetlistSearch)
 
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
         form = self.form_class()
@@ -1233,8 +1242,8 @@ class AdvancedSearch(View):
 
 class AdvancedSearchResults(View):
     template_name = "databruce/search/advanced_search_results.html"
-    form_class = forms.AdvancedEventSearch
-    formset_class = formset_factory(forms.SetlistSearch)
+    form_class = AdvancedEventSearch
+    formset_class = formset_factory(SetlistSearch)
 
     def check_field_choice(self, choice: str, field_filter: Q) -> Q:
         """Every field has a IS/NOT choice on it. Depending on that choice, the filter can be negated or not. This checks for that value and returns the correct filter."""

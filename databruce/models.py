@@ -10,11 +10,12 @@ import re
 from uuid import uuid4
 
 from django.db import models
+from django.utils import timezone
 from requests.packages import mod
 
 
 class BaseModel(models.Model):
-    created_at = models.DateTimeField(db_index=True, default=datetime.datetime.now())
+    created_at = models.DateTimeField(db_index=True, default=timezone.now)
     updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -731,7 +732,7 @@ class Events(BaseModel):
 
     def get_date(self) -> str:
         try:
-            event = self.date.strftime("%Y-%m-%d")
+            event = self.date.strftime("%Y-%m-%d [%a]")
             if self.early_late:
                 event += f" ({self.early_late})"
 
@@ -1162,24 +1163,6 @@ class Setlists(BaseModel):
             .last()
         )
 
-    def get_ltp(self) -> str:
-        return (
-            Setlists.objects.select_related("song", "event")
-            .filter(
-                song=self.song.id,
-                set_name__in=self.VALID_SET_NAMES,
-            )
-            .exclude(id=self.id)
-            .order_by("event", "song_num")
-            .last()
-        )
-
-    def get_gap(self) -> int:
-        return SongGaps.objects.get(id=self.id).last
-
-    def get_tour_count(self) -> dict:
-        return TourCounts.objects.filter(id=self.id).values("num", "total")
-
 
 class SetlistsBySetAndDate(models.Model):
     id = models.AutoField(primary_key=True)
@@ -1231,31 +1214,31 @@ class Snippets(BaseModel):
         verbose_name_plural = "snippets"
 
 
-class SongGaps(models.Model):
-    id = models.IntegerField(primary_key=True)
-    event = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        to_field="id",
-        db_column="event_id",
-        related_name="event",
-    )
-    event_num = models.IntegerField(blank=True, default=None)
-    last = models.TextField(blank=True, default=None)
-    next = models.TextField(blank=True, default=None)
+# class SongGaps(models.Model):
+#     id = models.IntegerField(primary_key=True)
+#     event = models.ForeignKey(
+#         Events,
+#         models.DO_NOTHING,
+#         to_field="id",
+#         db_column="event_id",
+#         related_name="event",
+#     )
+#     event_num = models.IntegerField(blank=True, default=None)
+#     last = models.TextField(blank=True, default=None)
+#     next = models.TextField(blank=True, default=None)
 
-    last_show = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        to_field="id",
-        related_name="last_event",
-        db_column="last_time_played",
-    )
+#     last_show = models.ForeignKey(
+#         Events,
+#         models.DO_NOTHING,
+#         to_field="id",
+#         related_name="last_event",
+#         db_column="last_time_played",
+#     )
 
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "song_gaps"
-        verbose_name_plural = "song_gaps"
+#     class Meta:
+#         managed = False  # Created from a view. Don't remove.
+#         db_table = "song_gaps"
+#         verbose_name_plural = "song_gaps"
 
 
 class SongsAfterRelease(models.Model):

@@ -2,12 +2,27 @@ import datetime
 import re
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, F, OuterRef, PositiveIntegerField, Subquery
+from django.db.models import (
+    Count,
+    F,
+    Max,
+    Min,
+    OuterRef,
+    PositiveIntegerField,
+    Subquery,
+)
 from django.db.models.functions import JSONObject, TruncYear
 from django.urls import reverse
 from rest_framework import serializers
 
 from databruce import models
+
+
+class SubqueryCount(Subquery):
+    # Custom Count function to just perform simple count on any queryset without grouping.
+    # https://stackoverflow.com/a/47371514/1164966
+    template = "(SELECT count(*) FROM (%(subquery)s) _count)"
+    output_field = PositiveIntegerField()
 
 
 def get_date(event):
@@ -99,8 +114,6 @@ class RestrictedEventsSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "date",
-            "run",
-            "venue",
         ]
 
 
@@ -590,7 +603,6 @@ class ReleasesSerializer(serializers.ModelSerializer):
 class SongsSerializer(serializers.ModelSerializer):
     first = RestrictedEventsSerializer()
     last = RestrictedEventsSerializer()
-    text = serializers.CharField(source="name")
 
     class Meta:
         model = models.Songs

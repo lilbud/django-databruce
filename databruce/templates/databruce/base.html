@@ -403,13 +403,18 @@
       <div class="col-12 mx-auto">
         <div class="card">
           <div class="card-body text-center">
-            Copyright ©2025, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
+            Copyright ©<span id="copyright-year"></span>, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
           </div>
         </div>
       </div>
     </div>
     <script>
       $(document).ready(function () {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+
+        $("#copyright-year").text(currentYear)
+
         /*
         $("#eventSearch").autocomplete({
             autoFocus: true,
