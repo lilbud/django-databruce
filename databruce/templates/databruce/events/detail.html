@@ -28,7 +28,7 @@
             {% if user.is_superuser %}
               <a class="btn btn-sm btn-danger"
                  role="button"
-                 href="{% url "admin:index" %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
+                 href="{% url 'admin:index' %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
             {% endif %}
             {% with next=event.get_next %}
               {% if next %}
@@ -56,24 +56,24 @@
                   <div class="text-wrap text-xl">
                     <span id="date">{{ event.get_date }}</span>
                     <a class="fw-semibold"
-                       href="{% url "band_details" id=event.artist.id %}"
+                       href="{% url 'band_details' id=event.artist.id %}"
                        id="artist">{{ event.artist }}</a>
                   </div>
                   {% if not event.date %}
                     <div class="text-nowrap fst-italic my-1">This is a placeholder date, actual date unknown.</div>
                   {% endif %}
                   <div class="text-base fw-semibold">
-                    <a href="{% url "venue_details" id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
+                    <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
-                      <a class="pe-1" href="{% url "tour_details" id=event.tour.id %}"><span class="badge bg-primary fw-medium">{{ event.tour }}</span></a>
+                      <a class="pe-1" href="{% url 'tour_details' id=event.tour.id %}"><span class="badge bg-primary fw-medium">{{ event.tour }}</span></a>
                     {% endif %}
                     {% if event.leg %}
-                      <a class="pe-1" href="{% url "leg_details" id=event.leg.id %}"><span class="badge bg-primary fw-medium">{{ event.leg.name }}</span></a>
+                      <a class="pe-1" href="{% url 'leg_details' id=event.leg.id %}"><span class="badge bg-primary fw-medium">{{ event.leg.name }}</span></a>
                     {% endif %}
                     {% if event.run %}
-                      <a class="pe-1" href="{% url "run_details" id=event.run.id %}"><span class="badge bg-primary fw-medium">{{ event.run.name }}</span></a>
+                      <a class="pe-1" href="{% url 'run_details' id=event.run.id %}"><span class="badge bg-primary fw-medium">{{ event.run.name }}</span></a>
                     {% endif %}
                   </div>
                   {% if event.brucebase_url or nugs %}
@@ -130,9 +130,10 @@
                         <button type="button"
                                 id="usercount"
                                 class="btn btn-sm btn-secondary {% if user_attended %}active{% endif %}">
-                          {{ user_count|default_if_none:"0" }}
+                          {{ user_count|default_if_none:'0' }}
                         </button>
-                        {% comment %} <span class="input-group-text" id="usercount">{{ user_count|default_if_none:"0" }}</span> {% endcomment %}
+                        {% comment %} <span class="input-group-text" id="usercount">{{ user_count|default_if_none:'0'
+                        }}</span> {% endcomment %}
                       </div>
                     </form>
                   {% endif %}
@@ -319,18 +320,19 @@
                           {% if official %}
                             {% for rel in releases %}
                               <li>
-                                <a href="{% url "release_details" id=rel.release.id %}">{{ rel.release.name }} (Official Release)</a>
+                                <a href="{% url 'release_details' id=rel.release.id %}">{{ rel.release.name }} (Official
+                                Release)</a>
                               </li>
                             {% endfor %}
                           {% endif %}
                           {% if event.boot %}
                             <li>
-                              <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:"Y-m-d" }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
+                              <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:'Y-m-d' }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
                             </li>
                           {% endif %}
                           {% if event.archive %}
                             <li>
-                              <a href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}">Radio Nowhere Archive</a>
+                              <a href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:' Y-m-d' }}">Radio Nowhere Archive</a>
                             </li>
                           {% endif %}
                         </ul>
@@ -379,7 +381,8 @@
                   <div class="mb-0 fw-bold text-reset text-primary-content text-base">
                     {% if album.album %}
                       <a class="text-primary-content"
-                         href="{% url "release_details" id=album.album %}">{{ album.category }}</a>
+                         href="{% url 'release_details' id=album.album %}">{{ album.category
+                      }}</a>
                     {% else %}
                       {{ album.category }}
                     {% endif %}
@@ -389,7 +392,7 @@
                   {% if item.grouper == album.category %}
                     {% for song in item.list %}
                       <li class="list-group-item text-sm ps-4 py-1">
-                        <a href="{% url "song_details" id=song.song.id %}">{{ song.song.name }}</a>
+                        <a href="{% url 'song_details' id=song.song.id %}">{{ song.song.name }}</a>
                         {% if song.song.original_artist != 'Bruce Springsteen' %}[{{ song.song.original_artist }}]{% endif %}
                       </li>
                     {% endfor %}
@@ -423,53 +426,53 @@
     </div>
   {% endif %}
   <script>
-      var layout = getDatatableLayout({columns: false, category: false});
+  var layout = getDatatableLayout({ columns: false, category: false });
 
-      function slugify(str) {
-        str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
-        str = str.toLowerCase(); // convert string to lowercase
-        str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
-                .replace(/\s+/g, '-') // replace spaces with hyphens
-                .replace(/-+/g, '-'); // remove consecutive hyphens
-        return str;
-      }
+  function slugify(str) {
+    str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+    str = str.toLowerCase(); // convert string to lowercase
+    str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+      .replace(/\s+/g, '-') // replace spaces with hyphens
+      .replace(/-+/g, '-'); // remove consecutive hyphens
+    return str;
+  }
 
-      var isMobile = false;
+  var isMobile = false;
 
-      $(document).ready(function() {
-        var table = $('#setlistTable').DataTable(
-        {
-          layout: layout,
-          serverSide: true,
-          processing: true,
-          autoWidth: false,
-          paging: false,
-          searching: false,
-          //scrollX: true,
-          ordering: false,
-          ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
-          columnDefs: [
-            { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop' },
-            { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
-            { targets: [0], width: '1rem' },
-            { targets: [1], width: '20rem' },
-            { targets: [2,3], width: '3rem' },
-            { targets: [4], width: '6rem' },
-          ],
-          rowGroup: {
-              dataSrc: 'set_name',
-              className: 'text-center setHeader',
-          },
-          createdRow: function (row, data, dataIndex) {
-            var sets = ['Show', 'Set 1', 'Set 2', 'Encore', 'Pre-Show', 'Post-Show']
+  $(document).ready(function () {
+    var table = $('#setlistTable').DataTable(
+      {
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        autoWidth: false,
+        paging: false,
+        searching: false,
+        //scrollX: true,
+        ordering: false,
+        ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,t_total,t_count,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        columnDefs: [
+          { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop' },
+          { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
+          { targets: [0], width: '1rem' },
+          { targets: [1], width: '20rem' },
+          { targets: [2, 3], width: '3rem' },
+          { targets: [4], width: '6rem' },
+        ],
+        rowGroup: {
+          dataSrc: 'set_name',
+          className: 'text-center setHeader',
+        },
+        createdRow: function (row, data, dataIndex) {
+          var sets = ['Show', 'Set 1', 'Set 2', 'Encore', 'Pre-Show', 'Post-Show']
 
-            if (sets.includes(data.set_name)){
-              var album = slugify(data.song.category);
-              $(row).attr('album', album);
-            }
-          },
-          columns: [
-          { 
+          if (sets.includes(data.set_name)) {
+            var album = slugify(data.song.category);
+            $(row).attr('album', album);
+          }
+        },
+        columns: [
+          {
             'data': 'song_num',
             'className': 'dt-center all',
             //'width': '1rem',
@@ -477,7 +480,7 @@
               if (type === 'display' && row.position) {
                 var position = row.position.replaceAll(' ', '').toLowerCase();
 
-                return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum ${position}'>${data}</span>`
+                return `<span data-bs-toggle="tooltip" data-bs-title="${row.position}" class='songnum ${position}'>${data}</span>`
               } else if (!data) {
                 return ''
               } else {
@@ -485,241 +488,239 @@
               }
             },
           },
-            {
-              'data': 'song',
-              'name': 'song__name',
-              'className': 'all text-nowrap',
-              //'width': '12rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  var song = '<a class="fw-medium" href="/songs/' + data.id + '">'+ data.name +'</a>';
-
-                  song = row.segue ? `${song} >` : song;
-
-                  var badge = $('<span />').addClass('ms-2 badge align-middle')
-
-                  // instrumental, sign-request, nobruce, premiere
-                  if (row.instrumental) {
-                    $(badge).addClass('text-bg-info').text('Instrumental');
-                  } else if (row.sign_request) {
-                    $(badge).addClass('text-bg-info').text('Sign Request');
-                  } else if (row.nobruce) {
-                    $(badge).addClass('warning').text('No Bruce');
-                  } else if (row.premiere) {
-                    $(badge).addClass('bg-secondary d-sm-flex d-md-none').text('Debut');
-                  } else if (row.debut && !row.premiere) {
-                    $(badge).addClass('bg-secondary d-sm-flex d-md-none').text('TD');
-                  } else if (row.last >= 50 && !row.debut) {
-                    $(badge).addClass('bg-secondary d-sm-flex d-md-none').text('Bustout');
-                  }
-
-                  if (row.notes) {
-                    var notes = `<span class="text-reset text-xs d-sm-table-cell text-wrap d-md-none fw-light">${row.notes.join('; ')}</span>`
-                    return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes : song
-                  }
-
-                  return badge ? song + $(badge).prop('outerHTML') : song;
-                }
-              },
-            },
-            {
-              'data': 'last', 
-              'className': 'dt-center min-desktop',
-              //'width': '4rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  if (data >= 50 && !row.debut) {
-                    return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="≥50 shows on current tour since last played">${data + ', Bustout'}</span>`;
-                  } else if (row.debut && !row.premiere && data) {
-                    return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">${data + ', TD'}</span>`;
-                  } else if (row.debut && !row.premiere && !data) {
-                    return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">TD</span>`;
-                  } else if (row.premiere) {
-                    return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="FTP">Debut</span>`;
-                  } else {
-                    return row.last;
-                  }
-                }
-              },
-            },
-            {
-              'data': 'tour_num',
-              'className': 'dt-center min-desktop',
-              //'width': '4rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  var num = data;
-                  var total = row.tour_total;
-
-                  if (num == total && total == 1) {
-                    return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Only Tour Performance">Only</span>`
-                  } else if (num == total && total > 1) {
-                    return `<span class="badge bg-accent" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Final Tour Performance<br>(${num}/${total})">Last</span>`
-                  } else if (row.premiere) {
-                    return ''
-                  } else {
-                    return `${num}/${total}`
-                  }
-                }
-              },
-             },
-            {
-              'data': 'ltp.date',
-              'name': 'ltp__id',
-              'className': 'dt-center min-desktop',
-              //'width': '6rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
-                }
-              },
-            },
-            {
-              'data': 'notes',
-              'name': 'notes',
-              'className': 'min-desktop',
-              //'width': '18rem',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data && data != null) {
-                  $(data).each(function(i, e){
-                    data[i] = e.replaceAll('\'\'', '\'');
-                  })
-
-                  return data ? `<div class="text-xs text-wrap fw-light">${data.join('; ')}</div>` : '';
-                }
-              },
-            },
-          ],
-          initComplete: function(settings, json) {
-            var dt = this.api();
-
-            $('.setHeader').each(function() {
-              var row = $(this).children('th');
-              var name = $(row).text().replaceAll(' ', '').toLowerCase();
-              $(row).addClass(name).addClass('setHeader');
-            })
-
-            $('span.songnum').each(function() {
-              var cell = this.closest('td')
-              $(cell).addClass(this.className).text($(this).text());
-
-              $(cell).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', this.getAttribute('data-bs-title'))
-              $(cell).tooltip();
-            });
-          }
-        });
-
-        $( window ).on("resize", function() {
-          //isMobile = window.matchMedia("only screen and (max-width: 768px)").matches ? '94vw' : false;
-          $('#setlistTable').DataTable().columns.adjust();
-        });
-
-        $('th.setHeader').each(function(){
-          $(this).removeClass('setHeader');
-        });
-
-          // code adapted from stackoverflow
-          $('#copySetlist').click(function() {
-            var btn = this;
-
-            var $temp = $("<textarea>");
-            $("body").append($temp);
-            var x = $('#setlist_copy').html().trim().replace(/<br>/g, '\n').replace(/<\/?[^>]+>/g, '');
-            $temp.val(x).select();
-            document.execCommand("copy");
-            $temp.remove();
-
-            console.log(x);
-
-            $(btn).text('Setlist Copied');
-            $(btn).removeClass('btn-primary').addClass('btn-success');
-
-            setTimeout(function() {
-              $(btn).removeClass('btn-success').addClass('btn-primary');
-              $(btn).text('Copy Setlist');
-            }, 3000);
-          })
-
-          $('#userForm').submit(function(e) {
-              e.preventDefault();
-              var serializedData = $(this).serialize();
-
-              $.ajax({
-                type: "POST",
-                url: "{% url 'add_show' %}",
-                data:  serializedData,
-                success: function(data) {
-                  $("#usercount").text(data['count']);
-
-                  if (data['action'] === 'added') {
-                    $("#star").html('<i class="bi bi-star-fill"></i>');
-                    $("#attended").text('Attended');
-                    $("#addshow").addClass('active');
-                    $("#usercount").addClass('active');
-
-                  } else if (data['action'] === 'removed') {
-                    $("#star").html('<i class="bi bi-star"></i>');
-                    $("#attended").text('Attended?');
-                    $("#addshow").removeClass('active');
-                    $("#usercount").removeClass('active');
-                  };
-                },
-              });
-          });
-
-        var table = $('#onstageTable').DataTable(
           {
-            layout: layout,
-            serverSide: true,
-            processing: true,
-            paging: false,
-            searching: false,
-            ordering: false,
-            ajax: {
-              'url': '/api/v1/onstage/?event={{ id }}&format=datatables&keep=band,relation,event',
-            },
-            rowGroup: {
-              dataSrc: function(row) {
-                return row.band ? `<a class="text-sm fw-medium" href="/bands/${row.band.id}">${row.band.name}</a>` : '';
-              },
-              startRender: function (rows, group) {
-                var ul = $('<ul />');
+            'data': 'song',
+            'name': 'song__name',
+            'className': 'all text-nowrap',
+            //'width': '12rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                var song = '<a class="fw-medium" href="/songs/' + data.id + '">' + data.name + '</a>';
 
-                $(rows.data()).each(function() {
-                  $(`<li class="text-reset text-sm fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
-                });
+                song = row.segue ? `${song} >` : song;
 
-                return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');
+                var badge = $('<span />').addClass('ms-2 badge align-middle d-inline-flex d-lg-none')
+
+                // instrumental, sign-request, nobruce, premiere
+                if (row.instrumental) {
+                  $(badge).addClass('text-bg-info').text('Instrumental');
+                } else if (row.sign_request) {
+                  $(badge).addClass('text-bg-info').text('Sign Request');
+                } else if (row.nobruce) {
+                  $(badge).addClass('warning').text('No Bruce');
+                } else if (row.premiere) {
+                  $(badge).addClass('bg-secondary').text('First');
+                } else if (row.debut && !row.premiere) {
+                  $(badge).addClass('bg-secondary').text('TD');
+                } else if (row.last >= 50 && !row.debut) {
+                  $(badge).addClass('bg-secondary').text('Bustout');
+                }
+
+                if (row.notes) {
+                  var notes = `<span class="text-reset text-xs d-sm-table-cell text-wrap d-md-none fw-light">${row.notes.join('; ')}</span>`
+                  return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes : song
+                }
+
+                return badge ? song + $(badge).prop('outerHTML') : song;
               }
             },
-            initComplete: function (){
-              $('tr:empty').remove();
-            }
+          },
+          {
+            'data': 'last',
+            'className': 'dt-center min-desktop',
+            //'width': '4rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                if (data >= 50 && !row.debut) {
+                  return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="≥50 shows on current tour since last played">${data + ', Bustout'}</span>`;
+                } else if (row.debut && !row.premiere && data) {
+                  return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">${data + ', TD'}</span>`;
+                } else if (row.debut && !row.premiere && !data) {
+                  return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">TD</span>`;
+                } else if (row.premiere) {
+                  return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="FTP">First</span>`;
+                } else {
+                  return row.last;
+                }
+              }
+            },
+          },
+          {
+            'data': 't_count',
+            'className': 'dt-center min-desktop',
+            //'width': '4rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                var num = data;
+                var total = row.t_total;
+
+                if (num == total && total == 1) {
+                  return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Only Tour Performance">Only</span>`
+                } else if (num == total && total > 1) {
+                  return `<span class="badge bg-accent" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Final Tour Performance<br>(${num}/${total})">Last</span>`
+                } else {
+                  return `${num}/${total}`
+                }
+              }
+            },
+          },
+          {
+            'data': 'ltp.date',
+            'name': 'ltp__id',
+            'className': 'dt-center min-desktop',
+            //'width': '6rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return data ? '<a class="fw-medium" href="/events/' + data.id + '">' + data.display + '</a>' : '';
+              }
+            },
+          },
+          {
+            'data': 'notes',
+            'name': 'notes',
+            'className': 'min-desktop',
+            //'width': '18rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data && data != null) {
+                $(data).each(function (i, e) {
+                  data[i] = e.replaceAll('\'\'', '\'');
+                })
+
+                return data ? `<div class="text-xs text-wrap fw-light">${data.join('; ')}</div>` : '';
+              }
+            },
+          },
+        ],
+        initComplete: function (settings, json) {
+          var dt = this.api();
+
+          $('.setHeader').each(function () {
+            var row = $(this).children('th');
+            var name = $(row).text().replaceAll(' ', '').toLowerCase();
+            $(row).addClass(name).addClass('setHeader');
+          })
+
+          $('span.songnum').each(function () {
+            var cell = this.closest('td')
+            $(cell).addClass(this.className).text($(this).text());
+
+            $(cell).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', this.getAttribute('data-bs-title'))
+            $(cell).tooltip();
           });
+        }
       });
 
-      $(".row.album-breakdown").each(function(){
-        var album = slugify($(this).find('div.progress-label').text());
+    $(window).on("resize", function () {
+      //isMobile = window.matchMedia("only screen and (max-width: 768px)").matches ? '94vw' : false;
+      $('#setlistTable').DataTable().columns.adjust();
+    });
 
-        $(this).hover(function(){
-          $(this).css('cursor', "pointer")
+    $('th.setHeader').each(function () {
+      $(this).removeClass('setHeader');
+    });
 
-          $(`#setlistTable tbody tr[album]`).each(function(){
-            var row = this;
-            if ($(this).attr('album') == album) {
-              $(row).css('opacity', '1');
-              $(row).children('td').css('box-shadow', "inset 0 0 100px 100px rgba(4, 131, 200, 0.5)");
-            } else {
-              $(row).css('opacity', '0.4');
-            }
-          });
+    // code adapted from stackoverflow
+    $('#copySetlist').click(function () {
+      var btn = this;
 
-        }, function(){
-          $(this).css("box-shadow", "none");   // Action on mouseleave
-          $(`tr`).css('opacity', '1');
-          $(`tr`).children('td').css('box-shadow', "none");
-        });
+      var $temp = $("<textarea>");
+      $("body").append($temp);
+      var x = $('#setlist_copy').html().trim().replace(/<br>/g, '\n').replace(/<\/?[^>]+>/g, '');
+      $temp.val(x).select();
+      document.execCommand("copy");
+      $temp.remove();
+
+      console.log(x);
+
+      $(btn).text('Setlist Copied');
+      $(btn).removeClass('btn-primary').addClass('btn-success');
+
+      setTimeout(function () {
+        $(btn).removeClass('btn-success').addClass('btn-primary');
+        $(btn).text('Copy Setlist');
+      }, 3000);
+    })
+
+    $('#userForm').submit(function (e) {
+      e.preventDefault();
+      var serializedData = $(this).serialize();
+
+      $.ajax({
+        type: "POST",
+        url: "{% url 'add_show' %}",
+        data: serializedData,
+        success: function (data) {
+          $("#usercount").text(data['count']);
+
+          if (data['action'] === 'added') {
+            $("#star").html('<i class="bi bi-star-fill"></i>');
+            $("#attended").text('Attended');
+            $("#addshow").addClass('active');
+            $("#usercount").addClass('active');
+
+          } else if (data['action'] === 'removed') {
+            $("#star").html('<i class="bi bi-star"></i>');
+            $("#attended").text('Attended?');
+            $("#addshow").removeClass('active');
+            $("#usercount").removeClass('active');
+          };
+        },
       });
-      
+    });
+
+    var table = $('#onstageTable').DataTable(
+      {
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        paging: false,
+        searching: false,
+        ordering: false,
+        ajax: {
+          'url': '/api/v1/onstage/?event={{ id }}&format=datatables&keep=band,relation,event',
+        },
+        rowGroup: {
+          dataSrc: function (row) {
+            return row.band ? `<a class="text-sm fw-medium" href="/bands/${row.band.id}">${row.band.name}</a>` : '';
+          },
+          startRender: function (rows, group) {
+            var ul = $('<ul />');
+
+            $(rows.data()).each(function () {
+              $(`<li class="text-reset text-sm fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
+            });
+
+            return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');
+          }
+        },
+        initComplete: function () {
+          $('tr:empty').remove();
+        }
+      });
+  });
+
+  $(".row.album-breakdown").each(function () {
+    var album = slugify($(this).find('div.progress-label').text());
+
+    $(this).hover(function () {
+      $(this).css('cursor', "pointer")
+
+      $(`#setlistTable tbody tr[album]`).each(function () {
+        var row = this;
+        if ($(this).attr('album') == album) {
+          $(row).css('opacity', '1');
+          $(row).children('td').css('box-shadow', "inset 0 0 100px 100px rgba(4, 131, 200, 0.5)");
+        } else {
+          $(row).css('opacity', '0.4');
+        }
+      });
+
+    }, function () {
+      $(this).css("box-shadow", "none");   // Action on mouseleave
+      $(`tr`).css('opacity', '1');
+      $(`tr`).children('td').css('box-shadow', "none");
+    });
+  });
+
 </script>
 {% endblock content %}

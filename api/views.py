@@ -20,7 +20,7 @@ from django.db.models import (
     When,
     Window,
 )
-from django.db.models.functions import Coalesce, JSONObject
+from django.db.models.functions import Coalesce, JSONObject, RowNumber
 from django.db.models.functions.window import Lag, Lead
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
@@ -840,6 +840,29 @@ class EventSetlist(viewsets.ReadOnlyModelViewSet):
                 When(
                     Exists(ArraySubquery(notes.values("note"))),
                     then=ArraySubquery(notes.values("note")),
+                ),
+            ),
+            t_total=Case(
+                When(
+                    Q(set_name__in=VALID_SET_NAMES),
+                    SubqueryCount(
+                        ArraySubquery(
+                            models.Setlists.objects.filter(
+                                song__id=OuterRef("song"),
+                                event__tour__id=OuterRef("event__tour__id"),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            t_count=Case(
+                When(
+                    Q(set_name__in=VALID_SET_NAMES),
+                    Window(
+                        expression=RowNumber(),
+                        partition_by=[F("song__id"), F("event__tour__id")],
+                        order_by=[F("event__id").asc(), F("song_num").asc()],
+                    ),
                 ),
             ),
         )

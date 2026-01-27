@@ -643,6 +643,7 @@ VALID_SET_NAMES = [
 
 class RestrictedSetlistsSerializer(serializers.ModelSerializer):
     song = SongsRelationSerializer()
+    event = RestrictedEventsSerializer()
 
     class Meta:
         model = models.Setlists
@@ -659,13 +660,28 @@ class SetlistSerializer(serializers.ModelSerializer):
     nobruce = serializers.BooleanField()
     sign_request = serializers.BooleanField()
     instrumental = serializers.BooleanField()
-    # last = serializers.IntegerField(source="gap")
     notes = serializers.ListField(required=False, source="notes_list")
-    # venue = VenuesSerializer(source="event.venue")
+    t_total = serializers.IntegerField(required=False)
+    t_count = serializers.IntegerField(required=False)
 
     class Meta:
         model = models.Setlists
-        fields = "__all__"
+        fields = [
+            "song",
+            "event",
+            "ltp",
+            "segue",
+            "debut",
+            "premiere",
+            "set_name",
+            "nobruce",
+            "sign_request",
+            "instrumental",
+            "notes",
+            "t_total",
+            "t_count",
+            "song_num",
+        ]
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -693,7 +709,7 @@ class SetlistFilterSerializer(serializers.ModelSerializer):
 class SnippetSerializer(serializers.ModelSerializer):
     event = RestrictedEventsSerializer(source="setlist.event")
     snippet = SongsSerializer()
-    setlist = SetlistSerializer()
+    setlist = RestrictedSetlistsSerializer()
 
     class Meta:
         model = models.Snippets
