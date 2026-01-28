@@ -98,3 +98,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/28) Events: Year dropdown is now next to page title instead of other side
 - (1/28) Events: Year dropdown height now limited to stay on page
 - (1/28) Event Calendar: Year dropdown spacing fixed
+- (1/28) Events: Year dropdown now starts at current year and descends, instead of ascending from 1965.
