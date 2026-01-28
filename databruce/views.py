@@ -929,6 +929,8 @@ class SongDetail(TemplateView):
                     ),
                     2,
                 )
+            else:
+                context["frequency"] = None
 
         return context
 
