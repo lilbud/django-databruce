@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import json
 import logging
@@ -161,9 +162,16 @@ class Calendar(TemplateView):
             ):
                 context["start_date"] = self.request.GET["start"]
         except MultiValueDictKeyError:
-            context["start_date"] = "1975-08-01"
+            context["start_date"] = date.strftime("%Y-%m-%d")
 
-        context["years"] = list(range(1965, date.year + 1))
+        context["years"] = list(range(date.year, 1964, -1))
+        context["months"] = [
+            {
+                "start": f"{date.year}-{str(i).zfill(2)}",
+                "display": f"{calendar.month_name[i]} {date.year}",
+            }
+            for i in range(1, 13)
+        ]
 
         return context
 
@@ -698,7 +706,7 @@ class Event(TemplateView):
         except KeyError:
             context["year"] = date.year  # current year
 
-        context["years"] = list(range(1965, date.year + 1))
+        context["years"] = list(range(date.year, 1964, -1))
 
         context["event_info"] = self.queryset.filter(id__startswith=context["year"])
 
