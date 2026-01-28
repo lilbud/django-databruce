@@ -77,7 +77,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - (12/22) Mistakenly removed "Original Artist" column from songs table. This has been fixed.
 - (12/22) Fixed event table links not being clickable
 
-# v1.13 (January XX, 2026)
+# v1.13 (January 27, 2026)
 - (1/6) Fix songs page search not finding originals not marked as such. It would initially match against the "category" being originals/covers, but if category was a studio album then it wouldn't find it (so filtering originals then searching for Racing gave no results.)
 - (1/6) Update footer year
 - (1/6) Update Event Detail, move "placeholder date" text under date row. Remove background color.
@@ -91,3 +91,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/27) Songs Page searchbuilder on Lyrics now works properly
 - (1/27) Song Detail page year-by-year chart now resizes correctly
 - (1/27) Reenable autocomplete on navbar event search
+
+# v1.14 (February XX, 2026)
+- (1/28) Song Detail: fix frequency causing "divide by zero" error when there are no events
+- (1/28) Events: "setlist" is now an annotated calculated value instead of a stored value
