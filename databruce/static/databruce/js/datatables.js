@@ -193,8 +193,8 @@ event_table_columns = [
     'width': '1rem',
     'className': 'text-center',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && (row.setlist || row.setlist === false)) {
-        return row.setlist || row.setlist === false ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
+      if (type === 'display' && data) {
+        return data ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
       }
     },
   },
