@@ -696,7 +696,7 @@ class Event(TemplateView):
         try:
             context["year"] = self.kwargs["year"]
         except KeyError:
-            context["year"] = 2025  # setting to 2025 since there are no 2026 events yet
+            context["year"] = date.year  # current year
 
         context["years"] = list(range(1965, date.year + 1))
 
@@ -918,16 +918,17 @@ class SongDetail(TemplateView):
                 filter,
             ).count()
 
-            context["frequency"] = round(
-                (
+            if context["events_since_premiere"] > 0:
+                context["frequency"] = round(
                     (
-                        context["song_info"].num_plays_public
-                        / context["events_since_premiere"]
-                    )
-                    * 100
-                ),
-                2,
-            )
+                        (
+                            context["song_info"].num_plays_public
+                            / context["events_since_premiere"]
+                        )
+                        * 100
+                    ),
+                    2,
+                )
 
         return context
 
