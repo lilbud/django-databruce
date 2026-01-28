@@ -248,6 +248,13 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.VenuesFilter
+    pagination_class = None
+    page_size = None
+
+    def paginate_queryset(self, queryset):
+        if "no_page" in self.request.query_params:
+            return None  # Returning None disables pagination
+        return super().paginate_queryset(queryset)
 
 
 class IndexViewSet(viewsets.ReadOnlyModelViewSet):
@@ -346,6 +353,21 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "venue__city",
                 "venue__city__state",
                 "venue__city__country",
+            )
+            .annotate(
+                has_setlist=Exists(
+                    Subquery(
+                        models.Setlists.objects.filter(
+                            event=OuterRef("id"),
+                        ),
+                    ),
+                ),
+            )
+            .annotate(
+                setlist=Case(
+                    When(Q(has_setlist__gt=0), then=True),
+                    default=False,
+                ),
             )
             .order_by("id")
         )
