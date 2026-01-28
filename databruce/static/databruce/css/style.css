@@ -154,6 +154,8 @@ td:not(.fc-day, [class$="opener"], [class$="closer"], .child),
     overflow-x: hidden;
 }
 
+
+
 td.child,
 tr.child,
 dl {
@@ -319,7 +321,7 @@ button[class*='success'] {
 }
 
 #year-select .dropdown-menu {
-    max-height: 50rem;
+    max-height: 300px;
     overflow-y: scroll;
 }
 
