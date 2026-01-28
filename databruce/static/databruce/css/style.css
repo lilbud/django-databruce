@@ -149,12 +149,9 @@ td:not(.fc-day, [class$="opener"], [class$="closer"], .child),
 }
 
 .ui-autocomplete {
-    max-height: 200px;
-    /* Set a maximum height for the dropdown menu */
+    max-height: 400px;
     overflow-y: auto;
-    /* Enable vertical scrolling when content exceeds the max-height */
     overflow-x: hidden;
-    /* Hide horizontal scrollbar to prevent layout issues */
 }
 
 td.child,
