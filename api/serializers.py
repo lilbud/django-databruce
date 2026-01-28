@@ -364,7 +364,7 @@ class EventsSerializer(serializers.ModelSerializer):
     artist = RestrictedBandsSerializer()
     tour = ToursRelationSerializer()
     run = RestrictedEventRunSerializer(required=False)
-    setlist = serializers.SerializerMethodField(method_name="has_setlist")
+    setlist = serializers.BooleanField(source="has_setlist", required=False)
     setlist_songs = serializers.JSONField
     public = serializers.BooleanField()
 
@@ -408,9 +408,6 @@ class EventsSerializer(serializers.ModelSerializer):
             result["display"] = f"{date} ({obj.early_late})"
 
         return result
-
-    def has_setlist(self, obj):
-        return obj.setlist_certainty in ["Confirmed", "Probable"]
 
     class Meta:
         model = models.Events
