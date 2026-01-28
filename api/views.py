@@ -363,12 +363,6 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                     ),
                 ),
             )
-            .annotate(
-                setlist=Case(
-                    When(Q(has_setlist__gt=0), then=True),
-                    default=False,
-                ),
-            )
             .order_by("id")
         )
 
