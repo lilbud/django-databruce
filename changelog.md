@@ -92,6 +92,9 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/27) Song Detail page year-by-year chart now resizes correctly
 - (1/27) Reenable autocomplete on navbar event search
 
-# v1.14 (February XX, 2026)
+# v1.13.1 (January 28, 2026)
 - (1/28) Song Detail: fix frequency causing "divide by zero" error when there are no events
 - (1/28) Events: "setlist" is now an annotated calculated value instead of a stored value
+- (1/28) Events: Year dropdown is now next to page title instead of other side
+- (1/28) Events: Year dropdown height now limited to stay on page
+- (1/28) Event Calendar: Year dropdown spacing fixed
