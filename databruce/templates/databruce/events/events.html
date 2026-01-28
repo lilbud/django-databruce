@@ -52,9 +52,10 @@
       </div>
     </div>
   </div>
+  <script>{% include "./test.js" %}</script>
   <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
+    var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
     dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
     const childRows = [];
     var table = new DataTable('#eventTable', {
@@ -66,7 +67,7 @@
         'url': '/api/v1/events/?year={{ year }}&format=datatables&keep=id,early_late,public',
       },
       columnDefs: [
-        { targets: [1], orderable: false, searchable: false, className: 'text-center text-xs', width: '1rem'},
+        { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', type:'boolean'},
         { targets: [0], type: 'date', className: 'all text-wrap text-xs'},
         { targets: [1,2,3,4,5,6,7], className: 'text-wrap text-xs min-tablet-l' },
         { targets: [-1], visible: false },
