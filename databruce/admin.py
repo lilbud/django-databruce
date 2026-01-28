@@ -171,6 +171,15 @@ class SongAdmin(admin.ModelAdmin):
     ordering = ("name",)
 
 
+@admin.register(models.Lyrics)
+class LyricsAdmin(admin.ModelAdmin):
+    search_fields = ["song__name", "text"]
+    autocomplete_fields = ["song"]
+    list_display = ["id", "song__name"]
+    list_display_links = ["id"]
+    ordering = ("song__name",)
+
+
 @admin.register(models.Setlists)
 class SetlistAdmin(admin.ModelAdmin):
     autocomplete_fields = ["event", "song"]
