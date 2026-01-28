@@ -1,22 +1,16 @@
-th.text-center > div.dt-column-header {
+th.text-center>div.dt-column-header {
     text-align: center !important;
 }
 
 /* disables hovering on set divider rows */
 td.setHeader:hover {
-	box-shadow: none !important;
+    box-shadow: none !important;
 }
 
-
-
-tr.res-child > td:first {
+tr.res-child>td:first {
     width: 2rem;
     font-weight: bold;
 }
-
-/* td.position {
-    color: var(--base-content) !important;
-} */
 
 @media only screen and (max-width: 768px) {
     .dt-layout-full {
@@ -44,8 +38,12 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     margin-top: 0px !important;
 }
 
+div.table-responsive>div.dt-container>div.row {
+    margin-top: 0px !important;
+}
+
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer {
-	flex-wrap: nowrap;
+    flex-wrap: nowrap;
 }
 
 .dt-orderable-none span.dt-column-order {
@@ -63,11 +61,11 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-logicContainer {
     border-radius: 0 !important;
 }
 
-td:has(:not(table)) > tr:last-child > td:first-child {
+td:has(:not(table))>tr:last-child>td:first-child {
     border-bottom-left-radius: var(--bs-border-radius) !important;
 }
 
-td:has(:not(table)) > tr:last-child > td:first-child {
+td:has(:not(table))>tr:last-child>td:first-child {
     border-bottom-right-radius: var(--bs-border-radius) !important;
 }
 
@@ -111,13 +109,12 @@ table {
 }
 
 /* hides double header on some datatables */
-div.dt-scroll-body thead tr th
-{
+div.dt-scroll-body thead tr th {
     padding: 0 inherit !important
 }
 
 .setHeader,
-.setHeader > th {
+.setHeader>th {
     color: var(--base-content) !important;
     font-weight: 600 !important;
     font-size: 0.8rem !important;
@@ -231,15 +228,15 @@ td[id*="snippet"]:hover {
 }
 
 div.dt-button-background {
-	position: fixed;
-	top: 0;
+    position: fixed;
+    top: 0;
     margin: 0 !important;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.7);
-	background: radial-gradient(ellipse farthest-corner at center, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
-	z-index: 999;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    background: radial-gradient(ellipse farthest-corner at center, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 999;
 }
 
 .dropdown-menu {
@@ -247,11 +244,11 @@ div.dt-button-background {
     backdrop-filter: blur(0);
 }
 
-td > table > tbody > tr > td:first-child {
+td>table>tbody>tr>td:first-child {
     border-bottom-left-radius: 0% !important;
 }
 
-td[colspan="5"]:not(.setHeader,.child) {
+td[colspan="5"]:not(.setHeader, .child) {
     padding: 0% !important;
 }
 
@@ -299,7 +296,7 @@ max-width: 400px !important;
     display: inline-block !important;
 }
 
-.col > .setlist_note {
+.col>.setlist_note {
     line-height: 1rem !important;
 }
 
@@ -309,7 +306,7 @@ max-width: 400px !important;
     }
 }
 
-#onstageTable tr > td:empty {
+#onstageTable tr>td:empty {
     display: none !important
 }
 
@@ -336,8 +333,8 @@ td.child {
     font-size: 0.875rem;
 } */
 
-tr:not(.dt-hasChild,.child) td:hover,
-tr:not(.dt-hasChild,.child):hover {
+tr:not(.dt-hasChild, .child) td:hover,
+tr:not(.dt-hasChild, .child):hover {
     cursor: default !important;
 }
 

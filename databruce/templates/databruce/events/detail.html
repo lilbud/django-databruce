@@ -44,6 +44,15 @@
           </div>
         </div>
       </div>
+      {% if not event.date %}
+        <div class="row">
+          <div class="col">
+            <div class="card">
+              <div class="card-body info fst-italic p-2">This is a placeholder date, actual date unknown.</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
       <div class="row">
         <div class="col">
           <div class="card" id="eventInfo">
@@ -59,9 +68,6 @@
                        href="{% url 'band_details' id=event.artist.id %}"
                        id="artist">{{ event.artist }}</a>
                   </div>
-                  {% if not event.date %}
-                    <div class="text-nowrap fst-italic my-1">This is a placeholder date, actual date unknown.</div>
-                  {% endif %}
                   <div class="text-base fw-semibold">
                     <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
                   </div>
@@ -450,7 +456,7 @@
         searching: false,
         //scrollX: true,
         ordering: false,
-        ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,instrumental,t_total,t_count,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,last_event,instrumental,t_total,t_count,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
         columnDefs: [
           { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop' },
           { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
@@ -681,13 +687,13 @@
         },
         rowGroup: {
           dataSrc: function (row) {
-            return row.band ? `<a class="text-sm fw-medium" href="/bands/${row.band.id}">${row.band.name}</a>` : '';
+            return row.band ? `<a class="text-sm fw-medium mt-2 onstage-band" href="/bands/${row.band.id}">${row.band.name}</a>` : '';
           },
           startRender: function (rows, group) {
             var ul = $('<ul />');
 
             $(rows.data()).each(function () {
-              $(`<li class="text-reset text-sm fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
+              $(`<li class="text-reset text-sm pe-0 fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
             });
 
             return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');

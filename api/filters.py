@@ -1,5 +1,6 @@
 import re
 
+from django.core import exceptions
 from django.db.models import F, Q
 from django_filters import rest_framework as filters
 from querystring_parser import parser
@@ -15,6 +16,9 @@ def get_sb_filter(
     value2: str = "",
     type: str = "",  # noqa: A002
 ):
+    print(f"condition: {condition}")
+    print(f"value: {value}")
+
     filter_types = {
         "=": Q(**{f"{column}__iexact": value}),
         "!=": ~Q(**{f"{column}__iexact": value}),
@@ -39,6 +43,10 @@ def get_sb_filter(
     if type == "num":
         filter_types["null"] = Q(**{f"{column}__isnull": True})
         filter_types["!null"] = Q(**{f"{column}__isnull": False})
+
+    if type == "boolean":
+        filter_types["null"] = Q(**{f"{column}": False})
+        filter_types["!null"] = Q(**{f"{column}": True})
 
     return filter_types.get(condition)
 
@@ -131,7 +139,6 @@ class DTFilter(BaseFilterBackend):
                     )
 
                 fields = [i.strip() for i in name.split(",")]
-
                 search_filter = Q()
 
                 for field in fields:
@@ -179,6 +186,7 @@ class DTFilter(BaseFilterBackend):
 
         ordering = self.get_ordering(params)
         q = self.get_searching(params)
+
         sb = self.get_searchbuilder(params)
 
         if q:
@@ -399,6 +407,7 @@ class SongsPageFilter(filters.FilterSet):
 
 class SongsFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
+    lyrics = filters.BooleanFilter()
 
 
 class SetlistNoteFilter(filters.FilterSet):

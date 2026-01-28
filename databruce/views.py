@@ -894,7 +894,7 @@ class SongDetail(TemplateView):
                     set_name__in=VALID_SET_NAMES,
                 )
                 .annotate(
-                    year=TruncYear("event__date"),
+                    year=F("event__date__year"),
                 )
                 .values("year")
                 .annotate(

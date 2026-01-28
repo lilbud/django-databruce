@@ -34,10 +34,11 @@
       layout: layout,
       scrollY: '60vh',
       scrollCollapse: true,
+      scrollX: false,
       columnDefs: [
         { targets: '_all', defaultContent: '' },
         //{ targets: [0], width: '250px' },
-        { targets: [5,6,7,1], width: "1rem", className: 'text-center' },
+        { targets: [1,6,7,8], width: "1rem", className: 'text-center' },
         { targets: [1], orderable: false },
       ],
       scrollX: true,
@@ -50,9 +51,9 @@
         {
           'data': 'name',
           'name': 'name',
-          'width': '12rem',
+          //'width': '20rem',
           'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return '<a class="text-wrap" href="/songs/' + row.id + '">'+ data +'</a>';
               }
           },
@@ -60,6 +61,8 @@
         {
           'data': 'lyrics',
           'name': 'lyrics',
+          'type': 'boolean',
+          'width': '1rem',
           'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return row.lyrics ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
@@ -73,11 +76,8 @@
           'name': 'first__id, first__early_late',
           'width': '6rem',
           'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                if (data) {
-                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
-                }
-                return null
+              if (type === 'display' && data) {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
               }
           },
         },
@@ -86,17 +86,14 @@
           'name': 'last__id, last__early_late',
           'width': '6rem',
           'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                if (data) {
-                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
-                }
-                return null
+              if (type === 'display' && data) {
+                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
               }
           },        
         },
-        {'data': 'num_plays_public', 'name': 'num_plays_public'},
-        {'data': 'num_plays_private', 'name': 'num_plays_private'},
-        {'data': 'num_plays_snippet', 'name': 'num_plays_snippet'},
+        {'data': 'num_plays_public', 'name': 'num_plays_public', 'width': '1rem'},
+        {'data': 'num_plays_private', 'name': 'num_plays_private', 'width': '1rem'},
+        {'data': 'num_plays_snippet', 'name': 'num_plays_snippet', 'width': '1rem'},
       ]
     });
   });

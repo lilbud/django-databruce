@@ -85,3 +85,9 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/18) Added "show gap" to song detail page. Listing how many shows since it's last performance.
 - (1/23) Fix song detail page snippet table not loading properly
 - (1/27) Event Setlist now tallies tour count/total live, instead of having to pull values from a view.
+- (1/27) Combined "Year by Year" and "Stats" into single tab on SongDetail page
+- (1/27) SongDetail snippet table now has band, venue, and location
+- (1/27) Songs Page fixed columns being too wide on mobile
+- (1/27) Songs Page searchbuilder on Lyrics now works properly
+- (1/27) Song Detail page year-by-year chart now resizes correctly
+- (1/27) Reenable autocomplete on navbar event search

@@ -17,10 +17,11 @@ from django.db.models import (
     Q,
     QuerySet,
     Subquery,
+    Value,
     When,
     Window,
 )
-from django.db.models.functions import Coalesce, JSONObject, RowNumber
+from django.db.models.functions import Coalesce, FirstValue, JSONObject, RowNumber
 from django.db.models.functions.window import Lag, Lead
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
@@ -848,6 +849,7 @@ class EventSetlist(viewsets.ReadOnlyModelViewSet):
                     SubqueryCount(
                         ArraySubquery(
                             models.Setlists.objects.filter(
+                                set_name__in=VALID_SET_NAMES,
                                 song__id=OuterRef("song"),
                                 event__tour__id=OuterRef("event__tour__id"),
                             ),

@@ -100,17 +100,17 @@ body {
     border-radius: var(--bs-border-radius) !important;
 }
 
-.card:not(:has(.card-header, .card-footer)) > .card-body {
+.card:not(:has(.card-header, .card-footer))>.card-body {
     border-radius: var(--bs-border-radius) !important;
 }
 
-.card:not(:has(.card-footer)) > .card-body {
+.card:not(:has(.card-footer))>.card-body {
     border-bottom-left-radius: var(--bs-border-radius) !important;
     border-bottom-right-radius: var(--bs-border-radius) !important;
 }
 
 th,
-td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
+td:not(.fc-day, [class$="opener"], [class$="closer"], .child),
 .modal-body,
 .list-group-item,
 #stats .row .card-body,
@@ -119,13 +119,16 @@ td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
     color: var(--base-content) !important;
     border-color: var(--border) !important;
 }
+
 .card {
-   break-inside: avoid;
+    break-inside: avoid;
 }
-.card-body:not(.success, .warning, .danger, .info) {
+
+.card-body:not(.success, .warning, .danger, .info, .accent) {
     background-color: var(--base-100) !important;
     color: var(--base-content) !important;
     border-color: var(--border) !important;
+    border-radius: var(--bs-border-radius) !important;
 }
 
 .card-header {
@@ -134,23 +137,43 @@ td:not(.fc-day,[class$="opener"],[class$="closer"],.child),
     border-color: var(--border) !important;
 }
 
+.card-body.info {
+    background-color: color-mix(in srgb, var(--info) 40%, transparent);
+    border: 1px solid var(--info);
+    color: var(--base-content);
+}
 
+/* onstage card reduce left padding when no grouping band */
+.dtrg-group>th:not(:has(a.onstage-band))>ul {
+    padding-left: 1rem !important;
+}
 
-td.child, tr.child, dl {
+.ui-autocomplete {
+    max-height: 200px;
+    /* Set a maximum height for the dropdown menu */
+    overflow-y: auto;
+    /* Enable vertical scrolling when content exceeds the max-height */
+    overflow-x: hidden;
+    /* Hide horizontal scrollbar to prevent layout issues */
+}
+
+td.child,
+tr.child,
+dl {
     background-color: var(--base-300) !important;
 }
 
 .dropdown-menu {
     background-color: var(--base-300) !important;
-    
+
     .dropdown-item {
         color: var(--base-content) !important;
     }
 }
 
 .form-check-input:checked {
-	background-color: var(--primary);
-	border-color: var(--primary);
+    background-color: var(--primary);
+    border-color: var(--primary);
 }
 
 a:link,
@@ -171,7 +194,7 @@ a:hover,
     background-color: var(--base-200) !important;
 }
 
-.page-item > button.page-link {
+.page-item>button.page-link {
     background-color: var(--primary) !important;
     color: var(--primary-content) !important;
     border-color: var(--primary) !important;
@@ -196,30 +219,28 @@ button.nav-link.active,
     border-color: var(--primary) !important;
 }
 
-/* a {
-    color: var(--primary) !important;
-} */
-
 .navbar .nav-link,
 .progress-bar,
 button.nav-link:not(.active, #bd-theme),
-.navbar .btn,
+.navbar .btn:not(#event-search-btn),
 .dropdown-menu .dropdown-item:hover,
 .dropdown-menu .dropdown-item.active,
 button#addshow.active,
 button#usercount.active,
 .btn-primary,
-.page-item > button.page-link {
+.page-item>button.page-link {
     color: var(--primary-content) !important;
 }
 
 .form-select {
-    height: 31px !important; /* stupid, but apparently needed because select2 fields are bigger for no reason */
+    height: 31px !important;
+    /* stupid, but apparently needed because select2 fields are bigger for no reason */
     background-color: var(--base-100) !important;
     border-color: var(--border) !important;
 }
 
-.form-control, .form-select:not(.dtsb-dropDown) {
+.form-control,
+.form-select:not(.dtsb-dropDown) {
     background-color: var(--base-100) !important;
     color: var(--base-content) !important;
     border-color: var(--border) !important;
@@ -250,7 +271,8 @@ button#usercount.active,
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
 }
 
-.card-header,.card-footer {
+.card-header,
+.card-footer {
     font-weight: 600 !important;
     font-size: 1rem !important;
     padding: 0.5rem 0.75rem !important;
@@ -296,7 +318,7 @@ button[class*='success'] {
 }
 
 .dtsb-searchBuilder {
-	color: var(--base-content) !important;
+    color: var(--base-content) !important;
 }
 
 #year-select .dropdown-menu {
@@ -312,7 +334,8 @@ button[class*='success'] {
 }
 
 @media (max-width: 1280px) {
-  /* profile dropdown, it gets pushed to under navbar on mobile when open.*/
+
+    /* profile dropdown, it gets pushed to under navbar on mobile when open.*/
     ul#profile {
         top: 4vh;
     }
@@ -323,8 +346,7 @@ nav ul {
 }
 
 .dropdown-menu .dropdown-item:hover,
-.dropdown-menu .dropdown-item.active
-{
+.dropdown-menu .dropdown-item.active {
     text-decoration: none !important;
 }
 
@@ -420,8 +442,9 @@ a.nav-link.active {
 }
 
 table tbody td,
-table tbody td > *{
-  vertical-align: middle;
+table tbody td>* {
+    vertical-align: middle;
+    white-space: wrap !important;
 }
 
 td .badge {
@@ -451,7 +474,7 @@ a#eventlink:hover {
 }
 
 .btn-close {
-	color: var(--base-content) !important;
+    color: var(--base-content) !important;
 }
 
 .footer {
@@ -484,11 +507,11 @@ a#eventlink:hover {
     display: flex !important;
 }
 
-.page-item.active > button.page-link {
+.page-item.active>button.page-link {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.3);
 }
 
-#notes-card > .card-body p a {
+#notes-card>.card-body p a {
     text-decoration: underline !important;
     color: var(--primary) !important;
 }
@@ -498,25 +521,27 @@ a#eventlink:hover {
     color: var(--primary) !important;
 }
 
-.dt-search > label {
+.dt-search>label {
     font-size: 0.875rem !important;
 }
 
-.badge .bi, th .bi {
-	/* font-size: 0.75rem !important; */
+.badge .bi,
+th .bi {
+    /* font-size: 0.75rem !important; */
     line-height: 1 !important;
 }
 
-.fc-daygrid-dot-event.fc-event-mirror, .fc-daygrid-dot-event:hover {
-	background: unset;
+.fc-daygrid-dot-event.fc-event-mirror,
+.fc-daygrid-dot-event:hover {
+    background: unset;
 }
 
 .fc-day.today {
     box-shadow: inset 0 0 100px 100px rgba(252, 183, 0, 0.2);
 }
 
-.fc-view-container { 
-    overflow-x: scroll; 
+.fc-view-container {
+    overflow-x: scroll;
 }
 
 @media (max-width: 576px) {
@@ -540,16 +565,16 @@ td.fc-day {
     padding: 0.5rem !important;
 }
 
-.fc-daygrid-day-events > .fc-daygrid-event-harness:not(:last-child) {
+.fc-daygrid-day-events>.fc-daygrid-event-harness:not(:last-child) {
     padding-bottom: 0.75rem !important;
 }
 
 th[role="presentation"] {
-	padding: 0 !important;
+    padding: 0 !important;
 }
 
 @media (max-width: 768px) {
-    tr:not(.hasChild,.child) > td:not(.child):hover {
+    tr:not(.hasChild, .child)>td:not(.child):hover {
         cursor: pointer;
     }
 }
@@ -580,14 +605,18 @@ body {
 
 @media (max-width: 768px) {
     .modal-dialog {
-        max-width: 90%; /* Use max-width for responsiveness */
-        width: 90%; /* Optional: fallback or specific width if needed */
+        max-width: 90%;
+        /* Use max-width for responsiveness */
+        width: 90%;
+        /* Optional: fallback or specific width if needed */
     }
 }
 
 @media (min-width: 768px) {
     .modal-dialog {
-        max-width: 40%; /* Use max-width for responsiveness */
-        width: 40%; /* Optional: fallback or specific width if needed */
+        max-width: 40%;
+        /* Use max-width for responsiveness */
+        width: 40%;
+        /* Optional: fallback or specific width if needed */
     }
 }

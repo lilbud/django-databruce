@@ -707,7 +707,7 @@ class SetlistFilterSerializer(serializers.ModelSerializer):
 
 
 class SnippetSerializer(serializers.ModelSerializer):
-    event = RestrictedEventsSerializer(source="setlist.event")
+    event = EventsSerializer(source="setlist.event")
     snippet = SongsSerializer()
     setlist = RestrictedSetlistsSerializer()
 

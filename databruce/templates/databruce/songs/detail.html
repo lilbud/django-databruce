@@ -81,10 +81,6 @@
                   data-bs-toggle="pill"
                   data-bs-target="#stats"
                   aria-controls="pills-stats">Stats</button>
-          <button class="nav-link text-center mb-1 mb-md-0"
-                  data-bs-toggle="pill"
-                  data-bs-target="#yearstats"
-                  aria-controls="pills-stats">Year by Year</button>
           {% if lyrics %}
             <button class="nav-link text-center mb-1 mb-md-0"
                     data-bs-toggle="pill"
@@ -103,91 +99,102 @@
     <div class="col-12 mx-auto">
       <div class="tab-content">
         <div id="stats" class="tab-pane fade">
-          <div class="card mb-3">
-            <div class="card-header">Song Stats</div>
-            <div class="card-body">
-              <div class="row mb-3">
-                <div class="col">
-                  <div class="text-lg pb-2">Performance Stats</div>
-                  <div class="row row-cols-1 row-cols-lg-4 g-2">
-                    <div class="col">
-                      <div class="card">
-                        <div class="card-body">
-                          <div class="text-sm text-nowrap">
-                            Public
-                            <i class="bi bi-info-circle-fill"
-                               data-bs-toggle="tooltip"
-                               data-bs-html="true"
-                               data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
-                          </div>
-                          <div class="text-xl">{{ counts.public }}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="card">
-                        <div class="card-body">
-                          <div class="text-sm text-nowrap">
-                            Private
-                            <i class="bi bi-info-circle-fill"
-                               data-bs-toggle="tooltip"
-                               data-bs-html="true"
-                               data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
-                          </div>
-                          <div class="text-xl">{{ counts.private }}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="card">
-                        <div class="card-body">
-                          <div class="text-sm text-nowrap">
-                            Snippet
-                            <i class="bi bi-info-circle-fill"
-                               data-bs-toggle="tooltip"
-                               data-bs-html="true"
-                               data-bs-title="Number of times a song was included as part of another."></i>
-                          </div>
-                          <div class="text-xl">{{ snippet_count }}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="card">
-                        <div class="card-body">
-                          <div class="text-sm text-nowrap">
-                            Frequency
-                            <i class="bi bi-info-circle-fill"
-                               data-bs-toggle="tooltip"
-                               data-bs-html="true"
-                               data-bs-title="How common a song is. Number of times played divided by number of shows since the debut. Formula from Dripfield.pro."></i>
-                          </div>
-                          <div class="text-xl">{{ frequency|default_if_none:"0" }}%</div>
-                        </div>
-                      </div>
-                    </div>
+          <div class="row row-cols-1 g-2">
+            <div class="col col-12 col-lg-8 pe-lg-2">
+              <div class="card">
+                <div class="card-header">Year Stats</div>
+                <div class="card-body">
+                  <div id="statChart">
+                    <canvas id="chart"></canvas>
                   </div>
                 </div>
               </div>
-              {% if positions %}
-                <div class="row">
-                  <div class="col">
-                    <div class="text-lg pb-2">Position Stats</div>
-                    <div class="row row-cols-1 row-cols-lg-4 g-2">
-                      {% for item in positions %}
-                        <div class="col">
-                          <div class="card">
-                            <div class="card-body">
-                              <div class="text-sm text-nowrap">{{ item.position }}</div>
-                              <div class="text-xl">{{ item.count }}</div>
+            </div>
+            <div class="col col-12 col-lg-4 px-2">
+              <div class="row row-cols-1 g-2">
+                <div class="card p-0">
+                  <div class="card-header">Performance Stats</div>
+                  <div class="card-body">
+                    <div class="row row-cols-2 g-2">
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="text-sm text-nowrap">
+                              Public
+                              <i class="bi bi-info-circle-fill"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-html="true"
+                                 data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
                             </div>
+                            <div class="text-xl">{{ counts.public }}</div>
                           </div>
                         </div>
-                      {% endfor %}
+                      </div>
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="text-sm text-nowrap">
+                              Private
+                              <i class="bi bi-info-circle-fill"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-html="true"
+                                 data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
+                            </div>
+                            <div class="text-xl">{{ counts.private }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="text-sm text-nowrap">
+                              Snippet
+                              <i class="bi bi-info-circle-fill"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-html="true"
+                                 data-bs-title="Number of times a song was included as part of another."></i>
+                            </div>
+                            <div class="text-xl">{{ snippet_count }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="text-sm text-nowrap">
+                              Frequency
+                              <i class="bi bi-info-circle-fill"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-html="true"
+                                 data-bs-title="How common a song is. Number of times played divided by number of shows since the debut. Formula from Dripfield.pro."></i>
+                            </div>
+                            <div class="text-xl">{{ frequency|default_if_none:"0" }}%</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              {% endif %}
+                {% if positions %}
+                  <div class="card p-0">
+                    <div class="card-header">Position Stats</div>
+                    <div class="card-body">
+                      <div class="row row-cols-2 g-2">
+                        {% for item in positions %}
+                          <div class="col">
+                            <div class="card p-0">
+                              <div class="card-body">
+                                <div class="text-sm text-nowrap">{{ item.position }}</div>
+                                <div class="text-xl">{{ item.count }}</div>
+                              </div>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
@@ -226,6 +233,9 @@
                   <thead>
                     <tr>
                       <th class="all">Date</th>
+                      <th class="min-tablet-l" scope="col">Act</th>
+                      <th class="all" scope="col">Venue</th>
+                      <th class="min-tablet-l" scope="col">Location</th>
                       <th class="all">During Song</th>
                       <th class="min-tablet-l">Note</th>
                     </tr>
@@ -261,18 +271,16 @@
             </div>
           </div>
         </div>
-        <div id="yearstats" class="tab-pane fade">
+        {% comment %} <div id="yearstats" class="tab-pane fade">
           <div class="card mb-3">
             <div class="card-header">Year Stats</div>
             <div class="card-body">
-              <div id="wrapper" class="p-0">
-                <div id="statChart">
-                  <canvas id="chart"></canvas>
-                </div>
+              <div id="statChart" class="p-0">
+                <canvas id="chart"></canvas>
               </div>
             </div>
           </div>
-        </div>
+        </div> {% endcomment %}
         <div id="lyrics" class="tab-pane fade">
           <div class="card">
             <div class="card-header">Lyrics</div>
@@ -313,12 +321,10 @@
         var style = getComputedStyle(document.body);
         var primCol = style.getPropertyValue('--primary');
 
-        console.log(primCol);
-
         let chart = new Chart(ctx, {
           type: "bar",
           data: {
-            labels: [{% for year in year_stats %}{{year.year|date:"Y"}},{% endfor %}],
+            labels: [{% for year in year_stats %}{{year.year}},{% endfor %}],
             datasets: [
                 {
                   label: "Events",
@@ -331,6 +337,7 @@
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             title: {
                 text: "Plays by Year",
                 display: true
@@ -398,7 +405,7 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
-                  return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+                  return '<a href="/venues/' + data.id + '">'+ data.name.replaceAll(',', ",<br>") +'</a>';
                 }
             },
           },
@@ -468,8 +475,9 @@
         },
         columns: [
           {
-            'data': 'setlist.event.date',
-            'name': 'setlist__event__id',
+            'data': 'event.date',
+            'name': 'event__id',
+            'width': '8rem',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
@@ -479,8 +487,39 @@
             },
           },
           {
+            'data': 'event.artist',
+            'name': 'event__artist__name',
+            'width': '14rem',
+            'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return '<a href="/bands/' + data.id + '">'+ data.name +'</a>';
+                }
+            },
+          },
+          {
+            'data': 'event.venue',
+            'name': 'event__venue__name, event__venue__detail',
+            'width': '12rem',
+            'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+                }
+            },
+          },
+          {
+            'data': 'event.venue.city',
+            'name': 'event__venue__city__name, event__venue__state__abbrev, event__venue__country__name',
+            'width': '12rem',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return '<a href="/cities/' + data.id + '">'+ data.display +'</a>';
+              };
+            },
+          },
+          {
             'data': 'setlist.song',
             'name': 'setlist__song__name',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return '<a href="/songs/' + data.id + '">'+ data.name +'</a>';

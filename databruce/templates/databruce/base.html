@@ -293,7 +293,9 @@
                   action="{% url 'search' %}"
                   class="d-flex my-xl-auto">
               {{ searchForm.date }}
-              <button type="submit" class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
+              <button type="submit"
+                      id="event-search-btn"
+                      class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
             </form>
             <hr class="d-xl-none">
             {% if user.is_authenticated %}
@@ -413,20 +415,36 @@
         const today = new Date();
         const currentYear = today.getFullYear();
 
-        $("#copyright-year").text(currentYear)
+        $("#copyright-year").text(currentYear);
 
-        /*
+        
         $("#eventSearch").autocomplete({
-            autoFocus: true,
-            source: "{% url 'events_auto' %}",
+            delay: 500,
+            source: function(request, response) {
+              $.ajax({
+                url: "/api/v1/events", // or .ashx, .asmx, etc.
+                dataType: "json",
+                data: {
+                  date: request.term
+                },
+                success: function(data) {
+                  response( $.map( data.results, function(item) {
+                    return {'id': item.id, 'value': `${item.date.display} - ${item.venue.formatted}`}
+                  }));
+                },
+                error: function() {
+                  // Always call response even if an error occurs to ensure the widget is in the correct state
+                  response([]);
+                }
+              });
+            },
             minLength: 7,
-            position: { my : "right top", at: "right bottom" },
+            position: { my:"right top", at:"right bottom", to:"#eventSearch", collision:"fit" },
             select: function (event, ui) {
-                window.location.href = "/events/" + ui.item.id;
-                console.log(ui.item);
+              window.location.href = "/events/" + ui.item.id;
             }
         });
-        */
+        
 
         // masks all date forms to fill in dashes
         $('.date-form').each(function() {

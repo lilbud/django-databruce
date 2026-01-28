@@ -95,9 +95,9 @@ function getDatatableLayout({ columns = true, category = false }) {
       'data-bs-toggle': 'modal',
       'data-bs-target': '#sbModal',
     },
-    init: function() {
-      console.log(this);
-    },
+    // init: function() {
+    //   console.log(this);
+    // },
     action: function (e, dt, node, config, cb) {
       new DataTable.SearchBuilder(dt, {
         liveSearch: false,
@@ -105,7 +105,7 @@ function getDatatableLayout({ columns = true, category = false }) {
         depthLimit: 1,
       });
 
-      dt.searchBuilder.container().prependTo('#modal-body');
+      dt.searchBuilder.container().appendTo('#modal-body');
     }
   };
 
@@ -120,13 +120,13 @@ function getDatatableLayout({ columns = true, category = false }) {
   return layout;
 };
 
-function dtCategorySelect({ layout, column_idx, values, label=false }) {
+function dtCategorySelect({ layout, column_idx, values, label = false }) {
   var div = $('<div />')
   $(div).addClass('me-2 my-auto text-sm align-middle');
   $(div).attr('id', 'dropdown-label');
 
   $(div).text(`${label.replace(":", "")}:`);
-  
+
   var all_button = {
     text: 'All',
     className: 'category-btn',
@@ -172,7 +172,7 @@ song_table_columns = [
       }
     },
   },
-  { 'data': 'song.category', 'name': 'song__category','width': '15rem', 'className': 'min-tablet-l' },
+  { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': 'min-tablet-l' },
 ]
 
 event_table_columns = [
