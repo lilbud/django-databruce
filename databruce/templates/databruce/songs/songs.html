@@ -27,7 +27,7 @@
 {% block scripts %}
   <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
+    var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7], category: true});
     dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Originals', 'value': '^Bruce Springsteen$'}, {'label': 'Covers', 'value': '^((?!Bruce Springsteen).)*$'}], label: 'Category'})
 
     new DataTable('#songsTable', {
@@ -45,13 +45,13 @@
       serverSide: true,
       processing: true,
       ajax: {
-        'url': '/api/v1/songs/?format=datatables&keep=id',
+        'url': '/api/v1/songs/?format=datatables&keep=id,has_lyrics',
       },
       columns: [
         {
           'data': 'name',
           'name': 'name',
-          //'width': '20rem',
+          'width': '20rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return '<a class="text-wrap" href="/songs/' + row.id + '">'+ data +'</a>';
@@ -59,13 +59,13 @@
           },
         },
         {
-          'data': 'lyrics',
-          'name': 'lyrics',
+          'data': 'has_lyrics',
+          'name': 'has_lyrics',
           'type': 'boolean',
           'width': '1rem',
           'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return row.lyrics ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
+                return data ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
               }
           },
         },
