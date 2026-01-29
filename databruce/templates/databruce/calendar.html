@@ -97,7 +97,7 @@
                   type="button"
                   id="my-button"
                   data-bs-toggle="dropdown"
-                  aria-expanded="false">{{ start_date }}</button>
+                  aria-expanded="false">{{ start_date|date:'Y' }}</button>
           <ul class="dropdown-menu">
             {% for i in years %}
               <li>
@@ -106,6 +106,16 @@
             {% endfor %}
           </ul>
         </div>
+        {% comment %} <div id="month-select">
+          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ start_date|date:'F' }}</button>
+          <ul class="dropdown-menu">
+            {% for i in months %}
+              <li>
+                <a class="dropdown-item" href="{% url "calendar" %}?start={{ i.start }}">{{ i.display }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div> {% endcomment %}
       </div>
       <div id="calendar"></div>
     </div>
