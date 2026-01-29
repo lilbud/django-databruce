@@ -155,6 +155,16 @@ class Calendar(TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
+        context["years"] = list(range(date.year, 1964, -1))
+
+        # context["months"] = [
+        #     {
+        #         "start": f"{date.year}-{str(i).zfill(2)}",
+        #         "display": f"{calendar.month_name[i]}",
+        #     }
+        #     for i in range(1, 13)
+        # ]
+
         try:
             if re.search(
                 r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
@@ -164,14 +174,37 @@ class Calendar(TemplateView):
         except MultiValueDictKeyError:
             context["start_date"] = date.strftime("%Y-%m-%d")
 
-        context["years"] = list(range(date.year, 1964, -1))
-        context["months"] = [
-            {
-                "start": f"{date.year}-{str(i).zfill(2)}",
-                "display": f"{calendar.month_name[i]} {date.year}",
-            }
-            for i in range(1, 13)
-        ]
+        # try:
+        #     if re.search(
+        #         r"^\d{4}-\d{2}-\d{2}$",
+        #         self.request.GET["start"],
+        #     ):
+        #         context["start_date"] = datetime.datetime.strptime(
+        #             self.request.GET["start"],
+        #             "%Y-%m-%d",
+        #         )
+        #     elif re.search(r"^\d{4}-\d{2}$", self.request.GET["start"]):
+        #         context["start_date"] = datetime.datetime.strptime(
+        #             self.request.GET["start"],
+        #             "%Y-%m",
+        #         )
+        #     elif re.search(r"^\d{4}$", self.request.GET["start"]):
+        #         context["start_date"] = datetime.datetime.strptime(
+        #             self.request.GET["start"],
+        #             "%Y",
+        #         )
+
+        #     context["start_date"].strftime("%Y-%m-%d")
+
+        # last = calendar.monthrange(
+        #     context["start_date"].year,
+        #     context["start_date"].month,
+        # )[1]
+
+        # context["end_date"] = context["start_date"].replace(day=last)
+
+        # except MultiValueDictKeyError:
+        #     context["start_date"] = date.strftime("%Y-%m-%d")
 
         return context
 
@@ -843,10 +876,13 @@ class SongDetail(TemplateView):
             .first()
         )
 
-        context["show_gap"] = models.Events.objects.filter(
-            id__gt=context["song_info"].last.id,
-            public=True,
-        ).count()
+        try:
+            context["show_gap"] = models.Events.objects.filter(
+                id__gt=context["song_info"].last.id,
+                public=True,
+            ).count()
+        except models.Songs.last.RelatedObjectDoesNotExist:
+            context["show_gap"] = 0
 
         context["title"] = f"{context['song_info'].name}"
 
