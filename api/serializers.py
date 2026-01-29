@@ -600,10 +600,22 @@ class ReleasesSerializer(serializers.ModelSerializer):
 class SongsSerializer(serializers.ModelSerializer):
     first = RestrictedEventsSerializer()
     last = RestrictedEventsSerializer()
+    has_lyrics = serializers.BooleanField(required=False)
 
     class Meta:
         model = models.Songs
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "first",
+            "last",
+            "original_artist",
+            "num_plays_public",
+            "num_plays_private",
+            "num_plays_snippet",
+            "category",
+            "has_lyrics",
+        ]
 
 
 class SongsRelationSerializer(serializers.ModelSerializer):
