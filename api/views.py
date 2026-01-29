@@ -737,6 +737,11 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
             "first",
             "last",
         )
+        .annotate(
+            has_lyrics=Exists(
+                Subquery(models.Lyrics.objects.filter(song=OuterRef("id"))),
+            ),
+        )
     )
     serializer_class = serializers.SongsSerializer
     filter_backends = [DjangoFilterBackend, filters.DTFilter]
