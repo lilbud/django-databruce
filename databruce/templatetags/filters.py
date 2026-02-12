@@ -150,8 +150,20 @@ def make_ordinal(n: int):
 def event_note_format(note: str) -> str:
     """Cuts note at first paragraph boundary."""
     md = MarkdownIt()
-
-    if len(note.splitlines()) > 1:
-        return md.render(note.splitlines()[0])
-
     return md.render(note)
+
+
+@register.filter
+def format_fuzzy(value):
+    try:
+        year, month, day = value[0:4], value[4:6], value[6:8]
+
+        if month == "00":
+            month = "01"
+
+        if day == "00":
+            day = "01"
+
+        return f"{year}-{month}-{day}"
+    except UnboundLocalError:
+        return value
