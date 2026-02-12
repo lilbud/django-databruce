@@ -3,6 +3,7 @@ import datetime
 import re
 from typing import Any
 
+import django_filters
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import (
@@ -10,30 +11,86 @@ from django.contrib.auth.forms import (
     UserCreationForm,
 )
 from django.contrib.auth.models import User
-from django.db.models import F
+from django.db.models import F, Q
 
 from . import models
 
 DATE = datetime.datetime.today()
 
 
+class CustomCharField(forms.CharField):
+    def __init__(self, *args, lookup_path=None, **kwargs) -> None:
+        self.lookup_path = lookup_path
+        super().__init__(*args, **kwargs)
+
+
+class CustomChoiceField(forms.ChoiceField):
+    def __init__(self, *args, lookup_path=None, **kwargs) -> None:
+        self.lookup_path = lookup_path
+        super().__init__(*args, **kwargs)
+
+
 class AdvancedEventSearch(forms.Form):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    class FormChoiceSelect(forms.ChoiceField):
-        def __init__(self, widget_id, *args: tuple, **kwargs: dict[str, Any]) -> None:
-            kwargs["initial"] = "is"
-            kwargs["label"] = ""
-            kwargs["choices"] = [("is", "is"), ("not", "not")]
-            kwargs["required"] = False
-            kwargs["widget"] = forms.Select(
-                attrs={
-                    "class": "form-select form-select-sm col-3",
-                    "id": widget_id,
-                },
+        ignore = ["first_date", "last_date", "month", "day", "conjunction"]
+
+        for field_name in list(self.fields.keys()):
+            if field_name.endswith("_exclude") or field_name in ignore:
+                continue
+
+            toggle_name = f"{field_name}_exclude"
+
+            self.fields[toggle_name] = forms.NullBooleanField(
+                required=False,
+                initial=False,
+                label="",
+                widget=forms.Select(
+                    attrs={
+                        "class": "form-select form-select-sm col-3",
+                    },
+                    choices=((False, "is"), (True, "not")),
+                ),
             )
-            super().__init__(*args, **kwargs)
+
+    def get_filters(self):
+        total_filter = Q()
+
+        if not self.is_valid():
+            return total_filter
+
+        for field in self.changed_data:
+            if field.endswith("_exclude") or field == "conjunction":
+                continue
+
+            value = self.cleaned_data.get(field)
+            if not value:
+                continue
+
+            # custom lookup_path variable on field, used to specify queryset lookup
+            field_instance = self.fields[field]
+            lookup_path = getattr(field_instance, "lookup_path", field)
+
+            # some fields have an id attribute, some have a 'id' key
+            val_id = getattr(
+                value,
+                "id",
+                value.get("id") if isinstance(value, dict) else value,
+            )
+
+            q_obj = Q(**{lookup_path: val_id})
+
+            # check if the field should be excluded
+            exclude_val = self.cleaned_data.get(f"{field}_exclude")
+
+            if exclude_val is True:
+                q_obj = ~q_obj
+
+            # Add the query object to the total filter
+            total_filter &= q_obj
+        print(total_filter)
+        return total_filter
 
     def get_months():
         months = [("", "")]
@@ -56,75 +113,9 @@ class AdvancedEventSearch(forms.Form):
         ("7", "Saturday"),
     ]
 
-    def get_states():
-        states = [("", "")]
-
-        states.extend(
-            models.States.objects.all()
-            .select_related("country")
-            .order_by("name")
-            .values_list("id", "name"),
-        )
-
-        return states
-
-    def get_cities():
-        cities = [("", "")]
-
-        cities.extend(
-            [
-                (item.id, item)
-                for item in models.Cities.objects.all()
-                .prefetch_related("state", "state__country")
-                .select_related("country")
-                .order_by("name")
-            ],
-        )
-
-        return cities
-
-    def get_countries():
-        countries = [("", "")]
-        countries.extend(
-            models.Countries.objects.all().order_by("name").values_list("id", "name"),
-        )
-        return countries
-
-    def get_musicians():
-        musicians = [("", "")]
-
-        musicians.extend(
-            models.Relations.objects.filter(appearances__gte=1)
-            .distinct("name")
-            .order_by("name")
-            .values_list("id", "name"),
-        )
-
-        return musicians
-
-    def get_bands():
-        bands = [("", "")]
-
-        bands.extend(
-            models.Bands.objects.filter(appearances__gte=1)
-            .distinct("name")
-            .order_by("name")
-            .values_list("id", "name"),
-        )
-
-        return bands
-
-    def get_tours():
-        tours = [("", "")]
-
-        tours.extend(
-            models.Tours.objects.all().order_by("name").values_list("id", "name"),
-        )
-
-        return tours
-
-    first_date = forms.CharField(
+    first_date = CustomCharField(
         label="Start Date",
+        lookup_path="date__gte",
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -138,8 +129,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    last_date = forms.CharField(
+    last_date = CustomCharField(
         label="Last Date",
+        lookup_path="date__lte",
         required=False,
         widget=forms.TextInput(
             attrs={
@@ -153,8 +145,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    month = forms.ChoiceField(
+    month = CustomChoiceField(
         label="Month",
+        lookup_path="date__month",
         choices=get_months(),
         required=False,
         widget=forms.Select(
@@ -166,8 +159,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    day = forms.ChoiceField(
+    day = CustomChoiceField(
         label="Day",
+        lookup_path="date__day",
         choices=get_days(),
         required=False,
         widget=forms.Select(
@@ -179,10 +173,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    day_of_week_choice = FormChoiceSelect(widget_id="dow_choice")
-
-    day_of_week = forms.ChoiceField(
+    day_of_week = CustomChoiceField(
         label="Day of Week",
+        lookup_path="date__week_day",
         choices=days_of_week,
         required=False,
         widget=forms.Select(
@@ -194,10 +187,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    city_choice = FormChoiceSelect(widget_id="city_choice")
-
-    city = forms.CharField(
+    city = CustomCharField(
         label="City",
+        lookup_path="venue__city__id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -208,10 +200,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    state_choice = FormChoiceSelect(widget_id="state_choice")
-
-    state = forms.CharField(
+    state = CustomCharField(
         label="State",
+        lookup_path="venue__city__state__id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -222,10 +213,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    country_choice = FormChoiceSelect(widget_id="country_choice")
-
-    country = forms.CharField(
+    country = CustomCharField(
         label="Country",
+        lookup_path="venue__city__country__id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -236,10 +226,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    venue_choice = FormChoiceSelect(widget_id="venue_choice")
-
-    venue = forms.CharField(
+    venue = CustomCharField(
         label="Venue",
+        lookup_path="venue__id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -250,10 +239,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    tour_choice = FormChoiceSelect(widget_id="tour_choice")
-
-    tour = forms.CharField(
+    tour = CustomCharField(
         label="Tour",
+        lookup_path="tour__id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -264,24 +252,22 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    musician_choice = FormChoiceSelect(widget_id="musician_choice")
-
-    musician = forms.CharField(
-        label="Musician",
+    relation = CustomCharField(
+        label="Relation",
+        lookup_path="onstage__relation_id",
         required=False,
         widget=forms.Select(
             attrs={
                 "class": "form-select form-select-sm select2",
-                "id": "musician",
-                "name": "event_musician",
+                "id": "relation",
+                "name": "event_relation",
             },
         ),
     )
 
-    band_choice = FormChoiceSelect(widget_id="band_choice")
-
-    band = forms.CharField(
+    band = CustomCharField(
         label="Band",
+        lookup_path="onstage__band_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -406,21 +392,15 @@ class AdvancedEventSearch(forms.Form):
 
         return None
 
-    def clean_musician(self):
-        if self.cleaned_data["musician"]:
-            return models.Relations.objects.get(id=self.cleaned_data["musician"])
+    def clean_relation(self):
+        if self.cleaned_data["relation"]:
+            return models.Relations.objects.get(id=self.cleaned_data["relation"])
 
         return None
 
     def clean_band(self):
         if self.cleaned_data["band"]:
             return models.Bands.objects.get(id=self.cleaned_data["band"])
-
-        return None
-
-    def clean_conjunction(self):
-        if self.cleaned_data["conjunction"]:
-            return self.cleaned_data["conjunction"]
 
         return None
 
@@ -457,17 +437,7 @@ class SetlistSearch(forms.Form):
     def __init__(self, *args: dict, **kwargs: dict) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
-        self.empty_permitted = False
-
-    def clean(self):
-        """Check that the setlist form has at least song1 set."""
-        cleaned_data = super().clean()
-
-        if cleaned_data.get("song1") is not None:
-            return cleaned_data
-
-        msg = "Invalid value"
-        raise forms.ValidationError((msg), code="invalid")
+        self.empty_permitted = True
 
     song1 = forms.CharField(
         label="Song:",
@@ -477,13 +447,13 @@ class SetlistSearch(forms.Form):
         ),
     )
 
-    choice = forms.ChoiceField(
+    choice = forms.NullBooleanField(
         label=None,
-        choices=[("is", "is"), ("not", "not")],
-        initial="is",
+        initial=True,
         required=False,
         widget=forms.Select(
             attrs={"class": "form-select form-select-sm choice"},
+            choices=((True, "is"), (False, "not")),
         ),
     )
 
@@ -525,49 +495,21 @@ class SetlistSearch(forms.Form):
         ),
     )
 
-    # songs = dict(models.Songs.objects.all().values_list("id", "name"))
-    # print(songs)
-
     def clean_song1(self):
         if self.cleaned_data["song1"]:
-            return {
-                "id": self.cleaned_data["song1"],
-                "value": models.Songs.objects.get(int(self.cleaned_data["song1"])).name,
-            }
+            return self.cleaned_data["song1"]
 
         return None
 
     def clean_song2(self):
         if self.cleaned_data["song2"]:
-            return {
-                "id": self.cleaned_data["song2"],
-                "value": models.Songs.objects.get(int(self.cleaned_data["song2"])).name,
-            }
+            return self.cleaned_data["song2"]
 
         return None
 
     def clean_position(self):
-        positions = {
-            "anywhere": "Anywhere",
-            "followed_by": "Followed By",
-            "show_opener": "Show Opener",
-            "in_show": "Show",
-            "in_set_one": "Set 1",
-            "set_one_opener": "Set 1 Opener",
-            "set_one_closer": "Set 1 Closer",
-            "in_set_two": "Set 2",
-            "set_two_opener": "Set 2 Opener",
-            "set_two_closer": "Set 2 Closer",
-            "main_set_closer": "Main Set Closer",
-            "encore_opener": "Encore Opener",
-            "in_encore": "Encore",
-            "in_preshow": "Pre-Show",
-            "in_recording": "Recording",
-            "in_soundcheck": "Soundcheck",
-            "show_closer": "Show Closer",
-        }
         if self.cleaned_data["position"]:
-            return positions.get(self.cleaned_data["position"])
+            return self.cleaned_data["position"]
 
         return None
 
@@ -583,7 +525,7 @@ class EventSearch(forms.Form):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    date = forms.CharField(
+    date = CustomCharField(
         label="",
         required=False,
         widget=forms.TextInput(
@@ -604,7 +546,7 @@ class SetlistNoteSearch(forms.Form):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    query = forms.CharField(
+    query = CustomCharField(
         label="",
         required=True,
         widget=forms.TextInput(
@@ -620,7 +562,7 @@ class SetlistNoteSearch(forms.Form):
 
 
 class UserForm(UserCreationForm):
-    username = forms.CharField(
+    username = CustomCharField(
         label="Username",
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control form-control-sm"}),
@@ -634,14 +576,14 @@ class UserForm(UserCreationForm):
         ),
     )
 
-    password1 = forms.CharField(
+    password1 = CustomCharField(
         label="Password",
         required=True,
         widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
         help_text=password_validation.password_validators_help_text_html(),
     )
 
-    password2 = forms.CharField(
+    password2 = CustomCharField(
         required=True,
         label="Enter the same password as before, for verification.",
         widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
@@ -662,7 +604,7 @@ class UpdateUserForm(forms.ModelForm):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    username = forms.CharField(
+    username = CustomCharField(
         label="Username:",
         required=True,
         widget=forms.TextInput(
@@ -700,7 +642,7 @@ class ContactForm(forms.Form):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    subject = forms.ChoiceField(
+    subject = CustomChoiceField(
         label="Subject",
         choices=[
             ("problem", "Bug/Problem"),
@@ -729,7 +671,7 @@ class ContactForm(forms.Form):
         ),
     )
 
-    message = forms.CharField(
+    message = CustomCharField(
         label="Message",
         required=True,
         widget=forms.Textarea(
@@ -742,7 +684,7 @@ class ContactForm(forms.Form):
         ),
     )
 
-    verification = forms.CharField(
+    verification = CustomCharField(
         label="Verification",
         required=True,
         help_text="Enter the release year of Bruce's third album",
