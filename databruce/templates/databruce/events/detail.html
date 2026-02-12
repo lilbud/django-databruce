@@ -22,7 +22,7 @@
                    data-bs-placement="top"
                    data-bs-html="true"
                    data-bs-title="<div>{{ last.get_date }}<br>{{ last.artist }}<br>{{ last.venue.name }}</div>"
-                   href="{% url "event_details" id=last.id %}">&lt; Prev</a>
+                   href="{% url "event_details" id=last.event_id %}">&lt; Prev</a>
               {% endif %}
             {% endwith %}
             {% if user.is_superuser %}
@@ -38,7 +38,7 @@
                    data-bs-placement="top"
                    data-bs-html="true"
                    data-bs-title="<div>{{ next.get_date }}<br>{{ next.artist }}<br>{{ next.venue.name }}</div>"
-                   href="{% url "event_details" id=next.id %}">Next &gt;</a>
+                   href="{% url "event_details" id=next.event_id %}">Next &gt;</a>
               {% endif %}
             {% endwith %}
           </div>
@@ -48,7 +48,7 @@
         <div class="row">
           <div class="col">
             <div class="card">
-              <div class="card-body info fst-italic p-2">This is a placeholder date, actual date unknown.</div>
+              <div class="card-body message info fst-italic p-2">This is a placeholder date, actual date unknown.</div>
             </div>
           </div>
         </div>
@@ -63,13 +63,13 @@
                     <div id="title" class="text-wrap mb-1 text-sm text-light">{{ event.title|markdown|safe }}</div>
                   {% endif %}
                   <div class="text-wrap text-xl">
-                    <span id="date">{{ event.get_date }}</span>
+                    <span id="date">{{ event.event_id|format_fuzzy }}</span>
                     <a class="fw-semibold"
                        href="{% url 'band_details' id=event.artist.id %}"
                        id="artist">{{ event.artist }}</a>
                   </div>
                   <div class="text-base fw-semibold">
-                    <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue }}, {{ event.venue.city }}</a>
+                    <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.get_name }}, {{ event.venue.city }}</a>
                   </div>
                   <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
                     {% if event.tour %}
@@ -87,7 +87,7 @@
                       {% if event.brucebase_url %}
                         <a id="eventlink"
                            class="pe-1"
-                           href="https://brucebase.wikidot.com/{{ event.id|brucebase_url }}">
+                           href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
                           <span class="badge bg-secondary text-secondary eventlink">
                             <i class="bi bi-link-45deg pe-1"></i>
                             <span>Brucebase</span>
@@ -118,13 +118,11 @@
                                 type="submit"
                                 name="submit"
                                 class="btn btn-sm text-nowrap {% if user_attended %}btn-primary active{% else %}btn-secondary{% endif %}">
-                          <span class="pe-1" id="star">
-                            {% if user_attended %}
-                              <i class="bi bi-star-fill"></i>
-                            {% else %}
-                              <i class="bi bi-star"></i>
-                            {% endif %}
-                          </span>
+                          {% if user_attended %}
+                            <i class="bi bi-star-fill pe-1" id="star"></i>
+                          {% else %}
+                            <i class="bi bi-star pe-1"id="star"></i>
+                          {% endif %}
                           <span id="attended">
                             {% if user_attended %}
                               Attended
@@ -190,55 +188,50 @@
                       </div>
                     </div>
                   {% endif %}
-                  {% if setlist_exists %}
-                    <div class="card mb-2" id="setlist-card">
-                      <div class="card-header">
-                        <div class="d-flex justify-content-between">
-                          <span>Setlist</span>
-                          <span class="text-sm my-auto"
-                                data-bs-toggle="tooltip"
-                                data-bs-html="true"
-                                data-bs-title="Setlist Options">
-                            <a role="button"
-                               class="btn btn-sm btn-primary px-1 py-0"
-                               data-bs-toggle="collapse"
-                               href="#options">
-                              <i class="bi bi-gear-fill text-sm"></i>
-                            </a>
-                          </span>
-                        </div>
-                        <div class="row collapse px-0 mt-2" id="options">
-                          <div class="row">
-                            <div class="col">
-                              <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-                            </div>
+                  <div class="card mb-2" id="setlist-card">
+                    <div class="card-header">
+                      <div class="d-flex justify-content-between">
+                        <span>Setlist</span>
+                        <span class="text-sm my-auto"
+                              data-bs-toggle="tooltip"
+                              data-bs-html="true"
+                              data-bs-title="Setlist Options">
+                          <a role="button"
+                             class="btn btn-sm btn-primary px-1 py-0"
+                             data-bs-toggle="collapse"
+                             href="#options">
+                            <i class="bi bi-gear-fill text-sm"></i>
+                          </a>
+                        </span>
+                      </div>
+                      <div class="row collapse px-0 mt-2" id="options">
+                        <div class="row">
+                          <div class="col">
+                            <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
                           </div>
                         </div>
                       </div>
-                      <div class="card-body p-0">
-                        <div class="d-none" id="setlist_copy">
-                          {{ setlist_copy|join:'<br>' }}
-                        </div>
-                        <div class="table-responsive">
-                          <table class="table table-hover display wrap" id="setlistTable">
-                            <thead>
-                              <th class="all">#</th>
-                              <th class="all">Song</th>
-                              {% comment %} <th class="none">Position</th> {% endcomment %}
-                              <th class="min-desktop">Gap</th>
-                              <th class="min-desktop">Tour</th>
-                              <th class="min-desktop">Last</th>
-                              <th class="min-desktop">Notes</th>
-                            </thead>
-                          </table>
-                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="table table-hover display wrap" id="setlistTable">
+                          <thead>
+                            <th class="all">#</th>
+                            <th class="all">Song</th>
+                            {% comment %} <th class="none">Position</th> {% endcomment %}
+                            <th class="min-desktop">Gap</th>
+                            <th class="min-desktop">Tour</th>
+                            <th class="min-desktop">Last</th>
+                            <th class="min-desktop">Notes</th>
+                          </thead>
+                        </table>
                       </div>
                     </div>
-                  {% endif %}
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-12 mt-2 mt-md-0 mb-4 {% if setlist_exists %}col-lg-2 ps-lg-0{% endif %} order-2">
+            <div class="col-12 mt-2 mt-md-0 mb-4 col-lg-2 ps-lg-0 order-2">
               <div class="row row-cols-1 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
                    id="masonry-grid">
                 {% if event.note %}
@@ -251,7 +244,7 @@
                         </div>
                       </div>
                       <div class="card-body text-xs">
-                        <div>{{ event.note|note_format|safe }}</div>
+                        <div>{{ event.note|markdown|safe }}</div>
                         <div class="row mt-1">
                           <a href="#"
                              role="button"
@@ -263,27 +256,27 @@
                     </div>
                   </div>
                 {% endif %}
-                {% if onstage %}
-                  <div class="col order-2">
-                    <div class="card">
-                      <div class="card-header">
-                        Performers
-                        <div class="float-end">
-                          <i class="bi bi-person"></i>
-                        </div>
+                {% comment %} {% if onstage %} {% endcomment %}
+                <div class="col order-2">
+                  <div class="card">
+                    <div class="card-header">
+                      Performers
+                      <div class="float-end">
+                        <i class="bi bi-person"></i>
                       </div>
-                      <div class="card-body p-1">
-                        <div class="table-responsive">
-                          <table class="table display" id="onstageTable">
-                            <thead>
-                              <th class="d-none all">#</th>
-                            </thead>
-                          </table>
-                        </div>
+                    </div>
+                    <div class="card-body p-1">
+                      <div class="table-responsive">
+                        <table class="table display" id="onstageTable">
+                          <thead>
+                            <th class="d-none all">#</th>
+                          </thead>
+                        </table>
                       </div>
                     </div>
                   </div>
-                {% endif %}
+                </div>
+                {% comment %} {% endif %} {% endcomment %}
                 {% if album_breakdown %}
                   <div class="col order-3">
                     <div class="card">
@@ -324,7 +317,7 @@
                       <div class="card-body">
                         <ul class="ps-2 d-grid gap-0 row-gap-2">
                           {% if official %}
-                            {% for rel in releases %}
+                            {% for rel in official %}
                               <li>
                                 <a href="{% url 'release_details' id=rel.release.id %}">{{ rel.release.name }} (Official
                                 Release)</a>
@@ -456,12 +449,11 @@
         searching: false,
         //scrollX: true,
         ordering: false,
-        ajax: '/api/v1/event_setlist/?event={{ id }}&format=datatables&keep=id,nobruce,last_event,instrumental,t_total,t_count,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+        ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
         columnDefs: [
           { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop' },
-          { targets: [0], type: 'text', className: 'songnum align-middle p-0' },
-          { targets: [0], width: '1rem' },
-          { targets: [1], width: '20rem' },
+          { targets: [0], type: 'text', className: 'songnum align-middle p-0', width: '1rem' },
+          { targets: [1], width: '22rem' },
           { targets: [2, 3], width: '3rem' },
           { targets: [4], width: '6rem' },
         ],
@@ -470,9 +462,7 @@
           className: 'text-center setHeader',
         },
         createdRow: function (row, data, dataIndex) {
-          var sets = ['Show', 'Set 1', 'Set 2', 'Encore', 'Pre-Show', 'Post-Show']
-
-          if (sets.includes(data.set_name)) {
+          if (set_names.includes(data.set_name)) {
             var album = slugify(data.song.category);
             $(row).attr('album', album);
           }
@@ -481,14 +471,13 @@
           {
             'data': 'song_num',
             'className': 'dt-center all',
-            //'width': '1rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && row.position) {
                 var position = row.position.replaceAll(' ', '').toLowerCase();
 
                 return `<span data-bs-toggle="tooltip" data-bs-title="${row.position}" class='songnum ${position}'>${data}</span>`
               } else if (!data) {
-                return ''
+                return null
               } else {
                 return `<span class='songnum'>${data}</span>`
               }
@@ -498,14 +487,13 @@
             'data': 'song',
             'name': 'song__name',
             'className': 'all text-nowrap',
-            //'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var song = '<a class="fw-medium" href="/songs/' + data.id + '">' + data.name + '</a>';
+                var song = `<a class="fw-medium" href="/songs/${data.id}">${data.name}</a>`;
 
                 song = row.segue ? `${song} >` : song;
 
-                var badge = $('<span />').addClass('ms-2 badge align-middle d-inline-flex d-lg-none')
+                var badge = $('<span />').addClass('ms-2 badge align-middle')
 
                 // instrumental, sign-request, nobruce, premiere
                 if (row.instrumental) {
@@ -513,13 +501,13 @@
                 } else if (row.sign_request) {
                   $(badge).addClass('text-bg-info').text('Sign Request');
                 } else if (row.nobruce) {
-                  $(badge).addClass('warning').text('No Bruce');
+                  $(badge).addClass('bg-warning').text('No Bruce');
                 } else if (row.premiere) {
-                  $(badge).addClass('bg-secondary').text('First');
+                  $(badge).addClass('bg-secondary d-inline-flex d-lg-none').text('First');
                 } else if (row.debut && !row.premiere) {
-                  $(badge).addClass('bg-secondary').text('TD');
+                  $(badge).addClass('bg-secondary d-inline-flex d-lg-none').text('TD');
                 } else if (row.last >= 50 && !row.debut) {
-                  $(badge).addClass('bg-secondary').text('Bustout');
+                  $(badge).addClass('bg-secondary d-inline-flex d-lg-none').text('Bustout');
                 }
 
                 if (row.notes) {
@@ -533,18 +521,24 @@
           },
           {
             'data': 'last',
-            'className': 'dt-center min-desktop',
-            //'width': '4rem',
+            'className': 'dt-center text-nowrap',
             'render': function (data, type, row, meta) {
+
+              var badge = $('<span />').addClass('badge align-middle text-nowrap d-none d-lg-inline-flex').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
+
               if (type === 'display') {
                 if (data >= 50 && !row.debut) {
-                  return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="≥50 shows on current tour since last played">${data + ', Bustout'}</span>`;
-                } else if (row.debut && !row.premiere && data) {
-                  return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">${data + ', TD'}</span>`;
-                } else if (row.debut && !row.premiere && !data) {
-                  return `<span class="badge bg-primary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Tour Debut">TD</span>`;
+                  $(badge).addClass('bg-primary').text(`${data}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+                  return $(badge).prop('outerHTML');
+                } else if (row.debut && !row.premiere) {
+                  $(badge).addClass('bg-primary').text(`${row.last}, TD`).attr('data-bs-title', 'Tour Debut');
+                  return $(badge).prop('outerHTML');
+                //} else if (row.debut && !row.premiere && !data) {
+                //  $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
+                //  return $(badge).prop('outerHTML');
                 } else if (row.premiere) {
-                  return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="FTP">First</span>`;
+                  $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
+                  return $(badge).prop('outerHTML');
                 } else {
                   return row.last;
                 }
@@ -552,18 +546,21 @@
             },
           },
           {
-            'data': 't_count',
+            'data': 'tour_num',
             'className': 'dt-center min-desktop',
-            //'width': '4rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 var num = data;
-                var total = row.t_total;
+                var total = row.tour_total;
+
+                var badge = $('<span />').addClass('badge align-middle').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
                 if (num == total && total == 1) {
-                  return `<span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Only Tour Performance">Only</span>`
+                  $(badge).addClass('bg-secondary').text('Only').attr('data-bs-title', 'Only Tour Performance');
+                  return $(badge).prop('outerHTML');
                 } else if (num == total && total > 1) {
-                  return `<span class="badge bg-accent" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Final Tour Performance<br>(${num}/${total})">Last</span>`
+                  $(badge).addClass('bg-accent').text('Last').attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
+                  return $(badge).prop('outerHTML');
                 } else {
                   return `${num}/${total}`
                 }
@@ -571,13 +568,12 @@
             },
           },
           {
-            'data': 'ltp.date',
+            'data': 'last_event',
             'name': 'ltp__id',
-            'className': 'dt-center min-desktop',
-            //'width': '6rem',
+            'className': 'dt-center min-desktop text-nowrap',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return data ? '<a class="fw-medium" href="/events/' + data.id + '">' + data.display + '</a>' : '';
+              if (type === 'display' && data) {
+                return `<a class="fw-medium" href="/events/${data.event_id}">${data.date.display_day}</a>`;
               }
             },
           },
@@ -585,14 +581,14 @@
             'data': 'notes',
             'name': 'notes',
             'className': 'min-desktop',
-            //'width': '18rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data && data != null) {
-                $(data).each(function (i, e) {
-                  data[i] = e.replaceAll('\'\'', '\'');
-                })
-
-                return data ? `<div class="text-xs text-wrap fw-light">${data.join('; ')}</div>` : '';
+              if (type === 'display') {
+                if (data) {
+                  return data
+                } else {
+                  return row.note
+                }
+                
               }
             },
           },
@@ -616,27 +612,30 @@
         }
       });
 
-    $(window).on("resize", function () {
-      //isMobile = window.matchMedia("only screen and (max-width: 768px)").matches ? '94vw' : false;
-      $('#setlistTable').DataTable().columns.adjust();
-    });
-
     $('th.setHeader').each(function () {
       $(this).removeClass('setHeader');
     });
 
-    // code adapted from stackoverflow
     $('#copySetlist').click(function () {
       var btn = this;
 
-      var $temp = $("<textarea>");
-      $("body").append($temp);
-      var x = $('#setlist_copy').html().trim().replace(/<br>/g, '\n').replace(/<\/?[^>]+>/g, '');
-      $temp.val(x).select();
-      document.execCommand("copy");
-      $temp.remove();
+      fetch('/api/v1/setlist/?event={{ id }}&format=json')
+      .then(response => response.json())
+      .then(data => {
+        var lines = [];
 
-      console.log(x);
+        data.results.forEach(function (item) {
+          var song = item.segue ? `${item.song.name} >` : item.song.name;
+          lines.push(song);
+        });
+
+        try {
+          navigator.clipboard.writeText(lines.join('\n'));
+          console.log('Text copied to clipboard successfully!');
+        } catch (err) {
+          console.error('Failed to copy text: ', err);
+        }
+      });
 
       $(btn).text('Setlist Copied');
       $(btn).removeClass('btn-primary').addClass('btn-success');
@@ -659,13 +658,13 @@
           $("#usercount").text(data['count']);
 
           if (data['action'] === 'added') {
-            $("#star").html('<i class="bi bi-star-fill"></i>');
+            $("#star").addClass('bi-star-fill').removeClass('bi-star');
             $("#attended").text('Attended');
             $("#addshow").addClass('active');
             $("#usercount").addClass('active');
 
           } else if (data['action'] === 'removed') {
-            $("#star").html('<i class="bi bi-star"></i>');
+            $("#star").addClass('bi-star').removeClass('bi-star-fill');
             $("#attended").text('Attended?');
             $("#addshow").removeClass('active');
             $("#usercount").removeClass('active');
@@ -683,7 +682,7 @@
         searching: false,
         ordering: false,
         ajax: {
-          'url': '/api/v1/onstage/?event={{ id }}&format=datatables&keep=band,relation,event',
+          'url': '/api/v1/onstage/?event={{ id }}&format=custom',
         },
         rowGroup: {
           dataSrc: function (row) {
@@ -693,7 +692,7 @@
             var ul = $('<ul />');
 
             $(rows.data()).each(function () {
-              $(`<li class="text-reset text-sm pe-0 fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul)
+              $(`<li class="text-reset text-sm pe-0 fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul);
             });
 
             return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');
@@ -728,5 +727,5 @@
     });
   });
 
-</script>
+  </script>
 {% endblock content %}
