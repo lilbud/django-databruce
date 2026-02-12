@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Lyrics
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Lyrics</div>
@@ -37,7 +37,7 @@
           serverSide: true,
           processing: true,
           ajax: {
-            'url': '/api/v1/lyrics/?format=datatables&keep=uuid',
+            'url': '/api/v1/lyrics/?format=custom',
           },
           columns: [
             {

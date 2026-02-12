@@ -111,7 +111,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/events/?leg={{ info.id }}&format=datatables&keep=id,early_late,public',
+          'url': '/api/v1/events/?leg={{ info.id }}&format=custom',
         },
         columnDefs: [
           { targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem'},
@@ -126,7 +126,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/setlists?leg={{ info.id }}&format=datatables&keep=songid',
+          'url': '/api/v1/setlists?leg={{ info.id }}&format=custom',
         },
         columns: song_table_columns,
       });
@@ -140,7 +140,7 @@
             start: 2
         },
         ajax: {
-          'url': '/api/v1/setlist_entries/?leg={{ info.id }}&format=datatables',
+          'url': '/api/v1/setlist_entries/?leg={{ info.id }}&format=custom',
         },
         columns: setlist_slots
       });

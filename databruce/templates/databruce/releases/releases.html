@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Releases
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Releases</div>
@@ -29,7 +29,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/releases/?format=datatables&keep=id',
+          'url': '/api/v1/releases/?format=custom',
         },
         columns: [
           {

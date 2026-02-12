@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Nugs Releases
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Nugs Releases</div>
@@ -26,27 +26,6 @@
       <th class="min-tablet-l">First Friday?</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-        {% for release in releases %}
-            <tr>
-                <td>{{ release.date|default_if_none:""|date:"Y-m-d" }}</td>
-                <td>
-                    <a href="{% url "event_details" id=release.event.id %}">{{ release.event }}</a>
-                </td>
-                <td>
-                    <a href="{% url 'venue_details' id=release.event.venue.id %}">{{ release.event.venue.name }}</a>
-                </td>
-                <td>
-                    {% if release.event.venue.city %}
-                        <a href="{% url 'city_details' id=release.event.venue.city.id %}">{{ release.event.venue.city }}</a>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ release.url }}">Nugs Release</a>
-                </td>
-            </tr>
-        {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
@@ -59,7 +38,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/nugs_releases/?format=datatables&keep=id,name',
+          'url': '/api/v1/nugs_releases/?format=custom',
         },
         columnDefs: [
           { targets: [-1], visible: false },
@@ -77,31 +56,31 @@
             },
           },
           {
-            'data': 'event.date',
-            'name': 'event__id',
+            'data': 'event',
+            'name': 'event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                return '<a href="/events/' + data.event_id + '">'+ data.date.display_day +'</a>';
               }
             },
           },
           {
-            'data': 'venue',
+            'data': 'event.venue',
             'name': 'event__venue__name',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return data.name;
+                return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
               }
-            },            
+            },
           },
           {
-            'data': 'venue.city',
+            'data': 'event.venue',
             'name': 'event__venue__city__name, event__venue__city__state__abbrev',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return data.display;
+                return '<a href="/cities/' + data.city.id + '">'+ data.location +'</a>';
               }
-            },            
+            },
           },
           {
             'data': 'url',

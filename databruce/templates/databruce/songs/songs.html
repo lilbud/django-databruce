@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Songs
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Songs</div>
@@ -45,7 +45,7 @@
       serverSide: true,
       processing: true,
       ajax: {
-        'url': '/api/v1/songs/?format=datatables&keep=id,has_lyrics',
+        'url': '/api/v1/songs/?format=custom',
       },
       columns: [
         {
@@ -54,7 +54,7 @@
           'width': '20rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return '<a class="text-wrap" href="/songs/' + row.id + '">'+ data +'</a>';
+                return `<a class="text-wrap" href="/songs/${row.id}">${data}</a>`
               }
           },
         },
@@ -72,22 +72,22 @@
         {'data': 'original_artist', 'name': 'original_artist', 'width': '10rem' },
         {'data': 'category', 'name': 'category', 'className': 'text-wrap', 'width': '15rem'},
         {
-          'data': 'first.date',
-          'name': 'first__id, first__early_late',
-          'width': '6rem',
+          'data': 'first_event.date',
+          'name': 'first_event__event_id, first_event__early_late',
+          'width': '9rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                return `<a class="text-wrap" href="/events/${data.id}">${data.display}</a>`
               }
           },
         },
         {
-          'data': 'last.date',
-          'name': 'last__id, last__early_late',
-          'width': '6rem',
+          'data': 'last_event.date',
+          'name': 'last_event__event_id, last_event__early_late',
+          'width': '9rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                return `<a class="text-wrap" href="/events/${data.id}">${data.display}</a>`
               }
           },        
         },

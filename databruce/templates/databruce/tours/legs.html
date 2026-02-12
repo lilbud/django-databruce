@@ -30,7 +30,7 @@
       processing: true,
       scrollY: '60vh',
       ajax: {
-        'url': '/api/v1/tour_legs/?format=datatables&keep=id',
+        'url': '/api/v1/tour_legs/?format=custom',
       },
       columnDefs: [
         { targets: [0,1], width: '12rem' },
@@ -62,8 +62,8 @@
           },
         },
         {
-          'data': 'first.date',
-          'name': 'first__id, first__early_late',
+          'data': 'first_event.date',
+          'name': 'first_event__event_id, first_event__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
@@ -71,8 +71,8 @@
           },
         },
         {
-          'data': 'last.date',
-          'name': 'last__id, last__early_late',
+          'data': 'last_event.date',
+          'name': 'last_event__event_id, last_event__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
               return '<a href="/events/' + data.id + '">'+ data.display +'</a>';

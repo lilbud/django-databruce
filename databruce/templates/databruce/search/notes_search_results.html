@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Events &gt; Search
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
@@ -22,21 +22,6 @@
                 <th scope="col" class="min-tablet-l">Note</th>
               </tr>
             </thead>
-            {% comment %} <tbody>
-              {% for item in results %}
-                <tr>
-                  <td>
-                    <a href="{% url "event_details" id=item.event.id %}">{{ item.event.get_date }}</a>
-                  </td>
-                  <td>{{ item.event.venue.get_name }}</td>
-                  <td>{{ item.id.set_name }}</td>
-                  <td>
-                    <a href="{% url "song_details" id=item.id.song.id %}">{{ item.id.song.name }}</a>
-                  </td>
-                  <td>{{ item.note|default_if_none:"" }}</td>
-                </tr>
-              {% endfor %}
-            </tbody> {% endcomment %}
           </table>
         </div>
       </div>
@@ -50,27 +35,27 @@
         processing: true,
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/setlist_notes/?note={{ query }}&format=datatables&keep=id,early_late,public',
+          'url': '/api/v1/setlist_notes/?note={{ query }}&format=custom',
         },
         columnDefs: [
           { targets: '_all', className: 'text-wrap text-xs', defaultContent: '' },
         ],
         columns: [
           {
-            'data': 'event.date',
-            'name': 'event__id, event__early_late',
+            'data': 'event',
+            'name': 'event__event_id, event__early_late',
             'className': 'text-nowrap all',
             'width': '8rem',
             'type': 'text',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+              if (type === 'display' && data) {
+                return '<a href="/events/' + data.event_id + '">' + data.date.display_day + '</a>';
               }
             },
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__name, venue__detail',
+            'name': 'event__venue__name, event__venue__detail',
             'className': 'text-nowrap all',
             'width': '12rem',
             'render': function (data, type, row, meta) {
@@ -91,7 +76,7 @@
             'className': 'text-nowrap',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return '<a href="/songs/' + data.id + '">' + data.name + '</a>';
               }
             },

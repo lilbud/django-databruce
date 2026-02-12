@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Search
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Event Search</div>
@@ -22,39 +22,6 @@
       <th class="min-tablet-l" scope="col">Public</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-    {% for event in events %}
-      <tr>
-        <td scope="row" class="text-nowrap">
-          <a href="{% url "event_details" id=event.id %}">{{ event }}</a>
-        </td>
-        <td>
-          {% if event.artist %}
-            <a href="{% url "band_details" id=event.artist.id %}">{{ event.artist.name }}</a>
-          {% endif %}
-        </td>
-        <td>
-          {% if event.venue %}
-            <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.name }}</a>
-          {% endif %}
-        </td>
-        <td>
-          {% if event.venue.city %}
-            <a href="{% url 'city_details' id=event.venue.city.id %}">
-              {{ event.venue.city }}
-            {% endif %}
-          </a>
-        </td>
-        <td>
-          {% if event.tour %}
-            <a href="{% url "tour_details" id=event.tour.id %}">{{ event.tour.name }}</a>
-          {% endif %}
-        </td>
-        <td>{{ event.title|default_if_none:'' }}</td>
-        <td>{{ event.public|default_if_none:'' }}</td>
-      </tr>
-    {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
@@ -67,7 +34,7 @@
       serverSide: true,
       processing: true,
       ajax: {
-        'url': '/api/v1/events/?date={{ request.GET.date }}&format=datatables',
+        'url': '/api/v1/events/?date={{ request.GET.date }}&format=custom',
       },
       columnDefs: [
         { targets: [1], orderable: false, className: 'text-center text-sm'},
