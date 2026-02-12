@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Home
+  {{ title }}
 {% endblock title %}
 {% load static %}
 {% block extrajs %}
@@ -71,7 +71,7 @@
           <div class="px-2 py-2">
             <div class="row">
               <a class="fw-medium text-sm text-reset"
-                 href="{% url "event_details" id=first.id %}">{{ first.get_date }} - {{ first.venue }}, {{ first.venue.city }}</a>
+                 href="{% url "event_details" id=first.event_id %}">{{ first.get_date }} - {{ first.venue }}, {{ first.venue.city }}</a>
             </div>
             <div class="row">
               <a class="text-reset text-sm"
@@ -170,23 +170,25 @@
           paging: false,
           ordering: false,
           serverSide: true,
-          processing: true,
+          processing: false,
           ajax: {
-            'url': '/api/v1/index/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&format=datatables&limit=5',
+            'url': '/api/v1/events/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&limit=5&format=custom',
           },
           columns: [
             {
               'data': 'date',
               'name': 'id',
+              'width': '8rem',
               'render': function (data, type, row, meta) {
+                console.log(row)
                 if (type === 'display') {
-                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                  return `<a class="fw-medium" href="/events/${row.event_id}">${data.display}</a>`;
                 }
               },
             },
             {
               'data': 'venue',
-              'name': 'venue__name, venue__detail',
+              'name': 'venue__name',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
                   return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
@@ -194,7 +196,6 @@
               },
             },
           ],
-          columnDefs: [{ targets: [0], width: '6rem', type: 'text' },],
       });
       
       new DataTable('#recentTable', {
@@ -203,17 +204,18 @@
           paging: false,
           ordering: false,
           serverSide: true,
-          processing: true,
+          processing: false,
           ajax: {
-            'url': '/api/v1/index/?recent=true&format=datatables&limit=5',
+            'url': '/api/v1/events/?recent=true&limit=5&format=custom',
           },
           columns: [
             {
               'data': 'date',
               'name': 'id',
+              'width': '8rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display') {
-                  return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+                  return `<a class="fw-medium" href="/events/${row.event_id}">${data.display}</a>`;
                 }
               },
             },
@@ -235,9 +237,14 @@
         paging: false,
         searching: false,
         ordering: false,
+        processing: false,
         ajax: {
-          'url': '/api/v1/event_setlist/?event={{ latest_event.id }}&song_num=true&format=datatables&keep=id,nobruce,instrumental,sign_request,song,premiere,notes,debut,set_name,position,last,ltp,tour_num,tour_total,song_num,segue',
+          'url': '/api/v1/setlists/?event={{ latest_event.event_id }}&format=custom&song_num=true',
         },
+        columnDefs: [
+          { targets: '_all', defaultContent: '', className: 'align-middle text-sm' },
+          { targets: [0], type: 'text', className: 'songnum align-middle p-0', width: '1rem' },
+        ],
         serverSide: true,
         processing: true,
         rowGroup: {
@@ -245,15 +252,15 @@
             className: 'text-center setHeader',
         },
         columns: [
-          { 
+          {
             'data': 'song_num',
-            'className': 'dt-center all align-middle text-xs',
-            'width': '1rem',
+            'className': 'dt-center all songnum align-middle p-0',
+            //'width': '1rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && row.position) {
                 var position = row.position.replaceAll(' ', '').toLowerCase();
 
-                return `<span data-bs-toggle="tooltip" data-bs-title="${ row.position }" class='songnum ${position}'>${data}</span>`
+                return `<span data-bs-toggle="tooltip" data-bs-title="${row.position}" class='songnum ${position}'>${data}</span>`
               } else if (!data) {
                 return ''
               } else {
@@ -267,9 +274,7 @@
             'className': 'all align-middle text-xs',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                var song = '<a class="fw-medium  align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
-
-                return row.segue ? `${song} >` : song;
+                return '<a class="fw-medium  align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
               }
             },
             },

@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Updates
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-lg-8 text-sm mx-auto">
@@ -40,7 +40,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/updates/?format=datatables&keep=id,view,item_id,msg,value',
+          'url': '/api/v1/updates/?format=custom',
         },
         columns:[
           {
