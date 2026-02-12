@@ -1,7 +1,6 @@
 /* Select 2 bootstrap-5 theme override */
 .select2-container--bootstrap-5 .select2-selection {
     background-color: var(--base-300) !important;
-    /* border: 1px solid var(--base-content) !important; */
 }
 
 .select2-container--bootstrap-5 .select2-selection--single {
@@ -12,7 +11,7 @@
     color: var(--base-content) !important;
 }
 
-* .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
     color: var(--base-content) !important;
 }
 
@@ -21,7 +20,7 @@
 }
 
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
-    color: var(--base-content)!important;
+    color: var(--base-content) !important;
 }
 
 .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
@@ -53,9 +52,8 @@
 }
 
 .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted,
-.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected
-{
-	color: var(--primary-content) !important;
-	background-color: var(--primary) !important;
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected {
+    color: var(--primary-content) !important;
+    background-color: var(--primary) !important;
     border-radius: var(--bs-border-radius) !important;
 }
