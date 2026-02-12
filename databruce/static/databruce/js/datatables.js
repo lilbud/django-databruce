@@ -4,7 +4,16 @@ DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
-DataTable.defaults.column.orderSequence = ['asc', 'desc'];
+DataTable.defaults.column.orderSequence = ['desc', 'asc'];
+
+set_names = [
+  "Show",
+  "Set 1",
+  "Set 2",
+  "Encore",
+  "Pre-Show",
+  "Post-Show",
+]
 
 $.extend(true, DataTable.defaults, {
   searching: true,
@@ -51,7 +60,7 @@ function getDatatableLayout({ columns = true, category = false }) {
               attr: {
                 id: 'dropdown-btn',
               },
-              className: 'btn btn-sm btn-primary category-btn my-2',
+              className: 'btn btn-sm btn-primary category-btn',
               buttons: []
             }
           ],
@@ -95,9 +104,6 @@ function getDatatableLayout({ columns = true, category = false }) {
       'data-bs-toggle': 'modal',
       'data-bs-target': '#sbModal',
     },
-    // init: function() {
-    //   console.log(this);
-    // },
     action: function (e, dt, node, config, cb) {
       new DataTable.SearchBuilder(dt, {
         liveSearch: false,
@@ -121,10 +127,9 @@ function getDatatableLayout({ columns = true, category = false }) {
 };
 
 function dtCategorySelect({ layout, column_idx, values, label = false }) {
-  var div = $('<div />')
-  $(div).addClass('me-2 my-auto text-sm align-middle');
-  $(div).attr('id', 'dropdown-label');
+  var div = $('<label />')
 
+  $(div).attr('for', 'dropdown-btn');
   $(div).text(`${label.replace(":", "")}:`);
 
   var all_button = {
@@ -152,23 +157,36 @@ function dtCategorySelect({ layout, column_idx, values, label = false }) {
   });
 
   $(document).ready(function () {
-    $(div).insertBefore($('#dropdown-btn').parent('.btn-group'));
+    $(div).insertBefore($('#dropdown-btn'));
   })
+}
 
+function renderLink(url, data, text) {
+  return '<a href="' + url + data + '">' + text + '</a>';
 }
 
 // below are some common table column definitions
 // tables like songs/events don't change from page to page
 song_table_columns = [
-  { 'data': 'count', 'name': 'count', 'width': '1rem', 'className': 'min-tablet-l' },
+  {
+    'data': 'count',
+    'name': 'count',
+    'width': '1rem',
+    'className': 'all',
+    'render': function (data, type, row, meta) {
+      if (data) {
+        return data
+      }
+    },
+  },
   {
     'data': 'song',
     'name': 'song__name',
-    'width': '15rem',
+    // 'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {
-        return '<a href="/songs/' + data.id + '">' + data.name + '</a>';
+        return renderLink('/songs/', data.id, data.name);
       }
     },
   },
@@ -178,79 +196,74 @@ song_table_columns = [
 event_table_columns = [
   {
     'data': 'date',
-    'name': 'id',
-    'width': '8rem',
+    'name': 'event_id',
+    'width': '10rem',
     'type': 'text',
+    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/events/' + data.id + '">' + data.display + '</a>';
-      }
+      return renderLink('/events/', row.event_id, data.display_day);
     },
   },
   {
-    'data': 'setlist',
-    'name': 'setlist',
+    'data': 'has_setlist',
+    'name': 'has_setlist',
     'width': '1rem',
-    'className': 'text-center',
+    'className': 'min-tablet-l text-center text-sm',
+    'orderable': false,
+    'searchable': false,
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return data ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
-      }
+      return data ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
     },
   },
   {
     'data': 'artist',
     'name': 'artist__name',
     'width': '12rem',
+    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/bands/' + data.id + '">' + data.name + '</a>';
-      }
+      return renderLink('/bands/', data.id, data.name);
     },
   },
   {
     'data': 'venue',
     'name': 'venue__name, venue__detail',
     'width': '12rem',
+    'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
-      }
+      return renderLink('/venues/', data.id, data.name);
     },
   },
   {
-    'data': 'venue.city',
-    'name': 'venue__city__name, venue__state__abbrev, venue__country__name',
+    'data': 'venue',
+    'name': 'venue__city__name, venue__city__state__abbrev, venue__city__country__name',
     'width': '12rem',
+    'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/cities/' + data.id + '">' + data.display + '</a>';
-      };
+      return renderLink('/cities/', data.city.id, data.location);
     },
   },
   {
     'data': 'tour',
     'name': 'tour__name',
     'width': '12rem',
+    'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/tours/' + data.id + '">' + data.name + '</a>';
-      }
+      return renderLink('/tours/', data.id, data.name);
     },
   },
-  { 'data': 'title', 'name': 'title', 'width': '15rem' },
-  { 'data': 'public', 'name': 'public' },
+  { 'data': 'title', 'name': 'title', 'width': '15rem', 'className': 'min-tablet-l', },
+  { 'data': 'public', 'name': 'public', 'className': 'min-tablet-l', 'visible': false, 'orderable': false },
 ]
 
 setlist_slots = [
   {
-    'data': 'event.date',
+    'data': 'event',
     'name': 'event__id, event__early_late',
-    'width': '6rem',
+    'width': '9rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {
-        return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+        return '<a href="/events/' + data.id + '">' + data.date.display_day + '</a>';
       }
     },
   },
@@ -260,13 +273,13 @@ setlist_slots = [
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display') {
-        return '<a href="/venues/' + data.id + '">' + data.formatted + '</a>';
+        return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
       }
     },
   },
   {
     'data': 'show_opener',
-    'name': 'show_opener__id, show_opener__name',
+    'name': 'show_opener__name',
     'width': '12rem',
     'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
@@ -277,7 +290,7 @@ setlist_slots = [
   },
   {
     'data': 's1_closer',
-    'name': 's1_closer__id, s1_closer__name',
+    'name': 's1_closer__name',
     'width': '12rem',
     'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
@@ -288,7 +301,7 @@ setlist_slots = [
   },
   {
     'data': 's2_opener',
-    'name': 's2_opener__id, s2_opener__name',
+    'name': 's2_opener__name',
     'width': '12rem',
     'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
@@ -299,7 +312,7 @@ setlist_slots = [
   },
   {
     'data': 'main_closer',
-    'name': 'main_closer__id, main_closer__name',
+    'name': 'main_closer__name',
     'width': '12rem',
     'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
@@ -310,7 +323,7 @@ setlist_slots = [
   },
   {
     'data': 'encore_opener',
-    'name': 'encore_opener__id, encore_opener__name',
+    'name': 'encore_opener__name',
     'width': '12rem',
     'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
@@ -321,7 +334,7 @@ setlist_slots = [
   },
   {
     'data': 'show_closer',
-    'name': 'show_closer__id, show_closer__name',
+    'name': 'show_closer__name',
     'width': '12rem',
     'className': 'min-tablet-l',
     'render': function (data, type, row, meta) {
