@@ -8,7 +8,7 @@
   --base-200: #F8F8F8;
   --base-300: #EEEEEE;
   --base-content: #18181b;
-  --primary-text: #0092e1;
+  --primary-text: #0474b0;
   --primary: #0483c8;
   --primary-content: #FFFFFF;
   --secondary: #008799;
@@ -39,7 +39,8 @@
   --base-300: #20252e;
   --base-content: #ecf9ff;
   --primary: #0483c8;
-  --primary-text: #0092e1; /* slightly brighter shade for contrast*/
+  --primary-text: #34b8ff;
+  /* slightly brighter shade for contrast*/
   --primary-content: #edf1fe;
   --secondary: #008799;
   --secondary-content: #fff;
@@ -103,26 +104,20 @@
   color: white !important;
 }
 
-[class*="success"] {
-  background-color: var(--success) !important;
-  color: var(--success-content) !important;
-  border-color: var(--success) !important;
-}
-
-[class*="warning"] {
-  background-color: var(--warning) !important;
-  color: var(--warning-content) !important;
-  border-color: var(--warning) !important;
-}
-
-[class*="secondary"] {
+.btn-secondary {
   background-color: var(--secondary) !important;
   color: var(--secondary-content) !important;
   border-color: var(--secondary) !important;
 }
 
-[class*="danger"]:not(i) {
-  background-color: var(--danger) !important;
-  color: var(--danger-content) !important;
-  border-color: var(--danger) !important;
+.btn-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-content) !important;
+  border-color: var(--primary) !important;
+}
+
+.btn-success {
+  background-color: var(--success) !important;
+  color: var(--success-content) !important;
+  border-color: var(--success) !important;
 }
