@@ -162,3 +162,9 @@ notes/
 
 *.sh
 TO_DO.md
+
+# copilot instructions
+copilot_instructions.md
+.zed/settings.json
+.github/copilot-instructions.md
+http_cache.sqlite
