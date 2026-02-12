@@ -1,11 +1,11 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Tours &gt; {{ tour.name }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
     <div class="text-2xl mb-3">
-      <a href="{% url 'tours' %}">Tours</a> &gt; {{ tour.name }}
+      <a href="{% url 'tours' %}">Tours</a> &gt; {{ title }}
     </div>
     <div class="card">
       <div class="card-header">
@@ -20,7 +20,7 @@
                     aria-controls="pills-home"
                     aria-selected="true">Events</button>
           </li>
-          {% if tour_legs %}
+          {% if info.num_legs > 0 %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link"
                       id="pills-legs-tab"
@@ -42,7 +42,7 @@
                     aria-controls="pills-profile"
                     aria-selected="false">Songs</button>
           </li>
-          {% if slots %}
+          {% if info.num_songs > 0 %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
               <button class="nav-link"
                       id="pills-songs-tab"
@@ -139,7 +139,7 @@
         processing: true,
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/events/?tour={{ tour.id }}&format=datatables&keep=id,early_late,public',
+          'url': '/api/v1/events/?tour={{ info.id }}&format=custom',
         },
         columnDefs: [
           { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', searchable: false},
@@ -160,7 +160,7 @@
             start: 2
         },
         ajax: {
-          'url': '/api/v1/setlist_entries/?tour={{ tour.id }}&format=datatables',
+          'url': '/api/v1/setlist_entries/?tour={{ info.id }}&format=custom',
         },
         columns: setlist_slots
       });
@@ -172,7 +172,7 @@
         autoWidth: false,
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/tour_legs/?tour={{ tour.id }}&format=datatables&keep=id,early_late,public',
+          'url': '/api/v1/tour_legs/?tour={{ info.id }}&format=custom',
         },
         columnDefs: [
           { targets: [1,2], className: 'text-center text-xs', width: '1rem'},
@@ -183,8 +183,8 @@
           {'data': 'num_shows', 'name': 'num_shows', 'width': '1rem'},
           {'data': 'num_songs', 'name': 'num_songs', 'width': '1rem'},
           {
-            'data': 'first.date',
-            'name': 'first__id, first__early_late',
+            'data': 'first_event.date',
+            'name': 'first_event__event_id, first_event__early_late',
             'width': '6rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
@@ -193,8 +193,8 @@
             },
           },
           {
-            'data': 'last.date',
-            'name': 'last__id, last__early_late',
+            'data': 'last_event.date',
+            'name': 'last_event__event_id, last_event__early_late',
             'width': '6rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display') {
@@ -212,10 +212,10 @@
         processing: true,
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/setlists/?tour={{ tour.id }}&format=datatables&keep=songid',
+          'url': '/api/v1/setlists/?tour={{ info.id }}&format=custom',
         },
         columnDefs: [
-          { targets: [0], className: 'text-center text-xs', width: '1rem'},
+          { targets: [0], className: 'text-center text-xs', width: '1rem', searchable: false },
           { targets: '_all', className: 'text-nowrap text-xs' },
         ],
         columns: song_table_columns,
