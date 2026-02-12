@@ -13,18 +13,12 @@ router.register(r"cities", views.CitiesViewSet, basename="city")
 router.register(r"countries", views.CountriesViewSet, basename="country")
 router.register(r"continents", views.ContinentsViewSet, basename="continent")
 router.register(r"covers", views.CoversViewSet, basename="cover")
-router.register(r"venuestext", views.VenuesTextViewSet, basename="venue_text")
 router.register(r"venues", views.VenuesViewSet, basename="venue")
 router.register(r"events", views.EventViewSet, basename="event")
 router.register(r"runs", views.EventRunViewSet, basename="runs")
 router.register(r"nugs_releases", views.NugsViewSet, basename="nugs_release")
 router.register(r"relations", views.RelationsViewSet, basename="relation")
 router.register(r"onstage", views.OnstageViewSet, basename="onstage")
-router.register(
-    r"onstage_events",
-    views.OnstageEventsViewSet,
-    basename="onstage_events",
-)
 router.register(r"onstageband", views.OnstageBandViewSet, basename="onstageband")
 router.register(
     r"release_tracks",
@@ -56,11 +50,6 @@ router.register(
     basename="index",
 )
 router.register(
-    r"event_setlist",
-    views.EventSetlist,
-    basename="event_setlist",
-)
-router.register(
     r"setlist_notes",
     views.SetlistNotesViewSet,
     basename="setlist_notes",
@@ -74,6 +63,21 @@ router.register(
     r"calendar",
     views.EventCalendar,
     basename="calendar",
+)
+router.register(
+    r"users",
+    views.UsersViewSet,
+    basename="users",
+)
+router.register(
+    r"user_attended_shows",
+    views.UsersAttendedShowsViewSet,
+    basename="user_attended_shows",
+)
+router.register(
+    r"adv_search",
+    views.AdvancedEventSearch,
+    basename="adv_search",
 )
 
 
