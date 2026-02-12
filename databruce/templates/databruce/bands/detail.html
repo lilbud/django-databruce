@@ -1,11 +1,14 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Bands &gt; {{ info.name }}
+  {{ title }} &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url 'bands' %}">Bands</a> &gt; {{ info.name }}
+    </div>
+    <div class="text-base text-wrap mb-3">
+      Note: The events below count when this band is the main band for a given event. "Members" counts when a person appeared as part of a band, regardless of whether said band is the main band.
     </div>
     <div class="card">
       <div class="card-header">
@@ -105,7 +108,8 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/onstage_events/?band={{ info.id }}&format=datatables',
+          //'url': '/api/v1/events/?band={{ info.id }}&format=custom',
+          'url': '/api/v1/events/?artist={{ info.id }}&format=custom',
         },
         columnDefs: [
           {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},
@@ -119,7 +123,8 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/onstageband/?band={{ info.id }}&format=datatables',
+          'url': '/api/v1/onstageband/?band={{ info.id }}&format=custom',
+          //'url': '/api/v1/bands/{{ info.id }}/members/?format=custom',
         },
         columnDefs: [
           {targets: [0], width: '1rem'},
@@ -127,29 +132,32 @@
         columns: [
           { 'data': 'count', 'name': 'count' },
           { 
-            'data': 'relation', 'name': 'relation__name',
+            'data': 'relation',
+            'name': 'relation__name',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return '<a href="/relations/' + data.id + '">' + data.name + '</a>';
+                return `<a href="/relations/${data.id}">${data.name}</a>`;
               }
             },
           },
-          { 'data': 'relation.instruments', 'name': 'relation__instruments' },
+          { 'data': 'relation.instruments',
+            'name': 'relation__instruments'
+          },
           { 
-            'data': 'first.date',
+            'data': 'first',
             'name': 'first__id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+                return `<a href="/events/${data.id}">${data.date.display_day}</a>`;
               }
             },
           },
           { 
-            'data': 'last.date',
+            'data': 'last',
             'name': 'last__id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return '<a href="/events/' + data.id + '">' + data.display + '</a>';
+                return `<a href="/events/${data.id}">${data.date.display_day}</a>`;
               }
             },          
           },
