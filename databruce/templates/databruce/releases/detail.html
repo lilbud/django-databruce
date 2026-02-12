@@ -1,12 +1,17 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Releases &gt; {{ info.name }}
+  {{ title }} &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
     <div class="text-2xl text-nowrap mb-2">{{ info.name }}</div>
-    <div class="text-base">{{ info.note|default_if_none:"" }}</div>
     <div class="text-lg mb-2 d-grid gap-0 row-gap-1">
+      {% if info.note %}
+        <div class="row">
+          <div class="fw-semibold">Notes</div>
+          <div id="notes">{{ info.note|markdown|safe }}</div>
+        </div>
+      {% endif %}
       <div class="row">
         <div class="fw-semibold">Release Date</div>
         <div>{{ info.date }}</div>
@@ -17,7 +22,7 @@
       </div>
       {% if info.event %}
         <div class="row">
-          <div class="fw-semibold">Event Date</div>
+          <div class="fw-semibold">Event</div>
           <div>
             <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue.get_name }}, {{ info.event.venue.city }}</a>
           </div>
@@ -87,13 +92,21 @@
       serverSide: true,
       processing: true,
       scrollX: false,
-      ajax: '/api/v1/release_tracks/?release={{ info.id }}&format=datatables&keep=id,disc',
+      ajax: '/api/v1/release_tracks/?release={{ info.id }}&format=custom',
       rowGroup: {
         emptyDataGroup: '',
         dataSrc: function(row) {
-          if (row.disc) {
-            return `Disc ${row.disc.disc_num}: ${row.disc.name}`;
+
+          if (row.discnum && !row.disc) {
+            return `Disc ${row.discnum}`;
+          } else if (row.disc) {
+            if (row.disc.name) {
+              return `Disc ${row.discnum}: ${row.disc.name}`;
+            }
+            
+            return `Disc ${row.discnum}`;
           }
+
         },
         className: 'setHeader bg-secondary text-center'
       },
@@ -110,7 +123,7 @@
           'name': 'song',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return '<a class="fw-medium text-sm" href="/songs/' + data.id + '">'+ data.name +'</a>';
+              return `<a class="fw-medium text-sm" href="/songs/${data.id}">${data.name}</a>`;
             }
           },
         },
@@ -120,7 +133,7 @@
           'name': 'event',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
-              return data ? '<a class="fw-medium" href="/events/' + data.id + '">'+ data.display +'</a>' : '';
+              return data ? `<a class="fw-medium" href="/events/${data.id}">${data.display}</a>` : '';
             }
           },
         },
