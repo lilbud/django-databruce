@@ -71,7 +71,7 @@
     <link rel="stylesheet" href="{% static 'databruce/css/preflight.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/datatables.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
+    {% comment %} <link rel="stylesheet" href="{% static 'databruce/css/style.consolidated.css' %}" /> {% endcomment %}
     <!-- Other -->
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"
@@ -422,14 +422,14 @@
             delay: 500,
             source: function(request, response) {
               $.ajax({
-                url: "/api/v1/events", // or .ashx, .asmx, etc.
+                url: "/api/v1/events/", // or .ashx, .asmx, etc.
                 dataType: "json",
                 data: {
                   date: request.term
                 },
                 success: function(data) {
                   response( $.map( data.results, function(item) {
-                    return {'id': item.id, 'value': `${item.date.display} - ${item.venue.formatted}`}
+                    return {'id': item.event_id, 'value': `${item.date.display_day} - ${item.venue.location}`}
                   }));
                 },
                 error: function() {
