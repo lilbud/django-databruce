@@ -1,41 +1,25 @@
 import datetime
-import json
-import re
 
-import rest_framework
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.expressions import ArraySubquery
-from django.core.exceptions import FieldError
 from django.db.models import (
-    Case,
-    Count,
     Exists,
     F,
-    Max,
-    Min,
     OuterRef,
     PositiveIntegerField,
-    Q,
-    QuerySet,
+    Prefetch,
     Subquery,
-    Value,
-    When,
-    Window,
 )
-from django.db.models.functions import Coalesce, FirstValue, JSONObject, RowNumber
-from django.db.models.functions.window import Lag, Lead
+from django.db.models.functions import JSONObject
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
 from rest_framework import permissions, viewsets
-from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.decorators import action
 
 from api import filters, serializers
 from databruce import models
 
-from .selectors import get_band_members
-
-permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+UserModel = get_user_model()
 VALID_SET_NAMES = [
     "Show",
     "Set 1",
@@ -58,9 +42,26 @@ class ArchiveViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ArchiveLinks.objects.all()
     serializer_class = serializers.ArchiveLinksSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = filters.ArchiveFilter
-    ordering = ["created_at", "event"]
+
+
+class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+    def get_queryset(self):
+        return (
+            models.OnstageBandMembers.objects.all()
+            .select_related(
+                "relation",
+                "band",
+                "first",
+                "last",
+            )
+            .order_by("count")
+        )
+
+    serializer_class = serializers.OnstageBandSerializer
+    filterset_class = filters.OnstageBandFilter
 
 
 class BandViewSet(viewsets.ReadOnlyModelViewSet):
@@ -69,17 +70,10 @@ class BandViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Bands.objects.all()
         .order_by("name")
-        .select_related("first", "last")
-        .annotate(
-            count=SubqueryCount(
-                models.Onstage.objects.select_related("event")
-                .filter(band=OuterRef("pk"))
-                .distinct("event"),
-            ),
-        )
+        .prefetch_related("first_event", "last_event")
     )
+
     serializer_class = serializers.BandsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.BandsFilter
 
 
@@ -93,9 +87,8 @@ class BootlegViewSet(viewsets.ReadOnlyModelViewSet):
         .prefetch_related("archive")
         .order_by("event")
     )
-    serializer_class = serializers.BootlegsSerializer
 
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
+    serializer_class = serializers.BootlegsSerializer
     filterset_class = filters.BootlegFilter
 
 
@@ -110,11 +103,11 @@ class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
                 models.Events.objects.filter(venue__city__id=OuterRef("pk")),
             ),
         )
-        .select_related("first", "last", "country")
+        .select_related("first_event", "last_event", "country")
         .prefetch_related("state")
     )
+
     serializer_class = serializers.CitiesSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.CitiesFilter
 
 
@@ -124,7 +117,7 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
     setlist = models.Setlists.objects.filter(
         set_name=OuterRef("set_name"),
         event__id=OuterRef("event__id"),
-    ).select_related("song")
+    ).select_related("song", "event")
 
     queryset = (
         models.Setlists.objects.select_related(
@@ -133,16 +126,9 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             "event__tour",
             "event__artist",
             "event__venue",
-            "event__venue__first",
-            "event__venue__last",
-            "event__venue__state",
-            "event__venue__country",
+            "event__venue__city",
         )
         .prefetch_related(
-            "song__first",
-            "song__last",
-            "event__venue__city",
-            "event__run",
             "event__venue__city__state",
             "event__venue__city__country",
         )
@@ -158,11 +144,10 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
                 .values(json=JSONObject(id="song__id", name="song__name"))[:1],
             ),
         )
-        .order_by("event", "song_num")
+        .order_by("event__event_id", F("song_num").asc(nulls_first=True))
     )
 
     serializer_class = serializers.SongsPageSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.SongsPageFilter
 
 
@@ -171,8 +156,6 @@ class ContinentsViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Continents.objects.all()
     serializer_class = serializers.ContinentsSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-
     filterset_fields = ["name"]
     ordering = ["name", "num_events"]
 
@@ -185,14 +168,13 @@ class CountriesViewSet(viewsets.ReadOnlyModelViewSet):
         .order_by("name")
         .annotate(
             count=SubqueryCount(
-                models.Events.objects.filter(venue__country__id=OuterRef("pk")),
+                models.Events.objects.filter(venue__city__country__id=OuterRef("pk")),
             ),
         )
-        .select_related("first", "last")
+        .select_related("first_event", "last_event")
     )
 
     serializer_class = serializers.CountriesSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.CountryFilter
 
 
@@ -202,30 +184,8 @@ class CoversViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Covers.objects.all()
     serializer_class = serializers.CoversSerializer
 
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = filters.CoversFilter
     ordering = ["event"]
-
-
-class VenuesTextViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
-
-    def get_queryset(self):
-        query_params = parser.parse(self.request.GET.urlencode())
-        venue = query_params.get("id")
-
-        qs = (
-            models.Venues.objects.all()
-            .select_related("city", "country", "first", "last")
-            .prefetch_related("state")
-        )
-
-        if venue:
-            qs = qs.filter(id=venue)
-
-        return qs
-
-    serializer_class = serializers.VenuesSerializer
 
 
 class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -236,25 +196,16 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Venues.objects.all()
         .select_related(
-            "first",
-            "last",
-            "state",
-            "country",
+            "first_event",
+            "last_event",
+            "city",
         )
-        .prefetch_related("city", "city__state", "city__country")
+        .prefetch_related("city__state", "city__country")
         .order_by("name")
     )
+
     serializer_class = serializers.VenuesSerializer
-
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.VenuesFilter
-    pagination_class = None
-    page_size = None
-
-    def paginate_queryset(self, queryset):
-        if "no_page" in self.request.query_params:
-            return None  # Returning None disables pagination
-        return super().paginate_queryset(queryset)
 
 
 class IndexViewSet(viewsets.ReadOnlyModelViewSet):
@@ -268,18 +219,13 @@ class IndexViewSet(viewsets.ReadOnlyModelViewSet):
                 "artist",
                 "tour",
                 "venue__city",
-                "venue__first",
-                "venue__last",
-                "venue__state",
-                "venue__country",
+                "venue__first_event",
+                "venue__last_event",
             )
             .prefetch_related(
                 "run",
-                "venue__city",
-                "venue__city__state",
-                "venue__city__country",
             )
-            .order_by("-id")
+            .order_by("-event_id")
         )
 
         try:
@@ -297,38 +243,59 @@ class IndexViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
     serializer_class = serializers.IndexSerializer
-    pagination_class = LimitOffsetPagination
-    filter_backends = [DjangoFilterBackend]
     filterset_class = filters.IndexFilter
 
 
 class EventCalendar(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
-        queryset = (
+        return (
             models.Events.objects.all()
             .select_related(
                 "venue",
                 "artist",
                 "tour",
-                "venue__first",
-                "venue__last",
-                "venue__state",
-                "venue__country",
+                "venue__first_event",
+                "venue__last_event",
+                "venue__city",
+                "venue__city__country",
             )
             .prefetch_related(
                 "run",
-                "venue__city",
                 "venue__city__state",
-                "venue__city__country",
             )
-            .order_by("id")
+            .order_by("event_id")
         )
 
-        return queryset
-
     serializer_class = serializers.EventCalendar
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.EventsFilter
+
+
+class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
+            "band",
+        )
+
+        return (
+            models.Events.objects.all()
+            .select_related(
+                "venue",
+                "artist",
+                "tour",
+                "venue__city",
+                "venue__city__country",
+            )
+            .prefetch_related(
+                "run",
+                "venue__city__state",
+                "leg",
+                Prefetch("onstage", queryset=onstage_qs),
+            )
+        ).order_by("event_id")
+
+    serializer_class = serializers.EventsSerializer
+    filterset_class = filters.EventsFilter
+    ordering = ["event_id"]  # Default ordering
 
 
 class EventViewSet(viewsets.ReadOnlyModelViewSet):
@@ -337,46 +304,38 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         params = parser.parse(self.request.GET.urlencode())
 
+        onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
+            "band",
+        )
+
         queryset = (
             models.Events.objects.all()
             .select_related(
                 "venue",
                 "artist",
                 "tour",
-                "venue__first",
-                "venue__last",
-                "venue__state",
-                "venue__country",
+                "venue__city",
+                "venue__city__country",
             )
             .prefetch_related(
                 "run",
-                "venue__city",
                 "venue__city__state",
-                "venue__city__country",
+                "leg",
+                Prefetch("onstage", queryset=onstage_qs),
             )
-            .annotate(
-                has_setlist=Exists(
-                    Subquery(
-                        models.Setlists.objects.filter(
-                            event=OuterRef("id"),
-                        ),
-                    ),
-                ),
-            )
-            .order_by("id")
-        )
+        ).order_by("event_id")
 
         try:
-            limit = int(params["limit"])
-            queryset = queryset[:limit]
+            if params["recent"]:
+                queryset = queryset.order_by("-event_id")
         except KeyError:
             pass
 
         return queryset
 
     serializer_class = serializers.EventsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.EventsFilter
+    ordering = ["event_id"]  # Default ordering
 
 
 class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
@@ -386,22 +345,12 @@ class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
             "venue",
             "artist",
             "tour",
-            "venue__first",
-            "venue__last",
-            "venue__state",
-            "venue__country",
-        )
-        .prefetch_related(
-            "run",
             "venue__city",
-            "venue__city__state",
-            "venue__city__country",
         )
-        .order_by("id")
+        .order_by("event_id")
     )
 
     serializer_class = serializers.EventsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.EventsFilter
 
 
@@ -415,108 +364,50 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
             "event__tour",
             "event__artist",
             "event__venue",
-            "event__venue__first",
-            "event__venue__last",
-            "event__venue__state",
-            "event__venue__country",
         )
         .prefetch_related(
-            "event__venue__city",
             "event__venue__city__state",
             "event__venue__city__country",
         )
     ).order_by("-date")
+
     serializer_class = serializers.NugsSerializer
-    filter_backends = [filters.DTFilter]
+    filter_backends = [filters.DataTablesFilterBackend]
 
 
 class RelationsViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
+    rel_aliases = models.RelationAliases.objects.filter(relation=OuterRef("id"))
+    onstage = models.Onstage.objects.select_related("relation").filter(
+        relation=OuterRef("id"),
+    )
+
     queryset = (
         models.Relations.objects.all()
         .order_by("name")
-        .select_related("first", "last")
+        .select_related("first_event", "last_event")
         .annotate(
             count=SubqueryCount(
-                models.Onstage.objects.select_related("relation").filter(
+                onstage.filter(
                     relation__id=OuterRef("id"),
                 ),
+            ),
+            aliases=ArraySubquery(
+                rel_aliases.filter(
+                    type="alias",
+                ).values("name"),
+            ),
+            nicknames=ArraySubquery(
+                rel_aliases.filter(
+                    type="nickname",
+                ).values("name"),
             ),
         )
     )
 
     serializer_class = serializers.RelationsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.RelationFilter
-
-
-def get_event(self, obj):
-    result = {"id": obj.id}
-
-    try:
-        date = datetime.datetime.strptime(obj.date, "%Y-%m-%d").strftime(
-            "%Y-%m-%d",
-        )
-    except (ValueError, TypeError):
-        # no month or day
-        if re.search(r"(19|20)\d{2}0{4}-", obj.id):
-            date = datetime.datetime.strptime(
-                f"{obj.id[0:4]}-01-01",
-                "%Y-%m-%d",
-            ).strftime(
-                "%Y-%m-%d",
-            )
-        # month, no day
-        elif re.search(r"(19|20)\d{2}[0-3]\d00-", obj.id):
-            date = datetime.datetime.strptime(
-                f"{obj.id[0:4]}-{obj.id[4:6]}-01",
-                "%Y-%m-%d",
-            ).strftime(
-                "%Y-%m-%d",
-            )
-        else:
-            date = datetime.datetime.strptime(obj.id[0:8], "%Y%m%d").strftime(
-                "%Y-%m-%d",
-            )
-
-    result["filter"] = date
-    result["display"] = date
-
-    if obj.early_late:
-        result["display"] = f"{date} ({obj.early_late})"
-
-    return result
-
-
-class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
-
-    def get_queryset(self):
-        query_params = parser.parse(self.request.GET.urlencode())
-        band = query_params.get("band")
-
-        return (
-            models.OnstageBandMembers.objects.filter(band__id=band)
-            .select_related(
-                "relation",
-                "band",
-                "first",
-                "last",
-            )
-            .annotate(
-                count=SubqueryCount(
-                    models.Onstage.objects.filter(
-                        relation=OuterRef("relation"),
-                        band=OuterRef("band"),
-                    ),
-                ),
-            )
-            .order_by("count")
-        )
-
-    serializer_class = serializers.OnstageRelationSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
 
 
 class OnstageViewSet(viewsets.ReadOnlyModelViewSet):
@@ -534,53 +425,8 @@ class OnstageViewSet(viewsets.ReadOnlyModelViewSet):
     ).order_by("event", F("band").asc(nulls_first=True), "relation__name")
 
     serializer_class = serializers.OnstageSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
+
     filterset_class = filters.OnstageFilter
-
-
-class OnstageEventsViewSet(viewsets.ReadOnlyModelViewSet):
-    def get_queryset(self):
-        q = Q()
-        query_params = parser.parse(self.request.GET.urlencode())
-        band = query_params.get("band")
-        relation = query_params.get("relation")
-
-        qs = (
-            models.Onstage.objects.all()
-            .select_related("relation", "event")
-            .prefetch_related("band")
-            .order_by("event")
-        )
-
-        if band:
-            q.add(Q(band__id=band), Q.AND)
-        if relation:
-            q.add(Q(relation__id=relation), Q.AND)
-
-        return (
-            models.Events.objects.filter(
-                id__in=qs.filter(q).values_list("event__id"),
-            )
-            .select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__city",
-                "venue__country",
-                "venue__first",
-                "venue__last",
-            )
-            .prefetch_related(
-                "venue__state",
-                "run",
-                "venue__city__state",
-                "venue__city__country",
-            )
-            .order_by("id")
-        )
-
-    serializer_class = serializers.EventsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
 
 
 class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
@@ -592,9 +438,8 @@ class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
         .select_related("song", "release")
         .prefetch_related("event", "discid")
     )
-    serializer_class = serializers.ReleaseTracksSerializer
 
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
+    serializer_class = serializers.ReleaseTracksSerializer
     filterset_class = filters.ReleaseTracksFilter
 
 
@@ -603,66 +448,39 @@ class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Releases.objects.all().order_by("-date")
     serializer_class = serializers.ReleasesSerializer
-
-    filter_backends = [filters.DTFilter]
     filterset_class = filters.ReleaseFilter
-
-
-class SubqueryCount(Subquery):
-    # Custom Count function to just perform simple count on any queryset without grouping.
-    # https://stackoverflow.com/a/47371514/1164966
-    template = "(SELECT count(*) FROM (%(subquery)s) _count)"
-    output_field = PositiveIntegerField()
 
 
 class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    song = models.Songs.objects.filter(id=OuterRef("song__id"))
-
     queryset = (
-        models.Setlists.objects.filter(
-            set_name__in=VALID_SET_NAMES,
-        )
+        models.Setlists.objects.all()
         .select_related(
             "event",
             "song",
         )
-        .prefetch_related("song__first", "song__last")
-        .values("song__id")
-        .annotate(
-            count=Count(F("event__id")),
-            songinfo=Subquery(
-                song.values(json=JSONObject(id="id", name="name", category="category")),
-            ),
-        )
-        .order_by("-count", "song__name")
+        .prefetch_related("ltp")
+        .order_by("event", F("song_num").asc(nulls_first=True))
     )
 
-    serializer_class = serializers.SetlistFilterSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter, OrderingFilter]
-    ordering_fields = ["song_num"]
+    serializer_class = serializers.SetlistSerializer
     filterset_class = filters.SetlistFilter
 
 
 class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
-        models.SetlistEntries.objects.prefetch_related()
-        .select_related(
-            "event",
-            "event__venue",
-            "event__artist",
-            "event__tour",
-            "event__venue__city",
-            "event__venue__country",
-            "event__venue__first",
-            "event__venue__last",
-        )
+        models.SetlistEntries.objects.all()
+        .select_related("event")
+        .order_by("event")
         .prefetch_related(
-            "event__venue__state",
-            "event__run",
+            "event__venue",
+            "event__venue__city",
             "event__venue__city__state",
             "event__venue__city__country",
+            "event__tour",
+            "event__leg",
+            "event__run",
             "show_opener",
             "s1_closer",
             "s2_opener",
@@ -670,42 +488,22 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
             "encore_opener",
             "show_closer",
         )
-        .order_by("event")
     )
 
     serializer_class = serializers.SetlistEntrySerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.SetlistEntryFilter
 
 
 class SnippetViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = (
-        models.Snippets.objects.all()
-        .select_related(
-            "snippet",
-            "setlist",
-            "setlist__song",
-            "setlist__event",
-            "setlist__event__venue",
-            "setlist__event__venue__first",
-            "setlist__event__venue__last",
-            "setlist__event__venue__state",
-            "setlist__event__venue__country",
-        )
-        .prefetch_related(
-            "snippet__first",
-            "snippet__last",
-            "setlist__event__venue__city",
-            "setlist__event__venue__city__state",
-            "setlist__event__venue__city__country",
-        )
-        .order_by("setlist__event")
+    queryset = models.Snippets.objects.all().select_related(
+        "snippet",
+        "setlist",
+        "setlist__song",
     )
 
     serializer_class = serializers.SnippetSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.SnippetFilter
 
 
@@ -716,14 +514,14 @@ class StatesViewSet(viewsets.ReadOnlyModelViewSet):
         models.States.objects.all()
         .annotate(
             count=SubqueryCount(
-                models.Events.objects.filter(venue__state__id=OuterRef("pk")),
+                models.Events.objects.filter(venue__city__state__id=OuterRef("pk")),
             ),
         )
-        .select_related("first", "last", "country")
+        .prefetch_related("first_event", "last_event", "country")
         .order_by("name")
     )
+
     serializer_class = serializers.StatesSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.StateFilter
 
 
@@ -732,10 +530,9 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = (
         models.Songs.objects.all()
-        .order_by("name")
         .prefetch_related(
-            "first",
-            "last",
+            "first_event",
+            "last_event",
         )
         .annotate(
             has_lyrics=Exists(
@@ -743,8 +540,8 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
             ),
         )
     )
+
     serializer_class = serializers.SongsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.SongsFilter
 
 
@@ -754,19 +551,18 @@ class ToursViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Tours.objects.all()
         .select_related(
-            "first",
-            "last",
+            "first_event",
+            "last_event",
             "band",
-            "first__artist",
-            "first__tour",
-            "last__artist",
-            "last__tour",
+            "first_event__artist",
+            "first_event__tour",
+            "last_event__artist",
+            "last_event__tour",
         )
-        .order_by("-last__id")
+        .order_by("-last_event__event_id")
     )
 
     serializer_class = serializers.ToursSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.TourFilter
 
 
@@ -777,18 +573,17 @@ class TourLegsViewSet(viewsets.ReadOnlyModelViewSet):
         models.TourLegs.objects.all()
         .select_related(
             "tour",
-            "first",
-            "last",
-            "first__artist",
-            "first__tour",
-            "last__artist",
-            "last__tour",
+            "first_event",
+            "last_event",
+            "first_event__artist",
+            "first_event__tour",
+            "last_event__artist",
+            "last_event__tour",
         )
-        .order_by("-last__id")
+        .order_by("-last_event__event_id")
     )
 
     serializer_class = serializers.TourLegsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.TourLegFilter
 
 
@@ -798,133 +593,86 @@ class EventRunViewSet(viewsets.ReadOnlyModelViewSet):
         .select_related(
             "venue",
             "band",
-            "venue__first",
-            "venue__last",
-            "first",
-            "last",
-            "venue__state",
-            "venue__country",
+            "first_event",
+            "last_event",
+            "venue__city",
         )
         .prefetch_related(
-            "venue__city",
             "venue__city__state",
             "venue__city__country",
         )
-        .order_by("first")
+        .order_by("first_event__event_id")
     )
+
     serializer_class = serializers.EventRunSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.EventRunFilter
-
-
-class EventRunDetailViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = (
-        models.Runs.objects.all()
-        .select_related(
-            "venue",
-            "band",
-            "venue__first",
-            "venue__last",
-            "first",
-            "last",
-            "venue__state",
-            "venue__country",
-        )
-        .prefetch_related(
-            "venue__city",
-            "venue__city__state",
-            "venue__city__country",
-        )
-        .order_by("first")
-    )
-    serializer_class = serializers.EventRunDetailSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
 
 
 class LyricsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Lyrics.objects.all().select_related("song").order_by("song__name")
     serializer_class = serializers.LyricsSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
 
 
 class EventSetlist(viewsets.ReadOnlyModelViewSet):
-    notes = models.Notes.objects.filter(
-        setlist__id=OuterRef("pk"),
-    ).select_related("event", "setlist")
-
-    queryset = (
-        models.Setlists.objects.all()
-        .select_related("song", "event")
-        .prefetch_related("ltp")
-        .prefetch_related("song__first", "song__last")
-        .annotate(
-            notes_list=Case(
-                When(
-                    Exists(ArraySubquery(notes.values("note"))),
-                    then=ArraySubquery(notes.values("note")),
-                ),
-            ),
-            t_total=Case(
-                When(
-                    Q(set_name__in=VALID_SET_NAMES),
-                    SubqueryCount(
-                        ArraySubquery(
-                            models.Setlists.objects.filter(
-                                set_name__in=VALID_SET_NAMES,
-                                song__id=OuterRef("song"),
-                                event__tour__id=OuterRef("event__tour__id"),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-            t_count=Case(
-                When(
-                    Q(set_name__in=VALID_SET_NAMES),
-                    Window(
-                        expression=RowNumber(),
-                        partition_by=[F("song__id"), F("event__tour__id")],
-                        order_by=[F("event__id").asc(), F("song_num").asc()],
-                    ),
-                ),
-            ),
+    def get_queryset(self):
+        return (
+            models.Setlists.objects.all()
+            .select_related("song", "event", "tour_stats_link")
+            .prefetch_related("ltp")
+            .order_by("event", F("song_num").asc(nulls_first=True))
         )
-        .order_by("event", F("song_num").asc(nulls_first=True))
-    )
+
     serializer_class = serializers.SetlistSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
     filterset_class = filters.SetlistFilter
 
 
 class SetlistNotesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
-        models.Notes.objects.all()
+        models.SetlistNotes.objects.all()
         .select_related(
             "setlist",
             "setlist__song",
             "event",
-            "event__venue__first",
-            "event__venue__last",
-            "event__venue__state",
-            "event__venue__country",
-            "event__tour",
-            "event__artist",
+            "event__venue",
+            "event__venue__city",
         )
         .prefetch_related(
-            "event__run",
-            "event__leg",
-            "event__venue__city",
             "event__venue__city__state",
             "event__venue__city__country",
         )
     )
 
-    serializer_class = serializers.NotesSerializer
-    filter_backends = [DjangoFilterBackend]
+    serializer_class = serializers.SetlistNotesSerializer
     filterset_class = filters.SetlistNoteFilter
 
 
 class UpdatesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Updates.objects.all().order_by("-created_at")
     serializer_class = serializers.UpdatesSerializer
-    filter_backends = [DjangoFilterBackend, filters.DTFilter]
+
+
+class UsersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = UserModel.objects.all()
+    serializer_class = serializers.UsersSerializer
+
+
+class UsersAttendedShowsViewSet(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        return (
+            models.UserAttendedShows.objects.all()
+            .select_related(
+                "user",
+                "event",
+                "event__venue",
+                "event__artist",
+                "event__tour",
+                "event__venue__city",
+            )
+            .prefetch_related(
+                "event__venue__city__state",
+                "event__venue__city__country",
+            )
+        )
+
+    serializer_class = serializers.UserAttendedShowsSerializer
+    filterset_class = filters.UserAttendedShowsFilter
