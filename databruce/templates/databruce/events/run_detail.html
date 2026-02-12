@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Runs &gt; {{ info.name }}
+  {{ title }} &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
@@ -109,7 +109,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/events/?run={{ info.id }}&format=datatables&keep=id,early_late,public',
+          'url': '/api/v1/events/?run={{ info.id }}&format=custom',
         },
         columnDefs: [
           { targets: '_all', className: 'text-wrap text-xs' },
@@ -127,7 +127,7 @@
           { targets: [0],  width: '1rem' },
         ],
         ajax: {
-          'url': '/api/v1/setlists?run={{ info.id }}&format=datatables&keep=songid',
+          'url': '/api/v1/setlists?run={{ info.id }}&format=custom',
         },
         columns: song_table_columns,
       });
@@ -141,7 +141,7 @@
             start: 2
         },
         ajax: {
-          'url': '/api/v1/setlist_entries/?run={{ info.id }}&format=datatables',
+          'url': '/api/v1/setlist_entries/?run={{ info.id }}&format=custom',
         },
         columns: setlist_slots
       });
