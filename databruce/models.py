@@ -3,23 +3,29 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+#   * Remove `` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-import datetime
 import re
 from uuid import uuid4
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 from requests.packages import mod
 
+from .templatetags.filters import format_fuzzy
+
+UserModel = get_user_model()
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(db_index=True, default=timezone.now)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
+        managed = True
 
 
 class ArchiveLinks(BaseModel):
@@ -36,79 +42,11 @@ class ArchiveLinks(BaseModel):
     url = models.TextField(blank=True, null=True, db_column="archive_url")  # noqa: DJ001
 
     class Meta:
-        managed = False
         db_table = "archive_links"
         verbose_name_plural = "archive_links"
 
-
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=150)
-
-    class Meta:
-        managed = False
-        db_table = "auth_group"
-
-
-class AuthGroupPermissions(models.Model):
-    id = models.AutoField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey("AuthPermission", models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = "auth_group_permissions"
-        unique_together = (("group", "permission"),)
-
-
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING)
-    codename = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = "auth_permission"
-        unique_together = (("content_type", "codename"),)
-
-
-class AuthUser(models.Model):
-    id = models.AutoField(primary_key=True)
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = "auth_user"
-
-
-class AuthUserGroups(models.Model):
-    id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = "auth_user_groups"
-        unique_together = (("user", "group"),)
-
-
-class AuthUserUserPermissions(models.Model):
-    id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = "auth_user_user_permissions"
-        unique_together = (("user", "permission"),)
+    def __str__(self) -> str:
+        return self.url
 
 
 class Bands(BaseModel):
@@ -116,22 +54,22 @@ class Bands(BaseModel):
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_url = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
-    appearances = models.IntegerField(default=0)
+    num_events = models.IntegerField(default=0)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
         related_name="band_first",
-        db_column="first_appearance",
+        db_column="first_event",
         blank=True,
         default=None,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
         related_name="band_last",
-        db_column="last_appearance",
+        db_column="last_event",
         blank=True,
         default=None,
     )
@@ -140,7 +78,6 @@ class Bands(BaseModel):
     mbid = models.UUIDField(default=None, editable=False)
 
     class Meta:
-        managed = False
         db_table = "bands"
         verbose_name_plural = "bands"
 
@@ -184,27 +121,8 @@ class Bootlegs(BaseModel):
     )
 
     class Meta:
-        managed = False
         db_table = "bootlegs"
         verbose_name_plural = "bootlegs"
-
-
-class BootlegsByDate(BaseModel):
-    event = models.ForeignKey(
-        to="Events",
-        on_delete=models.DO_NOTHING,
-        db_column="event_id",
-        blank=True,
-        default=None,
-    )
-    date = models.TextField(blank=True, default=None)
-    venue_location = models.TextField(blank=True, default=None)
-    count = models.BigIntegerField(blank=True, default=None)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "bootlegs_by_date"
-        verbose_name_plural = "Bootlegs By Date"
 
 
 class Cities(BaseModel):
@@ -234,32 +152,31 @@ class Cities(BaseModel):
     num_events = models.IntegerField(blank=True, default=None)
     aliases = models.TextField(blank=True, default=None)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
         related_name="city_first",
-        db_column="first_played",
+        db_column="first_event",
         blank=True,
         default=None,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
         related_name="city_last",
-        db_column="last_played",
+        db_column="last_event",
         blank=True,
         default=None,
     )
 
     class Meta:
-        managed = False
         db_table = "cities"
         verbose_name_plural = "cities"
         unique_together = (("name", "state"),)
 
     def __str__(self) -> str:
-        if self.country.id in [6, 37] and self.state:
+        if self.country_id in [6, 37] and self.state_id:
             return f"{self.name}, {self.state.abbrev}"
 
         return f"{self.name}, {self.country}"
@@ -272,7 +189,6 @@ class Continents(BaseModel):
     num_events = models.IntegerField(default=0)
 
     class Meta:
-        managed = False
         db_table = "continents"
         verbose_name_plural = "continents"
 
@@ -295,30 +211,28 @@ class Countries(BaseModel):
     )
 
     alpha_2 = models.TextField(blank=True, default=None, max_length=2)
-    alpha_3 = models.TextField(blank=True, default=None, max_length=3)
     aliases = models.TextField(blank=True, default=None)
     mbid = models.UUIDField(default=None, editable=False)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
         related_name="country_first",
-        db_column="first_played",
+        db_column="first_event",
         blank=True,
         default=None,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         to="Events",
         on_delete=models.DO_NOTHING,
         related_name="country_last",
-        db_column="last_played",
+        db_column="last_event",
         blank=True,
         default=None,
     )
 
     class Meta:
-        managed = False
         db_table = "countries"
         verbose_name_plural = "countries"
 
@@ -341,59 +255,8 @@ class Covers(BaseModel):
     )
 
     class Meta:
-        managed = False
         db_table = "covers"
         verbose_name_plural = "covers"
-
-
-class DjangoAdminLog(BaseModel):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, default=None)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.SmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey(
-        "DjangoContentType",
-        models.DO_NOTHING,
-        blank=True,
-        default=None,
-    )
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = "django_admin_log"
-
-
-class DjangoContentType(BaseModel):
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = "django_content_type"
-        unique_together = (("app_label", "model"),)
-
-
-class DjangoMigrations(BaseModel):
-    id = models.BigAutoField(primary_key=True)
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = "django_migrations"
-
-
-class DjangoSession(BaseModel):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = "django_session"
 
 
 class States(BaseModel):
@@ -410,51 +273,26 @@ class States(BaseModel):
     num_events = models.IntegerField(default=0)
     mbid = models.UUIDField(default=None, editable=False)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         "Events",
         models.DO_NOTHING,
         related_name="state_first",
-        db_column="first_played",
+        db_column="first_event",
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         "Events",
         models.DO_NOTHING,
         related_name="state_last",
-        db_column="last_played",
+        db_column="last_event",
     )
 
     class Meta:
-        managed = False
         db_table = "states"
         verbose_name_plural = "states"
 
     def __str__(self) -> str:
-        if self.country.id not in [2, 6, 37]:
-            return self.name
-
-        return self.abbrev
-
-
-class VenuesText(models.Model):
-    id = models.OneToOneField(
-        "Venues",
-        on_delete=models.DO_NOTHING,
-        primary_key=True,
-        db_column="id",
-    )
-
-    name = models.TextField(blank=True, default=None)
-    location = models.TextField(blank=True, default=None)
-    formatted = models.TextField(blank=True, default=None, db_column="formatted_loc")
-
-    class Meta:
-        managed = False
-        db_table = "venues_text"
-        verbose_name_plural = "venues_text"
-
-    def __str__(self) -> str:
-        return self.formatted
+        return self.name
 
 
 class Venues(BaseModel):
@@ -473,58 +311,43 @@ class Venues(BaseModel):
         default=None,
     )
 
-    state = models.ForeignKey(
-        States,
-        on_delete=models.CASCADE,
-        db_column="state",
-        related_name="venue_state",
-        null=True,
-        default=None,
-    )
-
-    country = models.ForeignKey(
-        Countries,
-        on_delete=models.CASCADE,
-        db_column="country",
-        related_name="venue_country",
-        null=True,
-        default=None,
-    )
-
-    continent = models.ForeignKey(
-        Continents,
-        on_delete=models.CASCADE,
-        db_column="continent",
-        related_name="venue_continent",
-        null=True,
-        default=None,
-    )
-
     num_events = models.IntegerField(default=0)
-    aliases = models.TextField(blank=True, default=None)
     note = models.TextField(blank=True, default=None)
     mbid = models.UUIDField(default=None, editable=False)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         "Events",
         models.DO_NOTHING,
-        db_column="first_played",
+        db_column="first_event",
         related_name="venues_first",
         blank=True,
         default=None,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         "Events",
         models.DO_NOTHING,
-        db_column="last_played",
+        db_column="last_event",
         related_name="venues_last",
         blank=True,
         default=None,
     )
 
+    address = models.CharField(max_length=500, null=True, blank=True)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+    )
+
     class Meta:
-        managed = False
         db_table = "venues"
         verbose_name_plural = "venues"
 
@@ -539,6 +362,9 @@ class Venues(BaseModel):
 
         if self.detail:
             name = f"{self.name}, {self.detail}"
+
+        if self.city:
+            name += f" ({self.city.name})"
 
         return name
 
@@ -556,28 +382,42 @@ class Venues(BaseModel):
 
         return name
 
+    @property
+    def country(self):
+        # Since the City always knows its Country, we just grab it from there
+        return self.city.country
 
-class SetlistsByDate(models.Model):
-    event = models.OneToOneField(
-        to="Events",
-        on_delete=models.DO_NOTHING,
-        blank=True,
-        default=None,
-        primary_key=True,
-        db_column="event_id",
-    )
+    @property
+    def state(self):
+        # This will return the State object or None if it's London/Paris/etc.
 
-    setlist = models.TextField(blank=True, default=None)
+        try:
+            state = self.city.state
+
+            if self.city.country.id in [2, 6, 37]:
+                return state.abbrev
+
+            return state.name
+        except AttributeError:
+            return None
+
+
+class VenueAliases(BaseModel):
+    id = models.UUIDField(primary_key=True)
+    venue = models.ForeignKey("Venues", models.DO_NOTHING, blank=True, null=True)
+    name = models.TextField()
+    note = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "setlists_by_date"
-        verbose_name_plural = "setlists_by_date"
+        db_table = "venue_aliases"
 
 
 class Events(BaseModel):
+    id = models.AutoField(primary_key=True)
     num = models.IntegerField(db_column="event_num")
-    id = models.TextField(primary_key=True, db_column="event_id")
+
+    event_id = models.SlugField(max_length=11, db_column="event_id", unique=True)
+
     date = models.DateField(blank=True, default=None, db_column="event_date")
 
     early_late_choices = [
@@ -693,8 +533,9 @@ class Events(BaseModel):
 
     note = models.TextField(blank=True, default=None)
     bootleg = models.BooleanField(blank=True, default=False)
+    is_stats_eligible = models.BooleanField(default=True)
 
-    official_id = models.ForeignKey(
+    official = models.ForeignKey(
         to="Releases",
         on_delete=models.DO_NOTHING,
         blank=True,
@@ -702,7 +543,7 @@ class Events(BaseModel):
         db_column="official_id",
     )
 
-    nugs_id = models.ForeignKey(
+    nugs = models.ForeignKey(
         to="NugsReleases",
         on_delete=models.DO_NOTHING,
         blank=True,
@@ -710,11 +551,11 @@ class Events(BaseModel):
         db_column="nugs_id",
     )
 
+    # objects = EventManager()
+
     class Meta:
-        managed = False
         db_table = "events"
         verbose_name_plural = "events"
-        unique_together = (("id", "date", "brucebase_url"),)
         ordering = ["id"]
 
     def __str__(self) -> str:
@@ -723,12 +564,14 @@ class Events(BaseModel):
             if self.early_late:
                 event += f" ({self.early_late})"
         except AttributeError:
-            event = f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
+            event = format_fuzzy(self.event_id)
+
+        # event += f" {self.venue}"
 
         return event
 
     def filter_date(self) -> str:
-        return f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
+        return f"{self.event_id[0:4]}-{self.event_id[4:6]}-{self.event_id[6:8]}"
 
     def get_date(self) -> str:
         try:
@@ -737,32 +580,40 @@ class Events(BaseModel):
                 event += f" ({self.early_late})"
 
         except AttributeError:
-            event = f"{self.id[0:4]}-{self.id[4:6]}-{self.id[6:8]}"
+            event = f"{self.event_id[0:4]}-{self.event_id[4:6]}-{self.event_id[6:8]}"
 
         return event
 
     def get_last(self):
         return (
             Events.objects.select_related("venue", "artist")
-            .filter(id__lt=self.id)
-            .order_by("-id")
+            .filter(event_id__lt=self.event_id)
+            .order_by("-event_id")
             .first()
         )
 
     def get_next(self):
         return (
             Events.objects.select_related("venue", "artist")
-            .filter(id__gt=self.id)
-            .order_by("id")
+            .filter(event_id__gt=self.event_id)
+            .order_by("event_id")
             .first()
         )
+
+    @property
+    def has_setlist(self):
+        return self.setlist_certainty in ("Confirmed", "Probable")
 
 
 class NugsReleases(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     nugs_id = models.IntegerField(blank=True, default=None)
-    event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        db_column="event_id",
+    )
     date = models.DateTimeField(blank=True, default=None, db_column="release_date")
     url = models.TextField(blank=True, default=None, db_column="nugs_url")
     thumbnail = models.TextField(blank=True, default=None, db_column="thumbnail_url")
@@ -770,35 +621,12 @@ class NugsReleases(BaseModel):
     first_friday = models.BooleanField(default=False, db_column="first_friday")
 
     class Meta:
-        managed = False
         db_table = "nugs_releases"
-        verbose_name_plural = "nugs_releases"
+        verbose_name_plural = "Nugs Releases"
         ordering = ["-event__id"]
 
     def __str__(self) -> str:
-        return self.event.id
-
-
-class OpenersClosers(models.Model):
-    song_id = models.TextField(blank=True, default=None)
-    position = models.TextField(blank=True, default=None)
-    num = models.BigIntegerField(blank=True, default=None)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "openers_closers"
-        verbose_name_plural = "openers_closers"
-
-
-class PremiereDebut(models.Model):
-    song_name = models.TextField(blank=True, default=None)
-    debuts = models.TextField(blank=True, default=None)  # This field type is a guess.
-    premiere = models.IntegerField(blank=True, default=None)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "premiere_debut"
-        verbose_name_plural = "premiere_debut"
+        return str(self.nugs_id)
 
 
 class Relations(BaseModel):
@@ -808,34 +636,41 @@ class Relations(BaseModel):
     brucebase_url = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
     appearances = models.IntegerField(default=0)
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="relation_first",
-        db_column="first_appearance",
+        db_column="first_event",
         blank=True,
         default=None,
     )
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="relation_last",
-        db_column="last_appearance",
+        db_column="last_event",
         blank=True,
         default=None,
     )
-    aliases = models.TextField(blank=True, default=None)
-    nickname = models.TextField(blank=True, default=None)
 
     instruments = models.TextField(blank=True, default=None)
 
     class Meta:
-        managed = False
         db_table = "relations"
         verbose_name_plural = "relations"
 
     def __str__(self) -> str:
         return self.name
+
+
+class RelationAliases(BaseModel):
+    id = models.UUIDField(primary_key=True)
+    relation = models.ForeignKey(Relations, models.DO_NOTHING, blank=True, null=True)
+    name = models.TextField()
+    type = models.TextField()
+
+    class Meta:
+        db_table = "relation_aliases"
 
 
 class Onstage(BaseModel):
@@ -845,8 +680,10 @@ class Onstage(BaseModel):
         to=Events,
         on_delete=models.DO_NOTHING,
         db_column="event_id",
+        related_name="onstage",
         blank=True,
         default=None,
+        db_index=True,
     )
 
     relation = models.ForeignKey(
@@ -861,6 +698,7 @@ class Onstage(BaseModel):
         to=Bands,
         on_delete=models.DO_NOTHING,
         db_column="band_id",
+        related_name="onstage_band",
         to_field="id",
         blank=True,
         default=None,
@@ -870,9 +708,12 @@ class Onstage(BaseModel):
     guest = models.BooleanField(default=False)
 
     class Meta:
-        managed = False
         db_table = "onstage"
         verbose_name_plural = "onstage"
+        unique_together = ("event", "relation", "band")
+
+    def __str__(self):
+        return f"Relation {self.relation_id} / Band {self.band_id}"
 
 
 class ReleaseTracks(BaseModel):
@@ -896,7 +737,12 @@ class ReleaseTracks(BaseModel):
         default=None,
     )
 
-    event = models.ForeignKey(Events, models.DO_NOTHING, blank=True, default=None)
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        blank=True,
+        default=None,
+    )
     note = models.TextField(blank=True, default=None)
 
     setlist = models.ForeignKey(
@@ -911,9 +757,8 @@ class ReleaseTracks(BaseModel):
     length = models.TimeField(blank=True, default=None)
 
     class Meta:
-        managed = False
         db_table = "release_tracks"
-        verbose_name_plural = "release_tracks"
+        verbose_name_plural = "Release Tracks"
         ordering = ["release__name", "track"]
 
 
@@ -922,13 +767,31 @@ class Releases(BaseModel):
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_id = models.TextField(blank=True, default=None)
     name = models.TextField(blank=True, default=None)
-    type = models.TextField(blank=True, default=None)
-    format = models.TextField(blank=True, default=None)
-    date = models.DateField(blank=True, default=None, db_column="release_date")
+
+    release_types = (
+        ("Live", "Live"),
+        ("Compilation", "Compilation"),
+        ("Studio", "Studio"),
+    )
+
+    type = models.CharField(blank=True, default=None, choices=release_types)
+
+    format_types = (
+        ("audio", "audio"),
+        ("video", "video"),
+    )
+
+    format = models.CharField(blank=True, default=None, choices=format_types)
+    date = models.DateField(
+        blank=True,
+        default=None,
+        db_column="release_date",
+        verbose_name="Release Date",
+    )
     short_name = models.TextField(blank=True, default=None)
     thumb = models.TextField(blank=True, default=None)
     note = models.TextField(blank=True, default=None)
-    mbid = models.UUIDField(default=None, editable=False)
+    mbid = models.UUIDField(default=None, blank=True, verbose_name="MusicBrainz ID")
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
@@ -939,7 +802,6 @@ class Releases(BaseModel):
     )
 
     class Meta:
-        managed = False
         db_table = "releases"
         verbose_name_plural = "releases"
 
@@ -948,10 +810,10 @@ class Releases(BaseModel):
 
 
 class SetlistNotes(models.Model):
-    id = models.OneToOneField(
+    setlist = models.ForeignKey(
         "Setlists",
         models.DO_NOTHING,
-        related_name="notes_setlist",
+        related_name="setlist_notes",
         db_column="id",
         primary_key=True,
     )
@@ -959,27 +821,21 @@ class SetlistNotes(models.Model):
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
+        to_field="event_id",
         related_name="notes_event",
         db_column="event_id",
     )
 
-    num = models.TextField(blank=True, default=None)
+    num = models.IntegerField(blank=False)
     note = models.TextField(blank=True, default=None)
-    gap = models.TextField(blank=True, default=None)
-
-    last = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        related_name="notes_last_event",
-        db_column="last",
-    )
-
-    last_date = models.TextField(blank=True, default=None)
 
     class Meta:
         managed = False  # Created from a view. Don't remove.
-        db_table = "setlist_notes"
-        verbose_name_plural = "setlist_notes"
+        db_table = "setlist_notes_new"
+        verbose_name_plural = "Setlist Notes"
+
+    def __str__(self):
+        return self.note
 
 
 class Songs(BaseModel):
@@ -994,22 +850,22 @@ class Songs(BaseModel):
     )
     short_name = models.TextField(blank=True, default=None, verbose_name="Short Name")
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         to=Events,
         on_delete=models.DO_NOTHING,
         related_name="song_first",
         verbose_name="First Played",
-        db_column="first_played",
+        db_column="first_event",
         blank=True,
         default=None,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         to=Events,
         on_delete=models.DO_NOTHING,
         related_name="song_last",
         verbose_name="Last Played",
-        db_column="last_played",
+        db_column="last_event",
         blank=True,
         default=None,
     )
@@ -1049,22 +905,18 @@ class Songs(BaseModel):
 
     aliases = models.TextField(blank=True, default=None)
 
+    sort_song_name = models.CharField(default="")
+
     class Meta:
-        managed = False
         db_table = "songs"
         ordering = ["name"]
         verbose_name_plural = "songs"
 
     def __str__(self) -> str:
-        name = self.name
-
-        if self.short_name:
-            name = self.short_name
-
         if not self.original:
-            return f"{name} ({self.original_artist})"
+            return f"{self.name} ({self.original_artist})"
 
-        return self.name
+        return f"{self.name}"
 
 
 class Setlists(BaseModel):
@@ -1077,6 +929,7 @@ class Setlists(BaseModel):
         db_column="event_id",
         blank=True,
         default=None,
+        db_index=True,
     )
 
     sets = (
@@ -1119,8 +972,8 @@ class Setlists(BaseModel):
     last = models.IntegerField(blank=True, default=None)
     next = models.IntegerField(blank=True, default=None)
 
-    tour_num = models.IntegerField(blank=True, default=0)
-    tour_total = models.IntegerField(blank=True, default=0)
+    tour_num = models.IntegerField(blank=True, default=None)
+    tour_total = models.IntegerField(blank=True, default=None)
 
     ltp = models.ForeignKey(
         to=Events,
@@ -1129,18 +982,24 @@ class Setlists(BaseModel):
         related_name="ltp_event",
         blank=True,
         default=None,
-        to_field="id",
     )
 
     sign_request = models.BooleanField(default=False)
 
+    is_opener = models.BooleanField(default=False)
+    is_closer = models.BooleanField(default=False)
+    is_set_opener = models.BooleanField(default=False)
+    is_set_closer = models.BooleanField(default=False)
+    is_last_in_show = models.BooleanField(default=False)
+    is_main_set_closer = models.BooleanField(default=False)
+
     class Meta:
-        managed = False
         db_table = "setlists"
         verbose_name_plural = "setlists"
 
     def __str__(self) -> str:
-        return f"{self.event.id} - {self.set_name} - {self.song} ({self.id})"
+        event_id = self.event_id
+        return f"{event_id} - {self.set_name} - {self.song_id} ({self.id})"
 
     VALID_SET_NAMES = [
         "Show",
@@ -1151,17 +1010,41 @@ class Setlists(BaseModel):
         "Post-Show",
     ]
 
-    def get_prev(self):
-        return (
-            Setlists.objects.select_related("song", "event")
-            .filter(
-                set_name=self.set_name,
-                event=self.event,
-                song_num__lt=self.song_num,
-            )
-            .order_by("event", "song_num")
-            .last()
-        )
+    # @property
+    # def prev_song(self):
+    #     try:
+    #         return (
+    #             Setlists.objects.select_related("song", "event")
+    #             .filter(
+    #                 set_name=self.set_name,
+    #                 event=self.event.id,
+    #                 song_num__isnull=False,
+    #                 song_num__lt=self.song_num,
+    #             )
+    #             .order_by("event__event_id", "song_num")
+    #             .last()
+    #             .song
+    #         )
+    #     except (AttributeError, ValueError):
+    #         return None
+
+    # @property
+    # def next_song(self):
+    #     try:
+    #         return (
+    #             Setlists.objects.select_related("song", "event")
+    #             .filter(
+    #                 set_name=self.set_name,
+    #                 event=self.event.id,
+    #                 song_num__isnull=False,
+    #                 song_num__gt=self.song_num,
+    #             )
+    #             .order_by("event__event_id", "song_num")
+    #             .first()
+    #             .song
+    #         )
+    #     except (AttributeError, ValueError):
+    #         return None
 
 
 class SetlistsBySetAndDate(models.Model):
@@ -1209,36 +1092,8 @@ class Snippets(BaseModel):
     note = models.TextField(blank=True, default=None, db_column="snippet_note")
 
     class Meta:
-        managed = False
         db_table = "snippets"
         verbose_name_plural = "snippets"
-
-
-# class SongGaps(models.Model):
-#     id = models.IntegerField(primary_key=True)
-#     event = models.ForeignKey(
-#         Events,
-#         models.DO_NOTHING,
-#         to_field="id",
-#         db_column="event_id",
-#         related_name="event",
-#     )
-#     event_num = models.IntegerField(blank=True, default=None)
-#     last = models.TextField(blank=True, default=None)
-#     next = models.TextField(blank=True, default=None)
-
-#     last_show = models.ForeignKey(
-#         Events,
-#         models.DO_NOTHING,
-#         to_field="id",
-#         related_name="last_event",
-#         db_column="last_time_played",
-#     )
-
-#     class Meta:
-#         managed = False  # Created from a view. Don't remove.
-#         db_table = "song_gaps"
-#         verbose_name_plural = "song_gaps"
 
 
 class SongsAfterRelease(models.Model):
@@ -1259,13 +1114,11 @@ class Tags(BaseModel):
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
-        to_field="id",
         db_column="event_id",
     )
     tags = models.TextField(blank=True, default=None)
 
     class Meta:
-        managed = False
         db_table = "tags"
         verbose_name_plural = "tags"
 
@@ -1286,20 +1139,20 @@ class Tours(BaseModel):
     name = models.TextField(blank=True, default=None, db_column="tour_name")
     slug = models.TextField(blank=True, default=None)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="tour_first",
-        db_column="first_show",
+        db_column="first_event",
         blank=True,
         default=None,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="tour_last",
-        db_column="last_show",
+        db_column="last_event",
         blank=True,
         default=None,
     )
@@ -1309,7 +1162,6 @@ class Tours(BaseModel):
     num_legs = models.IntegerField(default=0)
 
     class Meta:
-        managed = False
         db_table = "tours"
         verbose_name_plural = "tours"
 
@@ -1330,17 +1182,17 @@ class TourLegs(BaseModel):
 
     name = models.TextField(blank=True, default=None)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="tourleg_first",
-        db_column="first_show",
+        db_column="first_event",
     )
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="tourleg_last",
-        db_column="last_show",
+        db_column="last_event",
     )
 
     num_shows = models.IntegerField(default=0)
@@ -1348,7 +1200,6 @@ class TourLegs(BaseModel):
     note = models.TextField(blank=True, default=None)
 
     class Meta:
-        managed = False
         db_table = "tour_legs"
         verbose_name_plural = "tour_legs"
 
@@ -1417,18 +1268,18 @@ class Runs(BaseModel):
         blank=True,
         null=True,
     )
-    name = models.TextField()
+    name = models.TextField(blank=True, null=True, max_length=255)  # noqa: DJ001
     num_shows = models.IntegerField(blank=True, null=True)
     num_songs = models.IntegerField(blank=True, null=True)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         db_column="first_event",
         blank=True,
         null=True,
     )
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         db_column="last_event",
@@ -1438,7 +1289,6 @@ class Runs(BaseModel):
     )
 
     class Meta:
-        managed = False
         db_table = "runs"
         verbose_name_plural = "runs"
 
@@ -1460,7 +1310,7 @@ class StudioSessions(BaseModel):
     num_events = models.IntegerField(blank=True, null=True)
     num_songs = models.IntegerField(blank=True, null=True)
 
-    first = models.ForeignKey(
+    first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         db_column="first_event",
@@ -1469,7 +1319,7 @@ class StudioSessions(BaseModel):
         null=True,
     )
 
-    last = models.ForeignKey(
+    last_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         db_column="last_event",
@@ -1487,7 +1337,6 @@ class StudioSessions(BaseModel):
     )
 
     class Meta:
-        managed = False
         db_table = "studio_sessions"
         verbose_name_plural = "studio_sessions"
 
@@ -1495,15 +1344,21 @@ class StudioSessions(BaseModel):
 class UserAttendedShows(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
+
     user = models.ForeignKey(
-        to=AuthUser,
+        UserModel,
         on_delete=models.DO_NOTHING,
         db_column="user_id",
     )
-    event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
+
+    event = models.OneToOneField(
+        Events,
+        models.DO_NOTHING,
+        db_column="event_id",
+        related_name="user_attended_shows",
+    )
 
     class Meta:
-        managed = False
         db_table = "user_attended_shows"
         verbose_name_plural = "user_attended_shows"
         unique_together = ("user", "event")
@@ -1525,11 +1380,14 @@ class Guests(BaseModel):
         db_column="guest_id",
     )
 
-    event = models.ForeignKey(Events, models.DO_NOTHING, db_column="event_id")
+    event = models.ForeignKey(
+        Events,
+        models.DO_NOTHING,
+        db_column="event_id",
+    )
     note = models.TextField(blank=True, null=True)  # noqa: DJ001
 
     class Meta:
-        managed = False
         db_table = "guests"
         verbose_name_plural = "guests"
 
@@ -1554,8 +1412,8 @@ class Lyrics(BaseModel):
     note = models.TextField(blank=True, null=True)  # noqa: DJ001
 
     class Meta:
-        managed = False
         db_table = "lyrics"
+        verbose_name_plural = "lyrics"
 
 
 class Updates(models.Model):
@@ -1579,7 +1437,6 @@ class SiteUpdates(BaseModel):
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     class Meta:
-        managed = False
         db_table = "update_table"
 
 
@@ -1619,29 +1476,19 @@ class Songspagenew(models.Model):
         db_table = "songspagenew"
 
 
-class TourCounts(models.Model):
-    id = models.IntegerField(primary_key=True)
-    event = models.TextField(db_column="event_id")
-    song = models.IntegerField(db_column="song_id")
-    tour = models.IntegerField(db_column="tour_id")
-    num = models.IntegerField()
-    total = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = "tour_counts"
-
-
 class OnstageBandMembers(models.Model):
     id = models.IntegerField(primary_key=True)
     relation = models.ForeignKey(Relations, models.DO_NOTHING, db_column="relation_id")
     band = models.ForeignKey(Bands, models.DO_NOTHING, db_column="band_id")
+    count = models.IntegerField()
+
     first = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="onstagebandfirst",
         db_column="first",
     )
+
     last = models.ForeignKey(
         Events,
         models.DO_NOTHING,
@@ -1663,55 +1510,58 @@ class ReleaseDiscs(BaseModel):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = "release_discs"
+        verbose_name_plural = "Release Discs"
+
+    def __str__(self) -> str:
+        return f"Disc {self.disc_num}: {self.name}"
 
 
 class SetlistEntries(models.Model):
     id = models.AutoField(primary_key=True)
 
-    event = models.ForeignKey(
+    event = models.OneToOneField(
         Events,
         models.DO_NOTHING,
         db_column="event_id",
     )
 
-    show_opener = models.ForeignKey(
+    show_opener = models.OneToOneField(
         to=Songs,
         on_delete=models.DO_NOTHING,
         related_name="show_opener",
         db_column="show_opener",
     )
 
-    s1_closer = models.ForeignKey(
+    s1_closer = models.OneToOneField(
         to=Songs,
         on_delete=models.DO_NOTHING,
         related_name="s1_closer",
         db_column="s1_closer",
     )
 
-    s2_opener = models.ForeignKey(
+    s2_opener = models.OneToOneField(
         to=Songs,
         on_delete=models.DO_NOTHING,
         related_name="s2_opener",
         db_column="s2_opener",
     )
 
-    main_closer = models.ForeignKey(
+    main_closer = models.OneToOneField(
         to=Songs,
         on_delete=models.DO_NOTHING,
         related_name="main_closer",
         db_column="main_closer",
     )
 
-    encore_opener = models.ForeignKey(
+    encore_opener = models.OneToOneField(
         to=Songs,
         on_delete=models.DO_NOTHING,
         related_name="encore_opener",
         db_column="encore_opener",
     )
 
-    show_closer = models.ForeignKey(
+    show_closer = models.OneToOneField(
         to=Songs,
         on_delete=models.DO_NOTHING,
         related_name="show_closer",
@@ -1725,7 +1575,11 @@ class SetlistEntries(models.Model):
 
 class Notes(BaseModel):
     id = models.AutoField(primary_key=True)
-    event = models.ForeignKey(Events, on_delete=models.CASCADE, db_column="event_id")
+    event = models.ForeignKey(
+        Events,
+        on_delete=models.CASCADE,
+        db_column="event_id",
+    )
     num = models.IntegerField()
     note = models.TextField()
     gap = models.TextField(blank=True, null=True)  # noqa: DJ001
@@ -1740,9 +1594,50 @@ class Notes(BaseModel):
         db_column="setlist_id",
     )
 
-    def __str__(self):
+    class Meta:
+        db_table = "notes"
+
+    def __str__(self) -> str:
         return re.sub("'{2,}", "'", self.note)
 
+
+class Contact(BaseModel):
+    id = models.AutoField(primary_key=True)
+    email = models.EmailField()
+
+    subject_choices = [
+        ("problem", "Bug/Problem"),
+        ("suggestion", "Suggestion"),
+        ("comment", "Comment"),
+        ("comment", "Question"),
+    ]
+
+    is_user = models.BooleanField(default=False)
+
+    subject = models.CharField(choices=subject_choices)
+    message = models.TextField()
+
     class Meta:
-        managed = False
-        db_table = "notes"
+        db_table = "contact"
+        verbose_name_plural = "Contact"
+        managed = True
+
+    def __str__(self) -> str:
+        return f"Message from {self.name} - {self.subject}"
+
+
+class TourCount(models.Model):
+    setlist = models.OneToOneField(
+        "Setlists",
+        on_delete=models.DO_NOTHING,
+        primary_key=True,
+        db_column="id",
+        related_name="tour_stats_link",
+    )
+
+    num = models.IntegerField()
+    total = models.IntegerField()
+
+    class Meta:
+        managed = False  # Critical: Tells Django not to try to create/delete this table
+        db_table = "setlist_tour_count"
