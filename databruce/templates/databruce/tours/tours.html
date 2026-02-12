@@ -31,7 +31,7 @@
       scrollY: '60vh',
       scrollCollapse: true,
       ajax: {
-        'url': '/api/v1/tours/?format=datatables&keep=id',
+        'url': '/api/v1/tours/?format=custom',
       },
       columnDefs: [
         { "defaultContent": "", "type": 'text', "targets": '_all' },
@@ -65,8 +65,8 @@
           },
         },
         { 
-          'data': 'first.date',
-          'name': 'first__id, first__early_late',
+          'data': 'first_event.date',
+          'name': 'first_event__event_id, first_event__early_late',
           'width': '6rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
@@ -75,8 +75,8 @@
           },          
         },
         { 
-          'data': 'last.date',
-          'name': 'last__id, last__early_late',
+          'data': 'last_event.date',
+          'name': 'last_event__event_id, last_event__early_late',
           'width': '6rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
