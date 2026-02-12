@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  States &gt; {{ info }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
@@ -101,7 +101,7 @@
       serverSide: true,
       processing: true,
       ajax: {
-        'url': '/api/v1/events/?state={{ info.id }}&format=datatables&keep=id',
+        'url': '/api/v1/events/?state={{ info.id }}&format=custom',
       },
       columnDefs: [
         { targets: [-1], visible: false },
@@ -114,7 +114,7 @@
       serverSide: true,
       processing: true,
       ajax: {
-        'url': '/api/v1/setlists/?state={{ info.id }}&format=datatables&keep=id',
+        'url': '/api/v1/setlists/?state={{ info.id }}&format=custom',
       },
       columnDefs: [{ targets: [0], width: '1rem' },],
       columns: song_table_columns

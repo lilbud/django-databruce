@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Event Runs
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Event Runs</div>
@@ -34,7 +34,7 @@
           processing: true,
           scrollY: '60vh',
           ajax: {
-            'url': '/api/v1/runs/?format=datatables&keep=id',
+            'url': '/api/v1/runs/?format=custom',
           },
           columnDefs: [
             { targets: "_all", className: 'text-wrap text-xs'},
@@ -81,8 +81,8 @@
             {'data': 'num_shows', 'name': 'num_shows', 'width': '1rem' },
             {'data': 'num_songs', 'name': 'num_songs','width': '1rem' },
             {
-              'data': 'first.date',
-              'name': 'first__id, first__early_late',
+              'data': 'first_event.date',
+              'name': 'first__event_id, first__early_late',
               'width': '8rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
@@ -91,8 +91,8 @@
               },
             },
             {
-              'data': 'last.date',
-              'name': 'last__id, last__early_late',
+              'data': 'last_event.date',
+              'name': 'last__event_id, last__early_late',
               'width': '8rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {

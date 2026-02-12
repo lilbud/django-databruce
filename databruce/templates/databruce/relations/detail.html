@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Relations &gt; {{ info.name }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
@@ -89,12 +89,25 @@
       var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
       dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
 
+      //var columns = event_table_columns;
+      //
+      //// Modify columns to append event to column data and name
+      //columns.forEach(function(col) {
+      //
+      //  if (!col.data.includes("setlist")) {
+      //    col.data = 'event.' + col.data;
+      //    col.name = col.name.split(',').map(function(name) {
+      //      return `event__${name.trim()}`;
+      //    }).join(', ');
+      //  }
+      //});
+
       new DataTable('#eventTable', {
         layout: layout,
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/onstage_events/?relation={{ info.id }}&format=datatables',
+          'url': '/api/v1/events/?relation={{ info.id }}&format=custom',
         },
         columnDefs: [
           {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},

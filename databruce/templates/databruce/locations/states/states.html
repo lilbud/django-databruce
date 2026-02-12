@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  States
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">States</div>
@@ -19,27 +19,6 @@
       <th class="min-tablet-l" scope="col">Last</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-    {% for state in states %}
-      <tr>
-        <td class="text-center">{{ state.num_events }}</td>
-        <td>
-          <a href="{% url "state_details" id=state.id %}">{{ state.name }}</a>
-        </td>
-        <td>
-          {% if state.country %}
-            <a href="{% url "country_details" id=state.country.id %}">{{ state.country }}</a>
-          {% endif %}
-        </td>
-        <td data-sort="{{ state.first.get_date }}" data-filter="{{ state.first.get_date }}">
-          <a href="{% url "event_details" id=state.first.id %}">{{ state.first.get_date }}</a>
-        </td>
-        <td data-sort="{{ state.last.get_date }}" data-filter="{{ state.last.get_date }}">
-          <a href="{% url "event_details" id=state.last.id %}">{{ state.last.get_date }}</a>
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
@@ -49,7 +28,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/states/?format=datatables&keep=id',
+          'url': '/api/v1/states/?format=custom',
         },
         columnDefs: [
           { targets: [0], width: '1rem' },
@@ -75,7 +54,7 @@
             },
           },
           {
-            'data': 'first.date',
+            'data': 'first_event.date',
             'name': 'first__id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
@@ -84,7 +63,7 @@
             },
           },
           {
-            'data': 'last.date',
+            'data': 'last_event.date',
             'name': 'last__id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {

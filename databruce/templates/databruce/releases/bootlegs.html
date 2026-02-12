@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Bootlegs
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Bootlegs</div>
@@ -54,7 +54,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/bootlegs/?archive=false&format=datatables&keep=slid',
+          'url': '/api/v1/bootlegs/?archive=false&format=custom',
         },
         columns: [
           {
@@ -71,7 +71,7 @@
           {'data': 'type', 'name': 'type'},
           {
             'data': 'event.date',
-            'name': 'event__id',
+            'name': 'event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
                 return '<a href="/events/' + data.id + '">'+ data.display +'</a>';

@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Venues
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Venues</div>
@@ -21,41 +21,6 @@
       <th class="min-tablet-l" scope="col">Last</th>
     </tr>
   </thead>
-  {% comment %} <tbody>
-    {% for venue in venues %}
-      <tr>
-        <td class="text-center">{{ venue.num_events }}</td>
-        <td class="wrap">
-          <a href="{% url "venue_details" id=venue.id %}">{{ venue.get_name }}</a>
-        </td>
-        <td class="wrap">
-          {% if venue.city %}
-            <a href="{% url "city_details" id=venue.city.id %}">{{ venue.city.name }}</a>
-          {% endif %}
-        </td>
-        <td>
-          {% if venue.state %}
-            <a href="{% url "state_details" id=venue.state.id %}">{{ venue.state.name }}</a>
-          {% endif %}
-        </td>
-        <td>
-          {% if venue.country %}
-            <a href="{% url "country_details" id=venue.country.id %}">{{ venue.country }}</a>
-          {% endif %}
-        </td>
-        <td data-sort="{{ venue.first.get_date }}" data-filter="{{ venue.first.get_date }}">
-          {% if venue.first %}
-            <a href="{% url "event_details" id=venue.first.id %}">{{ venue.first.get_date }}</a>
-          {% endif %}
-        </td>
-        <td data-sort="{{ venue.last.get_date }}" data-filter="{{ venue.last.get_date }}">
-          {% if venue.last %}
-            <a href="{% url "event_details" id=venue.last.id %}">{{ venue.last.get_date }}</a>
-          {% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody> {% endcomment %}
 {% endblock table %}
 {% block scripts %}
   <script>
@@ -66,7 +31,7 @@
       processing: true,
       scrollY: '60vh',
       ajax: {
-        'url': '/api/v1/venues/?format=datatables&keep=id',
+        'url': '/api/v1/venues/?format=custom',
       },
       columnDefs: [
         { 'targets': [0], 'width': '1rem' },
@@ -89,28 +54,26 @@
           'name': 'city__name, city__aliases',
           'width': '10rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              if (data) {
-                return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
-              }
+            if (type === 'display' && data) {
+             
+              return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
+              
             }
           },
         },
         {
           'data': 'state', 
-          'name': 'state__name, state__abbrev',
+          'name': 'city__state__name, city__state__abbrev',
           'width': '8rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              if (data) {
-                return '<a href="/states/' + data.id + '">'+ data.name +'</a>';
-              }
+            if (type === 'display' && data) {
+              return '<a href="/states/' + data.id + '">'+ data.name +'</a>';
             }
           },       
         },
         {
           'data': 'country',
-          'name': 'country__name, country__alpha_2, country__alpha_3',
+          'name': 'city__country__name, city__country__alpha_2',
           'width': '10rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
@@ -121,8 +84,8 @@
           },        
         },
         {
-          'data': 'first.date', 
-          'name': 'first__id, first__early_late',
+          'data': 'first_event.date', 
+          'name': 'first_event__event_id, first_event__early_late',
           'width': '8rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {
@@ -133,8 +96,8 @@
           },
         },
         {
-          'data': 'last.date', 
-          'name': 'last__id, last__early_late',
+          'data': 'last_event.date', 
+          'name': 'last_event__event_id, last_event__early_late',
           'width': '8rem',
           'render': function (data, type, row, meta) {
             if (type === 'display') {

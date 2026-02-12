@@ -1,23 +1,23 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-  Venues &gt; {{ venue_info }}
+  {{ title }} &gt; {{ venue_info }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url "venues" %}">Venues</a> &gt;
-      {{ venue_info }}
+      {{ venue_info.name }}
     </div>
     {% if venue_info.aliases %}
       <div class="text-lg text-wrap mb-3">
         <span class="fw-medium">Nicknames/AKA:</span>
-        <div>{{ venue_info.aliases }}</div>
+        <div>{{ venue_info.aliases|join:'; ' }}</div>
       </div>
     {% endif %}
     {% if venue_info.note %}
       <div class="text-base text-wrap mb-3">
         <span class="fw-medium">Notes:</span>
-        <div>{{ venue_info.note|note_format|safe }}</div>
+        <div>{{ venue_info.note|markdown|safe }}</div>
       </div>
     {% endif %}
     <div class="card">
@@ -119,7 +119,7 @@
         processing: true,
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/events/?venue={{ venue_info.id }}&format=datatables&keep=id',
+          'url': '/api/v1/events/?venue={{ venue_info.id }}&format=custom',
         },
         columnDefs: [
           {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},
@@ -133,7 +133,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/setlists/?venue={{ venue_info.id }}&format=datatables',
+          'url': '/api/v1/setlists/?venue={{ venue_info.id }}&format=custom',
         },
         columns: song_table_columns,
       });

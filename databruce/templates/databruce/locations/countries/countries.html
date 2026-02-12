@@ -1,6 +1,6 @@
 {% extends "databruce/category.html" %}
 {% block title %}
-  Countries
+  {{ title }}
 {% endblock title %}
 {% block info_row %}
   <div class="text-2xl">Countries</div>
@@ -27,7 +27,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/countries/?format=datatables&keep=id',
+          'url': '/api/v1/countries/?format=custom',
         },
         columnDefs: [
           { width: '1rem', targets: [0] },
@@ -44,20 +44,20 @@
             },
           },
           {
-            'data': 'first.date',
-            'name': 'first__id',
+            'data': 'first_event',
+            'name': 'first_event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              if (type === 'display' && data) {
+                return '<a href="/events/' + row.event_id  + '">'+ data.date.display_day +'</a>';
               }
             },
           },
           {
-            'data': 'last.date',
-            'name': 'last__id',
+            'data': 'last_event',
+            'name': 'last_event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              if (type === 'display' && data) {
+                return '<a href="/events/' + row.event_id + '">'+ data.date.display_day +'</a>';
               }
             },
           },
