@@ -1,7 +1,7 @@
 {% extends "databruce/base.html" %}
 {% load i18n %}
 {% block title %}
-  Profile
+  {{ title }}
 {% endblock title %}
 {% block content %}
   {% translate user_info.username as username %}
@@ -70,7 +70,7 @@
                     {% comment %} <th class="min-tablet-l" scope="col">Remove</th> {% endcomment %}
                   </tr>
                 </thead>
-                <tbody>
+                {% comment %} <tbody>
                   {% for event in user_shows %}
                     {% with event=event.event %}
                       <tr>
@@ -79,10 +79,7 @@
                         </td>
                         <td class="icon text-center align-middle">
                           {% if event.setlist_certainty == "Confirmed" %}
-                            <i class="bi bi-file-earmark-check d-none d-md-block"
-                               data-bs-toggle="tooltip"
-                               data-bs-placement="top"
-                               data-bs-title="Has Setlist"></i>
+                            <i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>
                             <div class="d-inline d-md-none">True</div>
                           {% else %}
                             <div class="d-inline d-md-none">False</div>
@@ -109,7 +106,7 @@
                       </tr>
                     {% endwith %}
                   {% endfor %}
-                </tbody>
+                </tbody> {% endcomment %}
               </table>
             </div>
           </div>
@@ -142,7 +139,7 @@
                       </td>
                       <td>{{ song.category }}</td>
                       <td class="text-center">
-                        <a href="{% url "event_details" id=song.first %}">{{ song.first|get_date }}</a>
+                        <a href="{% url "event_details" id=song.first %}">{{ song.first_event }}</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -249,8 +246,10 @@
   {% endif %}
   <script>
       $(document).ready(function() {
+        var layout = getDatatableLayout({columns: false, category: false});
+
           new DataTable('#eventTable', {
-            layout: getDatatableLayout({category: false}),
+            layout: layout,
             scrollY: '30vh',
             columnDefs: [
               {target: [0], width: '8rem' },
@@ -259,6 +258,72 @@
               {target: [7], width: '15rem' },
               {target: [-1], visible: false }
             ],
+            serverSide: true,
+            processing: false,
+            ajax: {
+              'url': '/api/v1/user_attended_shows/?user={{user_info.id}}&format=custom',
+            },
+            columns: [
+              {
+                'data': 'event.date',
+                'name': 'event__event_id',
+                'width': '10rem',
+                'type': 'text',
+                'className': 'all',
+                'render': function (data, type, row, meta) {
+                  return renderLink('/events/', row.event_id, data.display_day);
+                },
+              },
+              {
+                'data': 'event.has_setlist',
+                'name': 'event__has_setlist',
+                'width': '1rem',
+                'className': 'min-tablet-l text-center text-sm',
+                'orderable': false,
+                'searchable': false,
+                'render': function (data, type, row, meta) {
+                  return data ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.setlist}</div>` : `<div class="d-inline d-md-none">${row.setlist}</div>`
+                },
+              },
+              {
+                'data': 'event.artist',
+                'name': 'event__artist__name',
+                'width': '12rem',
+                'className': 'all',
+                'render': function (data, type, row, meta) {
+                  return renderLink('/bands/', data.id, data.name);
+                },
+              },
+              {
+                'data': 'event.venue',
+                'name': 'event__venue__name, event__venue__detail',
+                'width': '12rem',
+                'className': 'min-tablet-l',
+                'render': function (data, type, row, meta) {
+                  return renderLink('/venues/', data.id, data.name);
+                },
+              },
+              {
+                'data': 'event.venue',
+                'name': 'event__venue__city__name, event__venue__city__state__abbrev, event__venue__city__country__name',
+                'width': '12rem',
+                'className': 'all',
+                'render': function (data, type, row, meta) {
+                  return renderLink('/cities/', data.city.id, data.location);
+                },
+              },
+              {
+                'data': 'event.tour',
+                'name': 'event__tour__name',
+                'width': '12rem',
+                'className': 'min-tablet-l',
+                'render': function (data, type, row, meta) {
+                  return renderLink('/tours/', data.id, data.name);
+                },
+              },
+              { 'data': 'event.title', 'name': 'event__title', 'width': '15rem', 'className': 'min-tablet-l', },
+              { 'data': 'event.public', 'name': 'event__public', 'className': 'min-tablet-l', 'visible': false, 'orderable': false },
+            ]
           });
 
           new DataTable('#songTable', {
