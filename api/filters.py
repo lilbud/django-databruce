@@ -1,7 +1,16 @@
 import re
+import time
+from functools import reduce
 
+import django_filters
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Column, Layout, Row, Submit
+from dal import autocomplete
+from django import forms
 from django.core import exceptions
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import F, Q
+from django_filters import CharFilter, FilterSet
 from django_filters import rest_framework as filters
 from querystring_parser import parser
 from rest_framework.filters import BaseFilterBackend
@@ -10,15 +19,13 @@ from databruce import models
 
 
 def get_sb_filter(
+    self,
     column: str,
     condition: str,
     value: str = "",
     value2: str = "",
-    type: str = "",  # noqa: A002
+    sb_type: str = "",
 ):
-    print(f"condition: {condition}")
-    print(f"value: {value}")
-
     filter_types = {
         "=": Q(**{f"{column}__iexact": value}),
         "!=": ~Q(**{f"{column}__iexact": value}),
@@ -40,169 +47,245 @@ def get_sb_filter(
         ),
     }
 
-    if type == "num":
+    if sb_type == "num":
         filter_types["null"] = Q(**{f"{column}__isnull": True})
         filter_types["!null"] = Q(**{f"{column}__isnull": False})
 
-    if type == "boolean":
+    if sb_type == "boolean":
         filter_types["null"] = Q(**{f"{column}": False})
         filter_types["!null"] = Q(**{f"{column}": True})
 
     return filter_types.get(condition)
 
 
-class DTFilter(BaseFilterBackend):
-    def get_searching(self, params):
-        filter = Q()
-        search_filter = Q()
-        search_type = "icontains"
+class DataTablesFilterBackend(BaseFilterBackend):
+    def get_sb_filter(
+        self,
+        column: str,
+        condition: str,
+        value: str = "",
+        value2: str = "",
+        sb_type: str = "",
+    ):
+        filter_types = {
+            "=": Q(**{f"{column}__iexact": value}),
+            "!=": ~Q(**{f"{column}__iexact": value}),
+            "starts": Q(**{f"{column}__istartswith": value}),
+            "!starts": ~Q(**{f"{column}__istartswith": value}),
+            "contains": Q(**{f"{column}__icontains": value}),
+            "!contains": ~Q(**{f"{column}__icontains": value}),
+            "ends": Q(**{f"{column}__iendswith": value}),
+            "!ends": ~Q(**{f"{column}__iendswith": value}),
+            "null": Q(**{f"{column}__exact": ""}) | Q(**{f"{column}__isnull": True}),
+            "!null": ~Q(**{f"{column}__exact": ""}) & Q(**{f"{column}__isnull": False}),
+            "<": Q(**{f"{column}__lt": value}),
+            "<=": Q(**{f"{column}__lte": value}),
+            ">=": Q(**{f"{column}__gte": value}),
+            ">": Q(**{f"{column}__gt": value}),
+            "between": Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
+            "!between": ~Q(
+                Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
+            ),
+        }
 
-        try:
-            for f in params["columns"].values():
-                fields = [n.replace(".", "__").strip() for n in f["data"].split(",")]
+        if sb_type == "num":
+            filter_types["null"] = Q(**{f"{column}__isnull": True})
+            filter_types["!null"] = Q(**{f"{column}__isnull": False})
 
-                if f["name"]:
-                    fields = [n.strip() for n in f["name"].split(",")]
+        if sb_type == "boolean":
+            filter_types["null"] = Q(**{f"{column}": False})
+            filter_types["!null"] = Q(**{f"{column}": True})
 
-                if f["searchable"] != "false":
-                    for field in fields:
-                        if f["search"]["regex"] == "true":
-                            search_type = "iregex"
+        return filter_types.get(condition)
 
-                        if f["search"]["value"]:
-                            filter.add(
-                                Q(**{f"{field}__{search_type}": f["search"]["value"]}),
-                                Q.OR,
-                            )
+    def verify_fields(self, model, fields):
+        valid_fields = []
 
-                        try:
-                            re.compile(params["search"]["value"])
-                            search_type = "iregex"
-                        except re.error:
-                            search_type = "icontains"
+        for path in fields:
+            current_model = model
+            parts = path.split("__")
+            is_valid = True
 
-                        if params["search"]["value"]:
-                            search_filter.add(
-                                Q(
-                                    **{
-                                        f"{field}__{search_type}": params["search"][
-                                            "value"
-                                        ],
-                                    },
-                                ),
-                                Q.OR,
-                            )
+            try:
+                for i, part in enumerate(parts):
+                    # 1. Try checking for a database field via _meta
+                    try:
+                        field = current_model._meta.get_field(part)
+                        if i < len(parts) - 1:
+                            if field.is_relation:
+                                current_model = field.related_model
+                            else:
+                                is_valid = False
+                                break
+                    except FieldDoesNotExist:
+                        # 2. Check if it's a @property on the model class
+                        # Properties only work at the end of a path for filtering/display
+                        if i == len(parts) - 1 and hasattr(current_model, part):
+                            attr = getattr(current_model, part)
+                            is_valid = bool(isinstance(attr, property))
+                        else:
+                            is_valid = False
+                        break
 
-            filter.add(search_filter, Q.AND)
+                if is_valid:
+                    valid_fields.append(path)
+            except Exception:  # noqa: BLE001, S112
+                continue
 
-        except KeyError:
-            pass
-
-        return filter
-
-    def get_ordering(self, params):
-        order = []
-
-        try:
-            for item in params["order"].values():
-                field = item["name"].split(",")[0].strip()
-
-                if item["dir"] == "asc":
-                    order.append(F(f"{field}").asc(nulls_last=True))
-                else:
-                    order.append(F(f"{field}").desc(nulls_last=True))
-
-        except KeyError:
-            pass
-
-        return order
-
-    def get_searchbuilder(self, params):
-        filter = Q()
-
-        try:
-            criteria = params["searchBuilder"]["criteria"]
-
-            for param in criteria.values():
-                name = next(
-                    item["name"]
-                    for item in params["columns"].values()
-                    if item["data"] == param["origData"]
-                )
-
-                # if name isn't present, use data instead
-                if not name:
-                    name = next(
-                        item["data"]
-                        for item in params["columns"].values()
-                        if item["data"] == param["origData"]
-                    )
-
-                fields = [i.strip() for i in name.split(",")]
-                search_filter = Q()
-
-                for field in fields:
-                    if "between" in param["condition"]:
-                        field_filter = get_sb_filter(
-                            column=field,
-                            value=param["value1"],
-                            value2=param["value2"],
-                            condition=param["condition"],
-                            type=param["type"],
-                        )
-                    elif "null" in param["condition"]:
-                        field_filter = get_sb_filter(
-                            column=field,
-                            condition=param["condition"],
-                            type=param["type"],
-                        )
-                    else:
-                        field_filter = get_sb_filter(
-                            column=field,
-                            value=param["value1"],
-                            condition=param["condition"],
-                            type=param["type"],
-                        )
-
-                    search_filter.add(field_filter, Q.OR)
-
-                if params["searchBuilder"]["logic"] == "AND":
-                    filter.add(
-                        search_filter,
-                        Q.AND,
-                    )
-                else:
-                    filter.add(
-                        search_filter,
-                        Q.OR,
-                    )
-        except KeyError:
-            pass
-        else:
-            return filter
+        return valid_fields
 
     def filter_queryset(self, request, queryset, view):
-        params = parser.parse(request.GET.urlencode())
+        # --- 1. PRE-PROCESS COLUMN METADATA ---
+        column_configs = []
+        col_index = 0
 
-        ordering = self.get_ordering(params)
-        q = self.get_searching(params)
+        while True:
+            col_prefix = f"columns[{col_index}]"
+            name_param = request.query_params.get(f"{col_prefix}[name]")
 
-        sb = self.get_searchbuilder(params)
+            if name_param is None:
+                break
 
-        if q:
-            queryset = queryset.filter(q)
+            fields = [f.strip().replace(".", "__") for f in name_param.split(",")]
 
-        if ordering:
-            queryset = queryset.order_by(*ordering)
+            # filter invalid field names
+            # fields = self.verify_fields(queryset.model, fields)
 
-        if sb:
-            queryset = queryset.filter(sb)
+            config = {
+                "index": str(col_index),
+                "fields": fields,
+                "data": request.query_params.get(f"{col_prefix}[data]"),
+                "searchable": request.query_params.get(f"{col_prefix}[searchable]")
+                == "true",
+                "orderable": request.query_params.get(f"{col_prefix}[orderable]")
+                == "true",
+                "order_value": request.query_params.get(f"{col_prefix}[orderable]")
+                == "true",
+                "order_dir": request.query_params.get(
+                    f"[order][{col_prefix}][dir]",
+                ),
+                "search_value": request.query_params.get(
+                    f"{col_prefix}[search][value]",
+                ),
+                "search_regex": request.query_params.get(
+                    f"{col_prefix}[search][regex]",
+                )
+                == "true",
+            }
+
+            if config["orderable"] and fields:
+                config["order_value"] = fields[0]
+
+            column_configs.append(config)
+
+            col_index += 1
+
+        # --- 2. SEARCHING LOGIC ---
+        global_search_value = request.query_params.get("search[value]")
+
+        is_filtered = False
+        global_q = Q()
+        column_q = Q()
+        search_type = "icontains"
+
+        for config in column_configs:
+            if not config["searchable"]:
+                continue
+
+            if global_search_value:
+                is_filtered = True
+                for field in config["fields"]:
+                    global_q |= Q(**{f"{field}__icontains": global_search_value})
+
+            if config["search_value"]:
+                is_filtered = True
+                col_specific_q = Q()
+
+                if config["search_regex"]:
+                    search_type = "iregex"
+
+                for field in config["fields"]:
+                    col_specific_q |= Q(
+                        **{f"{field}__{search_type}": config["search_value"]},
+                    )
+                column_q &= col_specific_q
+
+        # --- 3. ORDERING LOGIC ---
+        order_list = []
+        order_index = 0
+
+        while True:
+            order_prefix = f"order[{order_index}]"
+            col_idx_param = request.query_params.get(f"{order_prefix}[column]")
+
+            if col_idx_param is None:
+                break
+
+            # Find the config matching this index
+            target_config = next(
+                (c for c in column_configs if c["index"] == col_idx_param),
+                None,
+            )
+
+            if target_config and target_config["orderable"]:
+                direction = request.query_params.get(f"{order_prefix}[dir]", "asc")
+
+                if direction == "asc":
+                    order_list.append(
+                        F(f"{target_config['fields'][0]}").asc(nulls_last=True),
+                    )
+                else:
+                    order_list.append(
+                        F(f"{target_config['fields'][0]}").desc(nulls_last=True),
+                    )
+
+            order_index += 1
+
+        sb_index = 0
+        sb_filter = Q()
+
+        # searchbuilder
+        while True:
+            searchbuilder_prefix = f"searchBuilder[criteria][{sb_index}]"
+            col_idx_param = request.query_params.get(
+                f"{searchbuilder_prefix}[origData]",
+            )
+
+            if col_idx_param is None:
+                break
+
+            name = next(c for c in column_configs if c["data"] == col_idx_param)
+
+            for field in name["fields"]:
+                sb_filter &= self.get_sb_filter(
+                    column=field,
+                    condition=request.query_params.get(
+                        f"{searchbuilder_prefix}[condition]",
+                    ),
+                    value=request.query_params.get(f"{searchbuilder_prefix}[value1]"),
+                    value2=request.query_params.get(f"{searchbuilder_prefix}[value2]"),
+                    sb_type=request.query_params.get(
+                        f"{searchbuilder_prefix}[type]",
+                        "text",
+                    ),
+                )
+
+            sb_index += 1
+
+        if is_filtered:
+            queryset = queryset.filter(global_q & column_q)
+
+        if sb_filter:
+            queryset = queryset.filter(sb_filter)
+
+        if is_filtered or order_list:
+            return queryset.order_by(*order_list).distinct()
 
         return queryset
 
 
 class ArchiveFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__id")
+    event = filters.CharFilter(field_name="event__event_id")
     date = filters.CharFilter(field_name="event__event_date")
 
 
@@ -226,7 +309,17 @@ class CoversFilter(filters.FilterSet):
 
 class VenuesFilter(filters.FilterSet):
     id = filters.CharFilter(lookup_expr="exact")
-    city = filters.CharFilter(field_name="city__id", lookup_expr="exact")
+    city = filters.NumberFilter(field_name="city__id", lookup_expr="exact")
+    state = filters.NumberFilter(field_name="state__id", lookup_expr="exact")
+    country = filters.NumberFilter(field_name="country__id", lookup_expr="exact")
+
+    city_name = filters.CharFilter(field_name="city__name", lookup_expr="icontains")
+    state_name = filters.CharFilter(field_name="state__name", lookup_expr="icontains")
+    country_name = filters.CharFilter(
+        field_name="country__name",
+        lookup_expr="icontains",
+    )
+
     name = filters.CharFilter(lookup_expr="istartswith")
 
 
@@ -237,8 +330,11 @@ class IndexFilter(filters.FilterSet):
 
 
 class EventRunFilter(filters.FilterSet):
-    start_date = filters.DateTimeFilter(field_name="first__date", lookup_expr="gte")
-    end_date = filters.DateTimeFilter(field_name="last__date", lookup_expr="lte")
+    start_date = filters.DateTimeFilter(
+        field_name="first_event__date",
+        lookup_expr="gte",
+    )
+    end_date = filters.DateTimeFilter(field_name="last_event__date", lookup_expr="lte")
     id = filters.NumberFilter(lookup_expr="exact")
 
     class Meta:
@@ -246,39 +342,286 @@ class EventRunFilter(filters.FilterSet):
         fields = ["start_date", "end_date", "id"]
 
 
-class CharInFilter(filters.BaseInFilter, filters.CharFilter):
+class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
     pass
+
+
+class AdvancedEventSearchFilter(filters.FilterSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # 1. Loop through all filters defined in Meta.fields
+        # We create a copy of the keys to avoid 'dictionary changed size during iteration'
+        for field_name in list(self.filters.keys()):
+            # 2. Skip existing exclude toggles to avoid infinite loops
+            if field_name.endswith("_is_not"):
+                continue
+
+            # 3. Create a dynamic 'is not' toggle for this field
+            toggle_name = f"{field_name}_is_not"
+            self.filters[toggle_name] = django_filters.BooleanFilter(
+                label="",
+                widget=forms.Select(
+                    attrs={
+                        "class": "form-select form-select-sm col-3",
+                    },
+                    choices=((True, "is"), (False, "not")),
+                ),
+            )
+
+    id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
+
+    day_of_week = filters.NumberFilter(
+        field_name="date__week_day",
+        label="day of week",
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm", "id": "dow"},
+        ),
+    )
+
+    start_date = filters.DateFilter(
+        field_name="date",
+        required=False,
+        lookup_expr="gte",
+        label="start date",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    end_date = filters.DateFilter(
+        field_name="date",
+        required=False,
+        lookup_expr="lte",
+        label="end date",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    month = filters.NumberFilter(
+        field_name="date__month",
+        label="month",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm", "id": "month"},
+        ),
+    )
+
+    day = filters.NumberFilter(
+        field_name="date__day",
+        label="day",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "day"},
+        ),
+    )
+
+    venue = filters.NumberFilter(
+        field_name="venue__id",
+        label="venue",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "venue"},
+        ),
+    )
+
+    city = filters.NumberFilter(
+        label="city",
+        field_name="venue__city__id",
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "city"},
+        ),
+    )
+
+    state = filters.NumberFilter(
+        field_name="venue__city__state__id",
+        label="state",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "state"},
+        ),
+    )
+
+    country = filters.NumberFilter(
+        field_name="venue__city__country__id",
+        label="country",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "country"},
+        ),
+    )
+
+    run = filters.NumberFilter(
+        field_name="run__id",
+        label="event run",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "run"},
+        ),
+    )
+
+    tour = filters.NumberFilter(
+        field_name="tour__id",
+        label="tour",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "tour"},
+        ),
+    )
+
+    leg = filters.NumberFilter(
+        field_name="leg__id",
+        label="tour_leg",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "leg"},
+        ),
+    )
+
+    def filter_queryset(self, queryset):
+        """Global loop that stacks filters or exclusions based on the toggle state."""
+        # Ensure form is valid before accessing cleaned_data
+        if not self.form.is_valid():
+            return queryset
+
+        data = self.form.cleaned_data
+
+        for name, value in data.items():
+            # Skip empty inputs and the toggle fields themselves
+            if value in [None, "", False, []] or name.endswith("_is_not"):
+                continue
+
+            # Get the model field path (e.g., 'venue__city')
+            filter_obj = self.filters.get(name)
+            model_path = filter_obj.field_name if filter_obj else name
+
+            # Determine if we should .filter() or .exclude()
+            is_exclude = data.get(f"{name}_is_not") is True
+
+            if type(value) is str:
+                lookup = f"{model_path}__iexact"
+            else:
+                lookup = f"{model_path}__exact"
+
+            if is_exclude:
+                queryset = queryset.exclude(**{lookup: value})
+            else:
+                queryset = queryset.filter(**{lookup: value})
+
+            print(queryset)
+
+        return queryset
+
+    relation = django_filters.NumberFilter(
+        field_name="onstage__relation_id",
+        required=False,
+        label="onstage relation",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "relation"},
+        ),
+    )
+
+    band = django_filters.NumberFilter(
+        field_name="onstage__band_id",
+        distinct=True,
+        required=False,
+        label="onstage band",
+        widget=forms.Select(
+            attrs={"class": "form-select form-select-sm select2", "id": "band"},
+        ),
+    )
+
+    class Meta:
+        model = models.Events
+        fields = [
+            # "start_date",
+            # "end_date",
+            # "day_of_week",
+            # "month",
+            # "day",
+            "venue",
+            "city",
+            "state",
+            "country",
+            "run",
+            "tour",
+            "leg",
+            "relation",
+            "band",
+        ]
 
 
 class EventsFilter(filters.FilterSet):
     year = filters.CharFilter(
-        field_name="id",
+        field_name="event_id",
         lookup_expr="startswith",
         label="year",
     )
 
-    id__in = CharInFilter(field_name="id", lookup_expr="in")
+    id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
 
     start_date = filters.DateTimeFilter(field_name="date", lookup_expr="gte")
     end_date = filters.DateTimeFilter(field_name="date", lookup_expr="lte")
 
-    day_of_week = filters.NumberFilter(field_name="date__week_day", lookup_expr="exact")
+    day_of_week = filters.NumberFilter(
+        field_name="date__week_day",
+        lookup_expr="exact",
+        label="day of week",
+    )
 
     date = filters.CharFilter(field_name="date", lookup_expr="startswith")
+
     month = filters.NumberFilter(
         field_name="date__month",
         lookup_expr="exact",
         label="month",
     )
+
     day = filters.NumberFilter(field_name="date__day", lookup_expr="exact", label="day")
-    venue = filters.NumberFilter(field_name="venue__id", lookup_expr="exact")
-    city = filters.NumberFilter(field_name="venue__city__id", lookup_expr="exact")
-    state = filters.NumberFilter(field_name="venue__state__id", lookup_expr="exact")
-    country = filters.NumberFilter(field_name="venue__country__id", lookup_expr="exact")
-    run = filters.NumberFilter(field_name="run__id", lookup_expr="exact")
-    artist = filters.NumberFilter(field_name="artist__id", lookup_expr="exact")
-    tour = filters.NumberFilter(field_name="tour__id", lookup_expr="exact")
-    leg = filters.NumberFilter(field_name="leg__id", lookup_expr="exact")
+
+    venue = filters.NumberFilter(
+        field_name="venue__id",
+        lookup_expr="exact",
+        label="venue",
+    )
+
+    city = filters.NumberFilter(
+        field_name="venue__city__id",
+        lookup_expr="exact",
+        label="city",
+    )
+    state = filters.NumberFilter(
+        field_name="venue__city__state__id",
+        lookup_expr="exact",
+        label="state",
+    )
+    country = filters.NumberFilter(
+        field_name="venue__city__country__id",
+        lookup_expr="exact",
+        label="country",
+    )
+    run = filters.NumberFilter(
+        field_name="run__id",
+        lookup_expr="exact",
+        label="event run",
+    )
+    artist = filters.NumberFilter(
+        field_name="artist__id",
+        lookup_expr="exact",
+        label="artist",
+    )
+    tour = filters.NumberFilter(
+        field_name="tour__id",
+        lookup_expr="exact",
+        label="tour",
+    )
+    leg = filters.NumberFilter(
+        field_name="leg__id",
+        lookup_expr="exact",
+        label="tour_leg",
+    )
+
+    relation = django_filters.BaseInFilter(
+        field_name="onstage__relation_id",
+        label="onstage relation",
+    )
+
+    band = django_filters.BaseInFilter(
+        field_name="onstage__band_id",
+        distinct=True,
+        label="onstage band",
+    )
 
     class Meta:
         model = models.Events
@@ -295,13 +638,22 @@ class EventsFilter(filters.FilterSet):
             "artist",
             "tour",
             "leg",
+            "relation",
+            "band",
         ]
 
 
 class OnstageFilter(filters.FilterSet):
     relation = filters.NumberFilter(field_name="relation__id", lookup_expr="exact")
     band = filters.NumberFilter(field_name="band__id", lookup_expr="exact")
-    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
+
+
+class OnstageBandFilter(filters.FilterSet):
+    relation = filters.NumberFilter(field_name="relation__id", lookup_expr="exact")
+    band = filters.NumberFilter(field_name="band__id", lookup_expr="exact")
+    first = filters.CharFilter(field_name="first_event__event_id", lookup_expr="exact")
+    last = filters.CharFilter(field_name="last_event__event_id", lookup_expr="exact")
 
 
 class ReleaseTracksFilter(filters.FilterSet):
@@ -321,10 +673,12 @@ class BandsFilter(filters.FilterSet):
 class ReleaseFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
     type = filters.CharFilter(lookup_expr="icontains")
+    start_date = filters.DateTimeFilter(field_name="date", lookup_expr="gte")
+    end_date = filters.DateTimeFilter(field_name="date", lookup_expr="lte")
 
 
 class SetlistFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
     run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
     leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
     tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
@@ -335,11 +689,11 @@ class SetlistFilter(filters.FilterSet):
         lookup_expr="exact",
     )
     state = filters.NumberFilter(
-        field_name="event__venue__state__id",
+        field_name="event__venue__city__state__id",
         lookup_expr="exact",
     )
     country = filters.NumberFilter(
-        field_name="event__venue__country__id",
+        field_name="event__venue__city__country__id",
         lookup_expr="exact",
     )
 
@@ -357,7 +711,7 @@ class SetlistFilter(filters.FilterSet):
 
 
 class SetlistEntryFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
     run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
     leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
     tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
@@ -406,11 +760,16 @@ class SongsPageFilter(filters.FilterSet):
 
 
 class SongsFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
+    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     lyrics = filters.BooleanFilter()
 
 
 class SetlistNoteFilter(filters.FilterSet):
     id = filters.NumberFilter(field_name="setlist__id", lookup_expr="exact")
-    event = filters.CharFilter(field_name="event__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
     note = filters.CharFilter(lookup_expr="icontains")
+
+
+class UserAttendedShowsFilter(filters.FilterSet):
+    user = filters.NumberFilter(field_name="user__id", lookup_expr="exact")
+    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
