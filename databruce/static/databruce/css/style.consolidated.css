@@ -1,0 +1,644 @@
+/* Consolidated copy of style.css
+   - Extracted large SVG mask to --logo-mask
+   - Grouped repeated background/color/border rules into .base-surface
+   - Merged duplicated .ui-autocomplete and .badge .bi rules
+   - Added .inset-mask utility and consolidated modal-dialog responsive rules
+
+   Keep this file next to the original for testing before replacing.
+*/
+
+:root {
+    --logo-mask: url('/static/databruce/img/logo.svg');
+    --inset-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
+}
+
+/* Consolidated utility for commonly repeated surface styles */
+.base-surface,
+th,
+td:not(.fc-day, [class$="opener"], [class$="closer"], .child),
+.modal-body,
+.list-group-item,
+#stats .row .card-body,
+.modal-header,
+.form-control,
+.form-select,
+.card-body:not(.success, .warning, .danger, .info, .accent) {
+    background-color: var(--base-100) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
+}
+
+/* utility for repeated inset shadow */
+.inset-mask {
+    box-shadow: var(--inset-shadow) !important;
+}
+
+/* single source for the logo mask usage */
+.logo {
+    -webkit-mask-image: var(--logo-mask);
+    mask-image: var(--logo-mask);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    height: 18px !important;
+    width: 120px !important;
+    background-repeat: no-repeat !important;
+    background-color: var(--primary-content) !important;
+}
+
+/* Text-size utility variables (keeps original sizes but centralized) */
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+/* Begin rest of original stylesheet (kept mostly intact) */
+
+body {
+    background-color: var(--base-200);
+    color: var(--base-content) !important;
+    font-size: 0.75rem !important;
+    font-family: "Google Sans Flex", sans-serif;
+    font-variation-settings:
+        "slnt" 0,
+        "wdth" 100,
+        "GRAD" 0,
+        "ROND" 0;
+    font-optical-sizing: auto;
+    font-style: normal;
+    border-color: inherit !important;
+    max-width: 100% !important;
+}
+
+.card-body {
+    overflow-x: hidden !important;
+}
+
+.card {
+    border-color: var(--border);
+    border-radius: var(--bs-border-radius) !important;
+    break-inside: avoid;
+}
+
+.card:not(:has(.card-header, .card-footer))>.card-body {
+    border-radius: var(--bs-border-radius) !important;
+}
+
+.card:not(:has(.card-footer))>.card-body {
+    border-bottom-left-radius: var(--bs-border-radius) !important;
+    border-bottom-right-radius: var(--bs-border-radius) !important;
+}
+
+/* Note: the .base-surface above covers many of the following rules; they are kept when specificity or context matters. */
+
+.card-header {
+    background-color: var(--base-300) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
+}
+
+.card-body.message {
+    color: var(--base-content);
+    border-width: 1px;
+    border-style: solid;
+}
+
+.card-body.message.info {
+    background-color: color-mix(in srgb, var(--info) 40%, transparent);
+    border-color: color-mix(in srgb, var(--info) 40%, white 20%);
+}
+
+.card-body.message.success {
+    background-color: color-mix(in srgb, var(--success) 40%, transparent);
+    border-color: color-mix(in srgb, var(--success) 40%, white 20%);
+}
+
+.card-body.message.warning {
+    background-color: color-mix(in srgb, var(--warning) 40%, transparent);
+    border-color: color-mix(in srgb, var(--warning) 40%, white 20%);
+}
+
+.card-body.message.failure {
+    background-color: color-mix(in srgb, var(--danger) 40%, transparent);
+    border-color: color-mix(in srgb, var(--danger) 40%, white 20%);
+}
+
+/* onstage card reduce left padding when no grouping band */
+.dtrg-group>th:not(:has(a.onstage-band))>ul {
+    padding-left: 1rem !important;
+}
+
+.ui-autocomplete {
+    max-height: 400px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: var(--bs-body-bg) !important;
+    margin-top: 0.25rem !important;
+    padding-top: 0.5rem !important;
+    z-index: 1100 !important;
+}
+
+td.child,
+tr.child,
+dl,
+.dropdown-menu {
+    background-color: var(--base-300) !important;
+}
+
+.dropdown-menu .dropdown-item {
+    color: var(--base-content) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+a:link,
+.btn-link {
+    text-decoration: none !important;
+}
+
+#notes a {
+    color: var(--primary-text) !important;
+}
+
+#eventInfo a {
+    color: var(--base-content) !important;
+}
+
+#notes>p:last-child {
+    margin-bottom: 0 !important;
+}
+
+a:hover,
+.btn-link:hover {
+    text-decoration: underline !important;
+}
+
+.navbar {
+    border-bottom: none !important;
+}
+
+.progress {
+    background-color: var(--base-200) !important;
+}
+
+.page-item>button.page-link {
+    background-color: var(--primary) !important;
+    color: var(--primary-content) !important;
+    border-color: var(--primary) !important;
+}
+
+.navbar,
+.progress-bar,
+button.nav-link.active,
+.dropdown-item:hover,
+.dropdown-item.active,
+.list-group-item.active,
+.ui-state-active:hover,
+.ui-state-active,
+.ui-button:active,
+.btn-primary,
+.navbar .nav-item {
+    background-color: var(--primary) !important;
+    color: var(--primary-content) !important;
+}
+
+.btn-primary {
+    border-color: var(--primary) !important;
+}
+
+.navbar .nav-link,
+.progress-bar,
+button.nav-link:not(.active, #bd-theme),
+.navbar .btn:not(#event-search-btn),
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item.active,
+button#addshow.active,
+button#usercount.active,
+.btn-primary,
+.page-item>button.page-link {
+    color: var(--primary-content) !important;
+}
+
+.form-select {
+    height: 31px !important;
+    background-color: var(--base-100) !important;
+    border-color: var(--border) !important;
+}
+
+.form-control,
+.form-select:not(.dtsb-dropDown) {
+    background-color: var(--base-100) !important;
+    color: var(--base-content) !important;
+    border-color: var(--border) !important;
+}
+
+.dtb-collection-closeable {
+    background-color: var(--base-300) !important;
+    color: var(--neutral-content) !important;
+    padding: 1rem !important
+}
+
+.form-control::placeholder {
+    color: var(--base-content) !important;
+}
+
+/* navbar stuff */
+.navbar .nav-link {
+    font-size: 0.875rem !important;
+}
+
+/* card */
+.card tbody tr:last-child td {
+    border-bottom: 0px solid !important;
+}
+
+.card tbody tr:first-child:hover {
+    border-radius: 0 !important;
+    box-shadow: var(--inset-shadow);
+}
+
+.card-header,
+.card-footer {
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    padding: 0.5rem 0.75rem !important;
+    background-color: var(--base-300) !important;
+}
+
+.card-header {
+    padding: 0.5rem 0.75rem !important;
+}
+
+#eventInfo .card-footer a:hover {
+    background-color: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+#eventInfo .card-footer {
+    padding: 0rem 0.5rem !important;
+}
+
+.card-body :last-child:not(.dt-buttons button),
+.modal-body :last-child {
+    margin-bottom: 0 !important;
+}
+
+button.nav-link {
+    font-size: 0.875rem !important;
+}
+
+button.nav-link:not(.active, #bd-theme) {
+    background-color: var(--base-200) !important;
+    color: var(--base-content) !important;
+    border: 1px solid var(--base-content) !important;
+}
+
+button[class*='primary'],
+.dt-paging-button {
+    border-color: var(--primary) !important;
+}
+
+button[class*='success'] {
+    border: 1px solid var(--success) !important;
+}
+
+.dtsb-searchBuilder {
+    color: var(--base-content) !important;
+}
+
+#year-select>.dropdown-menu.show {
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    background-color: var(--bs-body-bg) !important;
+    margin-top: 0.25rem !important;
+    padding-top: 0.5rem !important;
+    z-index: 1100 !important;
+}
+
+.badge:hover,
+.dropdown-toggle:hover,
+.nav-link:hover,
+.btn:not(.dropdown-item):hover {
+    box-shadow: var(--inset-shadow);
+}
+
+@media (max-width: 1280px) {
+
+    /* profile dropdown, it gets pushed to under navbar on mobile when open.*/
+    ul#profile {
+        top: 4vh;
+    }
+}
+
+nav ul {
+    list-style-type: none;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item.active {
+    text-decoration: none !important;
+}
+
+.dropdown-item {
+    font-size: .875rem !important;
+}
+
+.navbar .btn {
+    border: 0 !important;
+}
+
+button {
+    vertical-align: middle !important;
+}
+
+button#usercount {
+    pointer-events: none !important;
+    background-color: var(--secondary) !important;
+    box-shadow: var(--inset-shadow);
+}
+
+button#addshow.active,
+button#usercount.active {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+/* icon sizing */
+.badge .bi,
+th .bi {
+    font-size: 1rem !important;
+    line-height: 1 !important;
+}
+
+.progress {
+    height: 0.9rem !important;
+    border-radius: 0.2rem !important;
+}
+
+.progress-bar {
+    border-radius: inherit !important;
+}
+
+.list-group-item.active {
+    border-color: var(--primary) !important;
+}
+
+/* ul.nav-pills>.nav-link:not(:last-child) {
+    margin-right: 0.25rem !important;
+}
+
+ul.nav-pills>.nav-link:last-child {
+    margin-right: 0 !important;
+} */
+
+a.nav-link:not(.active) {
+    color: var(--primary-text) !important;
+}
+
+a.nav-link.active {
+    color: var(--base-content) !important;
+}
+
+.fc-day {
+    border-color: var(--border) !important;
+}
+
+/* jquery autocomplete styling */
+.ui-menu-item {
+    color: var(--bs-body-color) !important;
+}
+
+.ui-state-active:hover,
+.ui-state-active,
+.ui-button:active {
+    border-color: var(--primary-content) !important;
+}
+
+.ui-widget.ui-widget-content {
+    border-radius: var(--bs-border-radius) !important;
+    border-width: var(--bs-border-width) !important;
+    border-color: var(--bs-border-color-translucent);
+    font-family: inherit !important;
+    font-size: 1rem;
+}
+
+table tbody td,
+table tbody td>* {
+    vertical-align: middle;
+    white-space: wrap !important;
+}
+
+td .badge {
+    padding: 0.25rem 0.35rem !important;
+}
+
+.badge {
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+}
+
+/* .card-body, */
+td:not(.fc-day) {
+    overflow: clip !important;
+}
+
+a#eventlink:hover {
+    text-decoration: none !important;
+}
+
+.card-body:not(.p-0) {
+    padding: 0.75rem !important;
+}
+
+#links li {
+    font-size: 0.875rem !important;
+}
+
+.btn-close {
+    color: var(--base-content) !important;
+}
+
+.footer {
+    bottom: 0.75rem;
+    position: relative !important;
+    z-index: 10 !important;
+    margin-left: 0.75rem !important;
+    margin-right: 0.75rem !important;
+    margin-top: 3rem !important;
+    font-size: 0.675rem !important;
+}
+
+.padded-body {
+    min-height: calc(100vh - 5em) !important;
+}
+
+.dataTable {
+    width: 100% !important;
+    overflow: auto !important;
+}
+
+.dt-buttons,
+#dropdown-container {
+    justify-content: center !important;
+    display: flex !important;
+}
+
+.page-item.active>button.page-link {
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.3);
+}
+
+#notes-card>.card-body p a,
+#notes-modal .modal-body a {
+    text-decoration: underline !important;
+    color: var(--primary-text) !important;
+}
+
+.dt-search>label {
+    font-size: 0.875rem !important;
+}
+
+.btn-group>label {
+    font-size: 0.875rem !important;
+    font-weight: normal;
+    white-space: nowrap;
+    text-align: left;
+}
+
+#dropdown-btn {
+    margin-left: .5em !important;
+}
+
+.btn-group:has(#dropdown-btn) {
+    display: block !important;
+}
+
+.fc-daygrid-dot-event.fc-event-mirror,
+.fc-daygrid-dot-event:hover {
+    background: unset;
+}
+
+.fc-day.today {
+    box-shadow: inset 0 0 100px 100px rgba(252, 183, 0, 0.2);
+}
+
+.fc-view-container {
+    overflow-x: scroll;
+}
+
+@media (max-width: 576px) {
+    .fc-day {
+        font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 577px) {
+    .fc-day {
+        font-size: 0.875rem;
+    }
+}
+
+td.fc-day {
+    padding: 0.5rem !important;
+}
+
+.fc-daygrid-day-events>.fc-daygrid-event-harness:not(:last-child) {
+    padding-bottom: 0.75rem !important;
+}
+
+th[role="presentation"] {
+    padding: 0 !important;
+}
+
+@media (max-width: 768px) {
+    tr:not(.hasChild, .child)>td:not(.child):hover {
+        cursor: pointer;
+    }
+}
+
+td.child {
+    color: var(--base-content);
+}
+
+.card#setlist-card {
+    width: 100% !important;
+}
+
+#setlist-card table {
+    width: 100% !important;
+}
+
+body {
+    width: 100% !important;
+}
+
+/* Consolidated modal-dialog responsive rules */
+.modal-dialog {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    height: 50% !important;
+    max-height: 50% !important;
+    /* width: 100%; */
+    max-width: 40%;
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .modal-dialog {
+        max-width: 70%;
+        width: 70%;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 90%;
+        width: 90%;
+    }
+}
