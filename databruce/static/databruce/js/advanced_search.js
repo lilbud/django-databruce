@@ -1,32 +1,33 @@
-var selectOptions = {
-  theme: "bootstrap-5",
-  selectionCssClass: "form-select",
-  dropdownCssClass: "form-control",
-  minimumInputLength: 3,
-  dropdownPosition: 'below',
-  allowClear: true,
-  placeholder: '',
-  width: 'resolve', // need to override the changed default\
-};
-
-function get_options({ajax_url = false}) {
+function get_options({ ajax_url = false }) {
   var options = {
     theme: "bootstrap-5",
     selectionCssClass: "form-select",
     dropdownCssClass: "form-control",
     minimumInputLength: 3,
+    dropdownAutoWidth: true,
     dropdownPosition: 'below',
     allowClear: true,
     placeholder: '',
-    width: 'resolve', // need to override the changed default\
+    width: '100%', // need to override the changed default\
     ajax: {
       delay: 500,
       url: '/api/v1/',
       dataType: 'json',
       data: function (params) {
         return {
-          name: params.term
+          name: params.term,
         }
+      },
+      processResults: function (data) {
+        // Map your custom data to the Select2 format
+        return {
+          results: $.map(data.results, function (item) {
+            return {
+              id: item.id,   // Replace with your ID field name
+              text: item.name // Replace with your text field name
+            };
+          })
+        };
       }
     }
   };
@@ -86,11 +87,13 @@ function removeForm(e) {
 
 function positionChange(row, select) {
   // show/hide the song2 field when position = followed_by
+  var select_row = $(select).parent().parent();
+
   if ($(select).val() == "followed_by") {
-    row.find(`[id*=song2]`).parent().show();
-    row.find(`[id*=song2]`).select2(get_options({ajax_url: 'songs/'}));
+    select_row.find("[id*=song2]").parent().show();
+    select_row.find("[id*=song2]").select2(get_options({ ajax_url: 'songs/' }));
   } else {
-    row.find(`[id*=song2]`).parent().hide();
+    select_row.find("[id*=song2]").parent().hide();
   }
 }
 
@@ -111,7 +114,7 @@ function addForm() {
 
   // adding incremented ids to fields
   row.find('.choice').attr({ 'id': `id_form-${count}-choice`, 'name': `form-${count}-choice` });
-  row.find('.song1').attr({ 'id': `id_form-${count}-song1`, 'name': `form-${count}-song1` }).select2(get_options({ajax_url: 'songs/'}));
+  row.find('.song1').attr({ 'id': `id_form-${count}-song1`, 'name': `form-${count}-song1` }).select2(get_options({ ajax_url: 'songs/' }));
   row.find('.position').attr({ 'id': `id_form-${count}-position`, 'name': `form-${count}-position` });
   row.find('.song2').attr({ 'id': `id_form-${count}-song2`, 'name': `form-${count}-song2` }).parent().hide();
 
@@ -134,18 +137,19 @@ $(document).ready(function () {
   //     $(this).select2();
   // });
 
-  $('#city').select2(get_options({ajax_url: 'cities/'}));
-  $('#state').select2(get_options({ajax_url: 'states/'}));
-  $('#country').select2(get_options({ajax_url: 'countries/'}));
-  $('#tour').select2(get_options({ajax_url: 'tours/'}));
-  $('#musician').select2(get_options({ajax_url: 'relations/'}));
-  $('#band').select2(get_options({ajax_url: 'bands/'}));
-  $('#venue').select2(get_options({ajax_url: 'venues/'}));
+  $('#city').select2(get_options({ ajax_url: 'cities/' }));
+  $('#state').select2(get_options({ ajax_url: 'states/' }));
+  $('#country').select2(get_options({ ajax_url: 'countries/' }));
+  $('#tour').select2(get_options({ ajax_url: 'tours/' }));
+  $('#relation').select2(get_options({ ajax_url: 'relations/' }));
+  $('#band').select2(get_options({ ajax_url: 'bands/' }));
+  $('#venue').select2(get_options({ ajax_url: 'venues/' }));
 
   row.find('.song2').parent().hide();
-  row.find('.song1').select2(get_options({ajax_url: 'songs/'}));
+  row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));
 
   $('[class*=position]').change(function () {
+    console.log(this)
     positionChange(row, this);
   });
 
