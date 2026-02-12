@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-    Lyrics for "{{ song_info.name }}"
+    {{ title }}
 {% endblock title %}
 {% block content %}
     <div class="col-12 col-xxl-8 mx-auto">
@@ -19,7 +19,7 @@
             {% if lyrics.note %}
                 <div class="row">
                     <div class="fw-semibold">Notes:</div>
-                    <div>{{ lyrics.note }}</div>
+                    <div>{{ lyrics.note|markdown|safe }}</div>
                 </div>
             {% endif %}
         </div>
