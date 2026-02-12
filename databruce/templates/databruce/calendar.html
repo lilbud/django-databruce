@@ -30,17 +30,21 @@
                 var eventsList = [];
 
                 $(data.results).each(function (i, val){
-                  var title = `${val.artist.name}: ${val.venue.formatted}`
+                  var title = `${val.artist.name}: ${val.venue.location}`
 
                   if (val.early_late) {
                     title += ` (${val.early_late})`
+                  }
+
+                  if (val.type) {
+                    title += ` [${val.type}]`
                   }
 
                   eventsList.push(
                     {
                       title: title,
                       start: val.date.filter,
-                      url: `/events/${val.id}`,
+                      url: `/events/${val.event_id}`,
                       allDay: false,
                       className: 'text-wrap',
                     }
@@ -50,7 +54,7 @@
               })
             },
             function (info, successCallback, failureCallback) {
-              fetch(`/api/v1/runs/?format=json&start=${info.start.toISOString()}&end=${info.end.toISOString()}`)
+              fetch(`/api/v1/runs/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
               .then((resp) => resp.json())
               .then(function(data){
                 var eventsList = [];
@@ -59,19 +63,51 @@
                   eventsList.push(
                     {
                       title: val.name,
-                      start: val.first.date.filter,
-                      end: `${val.last.date.filter}T23:59:59`,
+                      start: val.first_event.date.filter,
+                      end: `${val.last_event.date.filter}T23:59:59`,
                       url: `/runs/${val.id}`,
                       backgroundColor: 'var(--secondary)',
                       borderColor: 'var(--secondary)',
-                      className: 'text-wrap',
+                      className: 'text-wrap px-1 m-0',
                     }
                   )
                 })
+                console.log(eventsList)
+                successCallback(eventsList);
+              })
+            },
+            function (info, successCallback, failureCallback) {
+              fetch(`/api/v1/releases/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
+              .then((resp) => resp.json())
+              .then(function(data){
+                var eventsList = [];
+
+                $(data.results).each(function (i, val){
+                  eventsList.push(
+                    {
+                      title: val.name,
+                      start: val.date,
+                      url: `/releases/${val.id}`,
+                      backgroundColor: 'var(--accent)',
+                      borderColor: 'var(--accent)',
+                      className: 'text-wrap px-1 m-0',
+                    }
+                  )
+                })
+                console.log(eventsList)
                 successCallback(eventsList);
               })
             },
           ],
+          eventClick: function(info) {
+            // Check if the event has a URL
+            if (info.event.url) {
+              // Open the URL in a new tab
+              window.open(info.event.url, '_blank');
+              // Prevent the browser from navigating in the current tab
+              info.jsEvent.preventDefault();
+            }
+          },
 
           eventContent: function( info ) {
             return {html: info.event.title};
@@ -85,7 +121,7 @@
 {% endblock extrajs %}
 {% load static %}
 {% block title %}
-  Event Calendar
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="row justify-content-center py-3">
