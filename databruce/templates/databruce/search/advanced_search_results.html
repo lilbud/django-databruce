@@ -1,7 +1,7 @@
 {% extends "databruce/base.html" %}
 {% load filters %}
 {% block title %}
-  Advanced Search Results
+  {{ title }}
 {% endblock title %}
 {% block content %}
   <div class="col-12 col-xxl-8 mx-auto">
@@ -20,18 +20,6 @@
       <div class="card-body text-sm">
         <div id="row">
           <div class="d-flex flex-column">
-            {% if setlist_form %}
-              <div class="pe-2 fw-semibold">Songs:</div>
-              {% for form in setlist_form %}
-                {{ form.song1.value|default_if_none:form.song1 }} ({{ form.choice }} {{ form.position }})
-                {% if form.song2 %}{{ form.song2.value|default_if_none:form.song2 }}{% endif %}
-                {% if not forloop.last %}
-                  <br>
-                  {{ conjunction|upper }}
-                  <br>
-                {% endif %}
-              {% endfor %}
-            {% endif %}
             {% if display_fields %}
               {% for field in display_fields %}
                 <div>
@@ -39,6 +27,17 @@
                   {% if field.choice %}({{ field.choice }}){% endif %}
                   {{ field.data.value|default:field.data }}
                 </div>
+              {% endfor %}
+            {% endif %}
+            {% if search_summary %}
+              <div class="pe-2 fw-semibold">Songs:</div>
+              {% for field in search_summary %}
+                {{ field }}
+                {% if not forloop.last %}
+                  <div class="col-1">
+                    <span class="badge bg-secondary ms-2">{{ conjunction }}</span>
+                  </div>
+                {% endif %}
               {% endfor %}
             {% endif %}
           </div>
@@ -65,7 +64,7 @@
               {% for event in events %}
                 <tr>
                   <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
-                    <a href="{% url "event_details" id=event.id %}">{{ event.get_date }}</a>
+                    <a href="{% url "event_details" id=event.event_id %}">{{ event.get_date }}</a>
                   </td>
                   <td class="text-nowrap">
                     {% if event.setlist %}
@@ -95,6 +94,7 @@
                     {% endif %}
                   </td>
                   <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
+                  <td class="text-nowrap">{{ event.public }}</td>
                 </tr>
               {% endfor %}
             </tbody>
