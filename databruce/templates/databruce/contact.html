@@ -1,6 +1,6 @@
 {% extends "databruce/base.html" %}
 {% block title %}
-    Contact Us
+    {{ title }}
 {% endblock title %}
 {% block content %}
     <div class="col-12 col-lg-6 mx-auto">
@@ -11,8 +11,8 @@
                     <div class="row mb-3">
                         <div class="col">
                             {% for message in messages %}
-                                <div class="card text-bg-{% if message.tags == 'success' %}success{% else %}danger{% endif %}">
-                                    <div class="card-body">{{ message|safe }}</div>
+                                <div class="card">
+                                    <div class="card-body message {{ message.tags }}">{{ message|safe }}</div>
                                 </div>
                             {% endfor %}
                         </div>
