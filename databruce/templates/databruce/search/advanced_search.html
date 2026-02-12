@@ -1,7 +1,7 @@
 {% extends "databruce/base.html" %}
 {% load i18n %}
 {% block title %}
-  Advanced Search
+  {{ title }}
 {% endblock title %}
 {% block extrajs %}
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -25,15 +25,28 @@
       <div class="row mb-3">
         <div class="col">
           {% for message in messages %}
-            <div class="card {{ message.tags }}">
-              <div class="card-body {{ message.tags }}">{{ message }}</div>
+            <div class="card">
+              <div class="card-body message {{ message.tags }}">{{ message|safe }}</div>
             </div>
           {% endfor %}
         </div>
       </div>
     {% endif %}
+    {% if form.errors %}
+      <div class="row mb-3">
+        <div class="col">
+          {% for field in form %}
+            {% for error in field.errors %}
+              {% comment %} <li>{{ field.label }}: {{ error }}</li> {% endcomment %}
+              <div class="card">
+                <div class="card-body message failure">{{ error }}</div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
     <form action="{% url 'adv_search_results' %}" method="get" id="search-form">
-      {% comment %} {% csrf_token %} {% endcomment %}
       <div class="row d-grid gap-0 row-gap-3">
         <div class="row row-cols-2 px-auto">
           <div class="col-6 col-lg-2 pe-2">
@@ -62,49 +75,49 @@
         <div class="row">
           {{ form.day_of_week.errors }}
           <div class="form-label text-sm text-nowrap">{{ form.day_of_week.label }}</div>
-          <div class="col-3 col-lg-1 pe-1">{{ form.day_of_week_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.day_of_week_exclude }}</div>
           <div class="col-9 col-md-4 px-0">{{ form.day_of_week }}</div>
         </div>
         <div class="row">
           {{ form.city.errors }}
           <label class="form-label text-sm">{{ form.city.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.city_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.city_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.city }}</div>
         </div>
         <div class="row">
           {{ form.state.errors }}
           <label class="form-label text-sm">{{ form.state.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.state_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.state_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.state }}</div>
         </div>
         <div class="row">
           {{ form.country.errors }}
           <label class="form-label text-sm">{{ form.country.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.country_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.country_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.country }}</div>
         </div>
         <div class="row">
           {{ form.venue.errors }}
           <label class="form-label text-sm">{{ form.venue.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.venue_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.venue_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.venue }}</div>
         </div>
         <div class="row">
           {{ form.tour.errors }}
           <label class="form-label text-sm">{{ form.tour.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.tour_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.tour_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.tour }}</div>
         </div>
         <div class="row">
-          {{ form.musician.errors }}
-          <label class="form-label text-sm">{{ form.musician.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.musician_choice }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.musician }}</div>
+          {{ form.relation.errors }}
+          <label class="form-label text-sm">{{ form.relation.label }}</label>
+          <div class="col-3 col-lg-1 pe-1">{{ form.relation_exclude }}</div>
+          <div class="col-9 col-lg-4 px-0">{{ form.relation }}</div>
         </div>
         <div class="row">
           {{ form.band.errors }}
           <label class="form-label text-sm">{{ form.band.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.band_choice }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.band_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.band }}</div>
         </div>
         <div class="row">
