@@ -99,3 +99,24 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/28) Events: Year dropdown height now limited to stay on page
 - (1/28) Event Calendar: Year dropdown spacing fixed
 - (1/28) Events: Year dropdown now starts at current year and descends, instead of ascending from 1965.
+
+# v1.14 (Feburary 2026)
+## Database Changes
+- (1/31) Database: Added We Shall Overcome recording sessions (19971102-01, 20050319-01, 20060121-01, 20060518-01, 20060704-01).
+- (1/31) Database: Added Dead Man Walkin' recording session (19950400-02).
+- (1/31) Database: Added Viva Las Vegas recording session (19890913-01).
+- (1/31) Releases: Added 36 releases from [Brucebase](http://brucebase.wikidot.com/stats:discography-specials). Specifically those from "Compilations/Soundtracks".
+- (1/31) Releases: Merged River Single Album, River Outtakes, and Tempe 11/5/80 into The Ties That Bind: River Collection.
+
+## Site Changes
+- (1/31) Event Calendar: Improved loading time.
+- (1/31) Style: All page links now match the primary site color.
+- (1/31) Lyric Detail: Note now renders markdown if present.
+- (1/31) Event Detail: Improved loading time.
+- (1/31) Style: Table columns with dates now show the day of week, and width has been adjusted to compensate.
+- (1/31) Release Detail: Notes now show if present.
+- (1/31) Release Detail: Fix issue where "Event Date" would show the time and date, instead of just date.
+- (1/31) Release Detail: Release Discs now show for all releases if disc num is not null. Additionally, if a disc "name" is present (see Tracks 2), then it will be appended.
+- (2/2) General: Tables can now be sorted by multiple columns at once
+- (2/9) Calendar: Releases shown
+- (2/9) Calendar: Links now open in new tab by default
