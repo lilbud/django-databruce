@@ -1,10 +1,10 @@
-Django==5.2.9
-djangorestframework==3.16.1
-djangorestframework_datatables==0.7.2
-Markdown==3.7
-python-dotenv==1.1.0
-django-debug-toolbar==5.1.0
-django-filter==25.2
+Django==5.2.11
+djangorestframework
+djangorestframework_datatables
+Markdown
+python-dotenv
+django-debug-toolbar
+django-filter
 psycopg[binary,pool]
 requests
 django-link-shortener
@@ -14,4 +14,5 @@ querystring_parser
 python-slugify
 gunicorn
 gevent
-faast-generator
+djlint
+django-unfold
