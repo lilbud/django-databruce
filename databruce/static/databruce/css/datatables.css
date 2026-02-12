@@ -38,6 +38,18 @@ div.table-responsive>div.dt-container>div.row.mt-2:has(.dt-layout-end:empty) {
     margin-top: 0px !important;
 }
 
+.dt-container>.row:first-child {
+    margin-bottom: 8px !important;
+}
+
+.btn-group {
+    vertical-align: middle !important;
+}
+
+.btn-group>* {
+    vertical-align: middle !important;
+}
+
 div.dt-button-collection .dropdown-menu {
     border-radius: var(--bs-border-radius) !important;
 }
