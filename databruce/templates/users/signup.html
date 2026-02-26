@@ -1,4 +1,4 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% load i18n %}
 {% block title %}
     {{ title }}
@@ -13,9 +13,8 @@
                 {% for field in form %}
                     <div class="row mb-3">
                         <div class="col">
-                            <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+                            <label class="form-label text-xs" for="{{ field.id_for_label }}">{% translate field.label %}</label>
                             {% if field.errors %}
-                                <br>
                                 <span class="text-sm text-danger">
                                     {% for error in field.errors %}
                                         {% translate error %}
@@ -24,11 +23,7 @@
                             {% endif %}
                             <div>{{ field }}</div>
                             {% if field.help_text %}
-                                <div class="my-2 text-sm" id="{{ field.id_for_label }}_helptext">
-                                    {% blocktranslate %}
-                                    {{ field.help_text|safe }}
-                                    {% endblocktranslate %}
-                                </div>
+                                <div class="mt-2 mb-0 text-xs" id="{{ field.id_for_label }}_helptext">{{ field.help_text|safe }}</div>
                             {% endif %}
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/wide_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
@@ -8,378 +8,203 @@
   <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="d-grid gap-0 row-gap-2">
-    <div class="row" id="song-info">
-      <div class="text-2xl text-wrap">{{ song_info.name }}</div>
-    </div>
+  <div class="col-12">
     <div class="row">
       <div class="col">
-        <div class="text-lg">
-          <div class="d-grid gap-0 row-gap-1">
-            {% if song_info.album %}
-              <div class="row">
-                <div class="fw-semibold">Album</div>
-                <div>
-                  <a href="{% url "release_details" id=song_info.album.id %}">{{ song_info.category }}</a>
-                </div>
+        <div class="row d-grid gap-0 row-gap-1 text-lg">
+          <div class="text-2xl text-wrap">{{ song_info.name }}</div>
+          {% if song_info.album %}
+            <div class="row">
+              <div class="fw-semibold">Album</div>
+              <div>
+                <a href="{% url "release_details" id=song_info.album.uuid %}">{{ song_info.category }}</a>
+              </div>
+            </div>
+          {% endif %}
+          <div class="row">
+            <div class="fw-semibold">Original Artist</div>
+            <div>{{ song_info.original_artist }}</div>
+          </div>
+          <div class="row d-flex-inline col-gap-3">
+            <div class="col-auto">
+              <div class="fw-semibold">Public</div>
+              <div>{{ song_info.num_plays_public }}</div>
+            </div>
+            <div class="col-auto">
+              <div class="fw-semibold">Private</div>
+              <div>{{ song_info.num_plays_private }}</div>
+            </div>
+          </div>
+          <div class="row">
+            {% if song_info.last_event %}
+              <div class="fw-semibold">Last Played:</div>
+              <div>
+                <a class="fw-medium"
+                   href="{% url "event_details" id=song_info.last_event.event_id %}">{{ song_info.last_event.get_date }}</a>
+                <span class="text-reset fw-light">({{ show_gap }} shows ago)</span>
               </div>
             {% endif %}
-            <div class="row">
-              <div class="fw-semibold">Original Artist</div>
-              <div>{{ song_info.original_artist }}</div>
-            </div>
-            <div class="row">
-              <div class="col col-lg-1">
-                <div class="fw-semibold text-nowrap">
-                  Public:
-                  <i class="bi bi-info-circle-fill"
-                     data-bs-toggle="tooltip"
-                     data-bs-html="true"
-                     data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
-                </div>
-                <div class="public-count">{{ song_info.num_plays_public }}</div>
-              </div>
-              <div class="col col-lg-1">
-                <div class="fw-semibold text-nowrap">
-                  Private:
-                  <i class="bi bi-info-circle-fill"
-                     data-bs-toggle="tooltip"
-                     data-bs-html="true"
-                     data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
-                </div>
-                <div class="private-count">{{ song_info.num_plays_private }}</div>
-              </div>
-            </div>
-            <div class="row">
-              {% if song_info.last_event %}
-                <div class="fw-semibold">Last Played:</div>
-                <div>
-                  <a class="fw-medium"
-                     href="{% url "event_details" id=song_info.last_event.event_id %}">{{ song_info.last_event.get_date }}</a>
-                  <span class="text-reset fw-light">({{ show_gap }} shows ago)</span>
-                </div>
-              {% endif %}
-            </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <ul class="nav nav-pills items-end mb-2" role="tablist">
-          <button class="nav-link text-center active mb-1 mb-md-0"
-                  data-bs-toggle="pill"
-                  data-bs-target="#events"
-                  aria-controls="pills-events">Performances</button>
-          <button class="nav-link text-center mb-1 mb-md-0"
-                  data-bs-toggle="pill"
-                  data-bs-target="#snippets"
-                  aria-controls="pills-snippets">Snippets</button>
-          <button class="nav-link text-center mb-1 mb-md-0"
-                  data-bs-toggle="pill"
-                  data-bs-target="#stats"
-                  aria-controls="pills-stats">Stats</button>
-          <button class="nav-link text-center mb-1 mb-md-0"
-                  data-bs-toggle="pill"
-                  data-bs-target="#lyrics"
-                  aria-controls="pills-stats">Lyrics</button>
-          <button class="nav-link text-center mb-1 mb-md-0"
-                  data-bs-toggle="pill"
-                  data-bs-target="#links"
-                  aria-controls="pills-links">Links</button>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-12 mx-auto">
-      <div class="tab-content">
-        <div id="stats" class="tab-pane fade">
-          <div class="row row-cols-1 g-2">
-            <div class="col col-12 col-lg-8 pe-lg-2">
-              <div class="card">
-                <div class="card-header">Year Stats</div>
-                <div class="card-body">
-                  <div id="statChart">
-                    <canvas id="chart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col col-12 col-lg-4 px-2">
-              <div class="row row-cols-1 g-2">
-                <div class="card p-0">
-                  <div class="card-header">Performance Stats</div>
-                  <div class="card-body">
-                    <div class="row row-cols-2 g-2">
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-body">
-                            <div class="text-sm text-nowrap">
-                              Public
-                              <i class="bi bi-info-circle-fill"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-html="true"
-                                 data-bs-title="Number of times a song was played publicly. Meaning it was played at a show open to the public, not a soundcheck/private rehearsal"></i>
-                            </div>
-                            <div class="text-xl public-count">{{ song_info.num_plays_public }}</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-body">
-                            <div class="text-sm text-nowrap">
-                              Private
-                              <i class="bi bi-info-circle-fill"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-html="true"
-                                 data-bs-title="Number of times a song was played privately. Meaning at a closed rehearsal/soundcheck."></i>
-                            </div>
-                            <div class="text-xl private-count">{{ song_info.num_plays_private }}</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-body">
-                            <div class="text-sm text-nowrap">
-                              Snippet
-                              <i class="bi bi-info-circle-fill"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-html="true"
-                                 data-bs-title="Number of times a song was included as part of another."></i>
-                            </div>
-                            <div class="text-xl snippet-count">{{ song_info.num_plays_snippet }}</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-body">
-                            <div class="text-sm text-nowrap">
-                              Frequency
-                              <i class="bi bi-info-circle-fill"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-html="true"
-                                 data-bs-title="How common a song is. Number of times played divided by number of shows since the debut. Formula from Dripfield.pro."></i>
-                            </div>
-                            <div class="text-xl">{{ frequency|default_if_none:"0" }}%</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {% if positions %}
-                  <div class="card p-0">
-                    <div class="card-header">Position Stats</div>
-                    <div class="card-body">
-                      <div class="row row-cols-2 g-2">
-                        {% for item in positions %}
-                          <div class="col">
-                            <div class="card p-0">
-                              <div class="card-body">
-                                <div class="text-sm text-nowrap">{{ item.position }}</div>
-                                <div class="text-xl">{{ item.count }}</div>
-                              </div>
-                            </div>
-                          </div>
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="events" class="tab-pane fade show active">
-          <div class="card mb-3">
-            <div class="card-body px-0">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="songTable">
-                  <thead>
-                    <tr>
-                      <th class="all" scope="col">Date</th>
-                      <th class="min-tablet-l" scope="col">Act</th>
-                      <th class="all" scope="col">Venue</th>
-                      <th class="min-tablet-l" scope="col">Location</th>
-                      <th class="min-tablet-l" scope="col">Tour</th>
-                      <th class="min-tablet-l" scope="col">Position</th>
-                      <th class="min-tablet-l" scope="col">Gap</th>
-                      <th class="min-tablet-l" scope="col">Set</th>
-                      <th class="min-tablet-l" scope="col">Prev</th>
-                      <th class="min-tablet-l" scope="col">Next</th>
-                      <th class="min-tablet-l" scope="col">Note</th>
-                      <th class="min-tablet-l text-nowrap" scope="col">Public</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="snippets" class="tab-pane fade">
-          <div class="card mb-3">
-            <div class="card-header">Snippets</div>
-            <div class="card-body px-0">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="snippetTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Date</th>
-                      <th class="min-tablet-l" scope="col">Act</th>
-                      <th class="all" scope="col">Venue</th>
-                      <th class="min-tablet-l" scope="col">Location</th>
-                      <th class="all">During Song</th>
-                      <th class="min-tablet-l">Note</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="links" class="tab-pane fade">
-          <div class="card">
-            <div class="card-header">Links</div>
-            <div class="card-body">
-              <ul class="mb-1">
-                {% if song_info.brucebase_url %}
-                  <li>
-                    <a class=" "
-                       href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
-                  </li>
-                {% endif %}
-                {% if song_info.spotify_id %}
-                  <li>
-                    <a class=" "
-                       href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
-                  </li>
-                {% endif %}
-                {% if song_info.mbid %}
-                  <li>
-                    <a class=" " href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
-                  </li>
-                {% endif %}
+          <div class="row mt-3 mb-2">
+            <div class="col">
+              <ul class="nav nav-pills items-end mb-2 text-sm gap-1" role="tablist">
+                <button class="nav-link active mb-1 mb-md-0"
+                        data-bs-toggle="pill"
+                        data-bs-target="#events"
+                        aria-controls="pills-events">Performances</button>
+                <button class="nav-link mb-1 mb-md-0"
+                        data-bs-toggle="pill"
+                        data-bs-target="#snippets"
+                        aria-controls="pills-snippets">Snippets</button>
+                <button class="nav-link mb-1 mb-md-0"
+                        data-bs-toggle="pill"
+                        data-bs-target="#stats"
+                        aria-controls="pills-stats">Stats</button>
+                <button class="nav-link mb-1 mb-md-0"
+                        data-bs-toggle="pill"
+                        data-bs-target="#lyrics"
+                        aria-controls="pills-stats">Lyrics</button>
+                <button class="nav-link mb-1 mb-md-0"
+                        data-bs-toggle="pill"
+                        data-bs-target="#links"
+                        aria-controls="pills-links">Links</button>
               </ul>
             </div>
           </div>
         </div>
-        <div id="lyrics" class="tab-pane fade">
-          <div class="card">
-            <div class="card-header">Lyrics</div>
-            <div class="card-body text-sm">
-              {% for lyric in lyrics %}
-                {% if lyric.language == 'English' and lyric.version == song_info.category %}{{ lyric.text|linebreaks }}{% endif %}
-              {% endfor %}
-              {% if lyrics.count > 1 %}
-                <div class="text-base">Other Versions</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="tab-content">
+          <div id="events" class="tab-pane fade show active">
+            <div class="card">
+              <div class="card-header">Events</div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="songTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Date</th>
+                        <th class="all">Act</th>
+                        <th class="all">Venue</th>
+                        <th class="all">Location</th>
+                        <th class="all">Tour</th>
+                        <th class="all">Position</th>
+                        <th class="all">Gap</th>
+                        <th class="all">Set</th>
+                        <th class="all">Prev</th>
+                        <th class="all">Next</th>
+                        <th class="all">Note</th>
+                        <th class="all">Public</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="snippets" class="tab-pane fade">
+            <div class="card">
+              <div class="card-header">Snippets</div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="snippetTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Date</th>
+                        <th class="all">Act</th>
+                        <th class="all">Venue</th>
+                        <th class="all">Location</th>
+                        <th class="all">During Song</th>
+                        <th class="all">Note</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="stats" class="tab-pane fade">
+            <div class="card">
+              <div class="card-header">Stats</div>
+              <div class="card-body px-0"></div>
+            </div>
+          </div>
+          <div id="lyrics" class="tab-pane fade">
+            <div class="card">
+              <div class="card-header">Lyrics</div>
+              <div class="card-body text-sm">
+                {% for lyric in lyrics %}
+                  {% if lyric.language == 'English' %}{{ lyric.text|linebreaksbr }}{% endif %}
+                {% endfor %}
+                {% if lyrics.count > 1 %}
+                  <div class="fw-semibold mt-2">Other Versions</div>
+                  <ul>
+                    {% for lyric in lyrics %}
+                      <li>
+                        <a href="{% url "lyric_detail" id=lyric.uuid %}">
+                          {{ lyric.language }}
+                          {% if lyric.note %}[{{ lyric.note }}]{% endif %}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div id="links" class="tab-pane fade">
+            <div class="card">
+              <div class="card-header">Links</div>
+              <div class="card-body px-0">
                 <ul>
-                  {% for lyric in lyrics %}
-                    {% if lyric.language != 'English' %}
-                      <div class="text-base">
-                        <li>
-                          <a class=" " href="{% url "lyric_detail" id=lyric.uuid %}">
-                            {{ lyric.language }}
-                            {% if lyric.note %}[{{ lyric.note }}]{% endif %}
-                          </a>
-                        </li>
-                      </div>
-                    {% endif %}
-                  {% endfor %}
+                  {% if song_info.brucebase_url %}
+                    <li>
+                      <a href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
+                    </li>
+                  {% endif %}
+                  {% if song_info.spotify_id %}
+                    <li>
+                      <a href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
+                    </li>
+                  {% endif %}
+                  {% if song_info.mbid %}
+                    <li>
+                      <a href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
+                    </li>
+                  {% endif %}
                 </ul>
-              {% endif %}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- charts.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+  {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script> {% endcomment %}
   <script>
     $(document).ready(function () {
-        let ctx = document.getElementById("chart").getContext("2d");
-        Chart.defaults.color = '#999';
-
-        var style = getComputedStyle(document.body);
-        var primCol = style.getPropertyValue('--primary');
-
-        let chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: [{% for year in year_stats %}{{year.year}},{% endfor %}],
-            datasets: [
-                {
-                  label: "Events",
-                  backgroundColor: `${primCol}`,
-                  borderColor: `${primCol}`,
-                  color: "#ffffff",
-                  data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
-                }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            title: {
-                text: "Plays by Year",
-                display: true
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                grid: {
-                  color: '#5e5e5e',
-                },
-              },
-              x:{ 
-                grid: {
-                  color: '#5e5e5e',
-                },
-              },
-            },
-          },
-        });
-
-    });
-
-    $(document).ready(function () {
-
-      var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7,8,9,10], category: true});
-      var categories = [{'label': 'Public', 'value': '^Show|Set|Encore|Pre-Show$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}]
-      
-      dtCategorySelect({layout: layout, column_idx: 7, values: categories, label: 'Category'});
+      var layout = getDatatableLayout({category: true});
+      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': '^' + set_names.join('|') + '$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}], label: 'Category'})
 
       new DataTable('#songTable', {
         layout: layout,
-        serverSide: true,
-        processing: true,
         ajax: {
-          url: '/api/v1/songspage/',
-          data: {
-              song: '{{ song_info.id }}',
-              format: 'custom'
-          },
-          dataSrc: function(json) {
-            return json.data;
-          }
+          url: '/api/v1/songspage/?song={{ song_info.id }}&format=custom',
         },
         columnDefs: [
-          { 'targets': [-1], 'visible': false },
-          { 'targets': '_all', 'className': 'text-wrap', defaultContent: '' },
+          { 'target': -1, 'visible': false }
         ],
         columns: [
           {
             'data': 'event',
             'name': 'event__event_id',
-            'width': '8rem',
+            'width': '10rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                }
+              if (type === 'display' && data) {
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              }
             },
           },
           {
@@ -387,9 +212,9 @@
             'name': 'event__artist__name',
             'width': '14rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/bands/${data.id}">${data.name}</a>`
-                }
+              if (type === 'display' && data) {
+                return `<a href="/bands/${data.id}">${data.name}</a>`
+              }
             },
           },
           {
@@ -397,9 +222,9 @@
             'name': 'event__venue__name, event__venue__detail',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/venues/${data.id}">${data.name}</a>`
-                }
+              if (type === 'display' && data) {
+                return `<a href="/venues/${data.uuid}">${data.name}</a>`
+              }
             },
           },
           {
@@ -408,7 +233,7 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/cities/${data.city.id}">${data.location}</a>`
+                return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
               };
             },
           },
@@ -418,23 +243,21 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/tours/${data.id}">${data.name}</a>`
+                return `<a href="/tours/${data.uuid}">${data.name}</a>`
               }
             },
           },
-          {'data': 'position', 'name': 'position', 'width': '6rem',},
-          {'data': 'last', 'name': 'last', 'width': '1rem', },
-          {'data': 'set_name', 'name': 'set_name', 'width': '4rem',},
+          {'data': 'position', 'name': 'position', 'width': '6rem' },
+          {'data': 'last', 'name': 'last', 'width': '1rem' },
+          {'data': 'set_name', 'name': 'set_name', 'width': '4rem' },
           {
             'data': 'prev_song',
             'name': 'prev_song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-                if (data != null) {
-                  if (type === 'display' && data) {
-                    return `<a href="/songs/${data.id}">${data.name}</a>`
-                  }
-                }
+              if (type === 'display' && data) {
+                return `<a href="/songs/${data.uuid}">${data.name}</a>`
+              }
             },
           },
           {
@@ -442,39 +265,24 @@
             'name': 'next_song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-                if (data != null) {
-                  if (type === 'display' && data) {
-                    return `<a href="/songs/${data.id}">${data.name}</a>`
-                  }
-                }
+              if (type === 'display' && data) {
+                return `<a href="/songs/${data.uuid}">${data.name}</a>`
+              }
             },
           },
           {'data': 'note', 'name': 'note'},
-          {'data': 'event.public', 'name': 'event__public'},
-        ]
+          {'data': 'event.public', 'name': 'event__public' },
+        ],
       });
-
-      var layout = getDatatableLayout({columns: [0,1,2], category: false});
-      // for reasons unknown, an extra non-functioning searchbuilder button is added
-      // this removes that single button.
-      layout.topEnd.features.pop();
 
       new DataTable('#snippetTable', {
         layout: layout,
-        serverSide: true,
-        processing: true,
         ajax: {
           url: '/api/v1/snippets/',
           data: {
-              snippet: '{{ song_info.id }}',
-              format: 'custom'
+            snippet: '{{ song_info.id }}',
+            format: 'custom'
           },
-          dataSrc: function(response) {
-            // Initialize DataTable with the retrieved object
-            $('#snippet-count').text(response.recordsTotal);
-
-            return response.data;
-          }
         },
         columns: [
           {
@@ -483,7 +291,7 @@
             'width': '8rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.id}">${data.display}</a>`
+                return `<a href="/events/${data.uuid}">${data.display}</a>`
               }
             },
           },
@@ -493,7 +301,7 @@
             'width': '14rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
-                  return `<a href="/bands/${data.id}">${data.name}</a>`
+                  return `<a href="/bands/${data.uuid}">${data.name}</a>`
                 }
             },
           },
@@ -503,7 +311,7 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
-                  return `<a href="/venues/${data.id}">${data.name}</a>`
+                  return `<a href="/venues/${data.uuid}">${data.name}</a>`
                 }
             },
           },
@@ -512,8 +320,8 @@
             'name': 'event__venue__city__name, event__venue__state__abbrev, event__venue__country__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/cities/${data.city.id}">${data.location}</a>`
+              if (type === 'display' && data) {
+                return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
               };
             },
           },
@@ -523,13 +331,14 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/songs/${data.id}">${data.name}</a>`
+                return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
           },
           {'data': 'note', 'name': 'note'},
         ]
       });
-    });
+
+    })
   </script>
 {% endblock content %}

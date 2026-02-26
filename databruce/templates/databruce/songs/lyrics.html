@@ -44,7 +44,7 @@
               'data': 'song.name',
               'name': 'song__name',
               'render': function (data, type, row, meta) {
-                  if (type === 'display') {
+                  if (type === 'display' && data) {
                       return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
                   }
               },

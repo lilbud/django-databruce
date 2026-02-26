@@ -16,8 +16,8 @@ class OnstageInline(TabularInline):
             .get_queryset(request)
             .select_related(
                 "relation",
-                "band",
             )
+            .prefetch_related("band")
         )
 
     autocomplete_fields = ["relation", "band"]
@@ -214,7 +214,7 @@ class NugsAdmin(ModelAdmin):
 
 @admin.register(models.Events)
 class EventAdmin(ModelAdmin):
-    search_fields = ["id", "date", "run__name", "leg__name"]
+    search_fields = ["id", "event_id", "date"]
     autocomplete_fields = [
         "venue",
         "artist",
@@ -225,7 +225,7 @@ class EventAdmin(ModelAdmin):
         "official_id",
     ]
 
-    list_display = ["id", "date"]
+    list_display = ["id", "date", "event_id"]
     list_display_links = ["id"]
     inlines = [SetlistInline, OnstageInline]
 
@@ -376,18 +376,21 @@ class StateAdmin(ModelAdmin):
 
 @admin.register(models.Tours)
 class TourAdmin(ModelAdmin):
+    def get_queryset(self, request):
+        base_qs = super().get_queryset(request)
+        return base_qs.prefetch_related(
+            "band",
+            "first_event",
+            "last_event",
+        )
+
     search_fields = ["name"]
-    list_select_related = [
-        "first_event",
-        "band",
-        "last_event",
-        "first_event__venue",
-        "last_event__venue",
-        "first_event__venue__city",
-        "last_event__venue__city",
+    autocomplete_fields = ["band", "first_event", "last_event"]
+    list_display = [
+        "id",
+        "name",
+        "band__name",
     ]
-    autocomplete_fields = ["first_event", "last_event", "band"]
-    list_display = ["id", "name", "band", "first_event", "last_event"]
     list_display_links = ["id"]
 
 

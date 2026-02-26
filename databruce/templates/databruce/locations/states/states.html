@@ -12,11 +12,11 @@
 {% block table %}
   <thead>
     <tr>
-      <th class="text-center all" scope="col">Events</th>
-      <th class="all" scope="col">Name</th>
-      <th class="min-tablet-l" scope="col">Country</th>
-      <th class="min-tablet-l" scope="col">First</th>
-      <th class="min-tablet-l" scope="col">Last</th>
+      <th class="text-center all">Events</th>
+      <th class="all">Name</th>
+      <th class="all">Country</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -39,8 +39,8 @@
             'data': 'name',
             'name': 'name',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/states/' + row.id + '">'+ row.name +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/states/${row.uuid}">${row.name}</a>`;
               }
             },
           },
@@ -49,25 +49,25 @@
             'name': 'country__name',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return '<a href="/countries/' + data.id + '">'+ data.name +'</a>';
+                return `<a href="/countries/${data.uuid}">${data.name}</a>`;
               }
             },
           },
           {
-            'data': 'first_event.date',
-            'name': 'first__id',
+            'data': 'first_event',
+            'name': 'first_event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
             },
           },
           {
-            'data': 'last_event.date',
-            'name': 'last__id',
+            'data': 'last_event',
+            'name': 'last_event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
             },        
           },

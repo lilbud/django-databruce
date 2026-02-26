@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }} &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url 'bands' %}">Bands</a> &gt; {{ info.name }}
     </div>
@@ -70,11 +70,11 @@
               <table class="table table-hover display" id="memberTable">
                 <thead>
                   <tr>
-                    <th class="all text-center" scope="col">Events</th>
-                    <th class="all" scope="col">Name</th>
-                    <th class="all" scope="col">Instruments</th>
-                    <th class="min-tablet-l" scope="col">First</th>
-                    <th class="min-tablet-l" scope="col">Last</th>
+                    <th class="all text-center">Events</th>
+                    <th class="all">Name</th>
+                    <th class="all">Instruments</th>
+                    <th class="min-tablet-l">First</th>
+                    <th class="min-tablet-l">Last</th>
                   </tr>
                 </thead>
               </table>
@@ -108,7 +108,6 @@
         serverSide: true,
         processing: true,
         ajax: {
-          //'url': '/api/v1/events/?band={{ info.id }}&format=custom',
           'url': '/api/v1/events/?artist={{ info.id }}&format=custom',
         },
         columnDefs: [
@@ -118,13 +117,10 @@
         columns: event_table_columns,
       });
 
-      new DataTable('#memberTable',{
+      new DataTable('#memberTable', {
         layout: getDatatableLayout({category: false}),
-        serverSide: true,
-        processing: true,
         ajax: {
           'url': '/api/v1/onstageband/?band={{ info.id }}&format=custom',
-          //'url': '/api/v1/bands/{{ info.id }}/members/?format=custom',
         },
         columnDefs: [
           {targets: [0], width: '1rem'},
@@ -135,8 +131,8 @@
             'data': 'relation',
             'name': 'relation__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/relations/${data.id}">${data.name}</a>`;
+              if (type === 'display' && data) {
+                return `<a href="/relations/${data.uuid}">${data.name}</a>`;
               }
             },
           },
@@ -147,7 +143,7 @@
             'data': 'first',
             'name': 'first__id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return `<a href="/events/${data.id}">${data.date.display_day}</a>`;
               }
             },
@@ -156,7 +152,7 @@
             'data': 'last',
             'name': 'last__id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return `<a href="/events/${data.id}">${data.date.display_day}</a>`;
               }
             },          

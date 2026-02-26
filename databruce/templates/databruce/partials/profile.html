@@ -1,0 +1,48 @@
+{% if user.is_authenticated %}
+    <li class="nav-item dropdown list-unstyled">
+        <button class="btn btn-sm dropdown-toggle {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">Profile</button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <div class="text-sm px-4 py-1 dropdown-item pe-none">
+                    Hello {{ user }}
+                    {% if user.is_superuser %}
+                        (Admin)
+                    {% else %}
+                        (User)
+                    {% endif %}
+                </div>
+            </li>
+            <li>
+                <a class="dropdown-item"
+                   href="{% url "profile" username=user.username %}">View Profile</a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
+            </li>
+            {% if user.is_superuser %}
+                <li>
+                    <a class="dropdown-item" href="{% url "admin:index" %}">Admin Portal</a>
+                </li>
+            {% endif %}
+            <li>
+                <a class="dropdown-item" href="{% url "settings" %}">Settings</a>
+            </li>
+            <li>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="dropdown-item" role="button" type="submit" id="button-addon2">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </li>
+{% else %}
+    <li class="nav-item mx-lg-2 ms-auto d-none d-xl-inline mb-0">
+        <a class="btn btn-sm btn-link"
+           role="button"
+           type="button"
+           href="{% url 'login' %}?next={{ request.path }}">Login</a>
+    </li>
+{% endif %}

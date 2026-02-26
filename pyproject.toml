@@ -5,20 +5,19 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "crispy-bootstrap5>=2025.6",
-    "django==5.2.11",
+    "django==6.0.2",
     "django-autocomplete-light>=3.12.1",
     "django-browser-reload>=1.20.0",
-    "django-crispy-forms>=2.5",
     "django-debug-toolbar>=5.1.0",
+    "django-extensions>=4.1",
     "django-filter>=25.2",
     "django-link-shortener>=1.0.1",
     "django-unfold>=0.77.1",
     "djangorestframework>=3.16.1",
-    "djangorestframework-datatables>=0.7.2",
     "djlint>=1.36.4",
     "gevent>=25.9.1",
     "gunicorn>=25.0.0",
+    "iommi>=7.22.1",
     "markdown>=3.7",
     "markdown-it-py>=4.0.0",
     "psycopg[binary,pool]>=3.2.9",

@@ -1,6 +1,5 @@
-Django==5.2.11
+django
 djangorestframework
-djangorestframework_datatables
 Markdown
 python-dotenv
 django-debug-toolbar

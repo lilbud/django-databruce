@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url "countries" %}">Countries</a> &gt;
       {{ info }}
@@ -52,13 +52,13 @@
                 <thead>
                   <tr class="custom">
                     <th class="all">Date</th>
-                    <th class="min-tablet-l">Setlist</th>
+                    <th class="all">Setlist</th>
                     <th class="all">Band</th>
-                    <th class="min-tablet-l">Venue</th>
+                    <th class="all">Venue</th>
                     <th class="all">Location</th>
-                    <th class="min-tablet-l">Tour</th>
-                    <th class="min-tablet-l">Detail</th>
-                    <th class="min-tablet-l">Public</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
                   </tr>
                 </thead>
               </table>
@@ -72,7 +72,9 @@
                   <tr>
                     <th class="all">Plays</th>
                     <th class="all">Song</th>
-                    <th class="min-tablet-l">Category</th>
+                    <th class="all">Category</th>
+                    <th class="all">First</th>
+                    <th class="all">Last</th>
                   </tr>
                 </thead>
               </table>
@@ -115,7 +117,7 @@
       serverSide: true,
       processing: true,
       ajax: {
-        'url': '/api/v1/setlists/?country={{ info.id }}&format=custom',
+        'url': '/api/v1/setlist_songs/?country={{ info.id }}&format=custom',
       },
       columns: song_table_columns,
       columnDefs: [{ targets: [0], width: '1rem' }],

@@ -46,51 +46,73 @@ class BaseSerializer(serializers.ModelSerializer):
 class MinimalStatesSerializer(BaseSerializer):
     class Meta:
         model = models.States
-        fields = ["id", "name", "abbrev"]
+        fields = ["id", "name", "abbrev", "uuid"]
 
 
 class MinimalCountriesSerializer(BaseSerializer):
     class Meta:
         model = models.Countries
-        fields = ["id", "name"]
+        fields = ["id", "name", "uuid"]
 
 
 class MinimalBandsSerializer(BaseSerializer):
     class Meta:
         model = models.Bands
-        fields = ["id", "name"]
+        fields = ["id", "name", "uuid"]
 
 
 class MinimalCitiesSerializer(BaseSerializer):
+    formatted = serializers.SerializerMethodField()
+
+    def get_formatted(self, obj):
+        try:
+            if obj.state and obj.country_id in (2, 6, 37):
+                return f"{obj.name}, {obj.state.abbrev}"
+        except models.Cities.state.RelatedObjectDoesNotExist:
+            return f"{obj.name}, {obj.country.name}"
+
     class Meta:
         model = models.Cities
-        fields = ["id", "name"]
+        fields = ["id", "name", "formatted", "uuid"]
+
+
+class MinimalVenuesTextSerializer(BaseSerializer):
+    class Meta:
+        model = models.VenuesText
+        fields = ["formatted"]
 
 
 class MinimalVenuesSerializer(BaseSerializer):
     city = MinimalCitiesSerializer(required=False)
     state = MinimalStatesSerializer(source="city.state", required=False)
     country = MinimalCountriesSerializer(source="city.country", required=False)
-    location = serializers.SerializerMethodField()
+    formatted = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
-    def get_location(self, obj):
-        if obj.state:
-            return f"{obj.city.name}, {obj.state}"
+    def get_name(self, obj):
+        return ", ".join(filter(None, [obj.name, obj.detail]))
 
-        if obj.city:
-            return f"{obj.city.name}, {obj.country.name}"
-
-        return f"{obj.name}, {obj.country}"
+    def get_formatted(self, obj):
+        return MinimalVenuesTextSerializer(obj.venues_text).data["formatted"]
 
     class Meta:
         model = models.Venues
-        fields = ["id", "name", "detail", "city", "state", "country", "location"]
+        fields = [
+            "id",
+            "name",
+            "detail",
+            "city",
+            "state",
+            "country",
+            "formatted",
+            "uuid",
+        ]
 
 
 class MinimalToursSerializer(BaseSerializer):
     class Meta:
         model = models.Tours
-        fields = ["id", "name"]
+        fields = ["id", "name", "uuid"]
 
 
 class MinimalUserSerializer(BaseSerializer):
@@ -113,25 +135,33 @@ class MinimalEventSerializer(BaseSerializer):
 class MinimalTourLegsSerializer(BaseSerializer):
     class Meta:
         model = models.TourLegs
-        fields = ["id", "name"]
+        fields = ["id", "name", "uuid"]
 
 
 class MinimalEventRunSerializer(BaseSerializer):
     class Meta:
         model = models.Runs
-        fields = ["id", "name"]
+        fields = ["id", "name", "uuid"]
 
 
 class MinimalRelationsSerializer(BaseSerializer):
     class Meta:
         model = models.Relations
-        fields = ["id", "name", "instruments"]
+        fields = ["id", "name", "instruments", "uuid"]
 
 
 class MinimalSongsSerializer(BaseSerializer):
     class Meta:
         model = models.Songs
-        fields = ["id", "name", "album", "category"]
+        fields = [
+            "id",
+            "name",
+            "album",
+            "category",
+            "uuid",
+            "original_artist",
+            "num_plays_public",
+        ]
 
 
 class MinimalSetlistSerializer(BaseSerializer):
@@ -139,13 +169,19 @@ class MinimalSetlistSerializer(BaseSerializer):
 
     class Meta:
         model = models.Setlists
-        fields = ["id", "event_id", "song", "set_name"]
+        fields = ["id", "event_id", "song", "set_name", "uuid"]
 
 
 class MinimalOnstageSerializer(BaseSerializer):
     class Meta:
         model = models.Onstage
-        fields = ["relation_id"]
+        fields = ["relation_id", "uuid"]
+
+
+class MinimalArchiveLinksSerializer(BaseSerializer):
+    class Meta:
+        model = models.ArchiveLinks
+        fields = ["id", "url", "uuid"]
 
 
 class SubqueryCount(Subquery):
@@ -157,15 +193,16 @@ class SubqueryCount(Subquery):
 
 def get_date_from_instance(obj):
     """Get event date from instance, creating date from id if needed."""
-    event_id = str(obj.event_id)
-    event_date = getattr(obj, "date", None)
+    event_id = getattr(obj, "event_id", None)
+    date = getattr(obj, "date", None)
     early_late = getattr(obj, "early_late", None)
+
+    if event_id is None:
+        return None
 
     result = {}
 
-    try:
-        date = datetime.datetime.strptime(event_date, "%Y-%m-%d")
-    except (ValueError, TypeError):
+    if not date:
         date = datetime.datetime.strptime(format_fuzzy(event_id), "%Y-%m-%d")
 
     result["filter"] = date.strftime("%Y-%m-%d")
@@ -202,19 +239,11 @@ class CountriesSerializer(BaseSerializer):
 
 
 class CitiesSerializer(BaseSerializer):
-    state = MinimalStatesSerializer()
+    state = MinimalStatesSerializer(required=False)
     country = MinimalCountriesSerializer()
     count = serializers.IntegerField()
-    name = serializers.SerializerMethodField()
-
-    def get_name(self, obj):
-        try:
-            if obj.country_id in [2, 6, 37]:
-                return f"{obj.name}, {obj.state.abbrev}"
-
-            return f"{obj.name}, {obj.country.name}"
-        except models.Cities.state.RelatedObjectDoesNotExist:
-            return f"{obj.name}, {obj.country.name}"
+    first_event = MinimalEventSerializer(required=False)
+    last_event = MinimalEventSerializer(required=False)
 
     class Meta:
         model = models.Cities
@@ -233,10 +262,12 @@ class BandsSerializer(BaseSerializer):
 class VenuesSerializer(BaseSerializer):
     name = serializers.SerializerMethodField()
     city = MinimalCitiesSerializer(required=False)
-    state = MinimalStatesSerializer(required=False)
+    state = MinimalStatesSerializer(required=False, source="city.state")
     country = MinimalCountriesSerializer(required=False)
     text = serializers.SerializerMethodField(method_name="get_name")
     location = serializers.SerializerMethodField()
+    first_event = MinimalEventSerializer(required=False)
+    last_event = MinimalEventSerializer(required=False)
 
     def get_location(self, obj):
         try:
@@ -272,6 +303,7 @@ class EventRunSerializer(BaseSerializer):
             "last_event",
             "num_shows",
             "num_songs",
+            "uuid",
         ]
 
 
@@ -316,16 +348,16 @@ class OnstageSerializer(BaseSerializer):
 
     class Meta:
         model = models.Onstage
-        fields = ["event", "relation", "band"]
+        fields = ["event", "relation", "band", "guest", "uuid"]
 
 
 class EventsSerializer(BaseSerializer):
     order = serializers.SerializerMethodField(method_name="sort_id")
     date = serializers.SerializerMethodField(method_name="get_date")
-    run = EventRunSerializer(include=["id", "name"], required=False)
-    artist = BandsSerializer(include=["id", "name"])
-    tour = ToursSerializer(include=["id", "name"])
-    venue = MinimalVenuesSerializer()
+    run = MinimalEventRunSerializer(required=False)
+    artist = MinimalBandsSerializer(required=False)
+    tour = MinimalToursSerializer(required=False)
+    venue = MinimalVenuesSerializer(required=False)
     leg = MinimalTourLegsSerializer(required=False)
     has_setlist = serializers.BooleanField(required=False)
 
@@ -352,6 +384,8 @@ class EventsSerializer(BaseSerializer):
 
 
 class ArchiveLinksSerializer(BaseSerializer):
+    event = MinimalEventSerializer()
+
     class Meta:
         model = models.ArchiveLinks
         fields = "__all__"
@@ -386,7 +420,7 @@ class EventRunDetailSerializer(BaseSerializer):
 
 class BootlegsSerializer(BaseSerializer):
     event = MinimalEventSerializer()
-    archive = ArchiveLinksSerializer()
+    archive = MinimalArchiveLinksSerializer(required=False)
 
     class Meta:
         model = models.Bootlegs
@@ -396,7 +430,7 @@ class BootlegsSerializer(BaseSerializer):
 class ContinentsSerializer(BaseSerializer):
     class Meta:
         model = models.Continents
-        fields = ["id", "name"]
+        fields = "__all__"
 
 
 class CoversSerializer(BaseSerializer):
@@ -408,7 +442,6 @@ class CoversSerializer(BaseSerializer):
 class NugsSerializer(BaseSerializer):
     date = serializers.SerializerMethodField()
     event = EventsSerializer(include=["id", "event_id", "venue", "date"])
-    # venue = MinimalVenuesSerializer(source="event.venue")
 
     def get_date(self, obj):
         return {
@@ -441,14 +474,14 @@ class RelationsSerializer(BaseSerializer):
             "name",
             "aliases",
             "nicknames",
+            "uuid",
         ]
 
 
 class OnstageBandSerializer(BaseSerializer):
     first = MinimalEventSerializer()
     last = MinimalEventSerializer()
-    # count = serializers.IntegerField()
-    relation = RelationsSerializer(include=["id", "name", "instruments"])
+    relation = RelationsSerializer(include=["id", "name", "instruments", "uuid"])
 
     class Meta:
         model = models.OnstageBandMembers
@@ -490,6 +523,7 @@ class SongsSerializer(BaseSerializer):
             "has_lyrics",
             "sort_song_name",
             "text",
+            "uuid",
         ]
 
 
@@ -499,6 +533,20 @@ class SetlistSerializer(BaseSerializer):
     last_event = MinimalEventSerializer(source="ltp", required=False)
     position = serializers.SerializerMethodField()
     count = serializers.IntegerField(required=False)
+    notes = serializers.SerializerMethodField()
+
+    def get_notes(self, obj):
+        if not obj.setlist_notes.exists():
+            return None
+
+        notes = list(
+            {item.note for item in obj.setlist_notes.all() if item.note != ""},
+        )
+
+        if notes:
+            return notes
+
+        return None
 
     def get_position(self, obj):
         if (
@@ -513,7 +561,7 @@ class SetlistSerializer(BaseSerializer):
             return "Show Closer"
         if obj.is_main_set_closer:
             return "Main Set Closer"
-        if obj.is_opener:
+        if obj.is_opener and obj.set_name != "Encore":
             return "Show Opener"
 
         if obj.is_set_opener:
@@ -543,14 +591,15 @@ class SetlistSerializer(BaseSerializer):
             "tour_total",
             "song_num",
             "position",
-            "note",
+            "notes",
+            "uuid",
         ]
 
 
 class ReleaseDiscSerializer(BaseSerializer):
     class Meta:
         model = models.ReleaseDiscs
-        fields = ["id", "name"]
+        fields = ["id", "name", "uuid"]
 
 
 class ReleaseTracksSerializer(BaseSerializer):
@@ -569,6 +618,7 @@ class ReleaseTracksSerializer(BaseSerializer):
             "song",
             "length",
             "id",
+            "uuid",
         ]
 
 
@@ -656,14 +706,36 @@ class LyricsSerializer(BaseSerializer):
 
 class SetlistEntrySerializer(BaseSerializer):
     event = EventsSerializer(
-        include=["id", "name", "tour", "date", "leg", "run", "venue"],
+        include=["id", "tour", "date", "leg", "run", "event_id"],
     )
-    show_opener = MinimalSongsSerializer(required=False, read_only=True)
-    s1_closer = MinimalSongsSerializer(required=False, read_only=True)
-    s2_opener = MinimalSongsSerializer(required=False, read_only=True)
-    main_closer = MinimalSongsSerializer(required=False, read_only=True)
-    encore_opener = MinimalSongsSerializer(required=False, read_only=True)
-    show_closer = MinimalSongsSerializer(required=False, read_only=True)
+    show_opener = serializers.SerializerMethodField(required=False)
+    s1_closer = serializers.SerializerMethodField(required=False)
+    s2_opener = serializers.SerializerMethodField(required=False)
+    main_closer = serializers.SerializerMethodField(required=False)
+    encore_opener = serializers.SerializerMethodField(required=False)
+    show_closer = serializers.SerializerMethodField(required=False)
+
+    songs_map = {
+        s.id: MinimalSongsSerializer(s).data for s in models.Songs.objects.all()
+    }
+
+    def get_show_opener(self, obj):
+        return self.songs_map.get(obj.show_opener_id, None)
+
+    def get_s1_closer(self, obj):
+        return self.songs_map.get(obj.s1_closer_id, None)
+
+    def get_s2_opener(self, obj):
+        return self.songs_map.get(obj.s2_opener_id, None)
+
+    def get_main_closer(self, obj):
+        return self.songs_map.get(obj.main_closer_id, None)
+
+    def get_encore_opener(self, obj):
+        return self.songs_map.get(obj.encore_opener_id, None)
+
+    def get_show_closer(self, obj):
+        return self.songs_map.get(obj.show_closer_id, None)
 
     class Meta:
         model = models.SetlistEntries
@@ -679,11 +751,39 @@ class SetlistNotesSerializer(BaseSerializer):
         fields = ["event", "note", "setlist"]
 
 
+class SetlistSongsSerializer(BaseSerializer):
+    count = serializers.IntegerField(required=False)
+    song = serializers.SerializerMethodField(required=False)
+    first_event = serializers.SerializerMethodField(required=False)
+    last_event = serializers.SerializerMethodField(required=False)
+
+    event_map = {
+        s.event_id: MinimalEventSerializer(s).data for s in models.Events.objects.all()
+    }
+
+    song_map = {
+        s.id: MinimalSongsSerializer(s).data for s in models.Songs.objects.all()
+    }
+
+    def get_song(self, obj):
+        return self.song_map[obj["song_id"]]
+
+    def get_first_event(self, obj):
+        return self.event_map[obj["first_event"]]
+
+    def get_last_event(self, obj):
+        return self.event_map[obj["last_event"]]
+
+    class Meta:
+        model = models.Setlists
+        fields = ["song", "count", "first_event", "last_event"]
+
+
 class UpdatesSerializer(BaseSerializer):
     created_at = serializers.SerializerMethodField(method_name="get_created")
 
     def get_created(self, obj):
-        return obj.created_at.strftime("%Y-%m-%d")
+        return obj.created_at.strftime("%m/%y")
 
     class Meta:
         model = models.Updates
@@ -691,16 +791,21 @@ class UpdatesSerializer(BaseSerializer):
 
 
 class UsersSerializer(BaseSerializer):
+    event_count = serializers.IntegerField()
+
+    date_joined = serializers.SerializerMethodField()
+
+    def get_date_joined(self, obj):
+        return obj.date_joined.strftime("%Y-%m-%d")
+
     class Meta:
         model = UserModel
         fields = [
             "id",
             "username",
-            "email",
+            "event_count",
             "is_staff",
-            "is_superuser",
-            "is_active",
-            "last_login",
+            "date_joined",
         ]
 
 
@@ -713,3 +818,47 @@ class UserAttendedShowsSerializer(BaseSerializer):
     class Meta:
         model = models.UserAttendedShows
         fields = "__all__"
+
+
+class SetlistBreakdownSerializer(BaseSerializer):
+    max_val = serializers.IntegerField(required=False)
+    num = serializers.IntegerField(required=False)
+    percent = serializers.CharField(required=False)
+    category = serializers.CharField(required=False)
+
+    songs_map = {
+        s.id: MinimalSongsSerializer(s).data for s in models.Songs.objects.all()
+    }
+
+    total = serializers.IntegerField(required=False)
+    album_complete = serializers.SerializerMethodField(required=False)
+
+    def get_album_complete(self, obj):
+        """Check if all songs on album are present in setlist."""
+        album_songs = obj["album_songs"]
+        setlist_songs = obj["songs"]
+
+        album_songs.sort()
+        setlist_songs.sort()
+
+        return album_songs == setlist_songs
+
+    songs = serializers.SerializerMethodField(required=False)
+
+    def get_songs(self, obj):
+        try:
+            return [self.songs_map[s] for s in obj["songs"]]
+        except KeyError:
+            return []
+
+    class Meta:
+        model = models.Songs
+        fields = [
+            "max_val",
+            "percent",
+            "category",
+            "num",
+            "total",
+            "songs",
+            "album_complete",
+        ]

@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  {{ title }} &gt; {{ info.name }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col">
     <div class="text-2xl text-wrap mb-3">
       <a href="{% url "runs" %}">Runs</a>
       &gt; {{ info }}
@@ -71,6 +71,8 @@
                     <th class="all">Plays</th>
                     <th class="all">Song</th>
                     <th class="min-tablet-l">Category</th>
+                    <th class="all">First</th>
+                    <th class="all">Last</th>
                   </tr>
                 </thead>
               </table>
@@ -81,14 +83,13 @@
               <table class="table table-hover display" id="slotTable">
                 <thead>
                   <tr>
-                    <th class="text-nowrap all text-start">Event</th>
-                    <th class="text-wrap all text-start">Location</th>
-                    <th class="text-nowrap all text-start showopener">Show Opener</th>
-                    <th class="text-nowrap all text-start set1closer">Set 1 Closer</th>
-                    <th class="text-nowrap all text-start set2opener">Set 2 Opener</th>
-                    <th class="text-nowrap all text-start mainsetcloser">Main Set Closer</th>
-                    <th class="text-nowrap all text-start encoreopener">Encore Opener</th>
-                    <th class="text-nowrap all text-start showcloser">Show Closer</th>
+                    <th class="text-nowrap all">Event</th>
+                    <th class="text-nowrap all showopener">Show Opener</th>
+                    <th class="text-nowrap all set1closer">Set 1 Closer</th>
+                    <th class="text-nowrap all set2opener">Set 2 Opener</th>
+                    <th class="text-nowrap all mainsetcloser">Main Set Closer</th>
+                    <th class="text-nowrap all encoreopener">Encore Opener</th>
+                    <th class="text-nowrap all showcloser">Show Closer</th>
                   </tr>
                 </thead>
               </table>
@@ -106,44 +107,50 @@
 
       new DataTable('#eventTable', {
         layout: layout,
-        serverSide: true,
-        processing: true,
+        scrollX: true,
         ajax: {
           'url': '/api/v1/events/?run={{ info.id }}&format=custom',
         },
-        columnDefs: [
-          { targets: '_all', className: 'text-wrap text-xs' },
-          { targets: [1], orderable: false, width: '1rem', searchable: false },
-          { targets: [-1], visible: false },
-        ],
+        columnDefs: event_table_defs,
         columns: event_table_columns,
       });
 
       new DataTable('#songTable', {
         layout: getDatatableLayout({columns: [1,2], category: false}),
-        serverSide: true,
-        processing: true,
+        ajax: {
+          'url': '/api/v1/setlist_songs/?run={{ info.id }}&format=custom',
+        },
+        scrollX: true,
         columnDefs: [
+          { targets: '_all', className: 'text-wrap text-xs' },
           { targets: [0],  width: '1rem' },
         ],
-        ajax: {
-          'url': '/api/v1/setlists?run={{ info.id }}&format=custom',
-        },
         columns: song_table_columns,
       });
 
+      
       new DataTable('#slotTable', {
-        layout: getDatatableLayout({category: false}),
-        serverSide: true,
-        processing: true,
-        scrollX: true,
+        layout: getDatatableLayout({columns: false, category: false}),
         fixedColumns: {
             start: 2
         },
+        scrollX: true,
         ajax: {
           'url': '/api/v1/setlist_entries/?run={{ info.id }}&format=custom',
         },
-        columns: setlist_slots
+        columns: setlist_slots,
+        initComplete: function () {
+          console.log(this.api())
+          this.api().columns().every(function () {
+            var columnData = this.data().join(''); // Combine all cell data into one string
+
+            // Check if the combined string is empty
+            if (columnData.length === 0) {
+              // If empty, hide the column
+              this.visible(false);
+            }
+          });
+        }
       });
     })
   </script>

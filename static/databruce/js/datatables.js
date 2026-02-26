@@ -94,7 +94,7 @@ function getDatatableLayout({ columns = true, category = false }) {
       'data-bs-toggle': 'modal',
       'data-bs-target': '#sbModal',
     },
-    init: function() {
+    init: function () {
       console.log(this);
     },
     action: function (e, dt, node, config, cb) {
@@ -167,12 +167,12 @@ song_table_columns = [
     'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/songs/' + data.id + '">' + data.name + '</a>';
       }
     },
   },
-  { 'data': 'song.category', 'name': 'song__category','width': '15rem', 'className': 'min-tablet-l' },
+  { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': 'min-tablet-l' },
 ]
 
 event_table_columns = [
@@ -249,7 +249,7 @@ setlist_slots = [
     'width': '6rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/events/' + data.id + '">' + data.display + '</a>';
       }
     },
@@ -259,7 +259,7 @@ setlist_slots = [
     'name': 'event__venue__name, event__venue__detail',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display') {
+      if (type === 'display' && data) {
         return '<a href="/venues/' + data.id + '">' + data.formatted + '</a>';
       }
     },

@@ -431,14 +431,6 @@ th .bi {
     border-color: var(--primary) !important;
 }
 
-/* ul.nav-pills>.nav-link:not(:last-child) {
-    margin-right: 0.25rem !important;
-}
-
-ul.nav-pills>.nav-link:last-child {
-    margin-right: 0 !important;
-} */
-
 a.nav-link:not(.active) {
     color: var(--primary-text) !important;
 }

@@ -7,17 +7,17 @@ ignore = [
     "PERF203", # try-except-in-loop
     "D100",    # missing docstring
     "F401",    # missing imports
-    "RUF001", # ambiguous-unicode-character-string
-    "N813",   # imports not as camelcase
-    "E501", # line too long
-    "DTZ002", # timezone
+    "RUF001",  # ambiguous-unicode-character-string
+    "N813",    # imports not as camelcase
+    "E501",    # line too long
+    "DTZ002",  # timezone
     "ANN201",
     "D103",
     "DTZ005",
     "A001",
     "D101",
     "D102",
-    "DTZ007", #stop bugging me about timezones
+    "DTZ007",  #stop bugging me about timezones
     "D106",
     "DJ008",
     "D105",
@@ -28,5 +28,7 @@ ignore = [
     "ANN002",
     "ANN003",
     "D107",
-    "SIM105"
+    "SIM105",
+    "DJ001",
+    "S101",
 ]

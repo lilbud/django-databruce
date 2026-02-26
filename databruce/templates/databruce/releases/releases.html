@@ -12,9 +12,9 @@
 {% block table %}
   <thead>
     <tr class="header">
-      <th class="all" scope="col">Name</th>
-      <th class="min-tablet-l" scope="col">Date</th>
-      <th class="min-tablet-l" scope="col">Type</th>
+      <th class="all">Name</th>
+      <th class="all">Date</th>
+      <th class="all">Type</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -36,12 +36,12 @@
             'data': 'name',
             'name': 'name',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/releases/' + row.id + '">'+ data +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/releases/${row.uuid}">${data}</a>`;
               }
             },
           },
-          {'data': 'date', 'name': 'date'},
+          {'data': 'date', 'name': 'date', 'type': 'text'},
           {'data': 'type', 'name': 'type'},
         ]
       });

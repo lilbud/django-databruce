@@ -1,12 +1,12 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  {{ title }} &gt; {{ venue_info }}
+  {{ venue_info.get_name }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col-12">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url "venues" %}">Venues</a> &gt;
-      {{ venue_info.name }}
+      {{ venue_info }}
     </div>
     {% if venue_info.aliases %}
       <div class="text-lg text-wrap mb-3">
@@ -63,27 +63,28 @@
                 <thead>
                   <tr class="custom">
                     <th class="all">Date</th>
-                    <th class="min-tablet-l">Setlist</th>
+                    <th class="all">Setlist</th>
                     <th class="all">Band</th>
-                    <th class="min-tablet-l">Venue</th>
+                    <th class="all">Venue</th>
                     <th class="all">Location</th>
-                    <th class="min-tablet-l">Tour</th>
-                    <th class="min-tablet-l">Detail</th>
-                    <th class="min-tablet-l">Public</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
                   </tr>
                 </thead>
               </table>
             </div>
           </div>
           <div id="songs" class="tab-pane fade">
-            {% comment %} {% include "databruce/partials/song_position_table.html" with songs=songs %} {% endcomment %}
             <div class="table-responsive">
               <table class="table table-hover display" id="songTable">
                 <thead>
                   <tr>
                     <th class="all">Plays</th>
                     <th class="all">Song</th>
-                    <th class="min-tablet-l">Category</th>
+                    <th class="all">Category</th>
+                    <th class="all">First</th>
+                    <th class="all">Last</th>
                   </tr>
                 </thead>
               </table>
@@ -133,7 +134,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/setlists/?venue={{ venue_info.id }}&format=custom',
+          'url': '/api/v1/setlist_songs/?venue={{ venue_info.id }}&format=custom',
         },
         columns: song_table_columns,
       });

@@ -89,7 +89,7 @@ class AdvancedEventSearch(forms.Form):
 
             # Add the query object to the total filter
             total_filter &= q_obj
-        print(total_filter)
+
         return total_filter
 
     def get_months():
@@ -517,7 +517,7 @@ class SetlistSearch(forms.Form):
         if self.cleaned_data["choice"]:
             return self.cleaned_data["choice"]
 
-        return None
+        return False
 
 
 class EventSearch(forms.Form):
@@ -562,9 +562,10 @@ class SetlistNoteSearch(forms.Form):
 
 
 class UserForm(UserCreationForm):
-    username = CustomCharField(
+    username = forms.CharField(
         label="Username",
         required=True,
+        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
         widget=forms.TextInput(attrs={"class": "form-control form-control-sm"}),
     )
 
@@ -576,14 +577,14 @@ class UserForm(UserCreationForm):
         ),
     )
 
-    password1 = CustomCharField(
+    password1 = forms.CharField(
         label="Password",
         required=True,
         widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
         help_text=password_validation.password_validators_help_text_html(),
     )
 
-    password2 = CustomCharField(
+    password2 = forms.CharField(
         required=True,
         label="Enter the same password as before, for verification.",
         widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
@@ -604,7 +605,7 @@ class UpdateUserForm(forms.ModelForm):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    username = CustomCharField(
+    username = forms.CharField(
         label="Username:",
         required=True,
         widget=forms.TextInput(
@@ -642,7 +643,7 @@ class ContactForm(forms.Form):
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
-    subject = CustomChoiceField(
+    subject = forms.ChoiceField(
         label="Subject",
         choices=[
             ("problem", "Bug/Problem"),
@@ -671,7 +672,7 @@ class ContactForm(forms.Form):
         ),
     )
 
-    message = CustomCharField(
+    message = forms.CharField(
         label="Message",
         required=True,
         widget=forms.Textarea(
@@ -684,7 +685,7 @@ class ContactForm(forms.Form):
         ),
     )
 
-    verification = CustomCharField(
+    verification = forms.CharField(
         label="Verification",
         required=True,
         help_text="Enter the release year of Bruce's third album",

@@ -1,0 +1,610 @@
+:root {
+    --logo-mask: url('/static/databruce/img/logo.svg');
+    --inset-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+}
+
+/* Text-size utility variables (keeps original sizes but centralized) */
+.text-xs {
+    font-size: var(--text-xs);
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: var(--text-sm);
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: var(--text-base);
+    line-height: 1.5rem;
+}
+
+.text-lg {
+    font-size: var(--text-lg);
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: var(--text-xl);
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: var(--text-2xl);
+    line-height: 2rem;
+}
+
+.text-3xl {
+    font-size: var(--text-3xl);
+    line-height: 2.25rem;
+}
+
+.text-4xl {
+    font-size: var(--text-4xl);
+    line-height: 2.5rem;
+}
+
+.text-5xl {
+    font-size: var(--text-5xl);
+    line-height: 1;
+}
+
+body {
+    background-color: var(--base-200);
+    color: rgb(var(--base-content)) !important;
+    font-size: 0.75rem !important;
+    font-family: "Google Sans Flex", sans-serif;
+    font-variation-settings:
+        "slnt" 0,
+        "wdth" 100,
+        "GRAD" 0,
+        "ROND" 0;
+    font-optical-sizing: auto;
+    font-style: normal;
+    border-color: inherit !important;
+    max-width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Force the main content area to grow and fill available space */
+.padded-body {
+    flex: 1 0 auto;
+}
+
+/* Ensure the footer stays at the bottom */
+.footer {
+    flex-shrink: 0;
+}
+
+/* Optional: Improve the footer card appearance */
+.footer .card {
+    border-radius: 0;
+    /* Often looks better flush with the bottom */
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+}
+
+#links ul li {
+    font-size: var(--text-sm) !important;
+}
+
+ul:last-child {
+    margin-bottom: 0 !important;
+}
+
+.footer .card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.logo {
+    text-indent: -9999px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+
+    /* Existing mask logic */
+    -webkit-mask-image: var(--logo-mask);
+    mask-image: var(--logo-mask);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    /* Vital Dimensions */
+    width: 125px;
+    aspect-ratio: 6 / 1;
+
+    background-color: rgb(var(--primary-content));
+    display: inline-block;
+}
+
+.navbar {
+    background-color: rgb(var(--primary)) !important;
+}
+
+.navbar .nav-item,
+.navbar .nav-item .btn {
+    color: rgb(var(--primary-content)) !important
+}
+
+.navbar button.dropdown-toggle {
+    color: rgb(var(--primary-content)) !important;
+}
+
+/* logo needs font size 0 to be centered, as it is an SVG */
+.navbar-brand {
+    font-size: 0 !important;
+}
+
+/* optional for screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* remove default list styles */
+nav ul {
+    list-style-type: none !important;
+}
+
+/* remove default link styles */
+a:link,
+.btn-link {
+    text-decoration: none !important;
+}
+
+.card-header {
+    font-size: var(--text-base) !important;
+    font-weight: 600 !important;
+    line-height: 1.5rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* Remove bottom margin from card headers */
+.card-header * {
+    margin-bottom: 0 !important;
+}
+
+/* Remove the border from the last row of cells to prevent card overlap */
+.card .table tbody tr:last-child th,
+.card .table tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+/* Ensure the table itself doesn't have a bottom margin that creates a gap */
+/* .card .table {
+    margin-bottom: 0 !important;
+} */
+
+.card {
+    overflow: hidden !important;
+}
+
+.row:has(>div[class*="dt-layout-"]:empty) {
+    display: none !important;
+    margin-top: 0 !important;
+}
+
+.dt-layout-full {
+    padding: 0 !important;
+    margin-top: 0 !important;
+}
+
+#setlistTable_wrapper>.dt-layout-table,
+.index .dt-layout-table {
+    margin-top: 0 !important;
+}
+
+.card-message {
+    border-width: 1px !important;
+    border-style: solid !important;
+    overflow: hidden !important;
+    color: rgb(var(--base-content)) !important;
+}
+
+.card.message.info {
+    background-color: rgba(var(--info), 0.4) !important;
+    border-color: rgba(var(--info), 0.6) !important;
+}
+
+.card-header,
+.card-footer,
+.card-body,
+.card {
+    border-color: rgb(var(--border)) !important;
+    color: rgb(var(--base-content)) !important;
+}
+
+.card-header,
+.card-footer,
+.list-group-item {
+    background-color: rgb(var(--base-300)) !important;
+}
+
+.card-body,
+th,
+tr:not(.set-header) td:not(.songnum) {
+    background-color: rgb(var(--base-100)) !important;
+}
+
+td.songnum:not(:is([class*="opener"], [class*="closer"])) {
+    background-color: rgb(var(--base-100)) !important;
+}
+
+table th {
+    font-size: var(--text-sm) !important;
+}
+
+td {
+    line-height: 1rem !important;
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+}
+
+table.dataTable tbody tr:not(.album-header) td,
+tr.album-header>th {
+    font-size: var(--text-xs) !important;
+}
+
+table.dataTable td:not(.highlighted) a {
+    font-weight: 500 !important;
+    color: rgb(var(--primary-text)) !important;
+}
+
+
+[data-bs-theme="dark"] td.highlighted {
+    box-shadow: inset 0 0 100px 100px rgba(var(--border), 0.6);
+}
+
+[data-bs-theme="light"] td.highlighted {
+    box-shadow: inset 0 0 100px 100px rgba(var(--border), 0.4);
+}
+
+td.highlighted *:not(.badge) {
+    color: rgb(var(--base-content)) !important;
+}
+
+table.dataTable td:not(.songnum) {
+    font-weight: 300 !important;
+}
+
+table.dataTable tbody tr:not(.set-header) td {
+    padding-top: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+}
+
+.set-header td {
+    padding-top: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+}
+
+tr.album-header>td {
+    border-width: 0px !important;
+}
+
+/* align all cell content to middle vertically */
+td:not(.fc-day) {
+    align-items: center;
+    vertical-align: middle !important;
+}
+
+td .badge {
+    font-weight: 500 !important;
+    font-size: 0.7rem !important;
+    padding: 0.2em 0.45em 0.2em 0.45em !important;
+    border-radius: 0.5rem !important;
+}
+
+.badge-row .badge {
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    display: inline-flex;
+    vertical-align: middle;
+    padding: 0.25em 0.6em 0.25em 0.6em !important;
+    margin-top: -3px !important;
+    border-radius: 0.7rem !important;
+}
+
+td .segue,
+td .badge,
+td .check {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-top: -3px !important;
+}
+
+.segue {
+    font-size: var(--text-xl) !important;
+    font-weight: 500 !important;
+    color: rgb(var(--primary-text)) !important;
+}
+
+p {
+    margin-bottom: 0;
+}
+
+.setlist-note {
+    font-size: 0.7rem !important;
+}
+
+.card,
+.card-body {
+    overflow: scroll !important;
+}
+
+/* fix for scrolling table in card  */
+/* does this value seem odd? yes */
+/* why? because it is the absolute max width that the scrollable table can go before it affects the rest of the page */
+@media (max-width: 960px) {
+
+    .dt-scroll,
+    .dt-scroll-head,
+    .dt-scroll-body {
+        max-width: 94.5vw !important;
+    }
+}
+
+div.dt-container div.dt-layout-full> :only-child {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+div.dt-container label {
+    font-weight: normal;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.btn-group,
+.btn-group-vertical {
+    position: relative;
+    display: block;
+    /* vertical-align: middle; */
+}
+
+#dropdown-btn {
+    margin-left: 0.5em;
+    border-radius: var(--bs-btn-border-radius) !important;
+}
+
+.event-note p:empty {
+    display: none !important;
+}
+
+.event-note br:last-of-type {
+    display: none !important;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: fixed;
+    background-color: rgb(var(--base-100)) !important;
+    border-color: rgb(var(--bs-dropdown-border-color)) !important;
+    z-index: 1100 !important;
+}
+
+td.fc-day {
+    padding: 0.1rem !important;
+}
+
+.fc-event {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-wrap: wrap !important;
+    word-wrap: break-word !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+    box-shadow: inset 0 0 100px 100px rgba(4, 131, 200, 0.5);
+    background-color: rgba(4, 131, 200, 0.5) !important;
+    border-color: rgb(var(--primary)) !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+.btn:not(.btn-primary-dark):hover {
+    box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.2);
+}
+
+.badge-row .badge:hover {
+    box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
+}
+
+button:disabled {
+    border-color: none !important
+}
+
+.ui-state-active:hover,
+.ui-state-active {
+    background-color: rgba(4, 131, 200, 0.5) !important;
+    border-color: rgba(4, 131, 200, 0.5) !important;
+    color: rgb(var(--base-content)) !important;
+}
+
+.dropdown-menu:not(.dtcc-dropdown) {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-height: 250px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: rgb(var(--base-100)) !important;
+    border-radius: var(--bs-border-radius) !important;
+}
+
+.dtcc-dropdown.dropdown-menu {
+    font-size: var(--text-xs) !important;
+}
+
+.dropdown-item {
+    font-size: var(--text-sm) !important;
+    color: rgb(var(--base-content)) !important;
+    overflow: hidden !important;
+}
+
+.dropdown-menu .dropdown-item {
+    border-radius: 0 !important;
+}
+
+.dropdown-menu li:first-of-type:hover {
+    border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0 !important;
+}
+
+.dropdown-menu li:last-of-type:hover {
+    border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius) !important;
+}
+
+.progress {
+    height: 0.6rem !important;
+    border-radius: 0.2rem !important;
+    background-color: rgb(var(--base-300)) !important;
+}
+
+td:has(.album-breakdown):hover .progress {
+    background-color: rgb(var(--base-100)) !important;
+}
+
+.progress-bar {
+    border-radius: inherit !important;
+    background-color: rgb(var(--primary)) !important;
+}
+
+#albumTable tr td:empty {
+    display: none !important;
+}
+
+@media print {
+    #djDebug {
+        display: none !important;
+    }
+}
+
+button.nav-link.active,
+.dt-paging-button.page-item.active>button.page-link {
+    background-color: rgb(var(--primary)) !important;
+    border-color: rgb(var(--primary)) !important;
+}
+
+.dt-paging-button.page-item:not(.active)>button.page-link {
+    color: rgb(var(--primary)) !important;
+}
+
+button.nav-link:not(.active) {
+    font-weight: 300 !important;
+    color: rgb(var(--base-content)) !important;
+    background-color: rgba(4, 131, 200, 0.3) !important;
+}
+
+button.nav-link.active {
+    font-weight: 600 !important;
+}
+
+a.nav-link:not(.active) {
+    color: rgb(var(--base-content)) !important;
+}
+
+a:not(.nav-link, .btn):hover,
+.btn-link:hover {
+    text-decoration: underline !important;
+}
+
+a:not(.text-reset, .dropdown-item, .btn) {
+    color: rgb(var(--primary-text)) !important;
+}
+
+/* hides doubled column control buttons */
+.dt-column-header>.dtcc:nth-child(3) {
+    display: none !important;
+}
+
+table.dataTable span.dtcc span.dtcc-button-icon {
+    color: rgb(var(--base-content)) !important;
+}
+
+.set-header td {
+    background-color: #717f8e !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+.set-header span,
+.songnum {
+    font-weight: 500 !important;
+}
+
+.set-2-opener {
+    background-color: rgba(var(--secondary), 0.8) !important;
+    color: rgb(var(--secondary-content)) !important;
+}
+
+.set-1-closer,
+.main-set-closer {
+    background-color: rgba(var(--accent), 0.8) !important;
+    color: rgb(var(--accent-content)) !important;
+}
+
+.encore-opener,
+.show-closer {
+    background-color: rgba(var(--danger), 1) !important;
+    color: rgb(var(--danger-content)) !important;
+}
+
+.set-header:is(.set-1, .show) td,
+.show-opener {
+    background-color: rgba(var(--primary), 0.8) !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+.set-header.set-2 td {
+    background-color: rgb(var(--secondary), 0.8) !important;
+    color: rgb(var(--secondary-content)) !important;
+}
+
+.set-header.encore td {
+    background-color: rgb(var(--danger), 1) !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+.badge-row .btn-sm {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+
+.btn i {
+    font-weight: 700 !important;
+    display: inline-flex;
+    vertical-align: middle;
+    padding: 0 !important;
+    margin-top: -1px !important;
+    font-size: var(--text-base);
+}
+
+.nav.nav-pills.nav-fill li:not(:last-child) {
+    margin-right: 0.25rem !important;
+}

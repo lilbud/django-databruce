@@ -79,6 +79,16 @@ router.register(
     views.AdvancedEventSearch,
     basename="adv_search",
 )
+router.register(
+    r"setlist_songs",
+    views.SetlistSongsViewSet,
+    basename="setlist_songs",
+)
+router.register(
+    r"setlist_breakdown",
+    views.SetlistBreakdown,
+    basename="setlist_breakdown",
+)
 
 
 # The API URLs are now determined automatically by the router.

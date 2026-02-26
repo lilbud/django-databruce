@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
     {{ title }}
 {% endblock title %}
 {% block content %}
-    <div class="col-lg-6 text-base mx-auto">
+    <div class="col-10 text-base">
         <div class="row">
             <div class="text-2xl">
                 <a href="{% url 'index' %}">Databruce</a> &gt; Roadmap
@@ -35,11 +35,11 @@
             <p>
                 A collection of Bruce-related sites I managed to preserve/archive. Some no longer exist, and others are no longer available in their original form. As I finalize this, more details will be available.
             </p>
-            <div class="text-2xl">A Public API</div>
+            <div class="text-2xl mt-2">A Public API</div>
             <p>
                 I really don't know if/when this will happen, would have to figure out how to host it without killing my wallet in hosting fees.
             </p>
-            <div class="text-2xl">Data Improvements</div>
+            <div class="text-2xl mt-2">Data Improvements</div>
             <p>
                 I want to add more detailed data in general. Things like having Venue locations, capacity, and even possibly ticket sales per show. Would have to find a data source for the latter.
             </p>

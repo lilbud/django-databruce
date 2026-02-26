@@ -1,14 +1,16 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% load i18n %}
 {% block title %}
     {{ title }}
 {% endblock title %}
 {% block content %}
-    <div class="card col-12 col-lg-6 mx-auto">
-        <div class="card-header">{% translate "Logged Out" %}</div>
-        <div class="card-body">
-            <div class="text-xl">{% translate "You have been logged out." %}</div>
-            <a href="{% url "login" %}">{% translate "Click here to sign in again" %}</a>
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">{% translate "Logged Out" %}</div>
+            <div class="card-body">
+                <div class="text-xl">{% translate "You have been logged out." %}</div>
+                <a href="{% url "login" %}">{% translate "Click here to sign in again" %}</a>
+            </div>
         </div>
     </div>
 {% endblock content %}

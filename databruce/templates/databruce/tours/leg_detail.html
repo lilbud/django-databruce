@@ -1,14 +1,14 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   Tour Legs &gt; {{ info.name }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col">
     <div class="text-2xl mb-2">{{ info.name }}</div>
     <div class="text-xl">
       <div class="fw-semibold">Tour:</div>
       <div>
-        <a href="{% url "tour_details" id=info.tour.id %}">{{ info.tour }}</a>
+        <a href="{% url "tour_details" id=info.tour.uuid %}">{{ info.tour }}</a>
       </div>
     </div>
     <div class="card mt-3">
@@ -54,13 +54,13 @@
                 <thead>
                   <tr class="custom">
                     <th class="all">Date</th>
-                    <th class="min-tablet-l">Setlist</th>
+                    <th class="all">Setlist</th>
                     <th class="all">Band</th>
-                    <th class="min-tablet-l">Venue</th>
+                    <th class="all">Venue</th>
                     <th class="all">Location</th>
-                    <th class="min-tablet-l">Tour</th>
-                    <th class="min-tablet-l">Detail</th>
-                    <th class="min-tablet-l">Public</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
                   </tr>
                 </thead>
               </table>
@@ -73,7 +73,9 @@
                   <tr>
                     <th class="all">Plays</th>
                     <th class="all">Song</th>
-                    <th class="min-tablet-l">Category</th>
+                    <th class="all">Category</th>
+                    <th class="all">First</th>
+                    <th class="all">Last</th>
                   </tr>
                 </thead>
               </table>
@@ -85,7 +87,6 @@
                 <thead>
                   <tr>
                     <th class="text-nowrap all text-start">Event</th>
-                    <th class="text-wrap all text-start">Location</th>
                     <th class="text-nowrap all text-start showopener">Show Opener</th>
                     <th class="text-nowrap all text-start set1closer">Set 1 Closer</th>
                     <th class="text-nowrap all text-start set2opener">Set 2 Opener</th>
@@ -108,41 +109,43 @@
 
       new DataTable('#eventTable', {
         layout: layout,
-        serverSide: true,
-        processing: true,
         ajax: {
           'url': '/api/v1/events/?leg={{ info.id }}&format=custom',
         },
-        columnDefs: [
-          { targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem'},
-          { targets: [0], type: 'date'},
-          { targets: [-1], visible: false },
-        ],
+        columnDefs: event_table_defs,
         columns: event_table_columns,
       });
 
       new DataTable('#songTable', {
         layout: getDatatableLayout({category: false}),
-        serverSide: true,
-        processing: true,
+        scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/setlists?leg={{ info.id }}&format=custom',
+          'url': '/api/v1/setlist_songs/?leg={{ info.id }}&format=custom',
         },
         columns: song_table_columns,
       });
 
       new DataTable('#slotTable', {
         layout: getDatatableLayout({category: false}),
-        serverSide: true,
-        processing: true,
-        scrollX: true,
         fixedColumns: {
             start: 2
         },
         ajax: {
           'url': '/api/v1/setlist_entries/?leg={{ info.id }}&format=custom',
         },
-        columns: setlist_slots
+        columns: setlist_slots,
+        initComplete: function () {
+          console.log(this.api())
+          this.api().columns().every(function () {
+            var columnData = this.data().join(''); // Combine all cell data into one string
+
+            // Check if the combined string is empty
+            if (columnData.length === 0) {
+              // If empty, hide the column
+              this.visible(false);
+            }
+          });
+        }
       });
     })
   </script>

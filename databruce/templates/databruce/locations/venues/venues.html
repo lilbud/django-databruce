@@ -12,13 +12,13 @@
 {% block table %}
   <thead>
     <tr>
-      <th class="text-center all" scope="col">Events</th>
-      <th class="all" scope="col">Name</th>
-      <th class="min-tablet-l" scope="col">City</th>
-      <th class="min-tablet-l" scope="col">State</th>
-      <th class="min-tablet-l" scope="col">Country</th>
-      <th class="min-tablet-l" scope="col">First</th>
-      <th class="min-tablet-l" scope="col">Last</th>
+      <th class="text-center all">Events</th>
+      <th class="all">Name</th>
+      <th class="all">City</th>
+      <th class="all">State</th>
+      <th class="all">Country</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -38,14 +38,14 @@
         { 'targets': '_all', 'className': 'text-wrap', defaultContent: '' },
       ],
       columns: [
-        {'data': 'num_events', 'name': 'num_events', 'width': '1rem' },
+        {'data': 'num_events', 'name': 'num_events' },
         {
           'data': 'name',
           'name': 'name, detail',
           'width': '12rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return '<a href="/venues/' + row.id + '">'+ data +'</a>';
+            if (type === 'display' && data) {
+              return '<a href="/venues/' + row.uuid + '">'+ data +'</a>';
             }
           },
         },
@@ -56,7 +56,7 @@
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
              
-              return '<a href="/cities/' + data.id + '">'+ data.name +'</a>';
+              return '<a href="/cities/' + data.uuid + '">'+ data.name +'</a>';
               
             }
           },
@@ -67,7 +67,7 @@
           'width': '8rem',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return '<a href="/states/' + data.id + '">'+ data.name +'</a>';
+              return '<a href="/states/' + data.uuid + '">'+ data.name +'</a>';
             }
           },       
         },
@@ -76,34 +76,30 @@
           'name': 'city__country__name, city__country__alpha_2',
           'width': '10rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
+            if (type === 'display' && data) {
               if (data) {
-                return '<a href="/countries/' + data.id + '">'+ data.name +'</a>';
+                return '<a href="/countries/' + data.uuid + '">'+ data.name +'</a>';
               }
             }
           },        
         },
         {
-          'data': 'first_event.date', 
+          'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
           'width': '8rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              if (data) {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
-              }
+            if (type === 'display' && data) {
+              return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
             }
           },
         },
         {
-          'data': 'last_event.date', 
+          'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
           'width': '8rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              if (data) {
-                return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
-              }
+            if (type === 'display' && data) {
+              return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`              
             }
           },
         },

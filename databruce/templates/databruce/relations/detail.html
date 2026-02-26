@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
     </div>
@@ -13,7 +13,7 @@
           <div class="pe-2 fw-semibold text-nowrap">Appeared With:</div>
           <div>
             {% for band in bands %}
-              <a href="{% url "band_details" id=band.band.id %}">{{ band.band.name }}</a>
+              <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
               {% if not forloop.last %},{% endif %}
             {% endfor %}
           </div>
@@ -88,19 +88,6 @@
     $(document).ready(function() {
       var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
       dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
-
-      //var columns = event_table_columns;
-      //
-      //// Modify columns to append event to column data and name
-      //columns.forEach(function(col) {
-      //
-      //  if (!col.data.includes("setlist")) {
-      //    col.data = 'event.' + col.data;
-      //    col.name = col.name.split(',').map(function(name) {
-      //      return `event__${name.trim()}`;
-      //    }).join(', ');
-      //  }
-      //});
 
       new DataTable('#eventTable', {
         layout: layout,

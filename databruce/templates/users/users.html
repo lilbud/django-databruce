@@ -13,32 +13,52 @@
 {% block table %}
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Type</th>
+      <th class="all">Staff?</th>
+      <th class="all text-nowrap">Shows Seen</th>
+      <th class="all">Name</th>
+      <th class="all text-nowrap">Date Joined</th>
     </tr>
   </thead>
-  <tbody>
-    {% for user_data in users %}
-      <tr>
-        <td>
-          <a href="{% url "profile" username=user_data.username %}">{{ user_data.username }}</a>
-        </td>
-        <td>
-          {% if user_data.is_staff %}
-            Staff
-          {% else %}
-            User
-          {% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
 {% endblock table %}
 {% block scripts %}
   <script>
     $(document).ready(function () {
         new DataTable('#userTable', {
             layout: getDatatableLayout({category: false}),
+            scrollX: false,
+            ajax: {
+              'url': '/api/v1/users/?format=custom'
+            },
+            columnDefs: [
+              {'targets': '_all', 'className': 'dt-left' },
+              {'targets': [0, 1], 'width': '1rem', 'className': 'dt-center' },
+              {'targets': [0], 'columnControl': [] },
+              {'targets': [1], 'type': 'num' },
+              {'targets': [2], 'className': 'dt-left' },
+              {'targets': [-1], 'type': 'text' },
+            ],
+            columns: [
+              {
+                'data': 'is_staff',
+                'name': 'is_staff',
+                'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return data ? `<i class="bi bi-check-lg text-xl check"></i>` : '';
+                  }
+                },
+              },
+              { 'data': 'event_count', 'name': 'event_count' },
+              { 
+                'data': 'username',
+                'name': 'username',
+                'render': function (data, type, row, meta) {
+                  if (type === 'display') {
+                    return `<a href="/profile/${data}">${data}</a>`
+                  }
+                },
+              },
+              { 'data': 'date_joined', 'name': 'date_joined' },
+            ]
         })
     });
   </script>

@@ -12,22 +12,23 @@
 {% block table %}
   <thead>
     <tr>
-      <th class="all" scope="col">Events</th>
-      <th class="all" scope="col">Name</th>
-      <th class="min-tablet-l" scope="col">State</th>
-      <th class="min-tablet-l" scope="col">Country</th>
-      <th class="min-tablet-l" scope="col">First</th>
-      <th class="min-tablet-l" scope="col">Last</th>
+      <th class="all">Events</th>
+      <th class="all">Name</th>
+      <th class="all">State</th>
+      <th class="all">Country</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
     </tr>
   </thead>
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
-
+    var layout = getDatatableLayout({columns: [0,2,3,4,5], category: true});
+    dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
 
     new DataTable('#cityTable', {
-      layout: getDatatableLayout({columns: [0,2,3,4,5]}),
+      layout: layout,
       serverSide: true,
       processing: true,
       ajax: {
@@ -36,16 +37,15 @@
       columnDefs: [
         { width: '1rem', targets: [0] },
       ],
-      columns: [ // num, name, state, country, first, last
+      columns: [
         {'data': 'count', 'name': 'count'},
         {
           'data': 'name',
           'name': 'name',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return `<a href="/cities/${row.id}">${data}</a>`
+            if (type === 'display' && data) {
+              return `<a href="/cities/${row.uuid}">${data}</a>`
             }
-            return data;
           },
         },
         {
@@ -53,9 +53,8 @@
           'name': 'state__name, state__abbrev',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a href="/states/${data.id}">${data.name}</a>`
+              return `<a href="/states/${data.uuid}">${data.name}</a>`
             }
-            return data;
           },
         },
         {
@@ -63,29 +62,26 @@
           'name': 'country__name',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a href="/countries/${data.id}">${data.name}</a>`
+              return `<a href="/countries/${data.uuid}">${data.name}</a>`
             }
-            return data;
           },
         },
         {
-          'data': 'first_event.date',
-          'name': 'first_event__event_id, first_event__date, first_event__early_late',
+          'data': 'first_event',
+          'name': 'first_event__event_id, first_event__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a href="/events/${data.id}">${data.display}</a>`
+              return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
             }
-            return data;
           },
         },
         {
-          'data': 'last_event.date',
-          'name': 'last_event__event_id, last_event__date, last_event__early_late',
+          'data': 'last_event',
+          'name': 'last_event__event_id, last_event__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a href="/events/${data.id}">${data.display}</a>`
+              return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
             }
-            return data;
           },
         },
       ]

@@ -12,15 +12,15 @@
 {% block table %}
   <thead>
     <tr class="custom">
-      <th class="all" scope="col">Name</th>
-      <th class="min-tablet-l" scope="col">Lyrics</th>
-      <th class="all" scope="col">Orig. Artist</th>
-      <th class="min-tablet-l" scope="col">Category</th>
-      <th class="min-tablet-l" scope="col">First</th>
-      <th class="min-tablet-l" scope="col">Last</th>
-      <th class="min-tablet-l text-center" scope="col">Public</th>
-      <th class="min-tablet-l text-center" scope="col">Private</th>
-      <th class="min-tablet-l text-center" scope="col">Snippet</th>
+      <th class="all">Name</th>
+      <th class="all">Lyrics</th>
+      <th class="all">Orig. Artist</th>
+      <th class="all">Category</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
+      <th class="all">Public</th>
+      <th class="all">Private</th>
+      <th class="all">Snippet</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -33,28 +33,22 @@
     new DataTable('#songsTable', {
       layout: layout,
       scrollY: '60vh',
-      scrollCollapse: true,
-      scrollX: false,
       columnDefs: [
         { targets: '_all', defaultContent: '' },
-        //{ targets: [0], width: '250px' },
         { targets: [1,6,7,8], width: "1rem", className: 'text-center' },
-        { targets: [1], orderable: false },
+        { targets: [1], orderable: false, columnControl: [] },
       ],
-      scrollX: true,
-      serverSide: true,
-      processing: true,
       ajax: {
         'url': '/api/v1/songs/?format=custom',
       },
       columns: [
         {
           'data': 'name',
-          'name': 'name',
+          'name': 'sort_song_name',
           'width': '20rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-wrap" href="/songs/${row.id}">${data}</a>`
+                return `<a class="text-wrap" href="/songs/${row.uuid}">${data}</a>`
               }
           },
         },
@@ -64,7 +58,7 @@
           'type': 'boolean',
           'width': '1rem',
           'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return data ? '<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i><div class="d-inline d-md-none">True</div>' : '<div class="d-inline d-md-none">False</div>'
               }
           },
@@ -72,22 +66,22 @@
         {'data': 'original_artist', 'name': 'original_artist', 'width': '10rem' },
         {'data': 'category', 'name': 'category', 'className': 'text-wrap', 'width': '15rem'},
         {
-          'data': 'first_event.date',
+          'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
           'width': '9rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-wrap" href="/events/${data.id}">${data.display}</a>`
+                return `<a class="text-wrap" href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
           },
         },
         {
-          'data': 'last_event.date',
+          'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
           'width': '9rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-wrap" href="/events/${data.id}">${data.display}</a>`
+                return `<a class="text-wrap" href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
           },        
         },

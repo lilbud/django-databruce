@@ -11,13 +11,13 @@
 {% block table %}
   <thead>
     <tr class="header">
-      <th class="all" scope="col">Name</th>
-      <th class="all" scope="col">Band</th>
-      <th class="min-tablet-l" scope="col">First</th>
-      <th class="min-tablet-l" scope="col">Last</th>
-      <th scope="col" class="text-center min-tablet-l">Shows</th>
-      <th scope="col" class="text-center min-tablet-l">Songs</th>
-      <th scope="col" class="text-center min-tablet-l">Legs</th>
+      <th class="all">Name</th>
+      <th class="all">Band</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
+      <th class="all">Shows</th>
+      <th class="all">Songs</th>
+      <th class="all">Legs</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -26,67 +26,54 @@
   $(document).ready(function () {
     new DataTable('#tourTable', {
       layout: getDatatableLayout({columns: [1, 2, 3, 4, 5, 6]}),
-      serverSide: true,
-      processing: true,
-      scrollY: '60vh',
-      scrollCollapse: true,
       ajax: {
         'url': '/api/v1/tours/?format=custom',
       },
       columnDefs: [
-        { "defaultContent": "", "type": 'text', "targets": '_all' },
-        { targets: [4, 5, 6], width: '6rem', className: 'dt-center' },
-        { targets: [2, 3], width: '8rem', className: 'dt-left' },
-        { targets: [1], width: '12rem', className: 'dt-left' },
+        { targets: [4, 5, 6], width: '1rem', className: 'dt-center' },
+        { targets: [2, 3], width: '8rem' },
+        { targets: [1], width: '12rem' },
       ],
       columns: [
         {
           'data': 'name',
           'name': 'name',
-          'width': '10rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return '<a href="/tours/' + row.id + '">'+ row.name +'</a>';
-            } else if (type == 'filter') {
-              return 'name';
-            };
+            if (type === 'display' && data) {
+              return `<a href="/tours/${row.uuid}">${row.name}</a>`;
+            }
           },
         },
         { 
           'data': 'band',
           'name': 'band__name',
-          'width': '10rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return '<a href="/bands/' + data.id + '">'+ data.name +'</a>';
-            } else if (type == 'filter') {
-              return 'band__name';
-            };
+            if (type === 'display' && data) {
+              return `<a href="/bands/${data.uuid}">${data.name}</a>`;
+            }
           },
         },
         { 
-          'data': 'first_event.date',
+          'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
-          'width': '6rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            if (type === 'display' && data) {
+              return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`;
             }
           },          
         },
         { 
-          'data': 'last_event.date',
+          'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
-          'width': '6rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return '<a href="/events/' + data.id + '">'+ data.display +'</a>';
+            if (type === 'display' && data) {
+              return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`;
             }
           },          
         },
-        { 'data': 'num_shows', 'name': 'num_shows', 'width': '1rem' },
-        { 'data': 'num_songs', 'name': 'num_songs', 'width': '1rem'  },
-        { 'data': 'num_legs', 'name': 'num_legs', 'width': '1rem'  },
+        { 'data': 'num_shows', 'name': 'num_shows' },
+        { 'data': 'num_songs', 'name': 'num_songs'  },
+        { 'data': 'num_legs', 'name': 'num_legs'  },
       ]
     });
   });

@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col-12">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url "cities" %}">Cities</a> &gt;
       {{ info }}
@@ -51,14 +51,14 @@
               <table class="table table-hover display" id="eventTable">
                 <thead>
                   <tr class="custom">
-                    <th>Date</th>
-                    <th>Setlist</th>
-                    <th>Band</th>
-                    <th>Venue</th>
-                    <th>Location</th>
-                    <th>Tour</th>
-                    <th>Detail</th>
-                    <th>Public</th>
+                    <th class="all">Date</th>
+                    <th class="all">Setlist</th>
+                    <th class="all">Band</th>
+                    <th class="all">Venue</th>
+                    <th class="all">Location</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
                   </tr>
                 </thead>
               </table>
@@ -70,9 +70,11 @@
               <table class="table table-hover display" id="songTable">
                 <thead>
                   <tr>
-                    <th>Plays</th>
-                    <th>Song</th>
-                    <th>Category</th>
+                    <th class="all">Plays</th>
+                    <th class="all">Song</th>
+                    <th class="all">Category</th>
+                    <th class="all">First</th>
+                    <th class="all">Last</th>
                   </tr>
                 </thead>
               </table>
@@ -112,8 +114,9 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/setlists/?city={{ info.id }}&format=custom',
+          'url': '/api/v1/setlist_songs/?city={{ info.id }}&format=custom',
         },
+        columnDefs: [{ targets: [0], width: '1rem' },],
         columns: song_table_columns,
       });
     })

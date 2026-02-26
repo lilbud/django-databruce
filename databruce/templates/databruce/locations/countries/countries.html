@@ -14,8 +14,8 @@
     <tr>
       <th class="all">Events</th>
       <th class="all">Name</th>
-      <th class="min-tablet-l">First</th>
-      <th class="min-tablet-l">Last</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -32,14 +32,14 @@
         columnDefs: [
           { width: '1rem', targets: [0] },
         ],
-        columns: [ // num, name, state, country, first, last
+        columns: [
           {'data': 'count', 'name': 'count'},
           {
             'data': 'name',
             'name': 'name',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/countries/' + row.id + '">'+ row.name +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/countries/${row.uuid}">${row.name}</a>`;
               }
             },
           },
@@ -48,7 +48,7 @@
             'name': 'first_event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return '<a href="/events/' + row.event_id  + '">'+ data.date.display_day +'</a>';
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
             },
           },
@@ -57,7 +57,7 @@
             'name': 'last_event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return '<a href="/events/' + row.event_id + '">'+ data.date.display_day +'</a>';
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
             },
           },

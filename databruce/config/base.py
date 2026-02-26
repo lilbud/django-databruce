@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "shortener",
+    "django_extensions",
 ]
 
 SITE_ID = 1
@@ -80,6 +81,7 @@ if not TESTING:
         "debug_toolbar.middleware.DebugToolbarMiddleware",
         *MIDDLEWARE,
     ]
+
 
 ROOT_URLCONF = "databruce.urls"
 
@@ -163,8 +165,8 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
-        "api.filters.DataTablesFilterBackend",
         "rest_framework.filters.SearchFilter",
+        "api.filters.DataTablesFilterBackend",
         "rest_framework.filters.OrderingFilter",
     ],
     "PAGE_SIZE": 100,
@@ -178,7 +180,10 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
+SESSION_EXEXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+
 try:
-    from .local_settings import *  # noqa: F403
+    from .local import *  # noqa: F403
 except (ImportError, ModuleNotFoundError):
-    from .prod_settings import *  # noqa: F403
+    from .prod import *  # noqa: F403

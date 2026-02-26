@@ -1,131 +1,89 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/wide_layout.html" %}
+{% load i18n static tz %}
 {% block title %}
   {{ title }}
 {% endblock title %}
-{% load static %}
 {% block extrajs %}
 {% endblock extrajs %}
 {% block content %}
-  <div class="row mb-3">
-    <div class="col">
+  <div class="col">
+    <div class="row mb-3">
       <div class="text-3xl">Welcome to Databruce!</div>
       <div class="text-base">A Bruce Springsteen concert database</div>
     </div>
-  </div>
-  {% if not user.is_authenticated %}
-    <div class="row my-3">
+    {% if not user.is_authenticated %}
+      <div class="row my-3">
+        <div class="col">
+          <a href="{% url "login" %}"
+             type="button"
+             role="button"
+             class="btn btn-primary">Login</a>
+          <a href="{% url "signup" %}"
+             type="button"
+             role="button"
+             class="btn btn-primary">Create Account</a>
+        </div>
+      </div>
+    {% endif %}
+    <div class="row row-cols-1 row-cols-lg-3 gx-3 row-gap-3">
       <div class="col">
-        <a href="{% url "login" %}"
-           type="button"
-           role="button"
-           class="btn btn-primary">Login</a>
-        <a href="{% url "signup" %}"
-           type="button"
-           role="button"
-           class="btn btn-primary">Create Account</a>
-      </div>
-    </div>
-  {% endif %}
-  <div class="row mb-4">
-    <div class="col-12 col-md-6 col-lg-4 ps-2 pe-1">
-      <div class="card mb-2">
-        <div class="card-body p-0">
-          <img class="img-fluid card-img-top object-fit-cover"
-               id="headimg"
-               src="{% static 'databruce/img/header.webp' %}"
-               alt=""
-               height="1280"
-               width="auto">
-        </div>
-        <div class="card-footer">
-          <span class="text-base">San Siro - July 3, 2025</span>
-          <span class="text-sm">(photo by <a class="text-reset"href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)</span>
-        </div>
-      </div>
-      <div class="card mb-3 mb-lg-0 d-none d-lg-block">
-        <div class="card-header">
-          <span class="text-base">Recent Site Updates</span>
-          <span class="text-sm">(<a class="text-reset" href="{% url 'updates' %}">see more</a>)</span>
-        </div>
-        <div class="card-body px-3">
-          <ul class="mb-0 ps-4 text-sm">
-            {% load tz %}
-            {% timezone "America/New_York" %}
-            {% for item in updates %}
-              <li>
-                {{ item.description }}
-                ({{ item.created_at|date:'m/d' }})
-              </li>
-            {% endfor %}
-          {% endtimezone %}
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-6 col-lg-4 px-1">
-    <div class="card mb-2 mb-lg-0">
-      <div class="card-header">Featured Show</div>
-      <div class="card-body p-0">
-        {% with first=latest_event %}
-          <div class="text-sm px-2 pt-2 pb-0">{{ first.title|default_if_none:"" }}</div>
-          <div class="px-2 py-2">
-            <div class="row">
-              <a class="fw-medium text-sm text-reset"
-                 href="{% url "event_details" id=first.event_id %}">{{ first.get_date }} - {{ first.venue }}, {{ first.venue.city }}</a>
-            </div>
-            <div class="row">
-              <a class="text-reset text-sm"
-                 href="{% url 'band_details' id=first.artist.id %}">{{ first.artist.name }}</a>
-            </div>
-          {% endwith %}
-        </div>
-        {% if latest_event %}
-          <div class="table-responsive">
-            <table class="table table-hover display" id="setlistTable">
-              <thead>
-                <tr>
-                  <th class="songnum text-xs">#</th>
-                  <th>Song</th>
-                </tr>
-              </thead>
-            </table>
+        <div class="card mb-3">
+          <div class="card-body p-0">
+            <img class="img-fluid card-img-top object-fit-cover"
+                 id="headimg"
+                 src="{% static 'databruce/img/header.webp' %}"
+                 alt=""
+                 height="640"
+                 width="auto">
           </div>
-        {% else %}
-          <div class="text-base ms-2">No Set Details Available</div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-6 col-lg-4 ps-1 pe-2">
-    <div class="row row-cols-1 row-cols-md-1 g-3 mb-2">
-      <div class="col mb-2">
+          <div class="card-footer">
+            <span class="text-base">San Siro - July 3, 2025</span>
+            <span class="text-sm">(photo by <a class="text-reset"href="https://www.instagram.com/giovanni.canitano/">Giovanni Canitano</a>)</span>
+          </div>
+        </div>
         <div class="card">
-          <div class="card-header">Recent Events</div>
+          <div class="card-header">
+            Recent Site updates
+            <a role="button"
+               class="btn btn-sm btn-primary px-1 py-0"
+               href="{% url 'updates' %}">See More</a>
+          </div>
           <div class="card-body p-0">
             <div class="table-responsive index">
-              <table class="table table-hover display" id="recentTable">
+              <table class="table table-hover display wrap" id="updateTable">
                 <thead>
-                  <tr>
-                    <th class="all">Date</th>
-                    <th class="all">Location</th>
-                  </tr>
+                  <th class="all">Date</th>
+                  <th class="all">Description</th>
                 </thead>
               </table>
             </div>
           </div>
         </div>
       </div>
-      {% comment %} {% if upcoming %}
-        <div class="col mt-0">
-          <div class="card">
-            <div class="card-header">Upcoming Events</div>
-            <div class="card-body p-0">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">Setlist</div>
+          <div class="card-body p-0">
+            <div class="col">
+              {% with latest=latest_event %}
+                <div class="px-2 pt-2 pb-0">{{ latest.title }}</div>
+                <div class="p-2 pb-1">
+                  <div class="col">
+                    <a class="fw-medium text-sm"
+                       href="{% url "event_details" id=latest.event_id %}">{{ latest.get_date }} - {{ latest.venue.venues_text.formatted }}</a>
+                  </div>
+                  <div class="col">
+                    <a class="text-reset text-sm"
+                       href="{% url 'band_details' id=latest.artist.uuid %}">{{ latest.artist.name }}</a>
+                  </div>
+                </div>
+              {% endwith %}
               <div class="table-responsive index">
-                <table class="table table-hover display" id="upcomingTable">
+                <table class="table table-hover display" id="setlistTable">
                   <thead>
                     <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Location</th>
+                      <th class="all">#</th>
+                      <th class="all">Song</th>
                     </tr>
                   </thead>
                 </table>
@@ -133,44 +91,106 @@
             </div>
           </div>
         </div>
-      {% endif %} {% endcomment %}
-      <div class="col m-0">
-        <div class="card mt-0">
-          <div class="card-header">
-            <span class="text-base">On This Day</span>
-            <span class="text-sm">(<a class="text-reset"
-   href="{% url 'adv_search_results' %}?month={{ date|date:"n" }}&day={{ date|date:"j" }}">see more</a>)
-            </span>
+      </div>
+      <div class="col">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 gx-3">
+          <div class="col">
+            <div class="card mb-3">
+              <div class="card-header">Latest</div>
+              <div class="card-body p-0">
+                <div class="table-responsive index">
+                  <table class="table table-hover display" id="recentTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Date</th>
+                        <th class="all">Location</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-body p-0">
-            <div class="table-responsive index">
-              <table class="table table-hover display" id="otdTable">
-                <thead>
-                  <tr>
-                    <th class="all">Date</th>
-                    <th class="all">Location</th>
-                  </tr>
-                </thead>
-              </table>
+          <div class="col">
+            <div class="card">
+              <div class="card-header">
+                On This Day
+                <a role="button"
+                   class="btn btn-sm btn-primary px-1 py-0"
+                   href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive index">
+                  <table class="table table-hover display" id="otdTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Date</th>
+                        <th class="all">Location</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<script>
+  <script>
     var layout = getDatatableLayout({columns: false, category: false});
-    layout.topStart = 'pageLength';
+    {% comment %} layout.topStart = 'pageLength'; {% endcomment %}
 
     $(document).ready(function () {
+      new DataTable('#updateTable', {
+        layout: layout,
+        searching: false,
+        paging: false,
+        info: false,
+        ordering: false,
+        scrollX: false,
+        columnDefs: [
+          {'targets': '_all', columnControl: [] }
+        ],
+        ajax: {
+          'url': '/api/v1/updates/?format=custom&limit=10',
+        },
+        columns: [
+          {
+            'data': 'created_at',
+            'name': 'created_at',
+            'render': function (data, type, row, meta) {
+              return `<span>${data}</span>`
+            }
+          },
+          { 
+            'data': 'msg',
+            'name': 'msg',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                if (row.view) {
+                  return `<span>${data} <a class='fw-medium text-primary' href='/${row.view}/${row.item_id}'>${row.value}</a></span>`
+                }
+
+                return data
+              }
+            },
+          }
+        ]
+      })
+
       new DataTable('#otdTable', {
           layout: layout,
           searching: false,
           paging: false,
+          info: false,
           ordering: false,
-          serverSide: true,
+          scrollX: false,
           processing: false,
+          columnDefs: [
+            {'targets': '_all', columnControl: [] },
+            {'target': 0, width: '10rem' }
+          ],
           ajax: {
             'url': '/api/v1/events/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&limit=5&format=custom',
           },
@@ -178,11 +198,9 @@
             {
               'data': 'date',
               'name': 'id',
-              'width': '8rem',
               'render': function (data, type, row, meta) {
-                console.log(row)
-                if (type === 'display') {
-                  return `<a class="fw-medium" href="/events/${row.event_id}">${data.display}</a>`;
+                if (type === 'display' && data) {
+                  return `<a href="/events/${row.event_id}">${data.display}</a>`;
                 }
               },
             },
@@ -190,8 +208,8 @@
               'data': 'venue',
               'name': 'venue__name',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
+                if (type === 'display' && data) {
+                  return `<a href="/venues/${data.uuid}">${data.name}</a>`;
                 }
               },
             },
@@ -202,20 +220,23 @@
           layout: layout,
           searching: false,
           paging: false,
+          info: false,
           ordering: false,
-          serverSide: true,
-          processing: false,
+          scrollX: false,
           ajax: {
-            'url': '/api/v1/events/?recent=true&limit=5&format=custom',
+            'url': '/api/v1/events/?ordering=-event_id&limit=5&format=custom&latest=true',
           },
+          columnDefs: [
+            {'targets': '_all', columnControl: [] },
+            {'target': 0, width: '10rem' }
+          ],
           columns: [
             {
               'data': 'date',
               'name': 'id',
-              'width': '8rem',
               'render': function (data, type, row, meta) {
-                if (type === 'display') {
-                  return `<a class="fw-medium" href="/events/${row.event_id}">${data.display}</a>`;
+                if (type === 'display' && data) {
+                  return `<a href="/events/${row.event_id}">${data.display}</a>`;
                 }
               },
             },
@@ -223,80 +244,96 @@
               'data': 'venue',
               'name': 'venue__name, venue__detail',
               'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return '<a href="/venues/' + data.id + '">'+ data.formatted +'</a>';
+                  if (type === 'display' && data) {
+                    return `<a href="/venues/${data.uuid}">${data.name}</a>`;
                   }
               },
             },
           ],
-          columnDefs: [{ targets: [0], width: '6rem', type: 'text' },],
       });
 
-      new DataTable('#setlistTable', {
+      new DataTable('#setlistTable',
+      {
         layout: layout,
+        responsive: true,
+        scrollX: false,
         paging: false,
-        searching: false,
         ordering: false,
-        processing: false,
-        ajax: {
-          'url': '/api/v1/setlists/?event={{ latest_event.event_id }}&format=custom&song_num=true',
-        },
+        info: false,
+        searching: false,
         columnDefs: [
-          { targets: '_all', defaultContent: '', className: 'align-middle text-sm' },
-          { targets: [0], type: 'text', className: 'songnum align-middle p-0', width: '1rem' },
+          {'targets': '_all', columnControl: [] }
         ],
-        serverSide: true,
-        processing: true,
+        ajax: '/api/v1/setlists/?event={{ latest_event.event_id }}&format=custom&show_only=true',
         rowGroup: {
-            dataSrc: 'set_name',
-            className: 'text-center setHeader',
+          dataSrc: 'set_name',
+          className: 'text-center set-header p-0 dtrg-group',
+          startRender: function(rows, group) {
+            const g = `<span>${group}</span>`;
+            const td = `<td colspan="${rows.columns().count()}" class="py-0">${g}</td>`;
+            return $('<tr />').addClass(slugify(group)).append(td);
+          }
         },
         columns: [
           {
             'data': 'song_num',
-            'className': 'dt-center all songnum align-middle p-0',
-            //'width': '1rem',
+            'className': 'dt-center',
+            'width': '38px',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && row.position) {
-                var position = row.position.replaceAll(' ', '').toLowerCase();
-
-                return `<span data-bs-toggle="tooltip" data-bs-title="${row.position}" class='songnum ${position}'>${data}</span>`
-              } else if (!data) {
-                return ''
-              } else {
-                return `<span class='songnum'>${data}</span>`
+              if (type === 'display' && data) {
+                return data;
               }
+            },
+            'createdCell': function(td, cellData, rowData, row, col) {
+              $(td).addClass('songnum');
+
+              if (rowData.position) {
+                var position = slugify(rowData.position);
+                $(td).addClass(position).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
+              }
+
+              return td;
             },
           },
           {
             'data': 'song',
             'name': 'song__name',
-            'className': 'all align-middle text-xs',
+            'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a class="fw-medium  align-middle" href="/songs/' + data.id + '">'+ data.name +'</a>';
+              if (type === 'display' && data) {
+                var song = `<a class="fw-medium text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
+
+                var segue = row.segue ? $('<span />').addClass('segue text-xl').text('>').prop('outerHTML') : ''
+
+                song = `${song} ${segue}`;
+
+                var badge = $('<span />').addClass('ms-2 badge d-inline-flex')
+
+                if (row.instrumental) {
+                  $(badge).addClass('text-bg-info').text('Instrumental');
+                } else if (row.sign_request) {
+                  $(badge).addClass('text-bg-info').text('Sign Request');
+                } else if (row.nobruce) {
+                  $(badge).addClass('bg-warning').text('No Bruce');
+                } else if (row.premiere) {
+                  $(badge).addClass('bg-secondary').text('First');
+                } else if (row.debut && !row.premiere) {
+                  $(badge).addClass('bg-secondary').text('TD');
+                } else if (row.last >= 50 && !row.debut) {
+                  $(badge).addClass('bg-secondary').text('Bust');
+                }
+
+                if (row.notes) {
+                  var notes = $('<span />').addClass('text-xs text-wrap fw-light setlist-note').text(row.notes.join('; '))
+                  return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes.prop('outerHTML') : song
+                }
+
+                return badge ? song + $(badge).prop('outerHTML') : song;
               }
             },
-            },
-          ],
-          initComplete: function(settings, json) {
-            var dt = this.api();
-
-            $('.setHeader').each(function() {
-              var row = $(this).children('th');
-              var name = $(row).text().replaceAll(' ', '').toLowerCase();
-              $(row).addClass(name).addClass('setHeader');
-            });
-
-            $('span.songnum').each(function() {
-              var cell = this.closest('td')
-              $(cell).addClass(this.className).text($(this).text());
-
-              $(cell).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', this.getAttribute('data-bs-title'))
-              $(cell).tooltip();
-            });
-          }
-      });
+          },
+        ],
+      })
     })
-</script>
+  </script>
 {% endblock content %}

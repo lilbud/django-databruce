@@ -1,20 +1,34 @@
 import datetime
 
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.aggregates import ArrayAgg, JSONBAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import (
+    Count,
+    DecimalField,
     Exists,
+    ExpressionWrapper,
     F,
+    FloatField,
+    IntegerField,
+    JSONField,
+    Max,
+    Min,
     OuterRef,
     PositiveIntegerField,
     Prefetch,
+    Q,
+    StringAgg,
     Subquery,
+    Value,
+    Window,
 )
 from django.db.models.functions import JSONObject
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
-from rest_framework import permissions, viewsets
+from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from api import filters, serializers
 from databruce import models
@@ -27,7 +41,9 @@ VALID_SET_NAMES = [
     "Encore",
     "Pre-Show",
     "Post-Show",
+    "Rehearsal",
 ]
+date = datetime.datetime.now(tz=datetime.timezone.utc).date()
 
 
 class SubqueryCount(Subquery):
@@ -40,7 +56,7 @@ class SubqueryCount(Subquery):
 class ArchiveViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.ArchiveLinks.objects.all()
+    queryset = models.ArchiveLinks.objects.all().select_related("event")
     serializer_class = serializers.ArchiveLinksSerializer
     filterset_class = filters.ArchiveFilter
 
@@ -136,12 +152,24 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             prev_song=Subquery(
                 setlist.filter(song_num__lt=OuterRef("song_num"))
                 .order_by("-song_num", "-event")
-                .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                .values(
+                    json=JSONObject(
+                        id="song__id",
+                        name="song__name",
+                        uuid="song__uuid",
+                    ),
+                )[:1],
             ),
             next_song=Subquery(
                 setlist.filter(song_num__gt=OuterRef("song_num"))
                 .order_by("event", "song_num")
-                .values(json=JSONObject(id="song__id", name="song__name"))[:1],
+                .values(
+                    json=JSONObject(
+                        id="song__id",
+                        name="song__name",
+                        uuid="song__uuid",
+                    ),
+                )[:1],
             ),
         )
         .order_by("event__event_id", F("song_num").asc(nulls_first=True))
@@ -196,11 +224,9 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Venues.objects.all()
         .select_related(
-            "first_event",
-            "last_event",
             "city",
         )
-        .prefetch_related("city__state", "city__country")
+        .prefetch_related("city__state", "city__country", "first_event", "last_event")
         .order_by("name")
     )
 
@@ -302,40 +328,37 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
     def get_queryset(self):
-        params = parser.parse(self.request.GET.urlencode())
+        params = self.request.query_params
 
         onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
             "band",
         )
 
-        queryset = (
-            models.Events.objects.all()
-            .select_related(
+        qs = (
+            models.Events.objects.select_related(
                 "venue",
+                "venue__city",
                 "artist",
                 "tour",
-                "venue__city",
                 "venue__city__country",
-            )
-            .prefetch_related(
+                "venue__venues_text",
+            ).prefetch_related(
                 "run",
                 "venue__city__state",
                 "leg",
                 Prefetch("onstage", queryset=onstage_qs),
+                "user_event",
             )
         ).order_by("event_id")
 
-        try:
-            if params["recent"]:
-                queryset = queryset.order_by("-event_id")
-        except KeyError:
-            pass
+        if params.get("latest"):
+            return qs.filter(date__lt=date)
 
-        return queryset
+        return qs
 
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
-    ordering = ["event_id"]  # Default ordering
+    ordering_fields = ["event_id"]
 
 
 class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
@@ -460,33 +483,34 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
             "event",
             "song",
         )
-        .prefetch_related("ltp")
+        .prefetch_related("ltp", "setlist_notes")
         .order_by("event", F("song_num").asc(nulls_first=True))
+        .annotate(
+            count=Count("song__category"),
+        )
     )
 
     serializer_class = serializers.SetlistSerializer
     filterset_class = filters.SetlistFilter
+    ordering_fields = ["event", "song_num", "song__category", "song__name"]
 
 
 class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.SetlistEntries.objects.all()
-        .select_related("event")
-        .order_by("event")
-        .prefetch_related(
+        .select_related(
+            "event",
             "event__venue",
             "event__venue__city",
+            "event__venue__venues_text",
+        )
+        .order_by("event__event_id")
+        .prefetch_related(
             "event__venue__city__state",
             "event__venue__city__country",
             "event__tour",
             "event__leg",
             "event__run",
-            "show_opener",
-            "s1_closer",
-            "s2_opener",
-            "main_closer",
-            "encore_opener",
-            "show_closer",
         )
     )
 
@@ -494,13 +518,46 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.SetlistEntryFilter
 
 
+class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        queryset = (
+            models.Setlists.objects.filter(set_name__in=VALID_SET_NAMES)
+            .select_related("song", "event")
+            .all()
+        )
+
+        queryset = queryset.values("song_id").annotate(
+            count=Count("id"),
+            first_event=Min("event__event_id"),
+            last_event=Max("event__event_id"),
+        )
+
+        return self.filter_queryset(queryset)
+
+    serializer_class = serializers.SetlistSongsSerializer
+    filterset_class = filters.SetlistSongsFilter
+    ordering_fields = ["count"]
+
+
 class SnippetViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.Snippets.objects.all().select_related(
-        "snippet",
-        "setlist",
-        "setlist__song",
+    queryset = (
+        models.Snippets.objects.all()
+        .select_related(
+            "snippet",
+            "setlist",
+            "setlist__song",
+            "setlist__event",
+            "setlist__event__artist",
+            "setlist__event__venue",
+            "setlist__event__venue__city",
+            "setlist__event__venue__venues_text",
+        )
+        .prefetch_related(
+            "setlist__event__venue__city__state",
+            "setlist__event__venue__city__country",
+        )
     )
 
     serializer_class = serializers.SnippetSerializer
@@ -539,7 +596,7 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
                 Subquery(models.Lyrics.objects.filter(song=OuterRef("id"))),
             ),
         )
-    )
+    ).order_by("sort_song_name")
 
     serializer_class = serializers.SongsSerializer
     filterset_class = filters.SongsFilter
@@ -652,7 +709,18 @@ class UpdatesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UsersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = UserModel.objects.all()
+    queryset = (
+        UserModel.objects.filter(is_active=True)
+        .prefetch_related(
+            "user_attended_shows",
+        )
+        .annotate(
+            event_count=Count(
+                "user_attended_shows__event",
+            ),
+        )
+    )
+
     serializer_class = serializers.UsersSerializer
 
 
@@ -672,7 +740,71 @@ class UsersAttendedShowsViewSet(viewsets.ReadOnlyModelViewSet):
                 "event__venue__city__state",
                 "event__venue__city__country",
             )
-        )
+        ).order_by("-event__event_id")
 
     serializer_class = serializers.UserAttendedShowsSerializer
     filterset_class = filters.UserAttendedShowsFilter
+
+
+class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        event = self.request.query_params.get("event")
+
+        songs_in_setlist = (
+            models.Songs.objects.prefetch_related(
+                "album",
+                "album__release_tracks",
+                "album__release_tracks__song",
+            )
+            .filter(
+                Q(
+                    Q(setlists__event__event_id=event)
+                    & Q(setlists__set_name__in=VALID_SET_NAMES),
+                    # & Q(setlists__event__public=True),
+                ),
+            )
+            .order_by("setlists__song_num")
+        )
+
+        album_song_count = (
+            models.ReleaseTracks.objects.filter(
+                release__songs__category=OuterRef("category"),
+                release__songs__setlists__event__event_id=event,
+                release__songs__setlists__set_name__in=VALID_SET_NAMES,
+            )
+            .values("song_id")
+            .distinct("song_id")
+            .order_by("song_id")
+        )
+
+        breakdown_qs = (
+            songs_in_setlist.values("category")
+            .annotate(num=Count("id"))
+            .order_by("-num")
+        )
+
+        songs = (
+            songs_in_setlist.filter(category=OuterRef("category"))
+            .order_by("setlists__song_num")
+            .values(
+                "id",
+            )
+        )
+
+        song_count = songs_in_setlist.count()
+        album_max = breakdown_qs.aggregate(max_val=Max("num"))["max_val"] or 1
+
+        # 4. Final Annotation
+        return breakdown_qs.annotate(
+            max_val=Value(album_max),
+            percent=ExpressionWrapper(
+                (F("num") * 100) / song_count,
+                output_field=DecimalField(max_digits=20, decimal_places=15),
+            ),
+            total=Value(song_count),
+            songs=ArraySubquery(songs),
+            album_songs=ArraySubquery(album_song_count),
+        )
+
+    serializer_class = serializers.SetlistBreakdownSerializer
+    ordering = ["category", "max_val", "percent", "num"]

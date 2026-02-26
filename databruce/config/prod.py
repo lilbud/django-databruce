@@ -20,6 +20,7 @@ load_dotenv()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+
 ALLOWED_HOSTS = [
     "142.93.200.133",
     "databruce.com",

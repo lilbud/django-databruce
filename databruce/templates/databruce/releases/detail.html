@@ -1,9 +1,9 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  {{ title }} &gt; {{ info.name }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
+  <div class="col">
     <div class="text-2xl text-nowrap mb-2">{{ info.name }}</div>
     <div class="text-lg mb-2 d-grid gap-0 row-gap-1">
       {% if info.note %}
@@ -61,11 +61,11 @@
               <table class="table table-hover display" id="tracksTable">
                 <thead>
                   <tr class="header">
-                    <th class="all" scope="col">Track</th>
-                    <th class="all" scope="col">Song</th>
-                    <th class="all" scope="col">Length</th>
-                    <th class="min-tablet-l" scope="col">Event Date</th>
-                    <th class="min-tablet-l" scope="col">Note</th>
+                    <th class="all">Track</th>
+                    <th class="all">Song</th>
+                    <th class="all">Length</th>
+                    <th class="all">Event Date</th>
+                    <th class="all">Note</th>
                   </tr>
                 </thead>
               </table>
@@ -88,15 +88,10 @@
   $(document).ready(function () {
     new DataTable('#tracksTable', {
       layout: getDatatableLayout({columns: false, category: false}),
-      ordering: true,
-      serverSide: true,
-      processing: true,
-      scrollX: false,
       ajax: '/api/v1/release_tracks/?release={{ info.id }}&format=custom',
       rowGroup: {
         emptyDataGroup: '',
         dataSrc: function(row) {
-
           if (row.discnum && !row.disc) {
             return `Disc ${row.discnum}`;
           } else if (row.disc) {
@@ -106,42 +101,39 @@
             
             return `Disc ${row.discnum}`;
           }
-
         },
-        className: 'setHeader bg-secondary text-center'
+        className: 'text-center set-header p-0',
+        startRender: function(rows, group) {
+          var th = $('<td />').attr('colspan', '6').text(group).addClass('py-0');
+          return $('<tr />').append($(th))
+        }
       },
       columnDefs: [
-        { orderSequence: ['desc', 'asc', ''], targets: '_all', type: 'text' },
-        { targets: [0], type: 'text', className: 'songnum align-middle text-center p-0 text-sm', width: '30px' },
-        { targets: [1], type: 'text', width: '300px' },
-
+        { targets: [0], type: 'text', width: '30px', columnControl: [], className: 'dt-center' },
       ],
       columns: [
-        {'data': 'track', 'name': 'track' },
+        {'data': 'track', 'name': 'track', 'searchable': 'false' },
         {
           'data': 'song',
-          'name': 'song',
+          'name': 'song__sort_song_name',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a class="fw-medium text-sm" href="/songs/${data.id}">${data.name}</a>`;
+              return `<a href="/songs/${data.uuid}">${data.name}</a>`;
             }
           },
         },
-        {'data': 'length', 'name': 'length' },
+        {'data': 'length', 'name': 'length', 'searchable': 'false' },
         {
-          'data': 'event.date',
-          'name': 'event',
+          'data': 'event',
+          'name': 'event__event_id', 'searchable': 'false',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return data ? `<a class="fw-medium" href="/events/${data.id}">${data.display}</a>` : '';
+            if (type === 'display' && data) {
+              return data ? `<a href="/events/${data.event_id}">${data.date.display}</a>` : '';
             }
           },
         },
         {'data': 'note', 'name': 'note' },
       ],
-      initComplete: function(){
-        $('tr.setHeader > th:empty').remove();
-      }
     });
   });
   </script>

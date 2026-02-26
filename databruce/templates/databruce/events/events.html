@@ -1,58 +1,54 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
-{% block extrajs %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.19.0/clusterize.min.js"
-          integrity="sha512-sCslfbDbPoJepZJxo6S3mdJwYYt0SX+C9G1SYez6/yGuXcPrZXM9tqZQMpujvMZlujVve98JSzimWbYAlQzvFQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"></script>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.19.0/clusterize.min.css"
-        integrity="sha512-8KLHxyeJ2I3BzL2ma1RZxwT1cc/U5Rz/uJg+G25tCrQ8sFfPz3MfJdKZegZDPijTxK2A3+b4kAXvzyK/OLLU5A=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer" />
-{% endblock extrajs %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
-    <div class="d-flex justify-content-start mb-3">
-      <div class="text-2xl pe-2">Events</div>
-      <div id="year-select" class="pe-2">
-        <button class="btn btn-sm btn-primary dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">{{ year }}</button>
-        <ul class="dropdown-menu">
-          {% for i in years %}
-            <li>
-              <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
-            </li>
-          {% endfor %}
-        </ul>
+  <div class="col-12">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-start mb-3">
+          <div class="text-2xl pe-2">Events</div>
+          <div id="year-select" class="pe-2">
+            <button class="btn btn-sm btn-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ year }}</button>
+            <ul class="dropdown-menu">
+              {% for i in years %}
+                <li>
+                  <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-body px-0">
-        <div class="table-responsive">
-          <table class="table table-hover display nowrap" id="eventTable">
-            <thead>
-              <tr class="custom">
-                <th class="all">Date</th>
-                <th class="min-tablet-l">Setlist</th>
-                <th class="all">Band</th>
-                <th class="min-tablet-l">Venue</th>
-                <th class="all">Location</th>
-                <th class="min-tablet-l">Tour</th>
-                <th class="min-tablet-l">Detail</th>
-                <th class="min-tablet-l">Public</th>
-              </tr>
-            </thead>
-          </table>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body px-0">
+            <div class="table-responsive">
+              <table class="table table-hover display nowrap" id="eventTable">
+                <thead>
+                  <tr>
+                    <th class="all">Date</th>
+                    <th class="all">Setlist</th>
+                    <th class="all">Band</th>
+                    <th class="all">Venue</th>
+                    <th class="all">Location</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  {% comment %} <script>{% include "./test.js" %}</script> {% endcomment %}
   <script>
   $(document).ready(function () {
     var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
@@ -60,18 +56,11 @@
   
     var table = new DataTable('#eventTable', {
       layout: layout,
-      serverSide: true,
       scrollY: '60vh',
-      //scrollX: true,
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=custom',
       },
-      columnDefs: [
-        { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', type:'boolean'},
-        { targets: [0], type: 'date', className: 'all text-wrap text-xs'},
-        { targets: [1,2,3,4,5,6,7], className: 'text-wrap text-xs min-tablet-l' },
-        { targets: [-1], visible: false },
-      ],
+      columnDefs: event_table_defs,
       columns: event_table_columns,
     });
 

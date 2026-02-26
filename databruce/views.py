@@ -14,12 +14,12 @@ from django.contrib.auth.tokens import (
     default_token_generator,
 )
 from django.contrib.auth.views import LoginView
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import send_mail
 from django.db.models import (
-    Case,
     Count,
     ExpressionWrapper,
     F,
@@ -28,14 +28,11 @@ from django.db.models import (
     Min,
     OuterRef,
     PositiveIntegerField,
-    Prefetch,
     Q,
     Subquery,
     Value,
-    When,
     Window,
 )
-from django.db.models.functions import JSONObject, Lag, Lead
 from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -48,13 +45,12 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import TemplateView
 from django_filters.filterset import filterset_factory
-from django_filters.views import FilterView
 from shortener import shortener
 
-from api.filters import AdvancedEventSearchFilter, EventsFilter
-from databruce import models, settings
+from databruce import models
+from databruce.config import base
 from databruce.forms import (
     AdvancedEventSearch,
     ContactForm,
@@ -64,8 +60,7 @@ from databruce.forms import (
     UpdateUserForm,
     UserForm,
 )
-
-from .templatetags.filters import format_fuzzy
+from databruce.templatetags.filters import format_fuzzy
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -85,40 +80,7 @@ class Test(TemplateView):
     template_name = "databruce/test.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-
-        onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
-            "band",
-        )
-
-        queryset = (
-            models.Events.objects.all()
-            .select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__city",
-                "venue__city__country",
-            )
-            .prefetch_related(
-                "run",
-                "venue__city__state",
-                "leg",
-                Prefetch("onstage", queryset=onstage_qs),
-            )
-        ).order_by("event_id")
-
-        if not self.request.GET:
-            context["filter"] = AdvancedEventSearchFilter()
-            context["results"] = None
-        else:
-            context["filter"] = AdvancedEventSearchFilter(
-                self.request.GET,
-                queryset=queryset,
-            )
-            context["results"] = context["filter"].qs
-
-        return context
+        return super().get_context_data(**kwargs)
 
 
 class PageTitleMixin:
@@ -137,27 +99,20 @@ class Index(PageTitleMixin, TemplateView):
     template_name = "databruce/index.html"
     title = "Home"
 
-    queryset = (
-        models.Events.objects.all()
-        .select_related("venue", "artist", "venue__city", "venue__city__country")
-        .prefetch_related("venue__city__state")
-    )
-
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["updates"] = models.SiteUpdates.objects.all().order_by("-created_at")[
-            :10
-        ]
-
         context["latest_event"] = (
-            models.Events.objects.select_related(
+            models.Events.objects.filter(date__lt=datetime.datetime.today())
+            .select_related(
                 "artist",
                 "venue",
                 "venue__city",
+                "venue__venues_text",
             )
             .prefetch_related("venue__city__state")
-            .get(event_id="20260117-01")
+            .order_by("-event_id")
+            .first()
         )
 
         return context
@@ -193,11 +148,6 @@ class Links(PageTitleMixin, TemplateView):
     title = "Links"
 
 
-# class Test(PageTitleMixin, TemplateView):
-#     template_name = "databruce/test.html"
-#     title = "Test"
-
-
 class Calendar(PageTitleMixin, TemplateView):
     template_name = "databruce/calendar.html"
     title = "Event Calendar"
@@ -206,6 +156,8 @@ class Calendar(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["years"] = list(range(context["date"].year, 1964, -1))
+
+        context["end_date"] = f"{context['date'].year}-12-31"
 
         try:
             if re.search(
@@ -240,82 +192,75 @@ class UserProfile(PageTitleMixin, TemplateView):
             username__iexact=self.kwargs["username"],
         )
 
-        context["user_shows"] = (
-            models.UserAttendedShows.objects.filter(
-                user__id=context["user_info"].id,
-            )
-            .order_by("event__id")
-            .select_related(
-                "event",
-                "event__tour",
-                "event__venue",
-                "event__artist",
-                "event__venue__city",
-                "event__venue__city__country",
-            )
-            .prefetch_related(
-                "event__venue__city__state",
-            )
-            .annotate(
-                setlist=Case(
-                    When(
-                        Q(event__setlist_certainty__in=["Confirmed", "Probable"]),
-                        then=True,
-                    ),
-                    default=False,
-                ),
-            )
-        )
+        # context["user_shows"] = (
+        #     models.UserAttendedShows.objects.filter(
+        #         user__id=context["user_info"].id,
+        #     )
+        #     .order_by("event__id")
+        #     .select_related(
+        #         "event",
+        #         "event__tour",
+        #         "event__venue",
+        #         "event__artist",
+        #         "event__venue__city",
+        #         "event__venue__city__country",
+        #     )
+        #     .prefetch_related(
+        #         "event__venue__city__state",
+        #     )
+        # )
 
-        if context["user_shows"].count() > 0:
-            context["user_songs"] = models.Setlists.objects.filter(
-                event__id__in=context["user_shows"].values_list("event__id"),
-                set_name__in=VALID_SET_NAMES,
-            ).select_related("song", "song__first_event", "event")
+        # if context["user_shows"].count() > 0:
+        #     context["user_songs"] = models.Setlists.objects.filter(
+        #         event__id__in=context["user_shows"].values_list("event__id"),
+        #         set_name__in=VALID_SET_NAMES,
+        #     ).select_related("song", "event")
 
-            context["user_seen"] = (
-                context["user_songs"]
-                .values("song")
-                .annotate(
-                    name=F("song__name"),
-                    count=Count("event"),
-                    first=Min("event__id"),
-                    category=F("song__category"),
-                )
-                .order_by("-count", "name")
-            )
+        #     context["user_seen"] = (
+        #         context["user_songs"]
+        #         .values("song")
+        #         .annotate(
+        #             name=F("song__name"),
+        #             count=Count("event"),
+        #             uuid=F("song__uuid"),
+        #             first=Min("event__event_id"),
+        #             last=Max("event__event_id"),
+        #             category=F("song__category"),
+        #         )
+        #         .order_by("-count", "name")
+        #     )
 
-            context["user_not_seen"] = (
-                models.Songs.objects.exclude(
-                    id__in=context["user_songs"].values_list("song__id"),
-                )
-                .filter(num_plays_public__gte=100)
-                .order_by("-num_plays_public", "name")
-            )
+        #     context["user_not_seen"] = (
+        #         models.Songs.objects.exclude(
+        #             id__in=context["user_songs"].values_list("song__id"),
+        #         )
+        #         .filter(num_plays_public__gte=100)
+        #         .order_by("-num_plays_public", "name")
+        #     )
 
-            context["user_rare_songs"] = models.Songs.objects.filter(
-                id__in=context["user_songs"].values("song__id"),
-                num_plays_public__lte=100,
-            ).order_by("num_plays_public", "name")
+        #     context["user_rare_songs"] = (
+        #         context["user_songs"]
+        #         .filter(song__num_plays_public__lte=100)
+        #         .order_by("song__num_plays_public", "song__name")
+        #     )
 
         return context
 
 
-class Login(LoginView):
+class Login(PageTitleMixin, LoginView):
     form_class = LoginForm
     template_name = "users/login.html"
     title = "Login"
+    success_url = reverse_lazy("home")
 
     def form_valid(self, form):
-        print(form.cleaned_data)
-        remember_me = form.cleaned_data[
-            "remember_me"
-        ]  # get remember me data from cleaned_data of form
-        if not remember_me:
-            self.request.session.set_expiry(0)  # if remember me is
-            self.request.session.modified = True
+        remember_me = form.cleaned_data.get("remember_me")
 
-        self.request.session.set_expiry(1209600)
+        if not remember_me:
+            self.request.session.set_expiry(0)
+        else:
+            self.request.session.set_expiry(1209600)
+
         return super().form_valid(form)
 
 
@@ -326,9 +271,6 @@ class SignUp(PageTitleMixin, TemplateView):
     title = "Signup"
     token_generator = default_token_generator
     form_class = UserForm
-    extra_email_context = None
-    from_email = None
-    html_email_template_name = None
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
@@ -345,7 +287,6 @@ class SignUp(PageTitleMixin, TemplateView):
 
             current_site = get_current_site(request)
             use_https = True
-            extra_email_context = None
 
             context = {
                 "email": user.email,
@@ -355,7 +296,6 @@ class SignUp(PageTitleMixin, TemplateView):
                 "user": user,
                 "token": self.token_generator.make_token(user),
                 "protocol": "https" if use_https else "http",
-                **(extra_email_context or {}),
             }
 
             self.send_mail(
@@ -541,20 +481,9 @@ class EventDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
+        # context['event'] = get_object_or_404(models.Events.objects.select_related("artist", "venue"), event_id=self.kwargs["id"])
 
         context["id"] = self.kwargs["id"]
-
-        archive = models.ArchiveLinks.objects.filter(
-            event=OuterRef("id"),
-        ).values("url")
-
-        bootleg = models.Bootlegs.objects.filter(
-            event=OuterRef("id"),
-        ).values("id")
-
-        nugs = models.NugsReleases.objects.filter(
-            event=OuterRef("id"),
-        ).values(json=JSONObject(id="id", url="url"))
 
         context["event"] = (
             models.Events.objects.select_related(
@@ -562,56 +491,54 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "artist",
                 "tour",
                 "venue__city",
-            )
-            .prefetch_related(
+            ).prefetch_related(
                 "leg",
                 "run",
-                "venue__city__state",
-                "venue__city__state__country",
             )
-            .annotate(
-                archive=ArraySubquery(archive),
-                boot=ArraySubquery(bootleg),
-                nugs_rel=Subquery(nugs),
-                next_event=Window(Lead("event_id"), order_by=F("id").asc()),
-                prev_event=Window(Lag("event_id"), order_by=F("id").desc()),
-            )
-            .get(event_id=self.kwargs["id"])
+        ).get(event_id=self.kwargs["id"])
+
+        context["title"] = (
+            f"{context['event'].get_date()} - {context['event'].venue.name}"
         )
 
-        context["official"] = (
-            models.ReleaseTracks.objects.filter(
-                event__event_id=self.kwargs["id"],
+        try:
+            context["prev_event"] = (
+                models.Events.objects.select_related("venue", "artist")
+                .filter(event_id__lt=self.kwargs["id"])
+                .order_by("-event_id")
+                .first()
             )
-            .distinct("release__id")
-            .select_related("release", "event")
-            .order_by("release__id")
-        )
+        except models.Events.DoesNotExist:
+            context["prev_event"] = None
+
+        try:
+            context["next_event"] = (
+                models.Events.objects.select_related("venue", "artist")
+                .filter(event_id__gt=self.kwargs["id"])
+                .order_by("event_id")
+                .first()
+            )
+        except models.Events.DoesNotExist:
+            context["next_event"] = None
+
+        if not context["event"].date:
+            messages.info(
+                self.request,
+                "This is a placeholder date, actual date unknown.",
+            )
+
+        # context["official"] = (
+        #     models.ReleaseTracks.objects.filter(
+        #         event__event_id=self.kwargs["id"],
+        #     )
+        #     .distinct("release__id")
+        #     .select_related("release", "event")
+        #     .order_by("release__id")
+        # )
 
         context["title"] = (
             f"{format_fuzzy(context['event'].event_id)} {context['event'].venue.name}"
         )
-
-        # notes = models.SetlistNotes.objects.filter(
-        #     id=OuterRef("pk"),
-        # ).select_related("event", "id")
-
-        # snippets = (
-        #     models.Snippets.objects.order_by("position")
-        #     .select_related("snippet", "setlist")
-        #     .filter(
-        #         setlist=OuterRef("pk"),
-        #     )
-        #     .values(
-        #         json=JSONObject(
-        #             id="snippet__id",
-        #             name="snippet__name",
-        #             note="note",
-        #             position="position",
-        #             setlist="setlist__id",
-        #         ),
-        #     )
-        # )
 
         if self.request.user.is_authenticated:
             context["user_attended"] = models.UserAttendedShows.objects.filter(
@@ -622,38 +549,6 @@ class EventDetail(PageTitleMixin, TemplateView):
         context["user_count"] = models.UserAttendedShows.objects.filter(
             event__event_id=context["event"].event_id,
         ).count()
-
-        # # CURRENT BELOW
-        context["setlist_unique"] = (
-            models.Setlists.objects.filter(event__event_id=self.kwargs["id"])
-            .select_related("song")
-            .filter(
-                set_name__in=VALID_SET_NAMES,
-            )
-            .order_by("song__category", "song_num")
-        )
-
-        context["album_breakdown"] = (
-            models.Songs.objects.filter(
-                id__in=context["setlist_unique"].values("song__id"),
-            )
-            .values("category")
-            .annotate(num=Count("id"))
-            .order_by("-num")
-        )
-
-        if context["album_breakdown"]:
-            context["album_max"] = context["album_breakdown"].aggregate(
-                max=Max("num"),
-            )
-
-            context["album_breakdown"] = context["album_breakdown"].annotate(
-                max=Value(context["album_max"]["max"]),
-                percent=ExpressionWrapper(
-                    (F("num") / Value(1.0 * context["album_max"]["max"])) * 100,
-                    output_field=IntegerField(),
-                ),
-            )
 
         return context
 
@@ -716,7 +611,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
 
         context["events"] = (
             models.Events.objects.filter(
-                venue__id=self.kwargs["id"],
+                venue__uuid=self.kwargs["id"],
             )
             .select_related(
                 "artist",
@@ -731,7 +626,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
 
         context["venue_info"] = (
             models.Venues.objects.filter(
-                id=self.kwargs["id"],
+                uuid=self.kwargs["id"],
             )
             .annotate(
                 aliases=ArraySubquery(
@@ -747,7 +642,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
 
         context["songs"] = (
             models.Setlists.objects.filter(
-                event__venue__id=self.kwargs["id"],
+                event__venue__uuid=self.kwargs["id"],
                 set_name__in=VALID_SET_NAMES,
             )
             .select_related("song")
@@ -810,7 +705,7 @@ class SongDetail(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["song_info"] = (
-            models.Songs.objects.filter(id=self.kwargs["id"])
+            models.Songs.objects.filter(uuid=self.kwargs["id"])
             .prefetch_related(
                 "album",
                 "last_event",
@@ -823,7 +718,7 @@ class SongDetail(PageTitleMixin, TemplateView):
                 event_id__gt=context["song_info"].last_event.event_id,
                 public=True,
             ).count()
-        except models.Songs.last_event.RelatedObjectDoesNotExist:
+        except (models.Songs.last_event.RelatedObjectDoesNotExist, AttributeError):
             context["show_gap"] = 0
 
         context["title"] = f"{context['song_info'].name}"
@@ -832,19 +727,8 @@ class SongDetail(PageTitleMixin, TemplateView):
             song__id=self.kwargs["id"],
         )
 
-        context["positions"] = (
-            context["setlists"]
-            .filter(set_name__in=VALID_SET_NAMES)
-            .exclude(position=None)
-            .values("position")
-            .annotate(
-                count=Count("position"),
-                num=Min("song_num"),
-            )
-        ).order_by("num")
-
         context["lyrics"] = models.Lyrics.objects.filter(
-            song__id=self.kwargs["id"],
+            song__uuid=self.kwargs["id"],
         ).order_by("id")
 
         if context["song_info"].num_plays_public > 0:
@@ -909,7 +793,7 @@ class TourDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(models.Tours, id=self.kwargs["id"])
+        context["info"] = get_object_or_404(models.Tours, uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
 
         return context
@@ -956,8 +840,8 @@ class Contact(PageTitleMixin, TemplateView):
                 send_mail(
                     subject=form.cleaned_data["subject"],
                     message=body,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[settings.NOTIFY_EMAIL],
+                    from_email=base.DEFAULT_FROM_EMAIL,
+                    recipient_list=[base.NOTIFY_EMAIL],
                 )
 
                 messages.success(request, "Message Sent")
@@ -1073,14 +957,32 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
         setlist_qs = (
             models.Setlists.objects.all()
             .select_related("event", "song")
+            .values("event_id")
             .annotate(
                 next_song=Subquery(next_song),
             )
         )
 
+        setlist_anywhere_qs = (
+            models.Setlists.objects.all()
+            .select_related("event", "song")
+            .values("event_id")
+            .annotate(
+                songs_list=ArrayAgg(
+                    "song__id",
+                    filter=Q(set_name__in=VALID_SET_NAMES),
+                    distinct=True,  # Recommended to avoid duplicates from joins
+                ),
+            )
+        )
+
         event_filter = event_form.get_filters()
+        sl_filter = Q()
         event_queries = []
         display_queries = []
+
+        for f in event_filter.children:
+            sl_filter &= Q(**{f"event__{f[0]}": f[1]})
 
         if formset.is_valid() and formset.has_changed():
             song_ids = [f["song1"] for f in formset.cleaned_data if f.get("song1")]
@@ -1121,10 +1023,10 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                     summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
 
                 elif pos == "anywhere":
-                    if not choice:
-                        condition = ~Q(
-                            song=form["song1"],
-                        )
+                    condition = Q(songs_list__contains=[int(form["song1"])])
+
+                    if not choice or choice is None:
+                        condition = ~Q(songs_list__contains=[int(form["song1"])])
 
                 else:
                     pos_filter = self.position_filters.get(pos)
@@ -1137,11 +1039,20 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
                     summary = f"{s1_name} ({choice_str} {pos_display})"
 
-                print(condition)
+                # use different queryset for the anywhere position
+                if pos == "anywhere":
+                    matched_events = set(
+                        setlist_anywhere_qs.filter(condition).values_list(
+                            "event_id",
+                            flat=True,
+                        ),
+                    )
 
-                matched_events = set(
-                    setlist_qs.filter(condition).values_list("event_id", flat=True),
-                )
+                else:
+                    matched_events = set(
+                        setlist_qs.filter(condition).values_list("event_id", flat=True),
+                    )
+
                 event_queries.append(matched_events)
                 display_queries.append(summary)
 
@@ -1182,207 +1093,6 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
         return context
 
-    # def check_field_choice(self, choice: bool, field_filter: Q) -> Q:
-    #     """Every field has a IS/NOT choice on it. Depending on that choice, the filter can be negated or not. This checks for that value and returns the correct filter."""
-    #     if choice is False:
-    #         return ~field_filter
-
-    #     return field_filter
-
-    # # def get_lookup(self, data: dict, field: dict) -> Q:
-
-    # def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
-    #     event_form = self.form_class(request.GET)
-    #     formset = self.formset_class(request.GET)
-
-    #     setlist = models.Setlists.objects.filter(
-    #         set_name=OuterRef("set_name"),
-    #         event__id=OuterRef("event__id"),
-    #     ).select_related("song")
-
-    #     setlist_qs = (
-    #         models.Setlists.objects.all()
-    #         .select_related("event", "song")
-    #         .annotate(
-    #             next_song=Subquery(
-    #                 setlist.filter(song_num__gt=OuterRef("song_num"))
-    #                 .order_by("event", "song_num")
-    #                 .values("song__id")[:1],
-    #             ),
-    #         )
-    #     )
-
-    #     song_results = []
-    #     event_results = []
-    #     event_list = []
-    #     display_fields = []
-
-    #     setlist = ""
-
-    #     setlist_event_filter = Q()
-    #     event_filter = Q()
-
-    #     if formset.is_valid() and formset.has_changed():
-    #         setlist = formset.cleaned_data
-    #         form_fields = []
-
-    #         for form in formset.cleaned_data:
-    #             if form["choice"] and form["position"] == "Followed By":
-    #                 f = {
-    #                     "song1": form["song2"],
-    #                     "choice": "is",
-    #                     "position": "Anywhere",
-    #                     "hidden": "true",
-    #                 }
-    #                 form_fields.append(f)
-    #             else:
-    #                 form_fields.append(form)
-
-    #         for form in form_fields:
-    #             setlist_filter = Q()
-
-    #             try:
-    #                 song1 = form["song1"]["value"]
-
-    #                 match form["position"]:
-    #                     case "Followed By":
-    #                         song2 = form["song2"]["value"]
-
-    #                         song2_filter = self.check_field_choice(
-    #                             form["choice"],
-    #                             Q(next_song=form["song2"]["id"]),
-    #                         )
-
-    #                         setlist_filter = Q(
-    #                             Q(song=form["song1"]["id"]) & song2_filter,
-    #                         )
-
-    #                         events = setlist_qs.filter(setlist_filter).values_list(
-    #                             "event__id",
-    #                             flat=True,
-    #                         )
-
-    #                         song_results.append(
-    #                             f"{song1} ({form['choice']} followed by) {song2}",
-    #                         )
-
-    #                     case "Anywhere":
-    #                         print(form["choice"])
-    #                         setlist_filter = self.check_field_choice(
-    #                             form["choice"],
-    #                             Q(song__id=form["song1"]["id"]),
-    #                         )
-
-    #                         events = setlist_qs.filter(setlist_filter).values_list(
-    #                             "event__id",
-    #                             flat=True,
-    #                         )
-
-    #                         print(setlist_filter)
-
-    #                         try:
-    #                             if not form["hidden"]:
-    #                                 song_results.append(
-    #                                     f"{song1} ({form['choice']} anywhere)",
-    #                                 )
-    #                         except KeyError:
-    #                             song_results.append(
-    #                                 f"{song1} ({form['choice']} anywhere)",
-    #                             )
-    #                     case _:
-    #                         # all others except anywhere and followed by
-    #                         position_filter = self.check_field_choice(
-    #                             form["choice"],
-    #                             Q(position=form["position"]),
-    #                         )
-
-    #                         setlist_filter = Q(
-    #                             Q(song__id=form["song1"]["id"]) & position_filter,
-    #                         )
-
-    #                         events = setlist_qs.filter(setlist_filter).values_list(
-    #                             "event__id",
-    #                             flat=True,
-    #                         )
-
-    #                         song_results.append(
-    #                             f"{song1} ({form['choice']} {form['position']})",
-    #                         )
-
-    #                 event_results.append(list(events))
-
-    #                 match event_form.cleaned_data["conjunction"]:
-    #                     case "or":
-    #                         event_list = list(set.union(*map(set, event_results)))
-
-    #                     case "and":
-    #                         event_list = list(
-    #                             set.intersection(*map(set, event_results)),
-    #                         )
-
-    #             except ValueError:
-    #                 break
-    #             except AttributeError:
-    #                 break
-
-    #     if event_list:
-    #         setlist_event_filter = Q(id__in=event_list)
-
-    #     qs_filter = Q()
-
-    #     result = (
-    #         models.Events.objects.all()
-    #         .select_related(
-    #             "venue",
-    #             "venue__city",
-    #             "venue__city__country",
-    #             "artist",
-    #             "tour",
-    #         )
-    #         .prefetch_related(
-    #             "venue__city__state",
-    #             "venue__city__state__country",
-    #         )
-    #         .annotate(
-    #             setlist=Case(
-    #                 When(Q(setlist_certainty__in=["Confirmed", "Probable"]), then=True),
-    #                 default=False,
-    #             ),
-    #         )
-    #         .order_by("event_id")
-    #     )
-
-    #     if setlist_event_filter.children:
-    #         qs_filter &= setlist_event_filter
-
-    #     if event_filter.children:
-    #         qs_filter &= event_filter
-
-    #     # only if filter is not empty
-    #     if qs_filter.children:
-    #         result = result.filter(qs_filter)
-    #     else:
-    #         result = None
-
-    #     description = ""
-    #     description += ",".join(
-    #         [f"{item['label']}: {item['data']}" for item in display_fields],
-    #     )
-    #     description += f"Songs: {', '.join(song_results)}"
-
-    #     return render(
-    #         request=request,
-    #         template_name=self.template_name,
-    #         context={
-    #             "title": "Advanced Search",
-    #             "events": result,
-    #             "description": description,
-    #             "conjunction": event_form.cleaned_data["conjunction"],
-    #             "setlist_form": setlist,
-    #             "display_fields": display_fields,
-    #         },
-    #     )
-
 
 class ShortenURL(PageTitleMixin, TemplateView):
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
@@ -1405,7 +1115,7 @@ class RelationDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["info"] = models.Relations.objects.get(id=self.kwargs["id"])
+        context["info"] = models.Relations.objects.get(uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
         context["bands"] = (
             models.Onstage.objects.filter(relation=context["info"].id)
@@ -1426,7 +1136,7 @@ class BandDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(models.Bands, id=self.kwargs["id"])
+        context["info"] = get_object_or_404(models.Bands, uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
 
         return context
@@ -1442,7 +1152,7 @@ class ReleaseDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(models.Releases, id=self.kwargs["id"])
+        context["info"] = get_object_or_404(models.Releases, uuid=self.kwargs["id"])
         context["title"] = f"{context['info'].name}"
 
         return context
@@ -1459,7 +1169,7 @@ class CityDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        self.city = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        self.city = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
         context["info"] = self.city
         context["title"] = f"{context['info']}"
 
@@ -1477,7 +1187,7 @@ class StateDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
 
         return context
@@ -1497,7 +1207,7 @@ class CountryDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
 
         return context
@@ -1523,7 +1233,7 @@ class RunDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
 
         return context
@@ -1540,7 +1250,7 @@ class TourLegDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        self.leg = get_object_or_404(self.queryset, id=self.kwargs["id"])
+        self.leg = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
         context["info"] = self.leg
         context["title"] = f"{context['info']}"
 

@@ -50,7 +50,7 @@
             'className': 'text-nowrap',
             'type': 'text',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return `<span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${data.time}">${data.date}</span>`
               }
             },
@@ -59,8 +59,8 @@
             'data': 'event',
             'name': 'event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/events/' + data.event_id + '">'+ data.date.display_day +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
               }
             },
           },
@@ -68,8 +68,8 @@
             'data': 'event.venue',
             'name': 'event__venue__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/venues/' + data.id + '">'+ data.name +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/venues/${data.id}">${data.name}</a>`;
               }
             },
           },
@@ -77,8 +77,8 @@
             'data': 'event.venue',
             'name': 'event__venue__city__name, event__venue__city__state__abbrev',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="/cities/' + data.city.id + '">'+ data.location +'</a>';
+              if (type === 'display' && data) {
+                return `<a href="/cities/${data.city.id}">${data.city.formatted}</a>`
               }
             },
           },
@@ -86,8 +86,8 @@
             'data': 'url',
             'name': 'url',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return '<a href="' + data + '">'+ row.name +'</a>';
+              if (type === 'display' && data) {
+                return `<a target="_blank" rel="noopener noreferrer" href="${data}">${row.name}</a>`
               }
             },
           },
@@ -95,7 +95,7 @@
             'data': 'first_friday',
             'name': 'first_friday',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return data;
               }
             },

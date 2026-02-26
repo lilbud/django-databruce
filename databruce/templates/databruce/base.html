@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="synthwave">
+<html lang="en" data-bs-theme="light">
   <head>
-    {% load i18n %}
-    {% load static %}
+    {% load i18n static %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="A Springsteen Setlist Database">
@@ -33,6 +32,7 @@
     <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
     <title>
       {% block title %}
+        Home
       {% endblock title %}
       - Databruce
     </title>
@@ -49,36 +49,29 @@
           crossorigin="anonymous">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
     <!--Datatables-->
-    <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-2.3.6/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-print-3.2.6/cc-1.2.0/date-1.6.2/fc-5.0.5/fh-4.0.5/r-3.0.7/rg-1.6.0/sc-2.4.3/sb-1.8.4/datatables.min.css"
+    <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-2.3.7/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-print-3.2.6/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/r-3.0.8/rg-1.6.0/sc-2.4.3/sb-1.8.4/datatables.min.css"
           rel="stylesheet"
-          integrity="sha384-36/BNIJgUC88jTHeRVmQWK/fkSp3g3y/lQsrniZiD8yEyktMOiXTfj04uF+sN7iB"
+          integrity="sha384-1ijJ0GS6xbNbMTIXRekVwvl292OcATiqWK7mc3ClmZJDhJ17FevOvYA0HPtrCgXQ"
           crossorigin="anonymous">
-    <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-2.3.6/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-print-3.2.6/cc-1.2.0/date-1.6.2/fc-5.0.5/fh-4.0.5/r-3.0.7/rg-1.6.0/sc-2.4.3/sb-1.8.4/datatables.min.js"
-            integrity="sha384-lubdn2MpKGb6T3U7OsO+Y+MqYbP/R60V7GV6bp/ZWpIdLa+RYqizgJ0WN35IDbpM"
+    <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-2.3.7/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-print-3.2.6/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/r-3.0.8/rg-1.6.0/sc-2.4.3/sb-1.8.4/datatables.min.js"
+            integrity="sha384-uU3JucG4mNcB3qZQiRxj8fTAPtJaKGi4UnmJwsdImhPvG5iN2ngUpv12n8pVkzzv"
             crossorigin="anonymous"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
-          rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
           rel="stylesheet">
     <!--Static-->
     <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/preflight.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/datatables.css' %}" />
-    {% comment %} <link rel="stylesheet" href="{% static 'databruce/css/style.consolidated.css' %}" /> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'databruce/css/new_style.css' %}" />
     <!-- Other -->
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"
-            integrity="sha512-QoJS4DOhdmG8kbbHkxmB/rtPdN62cGWXAdAFWWJPvUFF1/zxcPSdAnn4HhYZSIlVoLVEJ0LesfNlusgm2bPfnA=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"></script>
-    {% comment %} <script src="{% static 'databruce/js/category_select.js' %}"></script> {% endcomment %}
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
     {% block extrastyle %}
     {% endblock extrastyle %}
@@ -87,220 +80,26 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
-      <div class="container-fluid p-2 bd-gutter flex-wrap flex-xl-nowrap">
-        <a class="p-0 mx-0 mx-lg-3 d-none d-xl-block" href="{% url 'index' %}">
-          <div id="logo" class="logo"></div>
-        </a>
+      <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
         <button class="btn btn-sm d-xl-none d-block dropdown-toggle me-auto py-0"
                 type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
                 aria-expanded="false"
                 aria-label="Toggle navigation">
           <i class="bi bi-list text-xl fw-semibold"></i>
         </button>
-        <a class="d-block d-xl-none" href="{% url 'index' %}">
-          <div id="logo" class="logo"></div>
+        <a class="navbar-brand p-0 mx-2" href="{% url 'index' %}">
+          <div class="logo" role="img" aria-label="Databruce">
+            <span class="sr-only">Databruce</span>
+          </div>
         </a>
-        {% if user.is_authenticated %}
-          <button class="btn btn-sm dropdown-toggle ms-auto d-block d-xl-none mb-0"
-                  role="button"
-                  data-bs-toggle="dropdown">Profile</button>
-          <ul class="dropdown-menu dropdown-menu-end" id="profile">
-            <li>
-              <div class="text-sm px-4 py-1">
-                Hello {{ user }}
-                {% if user.is_superuser %}
-                  (Admin)
-                {% else %}
-                  (User)
-                {% endif %}
-              </div>
-            </li>
-            <li>
-              <a class="dropdown-item"
-                 href="{% url "profile" username=user.username %}">View Profile</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
-            </li>
-            {% if user.is_superuser %}
-              <li>
-                <a class="dropdown-item" href="{% url "admin:index" %}">Admin Portal</a>
-              </li>
-            {% endif %}
-            <li>
-              <a class="dropdown-item" href="{% url "settings" %}">Settings</a>
-            </li>
-            <li>
-              <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button class="dropdown-item" role="button" type="submit" id="button-addon2">Logout</button>
-              </form>
-            </li>
-          </ul>
-        {% else %}
-          <li class="nav-item mx-lg-3 ms-auto d-inline d-xl-none mb-0">
-            <button class="btn btn-sm btn-link"
-                    role="button"
-                    href="{% url 'login' %}?next={{ request.path }}">Login</button>
-          </li>
-        {% endif %}
-        <div class="navbar-collapse collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto my-3 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-1">
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Events</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'events' %}">Events By Year</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'runs' %}">Events By Run</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'calendar' %}">Event Calendar</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Tours</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'tours' %}">Tours</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'tour_legs' %}">Tour Legs</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Songs</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'songs' %}">Songs</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'song_lyrics' %}">Lyrics</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item my-auto">
-              <a class="btn btn-sm btn-link"
-                 role="button"
-                 type="button"
-                 href="{% url 'venues' %}">Venues</a>
-            </li>
-            {% comment %} <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Locations</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'cities' %}">Cities</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'states' %}">States</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'countries' %}">Countries</a>
-                </li>
-              </ul>
-            </li> {% endcomment %}
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Relations and Bands</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'relations' %}">Relations</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'bands' %}">Bands</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Releases</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'releases' %}">Official Releases</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'nugs' %}">Nugs Releases</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'bootlegs' %}">Bootlegs</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Search</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Search</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Note Search</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown my-auto">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">More</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'about' %}">About Site</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'links' %}">Links</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'updates' %}">Updates</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'roadmap' %}">Roadmap</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url "contact" %}">Contact Us</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <hr class="d-xl-none">
-          <ul class="navbar-nav ms-auto align-middle">
-            <form role="search"
-                  method="get"
-                  action="{% url 'search' %}"
-                  class="d-flex my-xl-auto">
-              {{ searchForm.date }}
-              <button type="submit"
-                      id="event-search-btn"
-                      class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
-            </form>
-            <hr class="d-xl-none">
+        <div class="d-flex d-xl-none align-items-center order-lg-last ms-auto">
+          {% partialdef profile inline %}
             {% if user.is_authenticated %}
-              <li class="nav-item mx-xl-2 d-none d-xl-inline my-xl-auto dropdown">
-                <button class="btn btn-sm dropdown-toggle"
+              <li class="nav-item dropdown list-unstyled">
+                <button class="btn btn-sm dropdown-toggle {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
                         role="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">Profile</button>
@@ -339,101 +138,212 @@
                 </ul>
               </li>
             {% else %}
-              <li class="nav-item mx-lg-2 ms-auto d-none d-xl-inline mb-0">
-                <a class="btn btn-sm btn-link"
+              <li class="nav-item mx-lg-2 ms-auto d-inline mb-0">
+                <a class="btn btn-sm"
                    role="button"
                    type="button"
                    href="{% url 'login' %}?next={{ request.path }}">Login</a>
               </li>
             {% endif %}
+          {% endpartialdef profile %}
+        </div>
+        <div class="navbar-collapse collapse" id="mainNavbar">
+          <ul class="navbar-nav me-auto my-2 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-1">
             <li class="nav-item dropdown">
-              <button class="btn btn-sm nav-item px-2 py-1 dropdown-toggle d-inline align-items-center"
-                      id="bd-theme"
-                      type="button"
-                      aria-expanded="false"
+              <button class="btn btn-sm dropdown-toggle {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
+                      role="button"
                       data-bs-toggle="dropdown"
-                      data-bs-display="static"
-                      aria-label="Toggle theme (light)">
-                <i class="bi bi-sun-fill theme-icon-active mx-2" aria-hidden="true"></i>
-                <span class="d-lg-none" id="bd-theme-text">Toggle theme</span>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="bd-theme-text">
+                      aria-expanded="false">Events</button>
+              <ul class="dropdown-menu">
                 <li>
-                  <button type="button"
-                          class="dropdown-item d-flex align-items-center active"
-                          data-bs-theme-value="light"
-                          aria-pressed="true">
-                    Light
-                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
-                  </button>
+                  <a class="dropdown-item" href="{% url 'events' %}">Events By Year</a>
                 </li>
                 <li>
-                  <button type="button"
-                          class="dropdown-item d-flex align-items-center"
-                          data-bs-theme-value="dark"
-                          aria-pressed="false">
-                    Dark
-                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
-                  </button>
+                  <a class="dropdown-item" href="{% url 'runs' %}">Events By Run</a>
                 </li>
                 <li>
-                  <button type="button"
-                          class="dropdown-item d-flex align-items-center"
-                          data-bs-theme-value="auto"
-                          aria-pressed="false">
-                    Auto
-                    <i class="bi bi-check2 ms-auto d-none" aria-hidden="true"></i>
-                  </button>
+                  <a class="dropdown-item" href="{% url 'calendar' %}">Event Calendar</a>
                 </li>
               </ul>
             </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle {% if 'tours' in request.resolver_match.route %}fw-bold{% endif %}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Tours</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'tours' %}">Tours</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'tour_legs' %}">Tour Legs</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle {% if 'songs' in request.resolver_match.route %}fw-bold{% endif %}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Songs</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'songs' %}">Songs</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'song_lyrics' %}">Lyrics</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Locations</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'cities' %}">Cities</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'states' %}">States</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'countries' %}">Countries</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle {% if 'relations' in request.resolver_match.route or 'bands' in request.resolver_match.route %}fw-bold{% endif %}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Relations and Bands</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'relations' %}">Relations</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'bands' %}">Bands</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle {% if 'releases' in request.resolver_match.route %}fw-bold{% endif %}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Releases</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'releases' %}">Official Releases</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'nugs' %}">Nugs Releases</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'bootlegs' %}">Bootlegs</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle {% if 'search' in request.resolver_match.route %}fw-bold{% endif %}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">Search</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Search</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Note Search</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">More</button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'about' %}">About Site</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'links' %}">Links</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'updates' %}">Updates</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'roadmap' %}">Roadmap</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url "contact" %}">Contact Us</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <hr class="d-xxl-none mt-0 mb-3">
+          <form role="search"
+                method="get"
+                action="{% url 'search' %}"
+                class="d-flex my-xl-auto">
+            {{ searchForm.date }}
+            <button type="submit"
+                    id="event-search-btn"
+                    class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
+          </form>
+          <hr class="d-xxl-none mt-3 mb-0">
+          <ul class="navbar-nav my-2 my-xl-0 ms-xl-2 d-flex flex-wrap row-gap-1 column-gap-1">
+            <div class="d-none d-xxl-block">{% partial profile %}</div>
+            {% include "./partials/theme_toggler.html" %}
           </ul>
         </div>
       </div>
     </nav>
     <div class="padded-body">
-      <div class="container-fluid">
-        <div class="col-12 mt-3 mb-2">
+      {% block container %}
+      {% endblock container %}
+      {% comment %} <div class="container">
+        <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
           {% block content %}
           {% endblock content %}
         </div>
-      </div>
+      </div> {% endcomment %}
       {% include "./partials/searchbuilder.html" %}
     </div>
-    <div class="footer">
-      <div class="col-12 mx-auto">
+    <div class="footer mt-3">
+      <div class="col-12">
         <div class="card">
-          <div class="card-body text-center">
-            Copyright ©<span id="copyright-year"></span>, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
+          <div class="card-body text-center py-2">
+            Copyright ©{% now "Y" %}, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
           </div>
         </div>
       </div>
     </div>
     <script>
       $(document).ready(function () {
-        const today = new Date();
-        const currentYear = today.getFullYear();
+        const eventApi = "{% url 'api:event-list' %}";
 
-        $("#copyright-year").text(currentYear);
-
-        
         $("#eventSearch").autocomplete({
             delay: 500,
+            classes: {
+              "ui-autocomplete": "text-sm dropdown-menu"
+            },
             source: function(request, response) {
               $.ajax({
-                url: "/api/v1/events/", // or .ashx, .asmx, etc.
+                url: eventApi, // or .ashx, .asmx, etc.
                 dataType: "json",
                 data: {
                   date: request.term
                 },
                 success: function(data) {
                   response( $.map( data.results, function(item) {
-                    return {'id': item.event_id, 'value': `${item.date.display_day} - ${item.venue.location}`}
+                    console.log(item)
+                    return {'id': item.event_id, 'value': `${item.date.display_day} - ${item.venue.city.formatted}`}
                   }));
                 },
                 error: function() {
-                  // Always call response even if an error occurs to ensure the widget is in the correct state
                   response([]);
                 }
               });
@@ -468,9 +378,5 @@
       
       });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"></script>
-    <script></script>
   </body>
 </html>

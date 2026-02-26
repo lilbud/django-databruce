@@ -1,4 +1,4 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/wide_layout.html" %}
 {% block extrajs %}
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
   <script>
@@ -8,12 +8,12 @@
           initialView: 'dayGridMonth',
           validRange: {
             start: '1965-06-01',
-            end: new Date().toISOString(),
+            end: '{{ end_date }}',
           },
           fixedWeekCount: false,
           initialDate: '{{ start_date }}',
           schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-          dayMinWidth: 100,
+          dayMinWidth: 85,
           height: 768,
           contentHeight: 768,
           headerToolbar: {
@@ -30,7 +30,7 @@
                 var eventsList = [];
 
                 $(data.results).each(function (i, val){
-                  var title = `${val.artist.name}: ${val.venue.location}`
+                  var title = `${val.artist.name}: ${val.venue.formatted}`
 
                   if (val.early_late) {
                     title += ` (${val.early_late})`
@@ -46,7 +46,6 @@
                       start: val.date.filter,
                       url: `/events/${val.event_id}`,
                       allDay: false,
-                      className: 'text-wrap',
                     }
                   )
                 })
@@ -65,10 +64,10 @@
                       title: val.name,
                       start: val.first_event.date.filter,
                       end: `${val.last_event.date.filter}T23:59:59`,
-                      url: `/runs/${val.id}`,
-                      backgroundColor: 'var(--secondary)',
-                      borderColor: 'var(--secondary)',
-                      className: 'text-wrap px-1 m-0',
+                      url: `/runs/${val.uuid}`,
+                      backgroundColor: 'rgb(var(--secondary))',
+                      borderColor: 'rgb(var(--secondary))',
+                      className: 'px-1 m-0',
                     }
                   )
                 })
@@ -87,10 +86,10 @@
                     {
                       title: val.name,
                       start: val.date,
-                      url: `/releases/${val.id}`,
-                      backgroundColor: 'var(--accent)',
-                      borderColor: 'var(--accent)',
-                      className: 'text-wrap px-1 m-0',
+                      url: `/releases/${val.uuid}`,
+                      backgroundColor: 'rgb(var(--accent))',
+                      borderColor: 'rgb(var(--accent))',
+                      className: 'px-1 m-0',
                     }
                   )
                 })
@@ -124,35 +123,29 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="row justify-content-center py-3">
-    <div class="col-12 col-md-10">
-      <div class="d-flex justify-content-start">
-        <div class="text-2xl mb-3 pe-2">Event Calendar</div>
-        <div id="year-select" class="d-inline">
-          <button class="btn btn-sm btn-primary dropdown-toggle"
-                  type="button"
-                  id="my-button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false">{{ start_date|date:'Y' }}</button>
-          <ul class="dropdown-menu">
-            {% for i in years %}
-              <li>
-                <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
-              </li>
-            {% endfor %}
-          </ul>
+  <div class="col-12 col-xl-10">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-start mb-3">
+          <div class="text-2xl mb-3 pe-2">Event Calendar</div>
+          <div id="year-select">
+            <button class="btn btn-sm btn-primary dropdown-toggle"
+                    type="button"
+                    id="my-button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ start_date|date:'Y' }}</button>
+            <ul class="dropdown-menu">
+              {% for i in years %}
+                <li>
+                  <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-        {% comment %} <div id="month-select">
-          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ start_date|date:'F' }}</button>
-          <ul class="dropdown-menu">
-            {% for i in months %}
-              <li>
-                <a class="dropdown-item" href="{% url "calendar" %}?start={{ i.start }}">{{ i.display }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div> {% endcomment %}
       </div>
+    </div>
+    <div class="row">
       <div id="calendar"></div>
     </div>
   </div>

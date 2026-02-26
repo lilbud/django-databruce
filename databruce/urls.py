@@ -7,7 +7,10 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, reverse_lazy
 from django.views.generic.base import TemplateView
 
-from . import settings, views
+from databruce import models
+
+from . import views
+from .config import base as settings
 from .sitemap import StaticViewSitemap
 
 sitemaps = {
@@ -24,7 +27,7 @@ urlpatterns = [
     path("roadmap/", views.Roadmap.as_view(), name="roadmap"),
     path("links/", views.Links.as_view(), name="links"),
     path("s/", include("shortener.urls")),
-    path("", include("api.urls")),
+    path("", include("api.urls", namespace="api")),
     path("benner/", admin.site.urls),
     path("test/", views.Test.as_view(), name="test"),
     path("calendar/", views.Calendar.as_view(), name="calendar"),
@@ -57,20 +60,6 @@ urlpatterns = [
         ),
         name="logout",
     ),
-    # path(
-    #     "password_change/",
-    #     auth_views.PasswordChangeView.as_view(
-    #         template_name="users/change_password.html",
-    #     ),
-    #     name="password_change",
-    # ),
-    # path(
-    #     "password_change/done/",
-    #     auth_views.PasswordChangeDoneView.as_view(
-    #         template_name="users/change_password_done.html",
-    #     ),
-    #     name="password_change_done",
-    # ),
     path(
         "password_reset/",
         auth_views.PasswordResetView.as_view(
@@ -127,7 +116,7 @@ urlpatterns = [
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
     path("songs", views.Song.as_view(), name="songs"),
-    path("songs/<int:id>", views.SongDetail.as_view(), name="song_details"),
+    path("songs/<uuid:id>", views.SongDetail.as_view(), name="song_details"),
     path("lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
     path(
         "lyrics/<uuid:id>",
@@ -135,17 +124,17 @@ urlpatterns = [
         name="lyric_detail",
     ),
     path("venues", views.Venue.as_view(), name="venues"),
-    path("venues/<int:id>", views.VenueDetail.as_view(), name="venue_details"),
+    path("venues/<uuid:id>", views.VenueDetail.as_view(), name="venue_details"),
     path("tours", views.Tour.as_view(), name="tours"),
-    path("tours/<int:id>", views.TourDetail.as_view(), name="tour_details"),
+    path("tours/<uuid:id>", views.TourDetail.as_view(), name="tour_details"),
     path("search/results", views.EventSearch.as_view(), name="search"),
     path(
-        "advanced_search/",
+        "search/advanced/",
         views.AdvancedSearch.as_view(),
         name="adv_search",
     ),
     path(
-        "advanced_search_results",
+        "search/advanced/results",
         views.AdvancedSearchResults.as_view(),
         name="adv_search_results",
     ),
@@ -155,26 +144,30 @@ urlpatterns = [
         name="short_url",
     ),
     path(
-        "notes_search/",
+        "search/notes/",
         views.SetlistNotesSearch.as_view(),
         name="note_search",
     ),
     path("relations", views.Relation.as_view(), name="relations"),
-    path("relations/<int:id>", views.RelationDetail.as_view(), name="relation_details"),
+    path(
+        "relations/<uuid:id>",
+        views.RelationDetail.as_view(),
+        name="relation_details",
+    ),
     path("bands", views.Band.as_view(), name="bands"),
-    path("bands/<int:id>", views.BandDetail.as_view(), name="band_details"),
+    path("bands/<uuid:id>", views.BandDetail.as_view(), name="band_details"),
     path("releases/", views.Release.as_view(), name="releases"),
-    path("releases/<int:id>", views.ReleaseDetail.as_view(), name="release_details"),
+    path("releases/<uuid:id>", views.ReleaseDetail.as_view(), name="release_details"),
     path("cities/", views.City.as_view(), name="cities"),
-    path("cities/<int:id>", views.CityDetail.as_view(), name="city_details"),
+    path("cities/<uuid:id>", views.CityDetail.as_view(), name="city_details"),
     path("states/", views.State.as_view(), name="states"),
-    path("states/<int:id>", views.StateDetail.as_view(), name="state_details"),
+    path("states/<uuid:id>", views.StateDetail.as_view(), name="state_details"),
     path("countries/", views.Country.as_view(), name="countries"),
-    path("countries/<int:id>", views.CountryDetail.as_view(), name="country_details"),
+    path("countries/<uuid:id>", views.CountryDetail.as_view(), name="country_details"),
     path("events/runs", views.EventRun.as_view(), name="runs"),
-    path("events/runs/<int:id>", views.RunDetail.as_view(), name="run_details"),
+    path("events/runs/<uuid:id>", views.RunDetail.as_view(), name="run_details"),
     path("tours/legs", views.TourLeg.as_view(), name="tour_legs"),
-    path("tours/legs/<int:id>", views.TourLegDetail.as_view(), name="leg_details"),
+    path("tours/legs/<uuid:id>", views.TourLegDetail.as_view(), name="leg_details"),
     path("releases/nugs", views.NugsRelease.as_view(), name="nugs"),
     path("releases/bootlegs", views.Bootleg.as_view(), name="bootlegs"),
     path(
@@ -199,6 +192,7 @@ urlpatterns = [
     ),
     path("updates", views.Updates.as_view(), name="updates"),
 ]
+
 
 if not settings.TESTING:
     urlpatterns = [*urlpatterns, *debug_toolbar_urls()]

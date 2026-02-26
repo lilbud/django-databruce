@@ -1,101 +1,145 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-lg-6 mx-auto" id="about">
-    <div class="text-lg mb-2">
-      <a href="{% url 'index' %}">Databruce</a> &gt; About
+  <div class="col-12 col-lg-8">
+    <div class="mb-3">
+      <div class="text-xl fw-semibold">Welcome to Databruce</div>
+      <div class="text-base">A Bruce Springsteen Concert Database</div>
     </div>
-    <div class="text-xl">Welcome to Databruce, a new Bruce Springsteen database.</div>
     <hr>
-    <div class="text-sm">
+    <div class="mb-3">
+      <div class="card message info fst-italic p-2">This page was last updated on February 26, 2026.</div>
+    </div>
+    <div class="mb-3">
       <div class="text-lg fw-semibold">What is Databruce?</div>
-      <p>
-        Databruce is a database site that tracks stats about Bruce Springsteen's live performing history. It was created by and is maintained by lilbud.
-      </p>
+      <div class="text-sm">
+        Databruce is a database for tracking stats about Bruce Springsteen's performing history. It was created by and is maintained by lilbud. The site was launched in June 2025 as a beta test, and July 2025 to the general public. In October 2025, I created a post on Greasy Lake to mark the true "public" launch of the site (actually letting people know about it).
+      </div>
     </div>
-    <div class="text-sm">
-      <div class="text-lg fw-semibold">A Brief History</div>
-      <p>
-        Development on Databruce first started in August 2024, and a semi-public beta test started in June 2025. While the "public" launch was planned for the summer, it took a bit longer until I felt that the site was almost "just exactly perfect" and "ready for primetime" so to speak. The "public" launch eventually happened in October 2025.
-      </p>
+    <div class="mb-3 row row-gap-2">
+      <div class="text-lg fw-semibold">Why?</div>
+      <div class="text-sm row row-gap-2">
+        <p>Databruce was created for several reasons.</p>
+        <p>
+          One was I felt like there was a niche to fill that none of the current Bruce-focused sites did. The desire was to create a more "modern" database site in line with newer database sites for other artists like the Grateful Dead (Jerrybase) and Goose (ElGoose and Dripfield.pro). All of those had more modern layouts, better presentation of information, and features that I felt were not present in any of the current Bruce focused sites.
+        </p>
+        <p>
+          The second goes hand-in-hand with the first. I wanted a site with the kind of advanced search capabilities that were present on Jerrybase. They have an advanced event/setlist search, allowing users to query the sites data in any number of ways. This feature was the initial spark for Databruce all the way back in October 2022 (predating even the first Databruce database). The only Bruce-focused site with a similar feature is Paolo Calvi's "[Killing Floor](https://www.brucespringsteen.it)", which has a basic event/location search. Unfortunately it hasn't been updated since January 2019, and is unlikely to get one anytime soon.
+        </p>
+        <p>
+          The third was simply wanting a user-friendly way to interact with the aforementioned Databruce database. Which was first created as an extension of Brucebot (a Discord bot I developed starting in early 2023). Originally, the bot relied on scraping Brucebase for it's info, but it became clear that that was not sustainable long-term. Additionally, the bot is only capable of very simple lookups, anything more advanced (read: closer to Jerrybase' search) required using the underlying SQL database. This is something of a barrier to entry for most, and isn't very accessible.
+        </p>
+        <p>
+          The Databruce site was my way to create an easy and user-friendly way to interact with the database. As well as getting closer to my initial goal of a Jerrybase-like site for Bruce.
+        </p>
+        <p>
+          I suppose there's also something to having a site I was in-control of. Where I had free reign to do whatever the hell I wanted with it, without having to be constrained by the limits of another site.
+        </p>
+      </div>
     </div>
-    <div class="text-sm">
-      <div class="text-lg fw-semibold">Why Create It?</div>
-      <p>
-        Databruce was created for a number of reasons, chief among them being that I could create something that would fill a niche that none of the current Bruce sites did. I was inspired by the efforts of other communities like Jerrybase, ElGoose, Dripfield.pro, etc.
-      </p>
-      <p>
-        What I liked about those sites was the layout/design, how well they presented their data, and the features that each provided. Jerrybase and their advanced event search was a big influence, as it's a very useful feature that I'm not aware of many other sites having. The only Bruce-related site with a similar feature is KillingFloor, which hasn't been updated since January 2019.
-      </p>
-    </div>
-    <div class="text-sm">
-      <div class="text-lg fw-semibold">What Sets It Apart?</div>
-      <p>
-        Databruce was created to be a more "modern" Bruce database site in terms of design as well as features, which is what I think sets it apart. I took bits and pieces from other sites that I liked, and used them to create something new. Something that would, like I said earlier, fill a niche that none of the current Bruce sites did.
-      </p>
-      <p>
-        I also wanted to create a site that was closer to an actual database. One that allowed users to interact with and search/filter the data without requiring them to know SQL, and one that allowed for more than simply "viewing" the data like Brucebase.
-      </p>
-    </div>
-    <hr>
-    <div class="text-sm">
-      <div class="text-lg fw-semibold">Features</div>
-      <p>This section will briefly cover some of Databruce's features. Not comprehensive, but an overview of sorts.</p>
-      <div class="text-base fw-semibold text-primary">Layout/Design</div>
-      <p>
-        The sites I used as inspiration are well designed and present their data in a way that is easy to understand, and I tried to do the same with Databruce.
-      </p>
-      <div class="text-base fw-semibold text-primary">Searching/Filtering</div>
-      <p>
-        The data on most pages are presented in Datatables and can be searched/filtered in any number of ways. Either basic search, or more "advanced" queries thanks to the Searchbuilder.
-      </p>
-      <div class="text-base fw-semibold text-primary">Advanced Event Search</div>
-      <p>
-        Search for events by many combinations of possible parameters.
-        <ul>
-          <li>Date Range: Find events between two given dates, either specific days or just months.</li>
-          <li>Month/Day: Events on any given day in Bruce's performing history. Or even events on certain days of the week.</li>
-          <li>Location: Events by venue/city/state/country.</li>
-          <li>Band/Musicians: Find events where a specific musician/band appeared on stage with Bruce.</li>
-        </ul>
-      </p>
-      <p>
-        Additionally, there is also a setlist search. Which is a feature I am very proud of and also one that caused a great number of headaches. This can be used to find events based on specific songs being played, or even specific sequences of songs. Which when combined with the event search above makes it a very useful and powerful tool.
-      </p>
-      <p>
-        Given the complexity of the search feature, and the seemingly limitless possibilities for possible queries, this is always going to be a work in progress.
-      </p>
-      <div class="text-base fw-semibold text-primary">User Accounts</div>
-      <p>
-        Users can create accounts on the site, and add shows to their profiles. Furthermore, stats can be viewed on the songs you've seen (or not seen, sorry in advance to the Europeans who've never gotten Rosalita live).
-      </p>
-    </div>
-    <hr>
-    <div class="text-sm">
-      <div class="text-base fw-semibold">Credits/Closing</div>
-      <p>
-        Before this page gets too long (and believe me it *was*), I'd like to close out with some thanks and credits. Both to sites I drew inspiration from, as well as those which acted as data sources.
-      </p>
-      <p>
-        First and foremost, Brucebase. This site was largely built upon their data and information, which they've tirelessly gathered over the past few <i>decades</i>. They are an invaluable resource, and if I've said it once I'll say it a thousand times that if it wasn't for Brucebase, there would be no Databruce.
-      </p>
-      <p>
-        SpringsteenLyrics. This site provided most of the information on the many bootleg recordings that are out there. While I pulled data from here, it was pretty heavily modified/corrected, using my collection and other sources to fill in gaps and add additional info.
-      </p>
-      <p>
-        Jerrybase: the use of Datatables, and the advanced search which I referenced quite heavily while developing my own. I used theirs as a basis to figure out how it should all work (in theory, anyway). The setlist search rows and some of the code behind them was taken from there with credit.
-      </p>
-      <p>
-        ElGoose/Dripfield.pro/Speedrun.com: The sites were the primary influence on the design of many pages. The latter two more heavily, as I really liked their card based/table layout and made use of that for the event pages.
-      </p>
-      <p>
-        Lastly, I want to thank the members of the r/brucespringsteen Discord server for being my unwilling <s>Guinea Pigs</s> beta testers. Databruce is the first time I've done anything like this, let alone something both public and on this sort of scale. Their help in testing and providing feedback was crucial to this site in it's current state. They were also instrumental in the development of Brucebot, which indirectly led to Databruce in many ways.
-      </p>
-      <p>
-        This site is always going to be a work in progress. Questions/Comments/Suggestions? I can usually be found on Discord (.lilbud), or you can reach out via the contact form <a class="text-primary" href="{% url "contact" %}">here</a>. I'll do my best to respond quickly.
-      </p>
+    <div class="mb-3">
+      <div class="text-lg fw-semibold mb-2">Unique Features</div>
+      <div class="text-sm row row-gap-2">
+        <div>
+          <div class="text-base fw-semibold">Layout/Design</div>
+          <p>
+            A primary focus of Databruce was to create a better looking site, more "up to date" and inline with the sites I was inspired by. All of those are very well designed, and present their data in an easy to understand way, which I tried to emulate. This isn't to say that a site like Brucebase looks bad or doesn't present data well, but I think many would agree that it is somewhat dated visually. It also lacks any kind of mobile layout, which limits it's usefulness on anything that isn't a computer.
+          </p>
+        </div>
+        <div>
+          <div class="text-base fw-semibold">Searching/Filtering</div>
+          <p>
+            Most pages have data presented in Datatables, which allows for sorting/filtering/searching the data, as well as a basic "advanced search" (made possible via the Datatables "Searchbuilder"). This allows users to construct queries to filter the displayed data, which is quite useful.
+          </p>
+        </div>
+        <div class="text-sm row row-gap-2">
+          <div class="col">
+            <div class="text-base fw-semibold">Advanced Search</div>
+            <p>
+              The feature that started this whole endeavor in the first place. Largely inspired by Jerrybase, even using a similar layout.
+            </p>
+            <p>
+              <p>This allows for searching of events by any number of and combination of parameters. Things like:</p>
+              <ul>
+                <li>Date Range</li>
+                <li>Month/Day (or This Day in History)</li>
+                <li>Location</li>
+                <li>Band/Musicians present on stage</li>
+              </ul>
+            </p>
+            <p>
+              Additionally, there is the ability to search setlists by song or even sequence of songs (think Incident/Rosie). This is an incredibly powerful feature, especially when combined with the above event search. Due to the potentially limitless combination of queries, it should be considered a work in progress as I can't account for every possible query in my testing.
+            </p>
+            <p>
+              <br>
+              <p>Some examples include:</p>
+              <ul>
+                <li>
+                  <a href="{% url "adv_search_results" %}?day_of_week=7&conjunction=and&form-TOTAL_FORMS=1&form-INITIAL_FORMS=0&form-MIN_NUM_FORMS=&form-MAX_NUM_FORMS=&form-0-song1=1460&form-0-choice=True&form-0-position=anywhere&submit=">Shows on a Saturday where Tougher Than The Rest was played ("Well it's saturday night, you're all dressed up in blue...")</a>
+                </li>
+                <li>
+                  <a href="{% url "adv_search_results" %}?relation=1481&conjunction=and&form-TOTAL_FORMS=1&form-INITIAL_FORMS=0&form-MIN_NUM_FORMS=&form-MAX_NUM_FORMS=&form-0-song1=122&form-0-choice=True&form-0-position=anywhere&submit=">Shows where Patti Smith was present and Because The Night was played</a>
+                </li>
+                <li>
+                  <a href="{% url "adv_search_results" %}?city=273&conjunction=and&form-TOTAL_FORMS=1&form-INITIAL_FORMS=0&form-MIN_NUM_FORMS=&form-MAX_NUM_FORMS=&form-0-song1=1281&form-0-choice=True&form-0-position=anywhere&submit=">Street Fighting Man played in London ("Cause in sleepy London town, there's just no place for a street fighting man).</a>
+                </li>
+              </ul>
+            </p>
+            <p>
+              There is also a secondary search for searching setlist notes. Which includes everything from guests present on songs, which songs were acoustic/full band, etc.
+            </p>
+          </div>
+        </div>
+        <div class="text-sm row row-gap-2">
+          <div class="text-base fw-semibold">Data</div>
+          <p>
+            This extends to most of the data present on the site. I wanted a more comprehensive level of data that was present on sites like Brucebase. This was partially due to the focus on searching/filtering that I wanted, which did necessitate expanding what data was included in the database.
+          </p>
+          <p>
+            Things like Events now having tour legs and Event "runs", Songs having a count of public/private/snippet plays, and even being able to get a list of songs played on a given tour/run/leg/location. I even have plans to include venue address/coordinates, which is an ongoing effort.
+          </p>
+          <p>
+            Setlists in particular were a big focus. Setlists are broken up by set, and even include things like snippets, guests, sign requests and more. Songs are even marked based on whether Bruce was present, or if it was an instrumental. All this and more are now tracked as part of the setlists. That also means that they can be searched/queried with the advanced search above, rather than simply appearing as a text-based note on a page.
+          </p>
+          <p>
+            There is also an incomplete list of bootlegs and official releases. Eventually I plan to flesh out the bootleg data with info from the boots themselves. No ETA on this yet.
+          </p>
+        </div>
+        <div class="text-sm row row-gap-2">
+          <div class="text-lg fw-semibold mb-1">Credits and Closing</div>
+          <p>
+            Before this page gets too long, I'd like to close with some thanks. This isn't a comprehensive list by any means, and I plan to expand the credits/sources page eventually.
+          </p>
+          <p>
+            First and foremost, <a href="https://brucebase.wikidot.com/">Brucebase</a>. This site was built upon their data and information, which was gathered tirelessly over the past few decades. Without them, there would be no Databruce.
+          </p>
+          <p>
+            <a href="https://www.springsteenlyrics.com/index.php">SpringsteenLyrics</a>, which provided info on the many bootlegs that are out there. The data was pretty heavily modified, using my collection as a secondary source. This is very much incomplete, and I plan to flesh this info out further down the line.
+          </p>
+          <p>
+            <a href="https://jerrybase.com">Jerrybase</a>, <a href="https://elgoose.net/">ElGoose</a>, <a href="https://dripfield.pro/">Dripfield.pro</a>. All three of these provided various inspiration for many parts of Databruce. From layout to features to presentation of data was all inspired by these three sites.
+          </p>
+          <p>
+            Jerrybase in particular deserves thanks, as their advanced search was what got me started on this whole quest in the first place (even if it took longer than I anticipated.) My advanced search is based heavily on theirs, being used to figure out on a conceptual level how it should work in the first place.
+          </p>
+          <p>
+            Sites like ElGoose and Dripfield.pro (in it's pre 7.0 version) were an influence on the layout and design of the site. Additionally, the event detail page takes heavy influence from the game pages on Speedrun.com.
+          </p>
+          <p>
+            Lastly, I want to thank the members of the r/brucespringsteen Discord server for being my unwilling ~~Guinea Pigs~~ beta testers. Databruce marks the first time I've done anything on this scale at all (let alone something that was to be publicly available). Their help in testing and providing feedback/ideas was crucial to this site being in the state that it is.
+          </p>
+          <p>
+            This site is always going to be a work in progress. If you have suggestions/questions, I can be reached via the <a href="{% url "contact" %}">contact form here</a> or on Discord, Feel free to reach out!
+          </p>
+          <p>
+            Thanks for reading,
+            <br>
+            Lilbud (February 26, 2025)
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock content %}

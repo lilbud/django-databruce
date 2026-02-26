@@ -1,51 +1,24 @@
 import django_filters
 from django import forms
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models import F, Q
+from django.db.models import (
+    F,
+    Q,
+)
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
 
 from databruce import models
 
-
-def get_sb_filter(
-    self,
-    column: str,
-    condition: str,
-    value: str = "",
-    value2: str = "",
-    sb_type: str = "",
-):
-    filter_types = {
-        "=": Q(**{f"{column}__iexact": value}),
-        "!=": ~Q(**{f"{column}__iexact": value}),
-        "starts": Q(**{f"{column}__istartswith": value}),
-        "!starts": ~Q(**{f"{column}__istartswith": value}),
-        "contains": Q(**{f"{column}__icontains": value}),
-        "!contains": ~Q(**{f"{column}__icontains": value}),
-        "ends": Q(**{f"{column}__iendswith": value}),
-        "!ends": ~Q(**{f"{column}__iendswith": value}),
-        "null": Q(**{f"{column}__exact": ""}) | Q(**{f"{column}__isnull": True}),
-        "!null": ~Q(**{f"{column}__exact": ""}) & Q(**{f"{column}__isnull": False}),
-        "<": Q(**{f"{column}__lt": value}),
-        "<=": Q(**{f"{column}__lte": value}),
-        ">=": Q(**{f"{column}__gte": value}),
-        ">": Q(**{f"{column}__gt": value}),
-        "between": Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
-        "!between": ~Q(
-            Q(**{f"{column}__gte": value}) & Q(**{f"{column}__lte": value2}),
-        ),
-    }
-
-    if sb_type == "num":
-        filter_types["null"] = Q(**{f"{column}__isnull": True})
-        filter_types["!null"] = Q(**{f"{column}__isnull": False})
-
-    if sb_type == "boolean":
-        filter_types["null"] = Q(**{f"{column}": False})
-        filter_types["!null"] = Q(**{f"{column}": True})
-
-    return filter_types.get(condition)
+# from .views import VALID_SET_NAMES
+VALID_SET_NAMES = [
+    "Show",
+    "Set 1",
+    "Set 2",
+    "Encore",
+    "Pre-Show",
+    "Post-Show",
+]
 
 
 class DataTablesFilterBackend(BaseFilterBackend):
@@ -172,6 +145,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
         # --- 2. SEARCHING LOGIC ---
         global_search_value = request.query_params.get("search[value]")
+        global_search_regex = request.query_params.get("search[regex]")
 
         is_filtered = False
         global_q = Q()
@@ -184,8 +158,12 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
             if global_search_value:
                 is_filtered = True
+
+                # if global_search_regex:
+                #     search_type = "iregex"
+
                 for field in config["fields"]:
-                    global_q |= Q(**{f"{field}__icontains": global_search_value})
+                    global_q |= Q(**{f"{field}__{search_type}": global_search_value})
 
             if config["search_value"]:
                 is_filtered = True
@@ -198,6 +176,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
                     col_specific_q |= Q(
                         **{f"{field}__{search_type}": config["search_value"]},
                     )
+
                 column_q &= col_specific_q
 
         # --- 3. ORDERING LOGIC ---
@@ -263,12 +242,14 @@ class DataTablesFilterBackend(BaseFilterBackend):
             sb_index += 1
 
         if is_filtered:
+            print(global_q)
             queryset = queryset.filter(global_q & column_q)
 
         if sb_filter:
             queryset = queryset.filter(sb_filter)
 
         if is_filtered or order_list:
+            print(order_list)
             return queryset.order_by(*order_list).distinct()
 
         return queryset
@@ -334,202 +315,6 @@ class EventRunFilter(filters.FilterSet):
 
 class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
     pass
-
-
-class AdvancedEventSearchFilter(filters.FilterSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # 1. Loop through all filters defined in Meta.fields
-        # We create a copy of the keys to avoid 'dictionary changed size during iteration'
-        for field_name in list(self.filters.keys()):
-            # 2. Skip existing exclude toggles to avoid infinite loops
-            if field_name.endswith("_is_not"):
-                continue
-
-            # 3. Create a dynamic 'is not' toggle for this field
-            toggle_name = f"{field_name}_is_not"
-            self.filters[toggle_name] = django_filters.BooleanFilter(
-                label="",
-                widget=forms.Select(
-                    attrs={
-                        "class": "form-select form-select-sm col-3",
-                    },
-                    choices=((True, "is"), (False, "not")),
-                ),
-            )
-
-    id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
-
-    day_of_week = filters.NumberFilter(
-        field_name="date__week_day",
-        label="day of week",
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "dow"},
-        ),
-    )
-
-    start_date = filters.DateFilter(
-        field_name="date",
-        required=False,
-        lookup_expr="gte",
-        label="start date",
-        widget=forms.DateInput(attrs={"type": "date"}),
-    )
-
-    end_date = filters.DateFilter(
-        field_name="date",
-        required=False,
-        lookup_expr="lte",
-        label="end date",
-        widget=forms.DateInput(attrs={"type": "date"}),
-    )
-
-    month = filters.NumberFilter(
-        field_name="date__month",
-        label="month",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm", "id": "month"},
-        ),
-    )
-
-    day = filters.NumberFilter(
-        field_name="date__day",
-        label="day",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "day"},
-        ),
-    )
-
-    venue = filters.NumberFilter(
-        field_name="venue__id",
-        label="venue",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "venue"},
-        ),
-    )
-
-    city = filters.NumberFilter(
-        label="city",
-        field_name="venue__city__id",
-        required=False,
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "city"},
-        ),
-    )
-
-    state = filters.NumberFilter(
-        field_name="venue__city__state__id",
-        label="state",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "state"},
-        ),
-    )
-
-    country = filters.NumberFilter(
-        field_name="venue__city__country__id",
-        label="country",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "country"},
-        ),
-    )
-
-    run = filters.NumberFilter(
-        field_name="run__id",
-        label="event run",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "run"},
-        ),
-    )
-
-    tour = filters.NumberFilter(
-        field_name="tour__id",
-        label="tour",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "tour"},
-        ),
-    )
-
-    leg = filters.NumberFilter(
-        field_name="leg__id",
-        label="tour_leg",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "leg"},
-        ),
-    )
-
-    def filter_queryset(self, queryset):
-        """Global loop that stacks filters or exclusions based on the toggle state."""
-        # Ensure form is valid before accessing cleaned_data
-        if not self.form.is_valid():
-            return queryset
-
-        data = self.form.cleaned_data
-
-        for name, value in data.items():
-            # Skip empty inputs and the toggle fields themselves
-            if value in [None, "", False, []] or name.endswith("_is_not"):
-                continue
-
-            # Get the model field path (e.g., 'venue__city')
-            filter_obj = self.filters.get(name)
-            model_path = filter_obj.field_name if filter_obj else name
-
-            # Determine if we should .filter() or .exclude()
-            is_exclude = data.get(f"{name}_is_not") is True
-
-            if type(value) is str:
-                lookup = f"{model_path}__iexact"
-            else:
-                lookup = f"{model_path}__exact"
-
-            if is_exclude:
-                queryset = queryset.exclude(**{lookup: value})
-            else:
-                queryset = queryset.filter(**{lookup: value})
-
-            print(queryset)
-
-        return queryset
-
-    relation = django_filters.NumberFilter(
-        field_name="onstage__relation_id",
-        required=False,
-        label="onstage relation",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "relation"},
-        ),
-    )
-
-    band = django_filters.NumberFilter(
-        field_name="onstage__band_id",
-        distinct=True,
-        required=False,
-        label="onstage band",
-        widget=forms.Select(
-            attrs={"class": "form-select form-select-sm select2", "id": "band"},
-        ),
-    )
-
-    class Meta:
-        model = models.Events
-        fields = [
-            # "start_date",
-            # "end_date",
-            # "day_of_week",
-            # "month",
-            # "day",
-            "venue",
-            "city",
-            "state",
-            "country",
-            "run",
-            "tour",
-            "leg",
-            "relation",
-            "band",
-        ]
 
 
 class EventsFilter(filters.FilterSet):
@@ -613,6 +398,10 @@ class EventsFilter(filters.FilterSet):
         label="onstage band",
     )
 
+    user = filters.NumberFilter(
+        field_name="user_event__user_id",
+    )
+
     class Meta:
         model = models.Events
         fields = [
@@ -671,19 +460,36 @@ class SetlistFilter(filters.FilterSet):
     event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
     run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
     leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
-    tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
-    song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
+    tour = filters.NumberFilter(
+        field_name="event__tour__id",
+        lookup_expr="exact",
+    )
+
+    song = filters.NumberFilter(
+        field_name="song__id",
+        lookup_expr="exact",
+        distinct=True,
+    )
+
     venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+
     city = filters.NumberFilter(
         field_name="event__venue__city__id",
         lookup_expr="exact",
     )
+
     state = filters.NumberFilter(
         field_name="event__venue__city__state__id",
         lookup_expr="exact",
     )
+
     country = filters.NumberFilter(
         field_name="event__venue__city__country__id",
+        lookup_expr="exact",
+    )
+
+    user = filters.NumberFilter(
+        field_name="event__user_event__id",
         lookup_expr="exact",
     )
 
@@ -691,8 +497,18 @@ class SetlistFilter(filters.FilterSet):
         lookup = f"{name}__isnull"
         return queryset.filter(**{lookup: False})
 
+    def filter_show_only(self, queryset, name, value):
+        lookup = "set_name__in"
+
+        lookup = Q(set_name__in=VALID_SET_NAMES) & Q(event__public=True)
+        return queryset.filter(lookup)
+
     song_num = filters.BooleanFilter(
         method="filter_song_num",
+    )
+
+    show_only = filters.BooleanFilter(
+        method="filter_show_only",
     )
 
     class Meta:
@@ -718,6 +534,62 @@ class SetlistEntryFilter(filters.FilterSet):
         field_name="event__venue__country__id",
         lookup_expr="exact",
     )
+
+
+class SetlistSongsFilter(filters.FilterSet):
+    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
+    run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
+    leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
+    tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
+    venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+    city = filters.NumberFilter(
+        field_name="event__venue__city__id",
+        lookup_expr="exact",
+    )
+
+    state = filters.NumberFilter(
+        field_name="event__venue__city__state__id",
+        lookup_expr="exact",
+    )
+
+    country = filters.NumberFilter(
+        field_name="event__venue__city__country__id",
+        lookup_expr="exact",
+    )
+
+    user = filters.NumberFilter(
+        field_name="event__user_event__user_id",
+        lookup_expr="exact",
+    )
+
+    user_unseen = filters.NumberFilter(
+        field_name="event__user_event__user_id",
+        method="filter_unseen",
+        label="Unseen",
+    )
+
+    user_rare = filters.BooleanFilter(
+        field_name="song__num_plays_public",
+        method="filter_rare",
+        label="Rare (<100 plays)",
+    )
+
+    public_plays = filters.NumberFilter(
+        field_name="song__num_plays_public",
+        lookup_expr="gte",
+    )
+
+    def filter_rare(self, queryset, name, value):
+        lookup = "song__num_plays_public__lte"
+        return queryset.filter(**{lookup: 100})
+
+    def filter_unseen(self, queryset, name, value):
+        songs = queryset.filter(**{name: value}).values_list(
+            "song__id",
+            flat=True,
+        )
+
+        return queryset.exclude(song__id__in=songs).filter(song__num_plays_public__gt=0)
 
 
 class SnippetFilter(filters.FilterSet):
@@ -763,3 +635,10 @@ class SetlistNoteFilter(filters.FilterSet):
 class UserAttendedShowsFilter(filters.FilterSet):
     user = filters.NumberFilter(field_name="user__id", lookup_expr="exact")
     event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
+
+
+class SetlistBreakdownFilter(filters.FilterSet):
+    event = filters.CharFilter(
+        field_name="setlists__event__event_id",
+        lookup_expr="exact",
+    )

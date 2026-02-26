@@ -1,4 +1,4 @@
-{% extends "databruce/base.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
@@ -9,511 +9,582 @@
           async></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col-12 col-xxl-8 mx-auto">
-    <div class="d-grid gap-0 row-gap-2">
-      <div class="row">
+  <div class="col d-grid gap-0 gx-0">
+    <!-- next and last buttons-->
+    <div class="row mb-2 gx-0">
+      <div class="col gap-0 column-gap-1 d-flex justify-content-end">
+        {% if prev_event %}
+          <a role="button"
+             class="btn btn-sm btn-primary"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-html="true"
+             data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue.name }}</div>"
+             href="{% url 'event_details' id=prev_event.event_id %}">Prev</a>
+        {% endif %}
+        {% if user.is_superuser %}
+          <a class="btn btn-sm btn-danger"
+             role="button"
+             target="_blank"
+             href="{% url 'admin:index' %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
+        {% endif %}
+        {% if next_event %}
+          <a role="button"
+             class="btn btn-sm btn-primary"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-html="true"
+             data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue.name }}</div>"
+             href="{% url 'event_details' id=next_event.event_id %}">Next</a>
+        {% endif %}
+      </div>
+    </div>
+    {% if not event.date %}
+      <!-- message cards -->
+      <div class="row mb-2 gx-0">
         <div class="col">
-          <div class="float-end text-base">
-            {% with last=event.get_last %}
-              {% if last %}
-                <a class="btn btn-sm btn-secondary"
-                   role="button"
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top"
-                   data-bs-html="true"
-                   data-bs-title="<div>{{ last.get_date }}<br>{{ last.artist }}<br>{{ last.venue.name }}</div>"
-                   href="{% url "event_details" id=last.event_id %}">&lt; Prev</a>
-              {% endif %}
-            {% endwith %}
-            {% if user.is_superuser %}
-              <a class="btn btn-sm btn-danger"
-                 role="button"
-                 href="{% url 'admin:index' %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
-            {% endif %}
-            {% with next=event.get_next %}
-              {% if next %}
-                <a class="btn btn-sm btn-secondary"
-                   role="button"
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top"
-                   data-bs-html="true"
-                   data-bs-title="<div>{{ next.get_date }}<br>{{ next.artist }}<br>{{ next.venue.name }}</div>"
-                   href="{% url "event_details" id=next.event_id %}">Next &gt;</a>
-              {% endif %}
-            {% endwith %}
-          </div>
+          <div class="card message info fst-italic p-2">This is a placeholder date, actual date unknown.</div>
         </div>
       </div>
-      {% if not event.date %}
-        <div class="row">
-          <div class="col">
-            <div class="card">
-              <div class="card-body message info fst-italic p-2">This is a placeholder date, actual date unknown.</div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-      <div class="row">
-        <div class="col">
-          <div class="card" id="eventInfo">
-            <div class="card-body">
-              <div class="d-flex flex-wrap">
-                <div class="flex-grow-1 w-75 mb-2 mb-xl-0">
-                  {% if event.title %}
-                    <div id="title" class="text-wrap mb-1 text-sm text-light">{{ event.title|markdown|safe }}</div>
-                  {% endif %}
-                  <div class="text-wrap text-xl">
-                    <span id="date">{{ event.event_id|format_fuzzy }}</span>
-                    <a class="fw-semibold"
-                       href="{% url 'band_details' id=event.artist.id %}"
-                       id="artist">{{ event.artist }}</a>
-                  </div>
-                  <div class="text-base fw-semibold">
-                    <a href="{% url 'venue_details' id=event.venue.id %}">{{ event.venue.get_name }}, {{ event.venue.city }}</a>
-                  </div>
-                  <div class="badge-row mt-2 d-flex flex-wrap gap-0 row-gap-1">
-                    {% if event.tour %}
-                      <a class="pe-1" href="{% url 'tour_details' id=event.tour.id %}"><span class="badge bg-primary fw-medium">{{ event.tour }}</span></a>
-                    {% endif %}
-                    {% if event.leg %}
-                      <a class="pe-1" href="{% url 'leg_details' id=event.leg.id %}"><span class="badge bg-primary fw-medium">{{ event.leg.name }}</span></a>
-                    {% endif %}
-                    {% if event.run %}
-                      <a class="pe-1" href="{% url 'run_details' id=event.run.id %}"><span class="badge bg-primary fw-medium">{{ event.run.name }}</span></a>
-                    {% endif %}
-                  </div>
-                  {% if event.brucebase_url or nugs %}
-                    <div class="badge-row mt-3 text-base">
-                      {% if event.brucebase_url %}
-                        <a id="eventlink"
-                           class="pe-1"
-                           href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
-                          <span class="badge bg-secondary text-secondary eventlink">
-                            <i class="bi bi-link-45deg pe-1"></i>
-                            <span>Brucebase</span>
-                          </span>
-                        </a>
-                      {% endif %}
-                      {% if event.nugs %}
-                        <a class="pe-1" id="eventlink" href="{{ event.nugs.url }}">
-                          <span class="badge bg-nugs">
-                            <i class="bi bi-headphones pe-1"></i>
-                            <span>Nugs</span>
-                          </span>
-                        </a>
-                      {% endif %}
-                    </div>
-                  {% endif %}
-                </div>
-                <div class="flex-shrink-1 mt-2 mt-md-0">
-                  {% if user.is_authenticated and event.public %}
-                    <form method="post" id="userForm">
-                      <input type="hidden" name="event" value="{{ event.id }}">
-                      <input type="hidden" name="user" value="{{ user.id }}">
-                      {% csrf_token %}
-                      <div class="btn-group input-group input-group-sm"
-                           role="group"
-                           aria-label="Basic example">
-                        <button id="addshow"
-                                type="submit"
-                                name="submit"
-                                class="btn btn-sm text-nowrap {% if user_attended %}btn-primary active{% else %}btn-secondary{% endif %}">
-                          {% if user_attended %}
-                            <i class="bi bi-star-fill pe-1" id="star"></i>
-                          {% else %}
-                            <i class="bi bi-star pe-1"id="star"></i>
-                          {% endif %}
-                          <span id="attended">
-                            {% if user_attended %}
-                              Attended
-                            {% else %}
-                              Attended?
-                            {% endif %}
-                          </span>
-                        </button>
-                        <button type="button"
-                                id="usercount"
-                                class="btn btn-sm btn-secondary {% if user_attended %}active{% endif %}">
-                          {{ user_count|default_if_none:'0' }}
-                        </button>
-                        {% comment %} <span class="input-group-text" id="usercount">{{ user_count|default_if_none:'0'
-                        }}</span> {% endcomment %}
-                      </div>
-                    </form>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            <div class="card-footer">
-              <nav class="nav nav-underline px-2">
-                <a class="nav-link active text-sm"
-                   id="overview-tab"
-                   data-bs-toggle="pill"
-                   data-bs-target="#overview"
-                   type="button"
-                   role="tab"
-                   aria-controls="overview"
-                   aria-selected="true">Overview</a>
-                <a class="nav-link text-sm"
-                   id="notes-tab"
-                   data-bs-toggle="pill"
-                   data-bs-target="#notes"
-                   type="button"
-                   role="tab"
-                   aria-controls="notes"
-                   aria-selected="false">Notes</a>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-content">
-        <div id="overview" class="tab-pane fade show active">
-          <div class="row">
-            <div class="col-12 col-lg-10 order-2 order-lg-1 pe-lg-2">
-              <div class="row row-cols-1 g-2 row-gap-2">
-                <div class="col">
-                  {% if event.note %}
-                    <div class="col-12 d-md-block d-lg-none">
-                      <div class="card mb-2" id="notes-card">
-                        <div class="card-header">
-                          Event Notes
-                          <div class="float-end">
-                            <i class="bi bi-pencil"></i>
-                          </div>
-                        </div>
-                        <div class="card-body text-xs">
-                          <div>{{ event.note|mdlink|safe }}</div>
-                        </div>
-                      </div>
-                    </div>
-                  {% endif %}
-                  <div class="card mb-2" id="setlist-card">
-                    <div class="card-header">
-                      <div class="d-flex justify-content-between">
-                        <span>Setlist</span>
-                        <span class="text-sm my-auto"
-                              data-bs-toggle="tooltip"
-                              data-bs-html="true"
-                              data-bs-title="Setlist Options">
-                          <a role="button"
-                             class="btn btn-sm btn-primary px-1 py-0"
-                             data-bs-toggle="collapse"
-                             href="#options">
-                            <i class="bi bi-gear-fill text-sm"></i>
-                          </a>
-                        </span>
-                      </div>
-                      <div class="row collapse px-0 mt-2" id="options">
-                        <div class="row">
-                          <div class="col">
-                            <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-body p-0">
-                      <div class="table-responsive">
-                        <table class="table table-hover display wrap" id="setlistTable">
-                          <thead>
-                            <th class="all">#</th>
-                            <th class="all">Song</th>
-                            {% comment %} <th class="none">Position</th> {% endcomment %}
-                            <th class="min-desktop">Gap</th>
-                            <th class="min-desktop">Tour</th>
-                            <th class="min-desktop">Last</th>
-                            <th class="min-desktop">Notes</th>
-                          </thead>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mt-2 mt-md-0 mb-4 col-lg-2 ps-lg-0 order-2">
-              <div class="row row-cols-1 row-cols-md-3 row-cols-lg-1 g-2 ps-lg-0"
-                   id="masonry-grid">
-                {% if event.note %}
-                  <div class="col-12 d-none d-lg-block order-1">
-                    <div class="card" id="notes-card">
-                      <div class="card-header">
-                        Event Notes
-                        <div class="float-end">
-                          <i class="bi bi-pencil"></i>
-                        </div>
-                      </div>
-                      <div class="card-body text-xs">
-                        <div>{{ event.note|markdown|safe }}</div>
-                        <div class="row mt-1">
-                          <a href="#"
-                             role="button"
-                             class="btn-link text-primary fw-semibold mt-2 text-sm"
-                             data-bs-toggle="modal"
-                             data-bs-target="#notes-modal">See More</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
-                {% comment %} {% if onstage %} {% endcomment %}
-                <div class="col order-2">
-                  <div class="card">
-                    <div class="card-header">
-                      Performers
-                      <div class="float-end">
-                        <i class="bi bi-person"></i>
-                      </div>
-                    </div>
-                    <div class="card-body p-1">
-                      <div class="table-responsive">
-                        <table class="table display" id="onstageTable">
-                          <thead>
-                            <th class="d-none all">#</th>
-                          </thead>
-                        </table>
-                      </div>
+    {% endif %}
+    <!-- event info -->
+    <div class="row mb-3 gx-0">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-wrap">
+              <div class="flex-grow-1 w-75 mb-4 mb-md-0">
+                {% comment %} {% if event.title %} {% endcomment %}
+                <div class="row mb-1">
+                  <div class="col">
+                    <div id="title" class="text-wrap text-xs fst-italic fw-light">
+                      {{ event.title|markdown|safe|default_if_none:"test" }}
                     </div>
                   </div>
                 </div>
                 {% comment %} {% endif %} {% endcomment %}
-                {% if album_breakdown %}
-                  <div class="col order-3">
-                    <div class="card">
-                      <div class="card-header align-middle">
-                        Albums
-                        <button class="btn btn-sm btn-success float-end text-xs"
-                                data-bs-toggle="modal"
-                                data-bs-target="#album-breakdown-modal"
-                                role="button">Breakdown</button>
+                <div class="row mb-2">
+                  <div class="col">
+                    <div class="row">
+                      <div class="text-wrap text-lg">
+                        <span id="date">
+                          {% if event.date %}
+                            {{ event.get_date }}
+                          {% else %}
+                            {{ event.event_id|format_fuzzy }}
+                          {% endif %}
+                        </span>
+                        <a class="fw-medium text-reset"
+                           href="{% url 'band_details' id=event.artist.uuid %}"
+                           id="artist">{{ event.artist }}</a>
                       </div>
-                      <div class="card-body p-3" id="breakdown">
-                        {% for album in album_breakdown %}
-                          <div class="row pb-2 album-breakdown">
-                            <div class="col">
-                              <div class="progress-label text-xs fw-semibold">{{ album.category }}</div>
-                              <div class="progress d-flex flex-row justify-content-between">
-                                <div class="progress-bar"
-                                     style="width:{% widthratio album.percent album.max album.max %}%">
-                                  <span class="song-count fw-bold">{{ album.num }}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        {% endfor %}
+                    </div>
+                    <div class="row text-lg fw-medium text-reset">
+                      <div class="col">
+                        <a class="text-reset"
+                           href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}, {{ event.venue.city }}</a>
                       </div>
                     </div>
                   </div>
-                {% endif %}
-                {% if official or event.archive %}
-                  <div class="col order-4">
-                    <div class="card" id="links-card">
-                      <div class="card-header">
-                        Links
-                        <div class="float-end">
+                </div>
+                <div class="row mb-3">
+                  <div class="col-auto">
+                    <div class="badge-row d-inline-flex flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
+                         id="badge-row">
+                      {% if event.tour %}
+                        <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge bg-primary">{{ event.tour }}</span></a>
+                      {% endif %}
+                      {% if event.leg %}
+                        <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge bg-primary">{{ event.leg.name }}</span></a>
+                      {% endif %}
+                      {% if event.run %}
+                        <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge bg-primary">{{ event.run.name }}</span></a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-auto">
+                    <div class="badge-row d-flex-inline flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
+                         id="badge-row-2">
+                      {% if event.brucebase_url %}
+                        <a role="button"
+                           target="_blank"
+                           class="btn btn-sm btn-primary-dark text-xs"
+                           href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
                           <i class="bi bi-link-45deg"></i>
-                        </div>
-                      </div>
-                      <div class="card-body">
-                        <ul class="ps-2 d-grid gap-0 row-gap-2">
-                          {% if official %}
-                            {% for rel in official %}
-                              <li>
-                                <a href="{% url 'release_details' id=rel.release.id %}">{{ rel.release.name }} (Official
-                                Release)</a>
-                              </li>
-                            {% endfor %}
-                          {% endif %}
-                          {% if event.boot %}
-                            <li>
-                              <a href="https://www.springsteenlyrics.com/bootlegs.php?filter_date={{ event.date|date:'Y-m-d' }}&cmd=list&category=filter_date">View bootlegs on SpringsteenLyrics</a>
-                            </li>
-                          {% endif %}
-                          {% if event.archive %}
-                            <li>
-                              <a href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:' Y-m-d' }}">Radio Nowhere Archive</a>
-                            </li>
-                          {% endif %}
-                        </ul>
-                      </div>
+                          <span>Brucebase</span>
+                        </a>
+                      {% endif %}
+                      {% if event.nugs %}
+                        <a role="button"
+                           target="_blank"
+                           href="{{ event.nugs.url }}"
+                           class="btn btn-sm btn-primary-dark text-xs">
+                          <i class="bi bi-headphones"></i>
+                          <span>Nugs</span>
+                        </a>
+                      {% endif %}
                     </div>
                   </div>
+                </div>
+              </div>
+              <div class="flex-shrink-1">
+                {% if user.is_authenticated and event.public %}
+                  <form method="post" id="userForm">
+                    <input type="hidden" name="event" value="{{ event.id }}">
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    {% csrf_token %}
+                    <div class="btn-group input-group input-group-sm"
+                         role="group"
+                         aria-label="Basic example">
+                      <button id="addshow"
+                              type="submit"
+                              name="submit"
+                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-primary-dark{% endif %}">
+                        {% if user_attended %}
+                          <i class="bi bi-star-fill pe-1" id="star"></i>
+                        {% else %}
+                          <i class="bi bi-star pe-1"id="star"></i>
+                        {% endif %}
+                        <span id="attended">
+                          {% if user_attended %}
+                            Attended
+                          {% else %}
+                            Attended?
+                          {% endif %}
+                        </span>
+                        <button type="button"
+                                id="usercount"
+                                disabled
+                                class="btn btn-sm {% if user_attended %}btn-primary{% else %}btn-primary-dark{% endif %}">
+                          {{ user_count }}
+                        </button>
+                      </button>
+                    </div>
+                  </form>
                 {% endif %}
               </div>
             </div>
           </div>
+          <div class="card-footer py-0 px-1">
+            <nav class="nav nav-underline px-2">
+              <a class="nav-link active text-sm"
+                 id="overview-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#overview"
+                 type="button"
+                 role="tab"
+                 aria-controls="overview"
+                 aria-selected="true">Overview</a>
+              <a class="nav-link text-sm"
+                 id="onstage-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#onstage"
+                 type="button"
+                 role="tab"
+                 aria-controls="notes"
+                 aria-selected="false">Onstage</a>
+              <a class="nav-link text-sm"
+                 id="notes-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#notes"
+                 type="button"
+                 role="tab"
+                 aria-controls="notes"
+                 aria-selected="false">Notes</a>
+              <a class="nav-link text-sm"
+                 id="links-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#links"
+                 type="button"
+                 role="tab"
+                 aria-controls="notes"
+                 aria-selected="false">Links</a>
+            </nav>
+          </div>
         </div>
-        <div id="notes" class="tab-pane fade">
-          <div class="row">
+      </div>
+    </div>
+    <div class="row d-xl-none mb-3 gx-0">
+      <div class="col">
+        {% partialdef event-note inline %}
+          <div class="card">
+            <div class="card-header">
+              Notes
+              <i class="bi bi-pencil"></i>
+            </div>
+            <div class="card-body event-note">{{ event.note|markdown|safe|linebreaks|default_if_none:"" }}</div>
+          </div>
+        {% endpartialdef %}
+      </div>
+    </div>
+    <!-- setlist and notes -->
+    <div class="row row-cols-1 row-cols-lg-2 gy-3 gx-0">
+      <div class="col-12 col-lg-8 col-xl-9 pe-lg-3">
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active"
+               id="overview"
+               role="tabpanel"
+               aria-labelledby="overview-tab"
+               tabindex="0">
             <div class="col-12">
               <div class="card">
-                <div class="card-body">
-                  <div class="fs-5">Notes Coming Soon</div>
+                <div class="card-header d-flex flex-column">
+                  <div class="d-flex justify-content-between w-100">
+                    Setlist
+                    <span class="text-sm my-auto"
+                          data-bs-toggle="tooltip"
+                          data-bs-html="true"
+                          data-bs-title="Setlist Options">
+                      <a role="button"
+                         class="btn btn-sm btn-primary px-1 py-0"
+                         data-bs-toggle="collapse"
+                         href="#options">
+                        <i class="bi bi-three-dots text-sm"></i>
+                      </a>
+                    </span>
+                  </div>
+                  <div class="collapse row w-100" id="options">
+                    <div class="col-12 px-0 pt-1">
+                      <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover display wrap" id="setlistTable">
+                      <thead>
+                        <th class="all">#</th>
+                        <th class="all">Song</th>
+                        <th class="all">Gap</th>
+                        <th class="all">Tour</th>
+                        <th class="all">Last</th>
+                        <th class="all">Note</th>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade"
+               id="onstage"
+               role="tabpanel"
+               aria-labelledby="onstage-tab"
+               tabindex="1">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">Onstage</div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover display wrap" id="onstageTable">
+                      <thead>
+                        <th class="all">Guest</th>
+                        <th class="all">Person</th>
+                        <th class="all">Band</th>
+                        <th class="min-tablet-l">Note</th>
+                      </thead>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <div class="tab-pane fade"
+             id="notes"
+             role="tabpanel"
+             aria-labelledby="notes-tab"
+             tabindex="2"></div>
+        <div class="tab-pane fade"
+             id="links"
+             role="tabpanel"
+             aria-labelledby="links-tab"
+             tabindex="3"></div>
       </div>
-    </div>
-  </div>
-  <div class="modal fade"
-       id="album-breakdown-modal"
-       tabindex="-1"
-       aria-labelledby="album-breakdown-modal-label"
-       aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-title text-xl" id="album-breakdown-modal-label">Album Breakdown</div>
-          <button type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group mb-3" id="breakdown">
-            {% regroup setlist_unique by song.category as album_list %}
-            <ul class="list-group mb-3" id="breakdown">
-              {% for album in album_breakdown %}
-                <li class="list-group-item active px-2 py-1">
-                  <div class="mb-0 fw-bold text-reset text-primary-content text-base">
-                    {% if album.album %}
-                      <a class="text-primary-content"
-                         href="{% url 'release_details' id=album.album %}">{{ album.category
-                      }}</a>
-                    {% else %}
-                      {{ album.category }}
-                    {% endif %}
-                  </div>
-                </li>
-                {% for item in album_list %}
-                  {% if item.grouper == album.category %}
-                    {% for song in item.list %}
-                      <li class="list-group-item text-sm ps-4 py-1">
-                        <a href="{% url 'song_details' id=song.song.id %}">{{ song.song.name }}</a>
-                        {% if song.song.original_artist != 'Bruce Springsteen' %}[{{ song.song.original_artist }}]{% endif %}
-                      </li>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              {% endfor %}
-            </ul>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% if event.note %}
-    <div class="modal fade"
-         id="notes-modal"
-         tabindex="-1"
-         aria-labelledby="notes-modal-label"
-         aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div class="modal-title text-xl" id="album-breakdown-modal-label">Event Notes</div>
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+      <div class="col-12 col-lg-4 col-xl-3">
+        <div class="d-none d-xl-block mb-3">{% partial event-note %}</div>
+        <div class="card mb-3">
+          <div class="card-header">
+            Albums
+            <span class="text-sm my-auto"
+                  data-bs-toggle="tooltip"
+                  data-bs-html="true"
+                  data-bs-title="Expand/Collapse All Rows">
+              <a role="button"
+                 id="album-breakdown-btn"
+                 class="btn btn-sm btn-primary px-1 py-0"
+                 data-bs-toggle="collapse">
+                <i class="bi bi-three-dots text-sm"></i>
+              </a>
+            </span>
           </div>
-          <div class="modal-body text-sm">{{ event.note|markdown|safe }}</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover display wrap" id="albumTable">
+                <thead>
+                  <th class="d-none all">#</th>
+                </thead>
+              </table>
+            </div>
+          </div>
         </div>
+        {% comment %} <div class="card">
+          <div class="card-header">Event Info</div>
+          <div class="card-body">Show Count by tour, location? start/end time?</div>
+        </div> {% endcomment %}
       </div>
     </div>
-  {% endif %}
+  </div>
   <script>
-  var layout = getDatatableLayout({ columns: false, category: false });
+    var counts = [];
 
-  function slugify(str) {
-    str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
-    str = str.toLowerCase(); // convert string to lowercase
-    str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
-      .replace(/\s+/g, '-') // replace spaces with hyphens
-      .replace(/-+/g, '-'); // remove consecutive hyphens
-    return str;
-  }
+    $(document).ready(function () {
+    var layout = getDatatableLayout({ columns: false, category: false });
 
-  var isMobile = false;
+    $('#albumTable').DataTable({
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        ordering: false,
+        searching: false,
+        scrollX: false,
+        paging: false,
+        info: false,
+        ajax: {
+          'url': '/api/v1/setlist_breakdown/?event={{ id }}&format=custom&ordering=-num',
+        },
+        columns: [
+          {
+            'data': 'category',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                var album = slugify(data);
+                var percent = (row.num / row.total) * 100;
+                var complete_badge = ""
 
-  $(document).ready(function () {
-    var table = $('#setlistTable').DataTable(
+                const songItems = row.songs.map(song => {
+
+                  if (song.original_artist !== 'Bruce Springsteen') {
+                    return `<li class="list-group-item px-1 py-1">${song.name} [${song.original_artist}]</li>`
+                  }
+
+                  return `<li class="list-group-item px-1 py-1">${song.name}</li>`
+
+                }).join('')
+
+                if (row.album_complete) {
+                  complete_badge = `<div class="badge ms-1 bg-accent">Complete</div>`
+                }
+
+                const html = `
+                  <div class="col py-1 px-1 album-breakdown" data-bs-toggle="collapse" href="#${album}-collapse">
+                      <div class="row text-xs mx-0 pb-1 d-flex-inline justify-content-between">
+                          <div class="col ps-0 pe-1 text-wrap category"><span>${data}</span> ${complete_badge}</div>
+                          <div class="col-3 text-end px-0 text-nowrap me-1">${row.num}/${row.total} (${percent.toFixed(1)}%)</div>
+                      </div>
+                      <div class="progress px-0 mx-0">
+                          <div class="progress-bar" style="width:${row.percent}%"></div>
+                      </div>
+                      <div class="collapse" id="${album}-collapse">
+                          <ul class="list-group pt-2 pb-1">${songItems}</ul>
+                      </div>
+                  </div>`;
+
+                return html
+              }
+            },
+          }
+        ],
+        initComplete: function() {
+          // enable highlighting of setlist rows by album
+          $("#albumTable tr").each(function () {
+
+            var album = slugify($(this).find('div.category span').text());
+
+            $(this).hover(function () {
+              $(this).css('cursor', "pointer");
+
+              $(`#setlistTable tbody tr:not(.set-header)`).each(function () {
+                var row = $(this);
+                
+                if (row.attr('album') == album) {
+                  $(row).css('opacity', '1');
+                  $(row).children('td').addClass('highlighted');
+                } else {
+                  $(row).css('opacity', '0.2');
+                }
+              });
+
+            }, function () {
+              $(this).css("box-shadow", "none");   // Action on mouseleave
+              $(`#setlistTable tr`).css('opacity', '1');
+              $(`#setlistTable tr`).children('td').removeClass('highlighted');
+            });
+          });
+
+          // button to open/close all album sections
+          $('#album-breakdown-btn').click(function() {
+            var closed = $('#albumTable .collapse:not(.show)');
+            var all = $('#albumTable .collapse');
+
+            if (closed.length > 0) {
+              closed.each(function () {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+                bsCollapse.show();
+              })
+            } else {
+              all.each(function () {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+                bsCollapse.hide();
+              })
+            }
+          })
+        }
+    })
+    
+    $('#onstageTable').DataTable(
       {
         layout: layout,
         serverSide: true,
         processing: true,
-        autoWidth: false,
-        paging: false,
-        searching: false,
-        //scrollX: true,
         ordering: false,
-        ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
+        searching: false,
+        scrollX: false,
+        paging: false,
+        info: false,
+        ajax: {
+          'url': '/api/v1/onstage/?event={{ id }}&format=custom',
+        },
         columnDefs: [
-          { targets: '_all', defaultContent: '', className: 'align-middle text-sm min-desktop' },
-          { targets: [0], type: 'text', className: 'songnum align-middle p-0', width: '1rem' },
-          { targets: [1], width: '22rem' },
-          { targets: [2, 3], width: '3rem' },
-          { targets: [4], width: '6rem' },
+          {'target': 0, columnControl: [] }
         ],
+        columns: [
+          {
+            'data': 'guest',
+            'name': 'guest',
+            'className': 'dt-center text-xl',
+            'width': '38px',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return $('<i />').addClass('bi bi-check-lg text-xl check').prop('outerHTML')
+              }
+            },
+          },
+          {
+            'data': 'relation',
+            'name': 'relation__name',
+            'className': 'text-nowrap',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return `<a class="fw-medium text-reset" href="/songs/${data.id}">${data.name}</a>`;
+              }
+            },
+          },
+          {
+            'data': 'band',
+            'name': 'band__name',
+            'className': 'text-nowrap',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return `<a class="fw-medium text-reset" href="/bands/${data.id}">${data.name}</a>`;
+              }
+            },
+          },
+          {'data': 'note', 'name': 'note' },
+        ]
+      }
+    );
+
+    $('#setlistTable').DataTable(
+      {
+        layout: layout,
+        serverSide: true,
+        processing: true,
+        paging: false,
+        ordering: false,
+        searching: false,
+        info: false,
+        fixedHeader: true,
+        ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
         rowGroup: {
           dataSrc: 'set_name',
-          className: 'text-center setHeader',
+          className: 'text-center set-header p-0 dtrg-group',
+          startRender: function(rows, group) {
+            const g = `<span>${group}</span>`;
+            const td = `<td colspan="${rows.columns().count()}" class="py-0">${g}</td>`;
+            return $('<tr />').addClass(slugify(group)).append(td);
+          }
         },
         createdRow: function (row, data, dataIndex) {
-          if (set_names.includes(data.set_name)) {
+          $(row).addClass(slugify(data.set_name));
+
+          var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+
+          if (allowedSets.includes(data.set_name)) {
             var album = slugify(data.song.category);
             $(row).attr('album', album);
           }
         },
+        columnDefs: [
+          {'targets': '_all', columnControl: [] }
+        ],
         columns: [
           {
             'data': 'song_num',
-            'className': 'dt-center all',
+            'className': 'dt-center',
+            'width': '30px',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && row.position) {
-                var position = row.position.replaceAll(' ', '').toLowerCase();
-
-                return `<span data-bs-toggle="tooltip" data-bs-title="${row.position}" class='songnum ${position}'>${data}</span>`
-              } else if (!data) {
-                return null
-              } else {
-                return `<span class='songnum'>${data}</span>`
+              if (type === 'display' && data) {
+                return data;
               }
+            },
+            'createdCell': function(td, cellData, rowData, row, col) {
+              $(td).addClass('songnum');
+
+              if (rowData.position) {
+                var position = slugify(rowData.position);
+                $(td).addClass(`${position}`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
+              }
+
+              return td;
             },
           },
           {
             'data': 'song',
             'name': 'song__name',
-            'className': 'all text-nowrap',
+            'className': 'text-nowrap',
+            'width': '16rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                var song = `<a class="fw-medium" href="/songs/${data.id}">${data.name}</a>`;
+              if (type === 'display' && data) {
+                var song = `<a class="fw-medium text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
 
-                song = row.segue ? `${song} >` : song;
+                var segue = row.segue ? $('<span />').addClass('segue').text('>').prop('outerHTML') : ''
 
-                var badge = $('<span />').addClass('ms-2 badge align-middle')
+                song = `${song} ${segue}`;
 
-                // instrumental, sign-request, nobruce, premiere
+                var badge = $('<span />').addClass('ms-2 badge')
+
                 if (row.instrumental) {
                   $(badge).addClass('text-bg-info').text('Instrumental');
                 } else if (row.sign_request) {
                   $(badge).addClass('text-bg-info').text('Sign Request');
                 } else if (row.nobruce) {
                   $(badge).addClass('bg-warning').text('No Bruce');
-                } else if (row.premiere) {
-                  $(badge).addClass('bg-secondary d-inline-flex d-lg-none').text('First');
-                } else if (row.debut && !row.premiere) {
-                  $(badge).addClass('bg-secondary d-inline-flex d-lg-none').text('TD');
-                } else if (row.last >= 50 && !row.debut) {
-                  $(badge).addClass('bg-secondary d-inline-flex d-lg-none').text('Bustout');
                 }
+                //else if (row.premiere) {
+                //  $(badge).addClass('bg-secondary d-inline-flex d-md-none').text('First');
+                //} else if (row.debut && !row.premiere) {
+                //  $(badge).addClass('bg-secondary d-inline-flex d-md-none').text('TD');
+                //} else if (row.last >= 50 && !row.debut) {
+                //  $(badge).addClass('bg-secondary d-inline-flex d-md-none').text('Bust');
+                //}
 
-                if (row.notes) {
-                  var notes = `<span class="text-reset text-xs d-sm-table-cell text-wrap d-md-none fw-light">${row.notes.join('; ')}</span>`
-                  return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes : song
-                }
+                //if (row.notes) {
+                //  var notes = $('<span />').addClass('text-wrap d-inline-block d-md-none fw-light setlist-note').text(row.notes.join('; '))
+                //  return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes.prop('outerHTML') : song
+                //}
 
                 return badge ? song + $(badge).prop('outerHTML') : song;
               }
@@ -521,33 +592,34 @@
           },
           {
             'data': 'last',
-            'className': 'dt-center text-nowrap',
+            'className': 'dt-center',
+            'width': '4rem',
             'render': function (data, type, row, meta) {
-
-              var badge = $('<span />').addClass('badge align-middle text-nowrap d-none d-lg-inline-flex').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
+              var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
               if (type === 'display') {
                 if (data >= 50 && !row.debut) {
                   $(badge).addClass('bg-primary').text(`${data}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
                   return $(badge).prop('outerHTML');
-                } else if (row.debut && !row.premiere) {
-                  $(badge).addClass('bg-primary').text(`${row.last}, TD`).attr('data-bs-title', 'Tour Debut');
-                  return $(badge).prop('outerHTML');
-                //} else if (row.debut && !row.premiere && !data) {
-                //  $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
-                //  return $(badge).prop('outerHTML');
                 } else if (row.premiere) {
                   $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
                   return $(badge).prop('outerHTML');
+                } else if (row.debut && !row.premiere) {
+                  $(badge).addClass('bg-primary').text(`${data}, TD`).attr('data-bs-title', 'Tour Debut');
+                  return $(badge).prop('outerHTML');
+                } else if (row.debut && !row.premiere && !data) {
+                  $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
+                  return $(badge).prop('outerHTML');
                 } else {
-                  return row.last;
+                  return data;
                 }
               }
             },
           },
           {
             'data': 'tour_num',
-            'className': 'dt-center min-desktop',
+            'className': 'dt-center',
+            'width': '4rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 var num = data;
@@ -559,7 +631,7 @@
                   $(badge).addClass('bg-secondary').text('Only').attr('data-bs-title', 'Only Tour Performance');
                   return $(badge).prop('outerHTML');
                 } else if (num == total && total > 1) {
-                  $(badge).addClass('bg-accent').text('Last').attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
+                  $(badge).addClass('bg-accent').text(`${num}/${total}`).attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
                   return $(badge).prop('outerHTML');
                 } else {
                   return `${num}/${total}`
@@ -570,162 +642,92 @@
           {
             'data': 'last_event',
             'name': 'ltp__id',
-            'className': 'dt-center min-desktop text-nowrap',
+            'width': '6rem',
+            'className': 'dt-center text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="fw-medium" href="/events/${data.event_id}">${data.date.display_day}</a>`;
+                return `<a class="fw-medium text-reset" href="/events/${data.event_id}">${data.date.display}</a>`;
               }
             },
           },
           {
             'data': 'notes',
             'name': 'notes',
-            'className': 'min-desktop',
+            'width': '15rem',
+            'className': 'text-wrap text-xs',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                if (data) {
-                  return data
-                } else {
-                  return row.note
-                }
-                
+              if (type === 'display' && data) {
+                return `<span class="setlist-note">${row.notes.join('; ')}</span>`
               }
             },
-          },
+          }
         ],
-        initComplete: function (settings, json) {
-          var dt = this.api();
+      })
 
-          $('.setHeader').each(function () {
-            var row = $(this).children('th');
-            var name = $(row).text().replaceAll(' ', '').toLowerCase();
-            $(row).addClass(name).addClass('setHeader');
-          })
+      $('#copySetlist').click(function () {
+          var btn = this;
 
-          $('span.songnum').each(function () {
-            var cell = this.closest('td')
-            $(cell).addClass(this.className).text($(this).text());
+          fetch('/api/v1/setlists/?event={{ id }}&format=json')
+          .then(response => response.json())
+          .then(data => {
+            var lines = [];
 
-            $(cell).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', this.getAttribute('data-bs-title'))
-            $(cell).tooltip();
-          });
-        }
-      });
+            console.log(data)
 
-    $('th.setHeader').each(function () {
-      $(this).removeClass('setHeader');
-    });
-
-    $('#copySetlist').click(function () {
-      var btn = this;
-
-      fetch('/api/v1/setlist/?event={{ id }}&format=json')
-      .then(response => response.json())
-      .then(data => {
-        var lines = [];
-
-        data.results.forEach(function (item) {
-          var song = item.segue ? `${item.song.name} >` : item.song.name;
-          lines.push(song);
-        });
-
-        try {
-          navigator.clipboard.writeText(lines.join('\n'));
-          console.log('Text copied to clipboard successfully!');
-        } catch (err) {
-          console.error('Failed to copy text: ', err);
-        }
-      });
-
-      $(btn).text('Setlist Copied');
-      $(btn).removeClass('btn-primary').addClass('btn-success');
-
-      setTimeout(function () {
-        $(btn).removeClass('btn-success').addClass('btn-primary');
-        $(btn).text('Copy Setlist');
-      }, 3000);
-    })
-
-    $('#userForm').submit(function (e) {
-      e.preventDefault();
-      var serializedData = $(this).serialize();
-
-      $.ajax({
-        type: "POST",
-        url: "{% url 'add_show' %}",
-        data: serializedData,
-        success: function (data) {
-          $("#usercount").text(data['count']);
-
-          if (data['action'] === 'added') {
-            $("#star").addClass('bi-star-fill').removeClass('bi-star');
-            $("#attended").text('Attended');
-            $("#addshow").addClass('active');
-            $("#usercount").addClass('active');
-
-          } else if (data['action'] === 'removed') {
-            $("#star").addClass('bi-star').removeClass('bi-star-fill');
-            $("#attended").text('Attended?');
-            $("#addshow").removeClass('active');
-            $("#usercount").removeClass('active');
-          };
-        },
-      });
-    });
-
-    var table = $('#onstageTable').DataTable(
-      {
-        layout: layout,
-        serverSide: true,
-        processing: true,
-        paging: false,
-        searching: false,
-        ordering: false,
-        ajax: {
-          'url': '/api/v1/onstage/?event={{ id }}&format=custom',
-        },
-        rowGroup: {
-          dataSrc: function (row) {
-            return row.band ? `<a class="text-sm fw-medium mt-2 onstage-band" href="/bands/${row.band.id}">${row.band.name}</a>` : '';
-          },
-          startRender: function (rows, group) {
-            var ul = $('<ul />');
-
-            $(rows.data()).each(function () {
-              $(`<li class="text-reset text-sm pe-0 fw-normal"><a href="/relations/${this.relation.id}">${this.relation.name}</a></li>`).appendTo(ul);
+            data.results.forEach(function (item) {
+              var song = item.segue ? `${item.song.name} >` : item.song.name;
+              lines.push(song);
             });
 
-            return group ? `${group} ${$(ul).prop('outerHTML')}` : $(ul).prop('outerHTML');
-          }
-        },
-        initComplete: function () {
-          $('tr:empty').remove();
-        }
-      });
-  });
+            try {
+              navigator.clipboard.writeText(lines.join('\n'));
+              console.log('Text copied to clipboard successfully!');
+            } catch (err) {
+              console.error('Failed to copy text: ', err);
+            }
+          });
 
-  $(".row.album-breakdown").each(function () {
-    var album = slugify($(this).find('div.progress-label').text());
+          $(btn).text('Setlist Copied');
+          $(btn).removeClass('btn-primary').addClass('btn-success');
 
-    $(this).hover(function () {
-      $(this).css('cursor', "pointer")
+          setTimeout(function () {
+            $(btn).removeClass('btn-success').addClass('btn-primary');
+            $(btn).text('Copy Setlist');
+          }, 3000);
+        });
 
-      $(`#setlistTable tbody tr[album]`).each(function () {
-        var row = this;
-        if ($(this).attr('album') == album) {
-          $(row).css('opacity', '1');
-          $(row).children('td').css('box-shadow', "inset 0 0 100px 100px rgba(4, 131, 200, 0.5)");
-        } else {
-          $(row).css('opacity', '0.4');
-        }
-      });
+      $('#userForm').submit(function (e) {
+          e.preventDefault();
+          var serializedData = $(this).serialize();
 
-    }, function () {
-      $(this).css("box-shadow", "none");   // Action on mouseleave
-      $(`tr`).css('opacity', '1');
-      $(`tr`).children('td').css('box-shadow', "none");
+          $.ajax({
+            type: "POST",
+            url: "{% url 'add_show' %}",
+            data: serializedData,
+            success: function (data) {
+              $("#usercount").text(data['count']);
+
+              if (data['action'] === 'added') {
+                $("#star").addClass('bi-star-fill').removeClass('bi-star');
+                $("#attended").text('Attended');
+                $("#addshow").addClass('btn-primary').removeClass('btn-primary-dark');
+                $("#usercount").addClass('btn-primary').removeClass('btn-primary-dark');
+
+              } else if (data['action'] === 'removed') {
+                $("#star").addClass('bi-star').removeClass('bi-star-fill');
+                $("#attended").text('Attended?');
+                $("#addshow").removeClass('btn-primary').addClass('btn-primary-dark');
+                $("#usercount").removeClass('btn-primary').addClass('btn-primary-dark');
+              };
+            },
+          });
+        });
     });
-  });
+
+    
+
+
+
 
   </script>
 {% endblock content %}

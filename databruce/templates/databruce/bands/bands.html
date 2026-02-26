@@ -14,9 +14,9 @@
     <tr class="header">
       <th class="all text-center">Events</th>
       <th class="all">Name</th>
-      <th class="min-tablet-l">First</th>
-      <th class="min-tablet-l">Last</th>
-      <th class="min-tablet-l">Bruce's Band?</th>
+      <th class="all">First</th>
+      <th class="all">Last</th>
+      <th class="all">Bruce's Band?</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -33,8 +33,6 @@
         { target: -1, visible: false },
         { type: 'num', targets: [0], width: '1rem' },
       ],
-      serverSide: true,
-      processing: true,
       ajax: {
         'url': '/api/v1/bands/?format=custom',
       },
@@ -44,8 +42,8 @@
           'data': 'name',
           'name': 'name',
           'render': function (data, type, row, meta) {
-            if (type === 'display') {
-              return `<a href="/bands/${row.id}">${data}</a>`;
+            if (type === 'display' && data) {
+              return `<a href="/bands/${row.uuid}">${data}</a>`;
             }
           },
         },
