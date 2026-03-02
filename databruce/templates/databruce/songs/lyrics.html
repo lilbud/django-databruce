@@ -19,10 +19,10 @@
   <thead>
     <tr>
       <th class="all">Song</th>
-      <th class="min-tablet-l">Version</th>
-      <th class="min-tablet-l">Source</th>
+      <th class="all">Version</th>
+      <th class="all">Source</th>
       <th class="all">Language</th>
-      <th class="min-tablet-l">Note</th>
+      <th class="all">Note</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -42,7 +42,7 @@
           columns: [
             {
               'data': 'song.name',
-              'name': 'song__name',
+              'name': 'song__sort_song_name',
               'render': function (data, type, row, meta) {
                   if (type === 'display' && data) {
                       return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';

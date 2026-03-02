@@ -3,6 +3,9 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_btn.html" with view="runs" item=info.id %}
+  {% endif %}
   <div class="col">
     <div class="text-2xl text-wrap mb-3">
       <a href="{% url "runs" %}">Runs</a>
@@ -31,15 +34,17 @@
                     aria-controls="pills-profile"
                     aria-selected="false">Songs</button>
           </li>
-          <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
-            <button class="nav-link"
-                    id="pills-slots-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#slots"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-profile"
-                    aria-selected="false">Slots</button>
+          {% if info.num_songs > 0 %}
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-slots-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#slots"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-profile"
+                      aria-selected="false">Slots</button>
+            {% endif %}
           </li>
         </ul>
       </div>
@@ -51,13 +56,13 @@
                 <thead>
                   <tr class="custom">
                     <th class="all">Date</th>
-                    <th class="min-tablet-l">Setlist</th>
+                    <th class="all">Setlist</th>
                     <th class="all">Band</th>
-                    <th class="min-tablet-l">Venue</th>
+                    <th class="all">Venue</th>
                     <th class="all">Location</th>
-                    <th class="min-tablet-l">Tour</th>
-                    <th class="min-tablet-l">Detail</th>
-                    <th class="min-tablet-l">Public</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
                   </tr>
                 </thead>
               </table>
@@ -70,7 +75,7 @@
                   <tr>
                     <th class="all">Plays</th>
                     <th class="all">Song</th>
-                    <th class="min-tablet-l">Category</th>
+                    <th class="all">Category</th>
                     <th class="all">First</th>
                     <th class="all">Last</th>
                   </tr>
@@ -84,12 +89,12 @@
                 <thead>
                   <tr>
                     <th class="text-nowrap all">Event</th>
-                    <th class="text-nowrap all showopener">Show Opener</th>
-                    <th class="text-nowrap all set1closer">Set 1 Closer</th>
-                    <th class="text-nowrap all set2opener">Set 2 Opener</th>
-                    <th class="text-nowrap all mainsetcloser">Main Set Closer</th>
-                    <th class="text-nowrap all encoreopener">Encore Opener</th>
-                    <th class="text-nowrap all showcloser">Show Closer</th>
+                    <th class="text-nowrap all show-opener">Show Opener</th>
+                    <th class="text-nowrap all set-1-closer">Set 1 Closer</th>
+                    <th class="text-nowrap all set-2-opener">Set 2 Opener</th>
+                    <th class="text-nowrap all main-set-closer">Main Set Closer</th>
+                    <th class="text-nowrap all encore-opener">Encore Opener</th>
+                    <th class="text-nowrap all show-closer">Show Closer</th>
                   </tr>
                 </thead>
               </table>
@@ -129,21 +134,19 @@
       });
 
       
-      new DataTable('#slotTable', {
+      var table = new DataTable('#slotTable', {
         layout: getDatatableLayout({columns: false, category: false}),
         fixedColumns: {
-            start: 2
+            start: 1
         },
-        scrollX: true,
         ajax: {
           'url': '/api/v1/setlist_entries/?run={{ info.id }}&format=custom',
         },
         columns: setlist_slots,
         initComplete: function () {
-          console.log(this.api())
-          this.api().columns().every(function () {
+          table.columns().every(function () {
             var columnData = this.data().join(''); // Combine all cell data into one string
-
+          
             // Check if the combined string is empty
             if (columnData.length === 0) {
               // If empty, hide the column

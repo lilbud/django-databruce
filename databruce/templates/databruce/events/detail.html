@@ -9,6 +9,9 @@
           async></script>
 {% endblock extrajs %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_btn.html" with view="events" item=event.id %}
+  {% endif %}
   <div class="col d-grid gap-0 gx-0">
     <!-- next and last buttons-->
     <div class="row mb-2 gx-0">
@@ -21,12 +24,6 @@
              data-bs-html="true"
              data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue.name }}</div>"
              href="{% url 'event_details' id=prev_event.event_id %}">Prev</a>
-        {% endif %}
-        {% if user.is_superuser %}
-          <a class="btn btn-sm btn-danger"
-             role="button"
-             target="_blank"
-             href="{% url 'admin:index' %}databruce/events/{{ event.id }}/change">View on Admin Site</a>
         {% endif %}
         {% if next_event %}
           <a role="button"
@@ -53,16 +50,16 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex flex-wrap">
-              <div class="flex-grow-1 w-75 mb-4 mb-md-0">
-                {% comment %} {% if event.title %} {% endcomment %}
-                <div class="row mb-1">
-                  <div class="col">
-                    <div id="title" class="text-wrap text-xs fst-italic fw-light">
-                      {{ event.title|markdown|safe|default_if_none:"test" }}
+              <div class="flex-grow-1 w-75 mb-3 mb-md-0">
+                {% if event.title %}
+                  <div class="row mb-1">
+                    <div class="col">
+                      <div id="title" class="text-wrap text-xs fst-italic fw-light">
+                        {{ event.title|markdown|safe|default_if_none:"test" }}
+                      </div>
                     </div>
                   </div>
-                </div>
-                {% comment %} {% endif %} {% endcomment %}
+                {% endif %}
                 <div class="row mb-2">
                   <div class="col">
                     <div class="row">
@@ -87,9 +84,9 @@
                     </div>
                   </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-3 mb-md-0">
                   <div class="col-auto">
-                    <div class="badge-row d-inline-flex flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
+                    <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                          id="badge-row">
                       {% if event.tour %}
                         <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge bg-primary">{{ event.tour }}</span></a>
@@ -103,31 +100,33 @@
                     </div>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-auto">
-                    <div class="badge-row d-flex-inline flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
-                         id="badge-row-2">
-                      {% if event.brucebase_url %}
-                        <a role="button"
-                           target="_blank"
-                           class="btn btn-sm btn-primary-dark text-xs"
-                           href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
-                          <i class="bi bi-link-45deg"></i>
-                          <span>Brucebase</span>
-                        </a>
-                      {% endif %}
-                      {% if event.nugs %}
-                        <a role="button"
-                           target="_blank"
-                           href="{{ event.nugs.url }}"
-                           class="btn btn-sm btn-primary-dark text-xs">
-                          <i class="bi bi-headphones"></i>
-                          <span>Nugs</span>
-                        </a>
-                      {% endif %}
+                {% if event.brucebase_url or event.nugs %}
+                  <div class="row mt-3">
+                    <div class="col-auto">
+                      <div class="badge-row d-flex-inline flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
+                           id="badge-row-2">
+                        {% if event.brucebase_url %}
+                          <a role="button"
+                             target="_blank"
+                             class="btn btn-sm btn-primary-dark text-xs"
+                             href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
+                            <i class="bi bi-link-45deg"></i>
+                            <span>Brucebase</span>
+                          </a>
+                        {% endif %}
+                        {% if event.nugs %}
+                          <a role="button"
+                             target="_blank"
+                             href="{{ event.nugs.url }}"
+                             class="btn btn-sm btn-primary-dark text-xs">
+                            <i class="bi bi-headphones"></i>
+                            <span>Nugs</span>
+                          </a>
+                        {% endif %}
+                      </div>
                     </div>
                   </div>
-                </div>
+                {% endif %}
               </div>
               <div class="flex-shrink-1">
                 {% if user.is_authenticated and event.public %}
@@ -283,7 +282,7 @@
                         <th class="all">Guest</th>
                         <th class="all">Person</th>
                         <th class="all">Band</th>
-                        <th class="min-tablet-l">Note</th>
+                        <th class="all">Note</th>
                       </thead>
                     </table>
                   </div>
@@ -350,6 +349,7 @@
         ordering: false,
         searching: false,
         scrollX: false,
+        scrollY: '60vh',
         paging: false,
         info: false,
         ajax: {
@@ -553,7 +553,7 @@
           },
           {
             'data': 'song',
-            'name': 'song__name',
+            'name': 'song__sort_song_name',
             'className': 'text-nowrap',
             'width': '16rem',
             'render': function (data, type, row, meta) {
@@ -652,7 +652,7 @@
           },
           {
             'data': 'notes',
-            'name': 'notes',
+            'name': 'setlist_notes__note',
             'width': '15rem',
             'className': 'text-wrap text-xs',
             'render': function (data, type, row, meta) {

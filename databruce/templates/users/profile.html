@@ -58,13 +58,13 @@
                     <thead>
                       <tr>
                         <th class="all">Date</th>
-                        <th class="min-tablet-l">Setlist</th>
+                        <th class="all">Setlist</th>
                         <th class="all">Band</th>
-                        <th class="min-tablet-l">Venue</th>
+                        <th class="all">Venue</th>
                         <th class="all">Location</th>
-                        <th class="min-tablet-l">Tour</th>
-                        <th class="min-tablet-l">Detail</th>
-                        <th class="min-tablet-l">Public</th>
+                        <th class="all">Tour</th>
+                        <th class="all">Detail</th>
+                        <th class="all">Public</th>
                       </tr>
                     </thead>
                   </table>
@@ -86,9 +86,9 @@
                       <tr>
                         <th class="all">Count</th>
                         <th class="all">Name</th>
-                        <th class="min-tablet-l">Category</th>
-                        <th class="min-tablet-l">First</th>
-                        <th class="min-tablet-l">Last</th>
+                        <th class="all">Category</th>
+                        <th class="all">First</th>
+                        <th class="all">Last</th>
                       </tr>
                     </thead>
                   </table>
@@ -130,7 +130,7 @@
             <div class="tab-content">
               <div id="mostplayed" class="tab-pane show active fade">
                 <div class="row mb-2">
-                  <div class="text-lg pb-2">Most commonly played songs not seen</div>
+                  <div class="text-lg pb-2">{% translate "Most commonly played songs not seen (100+ plays)" %}</div>
                 </div>
                 <div class="table-responsive">
                   <table class="table table-hover display" id="notSeenTable">
@@ -186,9 +186,9 @@
 
           new DataTable('#songTable', {
             layout: getDatatableLayout({category: false}),
-            scrollY: '60vh',
+            scrollY: '30vh',
             ajax: {
-              'url': '/api/v1/setlist_songs/?user=94&format=custom&ordering=-count'
+              'url': '/api/v1/setlist_songs/?user={{ user_info.id }}&format=custom'
             },
             columnDefs: [
               {target: [0], width: '1rem', className: 'dt-center' },
@@ -207,7 +207,7 @@
               },
               { 
                 'data': 'song',
-                'name': 'song__name',
+                'name': 'song__sort_song_name',
                 'render': function (data, type, row, meta) {
                   if (type === 'display') {
                     return `<a href="/songs/${data.uuid}">${data.name}</a>`
@@ -247,10 +247,9 @@
 
           new DataTable('#notSeenTable', {
             layout: getDatatableLayout({columns: [0,2]}),
-            serverSide: false,
             scrollY: '30vh',
             ajax: {
-              'url': '/api/v1/setlist_songs/?user_unseen={{ user_info.id }}&public_plays=100&format=custom&ordering=-count'
+              'url': '/api/v1/setlist_songs/?user_unseen={{ user_info.id }}&public_plays=100&format=custom'
             },
             columnDefs: [
               {target: [0], width: '1rem', className: 'dt-center' },
@@ -268,7 +267,7 @@
               },
               { 
                 'data': 'song',
-                'name': 'song__name',
+                'name': 'song__sort_song_name',
                 'render': function (data, type, row, meta) {
                   if (type === 'display') {
                     return `<a href="/songs/${data.uuid}">${data.name}</a>`
@@ -309,7 +308,7 @@
             layout: getDatatableLayout({columns: [0,2]}),
             scrollY: '30vh',
             ajax: {
-              'url': '/api/v1/setlist_songs/?user={{ user_info.id }}&user_rare=true&format=custom&ordering=-count'
+              'url': '/api/v1/setlist_songs/?user={{ user_info.id }}&user_rare=true&format=custom'
             },
             columnDefs: [
               {target: [0], width: '1rem', className: 'dt-center' },
@@ -327,7 +326,7 @@
               },
               { 
                 'data': 'song',
-                'name': 'song__name',
+                'name': 'song__sort_song_name',
                 'render': function (data, type, row, meta) {
                   if (type === 'display') {
                     return `<a href="/songs/${data.uuid}">${data.name}</a>`

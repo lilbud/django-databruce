@@ -14,11 +14,13 @@
     {% if not user.is_authenticated %}
       <div class="row my-3">
         <div class="col">
-          <a href="{% url "login" %}"
+          <a target="_blank"
+             href="{% url "login" %}"
              type="button"
              role="button"
              class="btn btn-primary">Login</a>
-          <a href="{% url "signup" %}"
+          <a target="_blank"
+             href="{% url "signup" %}"
              type="button"
              role="button"
              class="btn btn-primary">Create Account</a>
@@ -31,7 +33,7 @@
           <div class="card-body p-0">
             <img class="img-fluid card-img-top object-fit-cover"
                  id="headimg"
-                 src="{% static 'databruce/img/header.webp' %}"
+                 src="{% static 'databruce/img/header.jpg' %}"
                  alt=""
                  height="640"
                  width="auto">
@@ -297,7 +299,7 @@
           },
           {
             'data': 'song',
-            'name': 'song__name',
+            'name': 'song__sort_song_name',
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {

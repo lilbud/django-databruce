@@ -20,10 +20,10 @@
     <tr class="header">
       <th class="all">Release Date</th>
       <th class="all">Event</th>
-      <th class="min-tablet-l">Venue</th>
+      <th class="all">Venue</th>
       <th class="all">Location</th>
       <th class="all">Link</th>
-      <th class="min-tablet-l">First Friday?</th>
+      <th class="all">First Friday?</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -69,7 +69,7 @@
             'name': 'event__venue__name',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/venues/${data.id}">${data.name}</a>`;
+                return `<a href="/venues/${data.uuid}">${data.name}</a>`;
               }
             },
           },
@@ -78,7 +78,7 @@
             'name': 'event__venue__city__name, event__venue__city__state__abbrev',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/cities/${data.city.id}">${data.city.formatted}</a>`
+                return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
               }
             },
           },

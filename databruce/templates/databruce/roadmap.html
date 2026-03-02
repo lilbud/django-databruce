@@ -3,7 +3,60 @@
     {{ title }}
 {% endblock title %}
 {% block content %}
-    <div class="col-10 text-base">
+    <div class="col-10">
+        <div class="row mb-3">
+            <div class="col">
+                <span class="mb-2 text-2xl">Roadmap</span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col text-2xl">
+                <p class="text-sm">
+                    This page is to list things I plan to do on the site at some point. None of these have any kind of ETA, and many are simply just ideas I had that I'd like to do, but haven't sorted out the details.
+                </p>
+            </div>
+        </div>
+        <div class="row row-gap-3 text-sm">
+            <div class="row">
+                <div class="col">
+                    <div class="text-lg fw-semibold">Data Improvements</div>
+                    <p>
+                        More detailed data/info, some ideas include:
+                        <ul class="mb-0 pb-0">
+                            <li>Venue location/addresses (in the works technically)</li>
+                            <li>Venue capacity?</li>
+                            <li>Ticket sales per show</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="text-lg fw-semibold">More Event Notes</div>
+                    <p>
+                        Recently, a "notes" tab was added to the event detail page, clicking it shows nothing as of now. The loose plan for this is to host notes/reviews/articles pertaining to each show taken from various sources. Those include: Backstreets Mag/Point Blank (via my archive), BTX Article Dump, and the E Street Shuffle archive. Additionally, including archived links to various reviews as well for those I haven't pulled into a database of some kind.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="text-lg fw-semibold">Publicly Available Database</div>
+                    <p>
+                        Right now, while the site is public, the database really isn't. I hope to make the database itself publicly accessible, likely in the form of a PostgreSQL database dump. This would be for those who do know SQL and want to mess around with a local copy of the database.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="text-lg fw-semibold">An API</div>
+                    <p>
+                        This one is basically just a vague idea, as I don't have a clue how to do it in a "safe" way. Meaning how to allow public access to the API without affecting the site itself, and without jacking up my hosting costs as I'm sure it would have an impact.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} <div class="col-10 text-base">
         <div class="row">
             <div class="text-2xl">
                 <a href="{% url 'index' %}">Databruce</a> &gt; Roadmap
@@ -44,5 +97,5 @@
                 I want to add more detailed data in general. Things like having Venue locations, capacity, and even possibly ticket sales per show. Would have to find a data source for the latter.
             </p>
         </div>
-    </div>
+    </div> {% endcomment %}
 {% endblock content %}

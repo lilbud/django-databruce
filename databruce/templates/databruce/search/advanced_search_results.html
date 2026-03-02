@@ -12,9 +12,7 @@
     <div id="short_url" class="mb-3">
       <button id="short-url" class="btn btn-sm btn-primary">Get Short URL</button>
       <span id="shortLink" class="px-2 d-none text-sm"></span>
-      <button onclick="copy_to_clipboard()"
-              class="btn btn-sm btn-primary d-none"
-              id="copyButton">Copy</button>
+      <button class="btn btn-sm btn-primary d-none" id="copyButton">Copy</button>
     </div>
     <div class="card mb-3">
       <div class="card-body text-sm">
@@ -81,7 +79,8 @@
                   </td>
                   <td class="text-nowrap">
                     {% if event.venue.city %}
-                      <a href="{% url "city_details" id=event.venue.city.uuid %}">{{ event.venue.city }}</a>
+                      <a target="_blank"
+                         href="{% url "city_details" id=event.venue.city.uuid %}">{{ event.venue.city }}</a>
                     {% endif %}
                   </td>
                   <td class="text-nowrap">
@@ -142,6 +141,21 @@
 
         $('#short-url').prop('disabled', true);
       });
+
+      $('#copyButton').click(function() {
+        var btn = this;
+
+        var link = $('#shortLink').text();
+        navigator.clipboard.writeText(link);
+
+        $(btn).text('Copied');
+        $(btn).removeClass('btn-primary').addClass('btn-success');
+
+        setTimeout(function () {
+          $(btn).removeClass('btn-success').addClass('btn-primary');
+          $(btn).text('Copy');
+        }, 3000);
+      })
     });
   </script>
 {% endblock content %}

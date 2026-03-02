@@ -3,6 +3,9 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_btn.html" with view="relations" item=info.id %}
+  {% endif %}
   <div class="col">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
@@ -54,13 +57,13 @@
                 <thead>
                   <tr class="custom">
                     <th class="all">Date</th>
-                    <th class="min-tablet-l">Setlist</th>
+                    <th class="all">Setlist</th>
                     <th class="all">Band</th>
-                    <th class="min-tablet-l">Venue</th>
+                    <th class="all">Venue</th>
                     <th class="all">Location</th>
-                    <th class="min-tablet-l">Tour</th>
-                    <th class="min-tablet-l">Detail</th>
-                    <th class="min-tablet-l">Public</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
                   </tr>
                 </thead>
               </table>
@@ -70,12 +73,13 @@
             <ul>
               {% if info.brucebase_url %}
                 <li>
-                  <a href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
+                  <a target="_blank"
+                     href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
                 </li>
               {% endif %}
               {% if info.mbid %}
                 <li>
-                  <a href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
+                  <a target="_blank" href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
                 </li>
               {% endif %}
             </ul>

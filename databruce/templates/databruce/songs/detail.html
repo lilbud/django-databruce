@@ -8,39 +8,42 @@
   <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
 {% endblock extrajs %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_btn.html" with view="songs" item=info.id %}
+  {% endif %}
   <div class="col-12">
     <div class="row">
       <div class="col">
         <div class="row d-grid gap-0 row-gap-1 text-lg">
-          <div class="text-2xl text-wrap">{{ song_info.name }}</div>
-          {% if song_info.album %}
+          <div class="text-2xl text-wrap">{{ info.name }}</div>
+          {% if info.album %}
             <div class="row">
               <div class="fw-semibold">Album</div>
               <div>
-                <a href="{% url "release_details" id=song_info.album.uuid %}">{{ song_info.category }}</a>
+                <a href="{% url "release_details" id=info.album.uuid %}">{{ info.category }}</a>
               </div>
             </div>
           {% endif %}
           <div class="row">
             <div class="fw-semibold">Original Artist</div>
-            <div>{{ song_info.original_artist }}</div>
+            <div>{{ info.original_artist }}</div>
           </div>
           <div class="row d-flex-inline col-gap-3">
             <div class="col-auto">
               <div class="fw-semibold">Public</div>
-              <div>{{ song_info.num_plays_public }}</div>
+              <div>{{ info.num_plays_public }}</div>
             </div>
             <div class="col-auto">
               <div class="fw-semibold">Private</div>
-              <div>{{ song_info.num_plays_private }}</div>
+              <div>{{ info.num_plays_private }}</div>
             </div>
           </div>
           <div class="row">
-            {% if song_info.last_event %}
+            {% if info.last_event %}
               <div class="fw-semibold">Last Played:</div>
               <div>
                 <a class="fw-medium"
-                   href="{% url "event_details" id=song_info.last_event.event_id %}">{{ song_info.last_event.get_date }}</a>
+                   href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
                 <span class="text-reset fw-light">({{ show_gap }} shows ago)</span>
               </div>
             {% endif %}
@@ -128,7 +131,29 @@
           <div id="stats" class="tab-pane fade">
             <div class="card">
               <div class="card-header">Stats</div>
-              <div class="card-body px-0"></div>
+              <div class="card-body">
+                <div class="row row-cols-1 row-cols-lg-2">
+                  <div class="col-12 col-lg-6 mb-3 mb-md-0">
+                    <div class="chart-container">
+                      <canvas id="chart"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-12 col-lg-6">
+                    <div class="row row-cols-2 g-2">
+                      {% for item in positions %}
+                        <div class="col">
+                          <div class="card p-0">
+                            <div class="card-body">
+                              <div class="text-sm text-nowrap">{{ item.position }}</div>
+                              <div class="text-xl">{{ item.count }}</div>
+                            </div>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div id="lyrics" class="tab-pane fade">
@@ -139,7 +164,7 @@
                   {% if lyric.language == 'English' %}{{ lyric.text|linebreaksbr }}{% endif %}
                 {% endfor %}
                 {% if lyrics.count > 1 %}
-                  <div class="fw-semibold mt-2">Other Versions</div>
+                  <div class="fw-semibold mt-2">All Versions</div>
                   <ul>
                     {% for lyric in lyrics %}
                       <li>
@@ -159,19 +184,21 @@
               <div class="card-header">Links</div>
               <div class="card-body px-0">
                 <ul>
-                  {% if song_info.brucebase_url %}
+                  {% if info.brucebase_url %}
                     <li>
-                      <a href="https://brucebase.wikidot.com{{ song_info.brucebase_url }}">Brucebase</a>
+                      <a target="_blank"
+                         href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
                     </li>
                   {% endif %}
-                  {% if song_info.spotify_id %}
+                  {% if info.spotify_id %}
                     <li>
-                      <a href="https://open.spotify.com/track/{{ song_info.spotify_id }}">Spotify</a>
+                      <a target="_blank"
+                         href="https://open.spotify.com/track/{{ info.spotify_id }}">Spotify</a>
                     </li>
                   {% endif %}
-                  {% if song_info.mbid %}
+                  {% if info.mbid %}
                     <li>
-                      <a href="https://musicbrainz.org/work/{{ song_info.mbid }}">Musicbrainz</a>
+                      <a target="_blank" href="https://musicbrainz.org/work/{{ info.mbid }}">Musicbrainz</a>
                     </li>
                   {% endif %}
                 </ul>
@@ -183,7 +210,30 @@
     </div>
   </div>
   {% comment %} <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script> {% endcomment %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
   <script>
+    $(document).ready(function () {
+        let ctx = document.getElementById("chart").getContext("2d");
+        Chart.defaults.color = '#999';
+
+        let chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: [{% for year in year_stats %}{{year.year}},{% endfor %}],
+            datasets: [
+                {
+                  label: "Events",
+                  color: "#ffffff",
+                  data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
+                }
+            ]
+          },
+          options: {
+            responsive: true,
+          },
+        });
+    });
+  
     $(document).ready(function () {
       var layout = getDatatableLayout({category: true});
       dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': '^' + set_names.join('|') + '$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}], label: 'Category'})
@@ -191,10 +241,11 @@
       new DataTable('#songTable', {
         layout: layout,
         ajax: {
-          url: '/api/v1/songspage/?song={{ song_info.id }}&format=custom',
+          url: '/api/v1/songspage/?song={{ info.id }}&format=custom',
         },
         columnDefs: [
-          { 'target': -1, 'visible': false }
+          { 'target': -1, 'visible': false },
+          //{ 'targets': [1,2,3,4,5,8,9,10], 'columnControl': [] }
         ],
         columns: [
           {
@@ -230,7 +281,7 @@
           {
             'data': 'event.venue',
             'name': 'event__venue__city__name, event__venue__city__state__abbrev, event__venue__city__country__name',
-            'width': '12rem',
+            'width': '16rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
@@ -247,12 +298,56 @@
               }
             },
           },
-          {'data': 'position', 'name': 'position', 'width': '6rem' },
-          {'data': 'last', 'name': 'last', 'width': '1rem' },
-          {'data': 'set_name', 'name': 'set_name', 'width': '4rem' },
+          {
+            'data': 'position',
+            'name': 'setlist_position__position',
+            'width': '6rem',
+            'className': 'dt-center',
+            //'columnControl': [],
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                //return data;
+
+                var className = slugify(data);
+                var badge = `<span class="${className} badge align-middle">${data}</span>`
+                //var badge = $('<span />').addClass(`badge align-middle text-nowrap ${data}`)
+
+                return badge
+              }
+            },
+          },
+          {
+            'data': 'last',
+            'name': 'last',
+            'width': '1rem',
+            'className': 'dt-center',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
+
+                if (row.premiere) {
+                  $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
+                  return $(badge).prop('outerHTML');
+                } else if (data >= 50 && !row.debut) {
+                  $(badge).addClass('bg-primary').text(`${data}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+                  return $(badge).prop('outerHTML');
+                } else if (row.debut && !row.premiere) {
+                  $(badge).addClass('bg-primary').text(`${data}, TD`).attr('data-bs-title', 'Tour Debut');
+                  return $(badge).prop('outerHTML');
+                } else if (row.debut && !row.premiere && !data) {
+                  $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
+                  return $(badge).prop('outerHTML');
+                } else {
+                  return data;
+                }
+
+              }
+            },
+          },
+          {'data': 'set_name', 'name': 'set_name', 'width': '4rem', 'columnControl': [] },
           {
             'data': 'prev_song',
-            'name': 'prev_song__name',
+            'name': 'songs_page__prev__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -262,7 +357,7 @@
           },
           {
             'data': 'next_song',
-            'name': 'next_song__name',
+            'name': 'songs_page__next__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -270,7 +365,15 @@
               }
             },
           },
-          {'data': 'note', 'name': 'note'},
+          {
+            'data': 'notes',
+            'name': 'setlist_notes__note',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return `<span class="setlist-note">${data.join('; ')}</span>`
+              }
+            },
+          },
           {'data': 'event.public', 'name': 'event__public' },
         ],
       });
@@ -280,7 +383,7 @@
         ajax: {
           url: '/api/v1/snippets/',
           data: {
-            snippet: '{{ song_info.id }}',
+            snippet: '{{ info.id }}',
             format: 'custom'
           },
         },

@@ -1,23 +1,26 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  {{ venue_info.get_name }}
+  {{ info.get_name }}
 {% endblock title %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_btn.html" with view="venues" item=info.id %}
+  {% endif %}
   <div class="col-12">
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url "venues" %}">Venues</a> &gt;
-      {{ venue_info }}
+      {{ info }}
     </div>
-    {% if venue_info.aliases %}
+    {% if info.aliases %}
       <div class="text-lg text-wrap mb-3">
         <span class="fw-medium">Nicknames/AKA:</span>
-        <div>{{ venue_info.aliases|join:'; ' }}</div>
+        <div>{{ info.aliases|join:'; ' }}</div>
       </div>
     {% endif %}
-    {% if venue_info.note %}
+    {% if info.note %}
       <div class="text-base text-wrap mb-3">
         <span class="fw-medium">Notes:</span>
-        <div>{{ venue_info.note|markdown|safe }}</div>
+        <div>{{ info.note|markdown|safe }}</div>
       </div>
     {% endif %}
     <div class="card">
@@ -92,14 +95,15 @@
           </div>
           <div id="links" class="tab-pane fade">
             <ul>
-              {% if venue_info.brucebase_url %}
+              {% if info.brucebase_url %}
                 <li>
-                  <a href="https://brucebase.wikidot.com/venue:{{ venue_info.brucebase_url }}">Brucebase</a>
+                  <a target="_blank"
+                     href="https://brucebase.wikidot.com/venue:{{ info.brucebase_url }}">Brucebase</a>
                 </li>
               {% endif %}
-              {% if venue_info.mbid %}
+              {% if info.mbid %}
                 <li>
-                  <a href="https://musicbrainz.org/place/{{ venue_info.mbid }}">Musicbrainz</a>
+                  <a target="_blank" href="https://musicbrainz.org/place/{{ info.mbid }}">Musicbrainz</a>
                 </li>
               {% endif %}
             </ul>
@@ -120,7 +124,7 @@
         processing: true,
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/events/?venue={{ venue_info.id }}&format=custom',
+          'url': '/api/v1/events/?venue={{ info.id }}&format=custom',
         },
         columnDefs: [
           {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},
@@ -134,7 +138,7 @@
         serverSide: true,
         processing: true,
         ajax: {
-          'url': '/api/v1/setlist_songs/?venue={{ venue_info.id }}&format=custom',
+          'url': '/api/v1/setlist_songs/?venue={{ info.id }}&format=custom',
         },
         columns: song_table_columns,
       });
