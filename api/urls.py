@@ -45,11 +45,6 @@ router.register(
     basename="advanced_search",
 )
 router.register(
-    r"index",
-    views.IndexViewSet,
-    basename="index",
-)
-router.register(
     r"setlist_notes",
     views.SetlistNotesViewSet,
     basename="setlist_notes",

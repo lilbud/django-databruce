@@ -531,7 +531,6 @@ class SetlistSerializer(BaseSerializer):
     song = MinimalSongsSerializer()
     event = EventsSerializer(include=["id", "event_id"])
     last_event = MinimalEventSerializer(source="ltp", required=False)
-    position = serializers.SerializerMethodField()
     count = serializers.IntegerField(required=False)
     notes = serializers.SerializerMethodField()
 
@@ -539,36 +538,9 @@ class SetlistSerializer(BaseSerializer):
         if not obj.setlist_notes.exists():
             return None
 
-        notes = list(
+        return list(
             {item.note for item in obj.setlist_notes.all() if item.note != ""},
         )
-
-        if notes:
-            return notes
-
-        return None
-
-    def get_position(self, obj):
-        if (
-            not obj.is_opener
-            and not obj.is_closer
-            and not obj.is_set_opener
-            and not obj.is_set_closer
-        ):
-            return None
-
-        if obj.is_last_in_show:
-            return "Show Closer"
-        if obj.is_main_set_closer:
-            return "Main Set Closer"
-        if obj.is_opener and obj.set_name != "Encore":
-            return "Show Opener"
-
-        if obj.is_set_opener:
-            return f"{obj.set_name} Opener"
-
-        if obj.is_set_closer:  # noqa: RET503
-            return f"{obj.set_name} Closer"
 
     class Meta:
         model = models.Setlists
@@ -605,7 +577,18 @@ class ReleaseDiscSerializer(BaseSerializer):
 class ReleaseTracksSerializer(BaseSerializer):
     event = MinimalEventSerializer(required=False)
     disc = ReleaseDiscSerializer(source="discid", required=False)
-    song = MinimalSongsSerializer()
+    song = SongsSerializer(
+        include=[
+            "id",
+            "name",
+            "uuid",
+            "first_event",
+            "last_event",
+            "num_plays_public",
+            "num_plays_private",
+            "num_plays_snippet",
+        ],
+    )
     length = serializers.TimeField(format="%M:%S", required=False)
 
     class Meta:
@@ -664,32 +647,56 @@ class TourLegsSerializer(BaseSerializer):
 
 class SongsPageSerializer(BaseSerializer):
     id = serializers.IntegerField()
-    song = MinimalSongsSerializer()
+    song = SongsSerializer(include=["id", "name", "uuid"])
     event = EventsSerializer(
-        include=["id", "event_id", "artist", "venue", "date", "tour"],
+        include=["id", "event_id", "venue", "artist", "date", "tour"],
     )
-    prev_song = MinimalSongsSerializer()
-    next_song = MinimalSongsSerializer()
+
     position = serializers.SerializerMethodField()
 
-    def get_position(self, obj):
-        if not obj.is_opener and not obj.is_closer:
+    songs_map = {
+        s.id: MinimalSongsSerializer(s).data for s in models.Songs.objects.all()
+    }
+
+    prev_song = SongsSerializer(
+        source="songs_page.prev",
+        include=["id", "name", "uuid"],
+        required=False,
+    )
+
+    next_song = SongsSerializer(
+        source="songs_page.next",
+        include=["id", "name", "uuid"],
+        required=False,
+    )
+
+    notes = serializers.SerializerMethodField()
+
+    def get_notes(self, obj):
+        if not obj.setlist_notes.exists():
             return None
 
-        if obj.is_last_in_show:
-            return "Show Closer"
-        if obj.is_main_set_closer:
-            return "Main Set Closer"
-        if obj.song_num == 1 and obj.is_opener:
-            # We know it's song 1 because of the is_opener + song_num check
-            return "Show Opener"
+        return list(
+            {item.note for item in obj.setlist_notes.all() if item.note != ""},
+        )
 
-        # Fallback labels
-        if obj.is_opener:
-            return f"{obj.set_name} Opener"
+    # def get_prev_song(self, obj):
+    #     try:
+    #         return self.songs_map[obj.songs_page.prev_id]
+    #     except (KeyError, TypeError):
+    #         return None
 
-        if obj.is_closer:  # noqa: RET503
-            return f"{obj.set_name} Closer"
+    # def get_next_song(self, obj):
+    #     try:
+    #         return self.songs_map[obj.songs_page.next_id]
+    #     except (KeyError, TypeError):
+    #         return None
+
+    def get_position(self, obj):
+        try:
+            return obj.setlist_position.position
+        except models.Setlists.setlist_position.RelatedObjectDoesNotExist:
+            return None
 
     class Meta:
         model = models.Setlists

@@ -1450,41 +1450,6 @@ class SiteUpdates(BaseModel):
         db_table = "update_table"
 
 
-class Songspagenew(models.Model):
-    id = models.AutoField(primary_key=True)
-
-    song = models.IntegerField(null=True, db_column="song_id")
-
-    num = models.IntegerField(null=True, db_column="song_num")
-
-    event = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        null=True,
-        db_column="event_id",
-        related_name="page_events",
-    )
-
-    artist = models.IntegerField(null=True, db_column="artist_id")
-    artist_name = models.TextField(null=True)
-    venue = models.IntegerField(null=True, db_column="venue_id")
-    venue_name = models.TextField(null=True, db_column="venue")
-    tour = models.IntegerField(null=True, db_column="tour_id")
-    tour_name = models.TextField(null=True)
-    position = models.TextField(null=True)
-    gap = models.IntegerField(null=True, default=0)
-    set_name = models.TextField(null=True)
-    prev = models.IntegerField(null=True, db_column="prev_id")
-    prev_name = models.TextField(null=True)
-    next = models.IntegerField(null=True, db_column="next_id")
-    next_name = models.TextField(null=True)
-    note = models.TextField(null=True)
-
-    class Meta:
-        managed = False
-        db_table = "songspagenew"
-
-
 class OnstageBandMembers(models.Model):
     id = models.IntegerField(primary_key=True)
     relation = models.ForeignKey(Relations, models.DO_NOTHING, db_column="relation_id")
@@ -1658,3 +1623,50 @@ class TourCount(models.Model):
     class Meta:
         managed = False  # Critical: Tells Django not to try to create/delete this table
         db_table = "setlist_tour_count"
+
+
+class SetlistPositions(models.Model):
+    id = models.OneToOneField(
+        "Setlists",
+        on_delete=models.DO_NOTHING,
+        primary_key=True,
+        db_column="id",
+        related_name="setlist_position",
+    )
+
+    position = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "setlist_positions"
+
+
+class SongsPage(models.Model):
+    id = models.OneToOneField(
+        Setlists,
+        models.DO_NOTHING,
+        primary_key=True,
+        related_name="songs_page",
+        db_column="id",
+    )
+
+    prev = models.OneToOneField(
+        Songs,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="prev_song",
+        db_column="prev",
+    )
+    next = models.OneToOneField(
+        Songs,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="next_song",
+        db_column="next",
+    )
+
+    class Meta:
+        managed = False
+        db_table = "songs_page"

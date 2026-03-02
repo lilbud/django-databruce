@@ -163,7 +163,7 @@ song_table_columns = [
   { 'data': 'count', 'name': 'count', 'width': '1rem', 'className': 'min-tablet-l' },
   {
     'data': 'song',
-    'name': 'song__name',
+    'name': 'song__sort_song_name',
     'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {

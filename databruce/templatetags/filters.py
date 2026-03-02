@@ -26,9 +26,9 @@ def brucebase_url(event: str):
 
     if int(event[-1]) > 1:
         d = dict(enumerate(string.ascii_lowercase, 1))
-        return f"{year}#{day}{month}{year[:2]}{d[int(event[-1])]}"
+        return f"{year}#{day}{month}{year[2:]}{d[int(event[-1])]}"
 
-    return f"{year}#{day}{month}{year[:2]}"
+    return f"{year}#{day}{month}{year[2:]}"
 
 
 @register.filter

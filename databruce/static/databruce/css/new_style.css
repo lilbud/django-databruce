@@ -97,21 +97,25 @@ body {
     border-bottom: none;
 }
 
+/* links card font size */
 #links ul li {
     font-size: var(--text-sm) !important;
 }
 
+/* Remove bottom margin from last ul item in card */
 ul:last-child {
     margin-bottom: 0 !important;
 }
 
-.footer .card-body {
+/* Optional: Improve the footer card appearance */
+/* .footer .card-body {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 1rem;
-}
+} */
 
+/* Logo */
 .logo {
     text-indent: -9999px;
     overflow: hidden;
@@ -133,17 +137,15 @@ ul:last-child {
     display: inline-block;
 }
 
+/* Navbar */
 .navbar {
     background-color: rgb(var(--primary)) !important;
 }
 
 .navbar .nav-item,
-.navbar .nav-item .btn {
-    color: rgb(var(--primary-content)) !important
-}
-
+.navbar .nav-item .btn,
 .navbar button.dropdown-toggle {
-    color: rgb(var(--primary-content)) !important;
+    color: rgb(var(--primary-content)) !important
 }
 
 /* logo needs font size 0 to be centered, as it is an SVG */
@@ -195,9 +197,9 @@ a:link,
 }
 
 /* Ensure the table itself doesn't have a bottom margin that creates a gap */
-/* .card .table {
+.card .table {
     margin-bottom: 0 !important;
-} */
+}
 
 .card {
     overflow: hidden !important;
@@ -218,7 +220,9 @@ a:link,
     margin-top: 0 !important;
 }
 
-.card-message {
+/* card */
+/* custom message card */
+.card.message {
     border-width: 1px !important;
     border-style: solid !important;
     overflow: hidden !important;
@@ -250,6 +254,7 @@ tr:not(.set-header) td:not(.songnum) {
     background-color: rgb(var(--base-100)) !important;
 }
 
+/* song num cell background when not position */
 td.songnum:not(:is([class*="opener"], [class*="closer"])) {
     background-color: rgb(var(--base-100)) !important;
 }
@@ -274,7 +279,7 @@ table.dataTable td:not(.highlighted) a {
     color: rgb(var(--primary-text)) !important;
 }
 
-
+/* setlist table highlighting, different shades for light and dark */
 [data-bs-theme="dark"] td.highlighted {
     box-shadow: inset 0 0 100px 100px rgba(var(--border), 0.6);
 }
@@ -283,29 +288,28 @@ table.dataTable td:not(.highlighted) a {
     box-shadow: inset 0 0 100px 100px rgba(var(--border), 0.4);
 }
 
+/* change text color when setlist table rows highlighted */
 td.highlighted *:not(.badge) {
     color: rgb(var(--base-content)) !important;
 }
 
+/* font weight for not song num */
 table.dataTable td:not(.songnum) {
     font-weight: 300 !important;
 }
 
-table.dataTable tbody tr:not(.set-header) td {
+/* padding for non-set header rows */
+table.dataTable tbody tr td {
     padding-top: 0.15rem !important;
     padding-bottom: 0.15rem !important;
 }
 
-.set-header td {
-    padding-top: 0.15rem !important;
-    padding-bottom: 0.15rem !important;
-}
-
+/* remove border from album header in breakdown card */
 tr.album-header>td {
     border-width: 0px !important;
 }
 
-/* align all cell content to middle vertically */
+/* align all calendar day cell content to middle vertically */
 td:not(.fc-day) {
     align-items: center;
     vertical-align: middle !important;
@@ -318,6 +322,7 @@ td .badge {
     border-radius: 0.5rem !important;
 }
 
+/* custom badges for the badge row on event detail */
 .badge-row .badge {
     font-weight: 500 !important;
     font-size: 0.75rem !important;
@@ -342,10 +347,12 @@ td .check {
     color: rgb(var(--primary-text)) !important;
 }
 
+/* remove bottom margin from paragraphs */
 p {
     margin-bottom: 0;
 }
 
+/* smaller font size for setlist notes */
 .setlist-note {
     font-size: 0.7rem !important;
 }
@@ -367,11 +374,13 @@ p {
     }
 }
 
+/* remove horizonal margin from empty datatable rows */
 div.dt-container div.dt-layout-full> :only-child {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
 
+/* datatable control labels */
 div.dt-container label {
     font-weight: normal;
     white-space: nowrap;
@@ -382,22 +391,25 @@ div.dt-container label {
 .btn-group-vertical {
     position: relative;
     display: block;
-    /* vertical-align: middle; */
 }
 
+/* datatable category dropdown button */
 #dropdown-btn {
     margin-left: 0.5em;
     border-radius: var(--bs-btn-border-radius) !important;
 }
 
+/* hide empty event note paragraphs, added by filter tag */
 .event-note p:empty {
     display: none !important;
 }
 
+/* hide empty event note breaks, added by filter tag */
 .event-note br:last-of-type {
     display: none !important;
 }
 
+/* jquery autocomplete menu, display above all and scroll */
 .ui-autocomplete {
     max-height: 200px;
     overflow-y: scroll;
@@ -408,6 +420,7 @@ div.dt-container label {
     z-index: 1100 !important;
 }
 
+/* calendar */
 td.fc-day {
     padding: 0.1rem !important;
 }
@@ -420,6 +433,7 @@ td.fc-day {
     word-wrap: break-word !important;
 }
 
+/* dropdown items */
 .dropdown-item:hover,
 .dropdown-item.active {
     box-shadow: inset 0 0 100px 100px rgba(4, 131, 200, 0.5);
@@ -428,18 +442,22 @@ td.fc-day {
     color: rgb(var(--primary-content)) !important;
 }
 
+/* buttons highlight on hover */
 .btn:not(.btn-primary-dark):hover {
     box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.2);
 }
 
+/* badges highlight on hover */
 .badge-row .badge:hover {
     box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
 }
 
+/* remove border from disabled buttons */
 button:disabled {
     border-color: none !important
 }
 
+/* highlighting on jquery autocomplete menu */
 .ui-state-active:hover,
 .ui-state-active {
     background-color: rgba(4, 131, 200, 0.5) !important;
@@ -447,6 +465,7 @@ button:disabled {
     color: rgb(var(--base-content)) !important;
 }
 
+/* dropdown menu */
 .dropdown-menu:not(.dtcc-dropdown) {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
@@ -457,6 +476,7 @@ button:disabled {
     border-radius: var(--bs-border-radius) !important;
 }
 
+/* column control dropdown */
 .dtcc-dropdown.dropdown-menu {
     font-size: var(--text-xs) !important;
 }
@@ -471,20 +491,24 @@ button:disabled {
     border-radius: 0 !important;
 }
 
+/* add top radius to first dropdown item */
 .dropdown-menu li:first-of-type:hover {
     border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0 !important;
 }
 
+/* add bottom radius to first dropdown item */
 .dropdown-menu li:last-of-type:hover {
     border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius) !important;
 }
 
+/* progress bar for album breakdown */
 .progress {
     height: 0.6rem !important;
     border-radius: 0.2rem !important;
     background-color: rgb(var(--base-300)) !important;
 }
 
+/* album breakdown on hover */
 td:has(.album-breakdown):hover .progress {
     background-color: rgb(var(--base-100)) !important;
 }
@@ -494,16 +518,23 @@ td:has(.album-breakdown):hover .progress {
     background-color: rgb(var(--primary)) !important;
 }
 
+/* hide empty table cells */
 #albumTable tr td:empty {
     display: none !important;
 }
 
+/* hide debug and edit button on print */
 @media print {
     #djDebug {
         display: none !important;
     }
+
+    #admin-btn {
+        display: none !important;
+    }
 }
 
+/* active nav button and datatables control color */
 button.nav-link.active,
 .dt-paging-button.page-item.active>button.page-link {
     background-color: rgb(var(--primary)) !important;
@@ -514,16 +545,19 @@ button.nav-link.active,
     color: rgb(var(--primary)) !important;
 }
 
+/* inactive nav button color and font */
 button.nav-link:not(.active) {
     font-weight: 300 !important;
     color: rgb(var(--base-content)) !important;
     background-color: rgba(4, 131, 200, 0.3) !important;
 }
 
+/* active nav button font weight */
 button.nav-link.active {
     font-weight: 600 !important;
 }
 
+/* inactive nav link color */
 a.nav-link:not(.active) {
     color: rgb(var(--base-content)) !important;
 }
@@ -533,6 +567,12 @@ a:not(.nav-link, .btn):hover,
     text-decoration: underline !important;
 }
 
+/* keep debug panel links white */
+#djDebugPanelList a {
+    color: white !important;
+}
+
+/* links should be primary site color except buttons and certain classes */
 a:not(.text-reset, .dropdown-item, .btn) {
     color: rgb(var(--primary-text)) !important;
 }
@@ -542,21 +582,26 @@ a:not(.text-reset, .dropdown-item, .btn) {
     display: none !important;
 }
 
+/* column control button icon color */
 table.dataTable span.dtcc span.dtcc-button-icon {
     color: rgb(var(--base-content)) !important;
 }
 
+/* set-header default color */
 .set-header td {
     background-color: #717f8e !important;
     color: rgb(var(--primary-content)) !important;
 }
 
+/* set-header and songnum font weight */
 .set-header span,
 .songnum {
     font-weight: 500 !important;
 }
 
-.set-2-opener {
+/* set-header colors and badge colors */
+.set-2-opener,
+td .badge.bg-secondary {
     background-color: rgba(var(--secondary), 0.8) !important;
     color: rgb(var(--secondary-content)) !important;
 }
@@ -574,7 +619,9 @@ table.dataTable span.dtcc span.dtcc-button-icon {
 }
 
 .set-header:is(.set-1, .show) td,
-.show-opener {
+.show-opener,
+td .badge.bg-primary,
+.badge.show-opener {
     background-color: rgba(var(--primary), 0.8) !important;
     color: rgb(var(--primary-content)) !important;
 }
@@ -589,6 +636,7 @@ table.dataTable span.dtcc span.dtcc-button-icon {
     color: rgb(var(--primary-content)) !important;
 }
 
+/* event detail badge row padding */
 .badge-row .btn-sm {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
@@ -596,6 +644,7 @@ table.dataTable span.dtcc span.dtcc-button-icon {
     padding-right: 0.4rem;
 }
 
+/* button icon */
 .btn i {
     font-weight: 700 !important;
     display: inline-flex;
@@ -605,6 +654,23 @@ table.dataTable span.dtcc span.dtcc-button-icon {
     font-size: var(--text-base);
 }
 
+/* have margin on all nav-pills except last */
 .nav.nav-pills.nav-fill li:not(:last-child) {
     margin-right: 0.25rem !important;
+}
+
+/* edit button, shown only to admin and hover at bottom right */
+#admin-btn {
+    position: fixed;
+    bottom: 60px;
+    right: 30px;
+    z-index: 9999;
+
+    .btn {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+}
+
+div.dt-scroll-body {
+    border-bottom-width: 0px !important;
 }

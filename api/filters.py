@@ -10,7 +10,6 @@ from rest_framework.filters import BaseFilterBackend
 
 from databruce import models
 
-# from .views import VALID_SET_NAMES
 VALID_SET_NAMES = [
     "Show",
     "Set 1",
@@ -159,8 +158,8 @@ class DataTablesFilterBackend(BaseFilterBackend):
             if global_search_value:
                 is_filtered = True
 
-                # if global_search_regex:
-                #     search_type = "iregex"
+                if global_search_regex:
+                    search_type = "iregex"
 
                 for field in config["fields"]:
                     global_q |= Q(**{f"{field}__{search_type}": global_search_value})
@@ -242,40 +241,38 @@ class DataTablesFilterBackend(BaseFilterBackend):
             sb_index += 1
 
         if is_filtered:
-            print(global_q)
             queryset = queryset.filter(global_q & column_q)
 
         if sb_filter:
             queryset = queryset.filter(sb_filter)
 
         if is_filtered or order_list:
-            print(order_list)
             return queryset.order_by(*order_list).distinct()
 
         return queryset
 
 
 class ArchiveFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__event_id")
-    date = filters.CharFilter(field_name="event__event_date")
+    event = filters.CharFilter(field_name="event__event_id", label="event")
+    date = filters.CharFilter(field_name="event__event_date", label="event date")
 
 
 class BootlegFilter(filters.FilterSet):
-    archive = filters.BooleanFilter(field_name="archive", lookup_expr="isnull")
+    archive = filters.BooleanFilter(
+        field_name="archive",
+        lookup_expr="isnull",
+        label="Has Archive.org upload",
+    )
 
 
 class CitiesFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
-    name = filters.CharFilter(lookup_expr="istartswith")
-
-
-class EventSetlistFilter(filters.FilterSet):
-    id = filters.CharFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="istartswith", label="Name")
 
 
 class CoversFilter(filters.FilterSet):
     event = filters.CharFilter(field_name="event")
-    date = filters.CharFilter(field_name="event__event_date")
+    date = filters.CharFilter(field_name="event__event_date", label="event date")
 
 
 class VenuesFilter(filters.FilterSet):
@@ -284,37 +281,41 @@ class VenuesFilter(filters.FilterSet):
     state = filters.NumberFilter(field_name="state__id", lookup_expr="exact")
     country = filters.NumberFilter(field_name="country__id", lookup_expr="exact")
 
-    city_name = filters.CharFilter(field_name="city__name", lookup_expr="icontains")
-    state_name = filters.CharFilter(field_name="state__name", lookup_expr="icontains")
+    city_name = filters.CharFilter(
+        field_name="city__name",
+        lookup_expr="icontains",
+        label="city name",
+    )
+    state_name = filters.CharFilter(
+        field_name="state__name",
+        lookup_expr="icontains",
+        label="state name",
+    )
+
     country_name = filters.CharFilter(
         field_name="country__name",
         lookup_expr="icontains",
     )
 
-    name = filters.CharFilter(lookup_expr="istartswith")
-
-
-class IndexFilter(filters.FilterSet):
-    date = filters.CharFilter(field_name="date", lookup_expr="startswith")
-    month = filters.CharFilter(field_name="date__month", lookup_expr="exact")
-    day = filters.CharFilter(field_name="date__day", lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="istartswith", label="name")
 
 
 class EventRunFilter(filters.FilterSet):
+    id = filters.NumberFilter(lookup_expr="exact")
     start_date = filters.DateTimeFilter(
         field_name="first_event__date",
         lookup_expr="gte",
+        label="start date",
     )
-    end_date = filters.DateTimeFilter(field_name="last_event__date", lookup_expr="lte")
-    id = filters.NumberFilter(lookup_expr="exact")
+    end_date = filters.DateTimeFilter(
+        field_name="last_event__date",
+        lookup_expr="lte",
+        label="end date",
+    )
 
     class Meta:
         model = models.Runs
         fields = ["start_date", "end_date", "id"]
-
-
-class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
-    pass
 
 
 class EventsFilter(filters.FilterSet):
@@ -326,8 +327,16 @@ class EventsFilter(filters.FilterSet):
 
     id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
 
-    start_date = filters.DateTimeFilter(field_name="date", lookup_expr="gte")
-    end_date = filters.DateTimeFilter(field_name="date", lookup_expr="lte")
+    start_date = filters.DateTimeFilter(
+        field_name="date",
+        lookup_expr="gte",
+        label="start date",
+    )
+    end_date = filters.DateTimeFilter(
+        field_name="date",
+        lookup_expr="lte",
+        label="end date",
+    )
 
     day_of_week = filters.NumberFilter(
         field_name="date__week_day",
@@ -356,6 +365,7 @@ class EventsFilter(filters.FilterSet):
         lookup_expr="exact",
         label="city",
     )
+
     state = filters.NumberFilter(
         field_name="venue__city__state__id",
         lookup_expr="exact",
@@ -423,16 +433,32 @@ class EventsFilter(filters.FilterSet):
 
 
 class OnstageFilter(filters.FilterSet):
-    relation = filters.NumberFilter(field_name="relation__id", lookup_expr="exact")
+    relation = filters.NumberFilter(
+        field_name="relation__id",
+        lookup_expr="exact",
+        label="relation",
+    )
     band = filters.NumberFilter(field_name="band__id", lookup_expr="exact")
-    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
+    event = filters.CharFilter(
+        field_name="event__event_id",
+        lookup_expr="exact",
+        label="event_id",
+    )
 
 
 class OnstageBandFilter(filters.FilterSet):
     relation = filters.NumberFilter(field_name="relation__id", lookup_expr="exact")
     band = filters.NumberFilter(field_name="band__id", lookup_expr="exact")
-    first = filters.CharFilter(field_name="first_event__event_id", lookup_expr="exact")
-    last = filters.CharFilter(field_name="last_event__event_id", lookup_expr="exact")
+    first = filters.CharFilter(
+        field_name="first_event__event_id",
+        lookup_expr="exact",
+        label="event_id",
+    )
+    last = filters.CharFilter(
+        field_name="last_event__event_id",
+        lookup_expr="exact",
+        label="event_id",
+    )
 
 
 class ReleaseTracksFilter(filters.FilterSet):
@@ -452,46 +478,81 @@ class BandsFilter(filters.FilterSet):
 class ReleaseFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
     type = filters.CharFilter(lookup_expr="icontains")
-    start_date = filters.DateTimeFilter(field_name="date", lookup_expr="gte")
-    end_date = filters.DateTimeFilter(field_name="date", lookup_expr="lte")
+    start_date = filters.DateTimeFilter(
+        field_name="date",
+        lookup_expr="gte",
+        label="start date",
+    )
+    end_date = filters.DateTimeFilter(
+        field_name="date",
+        lookup_expr="lte",
+        label="end date",
+    )
 
 
 class SetlistFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
-    run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
-    leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
+    event = filters.CharFilter(
+        field_name="event__event_id",
+        lookup_expr="exact",
+        label="event",
+    )
+    run = filters.NumberFilter(
+        field_name="event__run__id",
+        lookup_expr="exact",
+        label="event run",
+    )
+    leg = filters.NumberFilter(
+        field_name="event__leg__id",
+        lookup_expr="exact",
+        label="event tour leg",
+    )
     tour = filters.NumberFilter(
         field_name="event__tour__id",
         lookup_expr="exact",
+        label="tour",
     )
 
     song = filters.NumberFilter(
         field_name="song__id",
         lookup_expr="exact",
+        label="song",
         distinct=True,
     )
 
-    venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+    venue = filters.NumberFilter(
+        field_name="event__venue__id",
+        lookup_expr="exact",
+        label="venue",
+    )
 
     city = filters.NumberFilter(
         field_name="event__venue__city__id",
         lookup_expr="exact",
+        label="city",
     )
 
     state = filters.NumberFilter(
         field_name="event__venue__city__state__id",
         lookup_expr="exact",
+        label="state",
     )
 
     country = filters.NumberFilter(
         field_name="event__venue__city__country__id",
         lookup_expr="exact",
+        label="country",
     )
 
     user = filters.NumberFilter(
         field_name="event__user_event__id",
         lookup_expr="exact",
+        label="user",
     )
+
+    debut = filters.BooleanFilter(label="debut")
+    premiere = filters.BooleanFilter(label="premiere")
+    sign_request = filters.BooleanFilter(label="sign_request")
+    nobruce = filters.BooleanFilter(label="bruce not present")
 
     def filter_song_num(self, queryset, name, value):
         lookup = f"{name}__isnull"
@@ -505,10 +566,12 @@ class SetlistFilter(filters.FilterSet):
 
     song_num = filters.BooleanFilter(
         method="filter_song_num",
+        label="has song num",
     )
 
     show_only = filters.BooleanFilter(
         method="filter_show_only",
+        label="show only",
     )
 
     class Meta:
@@ -517,55 +580,103 @@ class SetlistFilter(filters.FilterSet):
 
 
 class SetlistEntryFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
-    run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
-    leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
-    tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
-    venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+    event = filters.CharFilter(
+        field_name="event__event_id",
+        lookup_expr="exact",
+        label="event_id",
+    )
+    run = filters.NumberFilter(
+        field_name="event__run__id",
+        lookup_expr="exact",
+        label="event run",
+    )
+    leg = filters.NumberFilter(
+        field_name="event__leg__id",
+        lookup_expr="exact",
+        label="tour leg",
+    )
+    tour = filters.NumberFilter(
+        field_name="event__tour__id",
+        lookup_expr="exact",
+        label="tour",
+    )
+    venue = filters.NumberFilter(
+        field_name="event__venue__id",
+        lookup_expr="exact",
+        label="venue",
+    )
     city = filters.NumberFilter(
         field_name="event__venue__city__id",
         lookup_expr="exact",
+        label="city",
     )
     state = filters.NumberFilter(
         field_name="event__venue__state__id",
         lookup_expr="exact",
+        label="state",
     )
     country = filters.NumberFilter(
         field_name="event__venue__country__id",
         lookup_expr="exact",
+        label="country",
     )
 
 
 class SetlistSongsFilter(filters.FilterSet):
-    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
-    run = filters.NumberFilter(field_name="event__run__id", lookup_expr="exact")
-    leg = filters.NumberFilter(field_name="event__leg__id", lookup_expr="exact")
-    tour = filters.NumberFilter(field_name="event__tour__id", lookup_expr="exact")
-    venue = filters.NumberFilter(field_name="event__venue__id", lookup_expr="exact")
+    event = filters.CharFilter(
+        field_name="event__event_id",
+        lookup_expr="exact",
+        label="event",
+    )
+    run = filters.NumberFilter(
+        field_name="event__run__id",
+        lookup_expr="exact",
+        label="event run",
+    )
+    leg = filters.NumberFilter(
+        field_name="event__leg__id",
+        lookup_expr="exact",
+        label="tour leg",
+    )
+    tour = filters.NumberFilter(
+        field_name="event__tour__id",
+        lookup_expr="exact",
+        label="tour",
+    )
+    venue = filters.NumberFilter(
+        field_name="event__venue__id",
+        lookup_expr="exact",
+        label="venue",
+    )
+
     city = filters.NumberFilter(
         field_name="event__venue__city__id",
         lookup_expr="exact",
+        label="city",
     )
 
     state = filters.NumberFilter(
         field_name="event__venue__city__state__id",
         lookup_expr="exact",
+        label="state",
     )
 
     country = filters.NumberFilter(
         field_name="event__venue__city__country__id",
         lookup_expr="exact",
+        label="country",
     )
 
     user = filters.NumberFilter(
         field_name="event__user_event__user_id",
         lookup_expr="exact",
+        label="User ID",
     )
 
     user_unseen = filters.NumberFilter(
         field_name="event__user_event__user_id",
         method="filter_unseen",
-        label="Unseen",
+        label="Show songs this user hasn't seen",
     )
 
     user_rare = filters.BooleanFilter(
@@ -577,6 +688,7 @@ class SetlistSongsFilter(filters.FilterSet):
     public_plays = filters.NumberFilter(
         field_name="song__num_plays_public",
         lookup_expr="gte",
+        label="Public Plays (>=)",
     )
 
     def filter_rare(self, queryset, name, value):
@@ -618,23 +730,30 @@ class TourLegFilter(filters.FilterSet):
 
 class SongsPageFilter(filters.FilterSet):
     song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
-    next = filters.NumberFilter(field_name="next_song", lookup_expr="exact")
 
 
 class SongsFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+    name = filters.CharFilter(field_name="name", lookup_expr="iregex")
     lyrics = filters.BooleanFilter()
 
 
 class SetlistNoteFilter(filters.FilterSet):
     id = filters.NumberFilter(field_name="setlist__id", lookup_expr="exact")
-    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
+    event = filters.CharFilter(
+        field_name="event__event_id",
+        lookup_expr="exact",
+        label="event_id",
+    )
     note = filters.CharFilter(lookup_expr="icontains")
 
 
 class UserAttendedShowsFilter(filters.FilterSet):
     user = filters.NumberFilter(field_name="user__id", lookup_expr="exact")
-    event = filters.CharFilter(field_name="event__event_id", lookup_expr="exact")
+    event = filters.CharFilter(
+        field_name="event__event_id",
+        lookup_expr="exact",
+        label="event_id",
+    )
 
 
 class SetlistBreakdownFilter(filters.FilterSet):

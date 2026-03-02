@@ -85,8 +85,12 @@ function removeForm(e) {
   adjust_conjunctions();
 }
 
+/**
+ * Show/hide the song2 field when position = followed_by
+ * @param {object} row - parent row of the select element
+ * @param {object} select - select element that triggered the change
+ */
 function positionChange(row, select) {
-  // show/hide the song2 field when position = followed_by
   var select_row = $(select).parent().parent();
 
   if ($(select).val() == "followed_by") {
@@ -133,10 +137,6 @@ function addForm() {
 $(document).ready(function () {
   var row = $('#setlist-search').find('.song-row').last();
 
-  // $('.select2').each(function() {
-  //     $(this).select2();
-  // });
-
   $('#city').select2(get_options({ ajax_url: 'cities/' }));
   $('#state').select2(get_options({ ajax_url: 'states/' }));
   $('#country').select2(get_options({ ajax_url: 'countries/' }));
@@ -149,7 +149,6 @@ $(document).ready(function () {
   row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));
 
   $('[class*=position]').change(function () {
-    console.log(this)
     positionChange(row, this);
   });
 

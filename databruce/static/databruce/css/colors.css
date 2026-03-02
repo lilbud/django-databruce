@@ -1,8 +1,4 @@
-:root {
-  --font-heading: "Cabin", sans-serif;
-  --font-body: "IBM Plex Sans Hebrew", sans-serif;
-}
-
+/* light theme colors, rgb format */
 [data-bs-theme="light"] {
   --base-100: 255, 255, 255;
   --base-200: 248, 248, 248;
@@ -33,6 +29,7 @@
   }
 }
 
+/* dark theme colors, rgb format */
 [data-bs-theme="dark"] {
   --base-100: 42, 48, 60;
   --base-200: 36, 41, 51;
@@ -78,23 +75,18 @@
   color: rgb(var(--primary-content)) !important;
 }
 
-/* Secondary */
-.text-secondary {
-  color: rgb(var(--secondary-content)) !important;
-}
-
 .bg-secondary {
   background-color: rgb(var(--secondary)) !important;
-}
-
-/* Accent */
-.text-accent {
-  color: rgb(var(--accent)) !important;
+  color: rgb(var(--secondary-content)) !important;
 }
 
 .bg-accent {
   background-color: rgb(var(--accent)) !important;
   color: rgb(var(--accent-content)) !important;
+}
+
+.text-accent {
+  color: rgb(var(--accent)) !important;
 }
 
 /* nugs */
@@ -127,6 +119,7 @@
   border-color: rgb(var(--accent)) !important;
 }
 
+/* custom primary button, used for event detail links and user form */
 .btn-primary-dark {
   color: rgb(var(--base-content)) !important;
 }

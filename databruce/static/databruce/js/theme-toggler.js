@@ -25,8 +25,10 @@
 
     if (theme === 'dark') {
       $('.theme-icon.bi-moon-stars-fill').show();
+      // $('#toggle-container').attr('data-bs-title', 'Toggle Theme (Light)');
     } else {
       $('.theme-icon.bi-sun-fill').show();
+      // $('#toggle-container').attr('data-bs-title', 'Toggle Theme (Dark)');
     }
   }
 

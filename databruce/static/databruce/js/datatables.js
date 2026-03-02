@@ -4,7 +4,7 @@ DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
-DataTable.defaults.column.columnControl = ['order', ['orderClear', 'orderAddAsc', 'orderAddDesc']];
+DataTable.defaults.column.columnControl = ['order', ['orderAsc', 'orderDesc', 'orderClear', 'orderAddAsc', 'orderAddDesc']];
 
 set_names = [
   "Show",
@@ -206,7 +206,7 @@ song_table_columns = [
   },
   {
     'data': 'song',
-    'name': 'song__name',
+    'name': 'song__sort_song_name',
     'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
@@ -305,8 +305,8 @@ setlist_slots = [
   {
     'data': 'event',
     'name': 'event__event_id, event__early_late',
-    'width': '9rem',
-    'className': 'all',
+    'width': '10rem',
+    'className': 'all text-nowrap',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/events/' + data.event_id + '">' + data.date.display_day + '</a>';
@@ -317,7 +317,6 @@ setlist_slots = [
     'data': 'show_opener',
     'name': 'show_opener__name',
     'width': '12rem',
-    'className': '',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
@@ -328,7 +327,6 @@ setlist_slots = [
     'data': 's1_closer',
     'name': 's1_closer__name',
     'width': '12rem',
-    'className': '',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
@@ -339,7 +337,6 @@ setlist_slots = [
     'data': 's2_opener',
     'name': 's2_opener__name',
     'width': '12rem',
-    'className': '',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
@@ -350,7 +347,6 @@ setlist_slots = [
     'data': 'main_closer',
     'name': 'main_closer__name',
     'width': '12rem',
-    'className': '',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
@@ -361,7 +357,6 @@ setlist_slots = [
     'data': 'encore_opener',
     'name': 'encore_opener__name',
     'width': '12rem',
-    'className': '',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
@@ -372,7 +367,6 @@ setlist_slots = [
     'data': 'show_closer',
     'name': 'show_closer__name',
     'width': '12rem',
-    'className': '',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';

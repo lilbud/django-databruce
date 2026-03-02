@@ -158,13 +158,13 @@ cython_debug/
 .cursorindexingignore
 
 notes/
-# static/
+./static/
 
 *.sh
 TO_DO.md
 
 # copilot instructions
 copilot_instructions.md
-.zed/settings.json
+.zed/
 .github/copilot-instructions.md
 http_cache.sqlite

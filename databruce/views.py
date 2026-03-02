@@ -192,58 +192,6 @@ class UserProfile(PageTitleMixin, TemplateView):
             username__iexact=self.kwargs["username"],
         )
 
-        # context["user_shows"] = (
-        #     models.UserAttendedShows.objects.filter(
-        #         user__id=context["user_info"].id,
-        #     )
-        #     .order_by("event__id")
-        #     .select_related(
-        #         "event",
-        #         "event__tour",
-        #         "event__venue",
-        #         "event__artist",
-        #         "event__venue__city",
-        #         "event__venue__city__country",
-        #     )
-        #     .prefetch_related(
-        #         "event__venue__city__state",
-        #     )
-        # )
-
-        # if context["user_shows"].count() > 0:
-        #     context["user_songs"] = models.Setlists.objects.filter(
-        #         event__id__in=context["user_shows"].values_list("event__id"),
-        #         set_name__in=VALID_SET_NAMES,
-        #     ).select_related("song", "event")
-
-        #     context["user_seen"] = (
-        #         context["user_songs"]
-        #         .values("song")
-        #         .annotate(
-        #             name=F("song__name"),
-        #             count=Count("event"),
-        #             uuid=F("song__uuid"),
-        #             first=Min("event__event_id"),
-        #             last=Max("event__event_id"),
-        #             category=F("song__category"),
-        #         )
-        #         .order_by("-count", "name")
-        #     )
-
-        #     context["user_not_seen"] = (
-        #         models.Songs.objects.exclude(
-        #             id__in=context["user_songs"].values_list("song__id"),
-        #         )
-        #         .filter(num_plays_public__gte=100)
-        #         .order_by("-num_plays_public", "name")
-        #     )
-
-        #     context["user_rare_songs"] = (
-        #         context["user_songs"]
-        #         .filter(song__num_plays_public__lte=100)
-        #         .order_by("song__num_plays_public", "song__name")
-        #     )
-
         return context
 
 
@@ -624,7 +572,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
             .order_by("event_id")
         )
 
-        context["venue_info"] = (
+        context["info"] = (
             models.Venues.objects.filter(
                 uuid=self.kwargs["id"],
             )
@@ -638,7 +586,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
             .first()
         )
 
-        context["title"] = f"{context['venue_info'].name}"
+        context["title"] = f"{context['info'].name}"
 
         context["songs"] = (
             models.Setlists.objects.filter(
@@ -682,11 +630,11 @@ class SongLyricDetail(PageTitleMixin, TemplateView):
             .first()
         )
 
-        context["song_info"] = models.Songs.objects.filter(
+        context["info"] = models.Songs.objects.filter(
             id=context["lyrics"].song.id,
         ).first()
 
-        context["title"] = f"Lyrics for {context['song_info'].name}"
+        context["title"] = f"Lyrics for {context['info'].name}"
 
         return context
 
@@ -704,7 +652,7 @@ class SongDetail(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["song_info"] = (
+        context["info"] = (
             models.Songs.objects.filter(uuid=self.kwargs["id"])
             .prefetch_related(
                 "album",
@@ -713,29 +661,47 @@ class SongDetail(PageTitleMixin, TemplateView):
             .first()
         )
 
+        context["title"] = f"{context['info'].name}"
+
+        context["setlists"] = (
+            models.Setlists.objects.filter(
+                song__uuid=self.kwargs["id"],
+            )
+            .select_related("event", "song")
+            .prefetch_related("setlist_positions")
+        )
+
+        context["positions"] = (
+            context["setlists"]
+            .filter(set_name__in=VALID_SET_NAMES)
+            .exclude(position=None)
+            .values("position")
+            .annotate(
+                count=Count("position"),
+                num=Min("song_num"),
+            )
+        ).order_by("num")
+
+        print(context["positions"])
+
         try:
             context["show_gap"] = models.Events.objects.filter(
-                event_id__gt=context["song_info"].last_event.event_id,
+                event_id__gt=context["info"].last_event.event_id,
+                date__lte=datetime.datetime.today().date(),
                 public=True,
             ).count()
         except (models.Songs.last_event.RelatedObjectDoesNotExist, AttributeError):
             context["show_gap"] = 0
 
-        context["title"] = f"{context['song_info'].name}"
-
-        context["setlists"] = models.Setlists.objects.filter(
-            song__id=self.kwargs["id"],
-        )
-
         context["lyrics"] = models.Lyrics.objects.filter(
             song__uuid=self.kwargs["id"],
         ).order_by("id")
 
-        if context["song_info"].num_plays_public > 0:
+        if context["info"].num_plays_public > 0:
             context["year_stats"] = (
                 models.Setlists.objects.select_related("event")
                 .filter(
-                    song_id=self.kwargs["id"],
+                    song__uuid=self.kwargs["id"],
                     set_name__in=VALID_SET_NAMES,
                     event__date__isnull=False,
                 )
@@ -754,7 +720,7 @@ class SongDetail(PageTitleMixin, TemplateView):
             )
 
             filter = Q(is_stats_eligible=True) & Q(
-                event_id__gt=context["song_info"].first_event.event_id,
+                event_id__gt=context["info"].first_event.event_id,
             )
 
             context["events_since_premiere"] = models.Events.objects.filter(
@@ -765,7 +731,7 @@ class SongDetail(PageTitleMixin, TemplateView):
                 context["frequency"] = round(
                     (
                         (
-                            context["song_info"].num_plays_public
+                            context["info"].num_plays_public
                             / context["events_since_premiere"]
                         )
                         * 100

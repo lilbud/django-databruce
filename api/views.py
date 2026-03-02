@@ -143,34 +143,16 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             "event__artist",
             "event__venue",
             "event__venue__city",
-        )
-        .prefetch_related(
-            "event__venue__city__state",
+            "event__venue__venues_text",
             "event__venue__city__country",
         )
-        .annotate(
-            prev_song=Subquery(
-                setlist.filter(song_num__lt=OuterRef("song_num"))
-                .order_by("-song_num", "-event")
-                .values(
-                    json=JSONObject(
-                        id="song__id",
-                        name="song__name",
-                        uuid="song__uuid",
-                    ),
-                )[:1],
-            ),
-            next_song=Subquery(
-                setlist.filter(song_num__gt=OuterRef("song_num"))
-                .order_by("event", "song_num")
-                .values(
-                    json=JSONObject(
-                        id="song__id",
-                        name="song__name",
-                        uuid="song__uuid",
-                    ),
-                )[:1],
-            ),
+        .prefetch_related(
+            "setlist_notes",
+            "setlist_position",
+            "songs_page",
+            "songs_page__prev",
+            "songs_page__next",
+            "event__venue__city__state",
         )
         .order_by("event__event_id", F("song_num").asc(nulls_first=True))
     )
@@ -232,44 +214,6 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = serializers.VenuesSerializer
     filterset_class = filters.VenuesFilter
-
-
-class IndexViewSet(viewsets.ReadOnlyModelViewSet):
-    def get_queryset(self):
-        params = parser.parse(self.request.GET.urlencode())
-
-        queryset = (
-            models.Events.objects.all()
-            .select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__city",
-                "venue__first_event",
-                "venue__last_event",
-            )
-            .prefetch_related(
-                "run",
-            )
-            .order_by("-event_id")
-        )
-
-        try:
-            if params["upcoming"] == "true":
-                return queryset.filter(date__gte=datetime.datetime.today().date())
-        except KeyError:
-            pass
-
-        try:
-            if params["recent"]:
-                return queryset.filter(date__lte=datetime.datetime.today().date())
-        except KeyError:
-            pass
-
-        return queryset
-
-    serializer_class = serializers.IndexSerializer
-    filterset_class = filters.IndexFilter
 
 
 class EventCalendar(viewsets.ReadOnlyModelViewSet):
@@ -459,7 +403,7 @@ class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
         models.ReleaseTracks.objects.all()
         .order_by("discnum", "track")
         .select_related("song", "release")
-        .prefetch_related("event", "discid")
+        .prefetch_related("event", "discid", "song__first_event", "song__last_event")
     )
 
     serializer_class = serializers.ReleaseTracksSerializer
@@ -492,7 +436,7 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = serializers.SetlistSerializer
     filterset_class = filters.SetlistFilter
-    ordering_fields = ["event", "song_num", "song__category", "song__name"]
+    ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
 
 
 class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -521,15 +465,22 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
 class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = (
-            models.Setlists.objects.filter(set_name__in=VALID_SET_NAMES)
+            models.Setlists.objects.filter(
+                set_name__in=VALID_SET_NAMES,
+                event__public=True,
+            )
             .select_related("song", "event")
             .all()
         )
 
-        queryset = queryset.values("song_id").annotate(
-            count=Count("id"),
-            first_event=Min("event__event_id"),
-            last_event=Max("event__event_id"),
+        queryset = (
+            queryset.values("song_id")
+            .annotate(
+                count=Count("id"),
+                first_event=Min("event__event_id"),
+                last_event=Max("event__event_id"),
+            )
+            .order_by("-count")
         )
 
         return self.filter_queryset(queryset)
@@ -670,19 +621,6 @@ class LyricsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LyricsSerializer
 
 
-class EventSetlist(viewsets.ReadOnlyModelViewSet):
-    def get_queryset(self):
-        return (
-            models.Setlists.objects.all()
-            .select_related("song", "event", "tour_stats_link")
-            .prefetch_related("ltp")
-            .order_by("event", F("song_num").asc(nulls_first=True))
-        )
-
-    serializer_class = serializers.SetlistSerializer
-    filterset_class = filters.SetlistFilter
-
-
 class SetlistNotesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.SetlistNotes.objects.all()
@@ -808,3 +746,8 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = serializers.SetlistBreakdownSerializer
     ordering = ["category", "max_val", "percent", "num"]
+
+
+class SongsPage(viewsets.ReadOnlyModelViewSet):
+    queryset = models.SongsPage.objects.all()
+    serializer_class = serializers.SongsPageSerializer

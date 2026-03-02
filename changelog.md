@@ -101,22 +101,46 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/28) Events: Year dropdown now starts at current year and descends, instead of ascending from 1965.
 
 # v1.14 (Feburary 2026)
-## Database Changes
-- (1/31) Database: Added We Shall Overcome recording sessions (19971102-01, 20050319-01, 20060121-01, 20060518-01, 20060704-01).
-- (1/31) Database: Added Dead Man Walkin' recording session (19950400-02).
-- (1/31) Database: Added Viva Las Vegas recording session (19890913-01).
-- (1/31) Releases: Added 36 releases from [Brucebase](http://brucebase.wikidot.com/stats:discography-specials). Specifically those from "Compilations/Soundtracks".
-- (1/31) Releases: Merged River Single Album, River Outtakes, and Tempe 11/5/80 into The Ties That Bind: River Collection.
-
-## Site Changes
-- (1/31) Event Calendar: Improved loading time.
-- (1/31) Style: All page links now match the primary site color.
-- (1/31) Lyric Detail: Note now renders markdown if present.
-- (1/31) Event Detail: Improved loading time.
-- (1/31) Style: Table columns with dates now show the day of week, and width has been adjusted to compensate.
-- (1/31) Release Detail: Notes now show if present.
-- (1/31) Release Detail: Fix issue where "Event Date" would show the time and date, instead of just date.
-- (1/31) Release Detail: Release Discs now show for all releases if disc num is not null. Additionally, if a disc "name" is present (see Tracks 2), then it will be appended.
-- (2/2) General: Tables can now be sorted by multiple columns at once
-- (2/9) Calendar: Releases shown
-- (2/9) Calendar: Links now open in new tab by default
+- Replaced `django_rest_framework_datatables` with a custom renderer/pagination.
+- Redid how much of the backend works, many pages now load a bit faster
+- All page links now match primary site color
+- Layout has been redone on many pages, particularly in regards to card/column spacing.
+- Added `columnControl` to datatables, allows for more flexible ordering/sorting. This allows for easier multi-column ordering, as well as it now being possible on mobile.
+- "Setlist Slots" tables now hide empty columns. Things like "Set 1/2" on tours with a "Show/Encore" structure
+- Theme Toggle is now a simple "light/dark" button instead of a dropdown menu.
+- Every link now uses UUID instead of ID, if you have any bookmarks they will not work anymore.
+- Redid how DataTables filter/order/search
+- Event Search: Fixed location not being shown on Event Search
+- User Profile: songs seen/rare now show first/last event you saw a song at
+- "Songs" table on many detail pages now shows first/last event
+- Event Calendar:
+	- Fixed Event Runs not showing up
+	- Improved loading time
+	- Links now open in new tab by default
+	- Added releases
+- Added "success" indicator on Contact Form submit.
+- Home Page featured/latest setlist now shows position indicators and notes
+- Lyric Detail note now renders markdown if present
+- Event Detail
+	- Loading time improved.
+	- Column ratio modified, setlist card is *slightly* narrower, and side column expanded.
+	- Onstage has been moved to it's own tab, rather than being squished on the sidebar.
+	- Album Breakdown: percentage is now of total number of songs instead of per album
+	- Album Breakdown: clicking on row now expands list of songs. This also means the popup is gone.
+	- Fixed tour counts showing 1 for all songs and shows.
+- Style:
+	- Table columns with dates now show day of week
+	- Updates to many layouts, including style tweaks and fixing some odd colors.
+	- Dark Theme colors updated slightly, better contrast on cards
+	- Much tighter layout in regards to spacing. Less padding in tables, and font has been shrunken slightly. Allows for more rows visible at once on desktop.
+	- Fixed table horizonal scrolling, was originally removed due to odd quirks with Datatables breaking mobile layouts.
+- Release Detail:
+	- Notes now show if present
+	- Fixed `event_date` showing date and time instead of just date
+	- Discs now show for all releases. If there is a "disc name" (Tracks 2), it is shown, otherwise just "Disc #". Defaults to "Disc 1" in most cases
+- Advanced Search:
+	- Performance improvements
+	- Significantly reworked this, as it was an absolute mess
+	- "band" is now when a band appeared at an event rather than solely if they're the "main" band for an event
+- Setlist Note Search
+	- Redid notes on the database, so this has been updated to match. Now searches all setlist notes.
