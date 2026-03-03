@@ -920,6 +920,10 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
         "in_soundcheck": Q(set_name="soundcheck"),
         "show_closer": Q(is_closer=True),
         "anywhere": Q(),  # No additional filters
+        "premiere": Q(premiere=True),
+        "debut": Q(debut=True),
+        "nobruce": Q(nobruce=True),
+        "request": Q(sign_request=True),
     }
 
     def get(self, request, *args, **kwargs):
@@ -1075,6 +1079,8 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
             )
             .prefetch_related("venue__city__state")
         ).order_by("event_id")
+
+        print(event_form.cleaned_data)
 
         context["display_fields"] = [
             {"label": event_form[f].label, "data": event_form.cleaned_data[f]}

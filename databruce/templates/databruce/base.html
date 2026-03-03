@@ -78,6 +78,14 @@
     {% block extrajs %}
     {% endblock extrajs %}
   </head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2PEZ706QCW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-2PEZ706QCW');
+  </script>
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
@@ -354,27 +362,40 @@
             }
         });
         
-
         // masks all date forms to fill in dashes
         $('.date-form').each(function() {
           $(this).mask('0000-00-00');
         });
 
-        // enables tooltips, has to be run once at page load, and on table resizes
-        function toolTips() {
-          let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-          tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-              return new bootstrap.Tooltip(tooltipTriggerEl);
+        let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        const tabElements = document.querySelectorAll('button[data-bs-toggle="pill"]');
+        tabElements.forEach(tabEl => {
+          tabEl.addEventListener('shown.bs.tab', (event) => {
+            const hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
+            if (hash) {
+              history.replaceState(null, null, hash);
+            }
           });
-        };
+        });
 
-        toolTips();
+        function activatePillFromUrlHash() {
+          const url = window.location.href;
+          if (url.includes("#")) {
+            const hash = url.substring(url.indexOf("#"));
+            const triggerEl = document.querySelector(`button[data-bs-target="${hash}"]`);
 
-        window.onresize = function() {
-          $($.fn.dataTable.tables(true)).DataTable().responsive.recalc().columns.adjust();
-          toolTips();
-        };
-      
+            if (triggerEl) {
+              const bsPill = new bootstrap.Tab(triggerEl);
+              bsPill.show();
+            }
+          }
+        }
+
+        activatePillFromUrlHash();
       });
     </script>
   </body>

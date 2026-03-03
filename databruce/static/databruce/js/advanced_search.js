@@ -141,6 +141,7 @@ $(document).ready(function () {
   $('#state').select2(get_options({ ajax_url: 'states/' }));
   $('#country').select2(get_options({ ajax_url: 'countries/' }));
   $('#tour').select2(get_options({ ajax_url: 'tours/' }));
+  $('#tour-leg').select2(get_options({ ajax_url: 'tour_legs/' }));
   $('#relation').select2(get_options({ ajax_url: 'relations/' }));
   $('#band').select2(get_options({ ajax_url: 'bands/' }));
   $('#venue').select2(get_options({ ajax_url: 'venues/' }));

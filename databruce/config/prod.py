@@ -97,6 +97,10 @@ CACHES = {
     },
 }
 
+# Session storage
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
 ADMINS = [("Brian", os.getenv("EMAIL"))]
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

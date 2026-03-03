@@ -74,6 +74,9 @@
                         <a class="fw-medium text-reset"
                            href="{% url 'band_details' id=event.artist.uuid %}"
                            id="artist">{{ event.artist }}</a>
+                        {% if event.type == 'Rescheduled' or event.type == 'Cancelled' or event.type == 'Relocated' or event.type == 'No Bruce' or event.type == 'No Gig' %}
+                          <span class="text-danger fw-medium">[{{ event.type }}]</span>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="row text-lg fw-medium text-reset">

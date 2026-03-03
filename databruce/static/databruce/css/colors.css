@@ -61,9 +61,25 @@
   }
 }
 
+/* [data-bs-theme="dark"] .table-warning {
+  box-shadow: inset 0 0 100px 100px rgba(var(--warning), 0.8);
+}
+
+[data-bs-theme="light"] .table-warning {
+  box-shadow: inset 0 0 100px 100px rgba(var(--warning), 0.05);
+} */
+
 /* Primary */
 .text-primary {
   color: rgb(var(--primary)) !important;
+}
+
+.text-warning {
+  color: rgb(var(--warning)) !important;
+}
+
+.text-danger {
+  color: rgb(var(--danger)) !important;
 }
 
 .text-primary-content {

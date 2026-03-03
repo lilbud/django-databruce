@@ -79,6 +79,12 @@
           <div class="col-9 col-md-4 px-0">{{ form.day_of_week }}</div>
         </div>
         <div class="row">
+          {{ form.event_type.errors }}
+          <div class="form-label text-sm text-nowrap">{{ form.event_type.label }}</div>
+          <div class="col-3 col-lg-1 pe-1">{{ form.event_type_exclude }}</div>
+          <div class="col-9 col-md-4 px-0">{{ form.event_type }}</div>
+        </div>
+        <div class="row">
           {{ form.city.errors }}
           <label class="form-label text-sm">{{ form.city.label }}</label>
           <div class="col-3 col-lg-1 pe-1">{{ form.city_exclude }}</div>
@@ -107,6 +113,12 @@
           <label class="form-label text-sm">{{ form.tour.label }}</label>
           <div class="col-3 col-lg-1 pe-1">{{ form.tour_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.tour }}</div>
+        </div>
+        <div class="row">
+          {{ form.tour_leg.errors }}
+          <label class="form-label text-sm">{{ form.tour_leg.label }}</label>
+          <div class="col-3 col-lg-1 pe-1">{{ form.tour_leg_exclude }}</div>
+          <div class="col-9 col-lg-4 px-0">{{ form.tour_leg }}</div>
         </div>
         <div class="row">
           {{ form.relation.errors }}

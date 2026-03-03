@@ -116,6 +116,14 @@ class AdvancedEventSearch(forms.Form):
         ("7", "Saturday"),
     ]
 
+    event_types = [
+        ("", ""),
+    ]
+
+    event_types.extend(
+        [item for item in models.Events.types],
+    )
+
     first_date = CustomCharField(
         label="Start Date",
         lookup_path="date__gte",
@@ -190,6 +198,20 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
+    event_type = CustomChoiceField(
+        label="Event Type",
+        lookup_path="type",
+        choices=event_types,
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "form-select form-select-sm",
+                "id": "type",
+                "name": "event_type",
+            },
+        ),
+    )
+
     city = CustomCharField(
         label="City",
         lookup_path="venue__city__id",
@@ -251,6 +273,19 @@ class AdvancedEventSearch(forms.Form):
                 "class": "form-select form-select-sm select2",
                 "id": "tour",
                 "name": "event_tour",
+            },
+        ),
+    )
+
+    tour_leg = CustomCharField(
+        label="Tour Leg",
+        lookup_path="leg__id",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "form-select form-select-sm select2",
+                "id": "tour-leg",
+                "name": "event_tour_leg",
             },
         ),
     )
@@ -395,6 +430,12 @@ class AdvancedEventSearch(forms.Form):
 
         return None
 
+    def clean_tour_leg(self):
+        if self.cleaned_data["tour_leg"]:
+            return models.TourLegs.objects.get(id=self.cleaned_data["tour_leg"])
+
+        return None
+
     def clean_relation(self):
         if self.cleaned_data["relation"]:
             return models.Relations.objects.get(id=self.cleaned_data["relation"])
@@ -480,6 +521,10 @@ class SetlistSearch(forms.Form):
             ("in_recording", "Recording"),
             ("in_soundcheck", "Soundcheck"),
             ("show_closer", "Show Closer"),
+            ("premiere", "Premiere"),
+            ("debut", "Tour Debut"),
+            ("nobruce", "No Bruce"),
+            ("request", "Sign Request"),
         ],
         required=False,
         initial="anywhere",

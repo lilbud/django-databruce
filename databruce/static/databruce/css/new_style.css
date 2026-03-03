@@ -255,7 +255,7 @@ a:link,
 
 .card-body,
 th,
-tr:not(.set-header) td:not(.songnum) {
+tr:not(.set-header) td:not(.songnum, .table-warning, .table-danger) {
     background-color: rgb(var(--base-100)) !important;
 }
 
@@ -281,6 +281,9 @@ tr.album-header>th {
 
 table.dataTable td:not(.highlighted) a {
     font-weight: 500 !important;
+}
+
+table.dataTable td:not(.highlighted) a:not(.text-reset) {
     color: rgb(var(--primary-text)) !important;
 }
 

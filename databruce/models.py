@@ -545,6 +545,7 @@ class Events(BaseModel):
         ("Memorial", "Memorial"),
         ("Music Festival", "Music Festival"),
         ("No Gig", "No Gig"),
+        ("No Bruce", "No Bruce"),
         ("Politics", "Politics"),
         ("Recording", "Recording"),
         ("Rehearsal", "Rehearsal"),
@@ -1030,6 +1031,8 @@ class Setlists(BaseModel):
 
     song_num = models.IntegerField(
         default=1,
+        blank=True,
+        null=True,
     )
 
     song = models.ForeignKey(

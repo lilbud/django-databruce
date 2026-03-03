@@ -90,7 +90,7 @@ class MinimalVenuesSerializer(BaseSerializer):
     name = serializers.SerializerMethodField()
 
     def get_name(self, obj):
-        return ", ".join(filter(None, [obj.name, obj.detail]))
+        return ", ".join(filter(None, [obj.detail, obj.name]))
 
     def get_formatted(self, obj):
         return MinimalVenuesTextSerializer(obj.venues_text).data["formatted"]
@@ -363,6 +363,11 @@ class EventsSerializer(BaseSerializer):
 
     bands = serializers.SerializerMethodField(required=False)
     relations = serializers.SerializerMethodField(required=False)
+
+    event_status = serializers.SerializerMethodField()
+
+    def get_event_status(self, obj):
+        return bool(obj.type and obj.type in ["Cancelled", "Relocated", "Rescheduled"])
 
     def get_bands(self, obj):
         return list({item.band_id for item in obj.onstage.all() if item.band_id})

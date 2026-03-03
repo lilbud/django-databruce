@@ -297,7 +297,21 @@ event_table_columns = [
       return renderLink('/tours/', data.uuid, data.name);
     },
   },
-  { 'data': 'title', 'name': 'title', 'width': '15rem' },
+  {
+    'data': 'title',
+    'name': 'title',
+    'width': '15rem',
+    'render': function (data, type, row, meta) {
+      if (row.event_status) {
+        if (data) {
+          return `<span class="text-danger fw-semibold">[${row.type}] ${data}</span>`
+        }
+        return `<span class="text-danger fw-semibold">[${row.type}]</span>`
+      }
+
+      return data;
+    },
+  },
   { 'data': 'public', 'name': 'public', 'visible': false, 'orderable': false },
 ]
 

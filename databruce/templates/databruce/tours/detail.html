@@ -3,6 +3,9 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_btn.html" with view="tours" item=info.id %}
+  {% endif %}
   <div class="col-12">
     <div class="text-2xl mb-3">
       <a href="{% url 'tours' %}">Tours</a> &gt; {{ title }}
@@ -121,12 +124,12 @@
                 <thead>
                   <tr>
                     <th class="text-nowrap all">Event</th>
-                    <th class="text-nowrap all showopener">Show Opener</th>
-                    <th class="text-nowrap all set1closer">Set 1 Closer</th>
-                    <th class="text-nowrap all set2opener">Set 2 Opener</th>
-                    <th class="text-nowrap all mainsetcloser">Main Set Closer</th>
-                    <th class="text-nowrap all encoreopener">Encore Opener</th>
-                    <th class="text-nowrap all showcloser">Show Closer</th>
+                    <th class="text-nowrap all show-opener">Show Opener</th>
+                    <th class="text-nowrap all set-1-closer">Set 1 Closer</th>
+                    <th class="text-nowrap all set-2-opener">Set 2 Opener</th>
+                    <th class="text-nowrap all main-set-closer">Main Set Closer</th>
+                    <th class="text-nowrap all encore-opener">Encore Opener</th>
+                    <th class="text-nowrap all show-closer">Show Closer</th>
                   </tr>
                 </thead>
               </table>
@@ -155,14 +158,13 @@
         layout: getDatatableLayout({category: false}),
         scrollY: '60vh',
         fixedColumns: {
-            start: 2
+            start: 1
         },
         ajax: {
           'url': '/api/v1/setlist_entries/?tour={{ info.id }}&format=custom',
         },
         columns: setlist_slots,
         initComplete: function () {
-          console.log(this.api())
           this.api().columns().every(function () {
             var columnData = this.data().join(''); // Combine all cell data into one string
 

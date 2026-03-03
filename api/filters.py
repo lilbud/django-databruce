@@ -733,6 +733,7 @@ class TourFilter(filters.FilterSet):
 
 class TourLegFilter(filters.FilterSet):
     tour = filters.NumberFilter(field_name="tour__id", lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="icontains")
 
 
 class SongsPageFilter(filters.FilterSet):
