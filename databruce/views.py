@@ -1099,7 +1099,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
 class ShortenURL(PageTitleMixin, TemplateView):
     def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        user = User.objects.first()
+        user = UserModel.objects.first()
         short_url = shortener.create(user, request.GET["url"])
 
         return HttpResponse(
