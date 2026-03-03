@@ -5,17 +5,20 @@ from typing import Any
 
 import django_filters
 from django import forms
-from django.contrib.auth import password_validation
+from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import (
     AuthenticationForm,
+    PasswordResetForm,
     UserCreationForm,
 )
-from django.contrib.auth.models import User
+
+# from django.contrib.auth.models import User
 from django.db.models import F, Q
 
 from . import models
 
 DATE = datetime.datetime.today()
+User = get_user_model()
 
 
 class CustomCharField(forms.CharField):

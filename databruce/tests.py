@@ -1,9 +1,40 @@
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from databruce.models import Bands, Events, Setlists, Songs, Venues
+from databruce.models import Bands, Events, Setlists, Songs, UserAttendedShows, Venues
+
+User = get_user_model()
+
+
+class UserTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="testuser@example.com",
+            password="faiasd87gf9s",
+            is_active=True,
+        )
+        self.venue = Venues.objects.create(name="Venue A")
+        self.artist = Bands.objects.create(name="Band A")
+        self.event = Events.objects.create(
+            event_id="19780919-01",
+            date=datetime.datetime(1978, 9, 19).date(),
+            venue=self.venue,
+            artist=self.artist,
+        )
+
+    def test_user_login(self):
+        # The login method requires credentials
+        self.client.login(username="testuser", password="faiasd87gf9s")
+
+    def test_user_add_show(self):
+        UserAttendedShows.objects.create(user=self.user, event=self.event)
+
+    def test_user_remove_show(self):
+        UserAttendedShows.objects.filter(user=self.user, event=self.event).delete()
 
 
 class AdvSearchTest(TestCase):

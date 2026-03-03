@@ -8,6 +8,15 @@
     <div class="card">
       <div class="card-header">Login</div>
       <div class="card-body">
+        {% if messages %}
+          <div class="row mb-3">
+            <div class="col">
+              {% for message in messages %}
+                <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
         <div class="row mb-3">
           <form method="post">
             {% csrf_token %}
@@ -18,17 +27,8 @@
                 {% translate "first" %}
               </span>
             </div>
-            <div class="col">{{ form.non_field_errors }}</div>
             <div class="fieldWrapper mb-3">
               <label class="form-label text-sm" for="{{ form.username.id_for_label }}">{% translate form.username.label %}</label>
-              {% if form.username.errors %}
-                <br>
-                <span class="text-sm text-danger">
-                  {% for error in form.username.errors %}
-                    {% translate error %}
-                  {% endfor %}
-                </span>
-              {% endif %}
               <input type="username"
                      class="form-control form-control-sm"
                      name="{{ form.username.name }}"
@@ -36,14 +36,6 @@
             </div>
             <div class="fieldWrapper mb-3">
               <label class="form-label text-sm" for="{{ form.password.id_for_label }}">{% translate form.password.label %}</label>
-              {% if form.password.errors %}
-                <br>
-                <span class="text-sm text-danger">
-                  {% for error in form.password.errors %}
-                    {% translate error %}
-                  {% endfor %}
-                </span>
-              {% endif %}
               <input type="password"
                      class="form-control form-control-sm"
                      name="{{ form.password.name }}"
@@ -51,14 +43,6 @@
             </div>
             <div class="row mb-3">
               <div class="col-12 text-base">
-                {% if form.remember_me.errors %}
-                  <br>
-                  <span class="text-sm text-danger">
-                    {% for error in form.remember_me.errors %}
-                      {% translate error %}
-                    {% endfor %}
-                  </span>
-                {% endif %}
                 {{ form.remember_me }}
                 <label class="form-label text-sm" for="{{ form.remember_me.id_for_label }}">
                   {% translate form.remember_me.label %}

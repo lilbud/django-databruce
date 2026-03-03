@@ -234,6 +234,11 @@ a:link,
     border-color: rgba(var(--info), 0.6) !important;
 }
 
+.card.message.error {
+    background-color: rgba(var(--danger), 0.4) !important;
+    border-color: rgba(var(--danger), 0.6) !important;
+}
+
 .card-header,
 .card-footer,
 .card-body,

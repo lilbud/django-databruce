@@ -115,8 +115,7 @@
                     </div>
                   </li>
                   <li>
-                    <a class="dropdown-item"
-                       href="{% url "profile" username=user.username %}">View Profile</a>
+                    <a class="dropdown-item" href="{% url "profile" id=user.uuid %}">View Profile</a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="{% url 'users' %}">View Users</a>

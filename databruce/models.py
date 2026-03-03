@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import F, Func, Value
 from django.db.models.functions import Lower, Trim
@@ -18,7 +19,22 @@ from requests.packages import mod
 
 from .templatetags.filters import format_fuzzy
 
-UserModel = get_user_model()
+
+class CustomUser(AbstractUser):
+    uuid = models.UUIDField(default=uuid4, unique=True, editable=False)
+
+    groups = models.ManyToManyField(
+        "auth.Group",
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        blank=True,
+    )
+
+    class Meta:
+        db_table = "auth_user"  # Directs Django to the existing table
+        verbose_name_plural = "Users"
 
 
 class RegexpReplace(Func):
@@ -1356,7 +1372,7 @@ class UserAttendedShows(BaseModel):
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     user = models.ForeignKey(
-        UserModel,
+        CustomUser,
         on_delete=models.DO_NOTHING,
         db_column="user_id",
         related_name="user_attended_shows",

@@ -1,10 +1,41 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import site
-from django.contrib.auth.models import User
+from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+from django.contrib.auth.models import Group, User
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 
 from . import models
+
+# Unregister the default User admin
+site.unregister(Group)
+
+
+@admin.register(models.CustomUser)
+class UserAdmin(DefaultUserAdmin, ModelAdmin):
+    search_fields = ["username"]
+    list_display = [
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "date_joined",
+        "last_login",
+        "is_active",
+        "uuid",
+    ]
+    # Forms loaded from `unfold.forms`
+    form = UserChangeForm
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
+
+
+@admin.register(Group)
+class GroupAdmin(BaseGroupAdmin, ModelAdmin):
+    pass
 
 
 class OnstageInline(TabularInline):
@@ -73,25 +104,6 @@ class ReleaseTrackInline(TabularInline):
     fk_name = "release"
     ordering = ("discnum", "track")
     extra = 0
-
-
-# Unregister the default User admin
-site.unregister(User)
-
-
-@admin.register(User)
-class UserAdmin(ModelAdmin):
-    search_fields = ["username"]
-    list_display = [
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-        "is_staff",
-        "date_joined",
-        "last_login",
-        "is_active",
-    ]
 
 
 @admin.register(models.ArchiveLinks)

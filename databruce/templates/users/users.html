@@ -49,11 +49,11 @@
               },
               { 'data': 'event_count', 'name': 'event_count' },
               { 
-                'data': 'username',
+                'data': 'uuid',
                 'name': 'username',
                 'render': function (data, type, row, meta) {
                   if (type === 'display') {
-                    return `<a href="/profile/${data}">${data}</a>`
+                    return `<a href="/profile/${data}">${row.username}</a>`
                   }
                 },
               },

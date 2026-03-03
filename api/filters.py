@@ -696,6 +696,13 @@ class SetlistSongsFilter(filters.FilterSet):
         return queryset.filter(**{lookup: 100})
 
     def filter_unseen(self, queryset, name, value):
+        events = models.UserAttendedShows.objects.filter(user_id=value).values_list(
+            "event_id",
+        )
+
+        if len(events) == 0:
+            return queryset.none()
+
         songs = queryset.filter(**{name: value}).values_list(
             "song__id",
             flat=True,

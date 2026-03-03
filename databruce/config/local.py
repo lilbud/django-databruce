@@ -42,11 +42,12 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = "smtp.mailgun.org"
 EMAIL_HOST_USER = os.getenv("MAILGUN_EMAIL")
 EMAIL_HOST_PASSWORD = os.getenv("MAILGUN_PASSWORD")
-EMAIL_PORT = 2525
-DEFAULT_FROM_EMAIL = f"Databruce {os.getenv('MAILGUN_EMAIL')}"
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
 PASSWORD_RESET_TIMEOUT = 259200
 
 CACHES = {

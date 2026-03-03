@@ -813,6 +813,7 @@ class UsersSerializer(BaseSerializer):
             "event_count",
             "is_staff",
             "date_joined",
+            "uuid",
         ]
 
 

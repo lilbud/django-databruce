@@ -8,7 +8,7 @@ from typing import Any
 
 import requests
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import (
     default_token_generator,
@@ -188,11 +188,27 @@ class UserProfile(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
-        context["user_info"] = UserModel.objects.get(
-            username__iexact=self.kwargs["username"],
+        context["info"] = UserModel.objects.get(
+            uuid=self.kwargs["id"],
         )
 
         return context
+
+
+class ResendActivation(PageTitleMixin, TemplateView):
+    template_name = "users/resend_activation.html"
+    title = "Resend Activation"
+
+    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+        email = request.POST.get("email")
+        user = User.objects.filter(email=email, is_active=False).first()
+        if user:
+            # RE-RUN YOUR ACTIVATION EMAIL LOGIC HERE
+            messages.success(request, "Activation email resent!")
+        else:
+            messages.error(request, "No inactive account found with that email.")
+
+        return render(request, template_name=self.template_name)
 
 
 class Login(PageTitleMixin, LoginView):
@@ -200,6 +216,21 @@ class Login(PageTitleMixin, LoginView):
     template_name = "users/login.html"
     title = "Login"
     success_url = reverse_lazy("home")
+
+    def form_invalid(self, form):
+        username = self.request.POST.get("username")
+        password = self.request.POST.get("password")
+        user = authenticate(self.request, username=username, password=password)
+
+        if user is None:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    if field.title() == "__All__":
+                        messages.error(self.request, f"{error}")
+                    else:
+                        messages.error(self.request, f"{field.title()}: {error}")
+
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         remember_me = form.cleaned_data.get("remember_me")

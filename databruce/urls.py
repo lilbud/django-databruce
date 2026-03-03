@@ -38,7 +38,7 @@ urlpatterns = [
         name="login",
     ),
     path(
-        "profile/<str:username>",
+        "profile/<uuid:id>",
         views.UserProfile.as_view(),
         name="profile",
     ),
