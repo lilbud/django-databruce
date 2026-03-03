@@ -2,6 +2,14 @@
 <html lang="en" data-bs-theme="light">
   <head>
     {% load i18n static %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2PEZ706QCW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-2PEZ706QCW');
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="A Springsteen Setlist Database">
@@ -78,15 +86,6 @@
     {% block extrajs %}
     {% endblock extrajs %}
   </head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2PEZ706QCW"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-2PEZ706QCW');
-  </script>
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
