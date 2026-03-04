@@ -473,8 +473,11 @@ class EventDetail(PageTitleMixin, TemplateView):
             ).prefetch_related(
                 "leg",
                 "run",
+                "archive_links",
             )
         ).get(event_id=self.kwargs["id"])
+
+        print(context["event"].archive_links.count())
 
         context["title"] = (
             f"{context['event'].get_date()} - {context['event'].venue.name}"
@@ -716,11 +719,22 @@ class SongDetail(PageTitleMixin, TemplateView):
         print(context["positions"])
 
         try:
-            context["show_gap"] = models.Events.objects.filter(
-                event_id__gt=context["info"].last_event.event_id,
-                date__lte=datetime.datetime.today().date(),
-                public=True,
-            ).count()
+            last_event = models.Events.objects.get(
+                event_id=context["info"].last_event.event_id,
+            ).num
+
+            latest = (
+                models.Events.objects.filter(num__isnull=False)
+                .order_by("-num")
+                .first()
+                .num
+            )
+
+            try:
+                context["show_gap"] = latest - last_event
+            except TypeError:
+                context["show_gap"] = None
+
         except (models.Songs.last_event.RelatedObjectDoesNotExist, AttributeError):
             context["show_gap"] = 0
 

@@ -59,6 +59,7 @@ class ArchiveLinks(BaseModel):
         to="Events",
         on_delete=models.DO_NOTHING,
         db_column="event_id",
+        related_name="archive_links",
         null=True,
     )
 

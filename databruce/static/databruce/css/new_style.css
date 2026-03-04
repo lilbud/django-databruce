@@ -655,10 +655,11 @@ td .badge.bg-primary,
 /* button icon */
 .btn i {
     font-weight: 700 !important;
-    display: inline-flex;
+    /* display: inline-flex; */
     vertical-align: middle;
     padding: 0 !important;
-    margin-top: -1px !important;
+    /* margin-top: auto !important;
+    margin-bottom: auto !important; */
     font-size: var(--text-base);
 }
 

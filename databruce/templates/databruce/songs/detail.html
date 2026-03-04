@@ -44,7 +44,7 @@
               <div>
                 <a class="fw-medium"
                    href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
-                <span class="text-reset fw-light">({{ show_gap }} shows ago)</span>
+                {% if show_gap %}<span class="text-reset fw-light">({{ show_gap }} shows ago)</span>{% endif %}
               </div>
             {% endif %}
           </div>

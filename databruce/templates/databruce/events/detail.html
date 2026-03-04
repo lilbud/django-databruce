@@ -126,6 +126,15 @@
                             <span>Nugs</span>
                           </a>
                         {% endif %}
+                        {% if event.archive_links.count > 0 %}
+                          <a role="button"
+                             target="_blank"
+                             href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}"
+                             class="btn btn-sm btn-primary-dark text-xs">
+                            <i class="bi bi-headphones"></i>
+                            <span>Radio Nowhere</span>
+                          </a>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
@@ -303,7 +312,25 @@
              id="links"
              role="tabpanel"
              aria-labelledby="links-tab"
-             tabindex="3"></div>
+             tabindex="3">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">Links</div>
+              <div class="card-body">
+                {% if event.archive_links.count > 0 %}
+                  <div class="text-sm">Radio Nowhere</div>
+                  <ul>
+                    {% for link in event.archive_links.all %}
+                      <li>
+                        <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-12 col-lg-4 col-xl-3">
         <div class="d-none d-xl-block mb-3">{% partial event-note %}</div>
