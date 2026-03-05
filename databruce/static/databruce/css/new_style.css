@@ -654,14 +654,35 @@ td .badge.bg-primary,
 
 /* button icon */
 .btn i {
-    font-weight: 700 !important;
-    /* display: inline-flex; */
-    vertical-align: middle;
-    padding: 0 !important;
-    /* margin-top: auto !important;
-    margin-bottom: auto !important; */
+    font-weight: 900 !important;
     font-size: var(--text-base);
+    display: inline-block;
+    line-height: 1;
 }
+
+.icon-button i {
+    padding-right: 0.25rem !important;
+}
+
+.icon-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Apply margin to everything EXCEPT the very last element */
+.card-body.event-note>*:not(:last-child) {
+    margin-bottom: 0.75rem !important;
+}
+
+/* Ensure the last element has no margin regardless of tag */
+.card-body.event-note> :last-child {
+    margin-bottom: 0 !important;
+}
+
+/* .card-body.event-note :not(:last-child) {
+    margin-bottom: 0.5rem !important;
+} */
 
 /* have margin on all nav-pills except last */
 .nav.nav-pills.nav-fill li:not(:last-child) {

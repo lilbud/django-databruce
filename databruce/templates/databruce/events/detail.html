@@ -111,7 +111,7 @@
                         {% if event.brucebase_url %}
                           <a role="button"
                              target="_blank"
-                             class="btn btn-sm btn-primary-dark text-xs"
+                             class="btn btn-sm btn-primary-dark text-xs icon-button"
                              href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
                             <i class="bi bi-link-45deg"></i>
                             <span>Brucebase</span>
@@ -121,7 +121,7 @@
                           <a role="button"
                              target="_blank"
                              href="{{ event.nugs.url }}"
-                             class="btn btn-sm btn-primary-dark text-xs">
+                             class="btn btn-sm btn-primary-dark text-xs icon-button">
                             <i class="bi bi-headphones"></i>
                             <span>Nugs</span>
                           </a>
@@ -130,7 +130,7 @@
                           <a role="button"
                              target="_blank"
                              href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}"
-                             class="btn btn-sm btn-primary-dark text-xs">
+                             class="btn btn-sm btn-primary-dark text-xs icon-button">
                             <i class="bi bi-headphones"></i>
                             <span>Radio Nowhere</span>
                           </a>
@@ -152,7 +152,7 @@
                       <button id="addshow"
                               type="submit"
                               name="submit"
-                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-primary-dark{% endif %}">
+                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-primary-dark{% endif %} icon-button">
                         {% if user_attended %}
                           <i class="bi bi-star-fill pe-1" id="star"></i>
                         {% else %}
@@ -225,7 +225,7 @@
               Notes
               <i class="bi bi-pencil"></i>
             </div>
-            <div class="card-body event-note">{{ event.note|markdown|safe|linebreaks|default_if_none:"" }}</div>
+            <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
           </div>
         {% endpartialdef %}
       </div>

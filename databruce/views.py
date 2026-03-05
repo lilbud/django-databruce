@@ -477,8 +477,6 @@ class EventDetail(PageTitleMixin, TemplateView):
             )
         ).get(event_id=self.kwargs["id"])
 
-        print(context["event"].archive_links.count())
-
         context["title"] = (
             f"{context['event'].get_date()} - {context['event'].venue.name}"
         )

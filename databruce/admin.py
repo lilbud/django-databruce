@@ -38,7 +38,7 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
 
 
-class OnstageInline(TabularInline):
+class OnstageInline(StackedInline):
     model = models.Onstage
 
     def get_queryset(self, request):
@@ -59,7 +59,7 @@ class OnstageInline(TabularInline):
     extra = 0
 
 
-class SetlistInline(TabularInline):
+class SetlistInline(StackedInline):
     model = models.Setlists
 
     def get_queryset(self, request):
