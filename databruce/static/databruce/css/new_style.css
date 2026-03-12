@@ -1,5 +1,6 @@
 :root {
     --logo-mask: url('/static/databruce/img/logo.svg');
+    --nugs-logo: url('/static/databruce/img/nugs.svg');
     --inset-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;
@@ -134,7 +135,6 @@ ul:last-child {
     aspect-ratio: 6 / 1;
 
     background-color: rgb(var(--primary-content));
-    display: inline-block;
 }
 
 /* Navbar */
@@ -378,7 +378,7 @@ p {
     .dt-scroll,
     .dt-scroll-head,
     .dt-scroll-body {
-        max-width: 94.5vw !important;
+        max-width: 97.5vw !important;
     }
 }
 
@@ -520,6 +520,24 @@ button:disabled {
 td:has(.album-breakdown):hover .progress {
     background-color: rgb(var(--base-100)) !important;
 }
+
+/* :root {
+    --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236ea8fe'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3e%3c/svg%3e");
+    --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236ea8fe'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3e%3c/svg%3e");
+}
+
+td:has(.album-breakdown)::after {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    content: "";
+    background-image: var(--bs-accordion-btn-icon);
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    transition: transform .2s ease-in-out;
+    display: inline-block !important;
+} */
 
 .progress-bar {
     border-radius: inherit !important;
@@ -703,4 +721,29 @@ td .badge.bg-primary,
 
 div.dt-scroll-body {
     border-bottom-width: 0px !important;
+}
+
+.card-body {
+    border-bottom-left-radius: var(--bs-border-radius) !important;
+    border-bottom-right-radius: var(--bs-border-radius) !important;
+    border-color: rgb(var(--border)) !important;
+}
+
+i.icon.nugs {
+    height: 17px !important;
+    width: 18px !important;
+}
+
+i.icon.nugs::before {
+    content: "";
+    background-color: rgb(var(--base-content)) !important;
+    -webkit-mask-image: var(--nugs-logo);
+    mask-image: var(--nugs-logo);
+    display: block;
+    height: 14px;
+    width: 14px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 1px !important;
 }

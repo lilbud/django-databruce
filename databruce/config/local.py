@@ -39,6 +39,14 @@ DATABASES = {
         "CONN_MAX_AGE": 600,
         "CONN_HEALTH_CHECKS": True,
     },
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": os.getenv("SUPABASE_DATABASE"),
+    #     "USER": os.getenv("SUPABASE_USER"),
+    #     "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+    #     "HOST": os.getenv("SUPABASE_HOST"),
+    #     "PORT": "5432",
+    # },
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

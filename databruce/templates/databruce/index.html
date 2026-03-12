@@ -64,11 +64,11 @@
       </div>
       <div class="col">
         <div class="card">
-          <div class="card-header">Setlist</div>
+          <div class="card-header">Featured Show</div>
           <div class="card-body p-0">
             <div class="col">
               {% with latest=latest_event %}
-                <div class="px-2 pt-2 pb-0">{{ latest.title }}</div>
+                {% if latest.title %}<div class="px-2 pt-2 pb-0">{{ latest.title }}</div>{% endif %}
                 <div class="p-2 pb-1">
                   <div class="col">
                     <a class="fw-medium text-sm"
@@ -188,7 +188,7 @@
           info: false,
           ordering: false,
           scrollX: false,
-          processing: false,
+          processing: true,
           columnDefs: [
             {'targets': '_all', columnControl: [] },
             {'target': 0, width: '10rem' }
@@ -305,7 +305,7 @@
               if (type === 'display' && data) {
                 var song = `<a class="fw-medium text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
 
-                var segue = row.segue ? $('<span />').addClass('segue text-xl').text('>').prop('outerHTML') : ''
+                var segue = row.segue ? $('<span />').addClass('segue').text('>').prop('outerHTML') : ''
 
                 song = `${song} ${segue}`;
 

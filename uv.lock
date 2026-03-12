@@ -162,6 +162,7 @@ dependencies = [
     { name = "django-filter" },
     { name = "django-link-shortener" },
     { name = "django-unfold" },
+    { name = "django-unfold-markdown" },
     { name = "djangorestframework" },
     { name = "djlint" },
     { name = "gevent" },
@@ -191,6 +192,7 @@ requires-dist = [
     { name = "django-filter", specifier = ">=25.2" },
     { name = "django-link-shortener", specifier = ">=1.0.1" },
     { name = "django-unfold", specifier = ">=0.77.1" },
+    { name = "django-unfold-markdown", specifier = ">=0.1.2" },
     { name = "djangorestframework", specifier = ">=3.16.1" },
     { name = "djlint", specifier = ">=1.36.4" },
     { name = "gevent", specifier = ">=25.9.1" },
@@ -267,6 +269,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/10/61/242b2b4b325951fded9497b0e058fb97f6c30e0b08b72cf8e70fd3e0b9d9/django_unfold-0.77.1.tar.gz", hash = "sha256:c8611a74cc1a944787c89e950bfbe29a8b8351078a79269f80fd974dc578dbd5", size = 1108615 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/d4/c0004a8d5369060c92a1419623de2866375a73180f16732e7cc4c9ad3e32/django_unfold-0.77.1-py3-none-any.whl", hash = "sha256:9a4305d4c65eff4de37800f60c176e242f6cb4fa2c5e96b69a5d300390c86d11", size = 1223570 },
+]
+
+[[package]]
+name = "django-unfold-markdown"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-unfold" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fb/c5/3d1e9d43fce9a0b646bf4f40fdce056af45cda39ede35a2d1cdebfb25ddc/django_unfold_markdown-0.1.2.tar.gz", hash = "sha256:6b4d8c627c08901fc6088a4aa85c357510fa4c9e55fcb2e81f2bdf10628076ec", size = 117597 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/6d/c4ded7b49db7e4c8daddafb28b6ec377a5e435879e370e048537342e65c3/django_unfold_markdown-0.1.2-py3-none-any.whl", hash = "sha256:a9614d7eac13c0b6be1288dfe7750987cbb99810372803a880b90b07ee014ce0", size = 119709 },
 ]
 
 [[package]]

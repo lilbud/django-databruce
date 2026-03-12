@@ -139,7 +139,7 @@
                     </div>
                   </div>
                   <div class="col-12 col-lg-6">
-                    <div class="row row-cols-2 g-2">
+                    <div class="row row-cols-3 g-2">
                       {% for item in positions %}
                         <div class="col">
                           <div class="card p-0">
@@ -389,12 +389,12 @@
         },
         columns: [
           {
-            'data': 'event.date',
+            'data': 'event',
             'name': 'event__event_id',
             'width': '8rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.uuid}">${data.display}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },

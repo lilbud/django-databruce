@@ -144,3 +144,9 @@ First public release of the site. Site was locked behind a login and accounts on
 	- "band" is now when a band appeared at an event rather than solely if they're the "main" band for an event
 - Setlist Note Search
 	- Redid notes on the database, so this has been updated to match. Now searches all setlist notes.
+
+# v1.15 (March 2026)
+- [Event Detail] Updated page so that "note" and "album breakdown" only show on the "overview" tab, and are hidden on the other tabs (onstage, notes, links).
+- [Event Detail] Added "Nugs" button back to event detail header
+- [Advanced Search] Updated event type to allow multiple values to be searched.
+- [Advanced Search] Event type field now styled to closer match default dropdown

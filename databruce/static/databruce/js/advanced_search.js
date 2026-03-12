@@ -1,13 +1,15 @@
 function get_options({ ajax_url = false }) {
   var options = {
     theme: "bootstrap-5",
-    selectionCssClass: "form-select",
-    dropdownCssClass: "form-control",
+    selectionCssClass: "form-select-sm",
+    dropdownCssClass: "form-select-sm",
     minimumInputLength: 3,
     dropdownAutoWidth: true,
     dropdownPosition: 'below',
+    placeholder: $(this).data('placeholder'),
     allowClear: true,
     placeholder: '',
+    maximumSelectionLength: 3,
     width: '100%', // need to override the changed default\
     ajax: {
       delay: 500,
@@ -145,6 +147,7 @@ $(document).ready(function () {
   $('#relation').select2(get_options({ ajax_url: 'relations/' }));
   $('#band').select2(get_options({ ajax_url: 'bands/' }));
   $('#venue').select2(get_options({ ajax_url: 'venues/' }));
+  $('#type').select2();
 
   row.find('.song2').parent().hide();
   row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));

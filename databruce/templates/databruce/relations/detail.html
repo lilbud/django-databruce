@@ -10,19 +10,21 @@
     <div class="text-2xl text-nowrap mb-3">
       <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
     </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="d-flex flex-row mb-0 text-sm">
-          <div class="pe-2 fw-semibold text-nowrap">Appeared With:</div>
-          <div>
-            {% for band in bands %}
-              <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
-              {% if not forloop.last %},{% endif %}
-            {% endfor %}
+    {% if bands %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex flex-row mb-0 text-sm">
+            <div class="pe-2 fw-semibold text-nowrap">Appeared With:</div>
+            <div>
+              {% for band in bands %}
+                <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    {% endif %}
     <div class="card">
       <div class="card-header">
         <ul class="nav nav-pills nav-fill" role="tablist">

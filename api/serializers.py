@@ -1,4 +1,5 @@
 import datetime
+from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
 from django.db.models import (
@@ -245,6 +246,17 @@ class CitiesSerializer(BaseSerializer):
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
 
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        try:
+            if obj.state and obj.country_id in (2, 6, 37):
+                return f"{obj.name}, {obj.state.abbrev}"
+        except models.Cities.state.RelatedObjectDoesNotExist:
+            return f"{obj.name}, {obj.country.name}"
+
+        return obj.name
+
     class Meta:
         model = models.Cities
         fields = "__all__"
@@ -449,9 +461,10 @@ class NugsSerializer(BaseSerializer):
     event = EventsSerializer(include=["id", "event_id", "venue", "date"])
 
     def get_date(self, obj):
+        print(obj.date)
         return {
             "date": obj.date.strftime("%Y-%m-%d [%a]"),
-            "time": obj.date.replace(tzinfo=datetime.timezone.utc).strftime(
+            "time": obj.date.astimezone(ZoneInfo("UTC")).strftime(
                 "%I:%M:%S %p",
             ),
         }
@@ -544,7 +557,11 @@ class SetlistSerializer(BaseSerializer):
             return None
 
         return list(
-            {item.note for item in obj.setlist_notes.all() if item.note != ""},
+            {
+                item.note.replace("''", "'")
+                for item in obj.setlist_notes.all()
+                if item.note != ""
+            },
         )
 
     class Meta:
@@ -795,7 +812,7 @@ class UpdatesSerializer(BaseSerializer):
     created_at = serializers.SerializerMethodField(method_name="get_created")
 
     def get_created(self, obj):
-        return obj.created_at.strftime("%m/%y")
+        return obj.created_at.strftime("%m/%d")
 
     class Meta:
         model = models.Updates

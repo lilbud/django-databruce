@@ -26,6 +26,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # Application definition
 INSTALLED_APPS = [
     "unfold",  # before django.contrib.admin
+    "unfold_markdown",
     "unfold.contrib.filters",  # optional, if special filters are needed
     "unfold.contrib.forms",  # optional, if special form elements are needed
     "unfold.contrib.inlines",  # optional, if special inlines are needed

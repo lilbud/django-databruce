@@ -102,8 +102,23 @@ class Index(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
+        latest_filter = Q(event_id="20000622-01")
+
+        # context["latest_event"] = (
+        #     models.Events.objects.filter(date__lt=datetime.datetime.today())
+        #     .select_related(
+        #         "artist",
+        #         "venue",
+        #         "venue__city",
+        #         "venue__venues_text",
+        #     )
+        #     .prefetch_related("venue__city__state")
+        #     .order_by("-event_id")
+        #     .first()
+        # )
+
         context["latest_event"] = (
-            models.Events.objects.filter(date__lt=datetime.datetime.today())
+            models.Events.objects.filter(latest_filter)
             .select_related(
                 "artist",
                 "venue",
@@ -111,7 +126,6 @@ class Index(PageTitleMixin, TemplateView):
                 "venue__venues_text",
             )
             .prefetch_related("venue__city__state")
-            .order_by("-event_id")
             .first()
         )
 
@@ -474,6 +488,7 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "leg",
                 "run",
                 "archive_links",
+                "nugs_event",
             )
         ).get(event_id=self.kwargs["id"])
 
@@ -950,6 +965,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context["danger_event_types"] = ["Cancelled", "Rescheduled", "Relocated"]
 
         event_form = self.form_class(self.request.GET)
         formset = self.formset_class(self.request.GET)
@@ -1092,13 +1108,25 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
             .prefetch_related("venue__city__state")
         ).order_by("event_id")
 
-        print(event_form.cleaned_data)
+        context["display_fields"] = []
 
-        context["display_fields"] = [
-            {"label": event_form[f].label, "data": event_form.cleaned_data[f]}
-            for f in event_form.changed_data
-            if "_exclude" not in f and f != "conjunction"
-        ]
+        for f in event_form.changed_data:
+            if "_exclude" not in f and f != "conjunction":
+                print(type(event_form.cleaned_data[f]))
+                context["display_fields"].append(
+                    {
+                        "label": event_form[f].label,
+                        "data": " OR ".join(event_form.cleaned_data[f])
+                        if type(event_form.cleaned_data[f]) is list
+                        else event_form.cleaned_data[f],
+                    },
+                )
+
+        # context["display_fields"] = [
+        #     {"label": event_form[f].label, "data": event_form.cleaned_data[f]}
+        #     for f in event_form.changed_data
+        #     if "_exclude" not in f and f != "conjunction"
+        # ]
 
         context["search_summary"] = display_queries
         context["conjunction"] = event_form.cleaned_data.get(

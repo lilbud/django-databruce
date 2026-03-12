@@ -33,6 +33,12 @@ class CustomChoiceField(forms.ChoiceField):
         super().__init__(*args, **kwargs)
 
 
+class CustomMultipleChoiceField(forms.MultipleChoiceField):
+    def __init__(self, *args, lookup_path=None, **kwargs) -> None:
+        self.lookup_path = lookup_path
+        super().__init__(*args, **kwargs)
+
+
 class AdvancedEventSearch(forms.Form):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -57,6 +63,23 @@ class AdvancedEventSearch(forms.Form):
                 ),
             )
 
+    def iterate_field(self, field: list, value: str, lookup_path: str) -> Q:
+        val_id = getattr(
+            value,
+            "id",
+            value.get("id") if isinstance(value, dict) else value,
+        )
+
+        q_obj = Q(**{lookup_path: val_id})
+
+        # check if the field should be excluded
+        exclude_val = self.cleaned_data.get(f"{field}_exclude")
+
+        if exclude_val is True:
+            q_obj = ~q_obj
+
+        return q_obj
+
     def get_filters(self):
         total_filter = Q()
 
@@ -75,20 +98,38 @@ class AdvancedEventSearch(forms.Form):
             field_instance = self.fields[field]
             lookup_path = getattr(field_instance, "lookup_path", field)
 
+            print(type(value))
+
+            if type(value) is list:
+                lookup_path = f"{lookup_path}__in"
+
+            q_obj = self.iterate_field(field, value, lookup_path)
+
+            # if type(value) is list:
+            #     for v in value:
+            #         print(v)
+            #         q_obj = self.iterate_field(field, v, lookup_path)
+            #         total_filter |= q_obj
+            # else:
+            #     q_obj = self.iterate_field(field, value, lookup_path)
+            #     total_filter &= q_obj
+
+            # print(total_filter)
+
             # some fields have an id attribute, some have a 'id' key
-            val_id = getattr(
-                value,
-                "id",
-                value.get("id") if isinstance(value, dict) else value,
-            )
+            # val_id = getattr(
+            #     value,
+            #     "id",
+            #     value.get("id") if isinstance(value, dict) else value,
+            # )
 
-            q_obj = Q(**{lookup_path: val_id})
+            # q_obj = Q(**{lookup_path: val_id})
 
-            # check if the field should be excluded
-            exclude_val = self.cleaned_data.get(f"{field}_exclude")
+            # # check if the field should be excluded
+            # exclude_val = self.cleaned_data.get(f"{field}_exclude")
 
-            if exclude_val is True:
-                q_obj = ~q_obj
+            # if exclude_val is True:
+            #     q_obj = ~q_obj
 
             # Add the query object to the total filter
             total_filter &= q_obj
@@ -116,9 +157,7 @@ class AdvancedEventSearch(forms.Form):
         ("7", "Saturday"),
     ]
 
-    event_types = [
-        ("", ""),
-    ]
+    event_types = []
 
     event_types.extend(
         [item for item in models.Events.types],
@@ -198,16 +237,17 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    event_type = CustomChoiceField(
+    event_type = CustomMultipleChoiceField(
         label="Event Type",
         lookup_path="type",
         choices=event_types,
         required=False,
-        widget=forms.Select(
+        widget=forms.SelectMultiple(
             attrs={
-                "class": "form-select form-select-sm",
+                "class": "form-select form-select-sm select2-multi",
                 "id": "type",
                 "name": "event_type",
+                "placeholder": "Choose multiple",
             },
         ),
     )

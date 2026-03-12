@@ -490,7 +490,7 @@ class Events(BaseModel):
         null=True,
     )
 
-    brucebase_url = models.TextField(default=None, blank=True, null=True)
+    brucebase_url = models.CharField(default=None, blank=True, null=True)
 
     venue = models.ForeignKey(
         to=Venues,
@@ -561,7 +561,7 @@ class Events(BaseModel):
         db_column="event_type",
     )
 
-    title = models.TextField(
+    title = models.CharField(
         default=None,
         db_column="event_title",
         blank=True,
@@ -678,6 +678,7 @@ class NugsReleases(BaseModel):
         Events,
         models.DO_NOTHING,
         db_column="event_id",
+        related_name="nugs_event",
     )
     date = models.DateTimeField(default=None, db_column="release_date")
     url = models.TextField(default=None, db_column="nugs_url")
@@ -776,7 +777,10 @@ class Onstage(BaseModel):
         unique_together = ("event", "relation", "band")
 
     def __str__(self) -> str:
-        return f"Relation {self.relation_id} / Band {self.band_id}"
+        try:
+            return f"Relation: {self.relation.name} / {self.band.name}"
+        except Onstage.band.RelatedObjectDoesNotExist:
+            return f"Relation: {self.relation.name}"
 
 
 class ReleaseTracks(BaseModel):
@@ -808,6 +812,8 @@ class ReleaseTracks(BaseModel):
         Events,
         models.DO_NOTHING,
         default=None,
+        blank=True,
+        null=True,
     )
     note = models.TextField(default=None, blank=True, null=True)
 
@@ -855,13 +861,17 @@ class Releases(BaseModel):
     short_name = models.TextField(default=None, blank=True, null=True)
     thumb = models.TextField(default=None, blank=True, null=True)
     note = models.TextField(default=None, blank=True, null=True)
-    mbid = models.UUIDField(default=None, verbose_name="MusicBrainz ID")
+    mbid = models.UUIDField(
+        default=None, verbose_name="MusicBrainz ID", blank=True, null=True
+    )
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         related_name="release_event",
         db_column="event_id",
         default=None,
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -1083,7 +1093,7 @@ class Setlists(BaseModel):
 
     def __str__(self) -> str:
         event_id = self.event_id
-        return f"{event_id} - {self.set_name} - {self.song_id} ({self.id})"
+        return f"[{self.id}] {event_id} - {self.set_name} - {self.song.name} ({self.song_id})"
 
     VALID_SET_NAMES = [
         "Show",

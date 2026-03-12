@@ -13,6 +13,7 @@ dependencies = [
     "django-filter>=25.2",
     "django-link-shortener>=1.0.1",
     "django-unfold>=0.77.1",
+    "django-unfold-markdown>=0.1.2",
     "djangorestframework>=3.16.1",
     "djlint>=1.36.4",
     "gevent>=25.9.1",

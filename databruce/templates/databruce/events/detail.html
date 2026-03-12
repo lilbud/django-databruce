@@ -103,7 +103,7 @@
                     </div>
                   </div>
                 </div>
-                {% if event.brucebase_url or event.nugs %}
+                {% if event.brucebase_url or event.nugs_event %}
                   <div class="row mt-3">
                     <div class="col-auto">
                       <div class="badge-row d-flex-inline flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
@@ -117,12 +117,12 @@
                             <span>Brucebase</span>
                           </a>
                         {% endif %}
-                        {% if event.nugs %}
+                        {% if event.nugs_event.count > 0 %}
                           <a role="button"
                              target="_blank"
-                             href="{{ event.nugs.url }}"
+                             href="{{ event.nugs_event.first.url }}"
                              class="btn btn-sm btn-primary-dark text-xs icon-button">
-                            <i class="bi bi-headphones"></i>
+                            <i class="icon nugs"></i>
                             <span>Nugs</span>
                           </a>
                         {% endif %}
@@ -217,28 +217,28 @@
         </div>
       </div>
     </div>
-    <div class="row d-xl-none mb-3 gx-0">
-      <div class="col">
-        {% partialdef event-note inline %}
-          <div class="card">
-            <div class="card-header">
-              Notes
-              <i class="bi bi-pencil"></i>
-            </div>
-            <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
-          </div>
-        {% endpartialdef %}
-      </div>
-    </div>
     <!-- setlist and notes -->
-    <div class="row row-cols-1 row-cols-lg-2 gy-3 gx-0">
-      <div class="col-12 col-lg-8 col-xl-9 pe-lg-3">
-        <div class="tab-content" id="myTabContent">
-          <div class="tab-pane fade show active"
-               id="overview"
-               role="tabpanel"
-               aria-labelledby="overview-tab"
-               tabindex="0">
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active"
+           id="overview"
+           role="tabpanel"
+           aria-labelledby="overview-tab"
+           tabindex="0">
+        <div class="row row-cols-1 row-cols-lg-2 gy-3 gx-0">
+          <div class="col-12 col-lg-8 col-xl-9 pe-lg-3">
+            <div class="row d-xl-none mb-3 gx-0">
+              <div class="col">
+                {% partialdef event-note inline %}
+                  <div class="card">
+                    <div class="card-header">
+                      Notes
+                      <i class="bi bi-pencil"></i>
+                    </div>
+                    <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
+                  </div>
+                {% endpartialdef %}
+              </div>
+            </div>
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex flex-column">
@@ -279,90 +279,93 @@
               </div>
             </div>
           </div>
-          <div class="tab-pane fade"
-               id="onstage"
-               role="tabpanel"
-               aria-labelledby="onstage-tab"
-               tabindex="1">
-            <div class="col-12">
-              <div class="card">
-                <div class="card-header">Onstage</div>
-                <div class="card-body p-0">
-                  <div class="table-responsive">
-                    <table class="table table-hover display wrap" id="onstageTable">
-                      <thead>
-                        <th class="all">Guest</th>
-                        <th class="all">Person</th>
-                        <th class="all">Band</th>
-                        <th class="all">Note</th>
-                      </thead>
-                    </table>
-                  </div>
+          <div class="col-12 col-lg-4 col-xl-3">
+            <div class="d-none d-xl-block mb-3">{% partial event-note %}</div>
+            <div class="card mb-3">
+              <div class="card-header">
+                Albums
+                <span class="text-sm my-auto"
+                      data-bs-toggle="tooltip"
+                      data-bs-html="true"
+                      data-bs-title="Expand/Collapse All Rows">
+                  <a role="button"
+                     id="album-breakdown-btn"
+                     class="btn btn-sm btn-primary px-1 py-0"
+                     data-bs-toggle="collapse">
+                    <i class="bi bi-three-dots text-sm"></i>
+                  </a>
+                </span>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover display wrap" id="albumTable">
+                    <thead>
+                      <th class="d-none all">#</th>
+                    </thead>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="tab-pane fade"
-             id="notes"
-             role="tabpanel"
-             aria-labelledby="notes-tab"
-             tabindex="2"></div>
-        <div class="tab-pane fade"
-             id="links"
-             role="tabpanel"
-             aria-labelledby="links-tab"
-             tabindex="3">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">Links</div>
-              <div class="card-body">
-                {% if event.archive_links.count > 0 %}
-                  <div class="text-sm">Radio Nowhere</div>
-                  <ul>
-                    {% for link in event.archive_links.all %}
-                      <li>
-                        <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
+      </div>
+      <div class="tab-pane fade"
+           id="onstage"
+           role="tabpanel"
+           aria-labelledby="onstage-tab"
+           tabindex="1">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">Onstage</div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover display wrap" id="onstageTable">
+                  <thead>
+                    <th class="all">Guest</th>
+                    <th class="all">Person</th>
+                    <th class="all">Band</th>
+                    <th class="all">Note</th>
+                  </thead>
+                </table>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-12 col-lg-4 col-xl-3">
-        <div class="d-none d-xl-block mb-3">{% partial event-note %}</div>
-        <div class="card mb-3">
-          <div class="card-header">
-            Albums
-            <span class="text-sm my-auto"
-                  data-bs-toggle="tooltip"
-                  data-bs-html="true"
-                  data-bs-title="Expand/Collapse All Rows">
-              <a role="button"
-                 id="album-breakdown-btn"
-                 class="btn btn-sm btn-primary px-1 py-0"
-                 data-bs-toggle="collapse">
-                <i class="bi bi-three-dots text-sm"></i>
-              </a>
-            </span>
+      <div class="tab-pane fade"
+           id="notes"
+           role="tabpanel"
+           aria-labelledby="notes-tab"
+           tabindex="2">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">Notes</div>
+            <div class="card-body"></div>
           </div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover display wrap" id="albumTable">
-                <thead>
-                  <th class="d-none all">#</th>
-                </thead>
-              </table>
+        </div>
+      </div>
+      <div class="tab-pane fade"
+           id="links"
+           role="tabpanel"
+           aria-labelledby="links-tab"
+           tabindex="3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">Links</div>
+            <div class="card-body">
+              {% if event.archive_links.count > 0 %}
+                <div class="text-sm">Radio Nowhere</div>
+                <ul>
+                  {% for link in event.archive_links.all %}
+                    <li>
+                      <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
             </div>
           </div>
         </div>
-        {% comment %} <div class="card">
-          <div class="card-header">Event Info</div>
-          <div class="card-body">Show Count by tour, location? start/end time?</div>
-        </div> {% endcomment %}
       </div>
     </div>
   </div>
@@ -508,7 +511,7 @@
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="fw-medium text-reset" href="/songs/${data.id}">${data.name}</a>`;
+                return `<a class="fw-medium text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
               }
             },
           },
@@ -518,7 +521,7 @@
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="fw-medium text-reset" href="/bands/${data.id}">${data.name}</a>`;
+                return `<a class="fw-medium text-reset" href="/bands/${data.uuid}">${data.name}</a>`;
               }
             },
           },
@@ -687,7 +690,7 @@
             'className': 'text-wrap text-xs',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<span class="setlist-note">${row.notes.join('; ')}</span>`
+                return `<span class="setlist-note">${row.notes.join('; ').replaceAll("''", "'")}</span>`
               }
             },
           }
@@ -701,8 +704,6 @@
           .then(response => response.json())
           .then(data => {
             var lines = [];
-
-            console.log(data)
 
             data.results.forEach(function (item) {
               var song = item.segue ? `${item.song.name} >` : item.song.name;

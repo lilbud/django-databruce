@@ -88,7 +88,10 @@
                       <a href="{% url "tour_details" id=event.tour.uuid %}">{{ event.tour.name }}</a>
                     {% endif %}
                   </td>
-                  <td class="text-nowrap">{{ event.title|default_if_none:"" }}</td>
+                  <td class="text-nowrap">
+                    {% if event.type in danger_event_types %}<span class="text-danger fw-semibold">[{{ event.type }}]</span>{% endif %}
+                    {{ event.title|default_if_none:"" }}
+                  </td>
                   <td class="text-nowrap">{{ event.public }}</td>
                 </tr>
               {% endfor %}
