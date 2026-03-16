@@ -326,7 +326,7 @@
                 }
 
                 if (row.notes) {
-                  var notes = $('<span />').addClass('text-xs text-wrap fw-light setlist-note').text(row.notes.join('; '))
+                  var notes = $('<span />').addClass('text-xs text-wrap fw-light setlist-note').text(row.notes.join('; ').replaceAll("''", "'"))
                   return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes.prop('outerHTML') : song
                 }
 
