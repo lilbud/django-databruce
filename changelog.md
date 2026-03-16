@@ -157,7 +157,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - All event and song tables have been made consistent in terms of column widths and ordering/searching.
 - This might change in future, but song tables now pull *all* songs instead of just those matching certain conditions (certain Sets + public shows only). I had that filter in place, but realized that venues like studios had no songs shown. This change means that every song played is listed in the table and counted. This also means that soundchecked and rehearsed songs are counted even if they didn't get played during the show.
 - [Songs] Added opener/closer count to table
-- [Setlist] Fixed double single quotes in song names.
+- [Setlist] Fixed double single quotes in song names. `"I''ve Been Everywhere" -> "I've Been Everywhere"`.
 - [Event Detail] Fixed onstage "note" column not showing notes
 - [Songs] Fixed songs page search not searching song name and not showing certain songs.
 - [Event Detail] Fixed gap calculation counting cancelled/postponed events.

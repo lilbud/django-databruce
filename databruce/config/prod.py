@@ -44,13 +44,28 @@ SECURE_HSTS_PRELOAD = True
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["file"]},
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    },
     "handlers": {
-        "file": {
+        "access": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": "/var/log/django.log",
-            "formatter": "app",
+            "filename": "/var/log/django/access.log",
+            "formatter": "verbose",
+        },
+        "error": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "/var/log/django/error.log",
+            "formatter": "verbose",
         },
     },
     "loggers": {
@@ -58,14 +73,6 @@ LOGGING = {
             "handlers": ["file"],
             "level": "INFO",
             "propagate": True,
-        },
-    },
-    "formatters": {
-        "app": {
-            "format": (
-                "%(asctime)s [%(levelname)-8s] (%(module)s.%(funcName)s) %(message)s"
-            ),
-            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
 }
