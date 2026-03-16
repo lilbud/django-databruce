@@ -58,13 +58,17 @@ LOGGING = {
     "handlers": {
         "access": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "/var/log/django/access.log",
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
             "formatter": "verbose",
         },
         "error": {
             "level": "ERROR",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
             "filename": "/var/log/django/error.log",
             "formatter": "verbose",
         },
