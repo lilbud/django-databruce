@@ -51,7 +51,7 @@ LOGGING = {
         },
     },
     "root": {
-        "handlers": ["console", "file", "access", "error"],
+        "handlers": ["access", "error"],
         "level": "INFO",
     },
     "handlers": {
