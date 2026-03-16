@@ -16,3 +16,4 @@ gevent
 djlint
 django-unfold
 django_redis
+redis
