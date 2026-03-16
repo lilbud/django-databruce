@@ -70,7 +70,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["access_file", "error_file"],
+            "handlers": ["access"],
             "level": "INFO",
             "propagate": True,
         },
