@@ -74,7 +74,7 @@
                         <a class="fw-medium text-reset"
                            href="{% url 'band_details' id=event.artist.uuid %}"
                            id="artist">{{ event.artist }}</a>
-                        {% if event.type == 'Rescheduled' or event.type == 'Cancelled' or event.type == 'Relocated' or event.type == 'No Bruce' or event.type == 'No Gig' %}
+                        {% if event.type == 'Rescheduled' or event.type == 'Cancelled' or event.type == 'Relocated' or event.type == 'No Bruce' or event.type == 'No Gig' or event.type == 'Rumored' %}
                           <span class="text-danger fw-medium">[{{ event.type }}]</span>
                         {% endif %}
                       </div>
@@ -103,7 +103,7 @@
                     </div>
                   </div>
                 </div>
-                {% if event.brucebase_url or event.nugs_event %}
+                {% if event.brucebase_url or event.nugs_event.count > 0 %}
                   <div class="row mt-3">
                     <div class="col-auto">
                       <div class="badge-row d-flex-inline flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
@@ -354,7 +354,7 @@
             <div class="card-header">Links</div>
             <div class="card-body">
               {% if event.archive_links.count > 0 %}
-                <div class="text-sm">Radio Nowhere</div>
+                <div class="text-sm">Radio Nowhere:</div>
                 <ul>
                   {% for link in event.archive_links.all %}
                     <li>
@@ -363,6 +363,29 @@
                   {% endfor %}
                 </ul>
               {% endif %}
+              {% if official %}
+                <div class="text-sm">Released In Full On:</div>
+                <ul>
+                  {% for release in official %}
+                    <li>
+                      <a href="{% url "release_details" id=release.uuid %}">{{ release.name }}</a>
+                      <span>({{ release.date }})</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% if official_tracks %}
+                <div class="text-sm">Included On:</div>
+                <ul>
+                  {% for release in official_tracks %}
+                    <li>
+                      <a href="{% url "release_details" id=release.release.uuid %}">{{ release.release.name }}</a>
+                      <span>({{ release.release.date }})</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% comment %} {{ official_tracks }} {% endcomment %}
             </div>
           </div>
         </div>
@@ -624,39 +647,39 @@
             },
           },
           {
-            'data': 'last',
+            'data': 'stats',
             'className': 'dt-center',
             'width': '4rem',
             'render': function (data, type, row, meta) {
               var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
-
-              if (type === 'display') {
-                if (data >= 50 && !row.debut) {
-                  $(badge).addClass('bg-primary').text(`${data}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+              
+              if (type === 'display' && data) {
+                if (data.gap >= 50 && !data.debut) {
+                  $(badge).addClass('bg-primary').text(`${data.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
                   return $(badge).prop('outerHTML');
-                } else if (row.premiere) {
+                } else if (data.premiere) {
                   $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
                   return $(badge).prop('outerHTML');
-                } else if (row.debut && !row.premiere) {
-                  $(badge).addClass('bg-primary').text(`${data}, TD`).attr('data-bs-title', 'Tour Debut');
+                } else if (data.debut && !data.premiere) {
+                  $(badge).addClass('bg-primary').text(`${data.gap}, TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
-                } else if (row.debut && !row.premiere && !data) {
+                } else if (data.debut && !data.premiere && !data.gap) {
                   $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
                 } else {
-                  return data;
+                  return data.gap;
                 }
               }
             },
           },
           {
-            'data': 'tour_num',
+            'data': 'stats',
             'className': 'dt-center',
             'width': '4rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                var num = data;
-                var total = row.tour_total;
+                var num = data.tour_num;
+                var total = data.tour_total;
 
                 var badge = $('<span />').addClass('badge align-middle').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
@@ -673,13 +696,13 @@
             },
           },
           {
-            'data': 'last_event',
-            'name': 'ltp__id',
+            'data': 'stats',
+            'name': 'stats__ltp__event_id',
             'width': '6rem',
             'className': 'dt-center text-nowrap',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a class="fw-medium text-reset" href="/events/${data.event_id}">${data.date.display}</a>`;
+              if (type === 'display' && data && data.ltp) {
+                return `<a class="fw-medium text-reset" href="/events/${data.ltp.event_id}">${data.ltp.date.display}</a>`;
               }
             },
           },

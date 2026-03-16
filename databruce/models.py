@@ -497,18 +497,12 @@ class Events(BaseModel):
         on_delete=models.DO_NOTHING,
         related_name="event_venue",
         db_column="venue_id",
-        default=None,
-        blank=True,
-        null=True,
     )
 
     tour = models.ForeignKey(
         to="Tours",
         on_delete=models.DO_NOTHING,
-        default=None,
         db_column="tour_id",
-        blank=True,
-        null=True,
     )
 
     leg = models.ForeignKey(
@@ -550,6 +544,7 @@ class Events(BaseModel):
         ("Politics", "Politics"),
         ("Recording", "Recording"),
         ("Rehearsal", "Rehearsal"),
+        ("Rumored", "Rumored"),
         ("Relocated", "Relocated"),
         ("Rescheduled", "Rescheduled"),
         ("Wedding", "Wedding"),
@@ -708,6 +703,8 @@ class Relations(BaseModel):
         related_name="relation_first",
         db_column="first_event",
         default=None,
+        blank=True,
+        null=True,
     )
     last_event = models.ForeignKey(
         Events,
@@ -715,6 +712,8 @@ class Relations(BaseModel):
         related_name="relation_last",
         db_column="last_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
     instruments = models.TextField(default=None, blank=True, null=True)
@@ -798,8 +797,11 @@ class ReleaseTracks(BaseModel):
         to_field="uuid",
         on_delete=models.DO_NOTHING,
         db_column="disc_id",
+        default=None,
+        blank=True,
+        null=True,
     )
-    track = models.IntegerField(db_column="track_num")
+    track = models.CharField(db_column="track_num")
 
     song = models.ForeignKey(
         to="Songs",
@@ -832,12 +834,25 @@ class ReleaseTracks(BaseModel):
         verbose_name_plural = "Release Tracks"
         ordering = ["release__name", "track"]
 
+    def __str__(self) -> str:
+        try:
+            return f"{self.discid.name} - {self.song.name}"
+        except AttributeError:
+            return f"Disc {self.discnum} - {self.song.name}"
+
 
 class Releases(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_id = models.TextField(default=None, blank=True, null=True)
     name = models.TextField(default=None, blank=True, null=True)
+    length = models.TimeField(default=None, blank=True, null=True)
+    spotify_link = models.TextField(
+        default=None,
+        blank=True,
+        null=True,
+        db_column="spotify_url",
+    )
 
     release_types = (
         ("Live", "Live"),
@@ -862,7 +877,10 @@ class Releases(BaseModel):
     thumb = models.TextField(default=None, blank=True, null=True)
     note = models.TextField(default=None, blank=True, null=True)
     mbid = models.UUIDField(
-        default=None, verbose_name="MusicBrainz ID", blank=True, null=True
+        default=None,
+        verbose_name="MusicBrainz ID",
+        blank=True,
+        null=True,
     )
     event = models.ForeignKey(
         Events,
@@ -1443,13 +1461,23 @@ class Lyrics(BaseModel):
         db_column="song_id",
         related_name="lyrics_song",
     )
-    version = models.TextField(db_column="version_info")
-    num = models.TextField(db_column="version_num")
-    source = models.TextField(db_column="source_info")
-    text = models.TextField(db_column="lyrics")
+    version = models.TextField(
+        db_column="version_info",
+        null=True,
+        blank=True,
+        default=None,
+    )
+    num = models.TextField(db_column="version_num", null=True, blank=True, default=None)
+    source = models.TextField(
+        db_column="source_info",
+        null=True,
+        blank=True,
+        default=None,
+    )
+    text = models.TextField(db_column="lyrics", null=True, blank=True, default=None)
 
-    language = models.TextField(null=True)
-    note = models.TextField(null=True)
+    language = models.TextField(null=True, blank=True, default=None)
+    note = models.TextField(null=True, blank=True, default=None)
 
     class Meta:
         db_table = "lyrics"
@@ -1700,3 +1728,59 @@ class SongsPage(models.Model):
     class Meta:
         managed = False
         db_table = "songs_page"
+
+
+class SetlistStats(models.Model):
+    setlist = models.OneToOneField(
+        Setlists,
+        on_delete=models.DO_NOTHING,
+        primary_key=True,
+        related_name="setlist_stats",
+        db_column="id",
+    )
+    song_num = models.IntegerField(blank=True, null=True)
+    set_name = models.TextField(blank=True, null=True)
+
+    event = models.ForeignKey(
+        Events,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+        db_column="event_id",
+        related_name="stats_event",
+    )
+
+    # event_id = models.IntegerField(blank=True, null=True, db_column="event_id")
+
+    total_event_songs = models.IntegerField(blank=True, null=True)
+    global_first = models.BooleanField(blank=True, null=True)
+    global_last = models.BooleanField(blank=True, null=True)
+    set_first = models.BooleanField(blank=True, null=True)
+    set_last = models.BooleanField(blank=True, null=True)
+    is_the_main_closer = models.BooleanField(blank=True, null=True)
+    show_has_encore = models.BooleanField(blank=True, null=True)
+    gap = models.IntegerField(blank=True, null=True, db_column="calc_gap")
+
+    ltp = models.ForeignKey(
+        Events,
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+        db_column="calc_last_ev_id",
+        related_name="stats_ltp",
+    )
+
+    # last_event = models.IntegerField(blank=True, null=True, db_column="calc_last_ev_id")
+    premiere = models.BooleanField(blank=True, null=True, db_column="is_premiere")
+    debut = models.BooleanField(blank=True, null=True, db_column="is_debut")
+    band_premiere = models.BooleanField(
+        blank=True,
+        null=True,
+        db_column="is_band_premiere",
+    )
+    tour_num = models.IntegerField(blank=True, null=True, db_column="tour_num")
+    tour_total = models.IntegerField(blank=True, null=True, db_column="tour_total")
+
+    class Meta:
+        managed = False
+        db_table = "setlist_stats"

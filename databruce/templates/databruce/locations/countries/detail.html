@@ -22,7 +22,9 @@
                     type="button"
                     role="tab"
                     aria-controls="pills-home"
-                    aria-selected="true">Events</button>
+                    aria-selected="true">
+              Events<span class="badge rounded-pill text-bg-light" id="event-count-badge">0</span>
+            </button>
           </li>
           <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
             <button class="nav-link"
@@ -32,7 +34,9 @@
                     type="button"
                     role="tab"
                     aria-controls="pills-profile"
-                    aria-selected="false">Songs</button>
+                    aria-selected="false">
+              Songs<span class="badge rounded-pill text-bg-light" id="song-count-badge">0</span>
+            </button>
           </li>
           <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
             <button class="nav-link"
@@ -108,11 +112,12 @@
       ajax: {
         'url': '/api/v1/events/?country={{ info.id }}&format=custom',
       },
-      columnDefs: [
-        {targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', searchable: false},
-        {targets: [-1], visible: false }
-      ],
+      columnDefs: event_table_defs,
       columns: event_table_columns,
+      initComplete: function(settings, json){ 
+        var info = this.api().page.info();
+        $('#event-count-badge').text(info.recordsTotal);
+      }
     });
 
     new DataTable('#songTable', {
@@ -123,7 +128,11 @@
         'url': '/api/v1/setlist_songs/?country={{ info.id }}&format=custom',
       },
       columns: song_table_columns,
-      columnDefs: [{ targets: [0], width: '1rem' }],
+      columnDefs: song_table_defs,
+      initComplete: function(settings, json){ 
+        var info = this.api().page.info();
+        $('#song-count-badge').text(info.recordsTotal);
+      }
     });
   })
   </script>

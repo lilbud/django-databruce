@@ -5,6 +5,7 @@ from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import Group, User
 from django.db import models as dj_models
+from django.db.models.functions import Cast, JSONObject
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
 from unfold.contrib.inlines.admin import (
     NonrelatedStackedInline,
@@ -98,19 +99,21 @@ class SetlistInline(StackedInline):
 
 class ReleaseTrackInline(StackedInline):
     model = models.ReleaseTracks
+    collapsible = True
 
     def get_queryset(self, request):
         base_qs = super().get_queryset(request)
         return (
             base_qs.select_related("song", "release")
-            .prefetch_related("event")
-            .order_by("discnum", "track")
+            .prefetch_related("event", "discid")
+            .order_by("discnum", Cast("track", output_field=dj_models.IntegerField()))
         )
 
-    autocomplete_fields = ["song", "event"]
+    autocomplete_fields = ["song", "event", "discid"]
 
     fields = [
         "discnum",
+        "discid",
         "track",
         "song",
         "event",
@@ -295,6 +298,16 @@ class SongAdmin(CustomModelAdmin):
     ordering = ("name",)
 
 
+class LyricForm(forms.ModelForm):
+    note = forms.CharField(
+        widget=MarkdownWidget(),
+    )
+
+    class Meta:
+        model = models.Lyrics
+        fields = "__all__"
+
+
 @admin.register(models.Lyrics)
 class LyricsAdmin(CustomModelAdmin):
     search_fields = ["song__name", "text"]
@@ -303,6 +316,8 @@ class LyricsAdmin(CustomModelAdmin):
     list_display_links = ["id"]
     list_select_related = ["song"]
     ordering = ("song__name",)
+
+    form = LyricForm
 
 
 @admin.register(models.Setlists)
@@ -364,12 +379,24 @@ class ReleaseTrackAdmin(CustomModelAdmin):
     list_display_links = ["id"]
 
 
+class ReleaseForm(forms.ModelForm):
+    note = forms.CharField(
+        widget=MarkdownWidget(),
+        required=False,
+    )
+
+    class Meta:
+        model = models.Releases
+        fields = "__all__"
+
+
 @admin.register(models.Releases)
 class ReleaseAdmin(CustomModelAdmin):
     def get_queryset(self, request):
         base_qs = super().get_queryset(request)
         return base_qs.prefetch_related("event")
 
+    form = ReleaseForm
     search_fields = ["name", "type"]
     list_display = ["id", "name", "type", "date", "mbid"]
     list_display_links = ["id"]

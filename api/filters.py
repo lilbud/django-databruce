@@ -4,6 +4,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models import (
     F,
     Q,
+    Subquery,
 )
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
@@ -490,6 +491,14 @@ class ReleaseFilter(filters.FilterSet):
     )
 
 
+class SetlistStatsFilter(filters.FilterSet):
+    id = filters.NumberFilter(lookup_expr="exact")
+
+    class Meta:
+        model = models.SetlistStats
+        fields = "__all__"
+
+
 class SetlistFilter(filters.FilterSet):
     event = filters.CharFilter(
         field_name="event__event_id",
@@ -713,6 +722,29 @@ class SetlistSongsFilter(filters.FilterSet):
 
 class SnippetFilter(filters.FilterSet):
     snippet = filters.NumberFilter(field_name="snippet__id", lookup_expr="exact")
+
+    song = filters.NumberFilter(
+        field_name="setlist__song_id",
+        lookup_expr="exact",
+        label="song",
+    )
+
+    unique = filters.BooleanFilter(
+        field_name="snippet_id",
+        method="filter_unique",
+        label="unique",
+    )
+
+    def filter_unique(self, queryset, name, value):
+        if value:
+            # Get the IDs of only the first instance of each snippet
+            unique_ids = (
+                models.Snippets.objects.order_by("snippet_id", "id")
+                .distinct("snippet_id")
+                .values_list("id", flat=True)
+            )
+            return queryset.filter(id__in=Subquery(unique_ids))
+        return queryset
 
 
 class StateFilter(filters.FilterSet):

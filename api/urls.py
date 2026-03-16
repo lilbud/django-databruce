@@ -40,6 +40,11 @@ router.register(
     basename="setlist_entries",
 )
 router.register(
+    r"setlist_stats",
+    views.SetlistStatsViewSet,
+    basename="setlist_stats",
+)
+router.register(
     r"advanced_search",
     views.AdvancedSearch,
     basename="advanced_search",

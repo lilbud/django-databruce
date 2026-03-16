@@ -21,13 +21,15 @@
       <th class="all">Public</th>
       <th class="all">Private</th>
       <th class="all">Snippet</th>
+      <th class="all">Opener</th>
+      <th class="all">Closer</th>
     </tr>
   </thead>
 {% endblock table %}
 {% block scripts %}
   <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7], category: true});
+    var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7,8,9], category: true});
     dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Originals', 'value': '^Bruce Springsteen$'}, {'label': 'Covers', 'value': '^((?!Bruce Springsteen).)*$'}], label: 'Category'})
 
     new DataTable('#songsTable', {
@@ -44,7 +46,7 @@
       columns: [
         {
           'data': 'name',
-          'name': 'sort_song_name',
+          'name': 'sort_song_name, name',
           'width': '20rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -88,6 +90,8 @@
         {'data': 'num_plays_public', 'name': 'num_plays_public', 'width': '1rem'},
         {'data': 'num_plays_private', 'name': 'num_plays_private', 'width': '1rem'},
         {'data': 'num_plays_snippet', 'name': 'num_plays_snippet', 'width': '1rem'},
+        {'data': 'opener', 'name': 'opener', 'width': '1rem'},
+        {'data': 'closer', 'name': 'closer', 'width': '1rem'},
       ]
     });
   });

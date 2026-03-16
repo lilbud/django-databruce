@@ -36,10 +36,7 @@
       ajax: {
         'url': '/api/v1/events/?date={{ request.GET.date }}&format=custom',
       },
-      columnDefs: [
-        { targets: [1], orderable: false, className: 'text-center text-sm'},
-        { targets: [-1], visible: false },
-      ],
+      columnDefs: event_table_defs,
       columns: event_table_columns,
     });
   })

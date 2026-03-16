@@ -27,8 +27,14 @@
         <div class="row">
           <div class="fw-semibold">Event</div>
           <div>
-            <a href="{% url "event_details" id=info.event.id %}">{{ info.event }} - {{ info.event.venue.get_name }}, {{ info.event.venue.city }}</a>
+            <a href="{% url "event_details" id=info.event.event_id %}">{{ info.event }} - {{ info.event.venue.venues_text.formatted }}</a>
           </div>
+        </div>
+      {% endif %}
+      {% if info.length %}
+        <div class="row">
+          <div class="fw-semibold">Length</div>
+          <div>{{ info.length|date:"H:i:s" }}</div>
         </div>
       {% endif %}
     </div>
@@ -80,6 +86,11 @@
                 <li>
                   <a target="_blank"
                      href="https://musicbrainz.org/release/{{ info.mbid }}">Musicbrainz</a>
+                </li>
+              {% endif %}
+              {% if info.spotify_link %}
+                <li>
+                  <a target="_blank" href="{{ info.spotify_link }}">Spotify</a>
                 </li>
               {% endif %}
             </ul>

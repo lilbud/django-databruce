@@ -27,7 +27,10 @@
                     type="button"
                     role="tab"
                     aria-controls="pills-home"
-                    aria-selected="true">Events</button>
+                    aria-selected="true">
+              Events
+              <span class="badge rounded-pill text-bg-light" id="event-count-badge">0</span>
+            </button>
           </li>
           {% if info.num_legs > 0 %}
             <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
@@ -38,7 +41,9 @@
                       type="button"
                       role="tab"
                       aria-controls="pills-profile"
-                      aria-selected="false">Legs</button>
+                      aria-selected="false">
+                Legs<span class="badge rounded-pill text-bg-light" id="leg-count-badge">0</span>
+              </button>
             </li>
           {% endif %}
           {% if info.num_songs > 0 %}
@@ -50,7 +55,9 @@
                       type="button"
                       role="tab"
                       aria-controls="pills-profile"
-                      aria-selected="false">Songs</button>
+                      aria-selected="false">
+                Songs<span class="badge rounded-pill text-bg-light" id="song-count-badge">0</span>
+              </button>
             </li>
           {% endif %}
           {% if info.num_songs > 0 %}
@@ -152,6 +159,10 @@
         },
         columnDefs: event_table_defs,
         columns: event_table_columns,
+        initComplete: function(settings, json){ 
+          var info = this.api().page.info();
+          $('#event-count-badge').text(info.recordsTotal);
+        }
       });
 
       new DataTable('#slotTable', {
@@ -181,10 +192,23 @@
         layout: getDatatableLayout({category: false}),
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/tour_legs/?tour={{ info.id }}&format=custom',
+          'url': '/api/v1/tour_legs/?tour={{ info.id }}&format=custom',    
+        },
+        initComplete: function(settings, json){ 
+          var info = this.api().page.info();
+          $('#leg-count-badge').text(info.recordsTotal);
         },
         columns: [
-          {'data': 'name', 'name': 'name', 'width': '20rem' },
+          {
+            'data': 'name',
+            'name': 'name',
+            'width': '20rem',
+            'render': function (data, type, row, meta) {
+                if (type === 'display' && data) {
+                  return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
+                }
+            },
+          },
           {'data': 'num_shows', 'name': 'num_shows', 'width': '1rem' },
           {'data': 'num_songs', 'name': 'num_songs', 'width': '1rem' },
           {
@@ -215,13 +239,14 @@
         layout: getDatatableLayout({category: false}),
         scrollY: '60vh',
         ajax: {
-          'url': '/api/v1/setlist_songs/?tour={{ info.id }}&format=custom',
+          'url': '/api/v1/setlist_songs/?tour={{ info.id }}&format=custom',       
         },
-        columnDefs: [
-          { targets: [0], className: 'text-center text-xs', width: '1rem', searchable: false },
-          { targets: '_all', className: 'text-nowrap text-xs' },
-        ],
+        columnDefs: song_table_defs,
         columns: song_table_columns,
+        initComplete: function(settings, json){ 
+          var info = this.api().page.info();
+          $('#song-count-badge').text(info.recordsTotal);
+        }
       });
       
     });

@@ -140,7 +140,7 @@ class Song(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["songs"] = (
             models.Songs.objects.all()
-            .select_related("first_event", "last_event")
+            .prefetch_related("first_event", "last_event")
             .order_by("name")
         )
 
@@ -522,14 +522,27 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "This is a placeholder date, actual date unknown.",
             )
 
-        # context["official"] = (
-        #     models.ReleaseTracks.objects.filter(
-        #         event__event_id=self.kwargs["id"],
-        #     )
-        #     .distinct("release__id")
-        #     .select_related("release", "event")
-        #     .order_by("release__id")
-        # )
+        filter = Q(event__event_id=self.kwargs["id"]) | Q(
+            release__event=self.kwargs["id"],
+        )
+
+        context["official"] = (
+            models.Releases.objects.filter(
+                event__event_id=self.kwargs["id"],
+            )
+            .prefetch_related("event")
+            .order_by("date")
+        )
+
+        context["official_tracks"] = (
+            models.ReleaseTracks.objects.filter(event__event_id=self.kwargs["id"])
+            .select_related("release")
+            .prefetch_related("event")
+            .distinct("release_id", "release__date")
+            .order_by("release__date")
+        )
+
+        print(context["official_tracks"].values())
 
         context["title"] = (
             f"{format_fuzzy(context['event'].event_id)} {context['event'].venue.name}"
@@ -729,7 +742,7 @@ class SongDetail(PageTitleMixin, TemplateView):
             )
         ).order_by("num")
 
-        print(context["positions"])
+        # print(context["positions"])
 
         try:
             last_event = models.Events.objects.get(
@@ -1112,7 +1125,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
         for f in event_form.changed_data:
             if "_exclude" not in f and f != "conjunction":
-                print(type(event_form.cleaned_data[f]))
+                # print(type(event_form.cleaned_data[f]))
                 context["display_fields"].append(
                     {
                         "label": event_form[f].label,

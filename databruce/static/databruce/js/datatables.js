@@ -32,7 +32,7 @@ $.extend(true, DataTable.defaults, {
   info: true,
   ordering: {
     indicators: false,
-    handler: false
+    handler: true
   },
   scrollX: true,
   pageLength: 100,
@@ -191,6 +191,11 @@ function dtCategorySelect({ layout, column_idx, values, label = false }) {
 function renderLink(url, data, text) {
   return `<a href="${url}${data}">${text}</a>`
 }
+
+song_table_defs = [
+  { targets: '_all', className: 'text-wrap text-xs' },
+  { targets: [0], width: '1rem' },
+]
 
 // below are some common table column definitions
 // tables like songs/events don't change from page to page

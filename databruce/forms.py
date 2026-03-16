@@ -98,7 +98,7 @@ class AdvancedEventSearch(forms.Form):
             field_instance = self.fields[field]
             lookup_path = getattr(field_instance, "lookup_path", field)
 
-            print(type(value))
+            # print(type(value))
 
             if type(value) is list:
                 lookup_path = f"{lookup_path}__in"

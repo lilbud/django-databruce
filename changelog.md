@@ -150,3 +150,15 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Event Detail] Added "Nugs" button back to event detail header
 - [Advanced Search] Updated event type to allow multiple values to be searched.
 - [Advanced Search] Event type field now styled to closer match default dropdown
+- [Release Detail] Fixed event link using wrong ID
+- [Release Detail] Changed track num to text to allow for Vinyl releases, which follow a different format than simply counting tracks.
+- [Song Detail] Added snippet, opener, and closer count to info
+- [Detail Pages] Added count badge to the tab buttons on most detail pages. This includes event count and song count for: Event Run, Tour, Tour Leg, Venue, City, State, Country. Tours also counts Tour Legs. This is loaded with the table, and will briefly show 0.
+- All event and song tables have been made consistent in terms of column widths and ordering/searching.
+- This might change in future, but song tables now pull *all* songs instead of just those matching certain conditions (certain Sets + public shows only). I had that filter in place, but realized that venues like studios had no songs shown. This change means that every song played is listed in the table and counted. This also means that soundchecked and rehearsed songs are counted even if they didn't get played during the show.
+- [Songs] Added opener/closer count to table
+- [Setlist] Fixed double single quotes in song names.
+- [Event Detail] Fixed onstage "note" column not showing notes
+- [Songs] Fixed songs page search not searching song name and not showing certain songs.
+- [Event Detail] Fixed gap calculation counting cancelled/postponed events.
+- [Event Detail] Added "rumored" event type for events that were only rumored to have happened. This may be extended to events with little evidence that they happened.

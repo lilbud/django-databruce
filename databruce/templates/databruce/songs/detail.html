@@ -12,78 +12,96 @@
     {% include "databruce/partials/admin_btn.html" with view="songs" item=info.id %}
   {% endif %}
   <div class="col-12">
-    <div class="row">
+    <div class="row mb-3">
       <div class="col">
-        <div class="row d-grid gap-0 row-gap-1 text-lg">
-          <div class="text-2xl text-wrap">{{ info.name }}</div>
-          {% if info.album %}
-            <div class="row">
-              <div class="fw-semibold">Album</div>
-              <div>
-                <a href="{% url "release_details" id=info.album.uuid %}">{{ info.category }}</a>
+        <div class="row d-grid gap-0 row-gap-1 text-base text-center text-lg-start">
+          <div class="text-2xl text-wrap mb-2">{{ info.name }}</div>
+          <div class="col-12">
+            <!-- start of original row -->
+            <div class="row row-gap-2">
+              {% if info.album %}
+                <div class="row">
+                  <div class="fw-semibold">Album</div>
+                  <div>
+                    <a href="{% url "release_details" id=info.album.uuid %}">{{ info.category }}</a>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="row">
+                <div class="fw-semibold">Original Artist</div>
+                <div>{{ info.original_artist }}</div>
+              </div>
+              <div class="row d-flex-inline col-gap-2 justify-content-center justify-content-lg-start">
+                <div class="col-auto">
+                  <div class="fw-semibold">Public</div>
+                  <div>{{ info.num_plays_public }}</div>
+                </div>
+                <div class="col-auto">
+                  <div class="fw-semibold">Private</div>
+                  <div>{{ info.num_plays_private }}</div>
+                </div>
+                <div class="col-auto">
+                  <div class="fw-semibold">Snippet</div>
+                  <div>{{ info.num_plays_snippet }}</div>
+                </div>
+                <div class="col-auto">
+                  <div class="fw-semibold">Opener</div>
+                  <div>{{ info.opener }}</div>
+                </div>
+                <div class="col-auto">
+                  <div class="fw-semibold">Closer</div>
+                  <div>{{ info.closer }}</div>
+                </div>
+              </div>
+              <div class="row">
+                {% if info.last_event %}
+                  <div class="fw-semibold">Last Played</div>
+                  <div>
+                    <a href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
+                    {% if show_gap %}<span>({{ show_gap }} shows ago)</span>{% endif %}
+                  </div>
+                {% endif %}
               </div>
             </div>
-          {% endif %}
-          <div class="row">
-            <div class="fw-semibold">Original Artist</div>
-            <div>{{ info.original_artist }}</div>
-          </div>
-          <div class="row d-flex-inline col-gap-3">
-            <div class="col-auto">
-              <div class="fw-semibold">Public</div>
-              <div>{{ info.num_plays_public }}</div>
-            </div>
-            <div class="col-auto">
-              <div class="fw-semibold">Private</div>
-              <div>{{ info.num_plays_private }}</div>
-            </div>
-          </div>
-          <div class="row">
-            {% if info.last_event %}
-              <div class="fw-semibold">Last Played:</div>
-              <div>
-                <a class="fw-medium"
-                   href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
-                {% if show_gap %}<span class="text-reset fw-light">({{ show_gap }} shows ago)</span>{% endif %}
-              </div>
-            {% endif %}
-          </div>
-          <div class="row mt-3 mb-2">
-            <div class="col">
-              <ul class="nav nav-pills items-end mb-2 text-sm gap-1" role="tablist">
-                <button class="nav-link active mb-1 mb-md-0"
-                        data-bs-toggle="pill"
-                        data-bs-target="#events"
-                        aria-controls="pills-events">Performances</button>
-                <button class="nav-link mb-1 mb-md-0"
-                        data-bs-toggle="pill"
-                        data-bs-target="#snippets"
-                        aria-controls="pills-snippets">Snippets</button>
-                <button class="nav-link mb-1 mb-md-0"
-                        data-bs-toggle="pill"
-                        data-bs-target="#stats"
-                        aria-controls="pills-stats">Stats</button>
-                <button class="nav-link mb-1 mb-md-0"
-                        data-bs-toggle="pill"
-                        data-bs-target="#lyrics"
-                        aria-controls="pills-stats">Lyrics</button>
-                <button class="nav-link mb-1 mb-md-0"
-                        data-bs-toggle="pill"
-                        data-bs-target="#links"
-                        aria-controls="pills-links">Links</button>
-              </ul>
-            </div>
+            <!-- end of original row -->
           </div>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <div class="tab-content">
-          <div id="events" class="tab-pane fade show active">
-            <div class="card">
-              <div class="card-header">Events</div>
-              <div class="card-body p-0">
+        <div class="card">
+          <div class="card-header">
+            <ul class="nav nav-pills items-end mb-2 text-sm gap-1" role="tablist">
+              <button class="nav-link active mb-1 mb-md-0"
+                      data-bs-toggle="pill"
+                      data-bs-target="#events"
+                      aria-controls="pills-events">
+                Performances<span class="badge rounded-pill text-bg-light" id="event-count-badge">0</span>
+              </button>
+              <button class="nav-link mb-1 mb-md-0"
+                      data-bs-toggle="pill"
+                      data-bs-target="#snippets"
+                      aria-controls="pills-snippets">
+                Snippets<span class="badge rounded-pill text-bg-light" id="snippet-count-badge">0</span>
+              </button>
+              <button class="nav-link mb-1 mb-md-0"
+                      data-bs-toggle="pill"
+                      data-bs-target="#stats"
+                      aria-controls="pills-stats">Stats</button>
+              <button class="nav-link mb-1 mb-md-0"
+                      data-bs-toggle="pill"
+                      data-bs-target="#lyrics"
+                      aria-controls="pills-stats">Lyrics</button>
+              <button class="nav-link mb-1 mb-md-0"
+                      data-bs-toggle="pill"
+                      data-bs-target="#links"
+                      aria-controls="pills-links">Links</button>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content">
+              <div id="events" class="tab-pane fade show active">
                 <div class="table-responsive">
                   <table class="table table-hover display" id="songTable">
                     <thead>
@@ -105,12 +123,7 @@
                   </table>
                 </div>
               </div>
-            </div>
-          </div>
-          <div id="snippets" class="tab-pane fade">
-            <div class="card">
-              <div class="card-header">Snippets</div>
-              <div class="card-body p-0">
+              <div id="snippets" class="tab-pane fade p-2">
                 <div class="table-responsive">
                   <table class="table table-hover display" id="snippetTable">
                     <thead>
@@ -126,12 +139,7 @@
                   </table>
                 </div>
               </div>
-            </div>
-          </div>
-          <div id="stats" class="tab-pane fade">
-            <div class="card">
-              <div class="card-header">Stats</div>
-              <div class="card-body">
+              <div id="stats" class="tab-pane fade">
                 <div class="row row-cols-1 row-cols-lg-2">
                   <div class="col-12 col-lg-6 mb-3 mb-md-0">
                     <div class="chart-container">
@@ -154,12 +162,7 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div id="lyrics" class="tab-pane fade">
-            <div class="card">
-              <div class="card-header">Lyrics</div>
-              <div class="card-body text-sm">
+              <div id="lyrics" class="tab-pane fade">
                 {% for lyric in lyrics %}
                   {% if lyric.language == 'English' %}{{ lyric.text|linebreaksbr }}{% endif %}
                 {% endfor %}
@@ -177,12 +180,7 @@
                   </ul>
                 {% endif %}
               </div>
-            </div>
-          </div>
-          <div id="links" class="tab-pane fade">
-            <div class="card">
-              <div class="card-header">Links</div>
-              <div class="card-body px-0">
+              <div id="links" class="tab-pane fade">
                 <ul>
                   {% if info.brucebase_url %}
                     <li>
@@ -274,7 +272,14 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
+
+                if (data.detail) {
+                  return `<a href="/venues/${data.uuid}">${data.detail},<br>${data.name}</a>`
+                }
+
                 return `<a href="/venues/${data.uuid}">${data.name}</a>`
+
+                
               }
             },
           },
@@ -376,6 +381,10 @@
           },
           {'data': 'event.public', 'name': 'event__public' },
         ],
+        initComplete: function(settings, json){ 
+          var info = this.api().page.info();
+          $('#event-count-badge').text(info.recordsTotal);
+        }
       });
 
       new DataTable('#snippetTable', {
@@ -439,7 +448,11 @@
             },
           },
           {'data': 'note', 'name': 'note'},
-        ]
+        ],
+        initComplete: function(settings, json){ 
+          var info = this.api().page.info();
+          $('#snippet-count-badge').text(info.recordsTotal);
+        }
       });
 
     })
