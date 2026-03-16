@@ -26,6 +26,7 @@ dependencies = [
     "python-slugify>=8.0.4",
     "querystring-parser>=1.2.4",
     "requests>=2.32.4",
+    "sentry-sdk>=2.54.0",
 ]
 
 [dependency-groups]

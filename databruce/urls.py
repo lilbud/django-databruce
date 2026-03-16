@@ -19,6 +19,7 @@ sitemaps = {
 
 date = datetime.datetime.today()
 
+
 app_name = "databruce"
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
