@@ -3,8 +3,6 @@
     bottom: 0;
     padding: 10px;
     background-color: white;
-    /* Or match your theme's background */
     border-top: 1px solid #e5e7eb;
-    /* Optional border */
     z-index: 100;
 }

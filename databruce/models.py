@@ -1111,7 +1111,7 @@ class Setlists(BaseModel):
 
     def __str__(self) -> str:
         event_id = self.event_id
-        return f"[{self.id}] {event_id} - {self.set_name} - {self.song.name} ({self.song_id})"
+        return f"[{self.id}] {self.event.event_id} - {self.set_name} - {self.song.name} ({self.song_id})"
 
     VALID_SET_NAMES = [
         "Show",
@@ -1439,11 +1439,12 @@ class Guests(BaseModel):
         db_column="guest_id",
     )
 
-    event = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        db_column="event_id",
-    )
+    # event = models.ForeignKey(
+    #     Events,
+    #     models.DO_NOTHING,
+    #     db_column="event_id",
+    # )
+
     note = models.TextField(null=True)
 
     class Meta:

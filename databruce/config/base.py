@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import sys
 from pathlib import Path
-
+from django.templatetags.static import static
 import sentry_sdk
 from dotenv import load_dotenv
 
@@ -184,6 +184,16 @@ STATICFILES_FINDERS = [
 
 SESSION_EXEXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+
+UNFOLD = {
+    "STYLES": [
+        lambda request: static("admin/css/custom_unfold.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("admin/js/jquery-4.0.0.min.js"),
+        lambda request: static("admin/js/custom_unfold.js"),
+    ],
+}
 
 try:
     from .local import *  # noqa: F403

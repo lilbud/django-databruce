@@ -20,16 +20,16 @@ from . import models
 site.unregister(Group)
 
 
-class CustomModelAdmin(ModelAdmin):
-    class Media:
-        css = {
-            "all": ("admin/css/custom_unfold.css",),
-        }
-        js = ("admin/js/custom_unfold.js",)
+# class CustomModelAdmin(ModelAdmin):
+#     class Media:
+#         css = {
+#             "all": ("admin/css/custom_unfold.css",),
+#         }
+#         js = ("admin/js/custom_unfold.js",)
 
 
 @admin.register(models.CustomUser)
-class UserAdmin(DefaultUserAdmin, CustomModelAdmin):
+class UserAdmin(DefaultUserAdmin, ModelAdmin):
     search_fields = ["username"]
     list_display = [
         "username",
@@ -49,7 +49,7 @@ class UserAdmin(DefaultUserAdmin, CustomModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(BaseGroupAdmin, CustomModelAdmin):
+class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
 
 
@@ -126,7 +126,7 @@ class ReleaseTrackInline(StackedInline):
 
 
 @admin.register(models.ArchiveLinks)
-class ArchiveAdmin(CustomModelAdmin):
+class ArchiveAdmin(ModelAdmin):
     search_fields = ["event__id", "url"]
     list_select_related = ["event", "event__venue", "event__venue__city"]
     autocomplete_fields = ["event"]
@@ -135,7 +135,7 @@ class ArchiveAdmin(CustomModelAdmin):
 
 
 @admin.register(models.UserAttendedShows)
-class UserAttendedShowsAdmin(CustomModelAdmin):
+class UserAttendedShowsAdmin(ModelAdmin):
     search_fields = ["user__username", "event", "event__date"]
     list_select_related = [
         "user",
@@ -149,7 +149,7 @@ class UserAttendedShowsAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Bands)
-class BandAdmin(CustomModelAdmin):
+class BandAdmin(ModelAdmin):
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
@@ -165,9 +165,9 @@ class BandAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Guests)
-class GuestAdmin(CustomModelAdmin):
-    autocomplete_fields = ["setlist", "guest", "event"]
-    search_fields = ["guest__name", "setlist__id"]
+class GuestAdmin(ModelAdmin):
+    autocomplete_fields = ["setlist", "guest"]
+    search_fields = ["guest__name", "setlist__id", "setlist__event__event_id", "setlist__song__name"]
     list_display = [
         "setlist__id",
         "setlist__event__event_id",
@@ -178,7 +178,7 @@ class GuestAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Bootlegs)
-class BootlegAdmin(CustomModelAdmin):
+class BootlegAdmin(ModelAdmin):
     search_fields = [
         "event__event_id",
         "event__date",
@@ -194,7 +194,7 @@ class BootlegAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Cities)
-class CityAdmin(CustomModelAdmin):
+class CityAdmin(ModelAdmin):
     search_fields = ["name"]
     list_select_related = [
         "state",
@@ -210,14 +210,14 @@ class CityAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Continents)
-class ContinentAdmin(CustomModelAdmin):
+class ContinentAdmin(ModelAdmin):
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
 
 
 @admin.register(models.Countries)
-class CountryAdmin(CustomModelAdmin):
+class CountryAdmin(ModelAdmin):
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_display_links = ["id"]
@@ -231,7 +231,7 @@ class CountryAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Covers)
-class CoverAdmin(CustomModelAdmin):
+class CoverAdmin(ModelAdmin):
     search_fields = ["event"]
     list_select_related = ["event", "event__venue", "event__venue__city"]
     list_display = ["id", "event", "url"]
@@ -241,7 +241,7 @@ class CoverAdmin(CustomModelAdmin):
 
 
 @admin.register(models.NugsReleases)
-class NugsAdmin(CustomModelAdmin):
+class NugsAdmin(ModelAdmin):
     search_fields = ["event"]
     autocomplete_fields = ["event"]
 
@@ -264,7 +264,7 @@ class EventForm(forms.ModelForm):
 
 
 @admin.register(models.Events)
-class EventAdmin(CustomModelAdmin):
+class EventAdmin(ModelAdmin):
     form = EventForm
     search_fields = ["id", "event_id", "date"]
     autocomplete_fields = [
@@ -289,7 +289,7 @@ class EventAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Songs)
-class SongAdmin(CustomModelAdmin):
+class SongAdmin(ModelAdmin):
     search_fields = ["name", "original_artist"]
     list_select_related = ["first_event", "last_event", "album"]
     autocomplete_fields = ["first_event", "last_event", "album"]
@@ -309,7 +309,7 @@ class LyricForm(forms.ModelForm):
 
 
 @admin.register(models.Lyrics)
-class LyricsAdmin(CustomModelAdmin):
+class LyricsAdmin(ModelAdmin):
     search_fields = ["song__name", "text"]
     autocomplete_fields = ["song"]
     list_display = ["id", "song__name"]
@@ -321,9 +321,9 @@ class LyricsAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Setlists)
-class SetlistAdmin(CustomModelAdmin):
+class SetlistAdmin(ModelAdmin):
     autocomplete_fields = ["event", "song", "ltp"]
-    search_fields = ["song__name", "event", "set_name"]
+    search_fields = ["song__name", "set_name", "event__event_id"]
     list_select_related = [
         "song",
         "event",
@@ -336,7 +336,7 @@ class SetlistAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Onstage)
-class OnstageAdmin(CustomModelAdmin):
+class OnstageAdmin(ModelAdmin):
     search_fields = ["relation__name", "band__name"]
     list_select_related = [
         "relation",
@@ -352,7 +352,7 @@ class OnstageAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Relations)
-class RelationAdmin(CustomModelAdmin):
+class RelationAdmin(ModelAdmin):
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_select_related = ["first_event", "last_event"]
@@ -362,7 +362,7 @@ class RelationAdmin(CustomModelAdmin):
 
 
 @admin.register(models.ReleaseDiscs)
-class ReleaseDiscAdmin(CustomModelAdmin):
+class ReleaseDiscAdmin(ModelAdmin):
     search_fields = ["release__name"]
     list_display = ["id", "name", "release__name"]
     list_select_related = ["release"]
@@ -371,7 +371,7 @@ class ReleaseDiscAdmin(CustomModelAdmin):
 
 
 @admin.register(models.ReleaseTracks)
-class ReleaseTrackAdmin(CustomModelAdmin):
+class ReleaseTrackAdmin(ModelAdmin):
     search_fields = ["release__name", "song__name"]
     list_select_related = ["release", "song", "event", "discid", "setlist"]
     list_display = ["id", "release__name", "track", "song", "song__name"]
@@ -391,7 +391,7 @@ class ReleaseForm(forms.ModelForm):
 
 
 @admin.register(models.Releases)
-class ReleaseAdmin(CustomModelAdmin):
+class ReleaseAdmin(ModelAdmin):
     def get_queryset(self, request):
         base_qs = super().get_queryset(request)
         return base_qs.prefetch_related("event")
@@ -405,7 +405,7 @@ class ReleaseAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Snippets)
-class SnippetAdmin(CustomModelAdmin):
+class SnippetAdmin(ModelAdmin):
     search_fields = [
         "snippet__name",
         "setlist",
@@ -437,7 +437,7 @@ class SnippetAdmin(CustomModelAdmin):
 
 
 @admin.register(models.States)
-class StateAdmin(CustomModelAdmin):
+class StateAdmin(ModelAdmin):
     search_fields = ["name", "abbrev", "country", "first_event", "last_event"]
     list_select_related = [
         "country",
@@ -457,7 +457,7 @@ class StateAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Tours)
-class TourAdmin(CustomModelAdmin):
+class TourAdmin(ModelAdmin):
     def get_queryset(self, request):
         base_qs = super().get_queryset(request)
         return base_qs.prefetch_related(
@@ -477,7 +477,7 @@ class TourAdmin(CustomModelAdmin):
 
 
 @admin.register(models.TourLegs)
-class TourLegAdmin(CustomModelAdmin):
+class TourLegAdmin(ModelAdmin):
     search_fields = ["name"]
     list_select_related = [
         "first_event",
@@ -494,7 +494,7 @@ class TourLegAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Venues)
-class VenueAdmin(CustomModelAdmin):
+class VenueAdmin(ModelAdmin):
     search_fields = ["name"]
     list_select_related = ["first_event", "last_event", "city"]
     list_display = [
@@ -528,7 +528,7 @@ class VenueAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Runs)
-class RunAdmin(CustomModelAdmin):
+class RunAdmin(ModelAdmin):
     search_fields = ["name", "band__name"]
     autocomplete_fields = ["band", "first_event", "last_event", "venue"]
     list_select_related = [
@@ -546,7 +546,7 @@ class RunAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Tags)
-class TagAdmin(CustomModelAdmin):
+class TagAdmin(ModelAdmin):
     search_fields = ["event"]
     list_select_related = [
         "event",
@@ -559,7 +559,7 @@ class TagAdmin(CustomModelAdmin):
 
 
 @admin.register(models.Contact)
-class ContactAdmin(CustomModelAdmin):
+class ContactAdmin(ModelAdmin):
     search_fields = ["email", "subject", "message"]
     list_display = [
         "id",
