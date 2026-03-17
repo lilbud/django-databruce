@@ -747,19 +747,21 @@ class SongDetail(PageTitleMixin, TemplateView):
         try:
             last_event = models.Events.objects.get(
                 event_id=context["info"].last_event.event_id,
-            ).num
+            ).event_id
 
             latest = (
-                models.Events.objects.filter(num__isnull=False)
+                models.Events.objects.filter(num__isnull=False, is_stats_eligible=True)
                 .order_by("-num")
                 .first()
-                .num
+                .event_id
             )
 
-            try:
-                context["show_gap"] = latest - last_event
-            except TypeError:
-                context["show_gap"] = None
+            context["show_gap"] = models.Events.objects.filter(
+                event_id__gt=last_event,
+                event_id__lt=latest,
+                is_stats_eligible=True,
+                num__isnull=False,
+            ).count()
 
         except (models.Songs.last_event.RelatedObjectDoesNotExist, AttributeError):
             context["show_gap"] = 0

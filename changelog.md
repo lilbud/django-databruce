@@ -162,3 +162,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Songs] Fixed songs page search not searching song name and not showing certain songs.
 - [Event Detail] Fixed gap calculation counting cancelled/postponed events.
 - [Event Detail] Added "rumored" event type for events that were only rumored to have happened. This may be extended to events with little evidence that they happened.
+- [Song Detail] Revised "show gap" calculation. Now counts events after last and before most recent
