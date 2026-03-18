@@ -1,11 +1,12 @@
 import datetime
+import re
 
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-
+from django.core import mail
 from databruce.models import Bands, Events, Setlists, Songs, UserAttendedShows, Venues
-
+from django.contrib.auth.models import Group
 User = get_user_model()
 
 
@@ -15,7 +16,7 @@ class UserTests(TestCase):
             username="testuser",
             email="testuser@example.com",
             password="faiasd87gf9s",
-            is_active=True,
+            is_active=False,
         )
         self.venue = Venues.objects.create(name="Venue A")
         self.artist = Bands.objects.create(name="Band A")
@@ -25,6 +26,8 @@ class UserTests(TestCase):
             venue=self.venue,
             artist=self.artist,
         )
+        self.client = Client()
+        self.signup_url = reverse('signup')
 
     def test_user_login(self):
         # The login method requires credentials
@@ -35,6 +38,40 @@ class UserTests(TestCase):
 
     def test_user_remove_show(self):
         UserAttendedShows.objects.filter(user=self.user, event=self.event).delete()
+
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_signup_and_email_confirmation_flow(self):
+        # 1. Simulate Signup POST request
+        signup_url = reverse('signup')  # Replace with your actual signup URL name
+        user_data = {
+            'username': 'testuser1',
+            'email': 'test@example.com',
+            'password1': 'faiasd87gf9s',
+            'password2': 'faiasd87gf9s',
+        }
+        response = self.client.post(signup_url, user_data)
+        Group.objects.create(name="Users")
+
+        # Verify user was created but is inactive
+        user = User.objects.get(email='test@example.com')
+        self.assertFalse(user.is_active)
+
+        # 2. Verify Email was sent to django.core.mail.outbox
+        self.assertEqual(len(mail.outbox), 1)
+        email_body = mail.outbox[0].body
+
+        # 3. Extract the activation link from the email body
+        link_match = re.search(r'https://example.com.*', email_body)
+        self.assertTrue(link_match, "Activation link not found in email")
+        activation_url = link_match.group(0)
+
+        # 4. Simulate clicking the link (GET request to the activation URL)
+        response = self.client.get(activation_url, follow=True)
+
+        # 5. Verify the user is now active
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+        self.assertContains(response, "Login")
 
 
 class AdvSearchTest(TestCase):

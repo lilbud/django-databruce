@@ -256,6 +256,7 @@ class Login(PageTitleMixin, LoginView):
 
         return super().form_valid(form)
 
+from django.core.mail import send_mail
 
 class SignUp(PageTitleMixin, TemplateView):
     template_name = "users/signup.html"
@@ -291,6 +292,7 @@ class SignUp(PageTitleMixin, TemplateView):
                 "protocol": "https" if use_https else "http",
             }
 
+
             self.send_mail(
                 context=context,
                 from_email=os.getenv("MAILGUN_EMAIL"),
@@ -300,32 +302,17 @@ class SignUp(PageTitleMixin, TemplateView):
             return redirect(reverse("signup_done"))
 
         return render(request, template_name=self.template_name, context={"form": form})
-
-    def send_mail(
-        self,
-        context: dict,
-        from_email: str,
-        to_email: str,
-    ):
-        subject_template_name = "users/signup_confirm_subject.txt"
-        email_template_name = "users/signup_email.html"
-
-        # Email subject *must not* contain newlines
-        subject = "".join(
-            loader.render_to_string(subject_template_name, context).splitlines(),
-        )
-        body = loader.render_to_string(email_template_name, context)
-
-        return requests.post(
-            url=os.getenv("MAILGUN_URL"),
-            auth=("api", os.getenv("MAILGUN_API")),
-            data={
-                "from": f"Databruce <{from_email}>",
-                "to": f"{context['user']} <{to_email}>",
-                "subject": subject,
-                "text": body,
-            },
-            timeout=10,
+    def send_mail(self, context, from_email, to_email):
+        subject = loader.render_to_string(self.subject_template_name, context).strip()
+        body = loader.render_to_string(self.email_template_name, context)
+        
+        # This will now be intercepted by the test runner
+        return send_mail(
+            subject,
+            body,
+            from_email,
+            [to_email],
+            fail_silently=False,
         )
 
 
@@ -384,10 +371,8 @@ class SignUpConfirm(PageTitleMixin, TemplateView):
                         token
                     )
 
-                    user_group = User.objects.get(username=self.user)
                     group = Group.objects.get(name="Users")
-                    user_group.groups.add(group)
-
+                    self.user.groups.add(group)
                     self.user.is_active = True
                     self.user.save()
 

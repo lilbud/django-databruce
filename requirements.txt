@@ -17,3 +17,4 @@ djlint
 django-unfold
 django_redis
 redis
+django-anymail[mailgun]

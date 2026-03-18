@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "databruce.apps.DatabruceConfig",
     "shortener",
+    "anymail",
 ]
 
 SITE_ID = 1
@@ -147,3 +148,12 @@ AUTH_USER_MODEL = "databruce.CustomUser"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
+    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"), # e.g., '://yourdomain.com'
+}
+
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
+NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL")

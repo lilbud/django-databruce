@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_filters",
     "shortener",
     "django_extensions",
+    "anymail", 
 ]
 
 SITE_ID = 1
@@ -174,7 +175,13 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 100,
 }
 
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+ANYMAIL = {
+    "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
+    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"), # e.g., '://yourdomain.com'
+}
+
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
 NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL")
 
 STATICFILES_FINDERS = [
@@ -194,6 +201,8 @@ UNFOLD = {
         lambda request: static("admin/js/custom_unfold.js"),
     ],
 }
+
+
 
 try:
     from .local import *  # noqa: F403
