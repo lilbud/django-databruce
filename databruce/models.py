@@ -777,9 +777,9 @@ class Onstage(BaseModel):
 
     def __str__(self) -> str:
         try:
-            return f"Relation: {self.relation.name} / {self.band.name}"
+            return f"Relation: [{self.relation_id}] {self.relation.name} / {self.band.name}"
         except Onstage.band.RelatedObjectDoesNotExist:
-            return f"Relation: {self.relation.name}"
+            return f"Relation: [{self.relation_id}] {self.relation.name}"
 
 
 class ReleaseTracks(BaseModel):
