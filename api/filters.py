@@ -1,3 +1,5 @@
+import datetime
+
 import django_filters
 from django import forms
 from django.core.exceptions import FieldDoesNotExist
@@ -19,6 +21,8 @@ VALID_SET_NAMES = [
     "Pre-Show",
     "Post-Show",
 ]
+
+date = datetime.datetime.now(tz=datetime.timezone.utc).date()
 
 
 class DataTablesFilterBackend(BaseFilterBackend):
@@ -333,6 +337,7 @@ class EventsFilter(filters.FilterSet):
         lookup_expr="gte",
         label="start date",
     )
+
     end_date = filters.DateTimeFilter(
         field_name="date",
         lookup_expr="lte",
@@ -412,6 +417,22 @@ class EventsFilter(filters.FilterSet):
     user = filters.NumberFilter(
         field_name="user_event__user_id",
     )
+
+    latest = filters.BooleanFilter(
+        method="filter_latest",
+        label="latest",
+    )
+
+    upcoming = filters.BooleanFilter(
+        method="filter_upcoming",
+        label="upcoming",
+    )
+
+    def filter_latest(self, queryset, name, value):
+        return queryset.filter(date__lt=date)
+
+    def filter_upcoming(self, queryset, name, value):
+        return queryset.filter(date__gt=date)
 
     class Meta:
         model = models.Events

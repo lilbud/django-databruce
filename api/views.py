@@ -24,6 +24,7 @@ from django.db.models import (
     Window,
 )
 from django.db.models.functions import Cast, JSONObject
+from django.shortcuts import get_list_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
 from rest_framework import mixins, permissions, viewsets
@@ -273,13 +274,11 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
     def get_queryset(self):
-        params = self.request.query_params
-
         onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
-            "band",
+            "band"
         )
 
-        qs = (
+        return (
             models.Events.objects.select_related(
                 "venue",
                 "venue__city",
@@ -295,11 +294,6 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "user_event",
             )
         ).order_by("event_id")
-
-        if params.get("latest"):
-            return qs.filter(date__lt=date)
-
-        return qs
 
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
@@ -483,7 +477,8 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
 class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         filter = Q(set_name__in=VALID_SET_NAMES, event__public=True) | Q(
-            set_name__in=["Recording"], event__public=False
+            set_name__in=["Recording"],
+            event__public=False,
         )
 
         # set_name in valid and event public

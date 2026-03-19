@@ -423,10 +423,10 @@
                 const songItems = row.songs.map(song => {
 
                   if (song.original_artist !== 'Bruce Springsteen') {
-                    return `<li class="list-group-item px-1 py-1">${song.name} [${song.original_artist}]</li>`
+                    return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
                   }
 
-                  return `<li class="list-group-item px-1 py-1">${song.name}</li>`
+                  return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
 
                 }).join('')
 
@@ -436,7 +436,7 @@
 
                 const html = `
                   <div class="col py-1 px-1 album-breakdown" data-bs-toggle="collapse" href="#${album}-collapse">
-                      <div class="row text-xs mx-0 pb-1 d-flex-inline justify-content-between">
+                      <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between">
                           <div class="col ps-0 pe-1 text-wrap category"><span>${data}</span> ${complete_badge}</div>
                           <div class="col-3 text-end px-0 text-nowrap me-1">${row.num}/${row.total} (${percent.toFixed(1)}%)</div>
                       </div>

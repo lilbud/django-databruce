@@ -1325,22 +1325,38 @@ class Runs(BaseModel):
         models.DO_NOTHING,
         db_column="band",
         null=True,
+        blank=True,
+        default=None,
     )
     venue = models.ForeignKey(
         Venues,
         models.DO_NOTHING,
         db_column="venue",
         null=True,
+        blank=True,
+        default=None,
     )
     name = models.TextField(null=True, max_length=255)
-    num_shows = models.IntegerField(null=True)
-    num_songs = models.IntegerField(null=True)
+
+    num_shows = models.IntegerField(
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+    num_songs = models.IntegerField(
+        null=True,
+        blank=True,
+        default=None,
+    )
 
     first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
         db_column="first_event",
         null=True,
+        blank=True,
+        default=None,
     )
     last_event = models.ForeignKey(
         Events,
@@ -1348,6 +1364,8 @@ class Runs(BaseModel):
         db_column="last_event",
         related_name="runs_last_event_set",
         null=True,
+        blank=True,
+        default=None,
     )
 
     class Meta:
@@ -1455,13 +1473,15 @@ class Guests(BaseModel):
 class Lyrics(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    song = models.ForeignKey(
+
+    song = models.OneToOneField(
         Songs,
         models.DO_NOTHING,
         null=True,
         db_column="song_id",
         related_name="lyrics_song",
     )
+
     version = models.TextField(
         db_column="version_info",
         null=True,

@@ -95,13 +95,30 @@
         </div>
       </div>
       <div class="col">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 gx-3">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 gx-3 gy-3">
           <div class="col">
-            <div class="card mb-3">
+            <div class="card">
               <div class="card-header">Latest</div>
               <div class="card-body p-0">
                 <div class="table-responsive index">
                   <table class="table table-hover display" id="recentTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Date</th>
+                        <th class="all">Location</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card">
+              <div class="card-header">Upcoming</div>
+              <div class="card-body p-0">
+                <div class="table-responsive index">
+                  <table class="table table-hover display" id="upcomingTable">
                     <thead>
                       <tr>
                         <th class="all">Date</th>
@@ -253,6 +270,44 @@
             },
           ],
       });
+
+      new DataTable('#upcomingTable', {
+          layout: layout,
+          searching: false,
+          paging: false,
+          info: false,
+          ordering: false,
+          scrollX: false,
+          ajax: {
+            'url': '/api/v1/events/?ordering=event_id&limit=5&format=custom&upcoming=true',
+          },
+          columnDefs: [
+            {'targets': '_all', columnControl: [] },
+            {'target': 0, width: '10rem' }
+          ],
+          columns: [
+            {
+              'data': 'date',
+              'name': 'id',
+              'render': function (data, type, row, meta) {
+                if (type === 'display' && data) {
+                  return `<a href="/events/${row.event_id}">${data.display}</a>`;
+                }
+              },
+            },
+            {
+              'data': 'venue',
+              'name': 'venue__name, venue__detail',
+              'render': function (data, type, row, meta) {
+                  if (type === 'display' && data) {
+                    return `<a href="/venues/${data.uuid}">${data.name}</a>`;
+                  }
+              },
+            },
+          ],
+      });
+
+
 
       new DataTable('#setlistTable',
       {

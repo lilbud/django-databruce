@@ -2,6 +2,8 @@
     --logo-mask: url('/static/databruce/img/logo.svg');
     --nugs-logo: url('/static/databruce/img/nugs.svg');
     --inset-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
+    --text-3xs: 0.675rem;
+    --text-2xs: 0.7rem;
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;
     --text-base: 1rem;
@@ -14,6 +16,14 @@
 }
 
 /* Text-size utility variables (keeps original sizes but centralized) */
+.text-3xs {
+    font-size: var(--text-3xs);
+}
+
+.text-2xs {
+    font-size: var(--text-2xs);
+}
+
 .text-xs {
     font-size: var(--text-xs);
     line-height: 1rem;
@@ -511,7 +521,7 @@ button:disabled {
 
 /* progress bar for album breakdown */
 .progress {
-    height: 0.6rem !important;
+    height: 0.45rem !important;
     border-radius: 0.2rem !important;
     background-color: rgb(var(--base-300)) !important;
 }
@@ -827,4 +837,17 @@ button.nav-link .badge {
 
 button.nav-link .badge {
     margin-left: 0.25rem !important;
+}
+
+#albumTable_wrapper>.dt-layout-table {
+    margin-top: 0 !important;
+}
+
+.album-breakdown .list-group-item {
+    font-size: var(--text-3xs) !important;
+}
+
+.py-0\.5 {
+    padding-top: 0.125rem !important;
+    padding-bottom: 0.125rem !important;
 }
