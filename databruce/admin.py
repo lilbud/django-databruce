@@ -91,7 +91,16 @@ class SetlistInline(StackedInline):
 
     autocomplete_fields = ["song"]
 
-    fields = ["set_name", "song_num", "song", "segue", "note"]
+    fields = [
+        "set_name",
+        "song_num",
+        "song",
+        "segue",
+        "note",
+        "nobruce",
+        "instrumental",
+        "sign_request",
+    ]
     fk_name = "event"
     ordering = ("song_num",)
     extra = 0
@@ -167,7 +176,12 @@ class BandAdmin(ModelAdmin):
 @admin.register(models.Guests)
 class GuestAdmin(ModelAdmin):
     autocomplete_fields = ["setlist", "guest"]
-    search_fields = ["guest__name", "setlist__id", "setlist__event__event_id", "setlist__song__name"]
+    search_fields = [
+        "guest__name",
+        "setlist__id",
+        "setlist__event__event_id",
+        "setlist__song__name",
+    ]
     list_display = [
         "setlist__id",
         "setlist__event__event_id",

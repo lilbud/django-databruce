@@ -275,7 +275,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
-            "band"
+            "band",
         )
 
         return (
@@ -477,7 +477,7 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
 class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         filter = Q(set_name__in=VALID_SET_NAMES, event__public=True) | Q(
-            set_name__in=["Recording"],
+            set_name__in=["Recording", "Rehearsal"],
             event__public=False,
         )
 
