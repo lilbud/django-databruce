@@ -103,6 +103,9 @@ DATABASES = {
         "PORT": "",
         "CONN_MAX_AGE": 15,
         "CONN_HEALTH_CHECKS": True,
+        "OPTIONS": {
+            "pool": True,
+        },
     },
 }
 
