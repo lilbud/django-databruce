@@ -101,7 +101,7 @@ DATABASES = {
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
         "HOST": "localhost",
         "PORT": "",
-        "CONN_MAX_AGE": 60,
+        "CONN_MAX_AGE": 15,
         "CONN_HEALTH_CHECKS": True,
     },
 }
