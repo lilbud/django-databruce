@@ -660,7 +660,7 @@
                 } else if (data.premiere) {
                   $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
                   return $(badge).prop('outerHTML');
-                } else if (data.debut && !data.premiere) {
+                } else if (data.debut && !data.premiere && data.gap) {
                   $(badge).addClass('bg-primary').text(`${data.gap}, TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
                 } else if (data.debut && !data.premiere && !data.gap) {
