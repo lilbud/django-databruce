@@ -1249,4 +1249,5 @@ class Bootleg(PageTitleMixin, TemplateView):
 
 class Updates(PageTitleMixin, TemplateView):
     template_name = "databruce/updates.html"
+    template_name = "databruce/updates.html"
     title = "Updates"

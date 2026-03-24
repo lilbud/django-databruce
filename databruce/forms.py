@@ -43,7 +43,14 @@ class AdvancedEventSearch(forms.Form):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        ignore = ["first_date", "last_date", "month", "day", "conjunction"]
+        ignore = [
+            "first_date",
+            "last_date",
+            "month",
+            "day",
+            "conjunction",
+            "event_type",
+        ]
 
         for field_name in list(self.fields.keys()):
             if field_name.endswith("_exclude") or field_name in ignore:
