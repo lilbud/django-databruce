@@ -658,11 +658,19 @@ class SetlistSongsFilter(filters.FilterSet):
         lookup_expr="exact",
         label="event",
     )
+
     run = filters.NumberFilter(
         field_name="event__run__id",
         lookup_expr="exact",
         label="event run",
     )
+
+    year = filters.NumberFilter(
+        field_name="event__date__year",
+        lookup_expr="exact",
+        label="year",
+    )
+
     leg = filters.NumberFilter(
         field_name="event__leg__id",
         lookup_expr="exact",
