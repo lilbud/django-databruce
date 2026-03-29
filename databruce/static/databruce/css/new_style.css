@@ -738,7 +738,7 @@ div.dt-scroll-body {
     border-bottom-width: 0px !important;
 }
 
-.card-body {
+.card-body :not(#headimg) {
     border-bottom-left-radius: var(--bs-border-radius) !important;
     border-bottom-right-radius: var(--bs-border-radius) !important;
     border-color: rgb(var(--border)) !important;
@@ -855,4 +855,11 @@ button.nav-link .badge {
 .py-0\.5 {
     padding-top: 0.125rem !important;
     padding-bottom: 0.125rem !important;
+}
+
+.card-img-top {
+    border-top-left-radius: var(--bs-card-inner-border-radius) !important;
+    border-top-right-radius: var(--bs-card-inner-border-radius) !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
 }
