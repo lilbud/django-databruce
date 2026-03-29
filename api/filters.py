@@ -429,7 +429,7 @@ class EventsFilter(filters.FilterSet):
     )
 
     def filter_latest(self, queryset, name, value):
-        return queryset.filter(date__lt=date)
+        return queryset.filter(date__lte=date)
 
     def filter_upcoming(self, queryset, name, value):
         return queryset.filter(date__gt=date)
