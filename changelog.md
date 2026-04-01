@@ -172,3 +172,5 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added "Events by Type" page
 - [Song Detail] Last Played now shows "latest event" instead of "0 show gap"
 - [Event Calendar] Past releases now show on calendar, they appear as a no fill orange box compared to the filled orange box for new releases.
+- [Band Detail] Added event count badge
+- [Relation Detail] Added event count badge

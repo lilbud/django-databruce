@@ -289,9 +289,6 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
             sb_index += 1
 
-        print(global_q)
-        print(column_q)
-
         if is_filtered:
             queryset = queryset.filter(global_q & column_q)
 
