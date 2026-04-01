@@ -309,9 +309,9 @@ event_table_columns = [
     'render': function (data, type, row, meta) {
       if (row.event_status) {
         if (data) {
-          return `<span class="text-danger fw-semibold">[${row.type}] ${data}</span>`
+          return `<span class="text-danger fw-semibold">[${row.type.name}] ${data}</span>`
         }
-        return `<span class="text-danger fw-semibold">[${row.type}]</span>`
+        return `<span class="text-danger fw-semibold">[${row.type.name}]</span>`
       }
 
       return data;

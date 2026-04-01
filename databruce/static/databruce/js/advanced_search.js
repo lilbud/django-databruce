@@ -147,7 +147,7 @@ $(document).ready(function () {
   $('#relation').select2(get_options({ ajax_url: 'relations/' }));
   $('#band').select2(get_options({ ajax_url: 'bands/' }));
   $('#venue').select2(get_options({ ajax_url: 'venues/' }));
-  $('#type').select2();
+  $('#type').select2(get_options({ ajax_url: 'event_types/' }));
 
   row.find('.song2').parent().hide();
   row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));

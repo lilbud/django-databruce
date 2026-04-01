@@ -1,12 +1,16 @@
 import datetime
+import re
 
+import django
 import django_filters
 from django import forms
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
+    CharField,
     F,
     Q,
     Subquery,
+    TextField,
 )
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
@@ -64,6 +68,23 @@ class DataTablesFilterBackend(BaseFilterBackend):
             filter_types["!null"] = Q(**{f"{column}": True})
 
         return filter_types.get(condition)
+
+    def get_final_field(self, model, path):
+        """Traverses the model __ path and returns the final Django field object."""
+        parts = path.split("__")
+        current_model = model
+
+        for i, part in enumerate(parts):
+            try:
+                field = current_model._meta.get_field(part)
+                # If there are more parts and this is a relation, move to the next model
+                if i < len(parts) - 1 and field.is_relation:
+                    current_model = field.related_model
+                else:
+                    return field
+            except FieldDoesNotExist:
+                return None
+        return None
 
     def verify_fields(self, model, fields):
         valid_fields = []
@@ -156,6 +177,9 @@ class DataTablesFilterBackend(BaseFilterBackend):
         column_q = Q()
         search_type = "icontains"
 
+        if global_search_regex == "true":
+            search_type = "iregex"
+
         for config in column_configs:
             if not config["searchable"]:
                 continue
@@ -163,25 +187,45 @@ class DataTablesFilterBackend(BaseFilterBackend):
             if global_search_value:
                 is_filtered = True
 
-                if global_search_regex:
-                    search_type = "iregex"
-
                 for field in config["fields"]:
-                    global_q |= Q(**{f"{field}__{search_type}": global_search_value})
+                    lookup = f"{field}__{search_type}"
+
+                    try:
+                        field_obj = self.get_final_field(queryset.model, field)
+
+                        if isinstance(field_obj, (CharField, TextField)):
+                            lookup = f"{field}__unaccent__{search_type}"
+
+                    except FieldDoesNotExist:
+                        continue
+
+                    global_q |= Q(
+                        **{
+                            lookup: global_search_value,
+                        },
+                    )
 
             if config["search_value"]:
                 is_filtered = True
-                col_specific_q = Q()
 
                 if config["search_regex"]:
                     search_type = "iregex"
 
                 for field in config["fields"]:
-                    col_specific_q |= Q(
-                        **{f"{field}__{search_type}": config["search_value"]},
-                    )
+                    lookup = f"{field}__{search_type}"
 
-                column_q &= col_specific_q
+                    try:
+                        field_obj = self.get_final_field(queryset.model, field)
+
+                        if isinstance(field_obj, (CharField, TextField)):
+                            lookup = f"{field}__unaccent__{search_type}"
+
+                    except FieldDoesNotExist:
+                        continue
+
+                    column_q &= Q(
+                        **{lookup: config["search_value"]},
+                    )
 
         # --- 3. ORDERING LOGIC ---
         order_list = []
@@ -245,6 +289,9 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
             sb_index += 1
 
+        print(global_q)
+        print(column_q)
+
         if is_filtered:
             queryset = queryset.filter(global_q & column_q)
 
@@ -273,6 +320,12 @@ class BootlegFilter(filters.FilterSet):
 class CitiesFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
     name = filters.CharFilter(lookup_expr="istartswith", label="Name")
+    # state = filters.CharFilter(
+    #     field_name="state__name", lookup_expr="istartswith", label="State"
+    # )
+    # country = filters.CharFilter(
+    #     field_name="country__name", lookup_expr="istartswith", label="Country"
+    # )
 
 
 class CoversFilter(filters.FilterSet):
@@ -331,6 +384,7 @@ class EventsFilter(filters.FilterSet):
     )
 
     id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
+    type = filters.CharFilter(field_name="type__id", lookup_expr="exact")
 
     start_date = filters.DateTimeFilter(
         field_name="date",
@@ -510,6 +564,29 @@ class ReleaseFilter(filters.FilterSet):
         lookup_expr="lte",
         label="end date",
     )
+
+    year = filters.NumberFilter(
+        field_name="date__year",
+        label="year",
+    )
+
+    current_year = filters.BooleanFilter(
+        method="include_current_year",
+        label="include current year?",
+    )
+
+    month = filters.NumberFilter(
+        field_name="date__month",
+        label="month",
+    )
+
+    day = filters.NumberFilter(field_name="date__day", label="day")
+
+    def include_current_year(self, queryset, name, value):
+        if value:
+            return queryset.filter(date__year=date.year)
+
+        return queryset.exclude(date__year=date.year)
 
 
 class SetlistStatsFilter(filters.FilterSet):
@@ -829,4 +906,11 @@ class SetlistBreakdownFilter(filters.FilterSet):
     event = filters.CharFilter(
         field_name="setlists__event__event_id",
         lookup_expr="exact",
+    )
+
+
+class EventTypeFilter(filters.FilterSet):
+    id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(
+        lookup_expr="icontains",
     )

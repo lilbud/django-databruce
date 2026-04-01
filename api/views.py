@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.aggregates import ArrayAgg, JSONBAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import (
+    CharField,
     Count,
     DecimalField,
     Exists,
@@ -408,7 +409,14 @@ class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
 class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = models.Releases.objects.all().order_by("-date")
+    queryset = (
+        models.Releases.objects.all()
+        .annotate(
+            date_str=Cast("date", output_field=CharField()),
+            time_str=Cast("length", output_field=CharField()),
+        )
+        .order_by("-date")
+    )
     serializer_class = serializers.ReleasesSerializer
     filterset_class = filters.ReleaseFilter
 
@@ -811,3 +819,9 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
 class SongsPage(viewsets.ReadOnlyModelViewSet):
     queryset = models.SongsPage.objects.all()
     serializer_class = serializers.SongsPageSerializer
+
+
+class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.EventTypes.objects.all()
+    serializer_class = serializers.EventTypeSerializer
+    filterset_class = filters.EventTypeFilter

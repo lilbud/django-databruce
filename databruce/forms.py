@@ -13,7 +13,7 @@ from django.contrib.auth.forms import (
 )
 
 # from django.contrib.auth.models import User
-from django.db.models import F, Q
+from django.db.models import F, Q, QuerySet
 
 from . import models
 
@@ -34,6 +34,10 @@ class CustomChoiceField(forms.ChoiceField):
 
 
 class CustomMultipleChoiceField(forms.MultipleChoiceField):
+    def valid_value(self, value):
+        # This bypasses the 'Select a valid choice' check against self.choices
+        return True
+
     def __init__(self, *args, lookup_path=None, **kwargs) -> None:
         self.lookup_path = lookup_path
         super().__init__(*args, **kwargs)
@@ -77,6 +81,8 @@ class AdvancedEventSearch(forms.Form):
             value.get("id") if isinstance(value, dict) else value,
         )
 
+        print(field, lookup_path, val_id)
+
         q_obj = Q(**{lookup_path: val_id})
 
         # check if the field should be excluded
@@ -98,6 +104,9 @@ class AdvancedEventSearch(forms.Form):
                 continue
 
             value = self.cleaned_data.get(field)
+
+            print(value, type(value))
+
             if not value:
                 continue
 
@@ -105,38 +114,10 @@ class AdvancedEventSearch(forms.Form):
             field_instance = self.fields[field]
             lookup_path = getattr(field_instance, "lookup_path", field)
 
-            # print(type(value))
-
-            if type(value) is list:
+            if type(value) is list or type(value) is QuerySet:
                 lookup_path = f"{lookup_path}__in"
 
             q_obj = self.iterate_field(field, value, lookup_path)
-
-            # if type(value) is list:
-            #     for v in value:
-            #         print(v)
-            #         q_obj = self.iterate_field(field, v, lookup_path)
-            #         total_filter |= q_obj
-            # else:
-            #     q_obj = self.iterate_field(field, value, lookup_path)
-            #     total_filter &= q_obj
-
-            # print(total_filter)
-
-            # some fields have an id attribute, some have a 'id' key
-            # val_id = getattr(
-            #     value,
-            #     "id",
-            #     value.get("id") if isinstance(value, dict) else value,
-            # )
-
-            # q_obj = Q(**{lookup_path: val_id})
-
-            # # check if the field should be excluded
-            # exclude_val = self.cleaned_data.get(f"{field}_exclude")
-
-            # if exclude_val is True:
-            #     q_obj = ~q_obj
 
             # Add the query object to the total filter
             total_filter &= q_obj
@@ -163,12 +144,6 @@ class AdvancedEventSearch(forms.Form):
         ("6", "Friday"),
         ("7", "Saturday"),
     ]
-
-    event_types = []
-
-    event_types.extend(
-        [item for item in models.Events.types],
-    )
 
     first_date = CustomCharField(
         label="Start Date",
@@ -246,8 +221,7 @@ class AdvancedEventSearch(forms.Form):
 
     event_type = CustomMultipleChoiceField(
         label="Event Type",
-        lookup_path="type",
-        choices=event_types,
+        lookup_path="type_id",
         required=False,
         widget=forms.SelectMultiple(
             attrs={
@@ -450,6 +424,19 @@ class AdvancedEventSearch(forms.Form):
     def clean_city(self):
         if self.cleaned_data["city"]:
             return models.Cities.objects.get(id=self.cleaned_data["city"])
+
+        return None
+
+    def clean_event_type(self):
+        if self.cleaned_data["event_type"]:
+            print(type(self.cleaned_data["event_type"]))
+
+            if isinstance(self.cleaned_data["event_type"], list):
+                return models.EventTypes.objects.filter(
+                    id__in=self.cleaned_data["event_type"],
+                )
+
+            return models.EventTypes.objects.get(id=self.cleaned_data["event_type"])
 
         return None
 

@@ -1,0 +1,79 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block content %}
+  <div class="col-12">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-start mb-3">
+          <div class="text-2xl pe-2">Events by Type</div>
+          <div id="type-select" class="pe-2">
+            <button class="btn btn-sm btn-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ type }}</button>
+            <ul class="dropdown-menu">
+              {% for i in types %}
+                <li>
+                  <a class="dropdown-item" href="{% url "events_by_type" type=i.uuid %}">{{ i.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body px-0">
+            <div class="table-responsive">
+              <table class="table table-hover display nowrap" id="eventTable">
+                <thead>
+                  <tr>
+                    <th class="all">Date</th>
+                    <th class="all">Setlist</th>
+                    <th class="all">Band</th>
+                    <th class="all">Venue</th>
+                    <th class="all">Location</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  $(document).ready(function () {
+    var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
+    dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+  
+    var table = new DataTable('#eventTable', {
+      layout: layout,
+      scrollY: '60vh',
+      ajax: {
+        'url': '/api/v1/events/?type={{ type.id }}&format=custom',
+      },
+      columnDefs: event_table_defs,
+      columns: event_table_columns,
+    });
+
+    $(function(){
+      // bind change event to select
+      $('#type_select').on('change', function () {
+          var url = $(this).val() // get selected value
+          if (url) { // require a URL
+              window.location = url; // redirect
+          }
+          return false;
+      });
+    });
+  });
+  </script>
+{% endblock content %}

@@ -280,7 +280,7 @@ class EventForm(forms.ModelForm):
 @admin.register(models.Events)
 class EventAdmin(ModelAdmin):
     form = EventForm
-    search_fields = ["id", "event_id", "date"]
+    search_fields = ["id", "event_id", "date", "type__name"]
     autocomplete_fields = [
         "venue",
         "artist",
@@ -289,6 +289,7 @@ class EventAdmin(ModelAdmin):
         "leg",
         "nugs_id",
         "official_id",
+        "type",
     ]
 
     formfield_overrides = {
@@ -300,6 +301,13 @@ class EventAdmin(ModelAdmin):
     list_display = ["id", "date", "event_id"]
     list_display_links = ["id"]
     inlines = [SetlistInline, OnstageInline]
+
+
+@admin.register(models.EventTypes)
+class EventTypeAdmin(ModelAdmin):
+    search_fields = ["name", "slug"]
+    list_display = ["id", "name"]
+    list_display_links = ["id"]
 
 
 @admin.register(models.Songs)

@@ -46,6 +46,7 @@
                       start: val.date.filter,
                       url: `/events/${val.event_id}`,
                       allDay: false,
+                      className: 'calendar event'
                     }
                   )
                 })
@@ -64,10 +65,8 @@
                       title: val.name,
                       start: val.first_event.date.filter,
                       end: `${val.last_event.date.filter}T23:59:59`,
-                      url: `/runs/${val.uuid}`,
-                      backgroundColor: 'rgb(var(--secondary))',
-                      borderColor: 'rgb(var(--secondary))',
-                      className: 'px-1 m-0',
+                      url: `/events/runs/${val.uuid}`,
+                      className: 'px-1 m-0 calendar event event-run',
                     }
                   )
                 })
@@ -76,7 +75,7 @@
               })
             },
             function (info, successCallback, failureCallback) {
-              fetch(`/api/v1/releases/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
+              fetch(`/api/v1/releases/?format=json&start_date=${info.startStr}&end_date=${info.endStr}`)
               .then((resp) => resp.json())
               .then(function(data){
                 var eventsList = [];
@@ -87,9 +86,32 @@
                       title: val.name,
                       start: val.date,
                       url: `/releases/${val.uuid}`,
-                      backgroundColor: 'rgb(var(--accent))',
-                      borderColor: 'rgb(var(--accent))',
-                      className: 'px-1 m-0',
+                      className: 'px-1 mx-0 calendar event release-event',
+                    }
+                  )
+                })
+                console.log(eventsList)
+                successCallback(eventsList);
+              })
+            },
+            function (info, successCallback, failureCallback) {
+              fetch(`/api/v1/releases/?format=json&month=${info.start.getMonth() + 1}&current_year=false`)
+              .then((resp) => resp.json())
+              .then(function(data){
+                var eventsList = [];
+                const currentViewYear = info.start.getFullYear();
+
+                $(data.results).each(function (i, val){
+
+                  let historicalDate = new Date(val.date);
+                  historicalDate.setFullYear(currentViewYear);
+
+                  eventsList.push(
+                    {
+                      title: val.name,
+                      start: historicalDate.toISOString().split('T')[0],
+                      url: `/releases/${val.uuid}`,
+                      className: 'px-1 mx-0 calendar event release-event-past',
                     }
                   )
                 })

@@ -863,3 +863,46 @@ button.nav-link .badge {
     border-bottom-left-radius: 0px !important;
     border-bottom-right-radius: 0px !important;
 }
+
+.fc-h-event .fc-event-main {
+    color: rgb(var(--base-content)) !important;
+}
+
+.calendar.event:hover {
+    text-decoration: none !important;
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.1);
+}
+
+.calendar.release-event {
+    background-color: rgb(var(--accent)) !important;
+    border-color: rgb(var(--accent)) !important;
+}
+
+.calendar.release-event-past {
+    background-color: rgb(var(--base-100)) !important;
+    border-color: rgb(var(--accent)) !important;
+}
+
+.calendar.event-run {
+    background-color: rgb(var(--secondary)) !important;
+    border-color: rgb(var(--secondary)) !important;
+}
+
+.calendar.event {
+    color: rgb(var(--base-content)) !important;
+}
+
+.calendar.release-event .fc-event-main,
+.calendar.event-run .fc-event-main {
+    color: white !important;
+}
+
+.calendar.release-event-past .fc-event-main {
+    color: rgb(var(--accent)) !important;
+    font-weight: 500 !important;
+}
+
+/* .fc-daygrid-day-events .fc-daygrid-event-harness-abs,
+.fc-daygrid-day-events .fc-daygrid-event-harness {
+    margin-bottom: 3px !important;
+} */

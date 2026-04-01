@@ -29,6 +29,7 @@ from django.db.models import (
     OuterRef,
     PositiveIntegerField,
     Q,
+    QuerySet,
     Subquery,
     Value,
     Window,
@@ -102,29 +103,16 @@ class Index(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        latest_filter = Q(event_id="20000622-01")
-
-        # context["latest_event"] = (
-        #     models.Events.objects.filter(date__lt=datetime.datetime.today())
-        #     .select_related(
-        #         "artist",
-        #         "venue",
-        #         "venue__city",
-        #         "venue__venues_text",
-        #     )
-        #     .prefetch_related("venue__city__state")
-        #     .order_by("-event_id")
-        #     .first()
-        # )
-
         queryset = models.Events.objects.select_related(
             "artist",
             "venue",
             "venue__city",
             "venue__venues_text",
-        ).prefetch_related("venue__city__state")
+        ).prefetch_related("venue__city__state", "setlist_event")
 
-        context["latest_event"] = get_object_or_404(queryset, event_id="20000622-01")
+        context["latest_event"] = (
+            queryset.filter(setlist_event__isnull=False).order_by("-event_id").first()
+        )
 
         return context
 
@@ -666,7 +654,11 @@ class SongDetail(PageTitleMixin, TemplateView):
             ).event_id
 
             latest = (
-                models.Events.objects.filter(num__isnull=False, is_stats_eligible=True)
+                models.Events.objects.filter(
+                    num__isnull=False,
+                    is_stats_eligible=True,
+                    setlist_event__isnull=False,
+                )
                 .order_by("-num")
                 .first()
                 .event_id
@@ -1040,6 +1032,8 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
             event_filter &= Q(id__in=final_events)
 
+        print(event_filter)
+
         context["events"] = (
             models.Events.objects.filter(event_filter)
             .select_related(
@@ -1056,14 +1050,32 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
         for f in event_form.changed_data:
             if "_exclude" not in f and f != "conjunction":
-                context["display_fields"].append(
-                    {
-                        "label": event_form[f].label,
-                        "data": " OR ".join(event_form.cleaned_data[f])
-                        if type(event_form.cleaned_data[f]) is list
-                        else event_form.cleaned_data[f],
-                    },
-                )
+                display = {
+                    "label": event_form[f].label,
+                    "data": event_form.cleaned_data[f],
+                }
+
+                if type(event_form.cleaned_data[f]) is list:
+                    display["data"] = " OR ".join(event_form.cleaned_data[f])
+                elif type(event_form.cleaned_data[f]) is QuerySet:
+                    display["data"] = " OR ".join(
+                        event_form.cleaned_data[f].values_list("name", flat=True),
+                    )
+
+                context["display_fields"].append(display)
+
+                # context["display_fields"].append(
+                #     {
+                #         "label": event_form[f].label,
+                #         "data": " OR ".join(event_form.cleaned_data[f])
+                #         if type(event_form.cleaned_data[f]) is list
+                #         or type(
+                #             event_form.cleaned_data[f],
+                #         )
+                #         is QuerySet
+                #         else event_form.cleaned_data[f],
+                #     },
+                # )
 
         context["search_summary"] = display_queries
         context["conjunction"] = event_form.cleaned_data.get(
@@ -1196,6 +1208,26 @@ class CountryDetail(PageTitleMixin, TemplateView):
 class EventRun(PageTitleMixin, TemplateView):
     template_name = "databruce/events/runs.html"
     title = "Event Runs"
+
+
+class EventType(PageTitleMixin, TemplateView):
+    template_name = "databruce/events/type.html"
+    title = "Event by Type"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        try:
+            context["type"] = get_object_or_404(
+                models.EventTypes,
+                uuid=self.kwargs["type"],
+            )
+        except KeyError:
+            context["type"] = "Concert"
+
+        context["types"] = models.EventTypes.objects.values("id", "name", "uuid")
+
+        return context
 
 
 class RunDetail(PageTitleMixin, TemplateView):

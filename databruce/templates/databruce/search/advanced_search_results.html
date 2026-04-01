@@ -89,7 +89,9 @@
                     {% endif %}
                   </td>
                   <td class="text-nowrap">
-                    {% if event.type in danger_event_types %}<span class="text-danger fw-semibold">[{{ event.type }}]</span>{% endif %}
+                    {% if event.type.name in danger_event_types %}
+                      <span class="text-danger fw-semibold">[{{ event.type.name }}]</span>
+                    {% endif %}
                     {{ event.title|default_if_none:"" }}
                   </td>
                   <td class="text-nowrap">{{ event.public }}</td>

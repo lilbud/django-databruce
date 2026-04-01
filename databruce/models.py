@@ -161,6 +161,8 @@ class Cities(BaseModel):
         related_name="city_state",
         db_column="state",
         default=None,
+        blank=True,
+        null=True,
     )
 
     country = models.ForeignKey(
@@ -169,6 +171,8 @@ class Cities(BaseModel):
         related_name="city_country",
         db_column="country",
         default=None,
+        blank=True,
+        null=True,
     )
 
     num_events = models.IntegerField(default=None, blank=True, null=True)
@@ -523,37 +527,13 @@ class Events(BaseModel):
         null=True,
     )
 
-    types = (
-        ("Anniversary", "Anniversary"),
-        ("Award Ceremony", "Award Ceremony"),
-        ("Benefit Concert", "Benefit Concert"),
-        ("Birthday", "Birthday"),
-        ("Cancelled", "Cancelled"),
-        ("Celebration", "Celebration"),
-        ("Concert", "Concert"),
-        ("Concert for TV Broadcast", "Concert for TV Broadcast"),
-        ("Filmshoot", "Filmshoot"),
-        ("Funeral", "Funeral"),
-        ("Interview", "Interview"),
-        ("Jam Session", "Jam Session"),
-        ("Keynote Speech", "Keynote Speech"),
-        ("Memorial", "Memorial"),
-        ("Music Festival", "Music Festival"),
-        ("No Gig", "No Gig"),
-        ("No Bruce", "No Bruce"),
-        ("Politics", "Politics"),
-        ("Recording", "Recording"),
-        ("Rehearsal", "Rehearsal"),
-        ("Rumored", "Rumored"),
-        ("Relocated", "Relocated"),
-        ("Rescheduled", "Rescheduled"),
-        ("Wedding", "Wedding"),
-    )
-
-    type = models.CharField(
-        default="Concert",
-        choices=types,
+    type = models.ForeignKey(
+        to="EventTypes",
+        on_delete=models.DO_NOTHING,
         db_column="event_type",
+        default=None,
+        blank=True,
+        null=True,
     )
 
     title = models.CharField(
@@ -566,6 +546,8 @@ class Events(BaseModel):
     event_certainty_choices = (
         ("Unknown Date", "Unknown Date"),
         ("Confirmed", "Confirmed"),
+        ("Rumored", "Rumored"),
+        ("Probable", "Probable"),
         ("Unknown Location", "Unknown Location"),
     )
 
@@ -615,6 +597,7 @@ class Events(BaseModel):
         db_table = "events"
         verbose_name_plural = "events"
         ordering = ["id", "event_id"]
+        get_latest_by = "event_id"
 
     def __str__(self) -> str:
         try:
@@ -858,6 +841,8 @@ class Releases(BaseModel):
         ("Live", "Live"),
         ("Compilation", "Compilation"),
         ("Studio", "Studio"),
+        ("Podcast", "Podcast"),
+        ("Retrospective", "Retrospective"),
     )
 
     type = models.CharField(default=None, choices=release_types)
@@ -1039,6 +1024,7 @@ class Setlists(BaseModel):
         to=Events,
         on_delete=models.DO_NOTHING,
         db_column="event_id",
+        related_name="setlist_event",
         default=None,
         db_index=True,
     )
@@ -1198,8 +1184,13 @@ class Snippets(BaseModel):
         default=None,
     )
 
-    position = models.IntegerField(db_column="snippet_pos")
-    note = models.TextField(default=None, db_column="snippet_note")
+    position = models.IntegerField(db_column="snippet_pos", default=1)
+    note = models.TextField(
+        default=None,
+        db_column="snippet_note",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         db_table = "snippets"
@@ -1805,3 +1796,19 @@ class SetlistStats(models.Model):
     class Meta:
         managed = False
         db_table = "setlist_stats"
+
+
+class EventTypes(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    name = models.TextField()
+    slug = models.TextField()
+    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    uuid = models.UUIDField()
+
+    class Meta:
+        managed = False
+        db_table = "event_types"
+
+    def __str__(self):
+        return self.name

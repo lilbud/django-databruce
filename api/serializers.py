@@ -9,6 +9,7 @@ from django.db.models import (
     Subquery,
 )
 from rest_framework import serializers
+from slugify import slugify
 
 from databruce import models
 from databruce.templatetags.filters import format_fuzzy
@@ -71,6 +72,8 @@ class MinimalCitiesSerializer(BaseSerializer):
                 return f"{obj.name}, {obj.state.abbrev}"
         except models.Cities.state.RelatedObjectDoesNotExist:
             return f"{obj.name}, {obj.country.name}"
+
+        return f"{obj.name}, {obj.country.name}"
 
     class Meta:
         model = models.Cities
@@ -247,9 +250,9 @@ class CitiesSerializer(BaseSerializer):
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
 
-    name = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
 
-    def get_name(self, obj):
+    def get_display_name(self, obj):
         try:
             if obj.state and obj.country_id in (2, 6, 37):
                 return f"{obj.name}, {obj.state.abbrev}"
@@ -364,6 +367,12 @@ class OnstageSerializer(BaseSerializer):
         fields = ["event", "relation", "band", "guest", "uuid", "note"]
 
 
+class EventTypeSerializer(BaseSerializer):
+    class Meta:
+        model = models.EventTypes
+        fields = "__all__"
+
+
 class EventsSerializer(BaseSerializer):
     order = serializers.SerializerMethodField(method_name="sort_id")
     date = serializers.SerializerMethodField(method_name="get_date")
@@ -373,6 +382,7 @@ class EventsSerializer(BaseSerializer):
     venue = MinimalVenuesSerializer(required=False)
     leg = MinimalTourLegsSerializer(required=False)
     has_setlist = serializers.BooleanField(required=False)
+    type = EventTypeSerializer(required=False)
 
     bands = serializers.SerializerMethodField(required=False)
     relations = serializers.SerializerMethodField(required=False)
@@ -380,7 +390,7 @@ class EventsSerializer(BaseSerializer):
     event_status = serializers.SerializerMethodField()
 
     def get_event_status(self, obj):
-        return bool(obj.type and obj.type in ["Cancelled", "Relocated", "Rescheduled"])
+        return bool(obj.type and obj.type_id in [21, 22, 6])
 
     def get_bands(self, obj):
         return list({item.band_id for item in obj.onstage.all() if item.band_id})
@@ -509,6 +519,10 @@ class OnstageBandSerializer(BaseSerializer):
 class ReleasesSerializer(BaseSerializer):
     event = MinimalEventSerializer(required=False)
     length = serializers.TimeField(format="%H:%M:%S", required=False)
+    month_day = serializers.SerializerMethodField()
+
+    def get_month_day(self, obj):
+        return obj.date.strftime("%m-%d")
 
     class Meta:
         model = models.Releases

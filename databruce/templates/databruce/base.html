@@ -170,6 +170,9 @@
                   <a class="dropdown-item" href="{% url 'runs' %}">Events By Run</a>
                 </li>
                 <li>
+                  <a class="dropdown-item" href="{% url 'events_type' %}">Events By Type</a>
+                </li>
+                <li>
                   <a class="dropdown-item" href="{% url 'calendar' %}">Event Calendar</a>
                 </li>
               </ul>
@@ -373,7 +376,8 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
 
-        const tabElements = document.querySelectorAll('button[data-bs-toggle="pill"]');
+        const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');
+        
         tabElements.forEach(tabEl => {
           tabEl.addEventListener('shown.bs.tab', (event) => {
             const hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
@@ -387,10 +391,16 @@
           const url = window.location.href;
           if (url.includes("#")) {
             const hash = url.substring(url.indexOf("#"));
-            const triggerEl = document.querySelector(`button[data-bs-target="${hash}"]`);
+            const buttonTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
+            const linkTrigger = document.querySelector(`a[data-bs-target="${hash}"]`);
 
-            if (triggerEl) {
-              const bsPill = new bootstrap.Tab(triggerEl);
+            if (buttonTrigger) {
+              const bsPill = new bootstrap.Tab(buttonTrigger);
+              bsPill.show();
+            }
+
+            if (linkTrigger) {
+              const bsPill = new bootstrap.Tab(linkTrigger);
               bsPill.show();
             }
           }

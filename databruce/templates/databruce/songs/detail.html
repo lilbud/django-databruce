@@ -58,7 +58,11 @@
                   <div class="fw-semibold">Last Played</div>
                   <div>
                     <a href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
-                    {% if show_gap %}<span>({{ show_gap }} shows ago)</span>{% endif %}
+                    {% if show_gap == 0 %}
+                      <span>(latest event)</span>
+                    {% else %}
+                      <span>({{ show_gap }} shows ago)</span>
+                    {% endif %}
                   </div>
                 {% endif %}
               </div>
