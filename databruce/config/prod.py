@@ -105,6 +105,7 @@ DATABASES = {
         "CONN_HEALTH_CHECKS": True,
         "OPTIONS": {
             "pool": True,
+            "options": "-c search_path=public,extensions",
         },
     },
 }
