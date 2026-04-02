@@ -542,6 +542,38 @@ class RelationFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
     name = filters.CharFilter(lookup_expr="istartswith")
 
+    start_date = filters.DateTimeFilter(
+        field_name="start_date",
+        lookup_expr="gte",
+        label="start date",
+    )
+
+    start_date_end = filters.DateTimeFilter(
+        field_name="start_date",
+        lookup_expr="lte",
+        label="end date",
+    )
+
+    month = filters.NumberFilter(
+        field_name="start_date__month",
+        lookup_expr="exact",
+        label="month",
+    )
+
+    day = filters.NumberFilter(
+        field_name="start_date__day",
+        lookup_expr="exact",
+        label="day",
+    )
+
+    show_cal = filters.BooleanFilter(
+        method="filter_show_cal",
+        label="show on calendar",
+    )
+
+    def filter_show_cal(self, queryset, name, value):
+        return queryset.filter(show_cal=value)
+
 
 class BandsFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")

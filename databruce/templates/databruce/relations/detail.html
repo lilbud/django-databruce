@@ -7,20 +7,38 @@
     {% include "databruce/partials/admin_btn.html" with view="relations" item=info.id %}
   {% endif %}
   <div class="col">
-    <div class="text-2xl text-nowrap mb-3">
+    <div class="text-2xl text-nowrap mb-2">
       <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
     </div>
+    {% if info.start_date or info.end_date %}
+      <div class="card mb-3">
+        <div class="card-body text-sm">
+          {% if info.start_date %}
+            <div class="prefix-container">
+              <span class="prefix">Born</span>
+              <span class="value">{{ info.start_date|date:'Y-m-d' }}</span>
+            </div>
+          {% endif %}
+          {% if info.end_date %}
+            <div class="prefix-container">
+              <span class="prefix">Died</span>
+              <span class="value">{{ info.end_date|date:'Y-m-d' }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
     {% if bands %}
       <div class="card mb-3">
-        <div class="card-body">
-          <div class="d-flex flex-row mb-0 text-sm">
-            <div class="pe-2 fw-semibold text-nowrap">Appeared With:</div>
-            <div>
+        <div class="card-body text-base">
+          <div class="prefix-container">
+            <span class="prefix">Appeared With</span>
+            <span class="value">
               {% for band in bands %}
                 <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
                 {% if not forloop.last %},{% endif %}
               {% endfor %}
-            </div>
+            </span>
           </div>
         </div>
       </div>

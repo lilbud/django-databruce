@@ -74,8 +74,8 @@
                         <a class="fw-medium text-reset"
                            href="{% url 'band_details' id=event.artist.uuid %}"
                            id="artist">{{ event.artist }}</a>
-                        {% if event.type == 'Rescheduled' or event.type == 'Cancelled' or event.type == 'Relocated' or event.type == 'No Bruce' or event.type == 'No Gig' or event.type == 'Rumored' %}
-                          <span class="text-danger fw-medium">[{{ event.type }}]</span>
+                        {% if event.type.name == 'Rescheduled' or event.type.name == 'Cancelled' or event.type.name == 'Relocated' or event.type.name == 'No Bruce' or event.type.name == 'No Gig' or event.type.name == 'Rumored' %}
+                          <span class="text-danger fw-medium">[{{ event.type.name }}]</span>
                         {% endif %}
                       </div>
                     </div>

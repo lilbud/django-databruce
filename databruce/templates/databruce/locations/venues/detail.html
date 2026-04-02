@@ -11,18 +11,34 @@
       <a href="{% url "venues" %}">Venues</a> &gt;
       {{ info }}
     </div>
-    {% if info.aliases %}
-      <div class="text-lg text-wrap mb-3">
-        <span class="fw-medium">Nicknames/AKA:</span>
-        <div>{{ info.aliases|join:'; ' }}</div>
+    <div class="row">
+      <div class="col-12">
+        {% if info.aliases %}
+          <div class="card mb-3">
+            <div class="card-body text-sm">
+              <div class="prefix-container">
+                <span class="prefix">Nicknames/AKA</span>
+                <span class="value">{{ info.aliases|join:'; ' }}</span>
+              </div>
+              <div class="prefix-container">
+                <span class="prefix">Address</span>
+                <span class="value">{{ info.address }}</span>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        {% if info.note %}
+          <div class="card mb-3">
+            <div class="card-body text-sm">
+              <div class="text-wrap">
+                <span class="fw-medium">Notes:</span>
+                <div>{{ info.note|markdown|safe }}</div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
-    {% endif %}
-    {% if info.note %}
-      <div class="text-base text-wrap mb-3">
-        <span class="fw-medium">Notes:</span>
-        <div>{{ info.note|markdown|safe }}</div>
-      </div>
-    {% endif %}
+    </div>
     <div class="card">
       <div class="card-header">
         <ul class="nav nav-pills nav-fill" role="tablist">
@@ -60,9 +76,21 @@
                     aria-controls="pills-links"
                     aria-selected="false">Links</button>
           </li>
+          {% if info.latitude %}
+            <li class="nav-item me-1 me-lg-2 mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link"
+                      id="pills-map-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#map"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-map"
+                      aria-selected="false">Map</button>
+            </li>
+          {% endif %}
         </ul>
       </div>
-      <div class="card-body px-0">
+      <div class="card-body">
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">
             <div class="table-responsive">
@@ -112,6 +140,11 @@
               {% endif %}
             </ul>
           </div>
+          <div id="map" class="tab-pane fade">
+            <div class="map-container">
+              <div id="map-object"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -151,6 +184,22 @@
           var info = this.api().page.info();
           $('#song-count-badge').text(info.recordsTotal);
         }
+      });
+      var lat = Number("{{ info.latitude }}");
+      var lng = Number("{{ info.longitude }}");
+
+      var map = L.map('map').setView([lat, lng], 13);
+      var marker = L.marker([lat, lng]).addTo(map);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          referrerPolicy: 'strict-origin-when-cross-origin'
+      }).addTo(map);
+
+      const mapTab = document.getElementById('pills-map-tab'); // The button that opens the map tab
+      mapTab.addEventListener('shown.bs.tab', function () {
+          map.invalidateSize();
       });
     })
   </script>

@@ -18,6 +18,7 @@
       <th class="all">Last</th>
       <th class="all">Instruments</th>
       <th class="all">Aliases</th>
+      <th class="all">Birthday</th>
     </tr>
   </thead>
 {% endblock table %}
@@ -63,6 +64,15 @@
           },
           {'data': 'instruments', 'name': 'instruments'},
           {'data': 'nicknames', 'name': 'nicknames, aliases'},
+          {
+            'data': 'birthday',
+            'name': 'birthday',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return `${data}`
+              }
+            },
+          },
         ]
       });
     });

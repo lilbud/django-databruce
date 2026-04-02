@@ -883,6 +883,11 @@ button.nav-link .badge {
     border-color: rgb(var(--accent)) !important;
 }
 
+.calendar.release-event-birthday {
+    background-color: rgb(var(--base-100)) !important;
+    border-color: rgb(var(--primary-text)) !important;
+}
+
 .calendar.event-run {
     background-color: rgb(var(--secondary)) !important;
     border-color: rgb(var(--secondary)) !important;
@@ -890,6 +895,11 @@ button.nav-link .badge {
 
 .calendar.event {
     color: rgb(var(--base-content)) !important;
+}
+
+.calendar.event.show {
+    color: rgb(var(--primary-content)) !important;
+    background-color: rgb(var(--primary)) !important;
 }
 
 .calendar.release-event .fc-event-main,
@@ -902,7 +912,40 @@ button.nav-link .badge {
     font-weight: 500 !important;
 }
 
-/* .fc-daygrid-day-events .fc-daygrid-event-harness-abs,
-.fc-daygrid-day-events .fc-daygrid-event-harness {
-    margin-bottom: 3px !important;
-} */
+.calendar.release-event-birthday .fc-event-main {
+    color: rgb(var(--primary-text)) !important;
+    font-weight: 500 !important;
+}
+
+.calendar.release-event-birthday .fc-event-main::before {
+    font-family: "bootstrap-icons" !important;
+    content: "\F6ED" !important;
+    margin-right: 0.25rem !important;
+    vertical-align: middle;
+}
+
+.prefix-container {
+    display: flex !important;
+}
+
+.prefix-container>span.prefix {
+    font-weight: 500 !important;
+    margin-right: 0.5rem !important;
+}
+
+.prefix-container>span.prefix::after {
+    content: ":";
+}
+
+.prefix-container>span.value {
+    text-wrap: nowrap !important;
+}
+
+.map-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#map-object {
+    height: 500px !important
+}

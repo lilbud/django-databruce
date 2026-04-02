@@ -490,12 +490,22 @@ class RelationsSerializer(BaseSerializer):
     count = serializers.IntegerField(required=False)
     aliases = serializers.ListField(required=False)
     nicknames = serializers.ListField(required=False)
+    birthday = serializers.SerializerMethodField()
+
+    def get_birthday(self, obj):
+        try:
+            return obj.start_date.strftime("%Y-%m-%d")
+        except AttributeError:
+            return None
 
     class Meta:
         model = models.Relations
         fields = [
             "first_event",
             "last_event",
+            "start_date",
+            "end_date",
+            "birthday",
             "id",
             "instruments",
             "count",

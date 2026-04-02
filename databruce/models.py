@@ -464,7 +464,7 @@ class Events(BaseModel):
         default=None,
     )
     event_id = models.CharField(max_length=11, db_column="event_id", unique=True)
-    date = models.DateField(default=None, db_column="event_date")
+    date = models.DateField(default=None, db_column="event_date", blank=True, null=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     early_late_choices = [
@@ -700,6 +700,9 @@ class Relations(BaseModel):
     )
 
     instruments = models.TextField(default=None, blank=True, null=True)
+    start_date = models.DateField(default=None, blank=True, null=True)
+    end_date = models.DateField(default=None, blank=True, null=True)
+    show_cal = models.BooleanField(default=False, db_column="show_calendar")
 
     class Meta:
         db_table = "relations"

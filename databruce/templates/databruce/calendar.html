@@ -15,6 +15,7 @@
           schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
           dayMinWidth: 85,
           height: 768,
+          dayMaxEventRows: true,
           contentHeight: 768,
           headerToolbar: {
             start: 'title',
@@ -37,7 +38,7 @@
                   }
 
                   if (val.type) {
-                    title += ` [${val.type}]`
+                    title += ` [${val.type.name}]`
                   }
 
                   eventsList.push(
@@ -46,7 +47,7 @@
                       start: val.date.filter,
                       url: `/events/${val.event_id}`,
                       allDay: false,
-                      className: 'calendar event'
+                      className: 'calendar event show px-1'
                     }
                   )
                 })
@@ -70,7 +71,7 @@
                     }
                   )
                 })
-                console.log(eventsList)
+                
                 successCallback(eventsList);
               })
             },
@@ -90,7 +91,7 @@
                     }
                   )
                 })
-                console.log(eventsList)
+                
                 successCallback(eventsList);
               })
             },
@@ -115,7 +116,33 @@
                     }
                   )
                 })
-                console.log(eventsList)
+                
+                successCallback(eventsList);
+              })
+            },
+            function (info, successCallback, failureCallback) {
+              fetch(`/api/v1/relations/?format=json&month=${info.start.getMonth() + 2}&show_cal=true`)
+              .then((resp) => resp.json())
+              .then(function(data){
+                var eventsList = [];
+                const currentViewYear = info.start.getFullYear();
+
+                $(data.results).each(function (i, val){
+
+                  let historicalDate = new Date(val.start_date);
+                  let birthYear = historicalDate.getUTCFullYear();
+                  historicalDate.setFullYear(currentViewYear);
+
+                  eventsList.push(
+                    {
+                      title: `${val.name} (${birthYear})`,
+                      start: historicalDate.toISOString().split('T')[0],
+                      //url: `/releases/${val.uuid}`,
+                      className: 'px-1 mx-0 calendar event release-event-birthday',
+                    }
+                  )
+                })
+                
                 successCallback(eventsList);
               })
             },
