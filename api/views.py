@@ -26,6 +26,8 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast, JSONObject
 from django.shortcuts import get_list_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
 from rest_framework import mixins, permissions, viewsets
@@ -287,6 +289,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "tour",
                 "venue__city__country",
                 "venue__venues_text",
+                "type",
             ).prefetch_related(
                 "run",
                 "venue__city__state",
@@ -444,9 +447,11 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
         )
         .prefetch_related(
             "ltp",
+            "song__last_event",
             "setlist_notes",
             "setlist_position",
             "setlist_stats",
+            "setlist_stats__ltp",
         )
         .order_by("event", F("song_num").asc(nulls_first=True))
         .annotate(

@@ -583,7 +583,7 @@ class SetlistStatsSerializer(BaseSerializer):
 class SetlistSerializer(BaseSerializer):
     song = MinimalSongsSerializer()
     last_event = MinimalEventSerializer(source="ltp", required=False)
-    event = EventsSerializer(include=["id", "event_id"])
+    event = MinimalEventSerializer()
     count = serializers.IntegerField(required=False)
     notes = serializers.SerializerMethodField()
     position = serializers.SerializerMethodField()
