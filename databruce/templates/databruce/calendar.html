@@ -67,7 +67,7 @@
                       start: val.first_event.date.filter,
                       end: `${val.last_event.date.filter}T23:59:59`,
                       url: `/events/runs/${val.uuid}`,
-                      className: 'px-1 m-0 calendar event event-run',
+                      className: 'px-1 calendar event event-run',
                     }
                   )
                 })
@@ -87,7 +87,7 @@
                       title: val.name,
                       start: val.date,
                       url: `/releases/${val.uuid}`,
-                      className: 'px-1 mx-0 calendar event release-event',
+                      className: 'px-1 calendar event release-event',
                     }
                   )
                 })
@@ -112,7 +112,7 @@
                       title: val.name,
                       start: historicalDate.toISOString().split('T')[0],
                       url: `/releases/${val.uuid}`,
-                      className: 'px-1 mx-0 calendar event release-event-past',
+                      className: 'px-1 calendar event release-event-past',
                     }
                   )
                 })
@@ -138,7 +138,7 @@
                       title: `${val.name} (${birthYear})`,
                       start: historicalDate.toISOString().split('T')[0],
                       //url: `/releases/${val.uuid}`,
-                      className: 'px-1 mx-0 calendar event release-event-birthday',
+                      className: 'px-1 calendar event release-event-birthday',
                     }
                   )
                 })

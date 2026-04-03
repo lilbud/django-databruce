@@ -1,6 +1,6 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  {{ info.name }}
+  Band "{{ info.name }}"
 {% endblock title %}
 {% block content %}
   {% if user.is_superuser %}
@@ -153,7 +153,7 @@
             'name': 'first__id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.id}">${data.date.display_day}</a>`;
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`;
               }
             },
           },
@@ -162,7 +162,7 @@
             'name': 'last__id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.id}">${data.date.display_day}</a>`;
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`;
               }
             },          
           },

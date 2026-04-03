@@ -180,3 +180,5 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Event Calendar] Added many birthdays to event calendar. Only those who've been a member of one of Bruce's bands are shown.
 - [User Profile] Redesigned page slightly
 - [User Profile] Added "albums" tab, which shows every studio album and the songs seen by the user
+- [Band Detail] Fixed members event link not linking to event
+- [General] Updated page titles and descriptions so that many show on opengraph embeds

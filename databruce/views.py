@@ -88,9 +88,13 @@ class PageTitleMixin:
     def get_page_title(self, context):
         return getattr(self, "title", None)
 
+    def get_page_description(self, context):
+        return getattr(self, "description", None)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = self.get_page_title(context)
+        context["description"] = self.get_page_description(context)
         context["date"] = datetime.datetime.today()
 
         return context
@@ -121,16 +125,6 @@ class Song(PageTitleMixin, TemplateView):
     template_name = "databruce/songs/songs.html"
     title = "Songs"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        context["songs"] = get_list_or_404(
-            models.Songs.objects.all()
-            .prefetch_related("first_event", "last_event")
-            .order_by("name"),
-        )
-
-        return context
-
 
 class About(PageTitleMixin, TemplateView):
     template_name = "databruce/about.html"
@@ -149,12 +143,13 @@ class Links(PageTitleMixin, TemplateView):
 
 class Calendar(PageTitleMixin, TemplateView):
     template_name = "databruce/calendar.html"
-    title = "Event Calendar"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
         context["years"] = list(range(context["date"].year, 1964, -1))
+        context["title"] = f"Event Calendar - {context['date'].strftime('%B %Y')}"
+        context["description"] = f"Events in {context['date'].strftime('%B %Y')}"
 
         context["end_date"] = f"{context['date'].year}-12-31"
 
@@ -173,9 +168,7 @@ class Calendar(PageTitleMixin, TemplateView):
 class Users(PageTitleMixin, TemplateView):
     template_name = "users/users.html"
     title = "Users"
-
-    def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
-        return super().get_context_data(**kwargs)
+    description = "List of Users"
 
 
 class UserProfile(PageTitleMixin, TemplateView):
@@ -185,6 +178,8 @@ class UserProfile(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["info"] = get_object_or_404(UserModel, uuid=self.kwargs["id"])
+        context["title"] = f'User "{context["info"]}"'
+        context["description"] = f"{context['info']} Profile"
         return context
 
 
@@ -434,6 +429,7 @@ class UserAddRemoveShow(View):
 
 class EventDetail(PageTitleMixin, TemplateView):
     template_name = "databruce/events/detail.html"
+    description = "Event Detail"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
@@ -452,6 +448,10 @@ class EventDetail(PageTitleMixin, TemplateView):
 
         context["title"] = (
             f"{context['event'].get_date()} - {context['event'].venue.name}"
+        )
+
+        context["description"] = (
+            f"{context['event'].get_date()}<br>{context['event'].artist}<br>{context['event'].venue.name}"
         )
 
         try:
@@ -480,10 +480,6 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "This is a placeholder date, actual date unknown.",
             )
 
-        # filter = Q(event__event_id=self.kwargs["id"]) | Q(
-        #     release__event=self.kwargs["id"],
-        # )
-
         context["official"] = (
             models.Releases.objects.filter(
                 event__event_id=self.kwargs["id"],
@@ -499,8 +495,6 @@ class EventDetail(PageTitleMixin, TemplateView):
             .distinct("release_id", "release__date")
             .order_by("release__date")
         )
-
-        # print(context["official_tracks"].values())
 
         context["title"] = (
             f"{format_fuzzy(context['event'].event_id)} {context['event'].venue.name}"
@@ -523,19 +517,6 @@ class Event(PageTitleMixin, TemplateView):
     template_name = "databruce/events/events.html"
     title = "Events"
 
-    queryset = (
-        models.Events.objects.all()
-        .select_related(
-            "venue",
-            "tour",
-            "artist",
-            "venue__city",
-            "venue__city__country",
-        )
-        .prefetch_related("venue__city__state")
-        .order_by("id")
-    )
-
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
@@ -544,6 +525,8 @@ class Event(PageTitleMixin, TemplateView):
         except KeyError:
             context["year"] = context["date"].year  # current year
 
+        context["title"] = f"{context['year']} Events"
+        context["description"] = f"{context['year']} Events"
         context["years"] = list(range(context["date"].year, 1964, -1))
 
         return context
@@ -552,6 +535,7 @@ class Event(PageTitleMixin, TemplateView):
 class Venue(PageTitleMixin, TemplateView):
     template_name = "databruce/locations/venues/venues.html"
     title = "Venues"
+    description = "List of Venues"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         return super().get_context_data(**kwargs)
@@ -578,6 +562,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
         )
 
         context["title"] = f"{context['info'].name}"
+        context["description"] = f"{context['info'].get_name()}"
 
         return context
 
@@ -585,6 +570,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
 class SongLyrics(PageTitleMixin, TemplateView):
     template_name = "databruce/songs/lyrics.html"
     title = "Lyrics"
+    description = "List of Song Lyrics"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         return super().get_context_data(**kwargs)
@@ -602,6 +588,9 @@ class SongLyricDetail(PageTitleMixin, TemplateView):
         )
 
         context["title"] = f"Lyrics for {context['lyrics'].song.name}"
+        context["description"] = (
+            f"Source: {context['lyrics'].source}<br>Language: {context['lyrics'].language}"
+        )
 
         return context
 
@@ -823,11 +812,12 @@ class Contact(PageTitleMixin, TemplateView):
 class SetlistNotesSearch(PageTitleMixin, TemplateView):
     form_class = SetlistNoteSearch
     title = "Setlist Notes Search"
+    description = "Search for setlist notes"
+    template_name = "databruce/search/notes_search.html"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["form"] = self.form_class(self.request.GET)
-        self.template_name = "databruce/search/notes_search.html"
 
         if context["form"].is_valid():
             self.template_name = "databruce/search/notes_search_results.html"
@@ -936,7 +926,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                 songs_list=ArrayAgg(
                     "song__id",
                     filter=Q(set_name__in=VALID_SET_NAMES),
-                    distinct=True,  # Recommended to avoid duplicates from joins
+                    distinct=True,
                 ),
             )
         )
@@ -1032,8 +1022,6 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
             event_filter &= Q(id__in=final_events)
 
-        print(event_filter)
-
         context["events"] = (
             models.Events.objects.filter(event_filter)
             .select_related(
@@ -1063,19 +1051,6 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                     )
 
                 context["display_fields"].append(display)
-
-                # context["display_fields"].append(
-                #     {
-                #         "label": event_form[f].label,
-                #         "data": " OR ".join(event_form.cleaned_data[f])
-                #         if type(event_form.cleaned_data[f]) is list
-                #         or type(
-                #             event_form.cleaned_data[f],
-                #         )
-                #         is QuerySet
-                #         else event_form.cleaned_data[f],
-                #     },
-                # )
 
         context["search_summary"] = display_queries
         context["conjunction"] = event_form.cleaned_data.get(
@@ -1212,7 +1187,7 @@ class EventRun(PageTitleMixin, TemplateView):
 
 class EventType(PageTitleMixin, TemplateView):
     template_name = "databruce/events/type.html"
-    title = "Event by Type"
+    title = "Events by Type"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -1224,6 +1199,8 @@ class EventType(PageTitleMixin, TemplateView):
             )
         except KeyError:
             context["type"] = "Concert"
+
+        context["title"] = f"Event Type '{context['type']}'"
 
         context["types"] = models.EventTypes.objects.values("id", "name", "uuid")
 
@@ -1280,6 +1257,5 @@ class Bootleg(PageTitleMixin, TemplateView):
 
 
 class Updates(PageTitleMixin, TemplateView):
-    template_name = "databruce/updates.html"
     template_name = "databruce/updates.html"
     title = "Updates"
