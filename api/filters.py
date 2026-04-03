@@ -943,3 +943,10 @@ class EventTypeFilter(filters.FilterSet):
     name = filters.CharFilter(
         lookup_expr="icontains",
     )
+
+
+class UserAlbumBreakdownFilter(filters.FilterSet):
+    user = filters.NumberFilter(
+        field_name="event__user_event__user_id",
+        lookup_expr="exact",
+    )

@@ -484,6 +484,12 @@ class NugsSerializer(BaseSerializer):
         fields = "__all__"
 
 
+class ReleasesSerializer(BaseSerializer):
+    class Meta:
+        model = models.Releases
+        fields = "__all__"
+
+
 class RelationsSerializer(BaseSerializer):
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
@@ -1024,3 +1030,34 @@ class SetlistBreakdownSerializer(BaseSerializer):
             "songs",
             "album_complete",
         ]
+
+
+class UserAlbumBreakdownSerializer(BaseSerializer):
+    album_song_count = serializers.IntegerField(read_only=True)
+    user_album_count = serializers.IntegerField(read_only=True)
+    album_percent = serializers.FloatField(read_only=True)
+    songs = serializers.SerializerMethodField()  # Single unified list
+
+    class Meta:
+        model = models.Releases
+        fields = [
+            "id",
+            "name",
+            "uuid",
+            "mbid",
+            "songs",
+            "album_song_count",
+            "user_album_count",
+            "album_percent",
+        ]
+
+    def get_songs(self, obj):
+        # Retrieve maps from context
+        songs_map = self.context.get("songs_map", {})
+        tracks_by_release = self.context.get("tracks_by_release", {})
+
+        # Get the ordered song IDs for this specific release
+        ordered_song_ids = tracks_by_release.get(obj.id, [])
+
+        # Return the enriched song data in order
+        return [songs_map.get(s_id) for s_id in ordered_song_ids if s_id in songs_map]

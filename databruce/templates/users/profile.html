@@ -7,7 +7,7 @@
   <div class="col-12">
     <div class="row mb-3">
       <div class="col">
-        {% if user_info.id == user.id %}
+        {% if info.id == user.id %}
           <div class="text-2xl">{% translate "Your Profile" %}</div>
         {% else %}
           <div class="text-2xl">{{ info.username }}'s Profile</div>
@@ -16,63 +16,79 @@
     </div>
     <div class="row mb-3">
       <div class="col">
-        <div class="card">
-          <div class="card-header">
-            <ul class="nav nav-pills nav-fill" role="tablist">
-              <li class="nav-item mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link active"
-                        id="pills-events-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#events"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-home"
-                        aria-selected="true">{% translate "Shows" %}</button>
-              </li>
-              <li class="nav-item mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link"
-                        id="pills-songs-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#songs"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-profile"
-                        aria-selected="false">{% translate "Songs" %}</button>
-              </li>
-            </ul>
-          </div>
-          <div class="card-body">
-            <div class="tab-content">
-              <div id="events" class="tab-pane fade show active">
-                <div class="text-lg pb-2">
-                  {% if user_info.id == user.id %}
-                    {% translate "Shows that you have seen" %}
-                  {% else %}
-                    {% translate "Shows that" %}
-                    {{ info.username }}
-                    {% translate "has seen" %}
-                  {% endif %}
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="eventTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Date</th>
-                        <th class="all">Setlist</th>
-                        <th class="all">Band</th>
-                        <th class="all">Venue</th>
-                        <th class="all">Location</th>
-                        <th class="all">Tour</th>
-                        <th class="all">Detail</th>
-                        <th class="all">Public</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
+        <ul class="nav nav-pills" role="tablist">
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-events"
+                    aria-selected="true">{% translate "Shows" %}</button>
+          </li>
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-songs-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#songs"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-songs"
+                    aria-selected="false">{% translate "Songs" %}</button>
+          </li>
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-albums-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#albums"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-album"
+                    aria-selected="false">{% translate "Albums" %}</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="tab-content">
+        <div id="events" class="tab-pane fade show active">
+          <div class="card">
+            <div class="card-header">
+              {% if info.id == user.id %}
+                {% translate "Shows that you have seen" %}
+              {% else %}
+                {% translate "Shows that" %}
+                {{ info.username }}
+                {% translate "has seen" %}
+              {% endif %}
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="eventTable">
+                  <thead>
+                    <tr>
+                      <th class="all">Date</th>
+                      <th class="all">Setlist</th>
+                      <th class="all">Band</th>
+                      <th class="all">Venue</th>
+                      <th class="all">Location</th>
+                      <th class="all">Tour</th>
+                      <th class="all">Detail</th>
+                      <th class="all">Public</th>
+                    </tr>
+                  </thead>
+                </table>
               </div>
-              <div id="songs" class="tab-pane fade">
-                <div class="text-lg pb-2">
-                  {% if user_info.id == user.id %}
+            </div>
+          </div>
+        </div>
+        <div id="songs" class="tab-pane fade">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="card">
+                <div class="card-header">
+                  {% if info.id == user.id %}
                     {% translate "Songs that you have seen" %}
                   {% else %}
                     {% translate "Songs that" %}
@@ -80,88 +96,99 @@
                     {% translate "has seen" %}
                   {% endif %}
                 </div>
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="songTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Count</th>
-                        <th class="all">Name</th>
-                        <th class="all">Category</th>
-                        <th class="all">First</th>
-                        <th class="all">Last</th>
-                      </tr>
-                    </thead>
-                  </table>
+                <div class="card-body px-1">
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="songTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Count</th>
+                          <th class="all">Name</th>
+                          <th class="all">Category</th>
+                          <th class="all">First</th>
+                          <th class="all">Last</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card">
+                <div class="card-header">
+                  <ul class="nav nav-pills nav-fill" role="tablist">
+                    <li class="nav-item mb-2 mb-lg-0" role="presentation">
+                      <button class="nav-link active"
+                              id="pills-events-tab"
+                              data-bs-toggle="pill"
+                              data-bs-target="#mostplayed"
+                              type="button"
+                              role="tab"
+                              aria-controls="pills-home"
+                              aria-selected="true">{% translate "Most Played Not Seen (100+ plays)" %}</button>
+                    </li>
+                    <li class="nav-item mb-2 mb-lg-0" role="presentation">
+                      <button class="nav-link"
+                              id="pills-songs-tab"
+                              data-bs-toggle="pill"
+                              data-bs-target="#rare"
+                              type="button"
+                              role="tab"
+                              aria-controls="pills-profile"
+                              aria-selected="false">
+                        {% translate "Rare Songs (<100 Plays)" %}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                <div class="card-body px-1">
+                  <div class="tab-content">
+                    <div id="mostplayed" class="tab-pane show active fade">
+                      <div class="table-responsive">
+                        <table class="table table-hover display" id="notSeenTable">
+                          <thead>
+                            <tr>
+                              <th class="all">Count</th>
+                              <th class="all">Name</th>
+                              <th class="all">Category</th>
+                              <th class="all">First</th>
+                              <th class="all">Last</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                    <div id="rare" class="tab-pane fade">
+                      <div class="table-responsive">
+                        <table class="table table-hover display" id="rareTable">
+                          <thead>
+                            <tr>
+                              <th class="all">Count</th>
+                              <th class="all">Name</th>
+                              <th class="all">Category</th>
+                              <th class="all">First</th>
+                              <th class="all">Last</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-            <ul class="nav nav-pills nav-fill" role="tablist">
-              <li class="nav-item mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link active"
-                        id="pills-events-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#mostplayed"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-home"
-                        aria-selected="true">{% translate "Most Played Not Seen" %}</button>
-              </li>
-              <li class="nav-item mb-2 mb-lg-0" role="presentation">
-                <button class="nav-link"
-                        id="pills-songs-tab"
-                        data-bs-toggle="pill"
-                        data-bs-target="#rare"
-                        type="button"
-                        role="tab"
-                        aria-controls="pills-profile"
-                        aria-selected="false">{% translate "Rare Songs" %}</button>
-              </li>
-            </ul>
-          </div>
-          <div class="card-body">
-            <div class="tab-content">
-              <div id="mostplayed" class="tab-pane show active fade">
-                <div class="row mb-2">
-                  <div class="text-lg pb-2">{% translate "Most commonly played songs not seen (100+ plays)" %}</div>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="notSeenTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Count</th>
-                        <th class="all">Name</th>
-                        <th class="all">Category</th>
-                        <th class="all">First</th>
-                        <th class="all">Last</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-              <div id="rare" class="tab-pane fade">
-                <div class="row mb-2">
-                  <div class="text-lg pb-2">{% translate "Songs seen with 100 plays or less" %}</div>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="rareTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Count</th>
-                        <th class="all">Name</th>
-                        <th class="all">Category</th>
-                        <th class="all">First</th>
-                        <th class="all">Last</th>
-                      </tr>
-                    </thead>
-                  </table>
+        <div id="albums" class="tab-pane fade">
+          <div class="col-12">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mx-0 g-3"
+                 id="cardContainer">
+              <div class="col d-none" id="example">
+                <div class="card" id="album">
+                  <div class="card-header py-0.5"></div>
+                  <div class="card-body p-0"></div>
                 </div>
               </div>
             </div>
@@ -172,196 +199,237 @@
   </div>
   <script>
       $(document).ready(function() {
-        var layout = getDatatableLayout({category: true});
+        /* album breakdown */
+        fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+          
+          var container = $('#cardContainer');
 
-          new DataTable('#eventTable', {
-            layout: layout,
-            ajax: {
-              'url': '/api/v1/events/?user={{ info.id }}&format=custom'
-            },
-            scrollY: '30vh',
-            columnDefs: event_table_defs,
-            columns: event_table_columns
+          data.forEach((item, index) => {
+            var col = $('#example').clone();
+            var list = $('<ul />').addClass('list-group list-group-flush');
+            
+
+            $(col).removeClass('d-none');
+            $(col).find('.card-header').append(`<span>${item.name}</span>`).append(`<span>${Math.round(item.album_percent)}%</span>`);
+            $(col).attr('id', `album-${index}`);
+
+            item.songs.forEach((i, index) => {
+              var listItem = $('<li />').addClass('list-group-item py-0.5 breakdown')
+              listItem.text(`${i.name}`);
+              
+              if (i.user_seen) {
+                listItem.addClass('fw-semibold');
+                listItem.text(`${i.name} (${i.times_seen})`);
+              }
+
+              $(list).append(listItem);
+            });
+
+            $(col).find('.card-body').append($(list).prop('outerHTML'))
+            $(container).append($(col).prop('outerHTML'));
           });
 
-          new DataTable('#songTable', {
-            layout: getDatatableLayout({category: false}),
-            scrollY: '30vh',
-            ajax: {
-              'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom'
-            },
-            columnDefs: [
-              {target: [0], width: '1rem', className: 'dt-center' },
-              {target: '_all', className: 'text-nowrap' },
-            ],
-            columns: [
-              { 
-                'data': 'count',
-                'name': 'count',
-                'searchable': 'false',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return data
-                  }
-                },
-              },
-              { 
-                'data': 'song',
-                'name': 'song__sort_song_name',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/songs/${data.uuid}">${data.name}</a>`
-                  }
-                },
-              },
-              { 
-                'data': 'song.category',
-                'name': 'song__category',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return data
-                  }
-                },
-              },
-              { 
-                'data': 'first_event',
-                'name': 'first_event',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                  }
-                },
-              },
-              { 
-                'data': 'last_event',
-                'name': 'last_event',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                  }
-                },
-              },
-            ]
+        })
+        .catch(error => console.error('Error:', error));
 
-          });
+        /* datatables */
+        var layout = getDatatableLayout({category: false});
+        layout.topStart = null;
 
-          new DataTable('#notSeenTable', {
-            layout: getDatatableLayout({columns: [0,2]}),
-            scrollY: '30vh',
-            ajax: {
-              'url': '/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom'
-            },
-            columnDefs: [
-              {target: [0], width: '1rem', className: 'dt-center' },
-              {target: '_all', className: 'text-nowrap' },
-            ],
-            columns: [
-              { 
-                'data': 'song.num_plays_public',
-                'name': 'song__num_plays_public',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return data
-                  }
-                },
-              },
-              { 
-                'data': 'song',
-                'name': 'song__sort_song_name',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/songs/${data.uuid}">${data.name}</a>`
-                  }
-                },
-              },
-              { 
-                'data': 'song.category',
-                'name': 'song__category',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return data
-                  }
-                },
-              },
-              { 
-                'data': 'first_event',
-                'name': 'first_event',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                  }
-                },
-              },
-              {
-                'data': 'last_event',
-                'name': 'last_event',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                  }
-                },
-              },
-            ]
-          });
+        new DataTable('#eventTable', {
+          layout: layout,
+          ajax: {
+            'url': '/api/v1/events/?user={{ info.id }}&format=custom'
+          },
+          columnDefs: event_table_defs,
+          columns: event_table_columns,
+          paging: false,
+          info: false,
+          searching: true,
+        });
 
-          new DataTable('#rareTable', {
-            layout: getDatatableLayout({columns: [0,2]}),
-            scrollY: '30vh',
-            ajax: {
-              'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom'
+        new DataTable('#songTable', {
+          layout: getDatatableLayout({category: false}),
+          scrollY: '30vh',
+          ajax: {
+            'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom'
+          },
+          order: [0, 'desc'],
+          columnDefs: [
+            {target: [0], width: '1rem', className: 'dt-center' },
+            {target: '_all', className: 'text-nowrap' },
+          ],
+          columns: [
+            { 
+              'data': 'count',
+              'name': 'count',
+              'searchable': 'false',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data
+                }
+              },
             },
-            columnDefs: [
-              {target: [0], width: '1rem', className: 'dt-center' },
-              {target: '_all', className: 'text-nowrap' },
-            ],
-            columns: [
-              { 
-                'data': 'song.num_plays_public',
-                'name': 'song__num_plays_public',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return data
-                  }
-                },
+            { 
+              'data': 'song',
+              'name': 'song__sort_song_name',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/songs/${data.uuid}">${data.name}</a>`
+                }
               },
-              { 
-                'data': 'song',
-                'name': 'song__sort_song_name',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/songs/${data.uuid}">${data.name}</a>`
-                  }
-                },
+            },
+            { 
+              'data': 'song.category',
+              'name': 'song__category',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data
+                }
               },
-              { 
-                'data': 'song.category',
-                'name': 'song__category',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return data
-                  }
-                },
+            },
+            { 
+              'data': 'first_event',
+              'name': 'first_event',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                }
               },
-              { 
-                'data': 'first_event',
-                'name': 'first_event',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                  }
-                },
+            },
+            { 
+              'data': 'last_event',
+              'name': 'last_event',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                }
               },
-              { 
-                'data': 'last_event',
-                'name': 'last_event',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display') {
-                    return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
-                  }
-                },
+            },
+          ]
+        });
+
+        new DataTable('#notSeenTable', {
+          layout: getDatatableLayout({columns: [0,2]}),
+          scrollY: '30vh',
+          ajax: {
+            'url': '/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom'
+          },
+          order: [0, 'desc'],
+          columnDefs: [
+            {target: [0], width: '1rem', className: 'dt-center' },
+            {target: '_all', className: 'text-nowrap' },
+          ],
+          columns: [
+            { 
+              'data': 'song.num_plays_public',
+              'name': 'song__num_plays_public',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data
+                }
               },
-            ]
-          });
+            },
+            { 
+              'data': 'song',
+              'name': 'song__sort_song_name',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/songs/${data.uuid}">${data.name}</a>`
+                }
+              },
+            },
+            { 
+              'data': 'song.category',
+              'name': 'song__category',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data
+                }
+              },
+            },
+            { 
+              'data': 'first_event',
+              'name': 'first_event',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                }
+              },
+            },
+            {
+              'data': 'last_event',
+              'name': 'last_event',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                }
+              },
+            },
+          ]
+        });
+
+        new DataTable('#rareTable', {
+          layout: getDatatableLayout({columns: [0,2]}),
+          scrollY: '30vh',
+          order: [0, 'desc'],
+          ajax: {
+            'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom&ordering=-count'
+          },
+          columnDefs: [
+            {target: [0], width: '1rem', className: 'dt-center' },
+            {target: '_all', className: 'text-nowrap' },
+          ],
+          columns: [
+            { 
+              'data': 'song.num_plays_public',
+              'name': 'song__num_plays_public',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data
+                }
+              },
+            },
+            { 
+              'data': 'song',
+              'name': 'song__sort_song_name',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/songs/${data.uuid}">${data.name}</a>`
+                }
+              },
+            },
+            { 
+              'data': 'song.category',
+              'name': 'song__category',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return data
+                }
+              },
+            },
+            { 
+              'data': 'first_event',
+              'name': 'first_event',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                }
+              },
+            },
+            { 
+              'data': 'last_event',
+              'name': 'last_event',
+              'render': function (data, type, row, meta) {
+                if (type === 'display') {
+                  return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                }
+              },
+            },
+          ]
+        });
       })
   </script>
 {% endblock content %}

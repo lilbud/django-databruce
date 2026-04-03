@@ -30,7 +30,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from querystring_parser import parser
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, permissions, response, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -760,6 +760,18 @@ class UsersAttendedShowsViewSet(viewsets.ReadOnlyModelViewSet):
 class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         event = self.request.query_params.get("event")
+        user = self.request.query_params.get("user")
+
+        song_filter = Q(
+            Q(setlists__event__event_id=event)
+            & Q(setlists__set_name__in=VALID_SET_NAMES),
+        )
+
+        album_filter = Q(
+            Q(release__songs__category=OuterRef("category"))
+            & Q(release__songs__setlists__event__event_id=event)
+            & Q(release__songs__setlists__set_name__in=VALID_SET_NAMES),
+        )
 
         songs_in_setlist = (
             models.Songs.objects.prefetch_related(
@@ -768,20 +780,14 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
                 "album__release_tracks__song",
             )
             .filter(
-                Q(
-                    Q(setlists__event__event_id=event)
-                    & Q(setlists__set_name__in=VALID_SET_NAMES),
-                    # & Q(setlists__event__public=True),
-                ),
+                song_filter,
             )
             .order_by("setlists__song_num")
         )
 
         album_song_count = (
             models.ReleaseTracks.objects.filter(
-                release__songs__category=OuterRef("category"),
-                release__songs__setlists__event__event_id=event,
-                release__songs__setlists__set_name__in=VALID_SET_NAMES,
+                album_filter,
             )
             .values("song_id")
             .distinct("song_id")
@@ -830,3 +836,106 @@ class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.EventTypes.objects.all()
     serializer_class = serializers.EventTypeSerializer
     filterset_class = filters.EventTypeFilter
+
+
+class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        user = self.request.query_params.get("user")
+
+        filter = Q(
+            Q(release_tracks__song__setlists__event__user_event__user=user)
+            & Q(release_tracks__song__setlists__set_name__in=VALID_SET_NAMES),
+        )
+
+        return (
+            models.Releases.objects.filter(type="Studio")
+            .prefetch_related("release_tracks", "release_tracks__song")
+            .annotate(
+                all_album_songs=ArrayAgg("release_tracks__song_id", distinct=True),
+                songs_seen=ArrayAgg(
+                    "release_tracks__song__id",
+                    filter=filter,
+                    distinct=True,
+                ),
+                user_album_count=Count(
+                    "release_tracks__song__id",
+                    filter=filter,
+                    distinct=True,
+                ),
+                album_song_count=Count("release_tracks", distinct=True),
+            )
+            .annotate(
+                album_percent=ExpressionWrapper(
+                    F("user_album_count") * 100.0 / F("album_song_count"),
+                    output_field=FloatField(),
+                ),
+            )
+            .order_by("date")
+        )
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()  # Assuming the annotations from previous steps
+        user = self.request.query_params.get("user")
+        valid_sets = ["Show", "Encore", "Set 1", "Set 2", "Pre-Show", "Post-Show"]
+
+        # 1. Get all ReleaseTracks for these albums to maintain Disc/Track order
+        # We order by discnum and track here so the list is ready
+        release_tracks = (
+            models.ReleaseTracks.objects.filter(
+                release__in=queryset,
+            )
+            .select_related("song", "release")
+            .order_by("discnum", Cast("track", output_field=IntegerField()))
+        )
+
+        # 2. Map song IDs to their respective Releases
+        tracks_by_release = {}
+        all_required_song_ids = set()
+        for rt in release_tracks:
+            all_required_song_ids.add(rt.song_id)
+            if rt.release_id not in tracks_by_release:
+                tracks_by_release[rt.release_id] = []
+            tracks_by_release[rt.release_id].append(rt.song_id)
+
+        # 3. Get "times seen" counts for this user
+        user_song_counts = (
+            models.Setlists.objects.filter(
+                event__user_event__user=user,
+                set_name__in=valid_sets,
+                song_id__in=all_required_song_ids,
+            )
+            .values("song_id")
+            .annotate(times_seen=Count("id"))
+        )
+        count_map = {item["song_id"]: item["times_seen"] for item in user_song_counts}
+
+        # 4. Bulk fetch and serialize the song objects
+        relevant_songs = models.Songs.objects.filter(id__in=all_required_song_ids)
+        serialized_songs = serializers.MinimalSongsSerializer(
+            relevant_songs,
+            many=True,
+        ).data
+
+        # 5. Enrich the map with "times_seen" and "user_seen"
+        songs_map = {}
+        for song_data in serialized_songs:
+            s_id = song_data["id"]
+            count = count_map.get(s_id, 0)
+
+            song_data["times_seen"] = count
+            song_data["user_seen"] = count > 0  # New boolean field
+
+            songs_map[s_id] = song_data
+
+        # 6. Pass enriched data to context
+        serializer = self.get_serializer(
+            queryset,
+            many=True,
+            context={
+                "songs_map": songs_map,
+                "tracks_by_release": tracks_by_release,
+            },
+        )
+        return response.Response(serializer.data)
+
+    serializer_class = serializers.UserAlbumBreakdownSerializer

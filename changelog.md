@@ -178,3 +178,5 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Relation Detail] Born/Died now shows for many relations, least those with known birthdays.
 - [Venue Detail] Added leaflet.js map to venue detail page. Most venues have addresses/coords, with those up through E having been manually checked.
 - [Event Calendar] Added many birthdays to event calendar. Only those who've been a member of one of Bruce's bands are shown.
+- [User Profile] Redesigned page slightly
+- [User Profile] Added "albums" tab, which shows every studio album and the songs seen by the user

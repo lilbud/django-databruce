@@ -388,7 +388,14 @@
         
         tabElements.forEach(tabEl => {
           tabEl.addEventListener('shown.bs.tab', (event) => {
-            const hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
+            var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
+
+            console.log(hash)
+
+            if (hash === '#mostplayed' || hash === "#rare") {
+              hash = "#songs"
+            };
+
             if (hash) {
               history.replaceState(null, null, hash);
             }
@@ -399,8 +406,8 @@
           const url = window.location.href;
           if (url.includes("#")) {
             const hash = url.substring(url.indexOf("#"));
-            const buttonTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
-            const linkTrigger = document.querySelector(`a[data-bs-target="${hash}"]`);
+            var buttonTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
+            var linkTrigger = document.querySelector(`a[data-bs-target="${hash}"]`);
 
             if (buttonTrigger) {
               const bsPill = new bootstrap.Tab(buttonTrigger);

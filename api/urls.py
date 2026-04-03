@@ -90,6 +90,11 @@ router.register(
     views.SetlistBreakdown,
     basename="setlist_breakdown",
 )
+router.register(
+    r"user_album_breakdown",
+    views.UserAlbumBreakdown,
+    basename="user_album_breakdown",
+)
 
 
 # The API URLs are now determined automatically by the router.

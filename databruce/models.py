@@ -771,13 +771,14 @@ class Onstage(BaseModel):
 class ReleaseTracks(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    release = models.ForeignKey(
+    release = models.OneToOneField(
         "Releases",
         models.DO_NOTHING,
         db_column="release_id",
         related_name="release_tracks",
     )
     discnum = models.IntegerField(db_column="disc_num")
+
     discid = models.ForeignKey(
         "ReleaseDiscs",
         to_field="uuid",
@@ -787,13 +788,14 @@ class ReleaseTracks(BaseModel):
         blank=True,
         null=True,
     )
+
     track = models.CharField(db_column="track_num")
 
-    song = models.ForeignKey(
+    song = models.OneToOneField(
         to="Songs",
         on_delete=models.DO_NOTHING,
         db_column="song_id",
-        default=None,
+        related_name="release_track_song",
     )
 
     event = models.ForeignKey(
@@ -1807,7 +1809,7 @@ class EventTypes(models.Model):
     slug = models.TextField()
     updated_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
-    uuid = models.UUIDField()
+    uuid = models.UUIDField(default=uuid4, editable=False)
 
     class Meta:
         managed = False

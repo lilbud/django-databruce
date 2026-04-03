@@ -186,7 +186,7 @@ a:link,
     text-decoration: none !important;
 }
 
-.card-header {
+.card-header:not(.text-sm) {
     font-size: var(--text-base) !important;
     font-weight: 600 !important;
     line-height: 1.5rem;
@@ -198,6 +198,16 @@ a:link,
 /* Remove bottom margin from card headers */
 .card-header * {
     margin-bottom: 0 !important;
+}
+
+#album .card-header {
+    font-size: var(--text-2xs) !important;
+    font-weight: 500 !important;
+    line-height: 1.25rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    /* padding: 0.15rem !important; */
 }
 
 /* Remove the border from the last row of cells to prevent card overlap */
@@ -264,7 +274,7 @@ a:link,
 
 .card-header,
 .card-footer,
-.list-group-item {
+.list-group-item:not(.breakdown) {
     background-color: rgb(var(--base-300)) !important;
 }
 
@@ -718,7 +728,7 @@ td .badge.bg-primary,
 } */
 
 /* have margin on all nav-pills except last */
-.nav.nav-pills.nav-fill li:not(:last-child) {
+.nav.nav-pills li:not(:last-child) {
     margin-right: 0.25rem !important;
 }
 
