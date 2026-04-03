@@ -1,10 +1,4 @@
-/* light theme colors, rgb format */
-[data-bs-theme="light"] {
-  --base-100: 255, 255, 255;
-  --base-200: 248, 248, 248;
-  --base-300: 238, 238, 238;
-  --base-content: 24, 24, 27;
-  --primary-text: 4, 116, 176;
+:root {
   --primary: 4, 131, 200;
   --primary-content: 255, 255, 255;
   --secondary: 0, 135, 153;
@@ -17,11 +11,21 @@
   --info-content: 0, 0, 0;
   --accent: 250, 91, 5;
   --accent-content: 255, 255, 255;
-  --border: 209, 209, 209;
   --neutral: 0, 0, 0;
   --neutral-content: 228, 228, 231;
   --warning: 252, 183, 0;
   --warning-content: 121, 50, 5;
+}
+
+
+/* light theme colors, rgb format */
+[data-bs-theme="light"] {
+  --base-100: 255, 255, 255;
+  --base-200: 248, 248, 248;
+  --base-300: 238, 238, 238;
+  --base-content: 24, 24, 27;
+  --primary-text: 4, 116, 176;
+  --border: 209, 209, 209;
 
   /* Arrow for form select fields, set stroke to base-content above */
   .form-select {
@@ -35,24 +39,8 @@
   --base-200: 36, 41, 51;
   --base-300: 32, 37, 46;
   --base-content: 236, 249, 255;
-  --primary: 4, 131, 200;
   --primary-text: 52, 184, 255;
-  --primary-content: 237, 241, 254;
-  --secondary: 0, 135, 153;
-  --secondary-content: 255, 255, 255;
-  --success: 0, 211, 144;
-  --success-content: 0, 76, 57;
-  --danger: 255, 98, 125;
-  --danger-content: 77, 2, 24;
-  --info: 0, 186, 254;
-  --info-content: 4, 46, 73;
-  --accent: 250, 91, 5;
-  --accent-content: 255, 255, 255;
   --border: 70, 78, 85;
-  --neutral: 0, 0, 0;
-  --neutral-content: 228, 228, 231;
-  --warning: 252, 183, 0;
-  --warning-content: 121, 50, 5;
 
   /* Arrow for form select fields, set stroke to base-content above */
   .form-select,
@@ -61,17 +49,13 @@
   }
 }
 
-/* [data-bs-theme="dark"] .table-warning {
-  box-shadow: inset 0 0 100px 100px rgba(var(--warning), 0.8);
-}
-
-[data-bs-theme="light"] .table-warning {
-  box-shadow: inset 0 0 100px 100px rgba(var(--warning), 0.05);
-} */
-
 /* Primary */
 .text-primary {
   color: rgb(var(--primary)) !important;
+}
+
+.text-base-content {
+  color: rgb(var(--base-content)) !important;
 }
 
 .text-warning {

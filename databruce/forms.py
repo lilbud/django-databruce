@@ -8,11 +8,11 @@ from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import (
     AuthenticationForm,
+    PasswordChangeForm,
     PasswordResetForm,
+    SetPasswordForm,
     UserCreationForm,
 )
-
-# from django.contrib.auth.models import User
 from django.db.models import F, Q, QuerySet
 
 from . import models
@@ -788,3 +788,11 @@ class LoginForm(AuthenticationForm):
         widget=forms.CheckboxInput(),
         label="Remember Me?",
     )
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    # Add custom fields or override __init__ to change styling
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control form-control-sm"})

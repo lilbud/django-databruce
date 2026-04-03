@@ -11,6 +11,7 @@ from databruce import models
 
 from . import views
 from .config import base as settings
+from .forms import CustomSetPasswordForm
 from .sitemap import StaticViewSitemap
 
 sitemaps = {
@@ -81,6 +82,7 @@ urlpatterns = [
     path(
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
+            form_class=CustomSetPasswordForm,
             template_name="users/reset_password_confirm.html",
             success_url=reverse_lazy("login"),
         ),

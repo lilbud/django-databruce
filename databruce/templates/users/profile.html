@@ -114,67 +114,47 @@
               </div>
             </div>
           </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="card">
+                <div class="card-header">Most Played Not Seen (100+ plays)</div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="notSeenTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Count</th>
+                          <th class="all">Name</th>
+                          <th class="all">Category</th>
+                          <th class="all">First</th>
+                          <th class="all">Last</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col">
               <div class="card">
                 <div class="card-header">
-                  <ul class="nav nav-pills nav-fill" role="tablist">
-                    <li class="nav-item mb-2 mb-lg-0" role="presentation">
-                      <button class="nav-link active"
-                              id="pills-events-tab"
-                              data-bs-toggle="pill"
-                              data-bs-target="#mostplayed"
-                              type="button"
-                              role="tab"
-                              aria-controls="pills-home"
-                              aria-selected="true">{% translate "Most Played Not Seen (100+ plays)" %}</button>
-                    </li>
-                    <li class="nav-item mb-2 mb-lg-0" role="presentation">
-                      <button class="nav-link"
-                              id="pills-songs-tab"
-                              data-bs-toggle="pill"
-                              data-bs-target="#rare"
-                              type="button"
-                              role="tab"
-                              aria-controls="pills-profile"
-                              aria-selected="false">
-                        {% translate "Rare Songs (<100 Plays)" %}
-                      </button>
-                    </li>
-                  </ul>
+                  Rare Songs (<100 Plays)
                 </div>
-                <div class="card-body px-1">
-                  <div class="tab-content">
-                    <div id="mostplayed" class="tab-pane show active fade">
-                      <div class="table-responsive">
-                        <table class="table table-hover display" id="notSeenTable">
-                          <thead>
-                            <tr>
-                              <th class="all">Count</th>
-                              <th class="all">Name</th>
-                              <th class="all">Category</th>
-                              <th class="all">First</th>
-                              <th class="all">Last</th>
-                            </tr>
-                          </thead>
-                        </table>
-                      </div>
-                    </div>
-                    <div id="rare" class="tab-pane fade">
-                      <div class="table-responsive">
-                        <table class="table table-hover display" id="rareTable">
-                          <thead>
-                            <tr>
-                              <th class="all">Count</th>
-                              <th class="all">Name</th>
-                              <th class="all">Category</th>
-                              <th class="all">First</th>
-                              <th class="all">Last</th>
-                            </tr>
-                          </thead>
-                        </table>
-                      </div>
-                    </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="rareTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Count</th>
+                          <th class="all">Name</th>
+                          <th class="all">Category</th>
+                          <th class="all">First</th>
+                          <th class="all">Last</th>
+                        </tr>
+                      </thead>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -212,16 +192,17 @@
             
 
             $(col).removeClass('d-none');
-            $(col).find('.card-header').append(`<span>${item.name}</span>`).append(`<span>${Math.round(item.album_percent)}%</span>`);
+            $(col).find('.card-header').append(`<span><a href="/releases/${item.uuid}" class="fw-semibold">${item.name}</a></span>`).append(`<span>${Math.round(item.album_percent)}%</span>`);
             $(col).attr('id', `album-${index}`);
 
             item.songs.forEach((i, index) => {
               var listItem = $('<li />').addClass('list-group-item py-0.5 breakdown')
-              listItem.text(`${i.name}`);
-              
+
               if (i.user_seen) {
                 listItem.addClass('fw-semibold');
-                listItem.text(`${i.name} (${i.times_seen})`);
+                listItem.append(`<span><a href="/songs/${i.uuid}" class="text-reset text-base-content">${i.name}</a> (${i.times_seen})</span>`);
+              } else {
+                listItem.append(`<span><a href="/songs/${i.uuid}" class="text-reset text-base-content">${i.name}</a></span>`);
               }
 
               $(list).append(listItem);
@@ -251,7 +232,7 @@
         });
 
         new DataTable('#songTable', {
-          layout: getDatatableLayout({category: false}),
+          layout: layout,
           scrollY: '30vh',
           ajax: {
             'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom'
@@ -311,8 +292,11 @@
           ]
         });
 
+        var layout = getDatatableLayout({columns: [0,2]})
+        layout.topStart = null;
+
         new DataTable('#notSeenTable', {
-          layout: getDatatableLayout({columns: [0,2]}),
+          layout: layout,
           scrollY: '30vh',
           ajax: {
             'url': '/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom'
@@ -372,7 +356,7 @@
         });
 
         new DataTable('#rareTable', {
-          layout: getDatatableLayout({columns: [0,2]}),
+          layout: layout,
           scrollY: '30vh',
           order: [0, 'desc'],
           ajax: {

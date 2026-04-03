@@ -1061,7 +1061,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
         query_display = f" {context['conjunction']} ".join(display_queries)
         field_display = ",".join(
-            [f"{f['label']}: {f['data']}" for f in context["display_fields"]]
+            [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
         )
 
         context["description"] = f"Songs: {query_display}, {field_display}"

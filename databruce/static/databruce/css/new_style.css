@@ -118,14 +118,6 @@ ul:last-child {
     margin-bottom: 0 !important;
 }
 
-/* Optional: Improve the footer card appearance */
-/* .footer .card-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-} */
-
 /* Logo */
 .logo {
     text-indent: -9999px;
@@ -665,7 +657,7 @@ td .badge.bg-secondary {
 
 .encore-opener,
 .show-closer {
-    background-color: rgba(var(--danger), 1) !important;
+    background-color: rgb(var(--danger)) !important;
     color: rgb(var(--danger-content)) !important;
 }
 
@@ -683,7 +675,7 @@ td .badge.bg-primary,
 }
 
 .set-header.encore td {
-    background-color: rgb(var(--danger), 1) !important;
+    background-color: rgb(var(--danger)) !important;
     color: rgb(var(--primary-content)) !important;
 }
 
