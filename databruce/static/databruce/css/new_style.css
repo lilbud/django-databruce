@@ -178,13 +178,15 @@ a:link,
     text-decoration: none !important;
 }
 
-.card-header:not(.text-sm) {
+.card-header,
+.card-footer {
     font-size: var(--text-base) !important;
     font-weight: 600 !important;
     line-height: 1.5rem;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    padding: 0.35rem 0.75rem !important;
 }
 
 /* Remove bottom margin from card headers */
@@ -199,7 +201,6 @@ a:link,
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    /* padding: 0.15rem !important; */
 }
 
 /* Remove the border from the last row of cells to prevent card overlap */
@@ -259,15 +260,11 @@ a:link,
 .card-header,
 .card-footer,
 .card-body,
-.card {
-    border-color: rgb(var(--border)) !important;
-    color: rgb(var(--base-content)) !important;
-}
-
-.card-header,
-.card-footer,
+.card,
 .list-group-item:not(.breakdown) {
     background-color: rgb(var(--base-300)) !important;
+    border-color: rgb(var(--border)) !important;
+    color: rgb(var(--base-content)) !important;
 }
 
 .card-body,
@@ -368,8 +365,8 @@ td .check {
 
 .segue {
     font-size: var(--text-xl) !important;
-    font-weight: 500 !important;
-    color: rgb(var(--primary-text)) !important;
+    font-weight: 300 !important;
+    color: rgb(var(--base-content)) !important;
 }
 
 /* remove bottom margin from paragraphs */
