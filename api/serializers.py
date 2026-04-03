@@ -959,6 +959,7 @@ class UpdatesSerializer(BaseSerializer):
 
 class UsersSerializer(BaseSerializer):
     event_count = serializers.IntegerField()
+    user_slug = serializers.CharField()
 
     date_joined = serializers.SerializerMethodField()
 
@@ -970,6 +971,7 @@ class UsersSerializer(BaseSerializer):
         fields = [
             "id",
             "username",
+            "user_slug",
             "event_count",
             "is_staff",
             "date_joined",

@@ -12,6 +12,7 @@ from django.db.models import (
     Subquery,
     TextField,
 )
+from django.db.models.functions import Lower
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
 

@@ -24,7 +24,7 @@ from django.db.models import (
     Value,
     Window,
 )
-from django.db.models.functions import Cast, JSONObject
+from django.db.models.functions import Cast, JSONObject, Lower
 from django.shortcuts import get_list_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -729,6 +729,7 @@ class UsersViewSet(viewsets.ReadOnlyModelViewSet):
             event_count=Count(
                 "user_attended_shows__event",
             ),
+            user_slug=Lower("username"),
         )
     )
 
