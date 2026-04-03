@@ -1053,6 +1053,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                 context["display_fields"].append(display)
 
         context["search_summary"] = display_queries
+        context["description"] = "<br>".join(display_queries)
         context["conjunction"] = event_form.cleaned_data.get(
             "conjunction",
             "and",
