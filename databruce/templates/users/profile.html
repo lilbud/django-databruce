@@ -63,7 +63,7 @@
                 {% translate "has seen" %}
               {% endif %}
             </div>
-            <div class="card-body p-0">
+            <div class="card-body px-0">
               <div class="table-responsive">
                 <table class="table table-hover display" id="eventTable">
                   <thead>
@@ -226,9 +226,6 @@
           },
           columnDefs: event_table_defs,
           columns: event_table_columns,
-          paging: false,
-          info: false,
-          searching: true,
         });
 
         new DataTable('#songTable', {
