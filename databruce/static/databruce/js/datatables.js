@@ -288,7 +288,7 @@ event_table_columns = [
   },
   {
     'data': 'venue.city',
-    'name': 'venue__city__name, venue__city__state__abbrev, venue__city__country__name',
+    'name': 'venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
       return renderLink('/cities/', data.uuid, data.formatted);
