@@ -186,6 +186,10 @@ a:link,
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+}
+
+.card-header,
+.card-footer:not(#eventInfoFooter) {
     padding: 0.35rem 0.75rem !important;
 }
 

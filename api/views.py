@@ -325,6 +325,7 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = (
         models.NugsReleases.objects.all()
+        .filter(date__isnull=False)
         .select_related(
             "event",
             "event__tour",

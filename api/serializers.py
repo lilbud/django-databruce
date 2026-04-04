@@ -472,12 +472,15 @@ class NugsSerializer(BaseSerializer):
     event = EventsSerializer(include=["id", "event_id", "venue", "date"])
 
     def get_date(self, obj):
-        return {
-            "date": obj.date.strftime("%Y-%m-%d [%a]"),
-            "time": obj.date.astimezone(ZoneInfo("UTC")).strftime(
-                "%I:%M:%S %p",
-            ),
-        }
+        try:
+            return {
+                "date": obj.date.strftime("%Y-%m-%d [%a]"),
+                "time": obj.date.astimezone(ZoneInfo("UTC")).strftime(
+                    "%I:%M:%S %p",
+                ),
+            }
+        except AttributeError:
+            return None
 
     class Meta:
         model = models.NugsReleases
