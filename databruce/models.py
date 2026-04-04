@@ -102,6 +102,7 @@ class Bands(BaseModel):
 
     springsteen_band = models.BooleanField(default=False)
     mbid = models.UUIDField(default=None, editable=False, null=True, blank=True)
+    note = models.TextField(default=None, blank=True)
 
     class Meta:
         db_table = "bands"
@@ -193,6 +194,8 @@ class Cities(BaseModel):
         db_column="last_event",
         default=None,
     )
+
+    timezone = models.TextField(default=None, blank=True, null=True)
 
     class Meta:
         db_table = "cities"
@@ -592,6 +595,10 @@ class Events(BaseModel):
         blank=True,
         null=True,
     )
+
+    start_time = models.DateTimeField(blank=True, null=True, default=None)
+    end_time = models.DateTimeField(blank=True, null=True, default=None)
+    scheduled_time = models.DateTimeField(blank=True, null=True, default=None)
 
     class Meta:
         db_table = "events"

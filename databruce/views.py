@@ -5,6 +5,7 @@ import logging
 import os
 import re
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import requests
 from django.contrib import messages
@@ -40,6 +41,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404, redirect, rende
 from django.template import loader
 from django.urls import reverse, reverse_lazy
 from django.utils.datastructures import MultiValueDictKeyError
+from django.utils.dateparse import parse_datetime
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -453,6 +455,45 @@ class EventDetail(PageTitleMixin, TemplateView):
         context["description"] = (
             f"{context['event'].get_date()}<br>{context['event'].artist}<br>{context['event'].venue.name}"
         )
+
+        timezone = ZoneInfo(context["event"].venue.city.timezone)
+
+        try:
+            context["scheduled_time"] = (
+                context["event"]
+                .scheduled_time.astimezone(timezone)
+                .strftime("%I:%M%p")
+                .lower()
+            )
+        except AttributeError:
+            context["scheduled_time"] = None
+
+        try:
+            context["start_time"] = (
+                context["event"]
+                .start_time.astimezone(timezone)
+                .strftime("%I:%M%p")
+                .lower()
+            )
+        except AttributeError:
+            context["start_time"] = None
+
+        try:
+            context["end_time"] = (
+                context["event"]
+                .end_time.astimezone(timezone)
+                .strftime("%I:%M%p")
+                .lower()
+            )
+        except AttributeError:
+            context["end_time"] = None
+
+        print(context["start_time"], context["end_time"], timezone)
+
+        if context["event"].start_time and context["event"].end_time:
+            context["duration"] = context["event"].end_time.astimezone(
+                timezone,
+            ) - context["event"].start_time.astimezone(timezone)
 
         try:
             context["prev_event"] = (

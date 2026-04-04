@@ -157,8 +157,19 @@ class UserAttendedShowsAdmin(ModelAdmin):
     list_display_links = ["id"]
 
 
+class BandsForm(forms.ModelForm):
+    note = forms.CharField(
+        widget=MarkdownWidget(),
+    )
+
+    class Meta:
+        model = models.Bands
+        fields = "__all__"
+
+
 @admin.register(models.Bands)
 class BandAdmin(ModelAdmin):
+    form = BandsForm
     search_fields = ["name"]
     list_display = ["id", "name"]
     list_display_links = ["id"]

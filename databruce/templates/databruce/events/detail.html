@@ -281,6 +281,40 @@
           </div>
           <div class="col-12 col-lg-4 col-xl-3">
             <div class="d-none d-xl-block mb-3">{% partial event-note %}</div>
+            {% if start_time or scheduled_time %}
+              <div class="card mb-3">
+                <div class="card-header">
+                  Set Times<i class="bi bi-clock"></i>
+                </div>
+                <div class="card-body">
+                  <div class="row row-cols-3">
+                    {% if start_time %}
+                      <div class="col">
+                        <div class="fw-semibold text-xs">Start</div>
+                        <div class="text-sm">{{ start_time }}</div>
+                      </div>
+                    {% elif scheduled_time %}
+                      <div class="col">
+                        <div class="fw-semibold text-xs">Scheduled</div>
+                        <div class="text-sm">{{ scheduled_time }}</div>
+                      </div>
+                    {% endif %}
+                    {% if end_time %}
+                      <div class="col">
+                        <div class="fw-semibold text-xs">End</div>
+                        <div class="text-sm">{{ end_time }}</div>
+                      </div>
+                    {% endif %}
+                    {% if duration %}
+                      <div class="col">
+                        <div class="fw-semibold text-xs">Length</div>
+                        <div class="text-sm">{{ duration }}</div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
             <div class="card mb-3">
               <div class="card-header">
                 Albums

@@ -182,3 +182,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - [User Profile] Added "albums" tab, which shows every studio album and the songs seen by the user
 - [Band Detail] Fixed members event link not linking to event
 - [General] Updated page titles and descriptions so that many show on opengraph embeds
+
+# v1.16 (April 2026)
+- [Event Detail] Added "set times" card. This will show start/end time and duration of event if known. Times are shown in local time. "Scheduled" time will show for future events.
+- [Band Detail] Added "note" card
