@@ -1,32 +1,35 @@
-var selectOptions = {
-  theme: "bootstrap-5",
-  selectionCssClass: "form-select",
-  dropdownCssClass: "form-control",
-  minimumInputLength: 3,
-  dropdownPosition: 'below',
-  allowClear: true,
-  placeholder: '',
-  width: 'resolve', // need to override the changed default\
-};
-
-function get_options({ajax_url = false}) {
+function get_options({ ajax_url = false }) {
   var options = {
     theme: "bootstrap-5",
-    selectionCssClass: "form-select",
-    dropdownCssClass: "form-control",
+    selectionCssClass: "form-select-sm",
+    dropdownCssClass: "form-select-sm",
     minimumInputLength: 3,
+    dropdownAutoWidth: true,
     dropdownPosition: 'below',
+    placeholder: $(this).data('placeholder'),
     allowClear: true,
     placeholder: '',
-    width: 'resolve', // need to override the changed default\
+    maximumSelectionLength: 3,
+    width: '100%', // need to override the changed default\
     ajax: {
       delay: 500,
       url: '/api/v1/',
       dataType: 'json',
       data: function (params) {
         return {
-          name: params.term
+          name: params.term,
         }
+      },
+      processResults: function (data) {
+        // Map your custom data to the Select2 format
+        return {
+          results: $.map(data.results, function (item) {
+            return {
+              id: item.id,   // Replace with your ID field name
+              text: item.name // Replace with your text field name
+            };
+          })
+        };
       }
     }
   };
@@ -84,13 +87,19 @@ function removeForm(e) {
   adjust_conjunctions();
 }
 
+/**
+ * Show/hide the song2 field when position = followed_by
+ * @param {object} row - parent row of the select element
+ * @param {object} select - select element that triggered the change
+ */
 function positionChange(row, select) {
-  // show/hide the song2 field when position = followed_by
+  var select_row = $(select).parent().parent();
+
   if ($(select).val() == "followed_by") {
-    row.find(`[id*=song2]`).parent().show();
-    row.find(`[id*=song2]`).select2(get_options({ajax_url: 'songs/'}));
+    select_row.find("[id*=song2]").parent().show();
+    select_row.find("[id*=song2]").select2(get_options({ ajax_url: 'songs/' }));
   } else {
-    row.find(`[id*=song2]`).parent().hide();
+    select_row.find("[id*=song2]").parent().hide();
   }
 }
 
@@ -111,7 +120,7 @@ function addForm() {
 
   // adding incremented ids to fields
   row.find('.choice').attr({ 'id': `id_form-${count}-choice`, 'name': `form-${count}-choice` });
-  row.find('.song1').attr({ 'id': `id_form-${count}-song1`, 'name': `form-${count}-song1` }).select2(get_options({ajax_url: 'songs/'}));
+  row.find('.song1').attr({ 'id': `id_form-${count}-song1`, 'name': `form-${count}-song1` }).select2(get_options({ ajax_url: 'songs/' }));
   row.find('.position').attr({ 'id': `id_form-${count}-position`, 'name': `form-${count}-position` });
   row.find('.song2').attr({ 'id': `id_form-${count}-song2`, 'name': `form-${count}-song2` }).parent().hide();
 
@@ -130,20 +139,18 @@ function addForm() {
 $(document).ready(function () {
   var row = $('#setlist-search').find('.song-row').last();
 
-  // $('.select2').each(function() {
-  //     $(this).select2();
-  // });
-
-  $('#city').select2(get_options({ajax_url: 'cities/'}));
-  $('#state').select2(get_options({ajax_url: 'states/'}));
-  $('#country').select2(get_options({ajax_url: 'countries/'}));
-  $('#tour').select2(get_options({ajax_url: 'tours/'}));
-  $('#musician').select2(get_options({ajax_url: 'relations/'}));
-  $('#band').select2(get_options({ajax_url: 'bands/'}));
-  $('#venue').select2(get_options({ajax_url: 'venues/'}));
+  $('#city').select2(get_options({ ajax_url: 'cities/' }));
+  $('#state').select2(get_options({ ajax_url: 'states/' }));
+  $('#country').select2(get_options({ ajax_url: 'countries/' }));
+  $('#tour').select2(get_options({ ajax_url: 'tours/' }));
+  $('#tour-leg').select2(get_options({ ajax_url: 'tour_legs/' }));
+  $('#relation').select2(get_options({ ajax_url: 'relations/' }));
+  $('#band').select2(get_options({ ajax_url: 'bands/' }));
+  $('#venue').select2(get_options({ ajax_url: 'venues/' }));
+  $('#type').select2(get_options({ ajax_url: 'event_types/' }));
 
   row.find('.song2').parent().hide();
-  row.find('.song1').select2(get_options({ajax_url: 'songs/'}));
+  row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));
 
   $('[class*=position]').change(function () {
     positionChange(row, this);

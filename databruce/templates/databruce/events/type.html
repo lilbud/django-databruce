@@ -16,7 +16,7 @@
             <ul class="dropdown-menu">
               {% for i in types %}
                 <li>
-                  <a class="dropdown-item" href="{% url "events_by_type" type=i.uuid %}">{{ i.name }}</a>
+                  <a class="dropdown-item" href="{% url "events_by_type" type=i.slug %}">{{ i.name }}</a>
                 </li>
               {% endfor %}
             </ul>

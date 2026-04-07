@@ -6,11 +6,11 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import Group, User
 from django.db import models as dj_models
 from django.db.models.functions import Cast, JSONObject
+from django.http import JsonResponse
+from django.urls import path
+from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
-from unfold.contrib.inlines.admin import (
-    NonrelatedStackedInline,
-    NonrelatedTabularInline,
-)
+from unfold.contrib.filters.admin import AutocompleteSelectFilter
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 from unfold_markdown.widgets import MarkdownWidget
 
@@ -18,14 +18,6 @@ from . import models
 
 # Unregister the default User admin
 site.unregister(Group)
-
-
-# class CustomModelAdmin(ModelAdmin):
-#     class Media:
-#         css = {
-#             "all": ("admin/css/custom_unfold.css",),
-#         }
-#         js = ("admin/js/custom_unfold.js",)
 
 
 @admin.register(models.CustomUser)
@@ -42,7 +34,14 @@ class UserAdmin(DefaultUserAdmin, ModelAdmin):
         "is_active",
         "uuid",
     ]
-    # Forms loaded from `unfold.forms`
+
+    def get_search_results(self, request, queryset, search_term):
+        # Apply filter during autocomplete requests
+        if "autocomplete" in request.path:
+            queryset = queryset.filter(groups=3)
+
+        return super().get_search_results(request, queryset, search_term)
+
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -578,19 +577,6 @@ class RunAdmin(ModelAdmin):
     list_display_links = ["id"]
 
 
-@admin.register(models.Tags)
-class TagAdmin(ModelAdmin):
-    search_fields = ["event"]
-    list_select_related = [
-        "event",
-        "event__venue",
-        "event__venue__city",
-    ]
-    autocomplete_fields = ["event"]
-    list_display = ["id", "event", "tags"]
-    list_display_links = ["id"]
-
-
 @admin.register(models.Contact)
 class ContactAdmin(ModelAdmin):
     search_fields = ["email", "subject", "message"]
@@ -603,3 +589,97 @@ class ContactAdmin(ModelAdmin):
         "created_at",
     ]
     list_display_links = ["id"]
+
+
+@admin.register(models.BlogCategory)
+class CategoryAdmin(ModelAdmin):
+    list_display = ("name", "slug", "created_at")
+    search_fields = ["name", "slug"]
+    prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(models.BlogTags)
+class TagAdmin(ModelAdmin):
+    list_display = ("name", "slug", "created_at")
+    search_fields = ["name", "slug"]
+    prepopulated_fields = {"slug": ("name",)}
+
+
+class TagInline(StackedInline):
+    model = models.BlogPostTags
+    autocomplete_fields = ["tag"]
+    extra = 0
+
+
+class CategoryInline(StackedInline):
+    model = models.BlogPostCategories
+    autocomplete_fields = ["category"]
+    extra = 0
+
+
+class PostForm(forms.ModelForm):
+    body = forms.CharField(
+        widget=MarkdownWidget(),
+    )
+
+    class Meta:
+        model = models.BlogPosts
+        fields = [
+            "title",
+            "slug",
+            "author",
+            "excerpt",
+            "published",
+            "published_at",
+            "body",
+        ]
+
+
+@admin.register(models.BlogPosts)
+class PostAdmin(ModelAdmin):
+    form = PostForm
+    list_filter = (
+        "published",
+        "author",
+        "created_at",
+    )
+
+    list_display = ("title", "author", "published", "created_at")
+    search_fields = ("title", "body")
+    prepopulated_fields = {"slug": ("title",)}
+    exclude = ("categories", "tags")  # Prevent double-rendering of fields
+
+    autocomplete_fields = ["author"]
+    list_select_related = ["author"]
+
+    # Add the inlines here
+    inlines = [CategoryInline, TagInline]
+
+    # 1. Filter the list so they only see their own posts
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        if request.user.is_superuser:
+            return qs
+
+        return qs.filter(author=request.user)
+
+    # 2. Prevent editing if they somehow access another user's post URL
+    def has_change_permission(self, request, obj=None):
+        if (
+            obj is not None
+            and not request.user.is_superuser
+            and obj.author != request.user
+        ):
+            return False
+        return super().has_change_permission(request, obj)
+
+    # 3. Prevent deleting if they aren't the owner
+    def has_delete_permission(self, request, obj=None):
+        if (
+            obj is not None
+            and not request.user.is_superuser
+            and obj.author != request.user
+        ):
+            return False
+        return super().has_delete_permission(request, obj)

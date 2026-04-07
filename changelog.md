@@ -186,3 +186,5 @@ First public release of the site. Site was locked behind a login and accounts on
 # v1.16 (April 2026)
 - [Event Detail] Added "set times" card. This will show start/end time and duration of event if known. Times are shown in local time. "Scheduled" time will show for future events.
 - [Band Detail] Added "note" card
+- Added "News" page, which is basically a site blog
+- Fixed many issues with signup and user adding shows

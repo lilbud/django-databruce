@@ -1,0 +1,28 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load i18n %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-8">
+        <div class="text-2xl text-nowrap mb-3">
+            <a href="{% url 'blog' %}">Blog</a> &gt; Posts By Tag: {{ tag }}
+        </div>
+        {% for post in page %}
+            {% include "./post_partial.html" with post=post %}
+            {% if not forloop.last %}<hr>{% endif %}
+        {% endfor %}
+        <hr>
+        <div class="pagination">
+            {% if page.has_previous %}
+                <a href="?page=1">&lt; First</a>
+                <a href="?page={{ page.previous_page_number }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+            {% if page.has_next %}
+                <a href="?page={{ page.next_page_number }}">Next</a>
+                <a href="?page={{ page.paginator.num_pages }}">Last &gt;</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

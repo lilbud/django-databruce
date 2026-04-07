@@ -1,0 +1,33 @@
+{% if class == "half" %}
+    <figure class="half">
+        <a href="{{ img1 }}" target="_blank">
+            <img src="{{ img1 }}"
+                 class="figure-img img-fluid rounded"
+                 alt="{{ alt1 }}"
+                 height="auto"
+                 loading="lazy"
+                 width="auto">
+        </a>
+        <a href="{{ img2 }}" target="_blank">
+            <img src="{{ img2 }}"
+                 class="figure-img img-fluid rounded"
+                 alt="{{ alt2 }}"
+                 height="auto"
+                 loading="lazy"
+                 width="auto">
+        </a>
+        {% if caption %}<figcaption class="figure-caption">{{ caption }}</figcaption>{% endif %}
+    </figure>
+{% else %}
+    <figure class="full">
+        <a href="{{ img1 }}" target="_blank">
+            <img src="{{ img1 }}"
+                 class="figure-img img-fluid rounded"
+                 alt="{{ alt1 }}"
+                 height="auto"
+                 loading="lazy"
+                 width="auto">
+        </a>
+        {% if caption %}<figcaption class="figure-caption">{{ caption }}</figcaption>{% endif %}
+    </figure>
+{% endif %}

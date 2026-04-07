@@ -78,6 +78,7 @@ function getDatatableLayout({ columns = true, category = false }) {
             {
               extend: 'collection',
               text: 'All',
+              fade: 100,
               name: 'category-select',
               attr: {
                 id: 'dropdown-btn',
@@ -100,6 +101,7 @@ function getDatatableLayout({ columns = true, category = false }) {
         {
           extend: 'pageLength',
           className: 'btn btn-sm btn-primary',
+          fade: 100,
         },
       ]
     },

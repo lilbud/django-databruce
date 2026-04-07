@@ -98,7 +98,7 @@
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
-        <button class="btn btn-sm d-xl-none d-block dropdown-toggle me-auto py-0"
+        <button class="btn btn-sm d-xl-none d-block dropdown-toggle py-0"
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#mainNavbar"
@@ -107,12 +107,12 @@
                 aria-label="Toggle navigation">
           <i class="bi bi-list text-xl fw-semibold"></i>
         </button>
-        <a class="navbar-brand p-0 mx-2" href="{% url 'index' %}">
+        <a class="navbar-brand p-auto p-xl-0 mx-2" href="{% url 'index' %}">
           <div class="logo" role="img" aria-label="Databruce">
             <span class="sr-only">Databruce</span>
           </div>
         </a>
-        <div class="d-flex d-xl-none align-items-center order-lg-last ms-auto">
+        <div class="d-flex-inline d-xxl-none align-items-center order-xl-last">
           {% partialdef profile inline %}
             {% if user.is_authenticated %}
               <li class="nav-item dropdown list-unstyled">
@@ -164,7 +164,13 @@
           {% endpartialdef profile %}
         </div>
         <div class="navbar-collapse collapse" id="mainNavbar">
-          <ul class="navbar-nav me-auto my-2 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-1">
+          <ul class="navbar-nav ms-2 me-auto my-2 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-1">
+            <li class="nav-item">
+              <a class="btn btn-sm"
+                 role="button"
+                 type="button"
+                 href="{% url 'blog' %}">News</a>
+            </li>
             <li class="nav-item dropdown">
               <button class="btn btn-sm dropdown-toggle {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
                       role="button"
@@ -302,7 +308,7 @@
               </ul>
             </li>
           </ul>
-          <hr class="d-xxl-none mt-0 mb-3">
+          <hr class="navbar-hr">
           <form role="search"
                 method="get"
                 action="{% url 'search' %}"
@@ -312,7 +318,7 @@
                     id="event-search-btn"
                     class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
           </form>
-          <hr class="d-xxl-none mt-3 mb-0">
+          <hr class="navbar-hr">
           <ul class="navbar-nav my-2 my-xl-0 ms-xl-2 d-flex flex-wrap row-gap-1 column-gap-1">
             <div class="d-none d-xxl-block">{% partial profile %}</div>
             {% include "./partials/theme_toggler.html" %}
@@ -323,12 +329,6 @@
     <div class="padded-body">
       {% block container %}
       {% endblock container %}
-      {% comment %} <div class="container">
-        <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
-          {% block content %}
-          {% endblock content %}
-        </div>
-      </div> {% endcomment %}
       {% include "./partials/searchbuilder.html" %}
     </div>
     <div class="footer mt-3">
@@ -347,7 +347,7 @@
         $("#eventSearch").autocomplete({
             delay: 500,
             classes: {
-              "ui-autocomplete": "text-sm dropdown-menu"
+              "ui-autocomplete": "dropdown-menu"
             },
             source: function(request, response) {
               $.ajax({
@@ -366,6 +366,14 @@
                   response([]);
                 }
               });
+            },
+            open: function(event, ui) {
+                // Target the autocomplete menu widget and fade it in
+                $(this).autocomplete("widget").addClass('show');
+            },
+            close: function() {
+                // The menu is already hidden by the widget; show it briefly to fade it out
+                $(this).autocomplete("widget").removeClass('show');
             },
             minLength: 7,
             position: { my:"right top", at:"right bottom", to:"#eventSearch", collision:"fit" },

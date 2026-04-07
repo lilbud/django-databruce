@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import sys
 from pathlib import Path
-from django.templatetags.static import static
+
 import sentry_sdk
+from django.templatetags.static import static
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -47,7 +48,7 @@ INSTALLED_APPS = [
     "django_filters",
     "shortener",
     "django_extensions",
-    "anymail", 
+    "anymail",
 ]
 
 SITE_ID = 1
@@ -177,7 +178,7 @@ REST_FRAMEWORK = {
 
 ANYMAIL = {
     "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
-    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"), # e.g., '://yourdomain.com'
+    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),  # e.g., '://yourdomain.com'
 }
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
@@ -201,7 +202,6 @@ UNFOLD = {
         lambda request: static("admin/js/custom_unfold.js"),
     ],
 }
-
 
 
 try:

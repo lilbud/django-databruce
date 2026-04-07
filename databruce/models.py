@@ -14,7 +14,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import F, Func, Value
 from django.db.models.functions import Lower, Trim
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 from requests.packages import mod
 
 from .templatetags.filters import format_fuzzy
@@ -31,6 +33,9 @@ class CustomUser(AbstractUser):
         "auth.Permission",
         blank=True,
     )
+
+    def __str__(self):
+        return self.username
 
     class Meta:
         db_table = "auth_user"  # Directs Django to the existing table
@@ -504,12 +509,18 @@ class Events(BaseModel):
         on_delete=models.DO_NOTHING,
         related_name="event_venue",
         db_column="venue_id",
+        default=None,
+        blank=True,
+        null=True,
     )
 
     tour = models.ForeignKey(
         to="Tours",
         on_delete=models.DO_NOTHING,
         db_column="tour_id",
+        default=None,
+        blank=True,
+        null=True,
     )
 
     leg = models.ForeignKey(
@@ -1221,21 +1232,6 @@ class SongsAfterRelease(models.Model):
         verbose_name_plural = "songs_after_release"
 
 
-class Tags(BaseModel):
-    id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(default=uuid4, editable=False)
-    event = models.ForeignKey(
-        Events,
-        models.DO_NOTHING,
-        db_column="event_id",
-    )
-    tags = models.TextField(default=None, blank=True, null=True)
-
-    class Meta:
-        db_table = "tags"
-        verbose_name_plural = "tags"
-
-
 class Tours(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
@@ -1466,7 +1462,7 @@ class Guests(BaseModel):
     #     db_column="event_id",
     # )
 
-    note = models.TextField(null=True)
+    note = models.TextField(null=True, blank=True, default=None)
 
     class Meta:
         db_table = "guests"
@@ -1794,7 +1790,6 @@ class SetlistStats(models.Model):
         related_name="stats_ltp",
     )
 
-    # last_event = models.IntegerField(blank=True, null=True, db_column="calc_last_ev_id")
     premiere = models.BooleanField(blank=True, null=True, db_column="is_premiere")
     debut = models.BooleanField(blank=True, null=True, db_column="is_debut")
     band_premiere = models.BooleanField(
@@ -1810,17 +1805,155 @@ class SetlistStats(models.Model):
         db_table = "setlist_stats"
 
 
-class EventTypes(models.Model):
+class EventTypes(BaseModel):
     id = models.AutoField(primary_key=True, db_column="id")
     name = models.TextField()
     slug = models.TextField()
-    updated_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     class Meta:
-        managed = False
         db_table = "event_types"
+        verbose_name_plural = "event types"
 
     def __str__(self):
         return self.name
+
+
+class BlogCategory(BaseModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    uuid = models.UUIDField(default=uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "blog_category"
+        verbose_name_plural = "blog categories"
+
+    def __str__(self):
+        return self.name
+
+
+class BlogTags(BaseModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        db_table = "blog_tags"
+        verbose_name_plural = "blog tags"
+
+    def __str__(self):
+        return self.name
+
+
+class BlogPosts(BaseModel):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField()
+    slug = models.SlugField(unique=True, blank=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    body = models.TextField()
+    excerpt = models.CharField()
+
+    categories = models.ManyToManyField(
+        "BlogCategory",
+        through="BlogPostCategories",
+        related_name="posts",
+    )
+
+    tags = models.ManyToManyField(
+        "BlogTags",
+        through="BlogPostTags",
+        related_name="posts",
+    )
+
+    published = models.BooleanField(default=False)
+    published_at = models.DateTimeField(blank=True, null=True, default=None)
+
+    class Meta:
+        db_table = "blog_posts"
+        verbose_name_plural = "blog posts"
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            # Check if the slug already exists in the DB
+            while BlogPosts.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
+        if not self.published_at:
+            self.published_at = self.created_at
+
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse(
+            "blog_post",
+            args=[
+                self.published_at.year,
+                self.published_at.month,
+                self.published_at.day,
+                self.slug,
+            ],
+        )
+
+
+class BlogPostTags(models.Model):
+    post = models.ForeignKey(
+        BlogPosts,
+        models.DO_NOTHING,
+        related_name="blog_post_tags",
+        db_column="post_id",
+    )
+
+    tag = models.ForeignKey(
+        BlogTags,
+        models.DO_NOTHING,
+        db_column="tag_id",
+        related_name="post_tags",
+    )
+
+    class Meta:
+        managed = True
+        db_table = "blog_post_tags"
+        verbose_name_plural = "Blog Post Tags"
+        unique_together = (("post", "tag"),)
+
+
+class BlogPostCategories(models.Model):
+    post = models.ForeignKey(
+        BlogPosts,
+        models.DO_NOTHING,
+        related_name="blog_post_categories",
+        db_column="post_id",
+    )
+
+    category = models.ForeignKey(
+        BlogCategory,
+        models.DO_NOTHING,
+        db_column="category_id",
+        related_name="post_categories",
+    )
+
+    class Meta:
+        managed = True
+        db_table = "blog_post_categories"
+        verbose_name_plural = "Blog Post Categories"
+        unique_together = (("post", "category"),)
+
+
+class BlogAuthors(BaseModel):
+    author = models.ForeignKey(CustomUser, models.DO_NOTHING)
+    uuid = models.UUIDField(default=uuid4, editable=False)
+
+    class Meta:
+        db_table = "blog_authors"
+        verbose_name_plural = "blog authors"

@@ -159,7 +159,8 @@ cython_debug/
 .cursorindexingignore
 
 notes/
-./static/
+/static/*
+/static/admin
 
 *.sh
 TO_DO.md

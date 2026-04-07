@@ -10,7 +10,7 @@
 {% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
-    {% include "databruce/partials/admin_btn.html" with view="events" item=event.id %}
+    {% include "databruce/partials/admin_edit_btn.html" with view="events" item=event.id %}
   {% endif %}
   <div class="col d-grid gap-0 gx-0">
     <!-- next and last buttons-->
@@ -40,7 +40,7 @@
       <!-- message cards -->
       <div class="row mb-2 gx-0">
         <div class="col">
-          <div class="card message info fst-italic p-2">This is a placeholder date, actual date unknown.</div>
+          <div class="card message info">This is a placeholder date, actual date unknown.</div>
         </div>
       </div>
     {% endif %}

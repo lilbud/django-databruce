@@ -9,7 +9,7 @@
 {% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
-    {% include "databruce/partials/admin_btn.html" with view="songs" item=info.id %}
+    {% include "databruce/partials/admin_edit_btn.html" with view="songs" item=info.id %}
   {% endif %}
   <div class="col-12">
     <div class="row mb-3">

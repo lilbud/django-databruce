@@ -1,0 +1,21 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load i18n %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-8">
+        <div class="text-2xl text-nowrap mb-3">
+            <a href="{% url 'blog' %}">Blog</a> &gt; Categories
+        </div>
+        <div class="text-sm">
+            <ul>
+                {% for tag in tags %}
+                    <li>
+                        <a href="{% url "blog_post_tag" slug=tag.slug %}">{{ tag.slug }}</a> -  {{ tag.post_tags.count }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock content %}

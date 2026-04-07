@@ -1,31 +1,31 @@
 :root {
-  --font-heading: "Cabin", sans-serif;
-  --font-body: "IBM Plex Sans Hebrew", sans-serif;
+  --primary: 4, 131, 200;
+  --primary-content: 255, 255, 255;
+  --secondary: 0, 135, 153;
+  --secondary-content: 255, 255, 255;
+  --success: 0, 211, 144;
+  --success-content: 0, 93, 57;
+  --danger: 255, 98, 125;
+  --danger-content: 255, 255, 255;
+  --info: 0, 186, 254;
+  --info-content: 0, 0, 0;
+  --accent: 250, 91, 5;
+  --accent-content: 255, 255, 255;
+  --neutral: 0, 0, 0;
+  --neutral-content: 228, 228, 231;
+  --warning: 252, 183, 0;
+  --warning-content: 121, 50, 5;
 }
 
+
+/* light theme colors, rgb format */
 [data-bs-theme="light"] {
-  --base-100: #FFFFFF;
-  --base-200: #F8F8F8;
-  --base-300: #EEEEEE;
-  --base-content: #18181b;
-  --primary-text: #0092e1;
-  --primary: #0483c8;
-  --primary-content: #FFFFFF;
-  --secondary: #008799;
-  --secondary-content: #FFFFFF;
-  --success: #00d390;
-  --success-content: #005d39;
-  --danger: #ff627d;
-  --danger-content: #FFFFFF;
-  --info: #00bafe;
-  --info-content: #000000;
-  --accent: #fa5b05;
-  --accent-content: #FFFFFF;
-  --border: #d1d1d1;
-  --neutral: #000000;
-  --neutral-content: #E4E4E7;
-  --warning: #fcb700;
-  --warning-content: #793205;
+  --base-100: 255, 255, 255;
+  --base-200: 248, 248, 248;
+  --base-300: 238, 238, 238;
+  --base-content: 24, 24, 27;
+  --primary-text: 4, 116, 176;
+  --border: 209, 209, 209;
 
   /* Arrow for form select fields, set stroke to base-content above */
   .form-select {
@@ -33,29 +33,14 @@
   }
 }
 
+/* dark theme colors, rgb format */
 [data-bs-theme="dark"] {
-  --base-100: #2a303c;
-  --base-200: #242933;
-  --base-300: #20252e;
-  --base-content: #ecf9ff;
-  --primary: #0483c8;
-  --primary-text: #0092e1; /* slightly brighter shade for contrast*/
-  --primary-content: #edf1fe;
-  --secondary: #008799;
-  --secondary-content: #fff;
-  --success: #00d390;
-  --success-content: #004c39;
-  --danger: #ff627d;
-  --danger-content: #4d0218;
-  --info: #00bafe;
-  --info-content: #042e49;
-  --accent: #fa5b05;
-  --accent-content: #fff;
-  --border: #464e55;
-  --neutral: #000000;
-  --neutral-content: #E4E4E7;
-  --warning: #fcb700;
-  --warning-content: #793205;
+  --base-100: 42, 48, 60;
+  --base-200: 36, 41, 51;
+  --base-300: 32, 37, 46;
+  --base-content: 236, 249, 255;
+  --primary-text: 52, 184, 255;
+  --border: 70, 78, 85;
 
   /* Arrow for form select fields, set stroke to base-content above */
   .form-select,
@@ -66,35 +51,42 @@
 
 /* Primary */
 .text-primary {
-  color: var(--primary) !important;
+  color: rgb(var(--primary)) !important;
+}
+
+.text-base-content {
+  color: rgb(var(--base-content)) !important;
+}
+
+.text-warning {
+  color: rgb(var(--warning)) !important;
+}
+
+.text-danger {
+  color: rgb(var(--danger)) !important;
 }
 
 .text-primary-content {
-  color: var(--primary-content) !important;
+  color: rgb(var(--primary-content)) !important;
 }
 
 .bg-primary {
-  background-color: var(--primary) !important;
-  color: var(--primary-content) !important;
-}
-
-/* Secondary */
-.text-secondary {
-  color: var(--secondary-content) !important;
+  background-color: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-content)) !important;
 }
 
 .bg-secondary {
-  background-color: var(--secondary) !important;
-}
-
-/* Accent */
-.text-accent {
-  color: var(--accent) !important;
+  background-color: rgb(var(--secondary)) !important;
+  color: rgb(var(--secondary-content)) !important;
 }
 
 .bg-accent {
-  background-color: var(--accent) !important;
-  color: var(--accent-content) !important;
+  background-color: rgb(var(--accent)) !important;
+  color: rgb(var(--accent-content)) !important;
+}
+
+.text-accent {
+  color: rgb(var(--accent)) !important;
 }
 
 /* nugs */
@@ -103,26 +95,51 @@
   color: white !important;
 }
 
-[class*="success"] {
-  background-color: var(--success) !important;
-  color: var(--success-content) !important;
-  border-color: var(--success) !important;
+.btn-secondary {
+  background-color: rgb(var(--secondary)) !important;
+  color: rgb(var(--secondary-content)) !important;
+  border-color: rgb(var(--secondary)) !important;
 }
 
-[class*="warning"] {
-  background-color: var(--warning) !important;
-  color: var(--warning-content) !important;
-  border-color: var(--warning) !important;
+.btn-primary {
+  background-color: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-content)) !important;
+  border-color: rgb(var(--primary)) !important;
 }
 
-[class*="secondary"] {
-  background-color: var(--secondary) !important;
-  color: var(--secondary-content) !important;
-  border-color: var(--secondary) !important;
+.btn-success {
+  background-color: rgb(var(--success)) !important;
+  color: rgb(var(--success-content)) !important;
+  border-color: rgb(var(--success)) !important;
 }
 
-[class*="danger"]:not(i) {
-  background-color: var(--danger) !important;
-  color: var(--danger-content) !important;
-  border-color: var(--danger) !important;
+.btn-accent {
+  background-color: rgb(var(--accent)) !important;
+  color: rgb(var(--accent-content)) !important;
+  border-color: rgb(var(--accent)) !important;
+}
+
+/* custom primary button, used for event detail links and user form */
+.btn-primary-dark {
+  color: rgb(var(--base-content)) !important;
+}
+
+[data-bs-theme="light"] .btn-primary-dark {
+  background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 20%) !important;
+  border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 20%) !important;
+}
+
+[data-bs-theme="light"] .btn-primary-dark:hover {
+  background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 5%) !important;
+  border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 5%) !important;
+}
+
+[data-bs-theme="dark"] .btn-primary-dark {
+  background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 50%) !important;
+  border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 50%) !important;
+}
+
+[data-bs-theme="dark"] .btn-primary-dark:hover {
+  background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 25%) !important;
+  border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 25%) !important;
 }

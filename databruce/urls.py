@@ -118,7 +118,7 @@ urlpatterns = [
     path("events", views.Event.as_view(), name="events"),
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
-    path("events/type/<uuid:type>/", views.EventType.as_view(), name="events_by_type"),
+    path("events/type/<slug:type>/", views.EventType.as_view(), name="events_by_type"),
     path("events/type", views.EventType.as_view(), name="events_type"),
     path("songs", views.Song.as_view(), name="songs"),
     path("songs/<uuid:id>", views.SongDetail.as_view(), name="song_details"),
@@ -196,6 +196,32 @@ urlpatterns = [
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("updates", views.Updates.as_view(), name="updates"),
+    path("blog", views.Blog.as_view(), name="blog"),
+    path(
+        "blog/<int:year>/<int:month>/<int:day>/<slug:slug>/",
+        views.BlogPost.as_view(),
+        name="blog_post",
+    ),
+    path(
+        "blog/categories/<slug:slug>",
+        views.BlogPostByCategory.as_view(),
+        name="blog_post_category",
+    ),
+    path(
+        "blog/categories/",
+        views.BlogCategories.as_view(),
+        name="blog_categories",
+    ),
+    path(
+        "blog/tags/<slug:slug>",
+        views.BlogPostByTag.as_view(),
+        name="blog_post_tag",
+    ),
+    path(
+        "blog/tags",
+        views.BlogTags.as_view(),
+        name="blog_tags",
+    ),
 ]
 
 

@@ -1,9 +1,41 @@
 import string
 
 import markdown
+import nh3
 from django import template
+from django.template import Context
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def render_includes(context, value):
+    """Render a string as a Django template within the current context."""
+    if not value:
+        return ""
+
+    value = nh3.clean(
+        value,
+        tags={"figure", "div", "br", "code", "blockquote", "p", "a", "img"},
+        attributes={
+            "div": {"class"},
+            "figure": {"class"},
+            "a": {"href"},
+            "img": {"src"},
+        },
+    )
+
+    value = markdown.markdown(value, extensions=["fenced_code"])
+
+    # Create the template object from your database string
+    template_obj = template.Template(value)
+
+    context_new = Context({"body": context.get("post").body})
+
+    # Use the existing context (which is already a Context object)
+    return mark_safe(template_obj.render(context_new))
 
 
 @register.filter(name="markdown")

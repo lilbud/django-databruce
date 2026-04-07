@@ -7,6 +7,7 @@ import re
 from typing import Any
 from zoneinfo import ZoneInfo
 
+import markdown
 import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
@@ -20,6 +21,7 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db.models import (
     Count,
     ExpressionWrapper,
@@ -38,13 +40,14 @@ from django.db.models import (
 from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
-from django.template import loader
+from django.template import Context, Template, loader
 from django.urls import reverse, reverse_lazy
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.dateparse import parse_datetime
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
@@ -1244,14 +1247,19 @@ class EventType(PageTitleMixin, TemplateView):
         try:
             context["type"] = get_object_or_404(
                 models.EventTypes,
-                uuid=self.kwargs["type"],
+                slug=self.kwargs["type"],
             )
         except KeyError:
             context["type"] = "Concert"
 
         context["title"] = f"Event Type '{context['type']}'"
 
-        context["types"] = models.EventTypes.objects.values("id", "name", "uuid")
+        context["types"] = models.EventTypes.objects.values(
+            "id",
+            "name",
+            "uuid",
+            "slug",
+        )
 
         return context
 
@@ -1308,3 +1316,126 @@ class Bootleg(PageTitleMixin, TemplateView):
 class Updates(PageTitleMixin, TemplateView):
     template_name = "databruce/updates.html"
     title = "Updates"
+
+
+class Blog(PageTitleMixin, TemplateView):
+    template_name = "blog/blog.html"
+    title = "Blog"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        posts = models.BlogPosts.objects.all().order_by("-published_at", "-created_at")
+        paginator = Paginator(posts, 10)
+        page_number = self.request.GET.get("page", 1)
+        context["page"] = paginator.get_page(page_number)
+
+        return context
+
+
+class BlogPost(PageTitleMixin, TemplateView):
+    template_name = "blog/post_detail.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        queryset = (
+            models.BlogPosts.objects.filter(published=True)
+            .select_related("author")
+            .prefetch_related(
+                "categories",
+                "tags",
+            )
+        )
+
+        context["post"] = get_object_or_404(queryset, slug=self.kwargs["slug"])
+        context["title"] = f"{context['post']}"
+
+        return context
+
+
+class BlogCategories(PageTitleMixin, TemplateView):
+    template_name = "blog/categories.html"
+    title = "Blog Categories"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["categories"] = (
+            models.BlogCategory.objects.all()
+            .prefetch_related(
+                "post_categories",
+            )
+            .order_by("name")
+        )
+
+        return context
+
+
+class BlogTags(PageTitleMixin, TemplateView):
+    template_name = "blog/tags.html"
+    title = "Blog Tags"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["tags"] = (
+            models.BlogTags.objects.all()
+            .prefetch_related(
+                "post_tags",
+            )
+            .order_by("name")
+        )
+
+        return context
+
+
+class BlogPostByCategory(PageTitleMixin, TemplateView):
+    template_name = "blog/posts_by_category.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        category = self.kwargs["slug"]
+
+        queryset = (
+            models.BlogPosts.objects.filter(categories__slug=category, published=True)
+            .select_related("author")
+            .prefetch_related(
+                "categories",
+                "tags",
+            )
+            .order_by("-published_at", "-created_at")
+        )
+
+        paginator = Paginator(queryset, 10)
+        page_number = self.request.GET.get("page", 1)
+        context["page"] = paginator.get_page(page_number)
+
+        context["title"] = "Posts By Category"
+        context["category"] = category
+
+        return context
+
+
+class BlogPostByTag(PageTitleMixin, TemplateView):
+    template_name = "blog/posts_by_tag.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        tag = self.kwargs["slug"]
+
+        queryset = (
+            models.BlogPosts.objects.filter(tags__slug=tag, published=True)
+            .select_related("author")
+            .prefetch_related(
+                "categories",
+                "tags",
+            )
+            .order_by("-published_at", "-created_at")
+        )
+
+        paginator = Paginator(queryset, 10)
+        page_number = self.request.GET.get("page", 1)
+        context["page"] = paginator.get_page(page_number)
+
+        context["title"] = "Posts By Category"
+        context["tag"] = tag
+
+        return context
