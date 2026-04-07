@@ -107,7 +107,7 @@ class Bands(BaseModel):
 
     springsteen_band = models.BooleanField(default=False)
     mbid = models.UUIDField(default=None, editable=False, null=True, blank=True)
-    note = models.TextField(default=None, blank=True)
+    note = models.TextField(default=None, blank=True, null=True)
 
     class Meta:
         db_table = "bands"
