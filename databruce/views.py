@@ -1080,6 +1080,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                 "venue__city__country",
                 "artist",
                 "tour",
+                "type",
             )
             .prefetch_related("venue__city__state")
         ).order_by("event_id")

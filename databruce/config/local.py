@@ -29,24 +29,29 @@ INTERNAL_IPS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": "localhost",
-        "PORT": "5432",
-        "CONN_MAX_AGE": 600,
-        "CONN_HEALTH_CHECKS": True,
-    },
     # "default": {
     #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("SUPABASE_DATABASE"),
-    #     "USER": os.getenv("SUPABASE_USER"),
-    #     "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-    #     "HOST": os.getenv("SUPABASE_HOST"),
+    #     "NAME": os.getenv("DATABASE_NAME"),
+    #     "USER": os.getenv("DATABASE_USER"),
+    #     "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+    #     "HOST": "localhost",
     #     "PORT": "5432",
+    #     "CONN_MAX_AGE": 600,
+    #     "CONN_HEALTH_CHECKS": True,
     # },
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("SUPABASE_DATABASE"),
+        "USER": os.getenv("SUPABASE_USER"),
+        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+        "HOST": os.getenv("SUPABASE_HOST"),
+        "PORT": "5432",
+        "CONN_MAX_AGE": 60,
+        "CONN_HEALTH_CHECKS": True,
+        "OPTIONS": {
+            "options": "-c search_path=public,extensions",
+        },
+    },
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

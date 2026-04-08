@@ -170,3 +170,4 @@ copilot_instructions.md
 .zed/
 .github/copilot-instructions.md
 http_cache.sqlite
+databruce/config/local.py
