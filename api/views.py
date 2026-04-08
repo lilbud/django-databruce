@@ -157,6 +157,8 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             "songs_page",
             "songs_page__prev",
             "songs_page__next",
+            "setlist_stats",
+            "setlist_stats__ltp",
             "event__venue__city__state",
         )
         .order_by("event__event_id", F("song_num").asc(nulls_first=True))

@@ -119,9 +119,15 @@ class Index(PageTitleMixin, TemplateView):
             "venue__venues_text",
         ).prefetch_related("venue__city__state", "setlist_event")
 
-        context["latest_event"] = (
-            queryset.filter(setlist_event__isnull=False).order_by("-event_id").first()
+        latest = (
+            models.Setlists.objects.filter(set_name__in=VALID_SET_NAMES)
+            .select_related("event")
+            .order_by("-event__event_id")
+            .first()
+            .event.id
         )
+
+        context["latest_event"] = queryset.get(id=latest)
 
         return context
 

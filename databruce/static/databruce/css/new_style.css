@@ -69,28 +69,35 @@
     line-height: 1;
 }
 
+h2,
+h3 {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    border-bottom: 1px solid rgb(var(--border));
+}
+
 h1 {
     font-size: var(--text-2xl);
 }
 
 h2 {
-    font-size: var(--text-xl);
-}
-
-h3 {
     font-size: var(--text-lg);
 }
 
-h4 {
+h3 {
     font-size: var(--text-base);
 }
 
-h5 {
+h4 {
     font-size: var(--text-sm);
 }
 
-h6 {
+h5 {
     font-size: var(--text-xs);
+}
+
+h6 {
+    font-size: var(--text-2xs);
 }
 
 body {
@@ -1084,16 +1091,7 @@ figcaption {
     text-align: center;
 }
 
-h1 {
-    padding-bottom: .5em;
-}
 
-h2,
-h3 {
-    padding-top: .5em;
-    padding-bottom: .5em;
-    border-bottom: 1px solid rgb(var(--border));
-}
 
 pre {
     padding: 1rem !important;
@@ -1103,4 +1101,6 @@ pre {
     white-space: pre-wrap;
     overflow-x: auto;
     word-break: normal !important;
+    font-size: var(--text-sm);
+    line-height: 1.25rem;
 }

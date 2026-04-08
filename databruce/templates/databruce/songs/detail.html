@@ -317,39 +317,36 @@
             //'columnControl': [],
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                //return data;
-
                 var className = slugify(data);
                 var badge = `<span class="${className} badge align-middle">${data}</span>`
-                //var badge = $('<span />').addClass(`badge align-middle text-nowrap ${data}`)
 
                 return badge
               }
             },
           },
           {
-            'data': 'last',
-            'name': 'last',
+            'data': 'stats',
+            'name': 'setlist_stats__gap',
             'width': '1rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
-                if (row.premiere) {
+                if (data.gap >= 50 && !data.debut) {
+                  $(badge).addClass('bg-primary').text(`${data.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+                  return $(badge).prop('outerHTML');
+                } else if (data.premiere) {
                   $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
                   return $(badge).prop('outerHTML');
-                } else if (data >= 50 && !row.debut) {
-                  $(badge).addClass('bg-primary').text(`${data}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+                } else if (data.debut && !data.premiere && data.gap) {
+                  $(badge).addClass('bg-primary').text(`${data.gap}, TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
-                } else if (row.debut && !row.premiere) {
-                  $(badge).addClass('bg-primary').text(`${data}, TD`).attr('data-bs-title', 'Tour Debut');
-                  return $(badge).prop('outerHTML');
-                } else if (row.debut && !row.premiere && !data) {
+                } else if (data.debut && !data.premiere && !data.gap) {
                   $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
                 } else {
-                  return data;
+                  return data.gap;
                 }
 
               }

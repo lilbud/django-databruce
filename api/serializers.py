@@ -797,6 +797,12 @@ class SongsPageSerializer(BaseSerializer):
         include=["id", "event_id", "venue", "artist", "date", "tour"],
     )
 
+    stats = SetlistStatsSerializer(
+        required=False,
+        read_only=True,
+        source="setlist_stats",
+    )
+
     position = serializers.SerializerMethodField()
 
     songs_map = {
