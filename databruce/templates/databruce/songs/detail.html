@@ -93,6 +93,12 @@
               </button>
               <button class="nav-link mb-1 mb-md-0"
                       data-bs-toggle="pill"
+                      data-bs-target="#included"
+                      aria-controls="pills-included">
+                Included Songs<span class="badge rounded-pill text-bg-light" id="included-count-badge">0</span>
+              </button>
+              <button class="nav-link mb-1 mb-md-0"
+                      data-bs-toggle="pill"
                       data-bs-target="#stats"
                       aria-controls="pills-stats">Stats</button>
               <button class="nav-link mb-1 mb-md-0"
@@ -140,6 +146,21 @@
                         <th class="all">Location</th>
                         <th class="all">During Song</th>
                         <th class="all">Note</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+              <div id="included" class="tab-pane fade p-2">
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="includedTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Count</th>
+                        <th class="all">Name</th>
+                        <th class="all">Category</th>
+                        <th class="all">First</th>
+                        <th class="all">Last</th>
                       </tr>
                     </thead>
                   </table>
@@ -249,7 +270,6 @@
         },
         columnDefs: [
           { 'target': -1, 'visible': false },
-          //{ 'targets': [1,2,3,4,5,8,9,10], 'columnControl': [] }
         ],
         columns: [
           {
@@ -314,7 +334,6 @@
             'name': 'setlist_position__position',
             'width': '6rem',
             'className': 'dt-center',
-            //'columnControl': [],
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 var className = slugify(data);
@@ -359,6 +378,9 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
+                if (row.prev_setlist.segue) {
+                  return `<a href="/songs/${data.uuid}">${data.name} \></a>`
+                }
                 return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
@@ -369,6 +391,12 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
+                if (row.segue) {
+                  return `<a href="/songs/${data.uuid}">\> ${data.name}</a>`
+                } else if (row.next_setlist.segue) {
+                  return `<a href="/songs/${data.uuid}">${data.name} \></a>`
+                }
+
                 return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
@@ -390,6 +418,8 @@
         }
       });
 
+      var layout = getDatatableLayout({category: false});
+
       new DataTable('#snippetTable', {
         layout: layout,
         ajax: {
@@ -402,7 +432,7 @@
         columns: [
           {
             'data': 'event',
-            'name': 'event__event_id',
+            'name': 'setlist__event__event_id',
             'width': '8rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -412,7 +442,7 @@
           },
           {
             'data': 'event.artist',
-            'name': 'event__artist__name',
+            'name': 'setlist__event__artist__name',
             'width': '14rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
@@ -422,7 +452,7 @@
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__name, event__venue__detail',
+            'name': 'setlist__event__venue__name, event__venue__detail',
             'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
@@ -432,7 +462,7 @@
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__city__name, event__venue__state__abbrev, event__venue__country__name',
+            'name': 'setlist__event__venue__city__name, setlist__event__venue__state__abbrev, setlist__event__venue__country__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -457,6 +487,72 @@
           $('#snippet-count-badge').text(info.recordsTotal);
         }
       });
+
+      new DataTable('#includedTable', {
+        layout: layout,
+        ajax: {
+          url: '/api/v1/snippets/',
+          data: {
+            song: '{{ info.id }}',
+            format: 'custom',
+            unique: 'true'
+          },
+        },
+        columns: [
+          {
+            'data': 'count',
+            'name': 'count',
+            'searchable': 'false',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return data
+              }
+            },
+          },
+          {
+            'data': 'snippet',
+            'name': 'snippet__name',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return `<a href="/songs/${data.uuid}">${data.name}</a>`
+              }
+            },
+          },
+          { 
+            'data': 'snippet.category',
+            'name': 'snippet__category',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return data
+              }
+            },
+          },
+          { 
+            'data': 'first',
+            'name': 'first__event_id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+              }
+            },
+          },
+          { 
+            'data': 'last',
+            'name': 'last__event_id',
+            'render': function (data, type, row, meta) {
+              if (type === 'display') {
+                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+              }
+            },
+          },
+        ],
+        initComplete: function(settings, json){ 
+          var info = this.api().page.info();
+          $('#included-count-badge').text(info.recordsTotal);
+        }
+      });
+
+
 
     })
   </script>

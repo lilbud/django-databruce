@@ -160,6 +160,9 @@ class DataTablesFilterBackend(BaseFilterBackend):
                     f"{col_prefix}[search][regex]",
                 )
                 == "true",
+                "sb_criteria": request.query_params.get(
+                    "[searchBuilder][logic]",
+                ),
             }
 
             if config["orderable"] and fields:
@@ -269,13 +272,15 @@ class DataTablesFilterBackend(BaseFilterBackend):
                 f"{searchbuilder_prefix}[origData]",
             )
 
+            criteria = request.query_params.get("searchBuilder[logic]")
+
             if col_idx_param is None:
                 break
 
             name = next(c for c in column_configs if c["data"] == col_idx_param)
 
             for field in name["fields"]:
-                sb_filter &= self.get_sb_filter(
+                sb_field_filter = self.get_sb_filter(
                     column=field,
                     condition=request.query_params.get(
                         f"{searchbuilder_prefix}[condition]",
@@ -288,9 +293,13 @@ class DataTablesFilterBackend(BaseFilterBackend):
                     ),
                 )
 
+                if criteria == "OR":
+                    sb_filter |= sb_field_filter
+                else:
+                    sb_filter &= sb_field_filter
+
             sb_index += 1
 
-        print(global_q, column_q)
         if is_filtered:
             queryset = queryset.filter(global_q & column_q)
 
@@ -907,6 +916,12 @@ class TourLegFilter(filters.FilterSet):
 
 class SongsPageFilter(filters.FilterSet):
     song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
+
+
+class SongsPageNewFilter(filters.FilterSet):
+    song = filters.NumberFilter(field_name="id__song_id", lookup_expr="exact")
+    next = filters.NumberFilter(field_name="next__song_id", lookup_expr="exact")
+    prev = filters.NumberFilter(field_name="prev__song_id", lookup_expr="exact")
 
 
 class SongsFilter(filters.FilterSet):

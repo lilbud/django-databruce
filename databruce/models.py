@@ -1353,6 +1353,7 @@ class Runs(BaseModel):
         Events,
         models.DO_NOTHING,
         db_column="first_event",
+        related_name="event_run_first",
         null=True,
         blank=True,
         default=None,
@@ -1361,11 +1362,12 @@ class Runs(BaseModel):
         Events,
         models.DO_NOTHING,
         db_column="last_event",
-        related_name="runs_last_event_set",
+        related_name="event_run_last",
         null=True,
         blank=True,
         default=None,
     )
+    note = models.TextField(default=None, blank=True, null=True)
 
     class Meta:
         db_table = "runs"
@@ -1736,6 +1738,14 @@ class SongsPage(models.Model):
         related_name="prev_song",
         db_column="prev",
     )
+    prev_setlist = models.OneToOneField(
+        Setlists,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="prev_song_id",
+        db_column="prev_setlist",
+    )
     next = models.OneToOneField(
         Songs,
         models.DO_NOTHING,
@@ -1744,10 +1754,50 @@ class SongsPage(models.Model):
         related_name="next_song",
         db_column="next",
     )
+    next_setlist = models.OneToOneField(
+        Setlists,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="next_song_id",
+        db_column="next_setlist",
+    )
 
     class Meta:
         managed = False
         db_table = "songs_page"
+
+
+class SongsPageNew(models.Model):
+    id = models.OneToOneField(
+        Setlists,
+        models.DO_NOTHING,
+        primary_key=True,
+        related_name="songs_page_new",
+        db_column="id",
+    )
+
+    prev = models.OneToOneField(
+        Setlists,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="prev_id",
+        db_column="prev",
+    )
+
+    next = models.OneToOneField(
+        Setlists,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="next_id",
+        db_column="next",
+    )
+
+    class Meta:
+        managed = False
+        db_table = "songs_page_new"
 
 
 class SetlistStats(models.Model):

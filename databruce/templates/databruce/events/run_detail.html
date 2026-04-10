@@ -11,6 +11,20 @@
       <a href="{% url "runs" %}">Runs</a>
       &gt; {{ info }}
     </div>
+    <div class="row">
+      <div class="col-12">
+        {% if info.note %}
+          <div class="card mb-3">
+            <div class="card-body text-sm">
+              <div class="text-wrap">
+                <span class="fw-medium">Notes:</span>
+                <div>{{ info.note|markdown|safe }}</div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
     <div class="card">
       <div class="card-header">
         <ul class="nav nav-pills nav-fill" role="tablist">

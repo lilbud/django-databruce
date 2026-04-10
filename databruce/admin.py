@@ -1,3 +1,5 @@
+import zoneinfo
+
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import site
@@ -156,13 +158,29 @@ class UserAttendedShowsAdmin(ModelAdmin):
     list_display_links = ["id"]
 
 
-class BandsForm(forms.ModelForm):
+class NoteForm(forms.ModelForm):
+    note = forms.CharField(
+        widget=MarkdownWidget(),
+    )
+
+
+class BandsForm(NoteForm):
     note = forms.CharField(
         widget=MarkdownWidget(),
     )
 
     class Meta:
         model = models.Bands
+        fields = "__all__"
+
+
+class RunForm(NoteForm):
+    note = forms.CharField(
+        widget=MarkdownWidget(),
+    )
+
+    class Meta:
+        model = models.Runs
         fields = "__all__"
 
 
@@ -285,6 +303,33 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = models.Events
         fields = "__all__"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        changed_data = self.changed_data
+
+        # scheduled_time = changed_data["scheduled_time"]
+        # start_time = changed_data["start_time"]
+        # end_time = changed_data["end_time"]
+
+        location = cleaned_data.get("venue")
+        tz_name = location.city.timezone
+        tz = zoneinfo.ZoneInfo(tz_name)
+
+        if "scheduled_time" in changed_data:
+            cleaned_data["scheduled_time"] = cleaned_data.get("scheduled_time").replace(
+                tzinfo=tz,
+            )
+
+        if "start_time" in changed_data:
+            cleaned_data["start_time"] = cleaned_data.get("start_time").replace(
+                tzinfo=tz,
+            )
+
+        if "end_time" in changed_data:
+            cleaned_data["end_time"] = cleaned_data.get("end_time").replace(tzinfo=tz)
+
+        return cleaned_data
 
 
 @admin.register(models.Events)
@@ -561,6 +606,7 @@ class VenueAdmin(ModelAdmin):
 
 @admin.register(models.Runs)
 class RunAdmin(ModelAdmin):
+    form = RunForm
     search_fields = ["name", "band__name"]
     autocomplete_fields = ["band", "first_event", "last_event", "venue"]
     list_select_related = [

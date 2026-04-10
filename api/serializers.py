@@ -790,6 +790,55 @@ class TourLegsSerializer(BaseSerializer):
         fields = "__all__"
 
 
+class SongsPageNewSerializer(BaseSerializer):
+    id = SetlistSerializer(source="id_id", include=["id", "set_name"])
+
+    event = EventsSerializer(
+        source="id.event",
+        include=["id", "event_id", "venue", "artist", "date", "tour"],
+    )
+
+    prev = SetlistSerializer(
+        include=["id", "segue", "song"],
+        required=False,
+    )
+
+    next = SetlistSerializer(
+        include=["id", "segue", "song"],
+        required=False,
+    )
+
+    position = serializers.CharField(
+        required=False,
+        source="id.setlist_position.position",
+    )
+
+    stats = SetlistStatsSerializer(
+        required=False,
+        read_only=True,
+        source="id.setlist_stats",
+    )
+
+    set_name = serializers.CharField(
+        required=False,
+        source="id.set_name",
+    )
+
+    notes = serializers.SerializerMethodField()
+
+    def get_notes(self, obj):
+        if not obj.id.setlist_notes.exists():
+            return None
+
+        return list(
+            {item.note for item in obj.id.setlist_notes.all() if item.note != ""},
+        )
+
+    class Meta:
+        model = models.SongsPageNew
+        fields = "__all__"
+
+
 class SongsPageSerializer(BaseSerializer):
     id = serializers.IntegerField()
     song = SongsSerializer(include=["id", "name", "uuid"])
@@ -803,11 +852,28 @@ class SongsPageSerializer(BaseSerializer):
         source="setlist_stats",
     )
 
-    position = serializers.SerializerMethodField()
+    position = serializers.CharField(
+        required=False,
+        source="setlist_position.position",
+    )
 
     songs_map = {
         s.id: MinimalSongsSerializer(s).data for s in models.Songs.objects.all()
     }
+
+    prev_setlist = SetlistSerializer(
+        source="songs_page.prev_setlist",
+        include=["id", "segue"],
+        read_only=True,
+        required=False,
+    )
+
+    next_setlist = SetlistSerializer(
+        source="songs_page.next_setlist",
+        include=["id", "segue"],
+        read_only=True,
+        required=False,
+    )
 
     prev_song = SongsSerializer(
         source="songs_page.prev",
@@ -830,24 +896,6 @@ class SongsPageSerializer(BaseSerializer):
         return list(
             {item.note for item in obj.setlist_notes.all() if item.note != ""},
         )
-
-    # def get_prev_song(self, obj):
-    #     try:
-    #         return self.songs_map[obj.songs_page.prev_id]
-    #     except (KeyError, TypeError):
-    #         return None
-
-    # def get_next_song(self, obj):
-    #     try:
-    #         return self.songs_map[obj.songs_page.next_id]
-    #     except (KeyError, TypeError):
-    #         return None
-
-    def get_position(self, obj):
-        try:
-            return obj.setlist_position.position
-        except models.Setlists.setlist_position.RelatedObjectDoesNotExist:
-            return None
 
     class Meta:
         model = models.Setlists

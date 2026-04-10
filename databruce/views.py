@@ -497,8 +497,6 @@ class EventDetail(PageTitleMixin, TemplateView):
         except AttributeError:
             context["end_time"] = None
 
-        print(context["start_time"], context["end_time"], timezone)
-
         if context["event"].start_time and context["event"].end_time:
             context["duration"] = context["event"].end_time.astimezone(
                 timezone,
@@ -633,7 +631,7 @@ class SongLyricDetail(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["lyrics"] = get_object_or_404(
-            models.Lyrics.objects.select_related("song"),
+            models.Lyrics.objects.filter().select_related("song"),
             uuid=self.kwargs["id"],
         )
 

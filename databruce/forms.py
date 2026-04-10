@@ -81,7 +81,7 @@ class AdvancedEventSearch(forms.Form):
             value.get("id") if isinstance(value, dict) else value,
         )
 
-        print(field, lookup_path, val_id)
+        # print(field, lookup_path, val_id)
 
         q_obj = Q(**{lookup_path: val_id})
 
@@ -105,7 +105,7 @@ class AdvancedEventSearch(forms.Form):
 
             value = self.cleaned_data.get(field)
 
-            print(value, type(value))
+            # print(value, type(value))
 
             if not value:
                 continue
@@ -326,7 +326,7 @@ class AdvancedEventSearch(forms.Form):
 
     band = CustomCharField(
         label="Band",
-        lookup_path="onstage__band_id",
+        lookup_path="artist_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -429,8 +429,6 @@ class AdvancedEventSearch(forms.Form):
 
     def clean_event_type(self):
         if self.cleaned_data["event_type"]:
-            print(type(self.cleaned_data["event_type"]))
-
             if isinstance(self.cleaned_data["event_type"], list):
                 return models.EventTypes.objects.filter(
                     id__in=self.cleaned_data["event_type"],

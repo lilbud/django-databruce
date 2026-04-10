@@ -128,6 +128,7 @@
         ajax: {
           'url': '/api/v1/setlist_songs/?city={{ info.id }}&format=custom',
         },
+        order: [[0, 'asc']],
         columnDefs: song_table_defs,
         columns: song_table_columns,
         initComplete: function(settings, json){ 

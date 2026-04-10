@@ -157,6 +157,8 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
             "songs_page",
             "songs_page__prev",
             "songs_page__next",
+            "songs_page__prev_setlist",
+            "songs_page__next_setlist",
             "setlist_stats",
             "setlist_stats__ltp",
             "event__venue__city__state",
@@ -562,7 +564,7 @@ class SnippetViewSet(viewsets.ReadOnlyModelViewSet):
                 # Count total occurrences of this snippet/song combo
                 count=SubqueryCount(related_events),  # Adjust based on how you group
             )
-        )
+        ).order_by("setlist__event__event_id")
 
         return self.filter_queryset(queryset)
 
@@ -832,8 +834,29 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
 
 
 class SongsPage(viewsets.ReadOnlyModelViewSet):
-    queryset = models.SongsPage.objects.all()
-    serializer_class = serializers.SongsPageSerializer
+    queryset = (
+        models.SongsPageNew.objects.all()
+        .select_related(
+            "id__song",
+            "id__event",
+            "id__event__venue__city__country",
+            "id__event__artist",
+            "id__event__tour",
+            "id__event__venue__venues_text",
+        )
+        .prefetch_related(
+            "prev__song",
+            "next__song",
+            "id__setlist_position",
+            "id__setlist_stats",
+            "id__setlist_stats__ltp",
+            "id__setlist_notes",
+            "id__event__venue__city__state",
+        )
+        .order_by("id__event__event_id", F("id__song_num").asc(nulls_first=True))
+    )
+    serializer_class = serializers.SongsPageNewSerializer
+    filterset_class = filters.SongsPageNewFilter
 
 
 class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):

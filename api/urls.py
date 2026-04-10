@@ -34,6 +34,7 @@ router.register(r"songs", views.SongsViewSet, basename="songs")
 router.register(r"tours", views.ToursViewSet, basename="tour")
 router.register(r"tour_legs", views.TourLegsViewSet, basename="tour_leg")
 router.register(r"songspage", views.SongsPageViewSet, basename="songs_page")
+router.register(r"sp_new", views.SongsPage, basename="songs_page_new")
 router.register(r"lyrics", views.LyricsViewSet, basename="lyrics")
 router.register(
     r"setlist_entries",

@@ -172,7 +172,7 @@ function dtCategorySelect({ layout, column_idx, values, label = false }) {
       text: element.label,
       className: 'button-page-length',
       action: function (e, dt, node, config) {
-        dt.column(column_idx).search(element.value, { regex: true }).draw();
+        dt.order([0, 'asc']).column(column_idx).search(element.value, { regex: true }).draw();
         node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
 
         node.parents('.dropdown-menu').find('.dt-button').each(function () {

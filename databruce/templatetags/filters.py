@@ -10,6 +10,17 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 
+class EMarkdown(markdown.Markdown):
+    def convert(self, text):
+        # Call the standard conversion
+        html = super().convert(text)
+        # Manually strip the wrapping <p> tags
+        return html.removeprefix("<p>").removesuffix("</p>")
+
+
+md = EMarkdown()
+
+
 @register.simple_tag(takes_context=True)
 def render_includes(context, value):
     """Render a string as a Django template within the current context."""
@@ -41,7 +52,7 @@ def render_includes(context, value):
 @register.filter(name="markdown")
 def markdown_convert(note: str) -> str:
     if note:
-        return markdown.markdown(note.strip())
+        return md.convert(note.strip())
 
     return None
 
