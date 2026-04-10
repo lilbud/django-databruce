@@ -373,11 +373,11 @@
                   $(badge).addClass('text-bg-info').text('Sign Request');
                 } else if (row.nobruce) {
                   $(badge).addClass('bg-warning').text('No Bruce');
-                } else if (row.premiere) {
+                } else if (row.stats.premiere) {
                   $(badge).addClass('bg-secondary').text('First');
-                } else if (row.debut && !row.premiere) {
+                } else if (row.stats.debut && !row.stats.premiere) {
                   $(badge).addClass('bg-secondary').text('TD');
-                } else if (row.last >= 50 && !row.debut) {
+                } else if (row.stats.last >= 50 && !row.stats.debut) {
                   $(badge).addClass('bg-secondary').text('Bust');
                 }
 
