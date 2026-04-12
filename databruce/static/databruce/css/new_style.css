@@ -944,6 +944,7 @@ button.nav-link .badge {
 
 .prefix-container {
     display: flex !important;
+    text-wrap: nowrap !important;
 }
 
 .prefix-container>span.prefix {
@@ -956,7 +957,7 @@ button.nav-link .badge {
 }
 
 .prefix-container>span.value {
-    text-wrap: nowrap !important;
+    text-wrap: wrap !important;
 }
 
 .map-container {
