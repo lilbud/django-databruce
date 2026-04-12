@@ -230,7 +230,9 @@ song_table_columns = [
     'type': 'text',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      return renderLink('/events/', data.event_id, data.date.display_day);
+      if (type === 'display' && data) {
+        return renderLink('/events/', data.event_id, data.date.display_day);
+      }
     },
   },
   {
@@ -240,7 +242,9 @@ song_table_columns = [
     'type': 'text',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      return renderLink('/events/', data.event_id, data.date.display_day);
+      if (type === 'display' && data) {
+        return renderLink('/events/', data.event_id, data.date.display_day);
+      }
     },
   },
 ]
@@ -277,7 +281,9 @@ event_table_columns = [
     'name': 'artist__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/bands/', data.uuid, data.name);
+      if (type === 'display' && data) {
+        return renderLink('/bands/', data.uuid, data.name);
+      }
     },
   },
   {
@@ -285,7 +291,9 @@ event_table_columns = [
     'name': 'venue__name, venue__detail',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/venues/', data.uuid, data.name);
+      if (type === 'display' && data) {
+        return renderLink('/venues/', data.uuid, data.name);
+      }
     },
   },
   {
@@ -293,7 +301,9 @@ event_table_columns = [
     'name': 'venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/cities/', data.uuid, data.formatted);
+      if (type === 'display' && data) {
+        return renderLink('/cities/', data.uuid, data.formatted);
+      }
     },
   },
   {
@@ -301,7 +311,9 @@ event_table_columns = [
     'name': 'tour__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/tours/', data.uuid, data.name);
+      if (type === 'display' && data) {
+        return renderLink('/tours/', data.uuid, data.name);
+      }
     },
   },
   {

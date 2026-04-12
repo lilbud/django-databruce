@@ -81,8 +81,13 @@
                     </div>
                     <div class="row text-lg fw-medium text-reset">
                       <div class="col">
-                        <a class="text-reset"
-                           href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}, {{ event.venue.city }}</a>
+                        {% if event.venue.city %}
+                          <a class="text-reset"
+                             href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}, {{ event.venue.city }}</a>
+                        {% else %}
+                          <a class="text-reset"
+                             href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
