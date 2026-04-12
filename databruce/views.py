@@ -465,12 +465,12 @@ class EventDetail(PageTitleMixin, TemplateView):
             f"{context['event'].get_date()}<br>{context['event'].artist}<br>{context['event'].venue.name}"
         )
 
-        timezone = ZoneInfo(context["event"].venue.city.timezone)
-
         try:
             context["scheduled_time"] = (
                 context["event"]
-                .scheduled_time.astimezone(timezone)
+                .scheduled_time.astimezone(
+                    ZoneInfo(context["event"].venue.city.timezone),
+                )
                 .strftime("%I:%M%p")
                 .lower()
             )
@@ -480,7 +480,7 @@ class EventDetail(PageTitleMixin, TemplateView):
         try:
             context["start_time"] = (
                 context["event"]
-                .start_time.astimezone(timezone)
+                .start_time.astimezone(ZoneInfo(context["event"].venue.city.timezone))
                 .strftime("%I:%M%p")
                 .lower()
             )
@@ -490,7 +490,7 @@ class EventDetail(PageTitleMixin, TemplateView):
         try:
             context["end_time"] = (
                 context["event"]
-                .end_time.astimezone(timezone)
+                .end_time.astimezone(ZoneInfo(context["event"].venue.city.timezone))
                 .strftime("%I:%M%p")
                 .lower()
             )
@@ -498,9 +498,13 @@ class EventDetail(PageTitleMixin, TemplateView):
             context["end_time"] = None
 
         if context["event"].start_time and context["event"].end_time:
+            timezone = ZoneInfo(context["event"].venue.city.timezone)
+
             context["duration"] = context["event"].end_time.astimezone(
                 timezone,
-            ) - context["event"].start_time.astimezone(timezone)
+            ) - context["event"].start_time.astimezone(
+                timezone,
+            )
 
         try:
             context["prev_event"] = (

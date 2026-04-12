@@ -413,6 +413,10 @@ blockquote p:last-of-type {
     margin-bottom: 0;
 }
 
+blockquote {
+    margin: 1rem 0 !important;
+}
+
 /* smaller font size for setlist notes */
 .setlist-note {
     font-size: 0.7rem !important;
