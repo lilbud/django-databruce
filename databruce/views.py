@@ -993,13 +993,13 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
         if formset.is_valid() and formset.has_changed():
             song_ids = [
-                f["song1"].replace("'", "")
+                str(f["song1"]).replace("'", "")
                 for f in formset.cleaned_data
                 if f.get("song1")
             ]
             song_ids.extend(
                 [
-                    f["song2"].replace("'", "")
+                    str(f["song2"]).replace("'", "")
                     for f in formset.cleaned_data
                     if f.get("song2")
                 ],
@@ -1015,7 +1015,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
                 choice = form.get("choice", True)
                 pos = form.get("position")
-                s1_name = song_map.get(str(form["song1"]))
+                s1_name = song_map.get(str(form["song1"]).replace("'", ""))
 
                 choice_str = "is" if choice else "not"
 
@@ -1024,7 +1024,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                 summary = f"{s1_name} ({choice_str} anywhere)"
 
                 if pos == "followed_by" and form.get("song2"):
-                    s2_name = song_map.get(str(form["song2"]))
+                    s2_name = song_map.get(str(form["song2"]).replace("'", ""))
 
                     song2_condition = Q(
                         next_song=form["song2"],
@@ -1038,10 +1038,14 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                     summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
 
                 elif pos == "anywhere":
-                    condition = Q(songs_list__contains=[int(form["song1"])])
+                    condition = Q(
+                        songs_list__contains=[int(form["song1"].replace("'", ""))]
+                    )
 
                     if not choice or choice is None:
-                        condition = ~Q(songs_list__contains=[int(form["song1"])])
+                        condition = ~Q(
+                            songs_list__contains=[int(form["song1"].replace("'", ""))]
+                        )
 
                 else:
                     pos_filter = self.position_filters.get(pos)
