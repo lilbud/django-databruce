@@ -992,9 +992,17 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
             sl_filter &= Q(**{f"event__{f[0]}": f[1]})
 
         if formset.is_valid() and formset.has_changed():
-            song_ids = [f["song1"] for f in formset.cleaned_data if f.get("song1")]
+            song_ids = [
+                f["song1"].replace("'", "")
+                for f in formset.cleaned_data
+                if f.get("song1")
+            ]
             song_ids.extend(
-                [f["song2"] for f in formset.cleaned_data if f.get("song2")],
+                [
+                    f["song2"].replace("'", "")
+                    for f in formset.cleaned_data
+                    if f.get("song2")
+                ],
             )
 
             song_map = {

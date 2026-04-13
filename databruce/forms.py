@@ -469,8 +469,10 @@ class AdvancedEventSearch(forms.Form):
         return None
 
     def clean_relation(self):
-        if self.cleaned_data["relation"]:
-            return models.Relations.objects.get(id=self.cleaned_data["relation"])
+        data = self.cleaned_data["relation"].replace("'", "")
+
+        if data:
+            return models.Relations.objects.get(id=data)
 
         return None
 
