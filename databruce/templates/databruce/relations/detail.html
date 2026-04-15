@@ -11,7 +11,7 @@
       <a href="{% url 'relations' %}">Relations</a> &gt; {{ info.name }}
     </div>
     {% if info.start_date or info.end_date %}
-      <div class="card mb-3">
+      <div class="card mb-2">
         <div class="card-body text-sm">
           {% if info.start_date %}
             <div class="prefix-container">
@@ -29,16 +29,16 @@
       </div>
     {% endif %}
     {% if bands %}
-      <div class="card mb-3">
-        <div class="card-body text-base">
+      <div class="card mb-2">
+        <div class="card-body text-sm">
           <div class="prefix-container">
-            <span class="prefix">Appeared With</span>
-            <span class="value">
+            <div class="prefix">Appeared With</div>
+            <div class="value">
               {% for band in bands %}
                 <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
                 {% if not forloop.last %},{% endif %}
               {% endfor %}
-            </span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 DataTable.type('num', 'className', 'dt-center');
-DataTable.type('string', 'className', 'dt-left text-wrap');
+DataTable.type('string', 'className', 'dt-left');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
@@ -269,11 +269,11 @@ event_table_columns = [
     'data': 'has_setlist',
     'name': 'has_setlist',
     'width': '1rem',
-    'className': 'text-center text-sm',
+    'className': 'text-center',
     'orderable': false,
     'searchable': false,
     'render': function (data, type, row, meta) {
-      return data ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.has_setlist}</div>` : `<div class="d-inline d-md-none">${row.has_setlist}</div>`
+      return data ? `<i class="bi bi-check-lg d-block text-base" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
     },
   },
   {

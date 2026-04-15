@@ -135,31 +135,20 @@ class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
 class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    setlist = models.Setlists.objects.filter(
-        set_name=OuterRef("set_name"),
-        event__id=OuterRef("event__id"),
-    ).select_related("song", "event")
-
     queryset = (
         models.Setlists.objects.select_related(
             "event",
             "song",
             "event__tour",
             "event__artist",
-            "event__venue",
-            "event__venue__city",
             "event__venue__venues_text",
             "event__venue__city__country",
         )
         .prefetch_related(
             "setlist_notes",
             "setlist_position",
-            "songs_page",
-            "songs_page__prev",
-            "songs_page__next",
-            "songs_page__prev_setlist",
-            "songs_page__next_setlist",
-            "setlist_stats",
+            "songs_page__prev_setlist__song",
+            "songs_page__next_setlist__song",
             "setlist_stats__ltp",
             "event__venue__city__state",
         )
@@ -187,7 +176,7 @@ class CountriesViewSet(viewsets.ReadOnlyModelViewSet):
         .order_by("name")
         .annotate(
             count=SubqueryCount(
-                models.Events.objects.filter(venue__city__country__id=OuterRef("pk")),
+                models.Events.objects.filter(venue__city__country_id=OuterRef("pk")),
             ),
         )
         .select_related("first_event", "last_event")
@@ -210,43 +199,17 @@ class CoversViewSet(viewsets.ReadOnlyModelViewSet):
 class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    events = models.Events.objects.filter(venue=OuterRef("id"))
-
     queryset = (
         models.Venues.objects.all()
         .select_related(
-            "city",
+            "city__country",
         )
-        .prefetch_related("city__state", "city__country", "first_event", "last_event")
+        .prefetch_related("city__state", "first_event", "last_event")
         .order_by("name")
     )
 
     serializer_class = serializers.VenuesSerializer
     filterset_class = filters.VenuesFilter
-
-
-class EventCalendar(viewsets.ReadOnlyModelViewSet):
-    def get_queryset(self):
-        return (
-            models.Events.objects.all()
-            .select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__first_event",
-                "venue__last_event",
-                "venue__city",
-                "venue__city__country",
-            )
-            .prefetch_related(
-                "run",
-                "venue__city__state",
-            )
-            .order_by("event_id")
-        )
-
-    serializer_class = serializers.EventCalendar
-    filterset_class = filters.EventsFilter
 
 
 class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
@@ -261,7 +224,6 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 "venue",
                 "artist",
                 "tour",
-                "venue__city",
                 "venue__city__country",
             )
             .prefetch_related(
@@ -287,8 +249,6 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
         return (
             models.Events.objects.select_related(
-                "venue",
-                "venue__city",
                 "artist",
                 "tour",
                 "venue__city__country",
@@ -331,14 +291,13 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
         models.NugsReleases.objects.all()
         .filter(date__isnull=False)
         .select_related(
-            "event",
+            "event__venue__venues_text",
             "event__tour",
             "event__artist",
-            "event__venue",
+            "event__venue__city__country",
         )
         .prefetch_related(
             "event__venue__city__state",
-            "event__venue__city__country",
         )
     ).order_by("-date")
 
@@ -405,7 +364,7 @@ class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = (
         models.ReleaseTracks.objects.all()
-        .order_by("discnum", Cast("track", output_field=IntegerField()))
+        .order_by("discnum", "position")
         .select_related("song", "release")
         .prefetch_related("event", "discid", "song__first_event", "song__last_event")
     )

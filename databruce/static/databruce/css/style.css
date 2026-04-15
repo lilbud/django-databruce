@@ -1,0 +1,1132 @@
+:root {
+    --logo-mask: url('/static/databruce/img/logo.svg');
+    --nugs-logo: url('/static/databruce/img/nugs.svg');
+    --inset-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.2);
+    --text-3xs: 0.675rem;
+    --text-2xs: 0.7rem;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+}
+
+/* Text-size utility variables (keeps original sizes but centralized) */
+.text-3xs {
+    font-size: var(--text-3xs);
+}
+
+.text-2xs {
+    font-size: var(--text-2xs);
+}
+
+.text-xs {
+    font-size: var(--text-xs);
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: var(--text-sm);
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: var(--text-base);
+    line-height: 1.5rem;
+}
+
+.text-base.bi-check-lg {
+    font-size: var(--text-base) !important;
+    line-height: 1 !important;
+}
+
+.text-lg {
+    font-size: var(--text-lg);
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: var(--text-xl);
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: var(--text-2xl);
+    line-height: 2rem;
+}
+
+.text-3xl {
+    font-size: var(--text-3xl);
+    line-height: 2.25rem;
+}
+
+.text-4xl {
+    font-size: var(--text-4xl);
+    line-height: 2.5rem;
+}
+
+.text-5xl {
+    font-size: var(--text-5xl);
+    line-height: 1;
+}
+
+h2,
+h3 {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    border-bottom: 1px solid rgb(var(--border));
+}
+
+h1 {
+    font-size: var(--text-2xl);
+}
+
+h2 {
+    font-size: var(--text-lg);
+}
+
+h3 {
+    font-size: var(--text-base);
+}
+
+h4 {
+    font-size: var(--text-sm);
+}
+
+h5 {
+    font-size: var(--text-xs);
+}
+
+h6 {
+    font-size: var(--text-2xs);
+}
+
+body {
+    background-color: var(--default);
+    color: rgb(var(--base-content)) !important;
+    font-size: 0.75rem !important;
+    font-family: "Google Sans Flex", sans-serif;
+    font-variation-settings:
+        "slnt" 0,
+        "wdth" 100,
+        "GRAD" 0,
+        "ROND" 0;
+    font-optical-sizing: auto;
+    font-style: normal;
+    border-color: inherit !important;
+    max-width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Force the main content area to grow and fill available space */
+.padded-body {
+    flex: 1 0 auto;
+}
+
+/* Ensure the footer stays at the bottom */
+.footer {
+    flex-shrink: 0;
+}
+
+/* Optional: Improve the footer card appearance */
+.footer .card {
+    border-radius: 0;
+    /* Often looks better flush with the bottom */
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+}
+
+/* links card font size */
+#links ul li {
+    font-size: var(--text-sm) !important;
+}
+
+/* Remove bottom margin from last ul item in card */
+ul:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Logo */
+.logo {
+    text-indent: -9999px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+
+    /* Existing mask logic */
+    -webkit-mask-image: var(--logo-mask);
+    mask-image: var(--logo-mask);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    /* Vital Dimensions */
+    width: 125px;
+    aspect-ratio: 6 / 1;
+
+    background-color: rgb(var(--primary-content));
+}
+
+/* Navbar */
+.navbar {
+    background-color: rgb(var(--primary)) !important;
+}
+
+.btn {
+    gap: calc(0.25rem * 1.5) !important;
+    align-items: center !important;
+}
+
+.navbar .nav-item,
+.navbar .nav-item .btn,
+.navbar button.dropdown-toggle {
+    color: rgb(var(--primary-content)) !important
+}
+
+/* logo needs font size 0 to be centered, as it is an SVG */
+.navbar-brand {
+    font-size: 0 !important;
+}
+
+/* optional for screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* remove default list styles */
+nav ul {
+    list-style-type: none !important;
+}
+
+/* remove default link styles */
+a:link,
+.btn-link {
+    text-decoration: none !important;
+}
+
+.card-header,
+.card-footer {
+    font-size: var(--text-base) !important;
+    font-weight: 600 !important;
+    line-height: 1.5rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.card-header,
+.card-footer:not(#eventInfoFooter) {
+    padding: 0.35rem 0.75rem !important;
+}
+
+/* Remove bottom margin from card headers */
+.card-header * {
+    margin-bottom: 0 !important;
+}
+
+#album .card-header {
+    font-size: var(--text-2xs) !important;
+    font-weight: 500 !important;
+    line-height: 1.25rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* Remove the border from the last row of cells to prevent card overlap */
+.card .table tbody tr:last-child th,
+.card .table tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+/* Ensure the table itself doesn't have a bottom margin that creates a gap */
+.card .table {
+    margin-bottom: 0 !important;
+}
+
+.card {
+    overflow: hidden !important;
+}
+
+.row:has(>div[class*="dt-layout-"]:empty) {
+    display: none !important;
+    margin-top: 0 !important;
+}
+
+.dt-layout-full {
+    padding: 0 !important;
+    margin-top: 0 !important;
+}
+
+#setlistTable_wrapper>.dt-layout-table,
+.index .dt-layout-table {
+    margin-top: 0 !important;
+}
+
+/* card */
+/* custom message card */
+.card.message {
+    border-width: 1px !important;
+    border-style: solid !important;
+    overflow: hidden !important;
+    color: rgb(var(--base-content)) !important;
+    padding: 0.5rem !important;
+    font-style: italic !important;
+    font-size: var(--text-xs) !important;
+    line-height: 1rem;
+}
+
+.card.message.info {
+    background-color: rgba(var(--info), 0.3) !important;
+    border-color: rgba(var(--info), 0.6) !important;
+}
+
+.card.message.error {
+    background-color: rgba(var(--danger), 0.3) !important;
+    border-color: rgba(var(--danger), 0.6) !important;
+}
+
+.card.message.warning {
+    background-color: rgba(var(--warning), 0.3) !important;
+    border-color: rgba(var(--warning), 0.6) !important;
+}
+
+.card-header,
+.card-footer,
+.card-body,
+.card,
+.list-group-item {
+    background-color: var(--subtle) !important;
+    border-color: var(--highlight) !important;
+    color: rgb(var(--base-content)) !important;
+}
+
+.card-body,
+th,
+tr:not(.set-header) td:not(.songnum, .table-warning, .table-danger),
+.list-group-item.breakdown {
+    background-color: var(--subtle) !important;
+}
+
+.form-control,
+.form-select,
+.form-select-sm {
+    background-color: rgb(var(--base-300)) !important;
+}
+
+/* song num cell background when not position */
+td.songnum:not(:is([class*="opener"], [class*="closer"])) {
+    background-color: rgb(var(--base-300)) !important;
+}
+
+table th {
+    font-size: var(--text-sm) !important;
+}
+
+td {
+    line-height: 1rem !important;
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+}
+
+table.dataTable tbody tr:not(.album-header) td,
+tr.album-header>th {
+    font-size: var(--text-xs) !important;
+}
+
+
+
+table.dataTable td:not(.highlighted) a:not(.text-reset) {
+    color: rgb(var(--primary-text)) !important;
+}
+
+/* setlist table highlighting, different shades for light and dark */
+[data-bs-theme="dark"] td.highlighted {
+    box-shadow: inset 0 0 100px 100px rgba(var(--border), 0.6);
+}
+
+[data-bs-theme="light"] td.highlighted {
+    box-shadow: inset 0 0 100px 100px rgba(var(--border), 0.4);
+}
+
+/* change text color when setlist table rows highlighted */
+td.highlighted *:not(.badge) {
+    color: rgb(var(--base-content)) !important;
+}
+
+table.dataTable td:not(.highlighted) a {
+    font-weight: 500 !important;
+}
+
+/* font weight for not song num */
+table.dataTable td:not(.songnum) {
+    font-weight: 300 !important;
+}
+
+/* padding for non-set header rows */
+table.dataTable tbody tr td {
+    padding-top: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+}
+
+/* remove border from album header in breakdown card */
+tr.album-header>td {
+    border-width: 0px !important;
+}
+
+/* align all calendar day cell content to middle vertically */
+td:not(.fc-day) {
+    align-items: center;
+    vertical-align: middle !important;
+}
+
+td .badge {
+    font-weight: 500 !important;
+    font-size: 0.7rem !important;
+    padding: 0.2em 0.45em 0.2em 0.45em !important;
+    border-radius: 0.5rem !important;
+}
+
+/* custom badges for the badge row on event detail */
+.badge-row .badge {
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    display: inline-flex;
+    vertical-align: middle;
+    padding: 0.25em 0.6em 0.25em 0.6em !important;
+    margin-top: -3px !important;
+    border-radius: 0.7rem !important;
+}
+
+td .segue,
+td .badge,
+td .check {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-top: -3px !important;
+}
+
+.segue {
+    font-size: var(--text-xl) !important;
+    font-weight: 300 !important;
+    color: rgb(var(--base-content)) !important;
+}
+
+/* remove bottom margin from paragraphs in event note card */
+blockquote p:last-of-type {
+    margin-bottom: 0;
+}
+
+blockquote {
+    margin: 1rem 0 !important;
+}
+
+/* smaller font size for setlist notes */
+.setlist-note {
+    font-size: 0.7rem !important;
+}
+
+.card,
+.card-body {
+    overflow: scroll !important;
+}
+
+/* fix for scrolling table in card  */
+/* does this value seem odd? yes */
+/* why? because it is the absolute max width that the scrollable table can go before it affects the rest of the page */
+@media (max-width: 960px) {
+
+    .dt-scroll,
+    .dt-scroll-head,
+    .dt-scroll-body {
+        max-width: 97.5vw !important;
+    }
+}
+
+/* remove horizonal margin from empty datatable rows */
+div.dt-container div.dt-layout-full> :only-child {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* datatable control labels */
+div.dt-container label {
+    font-weight: normal;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.btn-group,
+.btn-group-vertical {
+    position: relative;
+    display: block;
+}
+
+/* datatable category dropdown button */
+#dropdown-btn {
+    margin-left: 0.5em;
+    border-radius: var(--bs-btn-border-radius) !important;
+}
+
+/* hide empty event note paragraphs, added by filter tag */
+.event-note p:empty {
+    display: none !important;
+}
+
+/* hide empty event note breaks, added by filter tag */
+.event-note br:last-of-type {
+    display: none !important;
+}
+
+/* calendar */
+td.fc-day {
+    padding: 0.1rem !important;
+}
+
+.fc-event {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-wrap: wrap !important;
+    word-wrap: break-word !important;
+}
+
+/* dropdown items */
+.dropdown-item:hover {
+    box-shadow: inset 0 0 100px 100px rgba(var(--primary), 0.5);
+    background-color: rgba(var(--primary), 0.5) !important;
+    border-color: rgb(var(--primary)) !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+
+/* buttons highlight on hover */
+.btn:not(.btn-primary-dark):hover {
+    box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.2);
+}
+
+/* badges highlight on hover */
+.badge-row .badge:hover {
+    box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
+}
+
+/* remove border from disabled buttons */
+button:disabled {
+    border-color: none !important
+}
+
+/* highlighting on jquery autocomplete menu */
+.ui-state-active:hover,
+.ui-state-active {
+    background-color: rgb(var(--primary)) !important;
+    border-color: rgb(var(--primary)) !important;
+    color: rgb(var(--base-content)) !important;
+}
+
+/* column control dropdown */
+.dtcc-dropdown.dropdown-menu {
+    font-size: var(--text-xs) !important;
+}
+
+.dropdown-item {
+    font-size: var(--text-sm) !important;
+    color: rgb(var(--base-content)) !important;
+    overflow: hidden !important;
+}
+
+.dropdown-menu .dropdown-item {
+    border-radius: 0.3rem !important;
+}
+
+.dropdown-item:hover {
+    text-decoration: none !important;
+}
+
+/* progress bar for album breakdown */
+.progress {
+    height: 0.35rem !important;
+    border-radius: 0.2rem !important;
+    background-color: rgb(var(--base-300)) !important;
+}
+
+/* album breakdown on hover */
+td:has(.album-breakdown):hover .progress {
+    background-color: rgb(var(--base-100)) !important;
+}
+
+.progress-bar {
+    border-radius: inherit !important;
+    background-color: rgb(var(--primary)) !important;
+}
+
+/* hide empty table cells */
+#albumTable tr td:empty {
+    display: none !important;
+}
+
+/* hide debug and edit button on print */
+@media print {
+    #djDebug {
+        display: none !important;
+    }
+
+    #admin-btn {
+        display: none !important;
+    }
+}
+
+/* active nav button and datatables control color */
+button.nav-link.active,
+.dt-paging-button.page-item.active>button.page-link {
+    background-color: rgb(var(--primary)) !important;
+    border-color: rgb(var(--primary)) !important;
+}
+
+.dt-paging-button.page-item:not(.active)>button.page-link {
+    color: rgb(var(--primary)) !important;
+}
+
+/* inactive nav button color and font */
+button.nav-link:not(.active) {
+    font-weight: 300 !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+[data-bs-theme="dark"] button.nav-link:not(.active) {
+    background-color: color-mix(in srgb, rgb(var(--primary)) 100%, black 70%);
+}
+
+[data-bs-theme="light"] button.nav-link:not(.active) {
+    color: rgb(var(--base-content)) !important;
+    background-color: color-mix(in srgb, rgb(var(--primary)) 100%, white 90%);
+}
+
+/* active nav button font weight */
+button.nav-link.active {
+    font-weight: 600 !important;
+}
+
+/* inactive nav link color */
+a.nav-link:not(.active) {
+    color: rgb(var(--base-content)) !important;
+}
+
+a:not(.nav-link, .btn, .dropdown-item):hover,
+.btn-link:hover {
+    text-decoration: underline !important;
+}
+
+/* keep debug panel links white */
+#djDebugPanelList a {
+    color: white !important;
+}
+
+/* links should be primary site color except buttons and certain classes */
+a:not(.text-reset, .dropdown-item, .btn) {
+    color: rgb(var(--primary-text)) !important;
+}
+
+/* hides doubled column control buttons */
+.dt-column-header>.dtcc:nth-child(3) {
+    display: none !important;
+}
+
+/* column control button icon color */
+table.dataTable span.dtcc span.dtcc-button-icon {
+    color: rgb(var(--base-content)) !important;
+}
+
+/* set-header default color */
+.set-header td {
+    background-color: #717f8e !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+/* set-header and songnum font weight */
+.set-header span,
+.songnum {
+    font-weight: 500 !important;
+}
+
+/* set-header colors and badge colors */
+.set-2-opener,
+td .badge.bg-secondary {
+    background-color: rgba(var(--secondary), 0.8) !important;
+    color: rgb(var(--secondary-content)) !important;
+}
+
+.set-1-closer,
+.main-set-closer {
+    background-color: rgba(var(--accent), 0.8) !important;
+    color: rgb(var(--accent-content)) !important;
+}
+
+.encore-opener,
+.show-closer {
+    background-color: rgb(var(--danger)) !important;
+    color: rgb(var(--danger-content)) !important;
+}
+
+.set-header:is(.set-1, .show) td,
+.show-opener,
+td .badge.bg-primary,
+.badge.show-opener {
+    background-color: rgba(var(--primary), 0.8) !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+.set-header.set-2 td {
+    background-color: rgb(var(--secondary), 0.8) !important;
+    color: rgb(var(--secondary-content)) !important;
+}
+
+.set-header.encore td {
+    background-color: rgb(var(--danger)) !important;
+    color: rgb(var(--primary-content)) !important;
+}
+
+/* event detail badge row padding */
+.badge-row .btn-sm {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+
+/* button icon */
+.btn i {
+    font-weight: 900 !important;
+    font-size: var(--text-base);
+    display: inline-block;
+    line-height: 1;
+}
+
+.icon-button i {
+    padding-right: 0.25rem !important;
+}
+
+.icon-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Apply margin to everything EXCEPT the very last element */
+.card-body.event-note>*:not(:last-child) {
+    margin-bottom: 0.75rem !important;
+}
+
+/* Ensure the last element has no margin regardless of tag */
+.card-body.event-note> :last-child {
+    margin-bottom: 0 !important;
+}
+
+/* .card-body.event-note :not(:last-child) {
+    margin-bottom: 0.5rem !important;
+} */
+
+/* have margin on all nav-pills except last */
+.nav.nav-pills li:not(:last-child) {
+    margin-right: 0.25rem !important;
+}
+
+/* edit button, shown only to admin and hover at bottom right */
+#admin-btn,
+#new-btn {
+    position: fixed;
+    bottom: 60px;
+    right: 30px;
+    z-index: 9999;
+
+    .btn {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+}
+
+div.dt-scroll-body {
+    border-bottom-width: 0px !important;
+}
+
+.card-body:not(:has(#headimg)) {
+    border-bottom-left-radius: var(--bs-border-radius) !important;
+    border-bottom-right-radius: var(--bs-border-radius) !important;
+    border-color: var(--emphasis) !important;
+}
+
+i.icon.nugs {
+    height: 17px !important;
+    width: 18px !important;
+}
+
+i.icon.nugs::before {
+    content: "";
+    background-color: rgb(var(--base-content)) !important;
+    -webkit-mask-image: var(--nugs-logo);
+    mask-image: var(--nugs-logo);
+    display: block;
+    height: 14px;
+    width: 14px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 1px !important;
+}
+
+.row-cols-7>*:not(.vr) {
+    flex: 0 0 auto;
+    width: 14.2857142857%;
+}
+
+.row-cols-8>*:not(.vr) {
+    flex: 0 0 auto;
+    width: 12.5%;
+}
+
+.row-cols-10>*:not(.vr) {
+    flex: 0 0 auto;
+    width: 10%;
+}
+
+.row-cols-11>*:not(.vr) {
+    flex: 0 0 auto;
+    width: 9.09090909%;
+}
+
+@media (min-width: 992px) {
+    .row-cols-lg-8>*:not(.vr) {
+        flex: 0 0 auto;
+        width: 12.5%;
+    }
+}
+
+@media (min-width: 992px) {
+    .row-cols-lg-7>*:not(.vr) {
+        flex: 0 0 auto;
+        width: 14.2857142857%;
+    }
+}
+
+@media (min-width: 992px) {
+    .row-cols-lg-10>*:not(.vr) {
+        flex: 0 0 auto;
+        width: 10%;
+    }
+}
+
+@media (min-width: 992px) {
+    .row-cols-lg-11>*:not(.vr) {
+        flex: 0 0 auto;
+        width: 9.09090909%;
+    }
+}
+
+.vertical-line {
+    border-left: 1px solid black;
+    /* Width, style, and color of the line */
+    height: auto;
+    /* Length of the line */
+}
+
+button.nav-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button.nav-link * {
+    display: inline-flex;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+}
+
+button.nav-link .badge {
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    display: inline-flex;
+    vertical-align: middle;
+    padding: 0.25em 0.6em 0.25em 0.6em !important;
+    margin-left: 0.25rem !important;
+}
+
+#albumTable_wrapper>.dt-layout-table {
+    margin-top: 0 !important;
+}
+
+.album-breakdown .list-group-item {
+    font-size: var(--text-3xs) !important;
+    background-color: var(--highlight) !important;
+}
+
+.py-0\.5 {
+    padding-top: 0.125rem !important;
+    padding-bottom: 0.125rem !important;
+}
+
+.card-img-top {
+    border-top-left-radius: var(--bs-card-inner-border-radius) !important;
+    border-top-right-radius: var(--bs-card-inner-border-radius) !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+.fc-h-event .fc-event-main {
+    color: rgb(var(--base-content)) !important;
+}
+
+.calendar.event:hover {
+    text-decoration: none !important;
+    box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.1);
+}
+
+.calendar.release-event {
+    background-color: rgb(var(--accent)) !important;
+    border-color: rgb(var(--accent)) !important;
+}
+
+.calendar.release-event-past {
+    background-color: rgb(var(--base-100)) !important;
+    border-color: rgb(var(--accent)) !important;
+}
+
+.calendar.release-event-birthday {
+    background-color: rgb(var(--base-100)) !important;
+    border-color: rgb(var(--primary-text)) !important;
+}
+
+.calendar.event-run {
+    background-color: rgb(var(--secondary)) !important;
+    border-color: rgb(var(--secondary)) !important;
+}
+
+.calendar.event {
+    color: rgb(var(--base-content)) !important;
+}
+
+.calendar.event.show {
+    color: rgb(var(--primary-content)) !important;
+    background-color: rgb(var(--primary)) !important;
+}
+
+.calendar.release-event .fc-event-main,
+.calendar.event-run .fc-event-main {
+    color: white !important;
+}
+
+.calendar.release-event-past .fc-event-main {
+    color: rgb(var(--accent)) !important;
+    font-weight: 500 !important;
+}
+
+.calendar.release-event-birthday .fc-event-main {
+    color: rgb(var(--primary-text)) !important;
+    font-weight: 500 !important;
+}
+
+.calendar.release-event-birthday .fc-event-main::before {
+    font-family: "bootstrap-icons" !important;
+    content: "\F6ED" !important;
+    margin-right: 0.25rem !important;
+    vertical-align: middle;
+}
+
+.prefix-container {
+    display: flex !important;
+    text-wrap: wrap !important;
+}
+
+.prefix-container>.prefix {
+    font-weight: 500 !important;
+    margin-right: 0.5rem !important;
+    text-wrap: nowrap !important;
+}
+
+.prefix-container>.prefix::after {
+    content: ":";
+}
+
+.prefix-container>.value {
+    text-wrap: wrap !important;
+}
+
+.map-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#map-object {
+    height: 500px !important
+}
+
+@keyframes shadcn-entrance {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-2px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* .dropdown-menu:not(.ui-autocomplete).show {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-height: 250px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: rgb(var(--base-100)) !important;
+    border-radius: var(--bs-border-radius) !important;
+    padding: 0.3rem !important;
+} */
+
+/* Initial state: Hidden and transparent */
+.dropdown-menu:not(.ui-autocomplete) {
+    opacity: 0;
+    visibility: hidden;
+    overflow-y: scroll;
+    padding: 0.3rem !important;
+    overflow-x: hidden;
+    transform: translateY(2px);
+    background-color: rgb(var(--base-100)) !important;
+    border-radius: var(--bs-border-radius) !important;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    max-height: 250px;
+    box-shadow: var(--bs-box-shadow);
+}
+
+
+
+.ui-menu {
+    border: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color);
+}
+
+/* jquery autocomplete menu, display above all and scroll */
+.ui-autocomplete {
+    max-height: 250px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: fixed;
+    background-color: rgb(var(--base-100)) !important;
+    z-index: 1100 !important;
+    border-radius: var(--bs-border-radius);
+    padding: 0.3rem !important;
+}
+
+.ui-widget {
+    font-family: inherit !important;
+    font-size: var(--text-sm) !important;
+    border: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color) !important;
+}
+
+/* Individual item styling */
+.ui-menu-item {
+    padding: 0 !important;
+}
+
+.ui-menu-item .ui-menu-item-wrapper {
+    display: block;
+    padding: 0.25rem 1rem !important;
+    font-family: inherit !important;
+    border: 0;
+}
+
+/* Hover/Focus state */
+.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+    color: rgb(var(--primary-content)) !important;
+    background-color: rgb(var(--primary)) !important;
+    border-radius: 0.3rem !important;
+    border: none;
+    margin: 0;
+}
+
+figure {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+figure img {
+    object-position: top;
+    object-fit: contain;
+    border-radius: var(--bs-border-radius);
+}
+
+figure.half {
+    gap: 1rem;
+}
+
+a>img {
+    justify-content: center !important;
+}
+
+figure:not(.half) img {
+    width: 50% !important;
+    height: auto !important;
+}
+
+figure.full img {
+    width: 100% !important;
+    height: auto !important;
+}
+
+figure.half img {
+    width: calc(50% - 0.5rem);
+    height: auto !important;
+}
+
+figcaption {
+    width: 100%;
+    text-align: center;
+}
+
+pre {
+    padding: 1rem !important;
+    border-radius: var(--bs-border-radius) !important;
+    background-color: rgb(var(--base-300)) !important;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    word-break: normal !important;
+    font-size: var(--text-sm);
+    line-height: 1.25rem;
+}
+
+.form-control,
+.form-control-sm,
+.form-select,
+.form-select-sm {
+    border: 1px solid rgb(var(--border));
+}
+
+.form-select-sm {
+    padding: .25rem;
+    font-size: .875rem;
+    border-radius: var(--bs-border-radius-sm);
+}
+
+.bi.bi-star,
+.bi.bi-star-fill {
+    height: 16px;
+    width: 16px;
+}

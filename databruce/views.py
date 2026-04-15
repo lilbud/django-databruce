@@ -34,6 +34,7 @@ from django.db.models import (
     Q,
     QuerySet,
     Subquery,
+    Sum,
     Value,
     Window,
 )
@@ -1039,12 +1040,12 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
                 elif pos == "anywhere":
                     condition = Q(
-                        songs_list__contains=[int(form["song1"].replace("'", ""))]
+                        songs_list__contains=[int(form["song1"].replace("'", ""))],
                     )
 
                     if not choice or choice is None:
                         condition = ~Q(
-                            songs_list__contains=[int(form["song1"].replace("'", ""))]
+                            songs_list__contains=[int(form["song1"].replace("'", ""))],
                         )
 
                 else:
@@ -1193,7 +1194,9 @@ class ReleaseDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(models.Releases, uuid=self.kwargs["id"])
+
+        queryset = models.Releases.objects.all()
+        context["info"] = get_object_or_404(queryset, uuid=self.kwargs["id"])
         context["title"] = f"{context['info'].name}"
 
         return context

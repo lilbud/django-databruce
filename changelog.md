@@ -188,3 +188,12 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Band Detail] Added "note" card
 - Added "News" page, which is basically a site blog
 - Fixed many issues with signup and user adding shows
+- Cleaned up several API views, faster response on many
+- [Advanced Search] Fixed issue where quotes in IDs would cause error
+- [Event Tables] Changed setlist icon to checkmark, removed true/false text
+- [Event Detail] Link buttons now centered and evenly spaced
+- [Home Page] Changed rendering of Upcoming/Recent/OTD Tables, no longer using Datatables.
+- [Release Detail] Moved most items to cards
+- [Releases] Fixed length not showing on table
+- [Profile] Added count badge to nav tab buttons
+- Overall Style Tweaks, some slight color changes.

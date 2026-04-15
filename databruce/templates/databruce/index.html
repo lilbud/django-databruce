@@ -14,13 +14,11 @@
     {% if not user.is_authenticated %}
       <div class="row my-3">
         <div class="col">
-          <a target="_blank"
-             href="{% url "login" %}"
+          <a href="{% url "login" %}"
              type="button"
              role="button"
              class="btn btn-primary">Login</a>
-          <a target="_blank"
-             href="{% url "signup" %}"
+          <a href="{% url "signup" %}"
              type="button"
              role="button"
              class="btn btn-primary">Create Account</a>
@@ -100,35 +98,24 @@
           <div class="col">
             <div class="card">
               <div class="card-header">Latest</div>
-              <div class="card-body p-0">
-                <div class="table-responsive index">
+              <div class="card-body p-0" id="recent">
+                {% comment %} <div class="table-responsive index">
                   <table class="table table-hover display" id="recentTable">
                     <thead>
                       <tr>
-                        <th class="all">Date</th>
-                        <th class="all">Location</th>
+                        <th class="all d-none">Date</th>
+                        <th class="all d-none">Location</th>
                       </tr>
                     </thead>
                   </table>
-                </div>
+                </div> {% endcomment %}
               </div>
             </div>
           </div>
           <div class="col">
             <div class="card">
               <div class="card-header">Upcoming</div>
-              <div class="card-body p-0">
-                <div class="table-responsive index">
-                  <table class="table table-hover display" id="upcomingTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Date</th>
-                        <th class="all">Location</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
+              <div class="card-body p-0" id="upcoming"></div>
             </div>
           </div>
           <div class="col">
@@ -139,18 +126,7 @@
                    class="btn btn-sm btn-primary px-1 py-0"
                    href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
               </div>
-              <div class="card-body p-0">
-                <div class="table-responsive index">
-                  <table class="table table-hover display" id="otdTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Date</th>
-                        <th class="all">Location</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
+              <div class="card-body p-0" id="otd"></div>
             </div>
           </div>
         </div>
@@ -159,7 +135,21 @@
   </div>
   <script>
     var layout = getDatatableLayout({columns: false, category: false});
-    {% comment %} layout.topStart = 'pageLength'; {% endcomment %}
+
+    function createListItem(item) {
+      return `
+      <li class="list-group-item py-0.5">
+        <div class="row row-cols-2 fw-medium">
+          <div class="col-3 py-0 text-nowrap">
+            <a href="/events/${item.event_id}">${item.date.display}</a>
+          </div>
+          <div class="col py-0">
+            <a href="/venues/${item.venue.uuid}">${item.venue.display}</a>
+          </div>
+        </div>
+      </li>
+      `
+    }
 
     $(document).ready(function () {
       new DataTable('#updateTable', {
@@ -189,7 +179,7 @@
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 if (row.view) {
-                  return `<span>${data} <a class='fw-medium text-primary' href='/${row.view}/${row.item_id}'>${row.value}</a></span>`
+                  return `<span>${data} <a class='fw-medium' href='/${row.view}/${row.item_id}'>${row.value}</a></span>`
                 }
 
                 return data
@@ -198,117 +188,49 @@
           }
         ]
       })
-
-      new DataTable('#otdTable', {
-          layout: layout,
-          searching: false,
-          paging: false,
-          info: false,
-          ordering: false,
-          scrollX: false,
-          processing: true,
-          columnDefs: [
-            {'targets': '_all', columnControl: [] },
-            {'target': 0, width: '10rem' }
-          ],
-          ajax: {
-            'url': '/api/v1/events/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&limit=5&format=custom',
-          },
-          columns: [
-            {
-              'data': 'date',
-              'name': 'id',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/events/${row.event_id}">${data.display}</a>`;
-                }
-              },
-            },
-            {
-              'data': 'venue',
-              'name': 'venue__name',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/venues/${data.uuid}">${data.name}</a>`;
-                }
-              },
-            },
-          ],
-      });
       
-      new DataTable('#recentTable', {
-          layout: layout,
-          searching: false,
-          paging: false,
-          info: false,
-          ordering: false,
-          scrollX: false,
-          ajax: {
-            'url': '/api/v1/events/?ordering=-event_id&limit=5&format=custom&latest=true',
-          },
-          columnDefs: [
-            {'targets': '_all', columnControl: [] },
-            {'target': 0, width: '10rem' }
-          ],
-          columns: [
-            {
-              'data': 'date',
-              'name': 'id',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/events/${row.event_id}">${data.display}</a>`;
-                }
-              },
-            },
-            {
-              'data': 'venue',
-              'name': 'venue__name, venue__detail',
-              'render': function (data, type, row, meta) {
-                  if (type === 'display' && data) {
-                    return `<a href="/venues/${data.uuid}">${data.name}</a>`;
-                  }
-              },
-            },
-          ],
-      });
 
-      new DataTable('#upcomingTable', {
-          layout: layout,
-          searching: false,
-          paging: false,
-          info: false,
-          ordering: false,
-          scrollX: false,
-          ajax: {
-            'url': '/api/v1/events/?ordering=event_id&limit=5&format=custom&upcoming=true',
-          },
-          columnDefs: [
-            {'targets': '_all', columnControl: [] },
-            {'target': 0, width: '10rem' }
-          ],
-          columns: [
-            {
-              'data': 'date',
-              'name': 'id',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/events/${row.event_id}">${data.display}</a>`;
-                }
-              },
-            },
-            {
-              'data': 'venue',
-              'name': 'venue__name, venue__detail',
-              'render': function (data, type, row, meta) {
-                  if (type === 'display' && data) {
-                    return `<a href="/venues/${data.uuid}">${data.name}</a>`;
-                  }
-              },
-            },
-          ],
-      });
+      fetch('/api/v1/events/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&limit=5&format=json')
+        .then(response => response.json())
+        .then(data => {
+          var container = $('#otd');
+          var list = $('<ul />').addClass('list-group list-group-flush');
 
+          data.results.forEach((item, index) => {
+            var listItem = createListItem(item);
+            $(list).append(listItem);
+          });
 
+          $(container).append($(list).prop('outerHTML'));
+        }).catch(error => console.error('Error:', error));
+  
+      fetch('/api/v1/events/?ordering=event_id&limit=5&format=json&upcoming=true')
+        .then(response => response.json())
+        .then(data => {
+          var container = $('#upcoming');
+          var list = $('<ul />').addClass('list-group list-group-flush');
+
+          data.results.forEach((item, index) => {
+            var listItem = createListItem(item);
+            $(list).append(listItem);
+          });
+
+          $(container).append($(list).prop('outerHTML'));
+        }).catch(error => console.error('Error:', error));
+
+      fetch('/api/v1/events/?ordering=-event_id&limit=5&format=json&latest=true')
+        .then(response => response.json())
+        .then(data => {
+          var container = $('#recent');
+          var list = $('<ul />').addClass('list-group list-group-flush');
+
+          data.results.forEach((item, index) => {
+            var listItem = createListItem(item);
+            $(list).append(listItem);
+          });
+
+          $(container).append($(list).prop('outerHTML'));
+        }).catch(error => console.error('Error:', error));
 
       new DataTable('#setlistTable',
       {
@@ -372,13 +294,13 @@
                 } else if (row.sign_request) {
                   $(badge).addClass('text-bg-info').text('Sign Request');
                 } else if (row.nobruce) {
-                  $(badge).addClass('bg-warning').text('No Bruce');
+                  $(badge).addClass('badge-warning').text('No Bruce');
                 } else if (row.stats.premiere) {
-                  $(badge).addClass('bg-secondary').text('First');
+                  $(badge).addClass('badge-warning').text('First');
                 } else if (row.stats.debut && !row.stats.premiere) {
-                  $(badge).addClass('bg-secondary').text('TD');
+                  $(badge).addClass('badge-warning').text('TD');
                 } else if (row.stats.last >= 50 && !row.stats.debut) {
-                  $(badge).addClass('bg-secondary').text('Bust');
+                  $(badge).addClass('badge-warning').text('Bust');
                 }
 
                 if (row.notes) {
@@ -393,5 +315,6 @@
         ],
       })
     })
+  
   </script>
 {% endblock content %}

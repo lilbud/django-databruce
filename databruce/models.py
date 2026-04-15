@@ -807,7 +807,9 @@ class ReleaseTracks(BaseModel):
         null=True,
     )
 
-    track = models.CharField(db_column="track_num")
+    track = models.CharField(db_column="track")
+
+    position = models.IntegerField()
 
     song = models.OneToOneField(
         to="Songs",

@@ -25,7 +25,9 @@
                     type="button"
                     role="tab"
                     aria-controls="pills-events"
-                    aria-selected="true">{% translate "Shows" %}</button>
+                    aria-selected="true">
+              Shows<span class="badge rounded-pill text-bg-light" id="event-count-badge">0</span>
+            </button>
           </li>
           <li class="nav-item mb-2 mb-lg-0" role="presentation">
             <button class="nav-link"
@@ -35,7 +37,9 @@
                     type="button"
                     role="tab"
                     aria-controls="pills-songs"
-                    aria-selected="false">{% translate "Songs" %}</button>
+                    aria-selected="false">
+              Songs<span class="badge rounded-pill text-bg-light" id="song-count-badge">0</span>
+            </button>
           </li>
           <li class="nav-item mb-2 mb-lg-0" role="presentation">
             <button class="nav-link"
@@ -183,16 +187,14 @@
         fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
         .then(response => response.json()) // Parse JSON response
         .then(data => {
-          
           var container = $('#cardContainer');
 
           data.forEach((item, index) => {
             var col = $('#example').clone();
             var list = $('<ul />').addClass('list-group list-group-flush');
             
-
             $(col).removeClass('d-none');
-            $(col).find('.card-header').append(`<span><a href="/releases/${item.uuid}" class="fw-semibold">${item.name}</a></span>`).append(`<span>${Math.round(item.album_percent)}%</span>`);
+            $(col).find('.card-header').append(`<span><a href="/releases/${item.uuid}" class="fw-semibold text-reset">${item.name}</a></span>`).append(`<span>${Math.round(item.album_percent)}%</span>`);
             $(col).attr('id', `album-${index}`);
 
             item.songs.forEach((i, index) => {
@@ -226,6 +228,10 @@
           },
           columnDefs: event_table_defs,
           columns: event_table_columns,
+          initComplete: function(settings, json){ 
+            var info = this.api().page.info();
+            $('#event-count-badge').text(info.recordsTotal);
+          }
         });
 
         new DataTable('#songTable', {
@@ -286,7 +292,11 @@
                 }
               },
             },
-          ]
+          ],
+          initComplete: function(settings, json){ 
+            var info = this.api().page.info();
+            $('#song-count-badge').text(info.recordsTotal);
+          }
         });
 
         var layout = getDatatableLayout({columns: [0,2]})

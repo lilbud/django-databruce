@@ -335,18 +335,6 @@ class IndexSerializer(BaseSerializer):
         fields = ["id", "event_id", "date", "venue"]
 
 
-class EventCalendar(BaseSerializer):
-    start = serializers.DateField(source="date")
-    title = serializers.SerializerMethodField()
-
-    def get_title(self, obj):
-        return f"<span class='text-xs text-wrap'>{obj.artist}: {obj.venue}</span>"
-
-    class Meta:
-        model = models.Events
-        fields = ["id", "start", "title", "venue"]
-
-
 class ToursSerializer(BaseSerializer):
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
@@ -876,13 +864,13 @@ class SongsPageSerializer(BaseSerializer):
     )
 
     prev_song = SongsSerializer(
-        source="songs_page.prev",
+        source="songs_page.prev_setlist.song",
         include=["id", "name", "uuid"],
         required=False,
     )
 
     next_song = SongsSerializer(
-        source="songs_page.next",
+        source="songs_page.next_setlist.song",
         include=["id", "name", "uuid"],
         required=False,
     )

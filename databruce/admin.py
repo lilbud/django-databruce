@@ -167,6 +167,7 @@ class NoteForm(forms.ModelForm):
 class BandsForm(NoteForm):
     note = forms.CharField(
         widget=MarkdownWidget(),
+        required=False,
     )
 
     class Meta:

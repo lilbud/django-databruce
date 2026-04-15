@@ -1,0 +1,522 @@
+:root {
+    --color-white: #fff;
+    --color-black: #000;
+
+    /* gray */
+    --color-gray-50: #fbfcfe;
+    --color-gray-100: #eff2f8;
+    --color-gray-200: #dfe4ed;
+    --color-gray-300: #c9d0de;
+    --color-gray-400: #a4abb9;
+    --color-gray-500: #7c8491;
+    --color-gray-600: #505763;
+    --color-gray-700: #282c32;
+    --color-gray-800: #1d2025;
+    --color-gray-900: #111317;
+    --color-gray-950: #07080a;
+    /* blue */
+    --color-blue-50: #e8f1ff;
+    --color-blue-100: #d1e4ff;
+    --color-blue-200: #a2cdff;
+    --color-blue-300: #5db4ff;
+    --color-blue-400: #069def;
+    --color-blue-500: #0483c8;
+    --color-blue-600: #0268a0;
+    --color-blue-700: #014d78;
+    --color-blue-800: #013555;
+    --color-blue-900: #001d32;
+    --color-blue-950: #001222;
+    /* teal */
+    --color-teal-50: #d7f6ff;
+    --color-teal-100: #a6eeff;
+    --color-teal-200: #00ddf9;
+    --color-teal-300: #00bfd8;
+    --color-teal-400: #00a2b7;
+    --color-teal-500: #008799;
+    --color-teal-600: #006b79;
+    --color-teal-700: #00515c;
+    --color-teal-800: #003841;
+    --color-teal-900: #001f25;
+    --color-teal-950: #001418;
+    /* red */
+    --color-red-50: #ffeef0;
+    --color-red-100: #fcd9dc;
+    --color-red-200: #fab3ba;
+    --color-red-300: #fc909a;
+    --color-red-400: #f56b79;
+    --color-red-500: #f24455;
+    --color-red-600: #ce2b3e;
+    --color-red-700: #9d202f;
+    --color-red-800: #6d111d;
+    --color-red-900: #3c060b;
+    --color-red-950: #240306;
+    /* orange */
+    --color-orange-50: #ffedea;
+    --color-orange-100: #ffdad5;
+    --color-orange-200: #ffb4a8;
+    --color-orange-300: #ff8b72;
+    --color-orange-400: #fa5b05;
+    --color-orange-500: #d04a03;
+    --color-orange-600: #a73a02;
+    --color-orange-700: #802a01;
+    --color-orange-800: #5a1b01;
+    --color-orange-900: #370e00;
+    --color-orange-950: #260700;
+    /* green */
+    --color-green-50: #dffef3;
+    --color-green-100: #c4fde9;
+    --color-green-200: #6ff7c7;
+    --color-green-300: #40ebae;
+    --color-green-400: #25d092;
+    --color-green-500: #07b577;
+    --color-green-600: #058c5b;
+    --color-green-700: #026a44;
+    --color-green-800: #02452b;
+    --color-green-900: #002314;
+    --color-green-950: #00150a;
+    /* sky { */
+    --color-sky-50: #e4f8ff;
+    --color-sky-100: #c3f0fe;
+    --color-sky-200: #88e1fd;
+    --color-sky-300: #55d2fa;
+    --color-sky-400: #17c5fc;
+    --color-sky-500: #03a5d9;
+    --color-sky-600: #0180a8;
+    --color-sky-700: #006180;
+    --color-sky-800: #003f53;
+    --color-sky-900: #00202a;
+    --color-sky-950: #001117;
+}
+
+[data-bs-theme="light"] {
+    --background-color-subtle: var(--color-gray-50) !important;
+    --background-color-muted: var(--color-gray-100) !important;
+    --background-color-default: var(--color-white) !important;
+    --background-color-highlight: var(--color-gray-200) !important;
+    --background-color-emphasis: var(--color-gray-300) !important;
+
+    /* Text colors */
+    --text-color-subtle: var(--color-gray-400) !important;
+    --text-color-muted: var(--color-gray-600) !important;
+    --text-color-default: var(--color-gray-800) !important;
+    --text-color-highlight: var(--color-gray-900) !important;
+    --text-color-emphasis: var(--color-gray-950) !important;
+
+    /* neutral */
+    --color-light: var(--color-gray-100) !important;
+    --color-dark: var(--color-gray-950) !important;
+    --color-contrast: var(--color-white) !important;
+
+    /* primary */
+    --color-primary-lighter: var(--color-blue-50) !important;
+    --color-primary-light: var(--color-blue-400) !important;
+    --color-primary: var(--color-blue-500) !important;
+    --color-primary-dark: var(--color-blue-600) !important;
+    --color-primary-darker: var(--color-blue-900) !important;
+
+    /* secondary */
+    --color-secondary-lighter: var(--color-teal-50) !important;
+    --color-secondary-light: var(--color-teal-300) !important;
+    --color-secondary: var(--color-teal-500) !important;
+    --color-secondary-dark: var(--color-teal-700) !important;
+    --color-secondary-darker: var(--color-teal-900) !important;
+
+    /* danger */
+    --color-danger-lighter: var(--color-red-50) !important;
+    --color-danger-light: var(--color-red-300) !important;
+    --color-danger: var(--color-red-500) !important;
+    --color-danger-dark: var(--color-red-600) !important;
+    --color-danger-darker: var(--color-red-900) !important;
+
+    /* warning */
+    --color-warning-lighter: var(--color-orange-50) !important;
+    --color-warning-light: var(--color-orange-300) !important;
+    --color-warning: var(--color-orange-400) !important;
+    --color-warning-dark: var(--color-orange-700) !important;
+    --color-warning-darker: var(--color-orange-900) !important;
+
+    /* success */
+    --color-success-lighter: var(--color-green-50) !important;
+    --color-success-light: var(--color-green-400) !important;
+    --color-success: var(--color-green-500) !important;
+    --color-success-dark: var(--color-green-700) !important;
+    --color-success-darker: var(--color-green-900) !important;
+
+    /* info */
+    --color-info-lighter: var(--color-sky-50) !important;
+    --color-info-light: var(--color-sky-300) !important;
+    --color-info: var(--color-sky-500) !important;
+    --color-info-dark: var(--color-sky-700) !important;
+    --color-info-darker: var(--color-sky-900) !important;
+
+    /* borders */
+    --border-color-light: #c9d0de99;
+    --border-color-base: var(--color-gray-300) !important;
+    --border-color-dark: var(--color-gray-600) !important;
+
+    /* actions */
+    --color-active: var(--color-gray-500) !important;
+    --color-hover: var(--color-gray-100) !important;
+    --color-selected: var(--color-gray-100) !important;
+    --color-disabled-color: var(--color-gray-400) !important;
+    --color-disabled: var(--color-gray-200) !important;
+    --color-focus: var(--color-gray-300) !important;
+}
+
+[data-bs-theme="dark"] {
+    --background-color-subtle: var(--color-gray-900) !important;
+    --background-color-muted: var(--color-gray-800) !important;
+    --background-color-default: var(--color-gray-950) !important;
+    --background-color-highlight: var(--color-gray-700) !important;
+    --background-color-emphasis: var(--color-gray-600) !important;
+
+    /* Text colors */
+    --text-color-subtle: var(--color-gray-500) !important;
+    --text-color-muted: var(--color-gray-400) !important;
+    --text-color-default: var(--color-gray-100) !important;
+    --text-color-highlight: var(--color-gray-50) !important;
+    --text-color-emphasis: var(--color-white) !important;
+
+    /* neutral */
+    --color-light: var(--color-gray-800) !important;
+    --color-dark: var(--color-gray-700) !important;
+    --color-contrast: var(--color-gray-950) !important;
+
+    /* primary */
+    --color-primary-lighter: var(--color-blue-950) !important;
+    --color-primary-light: var(--color-blue-700) !important;
+    --color-primary: var(--color-blue-500) !important;
+    --color-primary-dark: var(--color-blue-300) !important;
+    --color-primary-darker: var(--color-blue-100) !important;
+
+    /* secondary */
+    --color-secondary-lighter: var(--color-teal-950) !important;
+    --color-secondary-light: var(--color-teal-700) !important;
+    --color-secondary: var(--color-teal-400) !important;
+    --color-secondary-dark: var(--color-teal-300) !important;
+    --color-secondary-darker: var(--color-teal-100) !important;
+
+    /* danger */
+    --color-danger-lighter: var(--color-red-950) !important;
+    --color-danger-light: var(--color-red-600) !important;
+    --color-danger: var(--color-red-400) !important;
+    --color-danger-dark: var(--color-red-300) !important;
+    --color-danger-darker: var(--color-red-200) !important;
+
+    /* warning */
+    --color-warning-lighter: var(--color-orange-950) !important;
+    --color-warning-light: var(--color-orange-800) !important;
+    --color-warning: var(--color-orange-400) !important;
+    --color-warning-dark: var(--color-orange-300) !important;
+    --color-warning-darker: var(--color-orange-200) !important;
+
+    /* success */
+    --color-success-lighter: var(--color-green-950) !important;
+    --color-success-light: var(--color-green-700) !important;
+    --color-success: var(--color-green-400) !important;
+    --color-success-dark: var(--color-green-300) !important;
+    --color-success-darker: var(--color-green-200) !important;
+
+    /* info */
+    --color-info-lighter: var(--color-sky-950) !important;
+    --color-info-light: var(--color-sky-700) !important;
+    --color-info: var(--color-sky-400) !important;
+    --color-info-dark: var(--color-sky-300) !important;
+    --color-info-darker: var(--color-sky-200) !important;
+
+    /* borders */
+    --border-color-light: var(--color-gray-800) !important;
+    --border-color-base: var(--color-gray-700) !important;
+    --border-color-dark: var(--color-gray-600) !important;
+
+    /* actions */
+    --color-active: var(--color-gray-500) !important;
+    --color-hover: var(--color-gray-700) !important;
+    --color-selected: var(--color-gray-900) !important;
+    --color-disabled-color: var(--color-gray-500) !important;
+    --color-disabled: var(--color-gray-700) !important;
+    --color-focus: var(--color-gray-700) !important;
+}
+
+/* border */
+.border-base {
+    border-color: var(--border-color-base) !important;
+}
+
+.border-light {
+    border-color: var(--border-color-light) !important;
+}
+
+.border-dark {
+    border-color: var(--border-color-dark) !important;
+}
+
+.bg-subtle {
+    background-color: var(--background-color-subtle) !important;
+}
+
+.bg-muted {
+    background-color: var(--background-color-muted) !important;
+}
+
+.bg-default {
+    background-color: var(--background-color-default) !important;
+}
+
+.bg-highlight {
+    background-color: var(--background-color-highlight) !important;
+}
+
+.bg-emphasis {
+    background-color: var(--background-color-emphasis) !important;
+}
+
+.text-subtle {
+    color: var(--text-color-subtle) !important;
+}
+
+.text-muted {
+    color: var(--text-color-muted) !important;
+}
+
+.text-default {
+    color: var(--text-color-default) !important;
+}
+
+.text-highlight {
+    color: var(--text-color-highlight) !important;
+}
+
+.text-emphasis {
+    color: var(--text-color-emphasis) !important;
+}
+
+.bg-active {
+    background-color: var(--color-active) !important;
+}
+
+.bg-hover {
+    background-color: var(--color-hover) !important;
+}
+
+.bg-selected {
+    background-color: var(--color-selected) !important;
+}
+
+.bg-disabled {
+    background-color: var(--color-disabled) !important;
+}
+
+.bg-focus {
+    background-color: var(--color-focus) !important;
+}
+
+.bg-light {
+    background-color: var(--color-light) !important;
+}
+
+.bg-dark {
+    background-color: var(--color-dark) !important;
+}
+
+.text-contrast {
+    color: var(--color-contrast) !important;
+}
+
+.bg-primary-lighter {
+    background-color: var(--color-primary-lighter) !important;
+}
+
+.bg-primary-light {
+    background-color: var(--color-primary-light) !important;
+}
+
+.bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-primary-dark {
+    background-color: var(--color-primary-dark) !important;
+}
+
+.bg-primary-darker {
+    background-color: var(--color-primary-darker) !important;
+}
+
+.bg-secondary-lighter {
+    background-color: var(--color-secondary-lighter) !important;
+}
+
+.bg-secondary-light {
+    background-color: var(--color-secondary-light) !important;
+}
+
+.bg-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-secondary-dark {
+    background-color: var(--color-secondary-dark) !important;
+}
+
+.bg-secondary-darker {
+    background-color: var(--color-secondary-darker) !important;
+}
+
+.bg-info-lighter {
+    background-color: var(--color-info-lighter) !important;
+}
+
+.bg-info-light {
+    background-color: var(--color-info-light) !important;
+}
+
+.bg-info {
+    background-color: var(--color-info) !important;
+}
+
+.bg-info-dark {
+    background-color: var(--color-info-dark) !important;
+}
+
+.bg-info-darker {
+    background-color: var(--color-info-darker) !important;
+}
+
+.bg-success-lighter {
+    background-color: var(--color-success-lighter) !important;
+}
+
+.bg-success-light {
+    background-color: var(--color-success-light) !important;
+}
+
+.bg-success {
+    background-color: var(--color-success) !important;
+}
+
+.bg-success-dark {
+    background-color: var(--color-success-dark) !important;
+}
+
+.bg-success-darker {
+    background-color: var(--color-success-darker) !important;
+}
+
+.bg-warning-lighter {
+    background-color: var(--color-warning-lighter) !important;
+}
+
+.bg-warning-light {
+    background-color: var(--color-warning-light) !important;
+}
+
+.bg-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-warning-dark {
+    background-color: var(--color-warning-dark) !important;
+}
+
+.bg-warning-darker {
+    background-color: var(--color-warning-darker) !important;
+}
+
+.bg-danger-lighter {
+    background-color: var(--color-danger-lighter) !important;
+}
+
+.bg-danger-light {
+    background-color: var(--color-danger-light) !important;
+}
+
+.bg-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.bg-danger-dark {
+    background-color: var(--color-danger-dark) !important;
+}
+
+.bg-danger-darker {
+    background-color: var(--color-danger-darker) !important;
+}
+
+.bg-nugs {
+    background-color: var(--color-secondary-dark) !important;
+    color: var(--color-white) !important;
+}
+
+.btn {
+    color: var(--color-contrast) !important;
+}
+
+.btn-secondary {
+    background-color: var(--color-secondary) !important;
+    border-color: var(--color-secondary) !important;
+}
+
+.btn-primary {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+}
+
+.btn-success {
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success) !important;
+}
+
+.btn-accent {
+    background-color: var(--color-warning) !important;
+    border-color: var(--color-warning) !important;
+}
+
+.btn-subtle {
+    background-color: var(--color-active) !important;
+    border-color: var(--color-active) !important;
+    color: var(--color-white) !important;
+}
+
+/* hover */
+.btn-secondary:hover {
+    background-color: var(--color-secondary-dark) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--color-success-dark) !important;
+}
+
+.btn-accent:hover {
+    background-color: var(--color-warning-dark) !important;
+}
+
+.btn-subtle:hover {
+    background-color: var(--background-color-emphasis) !important;
+    border-color: var(--background-color-emphasis) !important;
+}
+
+.badge-primary {
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+}
+
+.badge-secondary {
+    background-color: var(--color-secondary) !important;
+    color: var(--color-white) !important;
+}
+
+.badge-warning {
+    background-color: var(--color-warning) !important;
+    color: var(--color-white) !important;
+}
+
+.badge-info {
+    background-color: var(--color-info) !important;
+    color: var(--color-contrast) !important;
+}

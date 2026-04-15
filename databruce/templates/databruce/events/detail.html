@@ -97,13 +97,13 @@
                     <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                          id="badge-row">
                       {% if event.tour %}
-                        <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge bg-primary">{{ event.tour }}</span></a>
+                        <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">{{ event.tour }}</span></a>
                       {% endif %}
                       {% if event.leg %}
-                        <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge bg-primary">{{ event.leg.name }}</span></a>
+                        <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge badge-primary">{{ event.leg.name }}</span></a>
                       {% endif %}
                       {% if event.run %}
-                        <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge bg-primary">{{ event.run.name }}</span></a>
+                        <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge badge-primary">{{ event.run.name }}</span></a>
                       {% endif %}
                     </div>
                   </div>
@@ -116,27 +116,49 @@
                         {% if event.brucebase_url %}
                           <a role="button"
                              target="_blank"
-                             class="btn btn-sm btn-primary-dark text-xs icon-button"
+                             class="btn btn-sm btn-subtle text-xs icon-button"
                              href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
-                            <i class="bi bi-link-45deg"></i>
-                            <span>Brucebase</span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="16"
+                                 height="16"
+                                 fill="currentColor"
+                                 class="bi bi-link-45deg"
+                                 viewBox="0 0 16 16">
+                              <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" />
+                              <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" />
+                            </svg>
+                            Brucebase
                           </a>
                         {% endif %}
                         {% if event.nugs_event.count > 0 %}
                           <a role="button"
                              target="_blank"
                              href="{{ event.nugs_event.first.url }}"
-                             class="btn btn-sm btn-primary-dark text-xs icon-button">
-                            <i class="icon nugs"></i>
-                            <span>Nugs</span>
+                             class="btn btn-sm btn-subtle text-xs icon-button">
+                            <svg version="1.1"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 width="14"
+                                 fill="currentColor"
+                                 height="14"
+                                 viewBox="0 0 27.3 28">
+                              <path class="st0" d="M24.9,6.2c-3-4.2-7.9-6.3-12.7-5.7l6.1,8.7c0.3,0.4,0.8,0.4,1.1,0L20.1,8v6.8l-9.8-14c-1.6,0.4-3.1,1.1-4.5,2 c-6.2,4.3-7.7,12.8-3.4,19c3,4.3,8.1,6.4,13,5.7l-6.4-9.2C8.8,18,8.3,18,8,18.4l-0.8,1.2v-6.8l10.1,14.4c1.5-0.4,2.9-1.1,4.2-2 C27.7,20.9,29.2,12.3,24.9,6.2z" />
+                            </svg>
+                            Nugs
                           </a>
                         {% endif %}
                         {% if event.archive_links.count > 0 %}
                           <a role="button"
                              target="_blank"
                              href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}"
-                             class="btn btn-sm btn-primary-dark text-xs icon-button">
-                            <i class="bi bi-headphones"></i>
+                             class="btn btn-sm btn-subtle text-xs icon-button">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="16"
+                                 height="16"
+                                 fill="currentColor"
+                                 class="bi bi-headphones"
+                                 viewBox="0 0 16 16">
+                              <path d="M8 3a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a6 6 0 1 1 12 0v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1V8a5 5 0 0 0-5-5" />
+                            </svg>
                             <span>Radio Nowhere</span>
                           </a>
                         {% endif %}
@@ -157,11 +179,11 @@
                       <button id="addshow"
                               type="submit"
                               name="submit"
-                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-primary-dark{% endif %} icon-button">
+                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-subtle{% endif %} icon-button">
                         {% if user_attended %}
-                          <i class="bi bi-star-fill pe-1" id="star"></i>
+                          <i class="bi bi-star-fill" id="star"></i>
                         {% else %}
-                          <i class="bi bi-star pe-1"id="star"></i>
+                          <i class="bi bi-star"id="star"></i>
                         {% endif %}
                         <span id="attended">
                           {% if user_attended %}
@@ -173,7 +195,7 @@
                         <button type="button"
                                 id="usercount"
                                 disabled
-                                class="btn btn-sm {% if user_attended %}btn-primary{% else %}btn-primary-dark{% endif %}">
+                                class="btn btn-sm {% if user_attended %}btn-primary{% else %}btn-subtle{% endif %}">
                           {{ user_count }}
                         </button>
                       </button>
@@ -254,10 +276,17 @@
                           data-bs-html="true"
                           data-bs-title="Setlist Options">
                       <a role="button"
-                         class="btn btn-sm btn-primary px-1 py-0"
+                         class="btn btn-sm btn-primary icon-button px-1"
                          data-bs-toggle="collapse"
                          href="#options">
-                        <i class="bi bi-three-dots text-sm"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             class="bi bi-three-dots"
+                             viewBox="0 0 16 16">
+                          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                        </svg>
                       </a>
                     </span>
                   </div>
@@ -276,7 +305,7 @@
                         <th class="all">Gap</th>
                         <th class="all">Tour</th>
                         <th class="all">Last</th>
-                        <th class="all">Note</th>
+                        <th class="min-tablet-l">Note</th>
                       </thead>
                     </table>
                   </div>
@@ -329,9 +358,16 @@
                       data-bs-title="Expand/Collapse All Rows">
                   <a role="button"
                      id="album-breakdown-btn"
-                     class="btn btn-sm btn-primary px-1 py-0"
+                     class="btn btn-sm btn-primary icon-button px-1"
                      data-bs-toggle="collapse">
-                    <i class="bi bi-three-dots text-sm"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="16"
+                         height="16"
+                         fill="currentColor"
+                         class="bi bi-three-dots"
+                         viewBox="0 0 16 16">
+                      <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                    </svg>
                   </a>
                 </span>
               </div>
@@ -470,7 +506,7 @@
                 }).join('')
 
                 if (row.album_complete) {
-                  complete_badge = `<div class="badge ms-1 bg-accent">Complete</div>`
+                  complete_badge = `<div class="badge ms-1 badge-warning">Complete</div>`
                 }
 
                 const html = `
@@ -573,7 +609,7 @@
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="fw-medium text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
+                return `<a class="text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
               }
             },
           },
@@ -583,7 +619,7 @@
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="fw-medium text-reset" href="/bands/${data.uuid}">${data.name}</a>`;
+                return `<a class="text-reset" href="/bands/${data.uuid}">${data.name}</a>`;
               }
             },
           },
@@ -601,7 +637,8 @@
         ordering: false,
         searching: false,
         info: false,
-        fixedHeader: true,
+        fixedHeader: false,
+        autoWidth: false,
         ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
         rowGroup: {
           dataSrc: 'set_name',
@@ -653,35 +690,38 @@
             'width': '16rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                var song = `<a class="fw-medium text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
-
-                var segue = row.segue ? $('<span />').addClass('segue').text('>').prop('outerHTML') : ''
+                var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
+                var segue = row.segue ? `<span class="segue">\></span>` : '';
 
                 song = `${song} ${segue}`;
 
-                var badge = $('<span />').addClass('ms-2 badge')
+                var badges = $('<span />').addClass('ms-2');
+                var baseBadge = `<span class="badge ms-1" data-bs-toggle="tooltip" data-bs-html="true"></span>`
 
                 if (row.instrumental) {
-                  $(badge).addClass('text-bg-info').text('Instrumental');
-                } else if (row.sign_request) {
-                  $(badge).addClass('text-bg-info').text('Sign Request');
-                } else if (row.nobruce) {
-                  $(badge).addClass('bg-warning').text('No Bruce');
+                  var badge = $(baseBadge).clone();
+                  $(badge).addClass('badge-info').text('Inst.').attr('data-bs-title', 'Instrumental');
+                  badges.append($(badge).prop('outerHTML'));
                 }
-                //else if (row.premiere) {
-                //  $(badge).addClass('bg-secondary d-inline-flex d-md-none').text('First');
-                //} else if (row.debut && !row.premiere) {
-                //  $(badge).addClass('bg-secondary d-inline-flex d-md-none').text('TD');
-                //} else if (row.last >= 50 && !row.debut) {
-                //  $(badge).addClass('bg-secondary d-inline-flex d-md-none').text('Bust');
-                //}
 
-                //if (row.notes) {
-                //  var notes = $('<span />').addClass('text-wrap d-inline-block d-md-none fw-light setlist-note').text(row.notes.join('; '))
-                //  return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes.prop('outerHTML') : song
-                //}
+                if (row.sign_request) {
+                  var badge = $(baseBadge).clone();
+                  $(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
+                  $(badges).append($(badge).prop('outerHTML'));
+                }
+                
+                if (row.nobruce) {
+                  var badge = $(baseBadge).clone();
+                  $(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
+                  $(badges).append($(badge).prop('outerHTML'));
+                }
 
-                return badge ? song + $(badge).prop('outerHTML') : song;
+                if (row.notes) {
+                  var notes = `<span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes.join('; ')}</span>`;
+                  return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
+                }
+
+                return badges ? song + $(badges).prop('outerHTML') : song;
               }
             },
           },
@@ -694,16 +734,16 @@
               
               if (type === 'display' && data) {
                 if (data.gap >= 50 && !data.debut) {
-                  $(badge).addClass('bg-primary').text(`${data.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+                  $(badge).addClass('badge-primary').text(`${data.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
                   return $(badge).prop('outerHTML');
                 } else if (data.premiere) {
-                  $(badge).addClass('bg-secondary').text(`First`).attr('data-bs-title', 'FTP');
+                  $(badge).addClass('badge-secondary').text(`First`).attr('data-bs-title', 'FTP');
                   return $(badge).prop('outerHTML');
                 } else if (data.debut && !data.premiere && data.gap) {
-                  $(badge).addClass('bg-primary').text(`${data.gap}, TD`).attr('data-bs-title', 'Tour Debut');
+                  $(badge).addClass('badge-primary').text(`${data.gap}, TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
                 } else if (data.debut && !data.premiere && !data.gap) {
-                  $(badge).addClass('bg-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
+                  $(badge).addClass('badge-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
                 } else {
                   return data.gap;
@@ -723,10 +763,10 @@
                 var badge = $('<span />').addClass('badge align-middle').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
                 if (num == total && total == 1) {
-                  $(badge).addClass('bg-secondary').text('Only').attr('data-bs-title', 'Only Tour Performance');
+                  $(badge).addClass('badge-secondary').text('Only').attr('data-bs-title', 'Only Tour Performance');
                   return $(badge).prop('outerHTML');
                 } else if (num == total && total > 1) {
-                  $(badge).addClass('bg-accent').text(`${num}/${total}`).attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
+                  $(badge).addClass('badge-warning').text(`${num}/${total}`).attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
                   return $(badge).prop('outerHTML');
                 } else {
                   return `${num}/${total}`
@@ -741,7 +781,7 @@
             'className': 'dt-center text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data && data.ltp) {
-                return `<a class="fw-medium text-reset" href="/events/${data.ltp.event_id}">${data.ltp.date.display}</a>`;
+                return `<a class="text-reset" href="/events/${data.ltp.event_id}">${data.ltp.date.display}</a>`;
               }
             },
           },
@@ -803,14 +843,14 @@
               if (data['action'] === 'added') {
                 $("#star").addClass('bi-star-fill').removeClass('bi-star');
                 $("#attended").text('Attended');
-                $("#addshow").addClass('btn-primary').removeClass('btn-primary-dark');
-                $("#usercount").addClass('btn-primary').removeClass('btn-primary-dark');
+                $("#addshow").addClass('btn-primary').removeClass('btn-subtle');
+                $("#usercount").addClass('btn-primary').removeClass('btn-subtle');
 
               } else if (data['action'] === 'removed') {
                 $("#star").addClass('bi-star').removeClass('bi-star-fill');
                 $("#attended").text('Attended?');
-                $("#addshow").removeClass('btn-primary').addClass('btn-primary-dark');
-                $("#usercount").removeClass('btn-primary').addClass('btn-primary-dark');
+                $("#addshow").removeClass('btn-primary').addClass('btn-subtle');
+                $("#usercount").removeClass('btn-primary').addClass('btn-subtle');
               };
             },
           });

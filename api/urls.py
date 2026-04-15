@@ -62,11 +62,6 @@ router.register(
     basename="updates",
 )
 router.register(
-    r"calendar",
-    views.EventCalendar,
-    basename="calendar",
-)
-router.register(
     r"users",
     views.UsersViewSet,
     basename="users",
