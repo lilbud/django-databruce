@@ -106,7 +106,7 @@ h6 {
 }
 
 body {
-    background-color: var(--default);
+    background-color: rgb(var(--base-200));
     color: rgb(var(--base-content)) !important;
     font-size: 0.75rem !important;
     font-family: "Google Sans Flex", sans-serif;
@@ -307,12 +307,13 @@ a:link,
 }
 
 .card-header,
-.card-footer,
-.card-body,
-.card,
+.card-footer {
+    background-color: rgb(var(--base-300)) !important;
+}
+
 .list-group-item {
-    background-color: var(--subtle) !important;
-    border-color: var(--highlight) !important;
+    background-color: rgb(var(--base-100)) !important;
+    border-color: rgb(var(--border)) !important;
     color: rgb(var(--base-content)) !important;
 }
 
@@ -320,18 +321,18 @@ a:link,
 th,
 tr:not(.set-header) td:not(.songnum, .table-warning, .table-danger),
 .list-group-item.breakdown {
-    background-color: var(--subtle) !important;
+    background-color: rgb(var(--base-100)) !important;
 }
 
 .form-control,
 .form-select,
 .form-select-sm {
-    background-color: rgb(var(--base-300)) !important;
+    background-color: rgb(var(--base-100)) !important;
 }
 
 /* song num cell background when not position */
 td.songnum:not(:is([class*="opener"], [class*="closer"])) {
-    background-color: rgb(var(--base-300)) !important;
+    background-color: rgb(var(--base-100)) !important;
 }
 
 table th {
@@ -765,7 +766,7 @@ div.dt-scroll-body {
 .card-body:not(:has(#headimg)) {
     border-bottom-left-radius: var(--bs-border-radius) !important;
     border-bottom-right-radius: var(--bs-border-radius) !important;
-    border-color: var(--emphasis) !important;
+    border-color: rgb(var(--border)) !important;
 }
 
 i.icon.nugs {
@@ -870,7 +871,7 @@ button.nav-link .badge {
 
 .album-breakdown .list-group-item {
     font-size: var(--text-3xs) !important;
-    background-color: var(--highlight) !important;
+    background-color: rgb(var(--base-200)) !important;
 }
 
 .py-0\.5 {
