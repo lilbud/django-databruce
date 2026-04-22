@@ -8,6 +8,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 import markdown
+import nh3
 import requests
 from django import template
 from django.contrib import messages
@@ -1365,9 +1366,6 @@ class Blog(PageTitleMixin, TemplateView):
         return context
 
 
-import nh3
-
-
 class BlogPost(PageTitleMixin, TemplateView):
     template_name = "blog/post_detail.html"
 
@@ -1384,8 +1382,8 @@ class BlogPost(PageTitleMixin, TemplateView):
         )
 
         context["post"] = get_object_or_404(queryset, slug=self.kwargs["slug"])
-        context["title"] = f"{context['post']}"
-        context["description"] = f"{context['excerpt']}"
+        context["title"] = f"{context['post'].title}"
+        context["description"] = f"{context['post'].excerpt}"
 
         value = nh3.clean(
             context["post"].body,
