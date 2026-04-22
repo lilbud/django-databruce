@@ -1385,6 +1385,7 @@ class BlogPost(PageTitleMixin, TemplateView):
 
         context["post"] = get_object_or_404(queryset, slug=self.kwargs["slug"])
         context["title"] = f"{context['post']}"
+        context["description"] = f"{context['excerpt']}"
 
         value = nh3.clean(
             context["post"].body,
