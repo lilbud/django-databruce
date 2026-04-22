@@ -198,7 +198,7 @@ urlpatterns = [
     path("updates", views.Updates.as_view(), name="updates"),
     path("blog", views.Blog.as_view(), name="blog"),
     path(
-        "blog/<int:year>/<int:month>/<int:day>/<slug:slug>/",
+        "blog/<slug:slug>/",
         views.BlogPost.as_view(),
         name="blog_post",
     ),

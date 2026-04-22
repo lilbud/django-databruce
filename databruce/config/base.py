@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.http.ConditionalGetMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    "databruce.middleware.CleanQueryStringMiddleware",
 ]
 
 TESTING = "test" in sys.argv

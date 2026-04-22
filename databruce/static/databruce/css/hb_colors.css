@@ -1,6 +1,7 @@
 :root {
     --color-white: #fff;
     --color-black: #000;
+    --btn-border-color: transparent;
 
     /* gray */
     --color-gray-50: #fbfcfe;
@@ -26,18 +27,19 @@
     --color-blue-800: #013555;
     --color-blue-900: #001d32;
     --color-blue-950: #001222;
+
     /* teal */
-    --color-teal-50: #d7f6ff;
-    --color-teal-100: #a6eeff;
-    --color-teal-200: #00ddf9;
-    --color-teal-300: #00bfd8;
-    --color-teal-400: #00a2b7;
-    --color-teal-500: #008799;
-    --color-teal-600: #006b79;
-    --color-teal-700: #00515c;
-    --color-teal-800: #003841;
-    --color-teal-900: #001f25;
-    --color-teal-950: #001418;
+    --color-teal-50: #F0FDFA;
+    --color-teal-100: #CBFBF1;
+    --color-teal-200: #96F7E4;
+    --color-teal-300: #46ECD5;
+    --color-teal-400: #38D5BE;
+    --color-teal-500: #36BBA7;
+    --color-teal-600: #2A9689;
+    --color-teal-700: #18786F;
+    --color-teal-800: #075F5A;
+    --color-teal-900: #0B4F4A;
+    --color-teal-950: #022F2E;
     /* red */
     --color-red-50: #ffeef0;
     --color-red-100: #fcd9dc;
@@ -51,41 +53,41 @@
     --color-red-900: #3c060b;
     --color-red-950: #240306;
     /* orange */
-    --color-orange-50: #ffedea;
-    --color-orange-100: #ffdad5;
-    --color-orange-200: #ffb4a8;
-    --color-orange-300: #ff8b72;
-    --color-orange-400: #fa5b05;
-    --color-orange-500: #d04a03;
-    --color-orange-600: #a73a02;
-    --color-orange-700: #802a01;
-    --color-orange-800: #5a1b01;
-    --color-orange-900: #370e00;
-    --color-orange-950: #260700;
-    /* green */
-    --color-green-50: #dffef3;
-    --color-green-100: #c4fde9;
-    --color-green-200: #6ff7c7;
-    --color-green-300: #40ebae;
-    --color-green-400: #25d092;
-    --color-green-500: #07b577;
-    --color-green-600: #058c5b;
-    --color-green-700: #026a44;
-    --color-green-800: #02452b;
-    --color-green-900: #002314;
-    --color-green-950: #00150a;
-    /* sky { */
-    --color-sky-50: #e4f8ff;
-    --color-sky-100: #c3f0fe;
-    --color-sky-200: #88e1fd;
-    --color-sky-300: #55d2fa;
-    --color-sky-400: #17c5fc;
-    --color-sky-500: #03a5d9;
-    --color-sky-600: #0180a8;
-    --color-sky-700: #006180;
-    --color-sky-800: #003f53;
-    --color-sky-900: #00202a;
-    --color-sky-950: #001117;
+    --color-orange-50: #FFF7ED;
+    --color-orange-100: #FFEDD4;
+    --color-orange-200: #FFD6A7;
+    --color-orange-300: #FFB86A;
+    --color-orange-400: #FF8904;
+    --color-orange-500: #FF692A;
+    --color-orange-600: #F54927;
+    --color-orange-700: #CA3519;
+    --color-orange-800: #9F2D01;
+    --color-orange-900: #7E2A0C;
+    --color-orange-950: #441306;
+    /* emerald */
+    --color-green-50: #F0FDF4;
+    --color-green-100: #DCFCE7;
+    --color-green-200: #B9F8CF;
+    --color-green-300: #7BF1A8;
+    --color-green-400: #05DF72;
+    --color-green-500: #31C950;
+    --color-green-600: #2AA63E;
+    --color-green-700: #178236;
+    --color-green-800: #016630;
+    --color-green-900: #0D542B;
+    --color-green-950: #032E15;
+    /* cyan */
+    --color-cyan-50: #ECFEFF;
+    --color-cyan-100: #CEFAFE;
+    --color-cyan-200: #A2F4FD;
+    --color-cyan-300: #53EAFD;
+    --color-cyan-400: #42D3F2;
+    --color-cyan-500: #3BB8DB;
+    --color-cyan-600: #2C92B8;
+    --color-cyan-700: #1A7595;
+    --color-cyan-800: #015F78;
+    --color-cyan-900: #104E64;
+    --color-cyan-950: #053345;
 }
 
 [data-bs-theme="light"] {
@@ -130,8 +132,8 @@
 
     /* warning */
     --color-warning-lighter: var(--color-orange-50) !important;
-    --color-warning-light: var(--color-orange-300) !important;
-    --color-warning: var(--color-orange-400) !important;
+    --color-warning-light: var(--color-orange-400) !important;
+    --color-warning: var(--color-orange-500) !important;
     --color-warning-dark: var(--color-orange-700) !important;
     --color-warning-darker: var(--color-orange-900) !important;
 
@@ -143,11 +145,11 @@
     --color-success-darker: var(--color-green-900) !important;
 
     /* info */
-    --color-info-lighter: var(--color-sky-50) !important;
-    --color-info-light: var(--color-sky-300) !important;
-    --color-info: var(--color-sky-500) !important;
-    --color-info-dark: var(--color-sky-700) !important;
-    --color-info-darker: var(--color-sky-900) !important;
+    --color-info-lighter: var(--color-cyan-50) !important;
+    --color-info-light: var(--color-cyan-300) !important;
+    --color-info: var(--color-cyan-500) !important;
+    --color-info-dark: var(--color-cyan-700) !important;
+    --color-info-darker: var(--color-cyan-900) !important;
 
     /* borders */
     --border-color-light: #c9d0de99;
@@ -218,11 +220,11 @@
     --color-success-darker: var(--color-green-200) !important;
 
     /* info */
-    --color-info-lighter: var(--color-sky-950) !important;
-    --color-info-light: var(--color-sky-700) !important;
-    --color-info: var(--color-sky-400) !important;
-    --color-info-dark: var(--color-sky-300) !important;
-    --color-info-darker: var(--color-sky-200) !important;
+    --color-info-lighter: var(--color-cyan-950) !important;
+    --color-info-light: var(--color-cyan-700) !important;
+    --color-info: var(--color-cyan-400) !important;
+    --color-info-dark: var(--color-cyan-300) !important;
+    --color-info-darker: var(--color-cyan-200) !important;
 
     /* borders */
     --border-color-light: var(--color-gray-800) !important;
@@ -448,75 +450,364 @@
     color: var(--color-white) !important;
 }
 
-.btn {
-    color: var(--color-contrast) !important;
-}
-
-.btn-secondary {
-    background-color: var(--color-secondary) !important;
-    border-color: var(--color-secondary) !important;
-}
-
+/* primary btn */
 .btn-primary {
-    background-color: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    color: var(--color-white) !important;
+    --color: var(--color-white);
+    --bg: var(--color-primary);
+    --border-color: transparent;
+    --hover-bg: var(--color-primary-dark);
+    --hover-color: var(--color-white);
 }
 
+.btn-primary-subtle {
+    --color: var(--color-primary-dark);
+    --bg: color-mix(in oklab, var(--color-primary) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-primary) 50%, transparent);
+    --hover-color: var(--color-primary-dark);
+}
+
+.btn-primary-outline {
+    --color: var(--color-primary-dark);
+    --border-color: var(--color-primary-dark);
+    --hover-bg: color-mix(in oklab, var(--color-primary) 15%, transparent);
+    --hover-color: var(--color-primary-dark);
+}
+
+/* secondary btn */
+.btn-secondary {
+    --color: var(--color-contrast);
+    --bg: var(--color-secondary);
+    --border-color: transparent;
+    --hover-bg: var(--color-secondary-dark);
+    --hover-color: var(--color-contrast);
+}
+
+.btn-secondary-subtle {
+    --color: var(--color-secondary-dark);
+    --bg: color-mix(in oklab, var(--color-secondary) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-secondary) 50%, transparent);
+    --hover-color: var(--color-secondary-dark);
+}
+
+.btn-secondary-outline {
+    --color: var(--color-secondary-dark);
+    --border-color: var(--color-secondary-dark);
+    --hover-bg: color-mix(in oklab, var(--color-secondary) 30%, transparent);
+    --hover-color: var(--color-secondary-dark);
+}
+
+/* success btn */
 .btn-success {
-    background-color: var(--color-success) !important;
-    border-color: var(--color-success) !important;
+    --color: var(--color-contrast);
+    --bg: var(--color-success);
+    --border-color: transparent;
+    --hover-bg: var(--color-success-dark);
+    --hover-color: var(--color-contrast);
 }
 
-.btn-accent {
-    background-color: var(--color-warning) !important;
-    border-color: var(--color-warning) !important;
+.btn-success-subtle {
+    --color: var(--color-success-dark);
+    --bg: color-mix(in oklab, var(--color-success) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-success) 50%, transparent);
+    --hover-color: var(--color-success-dark);
 }
 
-.btn-subtle {
-    background-color: var(--color-active) !important;
-    border-color: var(--color-active) !important;
-    color: var(--color-white) !important;
+.btn-success-outline {
+    --color: var(--color-success-dark);
+    --border-color: var(--color-success-dark);
+    --hover-bg: color-mix(in oklab, var(--color-success) 30%, transparent);
+    --hover-color: var(--color-success-dark);
 }
 
-/* hover */
-.btn-secondary:hover {
-    background-color: var(--color-secondary-dark) !important;
+/* warning btn */
+.btn-warning {
+    --color: var(--color-contrast);
+    --bg: var(--color-warning);
+    --border-color: transparent;
+    --hover-bg: var(--color-warning-dark);
+    --hover-color: var(--color-contrast);
 }
 
-.btn-primary:hover {
-    background-color: var(--color-primary-dark) !important;
+.btn-warning-subtle {
+    --color: var(--color-warning-dark);
+    --bg: color-mix(in oklab, var(--color-warning) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-warning) 50%, transparent);
+    --hover-color: var(--color-warning-dark);
 }
 
-.btn-success:hover {
-    background-color: var(--color-success-dark) !important;
+.btn-warning-outline {
+    --color: var(--color-warning-dark);
+    --border-color: var(--color-warning-dark);
+    --hover-bg: color-mix(in oklab, var(--color-warning) 30%, transparent);
+    --hover-color: var(--color-warning-dark);
 }
 
-.btn-accent:hover {
-    background-color: var(--color-warning-dark) !important;
+/* danger btn */
+.btn-danger {
+    --color: var(--color-contrast);
+    --bg: var(--color-danger);
+    --border-color: transparent;
+    --hover-bg: var(--color-danger-dark);
+    --hover-color: var(--color-contrast);
 }
 
-.btn-subtle:hover {
-    background-color: var(--background-color-emphasis) !important;
-    border-color: var(--background-color-emphasis) !important;
+.btn-danger-subtle {
+    --color: var(--color-danger-dark);
+    --bg: color-mix(in oklab, var(--color-danger) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-danger) 50%, transparent);
+    --hover-color: var(--color-danger-dark);
 }
 
+.btn-danger-outline {
+    --color: var(--color-danger-dark);
+    --border-color: var(--color-danger-dark);
+    --hover-bg: color-mix(in oklab, var(--color-danger) 30%, transparent);
+    --hover-color: var(--color-danger-dark);
+}
+
+.btn-neutral {
+    --color: var(--color-white);
+    --bg: var(--color-active);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-active) 80%, transparent);
+    --hover-color: var(--color-white);
+}
+
+.btn-neutral-subtle {
+    --color: var(--text-color-emphasis);
+    --bg: color-mix(in oklab, var(--color-active) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-active) 50%, transparent);
+    --hover-color: var(--text-color-emphasis);
+}
+
+.btn-neutral-outline {
+    --color: var(--color-active);
+    --border-color: var(--color-active);
+    --hover-bg: color-mix(in oklab, var(--color-active) 30%, transparent);
+    --hover-color: var(--color-active);
+}
+
+.btn-info {
+    --color: var(--color-contrast);
+    --bg: var(--color-info);
+    --border-color: transparent;
+    --hover-bg: var(--color-info-dark);
+    --hover-color: var(--color-contrast);
+}
+
+.btn-info-subtle {
+    --color: var(--color-info);
+    --bg: color-mix(in oklab, var(--color-info) 30%, transparent);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-info) 50%, transparent);
+    --hover-color: var(--color-info);
+}
+
+.btn-info-outline {
+    --color: var(--color-info);
+    --border-color: var(--color-info);
+    --hover-bg: color-mix(in oklab, var(--color-info) 30%, transparent);
+    --hover-color: var(--color-info);
+}
+
+[class*="outline"] {
+    border-color: var(--btn-border-color) !important;
+    border-width: 1px !important;
+    background-color: transparent !important;
+}
+
+.badge-row .badge {
+    border-width: 1px !important;
+    border-style: solid !important;
+}
+
+/* primary badge */
 .badge-primary {
-    background-color: var(--color-primary) !important;
-    color: var(--color-white) !important;
+    --bg: var(--color-primary);
+    --color: var(--color-white);
+    --border-color: transparent;
+    --hover-bg: var(--color-primary-dark);
+    --hover-color: var(--color-white);
 }
 
+.badge-primary-subtle {
+    --bg: color-mix(in oklab, var(--color-primary) 30%, transparent);
+    --color: var(--color-primary-dark);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-primary) 50%, transparent);
+    --hover-color: var(--color-primary-dark);
+}
+
+.badge-primary-outline {
+    --bg: transparent;
+    --color: var(--color-primary-dark);
+    --border-color: var(--color-primary);
+    --hover-bg: color-mix(in oklab, var(--color-primary) 15%, transparent);
+    --hover-color: var(--color-primary-dark);
+}
+
+/* secondary badge */
 .badge-secondary {
-    background-color: var(--color-secondary) !important;
-    color: var(--color-white) !important;
+    --bg: var(--color-secondary);
+    --color: var(--color-contrast);
+    --border-color: transparent;
+    --hover-bg: var(--color-secondary-dark);
+    --hover-color: var(--color-contrast);
 }
 
+.badge-secondary-subtle {
+    --bg: color-mix(in oklab, var(--color-secondary) 30%, transparent);
+    --color: var(--color-secondary-dark);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-secondary) 50%, transparent);
+    --hover-color: var(--color-secondary-dark);
+}
+
+.badge-secondary-outline {
+    --bg: transparent;
+    --color: var(--color-secondary);
+    --border-color: var(--color-secondary);
+    --hover-bg: color-mix(in oklab, var(--color-secondary) 30%, transparent);
+    --hover-color: var(--color-secondary-dark);
+}
+
+/* success badge */
+.badge-success {
+    --bg: var(--color-success);
+    --color: var(--color-contrast);
+    --border-color: transparent;
+    --hover-bg: var(--color-success-dark);
+    --hover-color: var(--color-contrast);
+}
+
+.badge-success-subtle {
+    --bg: color-mix(in oklab, var(--color-success) 30%, transparent);
+    --color: var(--color-success-dark);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-success) 50%, transparent);
+    --hover-color: var(--color-success-dark);
+}
+
+.badge-success-outline {
+    --bg: transparent;
+    --color: var(--color-success);
+    --border-color: var(--color-success);
+    --hover-bg: color-mix(in oklab, var(--color-success) 30%, transparent);
+    --hover-color: var(--color-success-dark);
+}
+
+/* warning badge */
 .badge-warning {
-    background-color: var(--color-warning) !important;
-    color: var(--color-white) !important;
+    --bg: var(--color-warning);
+    --color: var(--color-contrast);
+    --border-color: transparent;
+    --hover-bg: var(--color-warning-dark);
+    --hover-color: var(--color-contrast);
 }
 
+.badge-warning-subtle {
+    --bg: color-mix(in oklab, var(--color-warning) 30%, transparent);
+    --color: var(--color-warning-dark);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-warning) 50%, transparent);
+    --hover-color: var(--color-warning-dark);
+}
+
+.badge-warning-outline {
+    --bg: transparent;
+    --color: var(--color-warning-dark);
+    --border-color: var(--color-warning);
+    --hover-bg: color-mix(in oklab, var(--color-warning) 30%, transparent);
+    --hover-color: var(--color-warning-dark);
+}
+
+/* info badge */
 .badge-info {
-    background-color: var(--color-info) !important;
-    color: var(--color-contrast) !important;
+    --bg: var(--color-info);
+    --color: var(--color-contrast);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-info) 80%, transparent);
+    --hover-color: var(--color-contrast);
+}
+
+.badge-info-subtle {
+    --bg: color-mix(in oklab, var(--color-info) 30%, transparent);
+    --color: var(--color-info-dark);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-info) 30%, transparent);
+    --hover-color: var(--color-info);
+}
+
+.badge-info-outline {
+    --bg: transparent;
+    --color: var(--color-info-dark);
+    --border-color: var(--color-info);
+    --hover-bg: color-mix(in oklab, var(--color-info) 30%, transparent);
+    --hover-color: var(--color-info);
+}
+
+/* danger badge */
+.badge-danger {
+    --bg: var(--color-danger);
+    --color: var(--color-contrast);
+    --border-color: transparent;
+    --hover-bg: var(--color-danger-dark);
+    --hover-color: var(--color-contrast);
+}
+
+.badge-danger-subtle {
+    --bg: color-mix(in oklab, var(--color-danger) 30%, transparent);
+    --color: var(--color-danger-dark);
+    --border-color: transparent;
+    --hover-bg: color-mix(in oklab, var(--color-danger) 50%, transparent);
+    --hover-color: var(--color-danger-dark);
+}
+
+.badge-danger-outline {
+    --bg: transparent;
+    --color: var(--color-danger-dark);
+    --border-color: var(--color-danger);
+    --hover-bg: color-mix(in oklab, var(--color-danger) 30%, transparent);
+    --hover-color: var(--color-danger-dark);
+}
+
+.badge-light {
+    --bg: var(--color-white);
+    --color: var(--color-black);
+    --border-color: transparent;
+    --hover-bg: var(--color-white);
+    --hover-color: var(--color-black);
+}
+
+.badge-dark {
+    --bg: var(--color-black);
+    --color: var(--color-white);
+    --border-color: transparent;
+    --hover-bg: var(--color-black);
+    --hover-color: var(--color-white);
+}
+
+.badge,
+.btn {
+    color: var(--color) !important;
+    background-color: var(--bg) !important;
+    border-color: var(--border-color) !important;
+    border-width: 1px !important;
+}
+
+.badge:hover,
+.btn:hover {
+    background-color: var(--hover-bg) !important;
+    color: var(--hover-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.modal-title {
+    color: var(--text-color-default) !important;
 }

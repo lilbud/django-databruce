@@ -1,5 +1,5 @@
 {% if class == "half" %}
-    <figure class="half">
+    <figure class="half" id="{{ id }}">
         <a href="{{ img1 }}" target="_blank">
             <img src="{{ img1 }}"
                  class="figure-img img-fluid rounded"
@@ -19,7 +19,7 @@
         {% if caption %}<figcaption class="figure-caption">{{ caption }}</figcaption>{% endif %}
     </figure>
 {% else %}
-    <figure class="full">
+    <figure class="full" id="{{ id }}">
         <a href="{{ img1 }}" target="_blank">
             <img src="{{ img1 }}"
                  class="figure-img img-fluid rounded"

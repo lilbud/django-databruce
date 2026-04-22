@@ -73,61 +73,60 @@
         <div class="row">
           {{ form.day_of_week.errors }}
           <div class="form-label text-sm text-nowrap">{{ form.day_of_week.label }}</div>
-          <div class="col-3 col-lg-1 pe-1">{{ form.day_of_week_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.day_of_week_exclude }}</div>
           <div class="col-9 col-md-4 px-0">{{ form.day_of_week }}</div>
         </div>
         <div class="row">
           {{ form.event_type.errors }}
           <div class="form-label text-sm text-nowrap">{{ form.event_type.label }}</div>
-          {% comment %} <div class="col-3 col-lg-1 pe-1">{{ form.event_type_exclude }}</div> {% endcomment %}
           <div class="col-9 col-md-4">{{ form.event_type }}</div>
         </div>
         <div class="row">
           {{ form.city.errors }}
           <label class="form-label text-sm">{{ form.city.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.city_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.city_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.city }}</div>
         </div>
         <div class="row">
           {{ form.state.errors }}
           <label class="form-label text-sm">{{ form.state.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.state_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.state_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.state }}</div>
         </div>
         <div class="row">
           {{ form.country.errors }}
           <label class="form-label text-sm">{{ form.country.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.country_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.country_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.country }}</div>
         </div>
         <div class="row">
           {{ form.venue.errors }}
           <label class="form-label text-sm">{{ form.venue.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.venue_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.venue_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.venue }}</div>
         </div>
         <div class="row">
           {{ form.tour.errors }}
           <label class="form-label text-sm">{{ form.tour.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.tour_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.tour_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.tour }}</div>
         </div>
         <div class="row">
           {{ form.tour_leg.errors }}
           <label class="form-label text-sm">{{ form.tour_leg.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.tour_leg_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.tour_leg_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.tour_leg }}</div>
         </div>
         <div class="row">
           {{ form.relation.errors }}
           <label class="form-label text-sm">{{ form.relation.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.relation_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.relation_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.relation }}</div>
         </div>
         <div class="row">
           {{ form.band.errors }}
           <label class="form-label text-sm">{{ form.band.label }}</label>
-          <div class="col-3 col-lg-1 pe-1">{{ form.band_exclude }}</div>
+          <div class="col-2 col-md-1 pe-1">{{ form.band_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.band }}</div>
         </div>
         <div class="row">
@@ -164,7 +163,7 @@
     <div id="new_row" class="row d-none mb-2">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
     <div id="conjunction" class="d-none">
       <div class="row conjunction-row mb-0 py-1">
-        <label class="offset-0 offset-md-1" for="conjunction">
+        <label class="offset-0 offset-lg-1" for="conjunction">
           <span class="conjunction text-base text-uppercase">And</span>
         </label>
       </div>

@@ -74,6 +74,16 @@
     line-height: 1;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--color-primary-dark);
+    scroll-margin-top: 60px;
+}
+
 h2,
 h3 {
     padding-top: .5em;
@@ -167,13 +177,20 @@ ul:last-child {
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
-
     /* Vital Dimensions */
     width: 125px;
     aspect-ratio: 6 / 1;
 
     background-color: var(--color-white);
 }
+
+/* @media (max-width: 1200px) {
+    .logo {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
+} */
 
 /* Navbar */
 .navbar {
@@ -182,8 +199,10 @@ ul:last-child {
 
 .navbar .nav-item,
 .navbar .nav-item .btn,
+.nav-btn,
 .navbar button.dropdown-toggle {
-    color: var(--color-white) !important
+    color: var(--color-white) !important;
+    border: none !important;
 }
 
 /* logo needs font size 0 to be centered, as it is an SVG */
@@ -301,6 +320,11 @@ a:link,
     border-color: var(--color-warning) !important;
 }
 
+.card.message.success {
+    background-color: var(--color-success-light) !important;
+    border-color: var(--color-success) !important;
+}
+
 .card-header,
 .card-footer,
 .card,
@@ -311,7 +335,7 @@ a:link,
 }
 
 th,
-tr:not(.set-header) td:not(.songnum, .table-warning, .table-danger) {
+tr:not(.set-header) td:not(.songnum, .position, .highlighted) {
     background-color: var(--background-color-subtle) !important;
 }
 
@@ -343,12 +367,12 @@ tr.album-header>th {
 }
 
 table.dataTable td:not(.highlighted) a:not(.text-reset) {
-    color: var(--color-primary) !important;
+    color: var(--color-primary-dark) !important;
 }
 
 /* setlist table highlighting, different shades for light and dark */
 td.highlighted {
-    box-shadow: inset 0 0 100px 100px var(--border-color-base);
+    background-color: var(--background-color-highlight) !important;
 }
 
 /* change text color when setlist table rows highlighted */
@@ -356,7 +380,7 @@ td.highlighted *:not(.badge) {
     color: var(--text-color-default) !important;
 }
 
-table.dataTable td:not(.highlighted) a {
+table.dataTable td a {
     font-weight: 500 !important;
 }
 
@@ -382,29 +406,34 @@ td:not(.fc-day) {
     vertical-align: middle !important;
 }
 
-td .badge {
+.badge {
+    padding: 0.2em 0.45em !important;
+    border-radius: calc(infinity * 1px) !important;
     font-weight: 500 !important;
-    font-size: 0.7rem !important;
-    padding: 0.2em 0.45em 0.2em 0.45em !important;
-    border-radius: 0.5rem !important;
+}
+
+td .badge {
+    font-size: var(--text-2xs) !important;
 }
 
 /* custom badges for the badge row on event detail */
-.badge-row .badge {
+.badge-row span.badge {
     font-weight: 500 !important;
-    font-size: 0.75rem !important;
+    font-size: var(--text-xs) !important;
     display: inline-flex;
+    padding: 0.1rem 0.3rem !important;
+    border-radius: calc(infinity * 1px) !important;
+}
+
+td .segue,
+td .check {
     vertical-align: middle;
-    padding: 0.25em 0.6em 0.25em 0.6em !important;
-    margin-top: -3px !important;
-    border-radius: 0.7rem !important;
 }
 
 td .segue,
 td .badge,
 td .check {
     display: inline-flex;
-    vertical-align: middle;
     margin-top: -3px !important;
 }
 
@@ -537,14 +566,15 @@ button:disabled {
 
 /* progress bar for album breakdown */
 .progress {
-    height: 0.35rem !important;
+    height: 5px !important;
     border-radius: 0.2rem !important;
     background-color: var(--background-color-emphasis) !important;
 }
 
 /* album breakdown on hover */
-td:has(.album-breakdown):hover .progress {
-    background-color: var(--background-color-emphasis) !important;
+.album-breakdown:hover {
+    cursor: pointer;
+    background-color: color-mix(in oklab, var(--color-active) 15%, transparent) !important;
 }
 
 .progress-bar {
@@ -582,17 +612,8 @@ button.nav-link.active,
 /* inactive nav button color and font */
 button.nav-link:not(.active) {
     font-weight: 300 !important;
-    color: var(--text-color-default) !important;
-    background-color: var(--color-disabled) !important;
-}
-
-[data-bs-theme="dark"] button.nav-link:not(.active) {
-    background-color: color-mix(in srgb, var(--color-primary)) 100%, black 70%;
-}
-
-[data-bs-theme="light"] button.nav-link:not(.active) {
-    color: var(--text-color-default) !important;
-    background-color: color-mix(in srgb, var(--color-primary)) 100%, white 90%;
+    color: var(--color-white) !important;
+    background-color: var(--color-active) !important;
 }
 
 /* active nav button font weight */
@@ -600,12 +621,22 @@ button.nav-link.active {
     font-weight: 600 !important;
 }
 
+button.nav-link:hover {
+    background-color: color-mix(in oklab, var(--color-active) 80%, transparent) !important;
+}
+
+button.nav-link.active:hover {
+    background-color: var(--color-primary-dark) !important;
+}
+
+
+
 /* inactive nav link color */
 a.nav-link:not(.active) {
     color: var(--text-color-default) !important;
 }
 
-a:not(.nav-link, .btn, .dropdown-item):hover,
+a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 .btn-link:hover {
     text-decoration: underline !important;
 }
@@ -616,8 +647,8 @@ a:not(.nav-link, .btn, .dropdown-item):hover,
 }
 
 /* links should be primary site color except buttons and certain classes */
-a:not(.text-reset, .dropdown-item, .btn) {
-    color: var(--color-primary) !important;
+a:not(.text-reset, .dropdown-item, .btn, .bd-links-link) {
+    color: var(--color-primary-dark) !important;
 }
 
 /* hides doubled column control buttons */
@@ -626,21 +657,23 @@ a:not(.text-reset, .dropdown-item, .btn) {
 }
 
 /* column control button icon color */
-table.dataTable span.dtcc span.dtcc-button-icon {
+table.dataTable span.dtcc span.dtcc-button-icon,
+.set-header span {
     color: var(--text-color-default) !important;
 }
 
 /* set-header default color */
 .set-header td {
-    background-color: #717f8e !important;
-    color: var(--color-contrast) !important;
+    background-color: var(--background-color-emphasis) !important;
 }
 
-/* set-header and songnum font weight */
 .set-header span,
 .songnum {
     font-weight: 500 !important;
-    color: var(--color-white) !important;
+}
+
+.songnum {
+    color: var(--color-contrast) !important;
 }
 
 /* set-header colors and badge colors */
@@ -659,19 +692,11 @@ td .badge.bg-secondary {
     background-color: var(--color-danger) !important;
 }
 
-.set-header:is(.set-1, .show) td,
+/* .set-header:is(.set-1, .show) td, */
 .show-opener,
 td .badge.bg-primary,
 .badge.show-opener {
     background-color: var(--color-primary) !important;
-}
-
-.set-header.set-2 td {
-    background-color: var(--color-secondary) !important;
-}
-
-.set-header.encore td {
-    background-color: var(--color-danger) !important;
 }
 
 /* button icon */
@@ -680,6 +705,12 @@ td .badge.bg-primary,
     font-size: var(--text-base);
     display: inline-block;
     line-height: 1;
+    vertical-align: middle !important;
+}
+
+.nav-btn i {
+    font-weight: 900 !important;
+    font-size: var(--text-2xl);
 }
 
 .icon-button i {
@@ -734,9 +765,11 @@ div.dt-scroll-body {
     border-color: var(--emphasis) !important;
 }
 
-.btn {
-    gap: calc(0.25rem * 1.5) !important;
+.btn,
+button.nav-link {
+    gap: 0.5rem !important;
     align-items: center !important;
+    vertical-align: middle !important;
 }
 
 .row-cols-7>*:not(.vr) {
@@ -794,6 +827,11 @@ div.dt-scroll-body {
     /* Length of the line */
 }
 
+.vr {
+    margin-left: 0.75rem !important;
+    margin-right: 0.75rem !important;
+}
+
 button.nav-link {
     display: inline-flex;
     justify-content: center;
@@ -805,6 +843,7 @@ button.nav-link * {
     vertical-align: middle;
     justify-content: center;
     align-items: center;
+
 }
 
 button.nav-link .badge {
@@ -812,8 +851,11 @@ button.nav-link .badge {
     font-size: 0.75rem !important;
     display: inline-flex;
     vertical-align: middle;
-    padding: 0.25em 0.6em 0.25em 0.6em !important;
-    margin-left: 0.25rem !important;
+
+
+    padding: 0.2em 0.45em !important;
+    border-radius: calc(infinity * 1px) !important;
+    /* margin-left: 0.25rem !important; */
 }
 
 #albumTable_wrapper>.dt-layout-table {
@@ -837,8 +879,17 @@ button.nav-link .badge {
     border-bottom-right-radius: 0px !important;
 }
 
-.fc-h-event .fc-event-main {
+/* .fc-h-event .fc-event-main {
     color: var(--text-color-default) !important;
+} */
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border: 1px solid var(--border-color-base);
+}
+
+.fc-theme-standard .fc-scrollgrid {
+    border: 1px solid var(--border-color-base);
 }
 
 .calendar.event:hover {
@@ -848,22 +899,24 @@ button.nav-link .badge {
 
 .calendar.release-event {
     background-color: var(--color-warning) !important;
-    border-color: var(--color-warning) !important;
+    border-color: var(--color-contrast) !important;
 }
 
 .calendar.release-event-past {
-    background-color: var(--text-color-highlight) !important;
+    background-color: transparent !important;
     border-color: var(--color-warning) !important;
 }
 
 .calendar.release-event-birthday {
-    background-color: var(--text-color-highlight) !important;
-    border-color: var(--color-primary-light) !important;
+    background-color: transparent !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary-dark) !important;
 }
 
 .calendar.event-run {
     background-color: var(--color-secondary) !important;
     border-color: var(--color-secondary) !important;
+    color: var(--color-contrast) !important;
 }
 
 .calendar.event {
@@ -877,7 +930,7 @@ button.nav-link .badge {
 
 .calendar.release-event .fc-event-main,
 .calendar.event-run .fc-event-main {
-    color: white !important;
+    color: var(--color-contrast) !important;
 }
 
 .calendar.release-event-past .fc-event-main {
@@ -886,7 +939,7 @@ button.nav-link .badge {
 }
 
 .calendar.release-event-birthday .fc-event-main {
-    color: var(--color-primary-light) !important;
+    color: var(--color-primary-dark) !important;
     font-weight: 500 !important;
 }
 
@@ -1024,18 +1077,23 @@ a>img {
     justify-content: center !important;
 }
 
-figure:not(.half) img {
+figure:not(.half) a {
     width: 50% !important;
     height: auto !important;
 }
 
-figure.full img {
+figure.full a {
     width: 100% !important;
     height: auto !important;
 }
 
-figure.half img {
+figure.half a {
     width: calc(50% - 0.5rem);
+    height: auto !important;
+}
+
+figure.half img {
+    width: stretch !important;
     height: auto !important;
 }
 
@@ -1047,7 +1105,8 @@ figcaption {
 pre {
     padding: 1rem !important;
     border-radius: var(--bs-border-radius) !important;
-    background-color: var(--text-color-emphasis) !important;
+    background-color: var(--background-color-muted) !important;
+    color: var(--text-color-default) !important;
     word-wrap: break-word;
     white-space: pre-wrap;
     overflow-x: auto;
@@ -1073,4 +1132,66 @@ pre {
 .bi.bi-star-fill {
     height: 16px;
     width: 16px;
+}
+
+.bd-links-link {
+    padding: .1875rem .5rem;
+    margin-top: .125rem;
+    margin-left: 1.125rem;
+    text-decoration: none;
+    display: inline-block;
+    font-size: var(--text-xs);
+    border-radius: var(--bs-border-radius);
+    color: var(--text-color-muted) !important;
+}
+
+.bd-links-heading {
+    gap: calc(0.25rem * 1.5) !important;
+    align-items: center !important;
+}
+
+.bd-links-link.active {
+    background-color: var(--color-primary) !important;
+    color: var(--color-contrast) !important;
+}
+
+.bd-links-link:hover {
+    text-decoration: none !important;
+    background-color: var(--color-primary) !important;
+    color: var(--color-contrast) !important;
+}
+
+.bd-links-nav {
+    column-count: 2;
+    column-gap: 1.5rem;
+}
+
+.bd-links-nav li {
+    break-inside: avoid;
+}
+
+.bd-links-nav .bd-links-span-all {
+    column-span: all;
+}
+
+.offcanvas.offcanvas-end {
+    width: 250px;
+}
+
+.offcanvas {
+    background-color: var(--background-color-highlight) !important;
+}
+
+.border-top {
+    border-top: var(--bs-border-width) var(--bs-border-style) var(--border-color-dark) !important;
+}
+
+.placeholder {
+    height: 1.1rem !important;
+    background-color: var(--color-active) !important;
+}
+
+.album-breakdown .badge {
+    padding: 0.1em 0.3em !important;
+    font-size: var(--text-3xs) !important;
 }

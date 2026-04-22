@@ -2,15 +2,6 @@
 <html lang="en" data-bs-theme="light">
   <head>
     {% load i18n static %}
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5RV5YKCT8Q"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-5RV5YKCT8Q');
-    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description"
@@ -46,49 +37,29 @@
       | Databruce
     </title>
     <!-- leaflet.js-->
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
+    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
+    <script src="{% static 'databruce/js/leaflet.js' %}"></script>
     <!--JQuery-->
     <link rel="stylesheet"
-          href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
+          href="{% static 'databruce/css/jquery-ui.min.css' %}">
+    <script src="{% static 'databruce/js/jquery-4.0.0.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery.mask.min.js' %}"></script>
     <!--Bootstrap-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="{% static 'databruce/css/bootstrap.min.css' %}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script defer
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"></script>
+    <script src="{% static 'databruce/js/bootstrap.bundle.min.js' %}"></script>
     <!--Datatables-->
-    <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-2.3.7/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-print-3.2.6/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/r-3.0.8/rg-1.6.0/sc-2.4.3/sb-1.8.4/datatables.min.css"
-          rel="stylesheet"
-          integrity="sha384-1ijJ0GS6xbNbMTIXRekVwvl292OcATiqWK7mc3ClmZJDhJ17FevOvYA0HPtrCgXQ"
-          crossorigin="anonymous">
-    <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-2.3.7/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-print-3.2.6/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/r-3.0.8/rg-1.6.0/sc-2.4.3/sb-1.8.4/datatables.min.js"
-            integrity="sha384-uU3JucG4mNcB3qZQiRxj8fTAPtJaKGi4UnmJwsdImhPvG5iN2ngUpv12n8pVkzzv"
-            crossorigin="anonymous"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    <link href="{% static 'databruce/css/datatables.min.css' %}"
           rel="stylesheet">
-    <!--Static-->
-    <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
-    {% comment %} <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" /> {% endcomment %}
-    {% comment %} <link rel="stylesheet" href="{% static 'databruce/css/hb_style.css' %}" /> {% endcomment %}
+    <script src="{% static 'databruce/js/datatables.min.js' %}"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_style.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_select2.css' %}" />
     <!-- Other -->
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
@@ -100,25 +71,180 @@
   <body>
     <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
       <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
-        <button class="btn btn-sm d-xl-none d-block dropdown-toggle py-0"
+        <button class="btn nav-btn d-xl-none d-block py-0"
                 type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#mainNavbar"
-                aria-controls="mainNavbar"
-                aria-expanded="false"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar"
                 aria-label="Toggle navigation">
-          <i class="bi bi-list text-xl fw-semibold"></i>
+          <i class="bi bi-list"></i>
         </button>
-        <a class="navbar-brand p-auto p-xl-0 mx-2" href="{% url 'index' %}">
+        <a class="navbar-brand p-auto p-xl-0 mx-auto mx-lg-2"
+           href="{% url 'index' %}">
           <div class="logo" role="img" aria-label="Databruce">
             <span class="sr-only">Databruce</span>
           </div>
         </a>
-        <div class="d-flex-inline d-xxl-none align-items-center order-xl-last">
-          {% partialdef profile inline %}
+        <ul class="navbar-nav ms-2 me-auto my-2 my-xl-0 flex-wrap row-gap-1 column-gap-1 d-none d-xl-flex">
+          <li class="nav-item">
+            <a class="btn btn-sm"
+               role="button"
+               type="button"
+               href="{% url 'blog' %}">News</a>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Events</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'events' %}">Events By Year</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'runs' %}">Events By Run</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'events_type' %}">Events By Type</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'calendar' %}">Event Calendar</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle {% if 'tours' in request.resolver_match.route %}fw-bold{% endif %}"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Tours</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'tours' %}">Tours</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'tour_legs' %}">Tour Legs</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle {% if 'songs' in request.resolver_match.route %}fw-bold{% endif %}"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Songs</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'songs' %}">Songs</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'song_lyrics' %}">Lyrics</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Locations</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'cities' %}">Cities</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'states' %}">States</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'countries' %}">Countries</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle {% if 'relations' in request.resolver_match.route or 'bands' in request.resolver_match.route %}fw-bold{% endif %}"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Relations and Bands</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'relations' %}">Relations</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'bands' %}">Bands</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle {% if 'releases' in request.resolver_match.route %}fw-bold{% endif %}"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Releases</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'releases' %}">Official Releases</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'nugs' %}">Nugs Releases</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'bootlegs' %}">Bootlegs</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle {% if 'search' in request.resolver_match.route %}fw-bold{% endif %}"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">Search</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Search</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Note Search</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-sm dropdown-toggle"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">More</button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item"
+                   href="{% url 'blog_post' slug="about-databruce" %}">About Site</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'blog_post' slug="links" %}">Links</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'updates' %}">Updates</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'blog_post' slug="roadmap" %}">Roadmap</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url "contact" %}">Contact Us</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <form role="search"
+              method="get"
+              action="{% url 'search' %}"
+              class="d-none d-xl-flex my-xl-auto">
+          {{ searchForm.date }}
+          <button type="submit"
+                  id="event-search-btn"
+                  class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
+        </form>
+        <div class="vr d-none d-xl-block"></div>
+        <ul class="navbar-nav my-2 my-xl-0 d-flex me-2 flex-wrap row-gap-1 column-gap-1">
+          <div class="d-none d-xxl-block">
             {% if user.is_authenticated %}
               <li class="nav-item dropdown list-unstyled">
-                <button class="btn btn-sm dropdown-toggle {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+                <button class="btn btn-sm px-0 dropdown-toggle {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
                         role="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false">Profile</button>
@@ -156,175 +282,252 @@
                 </ul>
               </li>
             {% else %}
-              <li class="nav-item mx-lg-2 ms-auto d-inline mb-0">
-                <a class="btn btn-sm"
+              <li class="nav-item d-inline mb-0">
+                <a class="btn btn-sm px-0 border-0"
                    role="button"
                    type="button"
                    href="{% url 'login' %}?next={{ request.path }}">Login</a>
               </li>
             {% endif %}
-          {% endpartialdef profile %}
+          </div>
+          <div class="vr d-none d-xl-block"></div>
+          {% include "./partials/theme_toggler.html" %}
+        </ul>
+        <button class="btn nav-btn d-xl-none d-block py-0"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasNavbarEnd"
+                aria-controls="offcanvasNavbarEnd"
+                aria-label="Toggle navigation">
+          <i class="bi bi-three-dots text-xl fw-semibold"></i>
+        </button>
+        <div class="offcanvas offcanvas-end d-xl-none"
+             tabindex="-1"
+             id="offcanvasNavbarEnd"
+             aria-labelledby="offcanvasNavbarEndLabel">
+          <div class="offcanvas-header">
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="w-100" id="offcanvasNavEnd" aria-label="Navigation">
+              <ul class="bd-links-nav list-unstyled mb-0 pb-3">
+                {% if user.is_authenticated %}
+                  <li class="bd-links-span-all mb-3">
+                    <div class="text-base py-1 text-center">
+                      Hello {{ user }}
+                      {% if user.is_superuser %}
+                        (Admin)
+                      {% else %}
+                        (User)
+                      {% endif %}
+                    </div>
+                  </li>
+                  <li class="bd-links-span-all mb-3">
+                    <ul class="list-unstyled pb-2 text-center text-lg">
+                      <li>
+                        <a class="dropdown-item" href="{% url "profile" id=user.uuid %}">View Profile</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
+                      </li>
+                      {% if user.is_superuser %}
+                        <li>
+                          <a class="dropdown-item" href="{% url "admin:index" %}">Admin Portal</a>
+                        </li>
+                      {% endif %}
+                      <li>
+                        <a class="dropdown-item" href="{% url "settings" %}">User Settings</a>
+                      </li>
+                      <li>
+                        <form method="post" action="{% url 'logout' %}">
+                          {% csrf_token %}
+                          <button class="dropdown-item" role="button" type="submit" id="button-addon2">Logout</button>
+                        </form>
+                      </li>
+                    </ul>
+                  </li>
+                {% else %}
+                  <li class="bd-links-span-all mb-3">
+                    <div class="d-grid gap-2">
+                      <button class="btn btn-sm btn-primary">Register</button>
+                      <button class="btn btn-sm btn-primary">Login</button>
+                    </div>
+                  </li>
+                {% endif %}
+                <li class="bd-links-span-all my-3 border-top"></li>
+                <li class="bd-links-span-all mb-3" id="toggle-container">
+                  <button class="btn btn-sm btn-primary px-0 border-0 bd-theme-btn w-100"
+                          id="bd-theme"
+                          type="button"
+                          aria-label="Toggle Theme">
+                    <i class="bi bi-sun-fill theme-icon" aria-hidden="true"></i>
+                    <i class="bi bi-moon-stars-fill theme-icon" aria-hidden="true"></i>
+                    <span class="my-auto" id="bd-theme-text">Toggle Theme</span>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
-        <div class="navbar-collapse collapse" id="mainNavbar">
-          <ul class="navbar-nav ms-2 me-auto my-2 my-xl-0 d-flex flex-wrap row-gap-1 column-gap-1">
-            <li class="nav-item">
-              <a class="btn btn-sm"
-                 role="button"
-                 type="button"
-                 href="{% url 'blog' %}">News</a>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Events</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'events' %}">Events By Year</a>
+        <div class="offcanvas offcanvas-start d-xl-none"
+             tabindex="-1"
+             id="offcanvasNavbar"
+             aria-labelledby="offcanvasNavbarLabel">
+          <div class="offcanvas-header">
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="w-100" id="offcanvasNav" aria-label="Navigation">
+              <ul class="bd-links-nav list-unstyled mb-0 pb-3">
+                <li class="bd-links-span-all">
+                  <form role="search"
+                        method="get"
+                        action="{% url 'search' %}"
+                        class="d-flex my-xl-auto">
+                    {{ searchForm.date }}
+                    <button type="submit"
+                            id="event-search-btn"
+                            class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
+                  </form>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'runs' %}">Events By Run</a>
+                <li class="bd-links-span-all my-3 border-top"></li>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-calendar-fill"></i>Events</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link" href="{% url 'events' %}">Events By Year</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'runs' %}">Events By Run</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'events_type' %}">Events By Type</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'calendar' %}">Event Calendar</a>
+                    </li>
+                  </ul>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'events_type' %}">Events By Type</a>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-bus-front-fill"></i>Tours</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link" href="{% url 'tours' %}">Tours</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'tour_legs' %}">Tour Legs</a>
+                    </li>
+                  </ul>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'calendar' %}">Event Calendar</a>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-music-note-beamed"></i>Songs</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link" href="{% url 'songs' %}">Songs</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'song_lyrics' %}">Lyrics</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-geo-alt-fill"></i>Locations</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link" href="{% url 'venues' %}">Venues</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'cities' %}">Cities</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'states' %}">States</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'countries' %}">Countries</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-person-fill"></i>Relations</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link"  href="{% url 'relations' %}">Relations</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'bands' %}">Bands</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-vinyl-fill"></i>Releases</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link" href="{% url 'releases' %}">Official Releases</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'nugs' %}">Nugs Releases</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'bootlegs' %}">Bootlegs</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-binoculars-fill"></i>Search</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link" href="{% url 'adv_search' %}">Advanced Search</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'note_search' %}">Setlist Note Search</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="bd-links-group py-2">
+                  <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-question-circle-fill"></i>About Site</span>
+                  <ul class="list-unstyled pb-2">
+                    <li>
+                      <a class="bd-links-link"
+                         href="{% url 'blog_post' slug="about-databruce" %}">News</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link"
+                         href="{% url 'blog_post' slug="about-databruce" %}">About Site</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'blog_post' slug="links" %}">Links</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'updates' %}">Updates</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url 'blog_post' slug="roadmap" %}">Roadmap</a>
+                    </li>
+                    <li>
+                      <a class="bd-links-link" href="{% url "contact" %}">Contact Us</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="bd-links-span-all my-3 border-top"></li>
+                <li class="bd-links-span-all mb-3" id="toggle-container">
+                  <button class="btn btn-sm btn-primary px-0 border-0 bd-theme-btn w-100"
+                          id="bd-theme"
+                          type="button"
+                          aria-label="Toggle Theme">
+                    <i class="bi bi-sun-fill theme-icon" aria-hidden="true"></i>
+                    <i class="bi bi-moon-stars-fill theme-icon" aria-hidden="true"></i>
+                    <span class="my-auto" id="bd-theme-text">Toggle Theme</span>
+                  </button>
                 </li>
               </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle {% if 'tours' in request.resolver_match.route %}fw-bold{% endif %}"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Tours</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'tours' %}">Tours</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'tour_legs' %}">Tour Legs</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle {% if 'songs' in request.resolver_match.route %}fw-bold{% endif %}"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Songs</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'songs' %}">Songs</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'song_lyrics' %}">Lyrics</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Locations</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'venues' %}">Venues</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'cities' %}">Cities</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'states' %}">States</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'countries' %}">Countries</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle {% if 'relations' in request.resolver_match.route or 'bands' in request.resolver_match.route %}fw-bold{% endif %}"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Relations and Bands</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'relations' %}">Relations</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'bands' %}">Bands</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle {% if 'releases' in request.resolver_match.route %}fw-bold{% endif %}"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Releases</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'releases' %}">Official Releases</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'nugs' %}">Nugs Releases</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'bootlegs' %}">Bootlegs</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle {% if 'search' in request.resolver_match.route %}fw-bold{% endif %}"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">Search</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'adv_search' %}">Advanced Search</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'note_search' %}">Setlist Note Search</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <button class="btn btn-sm dropdown-toggle"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">More</button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{% url 'about' %}">About Site</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'links' %}">Links</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'updates' %}">Updates</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url 'roadmap' %}">Roadmap</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{% url "contact" %}">Contact Us</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <hr class="navbar-hr">
-          <form role="search"
-                method="get"
-                action="{% url 'search' %}"
-                class="d-flex my-xl-auto">
-            {{ searchForm.date }}
-            <button type="submit"
-                    id="event-search-btn"
-                    class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
-          </form>
-          <hr class="navbar-hr">
-          <ul class="navbar-nav my-2 my-xl-0 ms-xl-2 d-flex flex-wrap row-gap-1 column-gap-1">
-            <div class="d-none d-xxl-block">{% partial profile %}</div>
-            {% include "./partials/theme_toggler.html" %}
-          </ul>
+            </nav>
+          </div>
         </div>
       </div>
     </nav>
@@ -346,7 +549,7 @@
       $(document).ready(function () {
         const eventApi = "{% url 'api:event-list' %}";
 
-        $("#eventSearch").autocomplete({
+        $(".event-search").autocomplete({
             delay: 500,
             classes: {
               "ui-autocomplete": "dropdown-menu"
@@ -389,6 +592,14 @@
           $(this).mask('0000-00-00');
         });
 
+        // highlight link on offcanvas navbar if current page
+        const activePage = window.location.pathname;
+        const navLinks = $('a.bd-links-link').each(function(index, link) {
+          if (activePage === link.pathname){
+            link.classList.add('active');
+          }
+        })
+
         let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -399,8 +610,6 @@
         tabElements.forEach(tabEl => {
           tabEl.addEventListener('shown.bs.tab', (event) => {
             var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
-
-            console.log(hash)
 
             if (hash === '#mostplayed' || hash === "#rare") {
               hash = "#songs"
@@ -416,16 +625,10 @@
           const url = window.location.href;
           if (url.includes("#")) {
             const hash = url.substring(url.indexOf("#"));
-            var buttonTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
-            var linkTrigger = document.querySelector(`a[data-bs-target="${hash}"]`);
+            var trigger = document.querySelector(`[data-bs-target="${hash}"]`);
 
-            if (buttonTrigger) {
-              const bsPill = new bootstrap.Tab(buttonTrigger);
-              bsPill.show();
-            }
-
-            if (linkTrigger) {
-              const bsPill = new bootstrap.Tab(linkTrigger);
+            if (trigger) {
+              const bsPill = new bootstrap.Tab(trigger);
               bsPill.show();
             }
           }

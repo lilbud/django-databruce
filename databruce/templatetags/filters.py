@@ -22,7 +22,7 @@ md = EMarkdown()
 
 
 @register.simple_tag(takes_context=True)
-def render_includes(context, value):
+def render_includes(value):
     """Render a string as a Django template within the current context."""
     if not value:
         return ""
@@ -38,15 +38,18 @@ def render_includes(context, value):
         },
     )
 
-    value = markdown.markdown(value, extensions=["fenced_code"])
+    md = markdown.Markdown(extensions=["fenced_code", "toc"])
+    post = md.convert(value)
 
-    # Create the template object from your database string
-    template_obj = template.Template(value)
+    return {"post": post, "toc": md.toc}
 
-    context_new = Context({"body": context.get("post").body})
+    # # Create the template object from your database string
+    # template_obj = template.Template(post)
 
-    # Use the existing context (which is already a Context object)
-    return mark_safe(template_obj.render(context_new))
+    # context_new = Context({"body": context.get("post").body, "toc": md.toc})
+
+    # # Use the existing context (which is already a Context object)
+    # return mark_safe(template_obj.render(context_new))
 
 
 @register.filter(name="markdown")

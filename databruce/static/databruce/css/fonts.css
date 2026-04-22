@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Google Sans Flex';
+    src: url('../fonts/GoogleSansFlex-VariableFont.ttf') format('truetype');
+    font-weight: 100 1000;
+    /* Defines the range of weights available */
+    font-stretch: 25% 150%;
+    /* Defines the width range */
+    font-display: swap;
+}

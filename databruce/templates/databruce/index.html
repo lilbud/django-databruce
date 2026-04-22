@@ -49,16 +49,7 @@
                class="btn btn-sm btn-primary px-1 py-0"
                href="{% url 'updates' %}">See More</a>
           </div>
-          <div class="card-body p-0">
-            <div class="table-responsive index">
-              <table class="table table-hover display wrap" id="updateTable">
-                <thead>
-                  <th class="all">Date</th>
-                  <th class="all">Description</th>
-                </thead>
-              </table>
-            </div>
-          </div>
+          <div class="card-body p-0 list-card" id="update"></div>
         </div>
       </div>
       <div class="col">
@@ -98,24 +89,13 @@
           <div class="col">
             <div class="card">
               <div class="card-header">Latest</div>
-              <div class="card-body p-0" id="recent">
-                {% comment %} <div class="table-responsive index">
-                  <table class="table table-hover display" id="recentTable">
-                    <thead>
-                      <tr>
-                        <th class="all d-none">Date</th>
-                        <th class="all d-none">Location</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div> {% endcomment %}
-              </div>
+              <div class="card-body p-0 list-card" id="recent"></div>
             </div>
           </div>
           <div class="col">
             <div class="card">
               <div class="card-header">Upcoming</div>
-              <div class="card-body p-0" id="upcoming"></div>
+              <div class="card-body p-0 list-card" id="upcoming"></div>
             </div>
           </div>
           <div class="col">
@@ -126,7 +106,7 @@
                    class="btn btn-sm btn-primary px-1 py-0"
                    href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
               </div>
-              <div class="card-body p-0" id="otd"></div>
+              <div class="card-body p-0 list-card" id="otd"></div>
             </div>
           </div>
         </div>
@@ -136,100 +116,97 @@
   <script>
     var layout = getDatatableLayout({columns: false, category: false});
 
-    function createListItem(item) {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    console.log(timezone); // Output: "America/New_York"
+
+    function createPlaceholderItem() {
+      return `
+      <li class="list-group-item py-0.5 placeholder-glow">
+        <div class="row">
+          <div class="col-12 placeholder p-0 align-middle">
+          </div>
+        </div>
+      </li>`;
+    }
+
+    function createListItem(item1, item2) {
       return `
       <li class="list-group-item py-0.5">
         <div class="row row-cols-2 fw-medium">
-          <div class="col-3 py-0 text-nowrap">
-            <a href="/events/${item.event_id}">${item.date.display}</a>
-          </div>
-          <div class="col py-0">
-            <a href="/venues/${item.venue.uuid}">${item.venue.display}</a>
-          </div>
+            ${item1}
+            ${item2}
         </div>
       </li>
       `
     }
 
+    function getEventData(url, containerId) {
+      fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        var container = $(containerId);
+        var list = $('<ul />').addClass('list-group list-group-flush');
+
+        data.results.forEach((item, index) => {
+          var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date.display}</a></div>`
+          var item2 = `<div class="col py-0 text-nowrap"><a href="/venues/${item.venue.uuid}">${item.venue.display}</a></div>`
+
+          var listItem = createListItem(item1, item2);
+          $(list).append(listItem);
+        });
+
+        $(container).html($(list).prop('outerHTML'));
+      }).catch(error => console.error('Error:', error));
+    }
+
     $(document).ready(function () {
-      new DataTable('#updateTable', {
-        layout: layout,
-        searching: false,
-        paging: false,
-        info: false,
-        ordering: false,
-        scrollX: false,
-        columnDefs: [
-          {'targets': '_all', columnControl: [] }
-        ],
-        ajax: {
-          'url': '/api/v1/updates/?format=custom&limit=10',
-        },
-        columns: [
-          {
-            'data': 'created_at',
-            'name': 'created_at',
-            'render': function (data, type, row, meta) {
-              return `<span>${data}</span>`
-            }
-          },
-          { 
-            'data': 'msg',
-            'name': 'msg',
-            'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                if (row.view) {
-                  return `<span>${data} <a class='fw-medium' href='/${row.view}/${row.item_id}'>${row.value}</a></span>`
-                }
+      var date = new Date();
 
-                return data
-              }
-            },
-          }
-        ]
+      var month = date.getMonth() + 1;
+      var day = date.getDate();
+
+      $(".list-card").each(function() {
+        var container = $(this).empty();
+        var loadingList = $('<ul />').addClass('list-group list-group-flush');
+        var limit = 5;
+
+        if ($(this).attr('id') === "update") {
+          var limit = 10;
+        }
+
+        for (let i = 0; i < limit; i++) {
+          loadingList.append(createPlaceholderItem());
+        }
+
+        container.append(loadingList);
       })
-      
 
-      fetch('/api/v1/events/?month={{ date|date:"n" }}&day={{ date|date:"j" }}&limit=5&format=json')
+      getEventData(`/api/v1/events/?month=${month}&day=${day}&limit=5&format=json`, '#otd')
+      getEventData('/api/v1/events/?ordering=event_id&limit=5&format=json&upcoming=true', '#upcoming')
+      getEventData('/api/v1/events/?ordering=-event_id&limit=5&format=json&latest=true', '#recent')
+
+      fetch('/api/v1/updates/?format=json&limit=10')
         .then(response => response.json())
         .then(data => {
-          var container = $('#otd');
+          var container = $('#update');
           var list = $('<ul />').addClass('list-group list-group-flush');
 
           data.results.forEach((item, index) => {
-            var listItem = createListItem(item);
+            var msg = item.msg;
+
+            if (item.view) {
+              var msg = `<span>${item.msg} <a href='/${item.view}/${item.item_id}'>${item.value}</a></span>`
+            }
+
+            var item1 = `<div class="col-1 py-0 text-nowrap">${item.created_at}</div>`;
+            var item2 = `<div class="col py-0 text-nowrap">${msg}</div>`;
+
+            var listItem = createListItem(item1, item2);
+
             $(list).append(listItem);
           });
 
-          $(container).append($(list).prop('outerHTML'));
-        }).catch(error => console.error('Error:', error));
-  
-      fetch('/api/v1/events/?ordering=event_id&limit=5&format=json&upcoming=true')
-        .then(response => response.json())
-        .then(data => {
-          var container = $('#upcoming');
-          var list = $('<ul />').addClass('list-group list-group-flush');
-
-          data.results.forEach((item, index) => {
-            var listItem = createListItem(item);
-            $(list).append(listItem);
-          });
-
-          $(container).append($(list).prop('outerHTML'));
-        }).catch(error => console.error('Error:', error));
-
-      fetch('/api/v1/events/?ordering=-event_id&limit=5&format=json&latest=true')
-        .then(response => response.json())
-        .then(data => {
-          var container = $('#recent');
-          var list = $('<ul />').addClass('list-group list-group-flush');
-
-          data.results.forEach((item, index) => {
-            var listItem = createListItem(item);
-            $(list).append(listItem);
-          });
-
-          $(container).append($(list).prop('outerHTML'));
+          $(container).html($(list).prop('outerHTML'));
         }).catch(error => console.error('Error:', error));
 
       new DataTable('#setlistTable',
@@ -269,7 +246,7 @@
 
               if (rowData.position) {
                 var position = slugify(rowData.position);
-                $(td).addClass(position).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
+                $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
               }
 
               return td;

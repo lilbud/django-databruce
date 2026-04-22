@@ -184,16 +184,22 @@ First public release of the site. Site was locked behind a login and accounts on
 - [General] Updated page titles and descriptions so that many show on opengraph embeds
 
 # v1.16 (April 2026)
-- [Event Detail] Added "set times" card. This will show start/end time and duration of event if known. Times are shown in local time. "Scheduled" time will show for future events.
-- [Band Detail] Added "note" card
-- Added "News" page, which is basically a site blog
-- Fixed many issues with signup and user adding shows
-- Cleaned up several API views, faster response on many
-- [Advanced Search] Fixed issue where quotes in IDs would cause error
-- [Event Tables] Changed setlist icon to checkmark, removed true/false text
-- [Event Detail] Link buttons now centered and evenly spaced
+- [Fix] Fixed issues with signup and user adding shows
+- [New Page] Added "News" page, which is basically a site blog
+- [Style] Colors changed slightly. Badge/Button colors slightly different
+- [Style] Light/Dark Theme Colors Updated Slightly
+- [Style] Numerous style tweaks, using some elements from Hummingbird as I think it looks nicer.
+- [Update] Cleaned up several API views, faster response on many
 - [Home Page] Changed rendering of Upcoming/Recent/OTD Tables, no longer using Datatables.
+- [Event Tables] Changed setlist icon to checkmark, removed true/false text
+- [Band Detail] Added "note" card
 - [Release Detail] Moved most items to cards
+- [Song Detail] Updated year stats to pull from API
 - [Releases] Fixed length not showing on table
 - [Profile] Added count badge to nav tab buttons
-- Overall Style Tweaks, some slight color changes.
+- [Event Detail] Added "set times" card. This will show start/end time and duration of event if known. Times are shown in local time.
+- [Event Detail] Link buttons now centered and evenly spaced
+- [Event Detail] Album Breakdown no longer uses Datatables
+- [Advanced Search] City search now shows country if no state
+- [Advanced Search] Fixed issue where quotes in IDs would cause error
+- [Blog Posts] Added `magnific-popup` to blog posts, images now have the same popup as my Github Pages site

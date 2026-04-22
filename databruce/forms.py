@@ -413,17 +413,21 @@ class AdvancedEventSearch(forms.Form):
         return None
 
     def clean_month(self):
-        if self.cleaned_data["month"]:
+        data = re.sub(r"\D", "", self.cleaned_data["month"])
+
+        if data:
             return {
-                "id": self.cleaned_data["month"],
-                "value": calendar.month_name[int(self.cleaned_data["month"])],
+                "id": data,
+                "value": calendar.month_name[int(data)],
             }
 
         return None
 
     def clean_city(self):
-        if self.cleaned_data["city"]:
-            return models.Cities.objects.get(id=self.cleaned_data["city"])
+        data = re.sub(r"\D", "", self.cleaned_data["city"])
+
+        if data:
+            return models.Cities.objects.get(id=data)
 
         return None
 
@@ -439,37 +443,47 @@ class AdvancedEventSearch(forms.Form):
         return None
 
     def clean_state(self):
-        if self.cleaned_data["state"]:
+        data = re.sub(r"\D", "", self.cleaned_data["state"])
+
+        if data:
             return models.States.objects.get(id=self.cleaned_data["state"])
 
         return None
 
     def clean_country(self):
-        if self.cleaned_data["country"]:
-            return models.Countries.objects.get(id=self.cleaned_data["country"])
+        data = re.sub(r"\D", "", self.cleaned_data["country"])
+
+        if data:
+            return models.Countries.objects.get(id=data)
 
         return None
 
     def clean_venue(self):
-        if self.cleaned_data["venue"]:
-            return models.Venues.objects.get(id=self.cleaned_data["venue"])
+        data = re.sub(r"\D", "", self.cleaned_data["venue"])
+
+        if data:
+            return models.Venues.objects.get(id=data)
 
         return None
 
     def clean_tour(self):
-        if self.cleaned_data["tour"]:
-            return models.Tours.objects.get(id=self.cleaned_data["tour"])
+        data = re.sub(r"\D", "", self.cleaned_data["tour"])
+
+        if data:
+            return models.Tours.objects.get(id=data)
 
         return None
 
     def clean_tour_leg(self):
-        if self.cleaned_data["tour_leg"]:
-            return models.TourLegs.objects.get(id=self.cleaned_data["tour_leg"])
+        data = re.sub(r"\D", "", self.cleaned_data["tour_leg"])
+
+        if data:
+            return models.TourLegs.objects.get(id=data)
 
         return None
 
     def clean_relation(self):
-        data = self.cleaned_data["relation"].replace("'", "")
+        data = re.sub(r"\D", "", self.cleaned_data["relation"])
 
         if data:
             return models.Relations.objects.get(id=data)
@@ -477,8 +491,10 @@ class AdvancedEventSearch(forms.Form):
         return None
 
     def clean_band(self):
-        if self.cleaned_data["band"]:
-            return models.Bands.objects.get(id=self.cleaned_data["band"])
+        data = re.sub(r"\D", "", self.cleaned_data["band"])
+
+        if data:
+            return models.Bands.objects.get(id=data)
 
         return None
 
@@ -507,6 +523,14 @@ class AdvancedEventSearch(forms.Form):
                 "id": self.cleaned_data["day"],
                 "value": self.cleaned_data["day"],
             }
+
+        return None
+
+    def clean_conjunction(self):
+        data = re.sub(r"'", "", self.cleaned_data["conjunction"])
+
+        if data:
+            return data
 
         return None
 
@@ -579,13 +603,13 @@ class SetlistSearch(forms.Form):
 
     def clean_song1(self):
         if self.cleaned_data["song1"]:
-            return self.cleaned_data["song1"]
+            return self.cleaned_data["song1"].strip('"').strip("'")
 
         return None
 
     def clean_song2(self):
         if self.cleaned_data["song2"]:
-            return self.cleaned_data["song2"]
+            return self.cleaned_data["song2"].strip('"').strip("'")
 
         return None
 
@@ -617,7 +641,7 @@ class EventSearch(forms.Form):
                 "name": "date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
-                "class": "form-control form-control-sm date-form",
+                "class": "form-control form-control-sm date-form event-search",
             },
         ),
     )

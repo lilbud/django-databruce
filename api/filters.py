@@ -915,7 +915,7 @@ class TourLegFilter(filters.FilterSet):
 
 
 class SongsPageFilter(filters.FilterSet):
-    song = filters.NumberFilter(field_name="song__id", lookup_expr="exact")
+    song = filters.NumberFilter(field_name="id__song_id", lookup_expr="exact")
 
 
 class SongsPageNewFilter(filters.FilterSet):
@@ -930,9 +930,9 @@ class SongsFilter(filters.FilterSet):
 
 
 class SetlistNoteFilter(filters.FilterSet):
-    id = filters.NumberFilter(field_name="setlist__id", lookup_expr="exact")
+    id = filters.NumberFilter(field_name="setlist_id", lookup_expr="exact")
     event = filters.CharFilter(
-        field_name="event__event_id",
+        field_name="event_id",
         lookup_expr="exact",
         label="event_id",
     )
@@ -965,5 +965,12 @@ class EventTypeFilter(filters.FilterSet):
 class UserAlbumBreakdownFilter(filters.FilterSet):
     user = filters.NumberFilter(
         field_name="event__user_event__user_id",
+        lookup_expr="exact",
+    )
+
+
+class YearSongBreakdownFilter(filters.FilterSet):
+    song = filters.NumberFilter(
+        field_name="song_id",
         lookup_expr="exact",
     )

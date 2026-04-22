@@ -116,7 +116,7 @@
                         {% if event.brucebase_url %}
                           <a role="button"
                              target="_blank"
-                             class="btn btn-sm btn-subtle text-xs icon-button"
+                             class="btn btn-sm btn-neutral text-xs icon-button"
                              href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  width="16"
@@ -134,7 +134,7 @@
                           <a role="button"
                              target="_blank"
                              href="{{ event.nugs_event.first.url }}"
-                             class="btn btn-sm btn-subtle text-xs icon-button">
+                             class="btn btn-sm btn-neutral text-xs icon-button">
                             <svg version="1.1"
                                  xmlns="http://www.w3.org/2000/svg"
                                  width="14"
@@ -150,7 +150,7 @@
                           <a role="button"
                              target="_blank"
                              href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}"
-                             class="btn btn-sm btn-subtle text-xs icon-button">
+                             class="btn btn-sm btn-neutral text-xs icon-button">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  width="16"
                                  height="16"
@@ -179,7 +179,7 @@
                       <button id="addshow"
                               type="submit"
                               name="submit"
-                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-subtle{% endif %} icon-button">
+                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-neutral{% endif %} icon-button">
                         {% if user_attended %}
                           <i class="bi bi-star-fill" id="star"></i>
                         {% else %}
@@ -195,7 +195,7 @@
                         <button type="button"
                                 id="usercount"
                                 disabled
-                                class="btn btn-sm {% if user_attended %}btn-primary{% else %}btn-subtle{% endif %}">
+                                class="btn btn-sm {% if user_attended %}btn-primary{% else %}btn-neutral{% endif %}">
                           {{ user_count }}
                         </button>
                       </button>
@@ -318,7 +318,12 @@
             {% if start_time or scheduled_time %}
               <div class="card mb-3">
                 <div class="card-header">
-                  Set Times<i class="bi bi-clock"></i>
+                  <span>Set Times
+                    <i class="bi bi-question-circle-fill"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Local Time Shown"></i>
+                  </span>
+                  <i class="bi bi-clock"></i>
                 </div>
                 <div class="card-body">
                   <div class="row row-cols-3">
@@ -371,14 +376,14 @@
                   </a>
                 </span>
               </div>
-              <div class="card-body p-0">
-                <div class="table-responsive">
+              <div class="card-body p-0" id="albums">
+                {% comment %} <div class="table-responsive">
                   <table class="table table-hover display wrap" id="albumTable">
                     <thead>
                       <th class="d-none all">#</th>
                     </thead>
                   </table>
-                </div>
+                </div> {% endcomment %}
               </div>
             </div>
           </div>
@@ -471,109 +476,85 @@
     var counts = [];
 
     $(document).ready(function () {
-    var layout = getDatatableLayout({ columns: false, category: false });
+      var event = "{{ event.id }}"
 
-    $('#albumTable').DataTable({
-        layout: layout,
-        serverSide: true,
-        processing: true,
-        ordering: false,
-        searching: false,
-        scrollX: false,
-        scrollY: '60vh',
-        paging: false,
-        info: false,
-        ajax: {
-          'url': '/api/v1/setlist_breakdown/?event={{ id }}&format=custom&ordering=-num',
-        },
-        columns: [
-          {
-            'data': 'category',
-            'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                var album = slugify(data);
-                var percent = (row.num / row.total) * 100;
-                var complete_badge = ""
-
-                const songItems = row.songs.map(song => {
-
-                  if (song.original_artist !== 'Bruce Springsteen') {
-                    return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
-                  }
-
-                  return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
-
-                }).join('')
-
-                if (row.album_complete) {
-                  complete_badge = `<div class="badge ms-1 badge-warning">Complete</div>`
-                }
-
-                const html = `
-                  <div class="col py-1 px-1 album-breakdown" data-bs-toggle="collapse" href="#${album}-collapse">
-                      <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between">
-                          <div class="col ps-0 pe-1 text-wrap category"><span>${data}</span> ${complete_badge}</div>
-                          <div class="col-3 text-end px-0 text-nowrap me-1">${row.num}/${row.total} (${percent.toFixed(1)}%)</div>
-                      </div>
-                      <div class="progress px-0 mx-0">
-                          <div class="progress-bar" style="width:${row.percent}%"></div>
-                      </div>
-                      <div class="collapse" id="${album}-collapse">
-                          <ul class="list-group pt-2 pb-1">${songItems}</ul>
-                      </div>
-                  </div>`;
-
-                return html
-              }
-            },
-          }
-        ],
-        initComplete: function() {
-          // enable highlighting of setlist rows by album
-          $("#albumTable tr").each(function () {
-
-            var album = slugify($(this).find('div.category span').text());
-
-            $(this).hover(function () {
-              $(this).css('cursor', "pointer");
-
-              $(`#setlistTable tbody tr:not(.set-header)`).each(function () {
-                var row = $(this);
-                
-                if (row.attr('album') == album) {
-                  $(row).css('opacity', '1');
-                  $(row).children('td').addClass('highlighted');
-                } else {
-                  $(row).css('opacity', '0.2');
-                }
-              });
-
-            }, function () {
-              $(this).css("box-shadow", "none");   // Action on mouseleave
-              $(`#setlistTable tr`).css('opacity', '1');
-              $(`#setlistTable tr`).children('td').removeClass('highlighted');
-            });
-          });
-
-          // button to open/close all album sections
-          $('#album-breakdown-btn').click(function() {
-            var closed = $('#albumTable .collapse:not(.show)');
-            var all = $('#albumTable .collapse');
-
-            if (closed.length > 0) {
-              closed.each(function () {
-                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-                bsCollapse.show();
-              })
-            } else {
-              all.each(function () {
-                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-                bsCollapse.hide();
-              })
+      fetch(`/api/v1/setlist_breakdown/?event=${event}&format=json&ordering=-num`)
+      .then(response => response.json())
+      .then(data => {
+        data.results.forEach((item, index) => {
+          var album = slugify(item.category);
+          var percent = ((item.num / item.max) * 100).toFixed(1);
+          var complete_badge = "";
+          
+          var songs = item.songs.map(song => {
+            if (song.original_artist !== 'Bruce Springsteen') {
+              return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
             }
+
+            return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
+          }).join('');
+
+          if (item.album_complete) {
+            complete_badge = `<span class="badge badge-warning text-3xs">Complete</span>`
+          }
+
+          const html = `
+            <div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
+                <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
+                    <div class="col ps-0 text-wrap category"><span class="pe-2">${item.category}</span>${complete_badge}</div>
+                    <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
+                </div>
+                <div class="progress px-0 mx-0">
+                    <div class="progress-bar" style="width:${percent}%"></div>
+                </div>
+                <div class="collapse" id="${album}-collapse">
+                    <ul class="list-group py-1">${songs}</ul>
+                </div>
+            </div>`;
+
+          $('#albums').append(html);
+        });
+        
+        $('#albums').find('.album-breakdown').each(function(index, row) {
+          var album = $(row).attr('album');
+
+          $(this).hover(function() {
+            $(this).css('cursor', "pointer");
+
+            $(`#setlistTable tbody tr:not(.set-header)`).each(function (index, row) {
+              if ($(row).attr('album') == album) {
+                $(row).css('opacity', '1');
+                $(row).children('td:not(.position)').addClass('highlighted');
+              } else {
+                $(row).css('opacity', '0.2');
+              }
+            });
+
+          }, function() {
+            $(`#setlistTable tr`).css('opacity', '1');
+            $(`#setlistTable tr`).children('td').removeClass('highlighted');
           })
-        }
-    })
+        });
+
+        $('#album-breakdown-btn').click(function() {
+          var closed = $('#albums .collapse:not(.show)');
+          var all = $('#albums .collapse');
+
+          if (closed.length > 0) {
+            closed.each(function () {
+              const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+              bsCollapse.show();
+            })
+          } else {
+            all.each(function () {
+              const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+              bsCollapse.hide();
+            })
+          }
+        })
+      }).catch(error => console.error('Error:', error));
+
+    var layout = getDatatableLayout({ columns: false, category: false });
     
     $('#onstageTable').DataTable(
       {
@@ -677,7 +658,7 @@
 
               if (rowData.position) {
                 var position = slugify(rowData.position);
-                $(td).addClass(`${position}`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
+                $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
               }
 
               return td;
@@ -843,24 +824,18 @@
               if (data['action'] === 'added') {
                 $("#star").addClass('bi-star-fill').removeClass('bi-star');
                 $("#attended").text('Attended');
-                $("#addshow").addClass('btn-primary').removeClass('btn-subtle');
-                $("#usercount").addClass('btn-primary').removeClass('btn-subtle');
+                $("#addshow").addClass('btn-primary').removeClass('btn-neutral');
+                $("#usercount").addClass('btn-primary').removeClass('btn-neutral');
 
               } else if (data['action'] === 'removed') {
                 $("#star").addClass('bi-star').removeClass('bi-star-fill');
                 $("#attended").text('Attended?');
-                $("#addshow").removeClass('btn-primary').addClass('btn-subtle');
-                $("#usercount").removeClass('btn-primary').addClass('btn-subtle');
+                $("#addshow").removeClass('btn-primary').addClass('btn-neutral');
+                $("#usercount").removeClass('btn-primary').addClass('btn-neutral');
               };
             },
           });
         });
     });
-
-    
-
-
-
-
   </script>
 {% endblock content %}

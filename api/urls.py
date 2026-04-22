@@ -91,6 +91,11 @@ router.register(
     views.UserAlbumBreakdown,
     basename="user_album_breakdown",
 )
+router.register(
+    r"year_song_breakdown",
+    views.YearSongBreakdown,
+    basename="year_song_breakdown",
+)
 
 
 # The API URLs are now determined automatically by the router.

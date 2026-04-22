@@ -47,7 +47,7 @@
 
     updateIcon(currentTheme);
 
-    $('#bd-theme').on('click', function () {
+    $('.bd-theme-btn').on('click', function () {
       currentTheme = document.documentElement.getAttribute('data-bs-theme');
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 

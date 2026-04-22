@@ -102,14 +102,6 @@
     border-width: 1px !important;
 }
 
-/* [data-bs-theme="light"] .select2-container--focus,
-[data-bs-theme="light"] .form-select:focus,
-[data-bs-theme="light"] .form-control:focus {
-    border-color: #86b7fe !important;
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: var(--text-color-default) !important;
 }
-
-[data-bs-theme="dark"] .select2-container--focus,
-[data-bs-theme="dark"] .form-select:focus,
-[data-bs-theme="dark"] .form-control:focus {
-    border-color: #749fdc !important;
-} */

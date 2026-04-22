@@ -4,7 +4,7 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-lg-4 mx-auto">
+  <div class="col-12 col-md-6">
     <div class="row mb-4">
       <div class="text-2xl">{% translate "User Settings" %}</div>
     </div>
@@ -14,13 +14,7 @@
         {% if messages %}
           <div class="row mb-3">
             <div class="col">
-              {% for message in messages %}
-                {% for message in messages %}
-                  <div class="card">
-                    <div class="card-body message {{ message.tags }}">{{ message|safe }}</div>
-                  </div>
-                {% endfor %}
-              {% endfor %}
+              {% for message in messages %}<div class="card message {{ message.tags }}">{{ message|safe }}</div>{% endfor %}
             </div>
           </div>
         {% endif %}

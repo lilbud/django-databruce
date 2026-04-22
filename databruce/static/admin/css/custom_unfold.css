@@ -2,7 +2,7 @@
     position: sticky;
     bottom: 0;
     padding: 10px;
-    background-color: #1e2939;
+    /* background-color: #1e2939; */
     /* border-top: 1px solid #e5e7eb; */
     z-index: 100;
 }

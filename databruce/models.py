@@ -446,6 +446,7 @@ class VenuesText(models.Model):
         db_column="id",
     )
 
+    location = models.TextField()
     formatted = models.TextField(db_column="full_location")
 
     class Meta:
@@ -922,7 +923,6 @@ class SetlistNotes(models.Model):
     event = models.ForeignKey(
         Events,
         models.DO_NOTHING,
-        to_field="event_id",
         related_name="notes_event",
         db_column="event_id",
     )
@@ -1724,7 +1724,7 @@ class SetlistPositions(models.Model):
 
 
 class SongsPage(models.Model):
-    id = models.OneToOneField(
+    id = models.ForeignKey(
         Setlists,
         models.DO_NOTHING,
         primary_key=True,
@@ -1732,37 +1732,22 @@ class SongsPage(models.Model):
         db_column="id",
     )
 
-    prev = models.OneToOneField(
-        Songs,
+    prev = models.ForeignKey(
+        Setlists,
         models.DO_NOTHING,
         blank=True,
         null=True,
-        related_name="prev_song",
+        related_name="prev_setlist",
         db_column="prev",
     )
-    prev_setlist = models.OneToOneField(
+
+    next = models.ForeignKey(
         Setlists,
         models.DO_NOTHING,
         blank=True,
         null=True,
-        related_name="prev_song_id",
-        db_column="prev_setlist",
-    )
-    next = models.OneToOneField(
-        Songs,
-        models.DO_NOTHING,
-        blank=True,
-        null=True,
-        related_name="next_song",
+        related_name="next_setlist",
         db_column="next",
-    )
-    next_setlist = models.OneToOneField(
-        Setlists,
-        models.DO_NOTHING,
-        blank=True,
-        null=True,
-        related_name="next_song_id",
-        db_column="next_setlist",
     )
 
     class Meta:
@@ -1950,9 +1935,6 @@ class BlogPosts(BaseModel):
         return reverse(
             "blog_post",
             args=[
-                self.published_at.year,
-                self.published_at.month,
-                self.published_at.day,
                 self.slug,
             ],
         )

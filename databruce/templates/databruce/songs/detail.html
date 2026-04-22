@@ -62,7 +62,7 @@
                       {% if show_gap == 0 %}
                         <span>(latest event)</span>
                       {% else %}
-                        <span>({{ show_gap }} shows ago)</span>
+                        <span>({{ show_gap }} show{{ show_gap|pluralize }} ago)</span>
                       {% endif %}
                     </div>
                   {% endif %}
@@ -83,19 +83,22 @@
                       data-bs-toggle="pill"
                       data-bs-target="#events"
                       aria-controls="pills-events">
-                Performances<span class="badge rounded-pill text-bg-light" id="event-count-badge">0</span>
+                Performances<span class="badge badge-light rounded-pill text-bg-light"
+      id="event-count-badge">0</span>
               </button>
               <button class="nav-link mb-1 mb-md-0"
                       data-bs-toggle="pill"
                       data-bs-target="#snippets"
                       aria-controls="pills-snippets">
-                Snippets<span class="badge rounded-pill text-bg-light" id="snippet-count-badge">0</span>
+                Snippets<span class="badge badge-light rounded-pill text-bg-light"
+      id="snippet-count-badge">0</span>
               </button>
               <button class="nav-link mb-1 mb-md-0"
                       data-bs-toggle="pill"
                       data-bs-target="#included"
                       aria-controls="pills-included">
-                Included Songs<span class="badge rounded-pill text-bg-light" id="included-count-badge">0</span>
+                Included Songs<span class="badge badge-light rounded-pill text-bg-light"
+      id="included-count-badge">0</span>
               </button>
               <button class="nav-link mb-1 mb-md-0"
                       data-bs-toggle="pill"
@@ -241,22 +244,37 @@
         let ctx = document.getElementById("chart").getContext("2d");
         Chart.defaults.color = '#999';
 
-        let chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: [{% for year in year_stats %}{{year.year}},{% endfor %}],
-            datasets: [
-                {
-                  label: "Events",
-                  color: "#ffffff",
-                  data: [{% for year in year_stats %}{{year.event_count}},{% endfor %}]
-                }
-            ]
-          },
-          options: {
-            responsive: true,
-          },
-        });
+        fetch('/api/v1/year_song_breakdown/?song={{ info.id }}')
+        .then(response => response.json())
+        .then(data => {
+          var labels = [];
+          var datasets = [];
+
+          data.results.forEach((item, index) => {
+            labels.push(item.year);
+            datasets.push(item.count);
+          })
+
+          let chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: labels,
+              datasets: [
+                  {
+                    label: "Events",
+                    color: "#ffffff",
+                    data: datasets,
+                  }
+              ]
+            },
+            options: {
+              responsive: true,
+            },
+          });
+
+        }).catch(error => console.error('Error:', error));
+
+        
     });
   
     $(document).ready(function () {
@@ -274,7 +292,7 @@
         columns: [
           {
             'data': 'event',
-            'name': 'event__event_id',
+            'name': 'id__event__event_id',
             'width': '10rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -284,7 +302,7 @@
           },
           {
             'data': 'event.artist',
-            'name': 'event__artist__name',
+            'name': 'id__event__artist__name',
             'width': '14rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -294,24 +312,17 @@
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__name, event__venue__detail',
+            'name': 'id__event__venue__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-
-                if (data.detail) {
-                  return `<a href="/venues/${data.uuid}">${data.detail},<br>${data.name}</a>`
-                }
-
                 return `<a href="/venues/${data.uuid}">${data.name}</a>`
-
-                
               }
             },
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__city__name, event__venue__city__state__abbrev, event__venue__city__state__name, event__venue__city__country__name',
+            'name': 'id__event__venue__city__name, id__event__venue__city__state__abbrev, id__event__venue__city__state__name, id__event__venue__city__country__name',
             'width': '16rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -321,7 +332,7 @@
           },
           {
             'data': 'event.tour',
-            'name': 'event__tour__name',
+            'name': 'id__event__tour__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
@@ -331,7 +342,7 @@
           },
           {
             'data': 'position',
-            'name': 'setlist_position__position',
+            'name': 'id__setlist_position__position',
             'width': '6rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
@@ -345,12 +356,12 @@
           },
           {
             'data': 'stats',
-            'name': 'setlist_stats__gap',
+            'name': 'id__setlist_stats__gap',
             'width': '1rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
+                var badge = $('<span />').addClass('badge').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
                 if (data.gap >= 50 && !data.debut) {
                   $(badge).addClass('badge-primary').text(`${data.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
@@ -371,46 +382,48 @@
               }
             },
           },
-          {'data': 'set_name', 'name': 'set_name', 'width': '4rem', 'columnControl': [] },
+          {'data': 'set_name', 'name': 'id__set_name', 'width': '4rem', 'columnControl': [], 'orderable': false },
           {
-            'data': 'prev_song',
-            'name': 'songs_page__prev__name',
+            'data': 'prev',
+            'name': 'prev__song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                if (row.prev_setlist.segue) {
-                  return `<a href="/songs/${data.uuid}">${data.name} \></a>`
+                if (data.segue) {
+                  return `<a href="/songs/${data.song.uuid}">${data.song.name} \></a>`
                 }
-                return `<a href="/songs/${data.uuid}">${data.name}</a>`
+                return `<a href="/songs/${data.song.uuid}">${data.song.name}</a>`
               }
             },
           },
           {
-            'data': 'next_song',
-            'name': 'songs_page__next__name',
+            'data': 'next',
+            'name': 'next__song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 if (row.segue) {
-                  return `<a href="/songs/${data.uuid}">\> ${data.name}</a>`
-                } else if (row.next_setlist.segue) {
-                  return `<a href="/songs/${data.uuid}">${data.name} \></a>`
+                  return `<a href="/songs/${data.song.uuid}">\> ${data.song.name}</a>`
+                } else if (data.segue) {
+                  return `<a href="/songs/${data.song.uuid}">${data.song.name} \></a>`
                 }
 
-                return `<a href="/songs/${data.uuid}">${data.name}</a>`
+                return `<a href="/songs/${data.song.uuid}">${data.song.name}</a>`
               }
             },
           },
           {
             'data': 'notes',
-            'name': 'setlist_notes__note',
+            'name': 'id__setlist_notes__note',
+            'columnControl': [],
+            'orderable': false,
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return `<span class="setlist-note">${data.join('; ')}</span>`
               }
             },
           },
-          {'data': 'event.public', 'name': 'event__public' },
+          {'data': 'event.public', 'name': 'id__event__public' },
         ],
         initComplete: function(settings, json){ 
           var info = this.api().page.info();
@@ -452,7 +465,7 @@
           },
           {
             'data': 'event.venue',
-            'name': 'setlist__event__venue__name, event__venue__detail',
+            'name': 'setlist__event__venue__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
@@ -462,7 +475,7 @@
           },
           {
             'data': 'event.venue',
-            'name': 'setlist__event__venue__city__name, setlist__event__venue__state__abbrev, setlist__event__venue__country__name',
+            'name': 'setlist__event__venue__city__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {

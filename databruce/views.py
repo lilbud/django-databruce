@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 import markdown
 import requests
+from django import template
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.models import Group, User
@@ -697,20 +698,20 @@ class SongDetail(PageTitleMixin, TemplateView):
 
             latest = (
                 models.Events.objects.filter(
-                    num__isnull=False,
                     is_stats_eligible=True,
                     setlist_event__isnull=False,
                 )
-                .order_by("-num")
+                .order_by("-event_id")
                 .first()
                 .event_id
             )
 
+            print(last_event, latest)
+
             context["show_gap"] = models.Events.objects.filter(
                 event_id__gt=last_event,
-                event_id__lt=latest,
+                event_id__lte=latest,
                 is_stats_eligible=True,
-                num__isnull=False,
             ).count()
 
         except (models.Songs.last_event.RelatedObjectDoesNotExist, AttributeError):
@@ -721,26 +722,26 @@ class SongDetail(PageTitleMixin, TemplateView):
         ).order_by("id")
 
         if context["info"].num_plays_public > 0:
-            context["year_stats"] = (
-                models.Setlists.objects.select_related("event")
-                .filter(
-                    song__uuid=self.kwargs["id"],
-                    set_name__in=VALID_SET_NAMES,
-                    event__date__isnull=False,
-                )
-                .annotate(
-                    year=F("event__date__year"),
-                )
-                .values("year")
-                .annotate(
-                    event_count=Count(
-                        "event",
-                        distinct=True,
-                        filter=Q(set_name__in=VALID_SET_NAMES),
-                    ),
-                )
-                .order_by("year")
-            )
+            # context["year_stats"] = (
+            #     models.Setlists.objects.select_related("event")
+            #     .filter(
+            #         song__uuid=self.kwargs["id"],
+            #         set_name__in=VALID_SET_NAMES,
+            #         event__date__isnull=False,
+            #     )
+            #     .annotate(
+            #         year=F("event__date__year"),
+            #     )
+            #     .values("year")
+            #     .annotate(
+            #         event_count=Count(
+            #             "event",
+            #             distinct=True,
+            #             filter=Q(set_name__in=VALID_SET_NAMES),
+            #         ),
+            #     )
+            #     .order_by("year")
+            # )
 
             filter = Q(is_stats_eligible=True) & Q(
                 event_id__gt=context["info"].first_event.event_id,
@@ -946,8 +947,16 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["danger_event_types"] = ["Cancelled", "Rescheduled", "Relocated"]
 
-        event_form = self.form_class(self.request.GET)
-        formset = self.formset_class(self.request.GET)
+        # Create a mutable copy of the GET data
+        mutable_data = self.request.GET.copy()
+
+        # Strip stray single quotes from every submitted value
+        for key in mutable_data:
+            value = mutable_data.get(key)
+            mutable_data[key] = value.strip("'")
+
+        event_form = self.form_class(mutable_data)
+        formset = self.formset_class(mutable_data)
 
         pos_choices = dict(self.formset_class.form.base_fields["position"].choices)
 
@@ -1123,7 +1132,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
         context["conjunction"] = event_form.cleaned_data.get(
             "conjunction",
             "and",
-        ).upper()
+        )
 
         query_display = f" {context['conjunction']} ".join(display_queries)
         field_display = ",".join(
@@ -1356,6 +1365,9 @@ class Blog(PageTitleMixin, TemplateView):
         return context
 
 
+import nh3
+
+
 class BlogPost(PageTitleMixin, TemplateView):
     template_name = "blog/post_detail.html"
 
@@ -1373,6 +1385,30 @@ class BlogPost(PageTitleMixin, TemplateView):
 
         context["post"] = get_object_or_404(queryset, slug=self.kwargs["slug"])
         context["title"] = f"{context['post']}"
+
+        value = nh3.clean(
+            context["post"].body,
+            tags={"figure", "div", "br", "code", "blockquote", "p", "a", "img"},
+            attributes={
+                "div": {"class"},
+                "figure": {"class"},
+                "a": {"href"},
+                "img": {"src"},
+            },
+        )
+
+        md = markdown.Markdown(extensions=["fenced_code", "toc"])
+        post = md.convert(value)
+
+        template_obj = template.Template(post)
+
+        context_new = Context({"body": context["post"].body})
+
+        # Use the existing context (which is already a Context object)
+        context["body"] = mark_safe(template_obj.render(context_new))  # noqa: S308
+        context["toc"] = md.toc
+
+        print(md.toc_tokens)
 
         return context
 
