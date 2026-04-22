@@ -120,13 +120,6 @@ body {
     color: var(--text-color-default) !important;
     font-size: 0.75rem !important;
     font-family: "Google Sans Flex", sans-serif;
-    font-variation-settings:
-        "slnt" 0,
-        "wdth" 100,
-        "GRAD" 0,
-        "ROND" 0;
-    font-optical-sizing: auto;
-    font-style: normal;
     border-color: inherit !important;
     max-width: 100% !important;
     display: flex;

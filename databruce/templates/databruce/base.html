@@ -352,8 +352,14 @@
                 {% else %}
                   <li class="bd-links-span-all mb-3">
                     <div class="d-grid gap-2">
-                      <button class="btn btn-sm btn-primary">Register</button>
-                      <button class="btn btn-sm btn-primary">Login</button>
+                      <a href="{% url "signup" %}"
+                         type="button"
+                         role="button"
+                         class="btn btn-sm btn-primary">Register</a>
+                      <a class="btn btn-sm btn-primary"
+                         role="button"
+                         type="button"
+                         href="{% url 'login' %}?next={{ request.path }}">Login</a>
                     </div>
                   </li>
                 {% endif %}
