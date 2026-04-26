@@ -1,4 +1,5 @@
 {% extends "databruce/narrow_layout.html" %}
+{% load static %}
 {% block title %}
   Venue "{{ info.get_name }}"
 {% endblock title %}
@@ -187,6 +188,9 @@
           $('#song-count-badge').text(info.recordsTotal);
         }
       });
+
+      L.Icon.Default.imagePath = "{% static 'databruce/img/images/' %}";
+
       var lat = Number("{{ info.latitude }}");
       var lng = Number("{{ info.longitude }}");
 
