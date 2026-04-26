@@ -463,7 +463,7 @@ blockquote {
     .dt-scroll,
     .dt-scroll-head,
     .dt-scroll-body {
-        max-width: 97.5vw !important;
+        max-width: calc(100vw - 1.5rem) !important;
     }
 }
 
@@ -731,9 +731,9 @@ td .badge.bg-primary,
 } */
 
 /* have margin on all nav-pills except last */
-.nav.nav-pills li:not(:last-child) {
+/* .nav.nav-pills li:not(:last-child) {
     margin-right: 0.25rem !important;
-}
+} */
 
 /* edit button, shown only to admin and hover at bottom right */
 #admin-btn,
