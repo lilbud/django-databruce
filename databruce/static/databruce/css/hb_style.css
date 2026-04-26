@@ -442,7 +442,9 @@ blockquote p:last-of-type {
 }
 
 blockquote {
-    margin: 1rem 0 !important;
+    margin: 0.5rem 0 !important;
+    padding: 0.5rem !important;
+    border-left: 2px solid var(--color-primary) !important;
 }
 
 /* smaller font size for setlist notes */
@@ -1135,7 +1137,7 @@ pre {
     display: inline-block;
     font-size: var(--text-xs);
     border-radius: var(--bs-border-radius);
-    color: var(--text-color-muted) !important;
+    color: var(--text-color-default) !important;
 }
 
 .bd-links-heading {
