@@ -1152,6 +1152,13 @@ pre {
     text-decoration: none !important;
     background-color: var(--color-primary) !important;
     color: var(--color-contrast) !important;
+
+}
+
+.list-unstyled .dropdown-item:hover {
+    background-color: var(--color-primary) !important;
+    color: var(--color-contrast) !important;
+    border-radius: var(--bs-border-radius-sm) !important;
 }
 
 .bd-links-nav {
