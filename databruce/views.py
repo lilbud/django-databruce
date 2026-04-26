@@ -800,19 +800,6 @@ class Contact(PageTitleMixin, TemplateView):
         context["form"] = self.form_class()
         return context
 
-    def send_mail(self, context, from_email, to_email):
-        subject = loader.render_to_string(self.subject_template_name, context).strip()
-        body = loader.render_to_string(self.email_template_name, context)
-
-        # This will now be intercepted by the test runner
-        return send_mail(
-            subject,
-            body,
-            from_email,
-            [to_email],
-            fail_silently=False,
-        )
-
     def post(self, request: HttpRequest):
         form = self.form_class(request.POST)
 
@@ -841,11 +828,12 @@ class Contact(PageTitleMixin, TemplateView):
                     context,
                 )
 
-                self.send_mail(
+                send_mail(
                     subject=form.cleaned_data["subject"],
                     message=body,
                     from_email=base.DEFAULT_FROM_EMAIL,
                     recipient_list=[base.NOTIFY_EMAIL],
+                    fail_silently=False,
                 )
 
                 messages.success(request, "Message Sent")

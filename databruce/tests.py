@@ -1,13 +1,34 @@
 import datetime
+import os
 import re
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.core import mail
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from django.core import mail
+
 from databruce.models import Bands, Events, Setlists, Songs, UserAttendedShows, Venues
-from django.contrib.auth.models import Group
+
 User = get_user_model()
+
+
+class ContactTests(TestCase):
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_contact(self):
+        contact_url = reverse("contact")
+        data = {
+            "email": "test@example.com",
+            "message": "Test Message",
+            "protocol": "http",
+            "subject": "problem",
+            "verification": os.getenv("VERIFICATION_ANSWER"),
+        }
+
+        response = self.client.post(path=contact_url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
 
 
 class UserTests(TestCase):
@@ -27,7 +48,7 @@ class UserTests(TestCase):
             artist=self.artist,
         )
         self.client = Client()
-        self.signup_url = reverse('signup')
+        self.signup_url = reverse("signup")
 
     def test_user_login(self):
         # The login method requires credentials
@@ -39,21 +60,21 @@ class UserTests(TestCase):
     def test_user_remove_show(self):
         UserAttendedShows.objects.filter(user=self.user, event=self.event).delete()
 
-    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_signup_and_email_confirmation_flow(self):
         # 1. Simulate Signup POST request
-        signup_url = reverse('signup')  # Replace with your actual signup URL name
+        signup_url = reverse("signup")  # Replace with your actual signup URL name
         user_data = {
-            'username': 'testuser1',
-            'email': 'test@example.com',
-            'password1': 'faiasd87gf9s',
-            'password2': 'faiasd87gf9s',
+            "username": "testuser1",
+            "email": "test@example.com",
+            "password1": "faiasd87gf9s",
+            "password2": "faiasd87gf9s",
         }
         response = self.client.post(signup_url, user_data)
         Group.objects.create(name="Users")
 
         # Verify user was created but is inactive
-        user = User.objects.get(email='test@example.com')
+        user = User.objects.get(email="test@example.com")
         self.assertFalse(user.is_active)
 
         # 2. Verify Email was sent to django.core.mail.outbox
@@ -61,7 +82,7 @@ class UserTests(TestCase):
         email_body = mail.outbox[0].body
 
         # 3. Extract the activation link from the email body
-        link_match = re.search(r'https://example.com.*', email_body)
+        link_match = re.search(r"https://example.com.*", email_body)
         self.assertTrue(link_match, "Activation link not found in email")
         activation_url = link_match.group(0)
 
