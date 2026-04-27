@@ -259,6 +259,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "leg",
                 Prefetch("onstage", queryset=onstage_qs),
                 "user_event",
+                "setlist_event",
             )
         ).order_by("event_id")
 

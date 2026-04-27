@@ -664,7 +664,7 @@ class Events(BaseModel):
 
     @property
     def has_setlist(self):
-        return self.setlist_certainty in ("Confirmed", "Probable")
+        return self.setlist_event.exists()
 
 
 class NugsReleases(BaseModel):
