@@ -86,8 +86,7 @@ h6 {
 
 h2,
 h3 {
-    padding-top: .5em;
-    padding-bottom: .5em;
+    padding: .5em 0;
     border-bottom: 1px solid var(--border-color-base);
 }
 
@@ -142,9 +141,7 @@ body {
 .footer .card {
     border-radius: 0;
     /* Often looks better flush with the bottom */
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
+    border: none;
 }
 
 /* links card font size */
@@ -176,14 +173,6 @@ ul:last-child {
 
     background-color: var(--color-white);
 }
-
-/* @media (max-width: 1200px) {
-    .logo {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-    }
-} */
 
 /* Navbar */
 .navbar {
@@ -241,11 +230,6 @@ a:link,
     padding: 0.35rem 0.75rem !important;
 }
 
-/* Remove bottom margin from card headers */
-.card-header * {
-    margin-bottom: 0 !important;
-}
-
 #album .card-header {
     font-size: var(--text-2xs) !important;
     font-weight: 500 !important;
@@ -270,19 +254,21 @@ a:link,
     overflow: hidden !important;
 }
 
+
+.row:has(>div[class*="dt-layout-"]:empty),
+.dt-layout-full,
+#setlistTable_wrapper>.dt-layout-table,
+.index .dt-layout-table {
+    margin-top: 0 !important;
+}
+
 .row:has(>div[class*="dt-layout-"]:empty) {
     display: none !important;
-    margin-top: 0 !important;
+
 }
 
 .dt-layout-full {
     padding: 0 !important;
-    margin-top: 0 !important;
-}
-
-#setlistTable_wrapper>.dt-layout-table,
-.index .dt-layout-table {
-    margin-top: 0 !important;
 }
 
 /* card */
@@ -296,26 +282,6 @@ a:link,
     font-style: italic !important;
     font-size: var(--text-xs) !important;
     line-height: 1rem;
-}
-
-.card.message.info {
-    background-color: var(--color-info-light) !important;
-    border-color: var(--color-info) !important;
-}
-
-.card.message.error {
-    background-color: var(--color-danger-light) !important;
-    border-color: var(--color-danger) !important;
-}
-
-.card.message.warning {
-    background-color: var(--color-warning-light) !important;
-    border-color: var(--color-warning) !important;
-}
-
-.card.message.success {
-    background-color: var(--color-success-light) !important;
-    border-color: var(--color-success) !important;
 }
 
 .card-header,
@@ -333,12 +299,11 @@ tr:not(.set-header) td:not(.songnum, .position, .highlighted) {
 }
 
 .form-control,
-.form-select,
-.form-select-sm {
+.form-select {
     background-color: var(--background-color-muted) !important;
 }
 
-/* song num cell background when not position */
+/* song number cell background when not position */
 td.songnum:not(:is([class*="opener"], [class*="closer"])) {
     background-color: var(--background-color-muted) !important;
     color: var(--text-color-default) !important;
@@ -350,8 +315,7 @@ table th {
 
 td {
     line-height: 1rem !important;
-    padding-top: 0.3rem !important;
-    padding-bottom: 0.3rem !important;
+    padding: 0.15rem 0.5rem !important;
 }
 
 table.dataTable tbody tr:not(.album-header) td,
@@ -380,12 +344,6 @@ table.dataTable td a {
 /* font weight for not song num */
 table.dataTable td:not(.songnum) {
     font-weight: 300 !important;
-}
-
-/* padding for non-set header rows */
-table.dataTable tbody tr td {
-    padding-top: 0.15rem !important;
-    padding-bottom: 0.15rem !important;
 }
 
 /* remove border from album header in breakdown card */
@@ -452,15 +410,10 @@ blockquote {
     font-size: 0.7rem !important;
 }
 
-.card,
-.card-body {
-    overflow: scroll !important;
-}
-
 /* fix for scrolling table in card  */
 /* does this value seem odd? yes */
 /* why? because it is the absolute max width that the scrollable table can go before it affects the rest of the page */
-@media (max-width: 960px) {
+@media (max-width: 992px) {
 
     .dt-scroll,
     .dt-scroll-head,
@@ -471,8 +424,7 @@ blockquote {
 
 /* remove horizonal margin from empty datatable rows */
 div.dt-container div.dt-layout-full> :only-child {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin: 0 !important;
 }
 
 /* datatable control labels */
@@ -494,12 +446,14 @@ div.dt-container label {
     border-radius: var(--bs-btn-border-radius) !important;
 }
 
-/* hide empty event note paragraphs, added by filter tag */
-.event-note p:empty {
-    display: none !important;
+.dt-search,
+.dt-buttons.btn-group.flex-wrap .btn-group {
+    align-items: center;
+    display: flex;
 }
 
-/* hide empty event note breaks, added by filter tag */
+/* hide empty event note paragraphs, added by filter tag */
+.event-note p:empty,
 .event-note br:last-of-type {
     display: none !important;
 }
@@ -624,8 +578,6 @@ button.nav-link.active:hover {
     background-color: var(--color-primary-dark) !important;
 }
 
-
-
 /* inactive nav link color */
 a.nav-link:not(.active) {
     color: var(--text-color-default) !important;
@@ -672,8 +624,12 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 }
 
 /* set-header colors and badge colors */
-.set-2-opener,
-td .badge.bg-secondary {
+
+.show-opener {
+    background-color: var(--color-primary) !important;
+}
+
+.set-2-opener {
     background-color: var(--color-secondary) !important;
 }
 
@@ -685,13 +641,6 @@ td .badge.bg-secondary {
 .encore-opener,
 .show-closer {
     background-color: var(--color-danger) !important;
-}
-
-/* .set-header:is(.set-1, .show) td, */
-.show-opener,
-td .badge.bg-primary,
-.badge.show-opener {
-    background-color: var(--color-primary) !important;
 }
 
 /* button icon */
@@ -727,15 +676,6 @@ td .badge.bg-primary,
 .card-body.event-note> :last-child {
     margin-bottom: 0 !important;
 }
-
-/* .card-body.event-note :not(:last-child) {
-    margin-bottom: 0.5rem !important;
-} */
-
-/* have margin on all nav-pills except last */
-/* .nav.nav-pills li:not(:last-child) {
-    margin-right: 0.25rem !important;
-} */
 
 /* edit button, shown only to admin and hover at bottom right */
 #admin-btn,
@@ -817,14 +757,11 @@ button.nav-link {
 
 .vertical-line {
     border-left: 1px solid black;
-    /* Width, style, and color of the line */
     height: auto;
-    /* Length of the line */
 }
 
 .vr {
-    margin-left: 0.75rem !important;
-    margin-right: 0.75rem !important;
+    margin: 0 0.75rem !important;
 }
 
 button.nav-link {
@@ -838,7 +775,6 @@ button.nav-link * {
     vertical-align: middle;
     justify-content: center;
     align-items: center;
-
 }
 
 button.nav-link .badge {
@@ -846,11 +782,8 @@ button.nav-link .badge {
     font-size: 0.75rem !important;
     display: inline-flex;
     vertical-align: middle;
-
-
     padding: 0.2em 0.45em !important;
     border-radius: calc(infinity * 1px) !important;
-    /* margin-left: 0.25rem !important; */
 }
 
 #albumTable_wrapper>.dt-layout-table {
@@ -874,15 +807,8 @@ button.nav-link .badge {
     border-bottom-right-radius: 0px !important;
 }
 
-/* .fc-h-event .fc-event-main {
-    color: var(--text-color-default) !important;
-} */
-
 .fc-theme-standard td,
-.fc-theme-standard th {
-    border: 1px solid var(--border-color-base);
-}
-
+.fc-theme-standard th,
 .fc-theme-standard .fc-scrollgrid {
     border: 1px solid var(--border-color-base);
 }
@@ -973,18 +899,6 @@ button.nav-link .badge {
     height: 500px !important
 }
 
-@keyframes shadcn-entrance {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-2px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
 /* Initial state: Hidden and transparent */
 .dropdown-menu:not(.ui-autocomplete) {
     opacity: 0;
@@ -1052,6 +966,7 @@ div.dt-button-collection {
     margin: 0;
 }
 
+/* blog post figure images */
 figure {
     display: flex;
     flex-wrap: wrap;
@@ -1097,6 +1012,7 @@ figcaption {
     text-align: center;
 }
 
+/* code blocks */
 pre {
     padding: 1rem !important;
     border-radius: var(--bs-border-radius) !important;
@@ -1111,9 +1027,7 @@ pre {
 }
 
 .form-control,
-.form-control-sm,
-.form-select,
-.form-select-sm {
+.form-select {
     border: 1px solid var(--border-color-base);
 }
 
@@ -1129,6 +1043,7 @@ pre {
     width: 16px;
 }
 
+/* offcanvas links */
 .bd-links-link {
     padding: .1875rem .5rem;
     margin-top: .125rem;
@@ -1154,7 +1069,6 @@ pre {
     text-decoration: none !important;
     background-color: var(--color-primary) !important;
     color: var(--color-contrast) !important;
-
 }
 
 .list-unstyled .dropdown-item:hover {
@@ -1176,6 +1090,7 @@ pre {
     column-span: all;
 }
 
+/* offcanvas */
 .offcanvas.offcanvas-end {
     width: 250px;
 }

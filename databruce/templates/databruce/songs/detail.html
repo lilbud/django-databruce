@@ -348,9 +348,16 @@
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 var className = slugify(data);
-                var badge = `<span class="${className} badge align-middle">${data}</span>`
 
-                return badge
+                if (className == "show-opener") {
+                  return `<span class="badge badge-primary align-middle">${data}</span>`
+                } else if (className == "set-2-opener") {
+                  return `<span class="badge badge-secondary align-middle">${data}</span>`
+                } else if (className == "set-1-closer" || className == "main-set-closer") {
+                  return `<span class="badge badge-warning align-middle">${data}</span>`
+                } else if (className == "show-closer" || className == "encore-opener") {
+                  return `<span class="badge badge-danger align-middle">${data}</span>`
+                }
               }
             },
           },

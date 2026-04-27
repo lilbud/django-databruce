@@ -516,7 +516,7 @@ class SnippetAdmin(ModelAdmin):
 
 @admin.register(models.States)
 class StateAdmin(ModelAdmin):
-    search_fields = ["name", "abbrev", "country", "first_event", "last_event"]
+    search_fields = ["name", "abbrev", "country__name"]
     list_select_related = [
         "country",
         "first_event",

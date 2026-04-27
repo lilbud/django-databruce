@@ -4,7 +4,7 @@
     --btn-border-color: transparent;
 
     /* gray */
-    /* --color-gray-50: #fbfcfe;
+    --color-gray-50: #fbfcfe;
     --color-gray-100: #eff2f8;
     --color-gray-200: #dfe4ed;
     --color-gray-300: #c9d0de;
@@ -14,23 +14,10 @@
     --color-gray-700: #282c32;
     --color-gray-800: #1d2025;
     --color-gray-900: #111317;
-    --color-gray-950: #07080a; */
-
-    /* gray */
-    /* --color-gray-50: #F9FAFB;
-    --color-gray-100: #F3F4F6;
-    --color-gray-200: #E5E7EB;
-    --color-gray-300: #D1D5DC;
-    --color-gray-400: #99A1AF;
-    --color-gray-500: #6A7282;
-    --color-gray-600: #4A5565;
-    --color-gray-700: #364153;
-    --color-gray-800: #1E2939;
-    --color-gray-900: #101828;
-    --color-gray-950: #030712; */
+    --color-gray-950: #07080a;
 
     /* zinc */
-    --color-gray-50: #FAFAFA;
+    /* --color-gray-50: #FAFAFA;
     --color-gray-100: #F4F4F5;
     --color-gray-200: #E4E4E7;
     --color-gray-300: #D4D4D8;
@@ -40,7 +27,7 @@
     --color-gray-700: #3F3F46;
     --color-gray-800: #27272A;
     --color-gray-900: #18181B;
-    --color-gray-950: #09090B;
+    --color-gray-950: #09090B; */
 
     /* blue */
     --color-blue-50: #e8f1ff;
@@ -837,4 +824,24 @@
 
 .modal-title {
     color: var(--text-color-default) !important;
+}
+
+.card.message.info {
+    background-color: var(--color-info-light) !important;
+    border-color: var(--color-info) !important;
+}
+
+.card.message.error {
+    background-color: var(--color-danger-light) !important;
+    border-color: var(--color-danger) !important;
+}
+
+.card.message.warning {
+    background-color: var(--color-warning-light) !important;
+    border-color: var(--color-warning) !important;
+}
+
+.card.message.success {
+    background-color: var(--color-success-light) !important;
+    border-color: var(--color-success) !important;
 }
