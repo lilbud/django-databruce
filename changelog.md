@@ -203,3 +203,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Advanced Search] City search now shows country if no state
 - [Advanced Search] Fixed issue where quotes in IDs would cause error
 - [Blog Posts] Added `magnific-popup` to blog posts, images now have the same popup as my Github Pages site
+
+# v1.17 (May 2026)
+- [Song Detail] Fixed year stats bar chart not scaling properly with window
+- [Song Detail] Updated layout of position cards, text now wraps

@@ -981,8 +981,14 @@ class SetlistBreakdownSerializer(BaseSerializer):
         album_songs = set(obj["album_songs"])
         setlist_songs = set(obj["songs"])
 
+        # print(obj["category"], album_songs, setlist_songs)
+
         # only actual albums, not covers category
-        return setlist_songs.issuperset(album_songs) and obj["category"] != "Covers"
+        return (
+            setlist_songs.issuperset(album_songs)
+            and obj["category"] != "Covers"
+            and album_songs != set()
+        )
 
     songs = serializers.SerializerMethodField(required=False)
 

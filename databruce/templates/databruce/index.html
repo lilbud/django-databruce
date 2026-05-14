@@ -37,8 +37,8 @@
                  width="auto">
           </div>
           <div class="card-footer">
-            <span class="text-base">Minneapolis - March 31, 2026</span>
-            <span class="text-sm">(photo by <a class="text-reset"
+            <span class="text-sm text-lg-base">Minneapolis - March 31, 2026</span>
+            <span class="text-sm text-lg-base">(photo by <a class="text-reset"
     href="https://consequence.net/2026/04/bruce-springsteen-minneapolis-tour-kickoff/">Kara Gerke</a>)</span>
           </div>
         </div>
@@ -149,7 +149,7 @@
 
         data.results.forEach((item, index) => {
           var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date.display}</a></div>`
-          var item2 = `<div class="col py-0 text-nowrap"><a href="/venues/${item.venue.uuid}">${item.venue.display}</a></div>`
+          var item2 = `<div class="col py-0 text-wrap"><a href="/venues/${item.venue.uuid}">${item.venue.display}</a></div>`
 
           var listItem = createListItem(item1, item2);
           $(list).append(listItem);
@@ -195,11 +195,11 @@
             var msg = item.msg;
 
             if (item.view) {
-              var msg = `<span>${item.msg} <a href='/${item.view}/${item.item_id}'>${item.value}</a></span>`
+              var msg = `${item.msg} <a href='/${item.view}/${item.item_id}'>${item.value}</a>`
             }
 
             var item1 = `<div class="col-2 col-md-1 py-0 text-nowrap">${item.created_at}</div>`;
-            var item2 = `<div class="col py-0 text-nowrap">${msg}</div>`;
+            var item2 = `<div class="col-10 py-0 text-wrap">${msg}</div>`;
 
             var listItem = createListItem(item1, item2);
 

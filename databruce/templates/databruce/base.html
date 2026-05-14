@@ -95,7 +95,7 @@
             <a class="btn btn-sm"
                role="button"
                type="button"
-               href="{% url 'blog' %}">News</a>
+               href="{% url 'blog:blog' %}">News</a>
           </li>
           <li class="nav-item dropdown">
             <button class="btn btn-sm dropdown-toggle {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
@@ -218,16 +218,17 @@
             <ul class="dropdown-menu">
               <li>
                 <a class="dropdown-item"
-                   href="{% url 'blog_post' slug="about-databruce" %}">About Site</a>
+                   href="{% url 'blog:blog_post' slug="about-databruce" %}">About Site</a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'blog_post' slug="links" %}">Links</a>
+                <a class="dropdown-item" href="{% url 'blog:blog_post' slug="links" %}">Links</a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'updates' %}">Updates</a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'blog_post' slug="roadmap" %}">Roadmap</a>
+                <a class="dropdown-item"
+                   href="{% url 'blog:blog_post' slug="roadmap" %}">Roadmap</a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url "contact" %}">Contact Us</a>
@@ -505,20 +506,21 @@
                   <ul class="list-unstyled pb-2">
                     <li>
                       <a class="bd-links-link"
-                         href="{% url 'blog_post' slug="about-databruce" %}">News</a>
+                         href="{% url 'blog:blog_post' slug="about-databruce" %}">News</a>
                     </li>
                     <li>
                       <a class="bd-links-link"
-                         href="{% url 'blog_post' slug="about-databruce" %}">About Site</a>
+                         href="{% url 'blog:blog_post' slug="about-databruce" %}">About Site</a>
                     </li>
                     <li>
-                      <a class="bd-links-link" href="{% url 'blog_post' slug="links" %}">Links</a>
+                      <a class="bd-links-link" href="{% url 'blog:blog_post' slug="links" %}">Links</a>
                     </li>
                     <li>
                       <a class="bd-links-link" href="{% url 'updates' %}">Updates</a>
                     </li>
                     <li>
-                      <a class="bd-links-link" href="{% url 'blog_post' slug="roadmap" %}">Roadmap</a>
+                      <a class="bd-links-link"
+                         href="{% url 'blog:blog_post' slug="roadmap" %}">Roadmap</a>
                     </li>
                     <li>
                       <a class="bd-links-link" href="{% url "contact" %}">Contact Us</a>

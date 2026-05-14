@@ -30,6 +30,7 @@ urlpatterns = [
     path("links/", views.Links.as_view(), name="links"),
     path("s/", include("shortener.urls")),
     path("", include("api.urls", namespace="api")),
+    path("", include("blog.urls", namespace="blog")),
     path("benner/", admin.site.urls),
     path("test/", views.Test.as_view(), name="test"),
     path("calendar/", views.Calendar.as_view(), name="calendar"),
@@ -196,32 +197,6 @@ urlpatterns = [
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("updates", views.Updates.as_view(), name="updates"),
-    path("blog", views.Blog.as_view(), name="blog"),
-    path(
-        "blog/<slug:slug>/",
-        views.BlogPost.as_view(),
-        name="blog_post",
-    ),
-    path(
-        "blog/categories/<slug:slug>",
-        views.BlogPostByCategory.as_view(),
-        name="blog_post_category",
-    ),
-    path(
-        "blog/categories/",
-        views.BlogCategories.as_view(),
-        name="blog_categories",
-    ),
-    path(
-        "blog/tags/<slug:slug>",
-        views.BlogPostByTag.as_view(),
-        name="blog_post_tag",
-    ),
-    path(
-        "blog/tags",
-        views.BlogTags.as_view(),
-        name="blog_tags",
-    ),
 ]
 
 

@@ -344,7 +344,12 @@
                         <div class="text-sm">{{ end_time }}</div>
                       </div>
                     {% endif %}
-                    {% if duration %}
+                    {% if event.length %}
+                      <div class="col">
+                        <div class="fw-semibold text-xs">Length</div>
+                        <div class="text-sm">{{ event.length|time:"h:i:s" }}</div>
+                      </div>
+                    {% elif duration %}
                       <div class="col">
                         <div class="fw-semibold text-xs">Length</div>
                         <div class="text-sm">{{ duration }}</div>
@@ -483,7 +488,7 @@
       .then(data => {
         data.results.forEach((item, index) => {
           var album = slugify(item.category);
-          var percent = ((item.num / item.max) * 100).toFixed(1);
+          var percent = ((item.num / item.max) * 100).toFixed(0);
           var complete_badge = "";
           
           var songs = item.songs.map(song => {
@@ -498,14 +503,32 @@
             complete_badge = `<span class="badge badge-warning text-3xs">Complete</span>`
           }
 
-          const html = `
+          //var html = `
+          //<div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
+          //    <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
+          //        <div class="col-8 text-truncate ps-0 text-wrap category"><span class="text-truncate pe-2">${item.category}</span>${complete_badge}</div>
+          //        <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
+          //    </div>
+          //    <div class="progress px-0 mx-0">
+          //        <div class="progress-bar" style="width:${percent}%"></div>
+          //    </div>
+          //    <div class="collapse" id="${album}-collapse">
+          //        <ul class="list-group py-1">${songs}</ul>
+          //    </div>
+          //</div>`;
+          
+
+          var html = `
             <div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
-                <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
-                    <div class="col ps-0 text-wrap category"><span class="pe-2">${item.category}</span>${complete_badge}</div>
-                    <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
-                </div>
-                <div class="progress px-0 mx-0">
-                    <div class="progress-bar" style="width:${percent}%"></div>
+                <div class="row text-xs mx-0 d-flex-inline justify-content-between align-middle">
+                    <div class="col-3 col-lg-4 text-truncate px-0 me-2 category" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${item.category}">
+                      <div class="text-truncate">${item.category}</div>
+                      ${complete_badge}
+                    </div>
+                    <div class="col-8 col-lg-6 progress px-0 my-auto align-middle">
+                        <div class="progress-bar" style="width:${percent}%"></div>
+                    </div>
+                    <div class="col text-end px-0 text-nowrap percent">${percent}%</div>
                 </div>
                 <div class="collapse" id="${album}-collapse">
                     <ul class="list-group py-1">${songs}</ul>
@@ -749,8 +772,10 @@
                 } else if (num == total && total > 1) {
                   $(badge).addClass('badge-warning').text(`${num}/${total}`).attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
                   return $(badge).prop('outerHTML');
-                } else {
+                } else if (num && total) {
                   return `${num}/${total}`
+                } else {
+                  return null
                 }
               }
             },

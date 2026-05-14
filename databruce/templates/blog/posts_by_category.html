@@ -6,7 +6,7 @@
 {% block content %}
     <div class="col-12 col-lg-8">
         <div class="text-2xl text-nowrap mb-3">
-            <a href="{% url 'blog' %}">Blog</a> &gt; Posts By Category: {{ category }}
+            <a href="{% url 'blog:blog' %}">Blog</a> &gt; Posts By Category: {{ category }}
         </div>
         {% for post in page %}
             {% include "./post_partial.html" with post=post %}

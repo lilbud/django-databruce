@@ -6,13 +6,13 @@
 {% block content %}
     <div class="col-12 col-lg-8">
         <div class="text-2xl text-nowrap mb-3">
-            <a href="{% url 'blog' %}">Blog</a> &gt; Categories
+            <a href="{% url 'blog:blog' %}">Blog</a> &gt; Categories
         </div>
         <div class="text-sm">
             <ul>
                 {% for tag in tags %}
                     <li>
-                        <a href="{% url "blog_post_tag" slug=tag.slug %}">{{ tag.slug }}</a> -  {{ tag.post_tags.count }}
+                        <a href="{% url "blog:blog_post_tag" slug=tag.slug %}">{{ tag.slug }}</a> -  {{ tag.post_tags.count }}
                     </li>
                 {% endfor %}
             </ul>

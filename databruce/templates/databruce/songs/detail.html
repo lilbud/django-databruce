@@ -177,12 +177,12 @@
                     </div>
                   </div>
                   <div class="col-12 col-lg-6">
-                    <div class="row row-cols-3 g-2">
+                    <div class="row row-cols-2 row-cols-lg-3 g-2">
                       {% for item in positions %}
                         <div class="col">
                           <div class="card p-0">
                             <div class="card-body">
-                              <div class="text-sm text-nowrap">{{ item.position }}</div>
+                              <div class="text-sm text-wrap">{{ item.position }}</div>
                               <div class="text-xl">{{ item.count }}</div>
                             </div>
                           </div>
@@ -269,6 +269,8 @@
             },
             options: {
               responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 2
             },
           });
 

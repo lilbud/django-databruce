@@ -611,6 +611,7 @@ class Events(BaseModel):
     start_time = models.DateTimeField(blank=True, null=True, default=None)
     end_time = models.DateTimeField(blank=True, null=True, default=None)
     scheduled_time = models.DateTimeField(blank=True, null=True, default=None)
+    length = models.TimeField(blank=True, null=True, default=None)
 
     class Meta:
         db_table = "events"
@@ -1933,7 +1934,7 @@ class BlogPosts(BaseModel):
 
     def get_absolute_url(self):
         return reverse(
-            "blog_post",
+            "blog:blog_post",
             args=[
                 self.slug,
             ],

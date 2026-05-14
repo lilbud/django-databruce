@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "databruce.apps.DatabruceConfig",
     "django_browser_reload",
     "api",
+    "blog",
     "rest_framework",
     "django_filters",
     "shortener",

@@ -313,22 +313,24 @@ class EventForm(forms.ModelForm):
         # start_time = changed_data["start_time"]
         # end_time = changed_data["end_time"]
 
-        location = cleaned_data.get("venue")
-        tz_name = location.city.timezone
-        tz = zoneinfo.ZoneInfo(tz_name)
+        location = cleaned_data.get("venue", None)
 
-        if "scheduled_time" in changed_data:
-            cleaned_data["scheduled_time"] = cleaned_data.get("scheduled_time").replace(
-                tzinfo=tz,
-            )
+        if location:
+            tz_name = location.city.timezone
+            tz = zoneinfo.ZoneInfo(tz_name)
 
-        if "start_time" in changed_data:
-            cleaned_data["start_time"] = cleaned_data.get("start_time").replace(
-                tzinfo=tz,
-            )
+            if "scheduled_time" in changed_data:
+                cleaned_data["scheduled_time"] = cleaned_data.get("scheduled_time").replace(
+                    tzinfo=tz,
+                )
 
-        if "end_time" in changed_data:
-            cleaned_data["end_time"] = cleaned_data.get("end_time").replace(tzinfo=tz)
+            if "start_time" in changed_data:
+                cleaned_data["start_time"] = cleaned_data.get("start_time").replace(
+                    tzinfo=tz,
+                )
+
+            if "end_time" in changed_data:
+                cleaned_data["end_time"] = cleaned_data.get("end_time").replace(tzinfo=tz)
 
         return cleaned_data
 

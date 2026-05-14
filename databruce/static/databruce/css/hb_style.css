@@ -395,8 +395,8 @@ td .check {
 }
 
 /* remove bottom margin from paragraphs in event note card */
-blockquote p:last-of-type {
-    margin-bottom: 0;
+blockquote p {
+    margin-top: 0 !important;
 }
 
 blockquote {
@@ -417,8 +417,16 @@ blockquote {
 
     .dt-scroll,
     .dt-scroll-head,
-    .dt-scroll-body {
+    .dt-scroll-body,
+    .list-group {
         max-width: calc(100vw - 1.5rem) !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .text-lg-base {
+        font-size: var(--text-base);
+        line-height: 1.5rem;
     }
 }
 
@@ -453,10 +461,10 @@ div.dt-container label {
 }
 
 /* hide empty event note paragraphs, added by filter tag */
-.event-note p:empty,
+/* .event-note p:empty,
 .event-note br:last-of-type {
     display: none !important;
-}
+} */
 
 /* calendar */
 td.fc-day {
@@ -469,6 +477,11 @@ td.fc-day {
     max-width: 100%;
     text-wrap: wrap !important;
     word-wrap: break-word !important;
+}
+
+.card,
+.card-body {
+    overflow-x: scroll;
 }
 
 /* dropdown items */
@@ -515,9 +528,13 @@ button:disabled {
 
 /* progress bar for album breakdown */
 .progress {
-    height: 5px !important;
-    border-radius: 0.2rem !important;
+    height: 8px !important;
+    border-radius: calc(infinity * 1px) !important;
     background-color: var(--background-color-emphasis) !important;
+}
+
+.col.percent {
+    max-width: 30px !important;
 }
 
 /* album breakdown on hover */
@@ -625,7 +642,8 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 
 /* set-header colors and badge colors */
 
-.show-opener {
+.show-opener,
+.pre-show-opener {
     background-color: var(--color-primary) !important;
 }
 
@@ -634,7 +652,8 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 }
 
 .set-1-closer,
-.main-set-closer {
+.main-set-closer,
+.pre-show-closer {
     background-color: var(--color-warning) !important;
 }
 
@@ -668,12 +687,20 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 }
 
 /* Apply margin to everything EXCEPT the very last element */
-.card-body.event-note>*:not(:last-child) {
+.card-body.event-note p:not(:last-child) {
     margin-bottom: 0.75rem !important;
 }
 
+.card-body.event-note blockquote>p {
+    margin: 0 !important;
+}
+
+.card-body.event-note>p {
+    margin-top: 0.75rem !important;
+}
+
 /* Ensure the last element has no margin regardless of tag */
-.card-body.event-note> :last-child {
+.card-body.event-note :last-child {
     margin-bottom: 0 !important;
 }
 
@@ -1111,4 +1138,8 @@ pre {
 .album-breakdown .badge {
     padding: 0.1em 0.3em !important;
     font-size: var(--text-3xs) !important;
+}
+
+#chart {
+    height: 250px !important;
 }

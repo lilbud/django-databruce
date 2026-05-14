@@ -55,7 +55,7 @@ def render_includes(value):
 @register.filter(name="markdown")
 def markdown_convert(note: str) -> str:
     if note:
-        return md.convert(note.strip())
+        return md.convert(note)
 
     return None
 
