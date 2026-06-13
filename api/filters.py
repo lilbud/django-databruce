@@ -398,7 +398,7 @@ class EventsFilter(filters.FilterSet):
 
     year = filters.CharFilter(
         field_name="event_id",
-        lookup_expr="startswith",
+        lookup_expr="exact",
         label="year",
     )
 

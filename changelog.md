@@ -241,3 +241,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - [General] Fixed spacing on navbar login button
 - Add custom 404 page.
 - Add custom 500 page, also has link to contact and email if needed.
+- [Events] Fix issue where the "year" filter accepted any value rather than complete years.

@@ -817,7 +817,8 @@ class Event(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         try:
-            context["year"] = self.kwargs["year"]
+            if len(str(self.kwargs["year"])) == 4:
+                context["year"] = self.kwargs["year"]
         except KeyError:
             context["year"] = context["date"].year  # current year
 
