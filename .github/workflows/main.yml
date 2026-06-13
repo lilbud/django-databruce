@@ -31,9 +31,6 @@ jobs:
             # Activate the virtual environment
             source .venv/bin/activate
 
-            # Install dependencies
-            uv sync
-
             # Stop Gunicorn
             sudo systemctl stop gunicorn gunicorn.socket
             
