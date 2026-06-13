@@ -191,6 +191,7 @@ dependencies = [
     { name = "django-extensions" },
     { name = "django-filter" },
     { name = "django-link-shortener" },
+    { name = "django-redis" },
     { name = "django-timezone-field" },
     { name = "django-types" },
     { name = "django-unfold" },
@@ -208,6 +209,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "python-slugify" },
     { name = "querystring-parser" },
+    { name = "redis" },
     { name = "sentry-sdk" },
 ]
 
@@ -226,6 +228,7 @@ requires-dist = [
     { name = "django-extensions", specifier = ">=4.1" },
     { name = "django-filter", specifier = ">=25.2" },
     { name = "django-link-shortener", specifier = ">=1.0.1" },
+    { name = "django-redis", specifier = ">=7.0.0" },
     { name = "django-timezone-field", specifier = ">=7.2.1" },
     { name = "django-types", specifier = ">=0.24.0" },
     { name = "django-unfold", specifier = ">=0.77.1" },
@@ -243,6 +246,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "python-slugify", specifier = ">=8.0.4" },
     { name = "querystring-parser", specifier = ">=1.2.4" },
+    { name = "redis", specifier = ">=8.0.0" },
     { name = "sentry-sdk", specifier = ">=2.54.0" },
 ]
 
@@ -296,6 +300,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/65/ca/5aaffcc734f5a1117ffe5d6931243318de6a1ecc7707d96887d48f704934/django_link_shortener-1.0.1.tar.gz", hash = "sha256:0aa36a18fe74208e1a04b94835f8afbf70270a308f90cabad2628b1d80584571", size = 7452 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9a/36/6504a205241b1e567d9027754a64037d74f34be0527dd3d4296ddabda3eb/django_link_shortener-1.0.1-py3-none-any.whl", hash = "sha256:568e30ba1bb195df59085d64de1300a3fecb65ef628ffbb15f0ee6a9d8894327", size = 10731 },
+]
+
+[[package]]
+name = "django-redis"
+version = "7.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "redis" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fb/78/203a0cdc0f1c083a5407d01f77b58099a120bb8a5a04562f56a9bb341314/django_redis-7.0.0.tar.gz", hash = "sha256:e48491c862f4350b0747ceb1016700686fb93c4f4e0fb9c490fe6c6658ffd933", size = 64601 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/9f/09cdb9a1eebe8533b02a7694ca787acfc1e4d93b5b6175ff99366d4e6d64/django_redis-7.0.0-py3-none-any.whl", hash = "sha256:4b23aa6e0cd0937bb1242e9a463809e6004de3ca2150f34e986306bb6220d688", size = 38932 },
 ]
 
 [[package]]
@@ -784,6 +802,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/4a/fa/f54f5662e0eababf0c49e92fd94bf178888562c0e7b677c8941bbbcd1bd6/querystring_parser-1.2.4.tar.gz", hash = "sha256:644fce1cffe0530453b43a83a38094dbe422ccba8c9b2f2a1c00280e14ca8a62", size = 5454 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/6b/572b2590fd55114118bf08bde63c0a421dcc82d593700f3e2ad89908a8a9/querystring_parser-1.2.4-py2.py3-none-any.whl", hash = "sha256:d2fa90765eaf0de96c8b087872991a10238e89ba015ae59fedfed6bd61c242a0", size = 7908 },
+]
+
+[[package]]
+name = "redis"
+version = "8.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/53/ae/ed461cca5780b5fc8b9fe8ca0ed98d89508645fb9d880c24cc42c087678f/redis-8.0.0.tar.gz", hash = "sha256:a00c5355432051ac14e593b8b197fc76c887ee12d55a0984f69328a1115fdc49", size = 5101591 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/e3/b519734372d305bd547534a9f32e4ce9f98552af753dce72cf3483a0ff0b/redis-8.0.0-py3-none-any.whl", hash = "sha256:c938c18338585009f0bc310f4c7e4e4b4d37639356c4ac072cedf3af570c8dc7", size = 499870 },
 ]
 
 [[package]]

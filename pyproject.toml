@@ -13,6 +13,7 @@ dependencies = [
     "django-extensions>=4.1",
     "django-filter>=25.2",
     "django-link-shortener>=1.0.1",
+    "django-redis>=7.0.0",
     "django-timezone-field>=7.2.1",
     "django-types>=0.24.0",
     "django-unfold>=0.77.1",
@@ -30,6 +31,7 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "python-slugify>=8.0.4",
     "querystring-parser>=1.2.4",
+    "redis>=8.0.0",
     "sentry-sdk>=2.54.0",
 ]
 

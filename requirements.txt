@@ -14,7 +14,7 @@ gunicorn
 gevent
 djlint
 django-unfold
-django_redis
+django-redis
 redis
 django-anymail[mailgun]
 django-timezone-field
