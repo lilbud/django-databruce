@@ -32,16 +32,16 @@ jobs:
             source .venv/bin/activate
 
             # Stop Gunicorn
-            sudo systemctl stop gunicorn gunicorn.socket
+            systemctl stop gunicorn gunicorn.socket
             
             # Remove Old Static
-            sudo rm -rf static/
+            rm -rf static/
             
             # Remove Local Settings If Present
-            sudo rm -rf databruce/config/local.py
+            rm -rf databruce/config/local.py
             
             # Collect New Static
             ./manage.py collectstatic --noinput
             
             # Reload Gunicorn using systemd
-            sudo systemctl restart gunicorn
+            systemctl restart gunicorn
