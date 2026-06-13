@@ -238,3 +238,6 @@ First public release of the site. Site was locked behind a login and accounts on
 - [User Profile] Added "discord name" to user profiles. Can be used in conjunction with Brucebot to display your own stats or another users stats.
 - [Event Detail] Updated setlist positions. Originally had them set semi-automatically, but found it was too much of a mess. With many positions being wrong (marking show opener/closer when Bruce only appeared for 2 songs mid-set). These are now set manually.
 - [Event Detail] Added "Event Info" card. Extended info about event that doesn't fit in header. Currently it is a current event num/total for tour, leg, and venue. More will likely be added eventually.
+- [General] Fixed spacing on navbar login button
+- Add custom 404 page.
+- Add custom 500 page, also has link to contact and email if needed.

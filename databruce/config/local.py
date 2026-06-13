@@ -18,7 +18,7 @@ load_dotenv()
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = [

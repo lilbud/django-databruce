@@ -301,3 +301,18 @@ tr.child:hover,
 td.child:hover {
     box-shadow: none !important;
 }
+
+.dt-container .row>div {
+    display: flex !important;
+    align-items: center;
+    width: auto !important;
+    /* Stop 100% width block stretching */
+}
+
+/* Force the actual select buttons/dropdowns to a fixed or natural width */
+.dt-container .dt-buttons,
+.dt-container select,
+.dt-container .dropdown-toggle {
+    width: auto !important;
+    display: inline-block !important;
+}
