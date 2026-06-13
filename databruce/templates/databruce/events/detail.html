@@ -396,7 +396,12 @@
                 </div>
               </div>
             {% endif %}
-            <div class="col-6 col-md-6 col-xl-12 order-2 order-xl-4">
+            <div class="col-6 col-md-6 col-xl-12 order-2
+                        {% if event.note %}
+                          order-xl-2
+                        {% else %}
+                          order-xl-1
+                        {% endif %}">
               <div class="card h-100">
                 <div class="card-header">Show Info</div>
                 <div class="card-body">

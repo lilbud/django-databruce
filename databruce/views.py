@@ -555,34 +555,34 @@ class EventDetail(PageTitleMixin, TemplateView):
         )
 
         ranked_events = list(
-            models.Events.objects.filter(tour=context["event"].tour)
+            models.Events.objects.filter()
             .annotate(
                 tour_num=Window(
                     expression=RowNumber(),
-                    partition_by=F("tour_id"),
+                    partition_by=F("tour__id"),
                     order_by=F("event_id").asc(),
                 ),
                 tour_total=Window(
                     expression=Count("id"),
-                    partition_by=F("tour_id"),
+                    partition_by=F("tour__id"),
                 ),
                 tour_leg_num=Window(
                     expression=RowNumber(),
-                    partition_by=F("leg_id"),
+                    partition_by=F("leg__id"),
                     order_by=F("event_id").asc(),
                 ),
                 tour_leg_total=Window(
                     expression=Count("id"),
-                    partition_by=F("leg_id"),
+                    partition_by=F("leg__id"),
                 ),
                 venue_num=Window(
                     expression=RowNumber(),
-                    partition_by=F("venue_id"),
+                    partition_by=F("venue__id"),
                     order_by=F("event_id").asc(),
                 ),
                 venue_total=Window(
                     expression=Count("id"),
-                    partition_by=F("venue_id"),
+                    partition_by=F("venue__id"),
                 ),
             )
             .values(),
@@ -592,6 +592,8 @@ class EventDetail(PageTitleMixin, TemplateView):
             (e for e in ranked_events if e["event_id"] == self.kwargs["id"]),
             None,
         )
+
+        print(context["rank_stats"])
 
         all_ranked_events = list(
             models.Events.objects.filter(length__isnull=False)
