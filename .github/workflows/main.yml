@@ -44,7 +44,7 @@ jobs:
             sudo rm -rf databruce/config/local.py
             
             # Collect New Static
-            ./manage.py collectstatic
+            ./manage.py collectstatic --noinput
             
             # Reload Gunicorn using systemd
             sudo systemctl restart gunicorn
