@@ -32,7 +32,7 @@ jobs:
             source .venv/bin/activate
 
             # Stop Gunicorn
-            systemctl stop gunicorn gunicorn.socket
+            sudo systemctl stop gunicorn gunicorn.socket
             
             # Remove Old Static
             rm -rf static/
@@ -44,4 +44,4 @@ jobs:
             ./manage.py collectstatic --noinput
             
             # Reload Gunicorn using systemd
-            systemctl restart gunicorn
+            sudo systemctl restart gunicorn
