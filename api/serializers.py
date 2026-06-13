@@ -2,14 +2,8 @@ import datetime
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
-from django.db.models import (
-    Count,
-    F,
-    PositiveIntegerField,
-    Subquery,
-)
+from django.db.models import Count, F
 from rest_framework import serializers
-from slugify import slugify
 
 from databruce import models
 from databruce.templatetags.filters import format_fuzzy
@@ -70,7 +64,7 @@ class MinimalCitiesSerializer(BaseSerializer):
         try:
             if obj.state and obj.country_id in (2, 6, 37):
                 return f"{obj.name}, {obj.state.abbrev}"
-        except models.Cities.state.RelatedObjectDoesNotExist:
+        except (models.Cities.state.RelatedObjectDoesNotExist, AttributeError):
             return f"{obj.name}, {obj.country.name}"
 
         return f"{obj.name}, {obj.country.name}"
@@ -91,6 +85,7 @@ class MinimalVenuesSerializer(BaseSerializer):
     state = MinimalStatesSerializer(source="city.state", required=False)
     country = MinimalCountriesSerializer(source="city.country", required=False)
     display = serializers.SerializerMethodField()
+    formatted = serializers.CharField(source="venues_text.formatted", required=False)
 
     def get_display(self, obj):
         return ", ".join(filter(None, [obj.detail, obj.name]))
@@ -104,7 +99,7 @@ class MinimalVenuesSerializer(BaseSerializer):
             "city",
             "state",
             "country",
-            # "formatted",
+            "formatted",
             "uuid",
             "display",
         ]
@@ -185,11 +180,10 @@ class MinimalArchiveLinksSerializer(BaseSerializer):
         fields = ["id", "url", "uuid"]
 
 
-class SubqueryCount(Subquery):
-    # Custom Count function to just perform simple count on any queryset without grouping.
-    # https://stackoverflow.com/a/47371514/1164966
-    template = "(SELECT count(*) FROM (%(subquery)s) _count)"
-    output_field = PositiveIntegerField()
+class MinimalEventTypeSerializer(BaseSerializer):
+    class Meta:
+        model = models.EventTypes
+        fields = ["id", "name"]
 
 
 def get_date_from_instance(obj):
@@ -256,7 +250,16 @@ class CitiesSerializer(BaseSerializer):
 
     class Meta:
         model = models.Cities
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "uuid",
+            "state",
+            "country",
+            "count",
+            "first_event",
+            "last_event",
+        ]
 
 
 class BandsSerializer(BaseSerializer):
@@ -272,17 +275,11 @@ class VenuesSerializer(BaseSerializer):
     name = serializers.SerializerMethodField()
     city = MinimalCitiesSerializer(required=False)
     state = MinimalStatesSerializer(required=False, source="city.state")
-    country = MinimalCountriesSerializer(required=False)
+    country = MinimalCountriesSerializer(required=False, source="city.country")
     text = serializers.SerializerMethodField(method_name="get_name")
-    location = serializers.SerializerMethodField()
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
-
-    def get_location(self, obj):
-        try:
-            return f"{obj.name}, {obj.city.name}, {obj.state.abbrev}"
-        except AttributeError:
-            return f"{obj.name}, {obj.city.name}, {obj.country.name}"
+    formatted = serializers.CharField(source="venues_text.formatted", required=False)
 
     def get_name(self, obj):
         if obj.detail:
@@ -354,6 +351,33 @@ class EventTypeSerializer(BaseSerializer):
         fields = "__all__"
 
 
+class EventSearchSerializer(BaseSerializer):
+    date = serializers.SerializerMethodField(method_name="get_date")
+    venue = serializers.CharField(required=False, source="venue.venues_text.formatted")
+    city = serializers.CharField(required=False, source="venue.city.name")
+    artist = serializers.CharField(required=False, source="artist.name")
+    type = serializers.CharField(required=False, source="type.name")
+    run = serializers.CharField(required=False, source="run.name")
+    rank = serializers.FloatField(required=False)
+
+    def get_date(self, obj):
+        return get_date_from_instance(obj)
+
+    class Meta:
+        model = models.Events
+        fields = [
+            "id",
+            "event_id",
+            "date",
+            "venue",
+            "city",
+            "artist",
+            "type",
+            "rank",
+            "run",
+        ]
+
+
 class EventsSerializer(BaseSerializer):
     order = serializers.SerializerMethodField(method_name="sort_id")
     date = serializers.SerializerMethodField(method_name="get_date")
@@ -363,7 +387,8 @@ class EventsSerializer(BaseSerializer):
     venue = MinimalVenuesSerializer(required=False)
     leg = MinimalTourLegsSerializer(required=False)
     has_setlist = serializers.BooleanField(required=False)
-    type = EventTypeSerializer(required=False)
+    type = MinimalEventTypeSerializer(required=False)
+    rank = serializers.IntegerField(required=False)
 
     bands = serializers.SerializerMethodField(required=False)
     relations = serializers.SerializerMethodField(required=False)
@@ -468,12 +493,6 @@ class NugsSerializer(BaseSerializer):
         fields = "__all__"
 
 
-class ReleasesSerializer(BaseSerializer):
-    class Meta:
-        model = models.Releases
-        fields = "__all__"
-
-
 class RelationsSerializer(BaseSerializer):
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
@@ -518,7 +537,7 @@ class OnstageBandSerializer(BaseSerializer):
 
 class ReleasesSerializer(BaseSerializer):
     event = MinimalEventSerializer(required=False)
-    length = serializers.TimeField(format="%H:%M:%S", required=False)
+    length = serializers.TimeField(format="%H:%M:%S", required=False)  # type: ignore
     month_day = serializers.SerializerMethodField()
 
     def get_month_day(self, obj):
@@ -572,16 +591,10 @@ class SetlistStatsSerializer(BaseSerializer):
 
 class SetlistSerializer(BaseSerializer):
     song = MinimalSongsSerializer()
-    last_event = MinimalEventSerializer(source="stats.ltp", required=False)
+    last_event = MinimalEventSerializer(source="ltp", required=False)
     event = MinimalEventSerializer()
     count = serializers.IntegerField(required=False)
     notes = serializers.SerializerMethodField()
-    position = serializers.SerializerMethodField()
-    stats = SetlistStatsSerializer(
-        required=False,
-        read_only=True,
-        source="setlist_stats",
-    )
 
     def get_notes(self, obj):
         if not obj.setlist_notes.exists():
@@ -590,12 +603,6 @@ class SetlistSerializer(BaseSerializer):
         return list(
             {item.note for item in obj.setlist_notes.all() if item.note != ""},
         )
-
-    def get_position(self, obj):
-        try:
-            return obj.setlist_position.position
-        except models.Setlists.setlist_position.RelatedObjectDoesNotExist:
-            return None
 
     class Meta:
         model = models.Setlists
@@ -620,8 +627,6 @@ class SetlistSerializer(BaseSerializer):
             "uuid",
             "notes",
             "last_event",
-            "setlist_position",
-            "stats",
         ]
 
 
@@ -633,7 +638,7 @@ class ReleaseDiscSerializer(BaseSerializer):
 
 class ReleaseTracksSerializer(BaseSerializer):
     event = MinimalEventSerializer(required=False)
-    disc = ReleaseDiscSerializer(source="discid", required=False)
+    disc = ReleaseDiscSerializer(required=False)
     song = SongsSerializer(
         include=[
             "id",
@@ -641,7 +646,7 @@ class ReleaseTracksSerializer(BaseSerializer):
             "uuid",
         ],
     )
-    length = serializers.TimeField(format="%M:%S", required=False)
+    length = serializers.TimeField(format="%M:%S", required=False)  # type: ignore
 
     class Meta:
         model = models.ReleaseTracks
@@ -981,8 +986,6 @@ class SetlistBreakdownSerializer(BaseSerializer):
         album_songs = set(obj["album_songs"])
         setlist_songs = set(obj["songs"])
 
-        # print(obj["category"], album_songs, setlist_songs)
-
         # only actual albums, not covers category
         return (
             setlist_songs.issuperset(album_songs)
@@ -1042,7 +1045,6 @@ class UserAlbumBreakdownSerializer(BaseSerializer):
 
 
 class YearSongBreakdownSerializer(BaseSerializer):
-    # song = serializers.IntegerField(source="song_id")
     year = serializers.IntegerField()
     count = serializers.IntegerField()
 

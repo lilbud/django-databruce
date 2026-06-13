@@ -1,5 +1,5 @@
 DataTable.type('num', 'className', 'dt-center');
-DataTable.type('string', 'className', 'dt-left');
+// DataTable.type('string', 'className', 'dt-left');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
@@ -28,13 +28,10 @@ $.extend(true, DataTable.defaults, {
   },
   autoWidth: false,
   paging: true,
-  searching: true,
-  info: true,
   ordering: {
     indicators: false,
     handler: true
   },
-  scrollX: true,
   pageLength: 100,
   lengthMenu: [25, 50, 100],
   language: {
@@ -83,7 +80,7 @@ function getDatatableLayout({ columns = true, category = false }) {
               attr: {
                 id: 'dropdown-btn',
               },
-              className: 'btn btn-sm btn-primary category-btn',
+              className: 'btn btn-sm btn-primary category-btn w-auto',
               buttons: []
             }
           ],
@@ -100,7 +97,7 @@ function getDatatableLayout({ columns = true, category = false }) {
       buttons: [
         {
           extend: 'pageLength',
-          className: 'btn btn-sm btn-primary',
+          className: 'btn btn-sm btn-primary w-auto',
           fade: 100,
         },
       ]

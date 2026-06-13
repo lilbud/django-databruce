@@ -2,10 +2,10 @@ from django.shortcuts import redirect
 
 
 class CleanQueryStringMiddleware:
-    def __init__(self, get_response):
+    def __init__(self, get_response) -> None:
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request):  # noqa: ANN204
         # Only check GET requests with parameters
         if request.GET:
             has_quotes = False

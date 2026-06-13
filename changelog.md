@@ -3,29 +3,36 @@ Note: While I have posted updates in various places, I've never compiled them to
 I had intended to create "releases" on Github, but you can't easily backdate them. And this really isn't a project with "releases", so it wouldn't make sense.
 
 # v0.1 (June 10, 2025)
+
 First beta release of Databruce. Site was opened to a small group to test and give feedback.
 
 # v0.11 (June 11, 2025)
+
 - Added "users" page
 - Added ability for users to change username/email
 - Added "latest show" card to front page
 
 # v0.12 (June 14, 2025)
+
 - User Profile Updates
-	- "Rare Songs" (<100 total plays) added
-	- "Personal Premieres" added
-	- "Most Played Not Seen" added
+  - "Rare Songs" (<100 total plays) added
+  - "Personal Premieres" added
+  - "Most Played Not Seen" added
 - Tour Detail page now shows songs in a given position (Opener/Closer)
 
 # v1.0 (July 15, 2025)
+
 First public release of the site. Site was locked behind a login and accounts only I could make while beta testing was underway. Had to get an email provider set up to send confirmation emails
+
 - Event page style changes to look better on mobile
 - Added autocomplete to navbar event search
 
 # v1.01 (July 18, 2025)
+
 - Login now redirects to previous page rather than home page
 
 # v1.02 (July 21, 2025)
+
 - Date filtering added to tables
 - Advanced Search form improved on mobile
 - Added short url creation to advanced search (thanks to Jerrybase for the idea)
@@ -33,25 +40,30 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added About page
 
 # v1.03 (August 26, 2025)
+
 - Fixed "On This Day" home page card not updating with current date
 
 # v1.04 (September 3, 2025)
+
 - Updated Song page layout
 - Updated Event page layout
 - Updated Events page
 - Rewrote About page
 
 # v1.05 (September 8, 2025)
+
 - Added "tour" column to event page
 - Added colored markers to event setlist page to indicate "position" (show opener, show closer, etc.)
 
 # v1.06 (October 25, 2025)
+
 - Song Detail page loads faster
 - Style changes, largely to "standardize" everything
 - Added "Synthwave" theme from DaisyUI
 - Added "Setlist Options" to Event Detail page, contained toggle to show/hide all setlist notes, as well as button to copy setlist as plain text.
 
 # v1.10 (December 3, 2025)
+
 - Added "Event Calendar" page, shows events and runs in a more visual manner
 - Synthwave theme removed, wasn't a fan of it
 - Added regex support to Table Search
@@ -59,11 +71,13 @@ First public release of the site. Site was locked behind a login and accounts on
 - Release Detail page now groups tracks by disc
 
 # v1.11 (December 8, 2025)
+
 - Updated Event Detail, songs in setlist are now highlighted when hovering over an album in the "breakdown" card. (Credit to Dripfield.pro)
 - Fixed Event Detail showing "null" for some gaps due to some shows not being counted
 - Updated Event Detail layout, setlist card is wider
 
 # v1.12 (January 4, 2026)
+
 - (12/14) Added `changelog.md`, lists changes and versions. Versions prior to 1.1 were retroactively added, and shouldn't be considered accurate.
 - (12/15) Added "Remember Me" check to the login form. This *should* keep you logged in for 2 weeks.
 - (12/17) Fixed table SearchBuilder. Moved to a bootstrap modal so it would stay on screen and not get cut off by table.
@@ -78,6 +92,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - (12/22) Fixed event table links not being clickable
 
 # v1.13 (January 27, 2026)
+
 - (1/6) Fix songs page search not finding originals not marked as such. It would initially match against the "category" being originals/covers, but if category was a studio album then it wouldn't find it (so filtering originals then searching for Racing gave no results.)
 - (1/6) Update footer year
 - (1/6) Update Event Detail, move "placeholder date" text under date row. Remove background color.
@@ -93,6 +108,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/27) Reenable autocomplete on navbar event search
 
 # v1.13.1 (January 28, 2026)
+
 - (1/28) Song Detail: fix frequency causing "divide by zero" error when there are no events
 - (1/28) Events: "setlist" is now an annotated calculated value instead of a stored value
 - (1/28) Events: Year dropdown is now next to page title instead of other side
@@ -101,6 +117,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - (1/28) Events: Year dropdown now starts at current year and descends, instead of ascending from 1965.
 
 # v1.14 (Feburary 2026)
+
 - Replaced `django_rest_framework_datatables` with a custom renderer/pagination.
 - Redid how much of the backend works, many pages now load a bit faster
 - All page links now match primary site color
@@ -114,38 +131,39 @@ First public release of the site. Site was locked behind a login and accounts on
 - User Profile: songs seen/rare now show first/last event you saw a song at
 - "Songs" table on many detail pages now shows first/last event
 - Event Calendar:
-	- Fixed Event Runs not showing up
-	- Improved loading time
-	- Links now open in new tab by default
-	- Added releases
+  - Fixed Event Runs not showing up
+  - Improved loading time
+  - Links now open in new tab by default
+  - Added releases
 - Added "success" indicator on Contact Form submit.
 - Home Page featured/latest setlist now shows position indicators and notes
 - Lyric Detail note now renders markdown if present
 - Event Detail
-	- Loading time improved.
-	- Column ratio modified, setlist card is *slightly* narrower, and side column expanded.
-	- Onstage has been moved to it's own tab, rather than being squished on the sidebar.
-	- Album Breakdown: percentage is now of total number of songs instead of per album
-	- Album Breakdown: clicking on row now expands list of songs. This also means the popup is gone.
-	- Fixed tour counts showing 1 for all songs and shows.
+  - Loading time improved.
+  - Column ratio modified, setlist card is *slightly* narrower, and side column expanded.
+  - Onstage has been moved to it's own tab, rather than being squished on the sidebar.
+  - Album Breakdown: percentage is now of total number of songs instead of per album
+  - Album Breakdown: clicking on row now expands list of songs. This also means the popup is gone.
+  - Fixed tour counts showing 1 for all songs and shows.
 - Style:
-	- Table columns with dates now show day of week
-	- Updates to many layouts, including style tweaks and fixing some odd colors.
-	- Dark Theme colors updated slightly, better contrast on cards
-	- Much tighter layout in regards to spacing. Less padding in tables, and font has been shrunken slightly. Allows for more rows visible at once on desktop.
-	- Fixed table horizonal scrolling, was originally removed due to odd quirks with Datatables breaking mobile layouts.
+  - Table columns with dates now show day of week
+  - Updates to many layouts, including style tweaks and fixing some odd colors.
+  - Dark Theme colors updated slightly, better contrast on cards
+  - Much tighter layout in regards to spacing. Less padding in tables, and font has been shrunken slightly. Allows for more rows visible at once on desktop.
+  - Fixed table horizonal scrolling, was originally removed due to odd quirks with Datatables breaking mobile layouts.
 - Release Detail:
-	- Notes now show if present
-	- Fixed `event_date` showing date and time instead of just date
-	- Discs now show for all releases. If there is a "disc name" (Tracks 2), it is shown, otherwise just "Disc #". Defaults to "Disc 1" in most cases
+  - Notes now show if present
+  - Fixed `event_date` showing date and time instead of just date
+  - Discs now show for all releases. If there is a "disc name" (Tracks 2), it is shown, otherwise just "Disc #". Defaults to "Disc 1" in most cases
 - Advanced Search:
-	- Performance improvements
-	- Significantly reworked this, as it was an absolute mess
-	- "band" is now when a band appeared at an event rather than solely if they're the "main" band for an event
+  - Performance improvements
+  - Significantly reworked this, as it was an absolute mess
+  - "band" is now when a band appeared at an event rather than solely if they're the "main" band for an event
 - Setlist Note Search
-	- Redid notes on the database, so this has been updated to match. Now searches all setlist notes.
+  - Redid notes on the database, so this has been updated to match. Now searches all setlist notes.
 
 # v1.15 (March 2026)
+
 - [Event Detail] Updated page so that "note" and "album breakdown" only show on the "overview" tab, and are hidden on the other tabs (onstage, notes, links).
 - [Event Detail] Added "Nugs" button back to event detail header
 - [Advanced Search] Updated event type to allow multiple values to be searched.
@@ -184,6 +202,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - [General] Updated page titles and descriptions so that many show on opengraph embeds
 
 # v1.16 (April 2026)
+
 - [Fix] Fixed issues with signup and user adding shows
 - [New Page] Added "News" page, which is basically a site blog
 - [Style] Colors changed slightly. Badge/Button colors slightly different
@@ -204,6 +223,18 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Advanced Search] Fixed issue where quotes in IDs would cause error
 - [Blog Posts] Added `magnific-popup` to blog posts, images now have the same popup as my Github Pages site
 
-# v1.17 (May 2026)
+# v1.17 (June 2026)
+
+- 1 Year of Databruce!, Site first went public on June 10, 2025 in beta, and July fully public.
 - [Song Detail] Fixed year stats bar chart not scaling properly with window
 - [Song Detail] Updated layout of position cards, text now wraps
+- [Event Detail] Adjusted event table column widths
+- [User Profile] Added info row cards to user profile, removed from navigation buttons. Counts are done in views instead of tied to datatables
+- [Event Detail] Added user list on hover to attended button
+- [Venue Detail] Added "address" card
+- [Adv. Search] Fixed advanced search control spacing on mobile being busted
+- [General] General code cleanup, removed some unnecessary code to reduce queries
+- [User Profile] Added "change password" section
+- [User Profile] Added "discord name" to user profiles. Can be used in conjunction with Brucebot to display your own stats or another users stats.
+- [Event Detail] Updated setlist positions. Originally had them set semi-automatically, but found it was too much of a mess. With many positions being wrong (marking show opener/closer when Bruce only appeared for 2 songs mid-set). These are now set manually.
+- [Event Detail] Added "Event Info" card. Extended info about event that doesn't fit in header. Currently it is a current event num/total for tour, leg, and venue. More will likely be added eventually.

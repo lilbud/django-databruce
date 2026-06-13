@@ -31,15 +31,14 @@
           <div class="card-body p-0">
             <img class="img-fluid card-img-top object-fit-cover"
                  id="headimg"
-                 src="{% static 'databruce/img/header-april-2026.webp' %}"
+                 src="{% static 'databruce/img/june26header.webp' %}"
                  alt=""
                  height="640"
                  width="auto">
           </div>
           <div class="card-footer">
-            <span class="text-sm text-lg-base">Minneapolis - March 31, 2026</span>
-            <span class="text-sm text-lg-base">(photo by <a class="text-reset"
-    href="https://consequence.net/2026/04/bruce-springsteen-minneapolis-tour-kickoff/">Kara Gerke</a>)</span>
+            <span class="text-sm">Philly - May 31, 2026</span>
+            <span class="text-sm">(photo by <a class="text-reset" href="https://www.instagram.com/redemartin">Rob Demartin</a>)</span>
           </div>
         </div>
         <div class="card">
@@ -149,7 +148,7 @@
 
         data.results.forEach((item, index) => {
           var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date.display}</a></div>`
-          var item2 = `<div class="col py-0 text-wrap"><a href="/venues/${item.venue.uuid}">${item.venue.display}</a></div>`
+          var item2 = `<div class="col-9 py-0 text-wrap"><a href="/venues/${item.venue.uuid}">${item.venue.display}</a></div>`
 
           var listItem = createListItem(item1, item2);
           $(list).append(listItem);
@@ -182,8 +181,8 @@
       })
 
       getEventData(`/api/v1/events/?month=${month}&day=${day}&limit=5&format=json`, '#otd')
-      getEventData('/api/v1/events/?ordering=event_id&limit=5&format=json&upcoming=true', '#upcoming')
-      getEventData('/api/v1/events/?ordering=-event_id&limit=5&format=json&latest=true', '#recent')
+      getEventData('/api/v1/events/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
+      getEventData('/api/v1/events/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
 
       fetch('/api/v1/updates/?format=json&limit=10')
         .then(response => response.json())
@@ -272,11 +271,11 @@
                   $(badge).addClass('text-bg-info').text('Sign Request');
                 } else if (row.nobruce) {
                   $(badge).addClass('badge-warning').text('No Bruce');
-                } else if (row.stats.premiere) {
+                } else if (row.premiere) {
                   $(badge).addClass('badge-warning').text('First');
-                } else if (row.stats.debut && !row.stats.premiere) {
+                } else if (row.debut && !row.premiere) {
                   $(badge).addClass('badge-warning').text('TD');
-                } else if (row.stats.last >= 50 && !row.stats.debut) {
+                } else if (row.last >= 50 && !row.debut) {
                   $(badge).addClass('badge-warning').text('Bust');
                 }
 

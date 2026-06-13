@@ -4,8 +4,8 @@ import markdown
 import nh3
 from django import template
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
-from django.template import Context, loader
+from django.shortcuts import get_object_or_404
+from django.template import Context
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
@@ -67,7 +67,7 @@ class BlogPost(PageTitleMixin, TemplateView):
 
         # Use the existing context (which is already a Context object)
         context["body"] = mark_safe(template_obj.render(context_new))  # noqa: S308
-        context["toc"] = md.toc
+        context["toc"] = md.toc  # type: ignore
 
         return context
 

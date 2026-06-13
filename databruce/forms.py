@@ -1,24 +1,26 @@
 import calendar
 import datetime
 import re
+from collections.abc import Iterable
 from typing import Any
 
-import django_filters
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
-    PasswordResetForm,
     SetPasswordForm,
     UserCreationForm,
 )
-from django.db.models import F, Q, QuerySet
+from django.db.models import Q, QuerySet
 
 from . import models
 
 DATE = datetime.datetime.today()
 User = get_user_model()
+
+# 1. Create a clean structural type alias for objects that act like dicts or models
+type FilterValue = dict[str, Any] | str | int | Any
 
 
 class CustomCharField(forms.CharField):
@@ -34,7 +36,7 @@ class CustomChoiceField(forms.ChoiceField):
 
 
 class CustomMultipleChoiceField(forms.MultipleChoiceField):
-    def valid_value(self, value):
+    def valid_value(self):
         # This bypasses the 'Select a valid choice' check against self.choices
         return True
 
@@ -74,26 +76,30 @@ class AdvancedEventSearch(forms.Form):
                 ),
             )
 
-    def iterate_field(self, field: list, value: str, lookup_path: str) -> Q:
-        val_id = getattr(
-            value,
-            "id",
-            value.get("id") if isinstance(value, dict) else value,
-        )
+    def iterate_field(
+        self,
+        field: str,
+        value: FilterValue | Iterable[Any],
+        lookup_path: str,
+    ) -> Q:
+        # If it's a string, dictionary, or single model instance
+        if isinstance(value, dict):
+            val_id = value.get("id")
+        else:
+            # Safely get .id from a model instance, fallback to the raw value (str/int)
+            val_id = getattr(value, "id", value)
 
-        # print(field, lookup_path, val_id)
-
+        # Note: If value was a list/QuerySet from get_filters, val_id is now the whole collection.
+        # This works perfectly with Django's __in operator.
         q_obj = Q(**{lookup_path: val_id})
 
-        # check if the field should be excluded
-        exclude_val = self.cleaned_data.get(f"{field}_exclude")
-
-        if exclude_val is True:
+        # Check if the field should be excluded
+        if self.cleaned_data.get(f"{field}_exclude") is True:
             q_obj = ~q_obj
 
         return q_obj
 
-    def get_filters(self):
+    def get_filters(self) -> Q:
         total_filter = Q()
 
         if not self.is_valid():
@@ -104,34 +110,32 @@ class AdvancedEventSearch(forms.Form):
                 continue
 
             value = self.cleaned_data.get(field)
-
-            # print(value, type(value))
-
             if not value:
                 continue
 
-            # custom lookup_path variable on field, used to specify queryset lookup
             field_instance = self.fields[field]
             lookup_path = getattr(field_instance, "lookup_path", field)
 
-            if type(value) is list or type(value) is QuerySet:
+            # FIX: Use isinstance() instead of type() to properly catch QuerySet subclasses
+            if isinstance(value, (list, QuerySet)):
                 lookup_path = f"{lookup_path}__in"
 
+            # Combine filters dynamically using & (AND) or | (OR) depending on your form logic
             q_obj = self.iterate_field(field, value, lookup_path)
-
-            # Add the query object to the total filter
             total_filter &= q_obj
 
         return total_filter
 
-    def get_months():
+    @staticmethod
+    def get_months() -> list[tuple[str, str]]:
         months = [("", "")]
-        months.extend([(i, calendar.month_name[i]) for i in range(1, 13)])
+        months.extend([(str(i), calendar.month_name[i]) for i in range(1, 13)])
         return months
 
-    def get_days():
+    @staticmethod
+    def get_days() -> list[tuple[str, str]]:
         days = [("", "")]
-        days.extend([(i, i) for i in range(1, 32)])
+        days.extend([(str(i), str(i)) for i in range(1, 32)])
         return days
 
     days_of_week = [
@@ -536,7 +540,7 @@ class AdvancedEventSearch(forms.Form):
 
 
 class SetlistSearch(forms.Form):
-    def __init__(self, *args: dict, **kwargs: dict) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
         self.empty_permitted = True
@@ -627,7 +631,7 @@ class SetlistSearch(forms.Form):
 
 
 class EventSearch(forms.Form):
-    def __init__(self, *args: dict, **kwargs: dict) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
@@ -648,7 +652,7 @@ class EventSearch(forms.Form):
 
 
 class SetlistNoteSearch(forms.Form):
-    def __init__(self, *args: dict, **kwargs: dict) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
@@ -706,10 +710,36 @@ class UserForm(UserCreationForm):
         ]
 
 
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            # Inject Bootstrap control style class
+            field.widget.attrs["class"] = "form-control form-control-sm"
+
+
 class UpdateUserForm(forms.ModelForm):
-    def __init__(self, *args: dict, **kwargs: dict) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            # Inject Bootstrap control style class
+            field.widget.attrs["class"] = "form-control form-control-sm"
+
+    email = forms.EmailField(
+        label="Email:",
+        max_length=254,
+        required=True,
+        disabled=True,
+        widget=forms.EmailInput(
+            attrs={
+                "autocomplete": "email",
+                "id": "email",
+                "type": "email",
+                "name": "email",
+            },
+        ),
+    )
 
     username = forms.CharField(
         label="Username:",
@@ -719,33 +749,29 @@ class UpdateUserForm(forms.ModelForm):
                 "id": "username",
                 "type": "text",
                 "name": "username",
-                "class": "form-control form-control-sm",
             },
         ),
     )
 
-    email = forms.EmailField(
-        label="Email:",
-        max_length=254,
-        required=True,
-        widget=forms.EmailInput(
+    discord_name = forms.CharField(
+        label="Discord Name:",
+        required=False,
+        widget=forms.TextInput(
             attrs={
-                "autocomplete": "email",
-                "id": "email",
-                "type": "email",
-                "name": "email",
-                "class": "form-control form-control-sm",
+                "id": "discord_name",
+                "type": "text",
+                "name": "discord_name",
             },
         ),
     )
 
     class Meta:
         model = User
-        fields = ["username", "email"]
+        fields = ["email", "username", "discord_name"]
 
 
 class ContactForm(forms.Form):
-    def __init__(self, *args: dict, **kwargs: dict) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize form."""
         super().__init__(*args, **kwargs)
 
@@ -816,7 +842,7 @@ class LoginForm(AuthenticationForm):
 
 class CustomSetPasswordForm(SetPasswordForm):
     # Add custom fields or override __init__ to change styling
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({"class": "form-control form-control-sm"})

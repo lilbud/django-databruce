@@ -3,13 +3,19 @@
   {{ title }}
 {% endblock title %}
 {% block info_row %}
-  <div class="text-2xl">Lyrics</div>
-  <div class="text-base">Lyrics for many of Bruce's songs.</div>
-  <div class="text-base">
-    English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
-    The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
-    I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
-    Credit to each translator provided when it was listed in the original files.
+  <div class="text-2xl mb-3">Lyrics</div>
+  <div class="card">
+    <div class="card-body text-sm">
+      <div class="text-wrap">
+        <span class="fw-medium">Note:</span>
+        <div>
+          English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
+          The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
+          I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
+          Credit to each translator provided when it was listed in the original files.
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock info_row %}
 {% block table_id %}

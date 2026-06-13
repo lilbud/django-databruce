@@ -1,4 +1,5 @@
 {% extends "databruce/narrow_layout.html" %}
+{% load humanize %}
 {% block title %}
   {{ title }}
 {% endblock title %}
@@ -64,13 +65,7 @@
                   <div class="col">
                     <div class="row">
                       <div class="text-wrap text-lg">
-                        <span id="date">
-                          {% if event.date %}
-                            {{ event.get_date }}
-                          {% else %}
-                            {{ event.event_id|format_fuzzy }}
-                          {% endif %}
-                        </span>
+                        <span id="date">{{ event.get_date }}</span>
                         <a class="fw-medium text-reset"
                            href="{% url 'band_details' id=event.artist.uuid %}"
                            id="artist">{{ event.artist }}</a>
@@ -92,10 +87,13 @@
                     </div>
                   </div>
                 </div>
-                <div class="row mb-3 mb-md-0">
+                <div class="row mb-0">
                   <div class="col-auto">
                     <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                          id="badge-row">
+                      {% if event.type %}
+                        <a href="{% url 'events_by_type' type=event.type.slug %}"><span class="badge badge-primary">{{ event.type }}</span></a>
+                      {% endif %}
                       {% if event.tour %}
                         <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">{{ event.tour }}</span></a>
                       {% endif %}
@@ -149,7 +147,7 @@
                         {% if event.archive_links.count > 0 %}
                           <a role="button"
                              target="_blank"
-                             href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:"Y-m-d" }}"
+                             href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:" Y-m-d" }}"
                              class="btn btn-sm btn-neutral text-xs icon-button">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  width="16"
@@ -176,83 +174,107 @@
                     <div class="btn-group input-group input-group-sm"
                          role="group"
                          aria-label="Basic example">
-                      <button id="addshow"
-                              type="submit"
-                              name="submit"
-                              class="btn btn-sm text-nowrap {% if user_attended %}btn-primary{% else %}btn-neutral{% endif %} icon-button">
-                        {% if user_attended %}
-                          <i class="bi bi-star-fill" id="star"></i>
-                        {% else %}
-                          <i class="bi bi-star"id="star"></i>
-                        {% endif %}
-                        <span id="attended">
+                      {% spaceless %}
+                        <button id="addshow"
+                                type="submit"
+                                name="submit"
+                                class="btn btn-sm text-nowrap
+                                       {% if user_attended %}
+                                         btn-primary
+                                       {% else %}
+                                         btn-neutral
+                                       {% endif %}
+                                       icon-button">
                           {% if user_attended %}
-                            Attended
+                            <i class="bi bi-star-fill" id="star"></i>
                           {% else %}
-                            Attended?
+                            <i class="bi bi-star" id="star"></i>
                           {% endif %}
-                        </span>
+                          <span id="attended">
+                            {% if user_attended %}
+                              Attended
+                            {% else %}
+                              Attended?
+                            {% endif %}
+                          </span>
+                        </button>
+                        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>Users Present:<br><div>
+                          {% for user in users %}{{ user.user }}<br>{% endfor %}
+                        </div></small>">
                         <button type="button"
                                 id="usercount"
                                 disabled
-                                class="btn btn-sm {% if user_attended %}btn-primary{% else %}btn-neutral{% endif %}">
-                          {{ user_count }}
-                        </button>
-                      </button>
-                    </div>
-                  </form>
-                {% endif %}
-              </div>
+                                class="btn rounded-start-0 btn-sm
+                                       {% if user_attended %}
+                                         btn-primary
+                                       {% else %}
+                                         btn-neutral
+                                       {% endif %}"
+                                style="pointer-events: none">{{ users.count }}</button>
+                      </span>
+                    {% endspaceless %}
+                  </div>
+                </form>
+              {% endif %}
             </div>
           </div>
-          <div class="card-footer py-0 px-1" id="eventInfoFooter">
-            <nav class="nav nav-underline px-2">
-              <a class="nav-link active text-sm"
-                 id="overview-tab"
-                 data-bs-toggle="pill"
-                 data-bs-target="#overview"
-                 type="button"
-                 role="tab"
-                 aria-controls="overview"
-                 aria-selected="true">Overview</a>
-              <a class="nav-link text-sm"
-                 id="onstage-tab"
-                 data-bs-toggle="pill"
-                 data-bs-target="#onstage"
-                 type="button"
-                 role="tab"
-                 aria-controls="notes"
-                 aria-selected="false">Onstage</a>
-              <a class="nav-link text-sm"
-                 id="notes-tab"
-                 data-bs-toggle="pill"
-                 data-bs-target="#notes"
-                 type="button"
-                 role="tab"
-                 aria-controls="notes"
-                 aria-selected="false">Notes</a>
-              <a class="nav-link text-sm"
-                 id="links-tab"
-                 data-bs-toggle="pill"
-                 data-bs-target="#links"
-                 type="button"
-                 role="tab"
-                 aria-controls="notes"
-                 aria-selected="false">Links</a>
-            </nav>
-          </div>
+        </div>
+        <div class="card-footer py-0 px-1" id="eventInfoFooter">
+          <nav class="nav nav-underline px-2">
+            <a class="nav-link active text-sm"
+               id="overview-tab"
+               data-bs-toggle="pill"
+               data-bs-target="#overview"
+               type="button"
+               role="tab"
+               aria-controls="overview"
+               aria-selected="true">Overview</a>
+            <a class="nav-link text-sm"
+               id="onstage-tab"
+               data-bs-toggle="pill"
+               data-bs-target="#onstage"
+               type="button"
+               role="tab"
+               aria-controls="notes"
+               aria-selected="false">Onstage</a>
+            <a class="nav-link text-sm"
+               id="notes-tab"
+               data-bs-toggle="pill"
+               data-bs-target="#notes"
+               type="button"
+               role="tab"
+               aria-controls="notes"
+               aria-selected="false">Notes</a>
+            <a class="nav-link text-sm"
+               id="links-tab"
+               data-bs-toggle="pill"
+               data-bs-target="#links"
+               type="button"
+               role="tab"
+               aria-controls="notes"
+               aria-selected="false">Links</a>
+          </nav>
         </div>
       </div>
     </div>
-    <!-- setlist and notes -->
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active"
-           id="overview"
-           role="tabpanel"
-           aria-labelledby="overview-tab"
-           tabindex="0">
-        <div class="row row-cols-1 row-cols-lg-2 gy-3 gx-0">
-          <div class="col-12 col-lg-8 col-xl-9 pe-lg-3">
+  </div>
+  <!-- setlist and notes -->
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active"
+         id="overview"
+         role="tabpanel"
+         aria-labelledby="overview-tab"
+         tabindex="0">
+      <div class="row row-cols-1
+                  {% if setlist_certainty %}row-cols-xl-2{% endif %}
+                  gy-3 gx-0">
+        <div class="col-12
+                    {% if setlist_certainty %}
+                      col-xl-9 pe-xl-3
+                    {% else %}
+                      mt-lg-0
+                    {% endif %}">
+          {% if event.note %}
             <div class="row d-xl-none mb-3 gx-0">
               <div class="col">
                 {% partialdef event-note inline %}
@@ -266,6 +288,8 @@
                 {% endpartialdef %}
               </div>
             </div>
+          {% endif %}
+          {% if setlist_certainty %}
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex flex-column">
@@ -312,273 +336,311 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="col-12 col-lg-4 col-xl-3">
-            <div class="d-none d-xl-block mb-3">{% partial event-note %}</div>
+          {% endif %}
+        </div>
+        <div class="col-12{% if setlist_certainty %} col-xl-3{% endif %}">
+          <div class="row row-cols-2 row-cols-xl-1 gy-3 gx-2">
+            {% if event.note %}
+              <div class="col-12 col-md-6 col-xl-12 d-none d-xl-block order-1">{% partial event-note %}</div>
+            {% endif %}
             {% if start_time or scheduled_time %}
-              <div class="card mb-3">
-                <div class="card-header">
-                  <span>Set Times
-                    <i class="bi bi-question-circle-fill"
-                       data-bs-toggle="tooltip"
-                       data-bs-title="Local Time Shown"></i>
-                  </span>
-                  <i class="bi bi-clock"></i>
-                </div>
-                <div class="card-body">
-                  <div class="row row-cols-3">
-                    {% if start_time %}
-                      <div class="col">
-                        <div class="fw-semibold text-xs">Start</div>
-                        <div class="text-sm">{{ start_time }}</div>
-                      </div>
-                    {% elif scheduled_time %}
-                      <div class="col">
-                        <div class="fw-semibold text-xs">Scheduled</div>
-                        <div class="text-sm">{{ scheduled_time }}</div>
-                      </div>
-                    {% endif %}
-                    {% if end_time %}
-                      <div class="col">
-                        <div class="fw-semibold text-xs">End</div>
-                        <div class="text-sm">{{ end_time }}</div>
-                      </div>
-                    {% endif %}
-                    {% if event.length %}
-                      <div class="col">
-                        <div class="fw-semibold text-xs">Length</div>
-                        <div class="text-sm">{{ event.length|time:"h:i:s" }}</div>
-                      </div>
-                    {% elif duration %}
-                      <div class="col">
-                        <div class="fw-semibold text-xs">Length</div>
-                        <div class="text-sm">{{ duration }}</div>
-                      </div>
-                    {% endif %}
+              <div class="col-6 col-md-6 col-xl-12 order-2">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <span>Set Times
+                      <i class="bi bi-question-circle-fill"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Local Time Shown"></i>
+                    </span>
+                    <i class="bi bi-clock"></i>
+                  </div>
+                  <div class="card-body">
+                    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 g-2">
+                      {% if scheduled_time %}
+                        <div class="col d-block d-lg-none">
+                          <div class="fw-semibold text-xs">Scheduled</div>
+                          <div class="text-sm">{{ scheduled_time }}</div>
+                        </div>
+                      {% endif %}
+                      {% if start_time %}
+                        <div class="col">
+                          <div class="fw-semibold text-xs">Start</div>
+                          <div class="text-sm">{{ start_time }}</div>
+                        </div>
+                      {% endif %}
+                      {% if end_time %}
+                        <div class="col">
+                          <div class="fw-semibold text-xs">End</div>
+                          <div class="text-sm">{{ end_time }}</div>
+                        </div>
+                      {% endif %}
+                      {% if event.length %}
+                        <div class="col-auto">
+                          <div class="fw-semibold text-xs">Length</div>
+                          <div class="text-sm text-nowrap m-0 d-inline-flex align-items-center gap-1">
+                            {{ event.length|time:"h:i:s" }}
+                            {% if rank %}
+                              <span data-bs-toggle="tooltip"
+                                    data-bs-title="{% if rank == 1 %}
+                                                     Longest Show to Date
+                                                   {% else %}
+                                                     {{ rank|ordinal }} longest show
+                                                   {% endif %}"
+                                    class="badge text-2xs badge-primary">#{{ rank }}</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
               </div>
             {% endif %}
-            <div class="card mb-3">
-              <div class="card-header">
-                Albums
-                <span class="text-sm my-auto"
-                      data-bs-toggle="tooltip"
-                      data-bs-html="true"
-                      data-bs-title="Expand/Collapse All Rows">
-                  <a role="button"
-                     id="album-breakdown-btn"
-                     class="btn btn-sm btn-primary icon-button px-1"
-                     data-bs-toggle="collapse">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="16"
-                         height="16"
-                         fill="currentColor"
-                         class="bi bi-three-dots"
-                         viewBox="0 0 16 16">
-                      <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                    </svg>
-                  </a>
-                </span>
-              </div>
-              <div class="card-body p-0" id="albums">
-                {% comment %} <div class="table-responsive">
-                  <table class="table table-hover display wrap" id="albumTable">
-                    <thead>
-                      <th class="d-none all">#</th>
-                    </thead>
-                  </table>
-                </div> {% endcomment %}
+            <div class="col-6 col-md-6 col-xl-12 order-2 order-xl-4">
+              <div class="card h-100">
+                <div class="card-header">Show Info</div>
+                <div class="card-body">
+                  <div class="justify-content-center text-center">
+                    <div class="col text-xs">
+                      <div class="row row-cols-2 justify-content-between gy-1">
+                        <div class="col">
+                          <div class="fw-semibold">{{ event.tour.name }}</div>
+                          <div>Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</div>
+                        </div>
+                        {% if event.leg %}
+                          <div class="col">
+                            <div class="fw-semibold">{{ event.leg.name }}</div>
+                            <div>Show {{ rank_stats.leg_num }} of {{ rank_stats.leg_total }}</div>
+                          </div>
+                        {% endif %}
+                        <div class="col">
+                          <div class="fw-semibold">{{ event.venue.name }}</div>
+                          <div>Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade"
-           id="onstage"
-           role="tabpanel"
-           aria-labelledby="onstage-tab"
-           tabindex="1">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">Onstage</div>
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover display wrap" id="onstageTable">
-                  <thead>
-                    <th class="all">Guest</th>
-                    <th class="all">Person</th>
-                    <th class="all">Band</th>
-                    <th class="all">Note</th>
-                  </thead>
-                </table>
+            {% if setlist_certainty %}
+              <div class="col-12 col-xl-12 order-3">
+                <div class="card h-100">
+                  <div class="card-header">
+                    Albums
+                    <span class="text-sm my-auto"
+                          data-bs-toggle="tooltip"
+                          data-bs-html="true"
+                          data-bs-title="Expand/Collapse All Rows">
+                      <a role="button"
+                         id="album-breakdown-btn"
+                         class="btn btn-sm btn-primary icon-button px-1"
+                         data-bs-toggle="collapse">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             class="bi bi-three-dots"
+                             viewBox="0 0 16 16">
+                          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                        </svg>
+                      </a>
+                    </span>
+                  </div>
+                  <div class="card-body p-0" id="albums"></div>
+                </div>
               </div>
-            </div>
+            {% endif %}
           </div>
         </div>
       </div>
-      <div class="tab-pane fade"
-           id="notes"
-           role="tabpanel"
-           aria-labelledby="notes-tab"
-           tabindex="2">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">Notes</div>
-            <div class="card-body"></div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade"
-           id="links"
-           role="tabpanel"
-           aria-labelledby="links-tab"
-           tabindex="3">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">Links</div>
-            <div class="card-body">
-              {% if event.archive_links.count > 0 %}
-                <div class="text-sm">Radio Nowhere:</div>
-                <ul>
-                  {% for link in event.archive_links.all %}
-                    <li>
-                      <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-              {% if official %}
-                <div class="text-sm">Released In Full On:</div>
-                <ul>
-                  {% for release in official %}
-                    <li>
-                      <a href="{% url "release_details" id=release.uuid %}">{{ release.name }}</a>
-                      <span>({{ release.date }})</span>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-              {% if official_tracks %}
-                <div class="text-sm">Included On:</div>
-                <ul>
-                  {% for release in official_tracks %}
-                    <li>
-                      <a href="{% url "release_details" id=release.release.uuid %}">{{ release.release.name }}</a>
-                      <span>({{ release.release.date }})</span>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-              {% comment %} {{ official_tracks }} {% endcomment %}
+    </div>
+    <div class="tab-pane fade"
+         id="onstage"
+         role="tabpanel"
+         aria-labelledby="onstage-tab"
+         tabindex="1">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">Onstage</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover display wrap" id="onstageTable">
+                <thead>
+                  <th class="all">Guest</th>
+                  <th class="all">Person</th>
+                  <th class="all">Band</th>
+                </thead>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="tab-pane fade"
+         id="notes"
+         role="tabpanel"
+         aria-labelledby="notes-tab"
+         tabindex="2">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">Notes</div>
+          <div class="card-body"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade"
+         id="links"
+         role="tabpanel"
+         aria-labelledby="links-tab"
+         tabindex="3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">Links</div>
+          <div class="card-body">
+            {% if event.archive_links.count > 0 %}
+              <div class="text-sm">Radio Nowhere:</div>
+              <ul>
+                {% for link in event.archive_links.all %}
+                  <li>
+                    <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            {% if official %}
+              <div class="text-sm">Released In Full On:</div>
+              <ul>
+                {% for release in official %}
+                  <li>
+                    <a href="{% url " release_details" id=release.uuid %}">{{ release.name }}</a>
+                    <span>({{ release.date }})</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            {% if official_tracks %}
+              <div class="text-sm">Included On:</div>
+              <ul>
+                {% for release in official_tracks %}
+                  <li>
+                    <a href="{% url " release_details" id=release.release.uuid %}">{{ release.release.name }}</a>
+                    <span>({{ release.release.date }})</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <script>
-    var counts = [];
+</div>
+<script>
+  var counts = [];
 
-    $(document).ready(function () {
-      var event = "{{ event.id }}"
+  $(document).ready(function () {
+    var event = "{{ event.id }}"
 
+    // only fetch if the albums div exists
+    if ($('#albums').length) {
       fetch(`/api/v1/setlist_breakdown/?event=${event}&format=json&ordering=-num`)
-      .then(response => response.json())
-      .then(data => {
-        data.results.forEach((item, index) => {
-          var album = slugify(item.category);
-          var percent = ((item.num / item.max) * 100).toFixed(0);
-          var complete_badge = "";
-          
-          var songs = item.songs.map(song => {
-            if (song.original_artist !== 'Bruce Springsteen') {
-              return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
+        .then(response => response.json())
+        .then(data => {
+          data.results.forEach((item, index) => {
+            var album = slugify(item.category);
+            var percent = ((item.num / item.max) * 100).toFixed(0);
+            var complete_badge = "";
+
+            var songs = item.songs.map(song => {
+              if (!(song.original)) {
+                return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
+              }
+
+              return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
+            }).join('');
+
+            if (item.album_complete) {
+              complete_badge = `<span class="badge badge-warning text-3xs">Complete</span>`
             }
 
-            return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
-          }).join('');
+            //var html = `
+            //<div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
+            //    <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
+            //        <div class="col-8 text-truncate ps-0 text-wrap category"><span class="text-truncate pe-2">${item.category}</span>${complete_badge}</div>
+            //        <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
+            //    </div>
+            //    <div class="progress px-0 mx-0">
+            //        <div class="progress-bar" style="width:${percent}%"></div>
+            //    </div>
+            //    <div class="collapse" id="${album}-collapse">
+            //        <ul class="list-group py-1">${songs}</ul>
+            //    </div>
+            //</div>`;
 
-          if (item.album_complete) {
-            complete_badge = `<span class="badge badge-warning text-3xs">Complete</span>`
-          }
 
-          //var html = `
-          //<div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
-          //    <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
-          //        <div class="col-8 text-truncate ps-0 text-wrap category"><span class="text-truncate pe-2">${item.category}</span>${complete_badge}</div>
-          //        <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
-          //    </div>
-          //    <div class="progress px-0 mx-0">
-          //        <div class="progress-bar" style="width:${percent}%"></div>
-          //    </div>
-          //    <div class="collapse" id="${album}-collapse">
-          //        <ul class="list-group py-1">${songs}</ul>
-          //    </div>
-          //</div>`;
-          
+            var html = `
+              <div class="col px-2 py-0.5 album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
+                  <div class="row mx-0 d-flex-inline justify-content-between align-middle">
+                      <div class="col-2 col-lg-4 text-truncate px-0 me-2 category" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${item.category}">
+                        <div class="text-truncate text-2xs">${item.category}</div>
+                        ${complete_badge}
+                      </div>
+                      <div class="col-8 col-lg-6 progress px-0 my-auto align-middle">
+                          <div class="progress-bar" style="width:${percent}%"></div>
+                      </div>
+                      <div class="col text-end px-0 text-2xs text-nowrap percent">${percent}%</div>
+                  </div>
+                  <div class="collapse" id="${album}-collapse">
+                      <ul class="list-group py-1">${songs}</ul>
+                  </div>
+              </div>`;
 
-          var html = `
-            <div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
-                <div class="row text-xs mx-0 d-flex-inline justify-content-between align-middle">
-                    <div class="col-3 col-lg-4 text-truncate px-0 me-2 category" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${item.category}">
-                      <div class="text-truncate">${item.category}</div>
-                      ${complete_badge}
-                    </div>
-                    <div class="col-8 col-lg-6 progress px-0 my-auto align-middle">
-                        <div class="progress-bar" style="width:${percent}%"></div>
-                    </div>
-                    <div class="col text-end px-0 text-nowrap percent">${percent}%</div>
-                </div>
-                <div class="collapse" id="${album}-collapse">
-                    <ul class="list-group py-1">${songs}</ul>
-                </div>
-            </div>`;
+            $('#albums').append(html);
+          });
 
-          $('#albums').append(html);
-        });
-        
-        $('#albums').find('.album-breakdown').each(function(index, row) {
-          var album = $(row).attr('album');
+          $('#albums').find('.album-breakdown').each(function (index, row) {
+            var album = $(row).attr('album');
 
-          $(this).hover(function() {
-            $(this).css('cursor', "pointer");
+            $(this).hover(function () {
+              $(this).css('cursor', "pointer");
 
-            $(`#setlistTable tbody tr:not(.set-header)`).each(function (index, row) {
-              if ($(row).attr('album') == album) {
-                $(row).css('opacity', '1');
-                $(row).children('td:not(.position)').addClass('highlighted');
-              } else {
-                $(row).css('opacity', '0.2');
-              }
-            });
+              $(`#setlistTable tbody tr:not(.set-header)`).each(function (index, row) {
+                if ($(row).attr('album') == album) {
+                  $(row).css('opacity', '1');
+                  $(row).children('td:not(.position)').addClass('highlighted');
+                } else {
+                  $(row).css('opacity', '0.2');
+                }
+              });
 
-          }, function() {
-            $(`#setlistTable tr`).css('opacity', '1');
-            $(`#setlistTable tr`).children('td').removeClass('highlighted');
+            }, function () {
+              $(`#setlistTable tr`).css('opacity', '1');
+              $(`#setlistTable tr`).children('td').removeClass('highlighted');
+            })
+          });
+
+          $('#album-breakdown-btn').click(function () {
+            var closed = $('#albums .collapse:not(.show)');
+            var all = $('#albums .collapse');
+
+            if (closed.length > 0) {
+              closed.each(function () {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+                bsCollapse.show();
+              })
+            } else {
+              all.each(function () {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+                bsCollapse.hide();
+              })
+            }
           })
-        });
-
-        $('#album-breakdown-btn').click(function() {
-          var closed = $('#albums .collapse:not(.show)');
-          var all = $('#albums .collapse');
-
-          if (closed.length > 0) {
-            closed.each(function () {
-              const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-              bsCollapse.show();
-            })
-          } else {
-            all.each(function () {
-              const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-              bsCollapse.hide();
-            })
-          }
-        })
-      }).catch(error => console.error('Error:', error));
+        }).catch(error => console.error('Error:', error));
+    };
 
     var layout = getDatatableLayout({ columns: false, category: false });
-    
+
     $('#onstageTable').DataTable(
       {
         layout: layout,
@@ -593,7 +655,7 @@
           'url': '/api/v1/onstage/?event={{ id }}&format=custom',
         },
         columnDefs: [
-          {'target': 0, columnControl: [] }
+          { 'target': 0, columnControl: [] }
         ],
         columns: [
           {
@@ -627,7 +689,6 @@
               }
             },
           },
-          {'data': 'note', 'name': 'note' },
         ]
       }
     );
@@ -647,7 +708,7 @@
         rowGroup: {
           dataSrc: 'set_name',
           className: 'text-center set-header p-0 dtrg-group',
-          startRender: function(rows, group) {
+          startRender: function (rows, group) {
             const g = `<span>${group}</span>`;
             const td = `<td colspan="${rows.columns().count()}" class="py-0">${g}</td>`;
             return $('<tr />').addClass(slugify(group)).append(td);
@@ -664,19 +725,19 @@
           }
         },
         columnDefs: [
-          {'targets': '_all', columnControl: [] }
+          { 'targets': '_all', columnControl: [] }
         ],
         columns: [
           {
             'data': 'song_num',
-            'className': 'dt-center',
-            'width': '30px',
+            'className': 'dt-center col-songnum',
+            'width': '15px',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return data;
               }
             },
-            'createdCell': function(td, cellData, rowData, row, col) {
+            'createdCell': function (td, cellData, rowData, row, col) {
               $(td).addClass('songnum');
 
               if (rowData.position) {
@@ -690,16 +751,16 @@
           {
             'data': 'song',
             'name': 'song__sort_song_name',
-            'className': 'text-wrap',
+            'className': 'text-wrap col-song',
             'width': '16rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
-                var segue = row.segue ? `<span class="segue">\></span>` : '';
+                var segue = row.segue ? `<span class="segue"></span>` : '';
 
                 song = `${song} ${segue}`;
 
-                var badges = $('<span />').addClass('ms-2');
+                var badges = $('<span />');
                 var baseBadge = `<span class="badge ms-1" data-bs-toggle="tooltip" data-bs-html="true"></span>`
 
                 if (row.instrumental) {
@@ -713,7 +774,7 @@
                   $(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
                   $(badges).append($(badge).prop('outerHTML'));
                 }
-                
+
                 if (row.nobruce) {
                   var badge = $(baseBadge).clone();
                   $(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
@@ -721,48 +782,57 @@
                 }
 
                 if (row.notes) {
-                  var notes = `<span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes.join('; ')}</span>`;
-                  return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
+                  var notes = `<br><span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes.join('; ')}</span>`;
+                  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song;
                 }
 
-                return badges ? song + $(badges).prop('outerHTML') : song;
+                return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
               }
             },
           },
           {
-            'data': 'stats',
-            'className': 'dt-center',
+            'data': 'last',
+            'className': 'dt-center col-showgap',
             'width': '4rem',
             'render': function (data, type, row, meta) {
               var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
-              
-              if (type === 'display' && data) {
-                if (data.gap >= 50 && !data.debut) {
-                  $(badge).addClass('badge-primary').text(`${data.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+
+              if (row.last == 0) {
+                gap = null;
+              } else {
+                gap = row.last;
+              }
+
+              var debut = row.debut;
+              var premiere = row.premiere;
+
+              if (type === 'display') {
+                if (gap >= 50 && !debut) {
+                  $(badge).addClass('badge-primary').text(`${gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
                   return $(badge).prop('outerHTML');
-                } else if (data.premiere) {
+                } else if (premiere) {
                   $(badge).addClass('badge-secondary').text(`First`).attr('data-bs-title', 'FTP');
                   return $(badge).prop('outerHTML');
-                } else if (data.debut && !data.premiere && data.gap) {
-                  $(badge).addClass('badge-primary').text(`${data.gap}, TD`).attr('data-bs-title', 'Tour Debut');
+                } else if (debut && !premiere && gap) {
+                  $(badge).addClass('badge-primary').text(`${gap}, TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
-                } else if (data.debut && !data.premiere && !data.gap) {
+                } else if (debut && !premiere && !gap) {
                   $(badge).addClass('badge-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
                   return $(badge).prop('outerHTML');
                 } else {
-                  return data.gap;
+                  return gap;
                 }
               }
             },
           },
           {
-            'data': 'stats',
-            'className': 'dt-center',
+            'data': 'tour_num',
+            'className': 'dt-center col-tour',
             'width': '4rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                var num = data.tour_num;
-                var total = data.tour_total;
+                var num = row.tour_num;
+                var total = row.tour_total;
 
                 var badge = $('<span />').addClass('badge align-middle').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
@@ -781,13 +851,13 @@
             },
           },
           {
-            'data': 'stats',
-            'name': 'stats__ltp__event_id',
-            'width': '6rem',
-            'className': 'dt-center text-nowrap',
+            'data': 'last_event',
+            'name': 'ltp__event_id',
+            'width': '5rem',
+            'className': 'dt-center text-nowrap col-ltp',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data && data.ltp) {
-                return `<a class="text-reset" href="/events/${data.ltp.event_id}">${data.ltp.date.display}</a>`;
+              if (type === 'display' && data) {
+                return `<a class="text-reset" href="/events/${data.event_id}">${data.date.filter}</a>`;
               }
             },
           },
@@ -795,7 +865,7 @@
             'data': 'notes',
             'name': 'setlist_notes__note',
             'width': '15rem',
-            'className': 'text-wrap text-xs',
+            'className': 'text-wrap text-xs col-notes',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return `<span class="setlist-note">${row.notes.join('; ').replaceAll("''", "'")}</span>`
@@ -805,62 +875,62 @@
         ],
       })
 
-      $('#copySetlist').click(function () {
-          var btn = this;
+    $('#copySetlist').click(function () {
+      var btn = this;
 
-          fetch('/api/v1/setlists/?event={{ id }}&format=json')
-          .then(response => response.json())
-          .then(data => {
-            var lines = [];
+      fetch('/api/v1/setlists/?event={{ id }}&format=json')
+        .then(response => response.json())
+        .then(data => {
+          var lines = [];
 
-            data.results.forEach(function (item) {
-              var song = item.segue ? `${item.song.name} >` : item.song.name;
-              lines.push(song);
-            });
-
-            try {
-              navigator.clipboard.writeText(lines.join('\n'));
-              console.log('Text copied to clipboard successfully!');
-            } catch (err) {
-              console.error('Failed to copy text: ', err);
-            }
+          data.results.forEach(function (item) {
+            var song = item.segue ? `${item.song.name} >` : item.song.name;
+            lines.push(song);
           });
 
-          $(btn).text('Setlist Copied');
-          $(btn).removeClass('btn-primary').addClass('btn-success');
-
-          setTimeout(function () {
-            $(btn).removeClass('btn-success').addClass('btn-primary');
-            $(btn).text('Copy Setlist');
-          }, 3000);
+          try {
+            navigator.clipboard.writeText(lines.join('\n'));
+            console.log('Text copied to clipboard successfully!');
+          } catch (err) {
+            console.error('Failed to copy text: ', err);
+          }
         });
 
-      $('#userForm').submit(function (e) {
-          e.preventDefault();
-          var serializedData = $(this).serialize();
+      $(btn).text('Setlist Copied');
+      $(btn).removeClass('btn-primary').addClass('btn-success');
 
-          $.ajax({
-            type: "POST",
-            url: "{% url 'add_show' %}",
-            data: serializedData,
-            success: function (data) {
-              $("#usercount").text(data['count']);
-
-              if (data['action'] === 'added') {
-                $("#star").addClass('bi-star-fill').removeClass('bi-star');
-                $("#attended").text('Attended');
-                $("#addshow").addClass('btn-primary').removeClass('btn-neutral');
-                $("#usercount").addClass('btn-primary').removeClass('btn-neutral');
-
-              } else if (data['action'] === 'removed') {
-                $("#star").addClass('bi-star').removeClass('bi-star-fill');
-                $("#attended").text('Attended?');
-                $("#addshow").removeClass('btn-primary').addClass('btn-neutral');
-                $("#usercount").removeClass('btn-primary').addClass('btn-neutral');
-              };
-            },
-          });
-        });
+      setTimeout(function () {
+        $(btn).removeClass('btn-success').addClass('btn-primary');
+        $(btn).text('Copy Setlist');
+      }, 3000);
     });
-  </script>
+
+    $('#userForm').submit(function (e) {
+      e.preventDefault();
+      var serializedData = $(this).serialize();
+
+      $.ajax({
+        type: "POST",
+        url: "{% url 'add_show' %}",
+        data: serializedData,
+        success: function (data) {
+          $("#usercount").text(data['count']);
+
+          if (data['action'] === 'added') {
+            $("#star").addClass('bi-star-fill').removeClass('bi-star');
+            $("#attended").text('Attended');
+            $("#addshow").addClass('btn-primary').removeClass('btn-neutral');
+            $("#usercount").addClass('btn-primary').removeClass('btn-neutral');
+
+          } else if (data['action'] === 'removed') {
+            $("#star").addClass('bi-star').removeClass('bi-star-fill');
+            $("#attended").text('Attended?');
+            $("#addshow").removeClass('btn-primary').addClass('btn-neutral');
+            $("#usercount").removeClass('btn-primary').addClass('btn-neutral');
+          };
+        },
+      });
+    });
+  });
+</script>
 {% endblock content %}

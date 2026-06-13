@@ -1,4 +1,4 @@
-# Digital Ocean Stuff to Fix:
+# Digital Ocean Stuff to Fix
 <!-- - search looks like hell on mobile -->
 <!-- - actually, check every page on mobile -->
 <!-- - logout not working? -->
@@ -10,8 +10,7 @@
 <!-- - add users page with table so people can find other pages -->
 - look into "friends" with profiles?
 
-
-# Pages to add:
+# Pages to add
 <!-- - Event Run Details
   - events, songs -->
 <!-- - Tour Legs -->
@@ -51,5 +50,6 @@
 <!-- Better styling -->
 
 # eventual features after initial launch
+
 - article vault
 - Radio Nowhere Archive page

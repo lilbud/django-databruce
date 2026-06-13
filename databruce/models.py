@@ -8,8 +8,6 @@
 import re
 from uuid import uuid4
 
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import F, Func, Value
@@ -17,13 +15,19 @@ from django.db.models.functions import Lower, Trim
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-from requests.packages import mod
+from timezone_field import TimeZoneField
 
 from .templatetags.filters import format_fuzzy
 
 
 class CustomUser(AbstractUser):
     uuid = models.UUIDField(default=uuid4, unique=True, editable=False)
+    discord_name = models.TextField(
+        default=None,
+        blank=True,
+        null=True,
+        db_column="discord_name",
+    )
 
     groups = models.ManyToManyField(
         "auth.Group",
@@ -34,7 +38,7 @@ class CustomUser(AbstractUser):
         blank=True,
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.username
 
     class Meta:
@@ -68,13 +72,16 @@ class ArchiveLinks(BaseModel):
         null=True,
     )
 
-    url = models.TextField(null=True, db_column="archive_url")
+    url = models.TextField(null=True, db_column="archive_url", blank=True, default=None)
 
     class Meta:
         db_table = "archive_links"
         verbose_name_plural = "archive_links"
 
     def __str__(self) -> str:
+        if not self.url:
+            return ""
+
         return self.url
 
 
@@ -190,6 +197,8 @@ class Cities(BaseModel):
         related_name="city_first",
         db_column="first_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
     last_event = models.ForeignKey(
@@ -198,9 +207,11 @@ class Cities(BaseModel):
         related_name="city_last",
         db_column="last_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
-    timezone = models.TextField(default=None, blank=True, null=True)
+    timezone = TimeZoneField(use_pytz=False, default="UTC")
 
     class Meta:
         db_table = "cities"
@@ -208,8 +219,8 @@ class Cities(BaseModel):
         unique_together = (("name", "state"),)
 
     def __str__(self) -> str:
-        if self.country_id in [6, 37] and self.state_id:
-            return f"{self.name}, {self.state.abbrev}"
+        if self.country_id in [6, 37] and self.state_id:  # type: ignore
+            return f"{self.name}, {self.state.abbrev}"  # type: ignore
 
         return f"{self.name}, {self.country}"
 
@@ -319,6 +330,9 @@ class States(BaseModel):
         verbose_name_plural = "states"
 
     def __str__(self) -> str:
+        if not self.name:
+            return ""
+
         return self.name
 
 
@@ -326,7 +340,7 @@ class Venues(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_url = models.TextField(default=None, blank=True, null=True)
-    name = models.TextField(default=None, blank=True, null=True)
+    name = models.TextField(default=None)
     detail = models.TextField(default=None, blank=True, null=True)
 
     city = models.ForeignKey(
@@ -382,7 +396,7 @@ class Venues(BaseModel):
     def __str__(self) -> str:
         name = self.name
 
-        if self.id in [351]:
+        if self.id == 351:  # noqa: PLR2004
             name = "Pierre's Good Citizens Ballpark"
 
         if self.id in [2040, 2844]:
@@ -391,50 +405,24 @@ class Venues(BaseModel):
         if self.detail:
             name = f"{self.name}, {self.detail}"
 
-        # if self.city:
-        #     name += f" ({self.city.name})"
+        if self.city and name:
+            name += f" ({self.city.name})"
 
         return name
 
     def get_name(self) -> str:
         name = self.name
 
-        if self.id == 351:
-            name = "Pierre's Good Citizens Ballpark (Citizens Bank Park)"
+        if self.id == 351:  # noqa: PLR2004
+            name = "Pierre's Good Citizens Ballpark"
 
-        if self.id == 2040:
-            name = "The Big Joint (Wells Fargo Center)"
+        if self.id in (2040, 2844):
+            name = "The Big Joint"
 
-        if self.id == 2844:
-            name = "The Big Joint (Xfinity Mobile Arena)"
-
-        if self.detail:
-            return f"{name}, {self.detail}"
+        if not name:
+            return "N/A"
 
         return name
-
-    @property
-    def country(self):
-        # Since the City always knows its Country, we just grab it from there
-        try:
-            return self.city.country
-        except AttributeError:
-            return None
-
-    @property
-    def state(self):
-        # This will return the State object or None if it's London/Paris/etc.
-
-        try:
-            state = self.city.state
-
-            if self.city.country.id in [2, 6, 37]:
-                return state.abbrev
-
-        except AttributeError:
-            return None
-        else:
-            return self.city.state.name
 
 
 class VenuesText(models.Model):
@@ -455,7 +443,8 @@ class VenuesText(models.Model):
 
 
 class VenueAliases(BaseModel):
-    id = models.UUIDField(primary_key=True)
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid4, editable=False)
     venue = models.ForeignKey("Venues", models.DO_NOTHING, null=True)
     name = models.TextField()
     note = models.TextField(null=True)
@@ -559,6 +548,7 @@ class Events(BaseModel):
     )
 
     event_certainty_choices = (
+        ("", ""),
         ("Unknown Date", "Unknown Date"),
         ("Confirmed", "Confirmed"),
         ("Rumored", "Rumored"),
@@ -567,6 +557,7 @@ class Events(BaseModel):
     )
 
     setlist_certainty_choices = (
+        ("", ""),
         ("Unknown", "Unknown"),
         ("Confirmed", "Confirmed"),
         ("Probable", "Probable"),
@@ -587,6 +578,8 @@ class Events(BaseModel):
     )
 
     note = models.TextField(default=None, blank=True, null=True)
+    summary = models.TextField(default=None, blank=True, null=True)
+
     bootleg = models.BooleanField(default=False)
     is_stats_eligible = models.BooleanField(default=True)
 
@@ -620,32 +613,22 @@ class Events(BaseModel):
         get_latest_by = "event_id"
 
     def __str__(self) -> str:
-        try:
-            event = self.date.strftime("%Y-%m-%d")
-            if self.early_late:
-                event += f" ({self.early_late})"
-        except AttributeError:
-            event = format_fuzzy(self.event_id)
-
-        return event
-
-    def filter_date(self) -> str:
-        return f"{self.event_id[0:4]}-{self.event_id[4:6]}-{self.event_id[6:8]}"
-
-    def get_date(self) -> str:
-        try:
+        if self.date:
             if self.early_late:
                 return f"{self.date.strftime('%Y-%m-%d [%a]')} ({self.early_late})"
 
-            return self.date.strftime("%Y-%m-%d [%a]")
+            return f"{self.date.strftime('%Y-%m-%d [%a]')}"
 
-        except AttributeError:
-            event = format_fuzzy(self.event_id)
+        return format_fuzzy(self.event_id)
 
+    def get_date(self) -> str:
+        if self.date:
             if self.early_late:
-                return f"{event} ({self.early_late})"
+                return f"{self.date.strftime('%Y-%m-%d [%a]')} ({self.early_late})"
 
-            return event
+            return f"{self.date.strftime('%Y-%m-%d [%a]')}"
+
+        return format_fuzzy(self.event_id)
 
     def get_last(self):
         return (
@@ -662,10 +645,6 @@ class Events(BaseModel):
             .order_by("event_id")
             .first()
         )
-
-    @property
-    def has_setlist(self):
-        return self.setlist_event.exists()
 
 
 class NugsReleases(BaseModel):
@@ -729,6 +708,9 @@ class Relations(BaseModel):
         verbose_name_plural = "relations"
 
     def __str__(self) -> str:
+        if not self.name:
+            return ""
+
         return self.name
 
 
@@ -782,10 +764,17 @@ class Onstage(BaseModel):
         unique_together = ("event", "relation", "band")
 
     def __str__(self) -> str:
+        name = getattr(self.relation, "name", None)
+
         try:
-            return f"Relation: [{self.relation_id}] {self.relation.name} / {self.band.name}"
+            band = getattr(self.band, "name", None)
+
+            if band:
+                return f"Relation: [{self.relation_id}] {name} / {band}"  # type: ignore
         except Onstage.band.RelatedObjectDoesNotExist:
-            return f"Relation: [{self.relation_id}] {self.relation.name}"
+            pass
+
+        return f"Relation: [{self.relation_id}] {name}"  # type: ignore
 
 
 class ReleaseTracks(BaseModel):
@@ -799,7 +788,7 @@ class ReleaseTracks(BaseModel):
     )
     discnum = models.IntegerField(db_column="disc_num")
 
-    discid = models.ForeignKey(
+    disc = models.ForeignKey(
         "ReleaseDiscs",
         to_field="uuid",
         on_delete=models.DO_NOTHING,
@@ -845,10 +834,10 @@ class ReleaseTracks(BaseModel):
         ordering = ["release__name", "track"]
 
     def __str__(self) -> str:
-        try:
-            return f"{self.discid.name} - {self.song.name}"
-        except AttributeError:
-            return f"Disc {self.discnum} - {self.song.name}"
+        if self.disc:
+            return f"{self.disc.name} - {self.song.name}"
+
+        return f"Disc {self.discnum} - {self.song.name}"
 
 
 class Releases(BaseModel):
@@ -909,6 +898,9 @@ class Releases(BaseModel):
         verbose_name_plural = "releases"
 
     def __str__(self) -> str:
+        if not self.name:
+            return ""
+
         return self.name
 
 
@@ -932,11 +924,14 @@ class SetlistNotes(models.Model):
     note = models.TextField(default=None, blank=True, null=True)
 
     class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = "setlist_notes_new"
+        managed = True  # Created from a view. Don't remove.
+        db_table = "setlist_notes"
         verbose_name_plural = "Setlist Notes"
 
     def __str__(self) -> str:
+        if not self.note:
+            return ""
+
         return self.note
 
 
@@ -1084,13 +1079,30 @@ class Setlists(BaseModel):
         to_field="id",
     )
 
+    positions = [
+        ("", ""),
+        ("Encore Opener", "Encore Opener"),
+        ("Main Set Closer", "Main Set Closer"),
+        ("Pre-Show Closer", "Pre-Show Closer"),
+        ("Pre-Show Opener", "Pre-Show Opener"),
+        ("Rehearsal Closer", "Rehearsal Closer"),
+        ("Rehearsal Opener", "Rehearsal Opener"),
+        ("Set 1 Closer", "Set 1 Closer"),
+        ("Set 1 Opener", "Set 1 Opener"),
+        ("Set 2 Closer", "Set 2 Closer"),
+        ("Set 2 Opener", "Set 2 Opener"),
+        ("Show Closer", "Show Closer"),
+        ("Show Opener", "Show Opener"),
+    ]
+
     note = models.TextField(default=None, db_column="song_note", blank=True, null=True)
     segue = models.BooleanField(default=False)
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
     instrumental = models.BooleanField(default=False)
     nobruce = models.BooleanField(default=False)
-    position = models.TextField(default=None, blank=True, null=True)
+
+    position = models.CharField(default=None, blank=True, null=True, choices=positions)
 
     last = models.IntegerField(default=None, blank=True, null=True)
     next = models.IntegerField(default=None, blank=True, null=True)
@@ -1122,8 +1134,9 @@ class Setlists(BaseModel):
         verbose_name_plural = "setlists"
 
     def __str__(self) -> str:
-        event_id = self.event_id
-        return f"[{self.id}] {self.event.event_id} - {self.set_name} - {self.song.name} ({self.song_id})"
+        event = getattr(self.event, "event_id", None)
+
+        return f"{event} - {self.set_name} - {self.song}"
 
     VALID_SET_NAMES = [
         "Show",
@@ -1133,42 +1146,6 @@ class Setlists(BaseModel):
         "Pre-Show",
         "Post-Show",
     ]
-
-    # @property
-    # def prev_song(self):
-    #     try:
-    #         return (
-    #             Setlists.objects.select_related("song", "event")
-    #             .filter(
-    #                 set_name=self.set_name,
-    #                 event=self.event.id,
-    #                 song_num__isnull=False,
-    #                 song_num__lt=self.song_num,
-    #             )
-    #             .order_by("event__event_id", "song_num")
-    #             .last()
-    #             .song
-    #         )
-    #     except (AttributeError, ValueError):
-    #         return None
-
-    # @property
-    # def next_song(self):
-    #     try:
-    #         return (
-    #             Setlists.objects.select_related("song", "event")
-    #             .filter(
-    #                 set_name=self.set_name,
-    #                 event=self.event.id,
-    #                 song_num__isnull=False,
-    #                 song_num__gt=self.song_num,
-    #             )
-    #             .order_by("event__event_id", "song_num")
-    #             .first()
-    #             .song
-    #         )
-    #     except (AttributeError, ValueError):
-    #         return None
 
 
 class SetlistsBySetAndDate(models.Model):
@@ -1315,6 +1292,9 @@ class TourLegs(BaseModel):
         verbose_name_plural = "tour_legs"
 
     def __str__(self) -> str:
+        if not self.name:
+            return ""
+
         return self.name
 
 
@@ -1377,6 +1357,9 @@ class Runs(BaseModel):
         verbose_name_plural = "runs"
 
     def __str__(self) -> str:
+        if not self.name:
+            return ""
+
         return self.name
 
 
@@ -1460,12 +1443,6 @@ class Guests(BaseModel):
         on_delete=models.DO_NOTHING,
         db_column="guest_id",
     )
-
-    # event = models.ForeignKey(
-    #     Events,
-    #     models.DO_NOTHING,
-    #     db_column="event_id",
-    # )
 
     note = models.TextField(null=True, blank=True, default=None)
 
@@ -1688,7 +1665,7 @@ class Contact(BaseModel):
         managed = True
 
     def __str__(self) -> str:
-        return f"Message from {self.name} - {self.subject}"
+        return f"Message from {self.email} - {self.subject}"
 
 
 class TourCount(models.Model):
@@ -1808,8 +1785,6 @@ class SetlistStats(models.Model):
         related_name="stats_event",
     )
 
-    # event_id = models.IntegerField(blank=True, null=True, db_column="event_id")
-
     total_event_songs = models.IntegerField(blank=True, null=True)
     global_first = models.BooleanField(blank=True, null=True)
     global_last = models.BooleanField(blank=True, null=True)
@@ -1853,7 +1828,7 @@ class EventTypes(BaseModel):
         db_table = "event_types"
         verbose_name_plural = "event types"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -1869,7 +1844,7 @@ class BlogCategory(BaseModel):
         db_table = "blog_category"
         verbose_name_plural = "blog categories"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -1882,7 +1857,7 @@ class BlogTags(BaseModel):
         db_table = "blog_tags"
         verbose_name_plural = "blog tags"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -1913,7 +1888,7 @@ class BlogPosts(BaseModel):
         db_table = "blog_posts"
         verbose_name_plural = "blog posts"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
     def save(self, *args, **kwargs):

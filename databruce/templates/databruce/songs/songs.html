@@ -20,7 +20,6 @@
       <th class="all">Last</th>
       <th class="all">Public</th>
       <th class="all">Private</th>
-      <th class="all">Snippet</th>
       <th class="all">Opener</th>
       <th class="all">Closer</th>
     </tr>
@@ -29,7 +28,7 @@
 {% block scripts %}
   <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7,8,9], category: true});
+    var layout = getDatatableLayout({columns: [0,1,2,3,4,5,6,7,8], category: true});
     dtCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Originals', 'value': '^Bruce Springsteen$'}, {'label': 'Covers', 'value': '^((?!Bruce Springsteen).)*$'}], label: 'Category'})
 
     new DataTable('#songsTable', {
@@ -74,7 +73,7 @@
           'width': '9rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-wrap" href="/events/${data.event_id}">${data.date.display_day}</a>`
+                return `<a class="text-wrap" href="/events/${data.event_id}">${data.date.filter}</a>`
               }
           },
         },
@@ -84,13 +83,12 @@
           'width': '9rem',
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-wrap" href="/events/${data.event_id}">${data.date.display_day}</a>`
+                return `<a class="text-wrap" href="/events/${data.event_id}">${data.date.filter}</a>`
               }
           },        
         },
         {'data': 'num_plays_public', 'name': 'num_plays_public', 'width': '1rem'},
         {'data': 'num_plays_private', 'name': 'num_plays_private', 'width': '1rem'},
-        {'data': 'num_plays_snippet', 'name': 'num_plays_snippet', 'width': '1rem'},
         {'data': 'opener', 'name': 'opener', 'width': '1rem'},
         {'data': 'closer', 'name': 'closer', 'width': '1rem'},
       ]

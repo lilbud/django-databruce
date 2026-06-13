@@ -1,0 +1,48 @@
+name: Deploy Django to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Droplet via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Move into the application directory
+            cd /home/lilbud/django-databruce
+
+            # Pull the latest changes from GitHub
+            git pull
+
+            # Activate the virtual environment
+            source .venv/bin/activate
+            
+            # Install any new dependencies
+            pip install -r requirements.txt
+            
+            # Stop Gunicorn
+            sudo systemctl stop gunicorn gunicorn.socket
+            
+            # Remove Old Static
+            sudo rm -rf static/
+            
+            # Remove Local Settings If Present
+            sudo rm -rf databruce/config/local.py
+            
+            # Collect New Static
+            ./manage.py collectstatic
+            
+            # Reload Gunicorn using systemd
+            sudo systemctl restart gunicorn

@@ -27,8 +27,8 @@ class ContactTests(TestCase):
 
         response = self.client.post(path=contact_url, data=data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 1)
+        assert response.status_code == 302  # noqa: PLR2004
+        assert len(mail.outbox) == 1
 
 
 class UserTests(TestCase):
@@ -36,14 +36,19 @@ class UserTests(TestCase):
         self.user = User.objects.create_user(
             username="testuser",
             email="testuser@example.com",
-            password="faiasd87gf9s",
+            password="faiasd87gf9s",  # noqa: S106
             is_active=False,
         )
         self.venue = Venues.objects.create(name="Venue A")
         self.artist = Bands.objects.create(name="Band A")
         self.event = Events.objects.create(
             event_id="19780919-01",
-            date=datetime.datetime(1978, 9, 19).date(),
+            date=datetime.datetime(
+                year=1978,
+                month=9,
+                day=19,
+                tzinfo=datetime.UTC,
+            ).date(),
             venue=self.venue,
             artist=self.artist,
         )
@@ -52,7 +57,7 @@ class UserTests(TestCase):
 
     def test_user_login(self):
         # The login method requires credentials
-        self.client.login(username="testuser", password="faiasd87gf9s")
+        self.client.login(username="testuser", password="faiasd87gf9s")  # noqa: S106
 
     def test_user_add_show(self):
         UserAttendedShows.objects.create(user=self.user, event=self.event)
@@ -75,29 +80,29 @@ class UserTests(TestCase):
 
         # Verify user was created but is inactive
         user = User.objects.get(email="test@example.com")
-        self.assertFalse(user.is_active)
+        assert not user.is_active
 
         # 2. Verify Email was sent to django.core.mail.outbox
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email_body = mail.outbox[0].body
 
         # 3. Extract the activation link from the email body
         link_match = re.search(r"https://example.com.*", email_body)
-        self.assertTrue(link_match, "Activation link not found in email")
-        activation_url = link_match.group(0)
+        assert link_match, "Activation link not found in email"
+        activation_url = link_match.group(0)  # type: ignore
 
         # 4. Simulate clicking the link (GET request to the activation URL)
         response = self.client.get(activation_url, follow=True)
 
         # 5. Verify the user is now active
         user.refresh_from_db()
-        self.assertTrue(user.is_active)
+        assert user.is_active
         self.assertContains(response, "Login")
 
 
 class AdvSearchTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         # Create common infrastructure once
         cls.song_a = Songs.objects.create(
             name="Song A",
@@ -116,14 +121,24 @@ class AdvSearchTest(TestCase):
 
         cls.event1 = Events.objects.create(
             event_id="19780919-01",
-            date=datetime.datetime(1978, 9, 19).date(),
+            date=datetime.datetime(
+                year=1978,
+                month=9,
+                day=19,
+                tzinfo=datetime.UTC,
+            ).date(),
             venue=cls.venue,
             artist=cls.artist,
         )
 
         cls.event2 = Events.objects.create(
             event_id="19780919-02",
-            date=datetime.datetime(1978, 9, 19).date(),
+            date=datetime.datetime(
+                year=1978,
+                month=9,
+                day=19,
+                tzinfo=datetime.UTC,
+            ).date(),
             venue=cls.venue,
             artist=cls.artist,
         )
@@ -163,9 +178,9 @@ class AdvSearchTest(TestCase):
         self,
         client,
         song1_id,
-        song2_id=None,
-        position="anywhere",
-        choice="True",
+        song2_id: int | None = None,
+        position: str = "anywhere",
+        choice: str = "True",
     ):
         """Simulate the Advanced Search GET request and return the dict object."""
         url = reverse("adv_search_results")
@@ -190,7 +205,7 @@ class AdvSearchTest(TestCase):
             client=self.client,
             song1_id=self.song_a.id,
             position="show_opener",
-            choice=True,
+            choice="True",
         )
 
         events = response.context["events"]
@@ -210,7 +225,7 @@ class AdvSearchTest(TestCase):
             song1_id=self.song_a.id,
             song2_id=self.song_b.id,
             position="followed_by",
-            choice=True,
+            choice="True",
         )
 
         events = response.context["events"]
@@ -230,7 +245,7 @@ class AdvSearchTest(TestCase):
             song1_id=self.song_a.id,
             song2_id=self.song_b.id,
             position="followed_by",
-            choice=False,
+            choice="False",
         )
 
         events = response.context["events"]
@@ -248,7 +263,7 @@ class AdvSearchTest(TestCase):
             client=self.client,
             song1_id=self.song_b.id,
             position="anywhere",
-            choice=False,
+            choice="False",
         )
 
         events = response.context["events"]
@@ -263,7 +278,7 @@ class AdvSearchTest(TestCase):
             client=self.client,
             song1_id=self.song_a.id,
             position="anywhere",
-            choice=True,
+            choice="True",
         )
 
         events = response.context["events"]

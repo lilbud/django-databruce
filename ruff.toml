@@ -6,7 +6,7 @@ ignore = [
     "FA102",   # future-required-type-annotation
     "PERF203", # try-except-in-loop
     "D100",    # missing docstring
-    "F401",    # missing imports
+    # "F401",    # missing imports
     "RUF001",  # ambiguous-unicode-character-string
     "N813",    # imports not as camelcase
     "E501",    # line too long
@@ -31,4 +31,11 @@ ignore = [
     "SIM105",
     "DJ001",
     "S101",
+    "ANN401",
+    "PLR0915",
+    "PLR0912",
+    "C901",
+    "PGH003",
+    "DJ007",
+    "ARG005",
 ]

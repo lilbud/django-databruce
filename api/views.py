@@ -1,38 +1,26 @@
 import datetime
+from typing import Any
 
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.aggregates import ArrayAgg, JSONBAgg
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import (
     CharField,
     Count,
-    DecimalField,
     Exists,
     ExpressionWrapper,
     F,
     FloatField,
     IntegerField,
-    JSONField,
     Max,
     Min,
     OuterRef,
-    PositiveIntegerField,
     Prefetch,
     Q,
-    StringAgg,
     Subquery,
-    Value,
-    Window,
 )
-from django.db.models.functions import Cast, ExtractYear, JSONObject, Lower
-from django.shortcuts import get_list_or_404
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django_filters.rest_framework import DjangoFilterBackend
-from querystring_parser import parser
-from rest_framework import mixins, permissions, response, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from django.db.models.functions import Cast, Lower
+from rest_framework import response, viewsets
 
 from api import filters, serializers
 from databruce import models
@@ -48,14 +36,38 @@ VALID_SET_NAMES = [
     "Rehearsal",
     "Recording",
 ]
-date = datetime.datetime.now(tz=datetime.timezone.utc).date()
+date = datetime.datetime.now(tz=datetime.UTC).date()
 
 
 class SubqueryCount(Subquery):
-    # Custom Count function to just perform simple count on any queryset without grouping.
-    # https://stackoverflow.com/a/47371514/1164966
-    template = "(SELECT count(*) FROM (%(subquery)s) _count)"
-    output_field = PositiveIntegerField()
+    """A custom Subquery class that performs a SQL COUNT operation.
+
+    Instantiating fields in __init__ resolves Pylance / Pyright property type conflicts.
+    """
+
+    template = "(SELECT COUNT(*) FROM (%(subquery)s) _count)"
+
+    def __init__(self, queryset: Any, **kwargs: Any) -> None:
+        # Move the instantiation here to resolve the type-checker error
+        kwargs.setdefault("output_field", IntegerField())
+        super().__init__(queryset, **kwargs)
+
+
+class EventSearch(viewsets.ReadOnlyModelViewSet):
+    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+    queryset = (
+        models.Events.objects.select_related(
+            "artist",
+            "tour",
+            "venue__city",
+            "venue__venues_text",
+            "type",
+        ).prefetch_related("run", "leg")
+    ).order_by("event_id")
+
+    serializer_class = serializers.EventSearchSerializer
+    filterset_class = filters.EventsFilter
 
 
 class ArchiveViewSet(viewsets.ReadOnlyModelViewSet):
@@ -200,6 +212,7 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
         models.Venues.objects.all()
         .select_related(
             "city__country",
+            "venues_text",
         )
         .prefetch_related("city__state", "first_event", "last_event")
         .order_by("name")
@@ -253,7 +266,8 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "venue__city__country",
                 "venue__venues_text",
                 "type",
-            ).prefetch_related(
+            )
+            .prefetch_related(
                 "run",
                 "venue__city__state",
                 "leg",
@@ -261,11 +275,17 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "user_event",
                 "setlist_event",
             )
+            .annotate(
+                has_setlist=Exists(
+                    Subquery(models.Setlists.objects.filter(event_id=OuterRef("id"))),
+                ),
+            )
         ).order_by("event_id")
 
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
-    ordering_fields = ["event_id"]
+    ordering_fields = ["-event_id"]
+    ordering = ["-event_id"]
 
 
 class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
@@ -358,7 +378,6 @@ class OnstageViewSet(viewsets.ReadOnlyModelViewSet):
     ).order_by("event", F("band").asc(nulls_first=True), "relation__name")
 
     serializer_class = serializers.OnstageSerializer
-
     filterset_class = filters.OnstageFilter
 
 
@@ -369,7 +388,7 @@ class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
         models.ReleaseTracks.objects.all()
         .order_by("discnum", "position")
         .select_related("song", "release")
-        .prefetch_related("event", "discid")
+        .prefetch_related("event", "disc")
     )
 
     serializer_class = serializers.ReleaseTracksSerializer
@@ -414,10 +433,8 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
             "song",
         )
         .prefetch_related(
-            "song__last_event",
             "setlist_notes",
-            "setlist_position",
-            "setlist_stats__ltp",
+            "ltp",
         )
         .order_by("event", F("song_num").asc(nulls_first=True))
         .annotate(
@@ -477,7 +494,7 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
             .order_by("-count")
         )
 
-        return self.filter_queryset(queryset)
+        return self.filter_queryset(queryset)  # type: ignore
 
     serializer_class = serializers.SetlistSongsSerializer
     filterset_class = filters.SetlistSongsFilter
@@ -825,7 +842,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
             .order_by("date")
         )
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs) -> response.Response:
         queryset = self.get_queryset()  # Assuming the annotations from previous steps
         user = self.request.query_params.get("user")
         valid_sets = ["Show", "Encore", "Set 1", "Set 2", "Pre-Show", "Post-Show"]
@@ -843,11 +860,12 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
         # 2. Map song IDs to their respective Releases
         tracks_by_release = {}
         all_required_song_ids = set()
+
         for rt in release_tracks:
-            all_required_song_ids.add(rt.song_id)
-            if rt.release_id not in tracks_by_release:
-                tracks_by_release[rt.release_id] = []
-            tracks_by_release[rt.release_id].append(rt.song_id)
+            all_required_song_ids.add(rt.song_id)  # type: ignore
+            if rt.release_id not in tracks_by_release:  # type: ignore
+                tracks_by_release[rt.release_id] = []  # type: ignore
+            tracks_by_release[rt.release_id].append(rt.song_id)  # type: ignore
 
         # 3. Get "times seen" counts for this user
         user_song_counts = (

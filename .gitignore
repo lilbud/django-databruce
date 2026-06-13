@@ -171,3 +171,6 @@ copilot_instructions.md
 .github/copilot-instructions.md
 http_cache.sqlite
 databruce/config/local.py
+
+api_v2/
+/static/*

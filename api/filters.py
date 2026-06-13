@@ -1,18 +1,23 @@
 import datetime
-import re
 
-import django
 import django_filters
-from django import forms
-from django.core.exceptions import FieldDoesNotExist, FieldError
+from dateutil import parser
+from django.contrib.postgres.search import (
+    SearchQuery,
+    SearchRank,
+    SearchVector,
+)
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import (
+    Case,
     CharField,
     F,
     Q,
     Subquery,
     TextField,
+    Value,
+    When,
 )
-from django.db.models.functions import Lower
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
 
@@ -27,7 +32,7 @@ VALID_SET_NAMES = [
     "Post-Show",
 ]
 
-date = datetime.datetime.now(tz=datetime.timezone.utc).date()
+date = datetime.datetime.now(tz=datetime.UTC).date()
 
 
 class DataTablesFilterBackend(BaseFilterBackend):
@@ -385,6 +390,12 @@ class EventRunFilter(filters.FilterSet):
 
 
 class EventsFilter(filters.FilterSet):
+    time_frame = filters.ChoiceFilter(
+        choices=[("latest", "Latest"), ("upcoming", "Upcoming")],
+        method="filter_time_frame",
+        label="Filter events by time frame",
+    )
+
     year = filters.CharFilter(
         field_name="event_id",
         lookup_expr="startswith",
@@ -392,7 +403,7 @@ class EventsFilter(filters.FilterSet):
     )
 
     id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
-    type = filters.CharFilter(field_name="type__id", lookup_expr="exact")
+    type = filters.CharFilter(field_name="type_id", lookup_expr="exact")
 
     start_date = filters.DateTimeFilter(
         field_name="date",
@@ -423,44 +434,44 @@ class EventsFilter(filters.FilterSet):
     day = filters.NumberFilter(field_name="date__day", lookup_expr="exact", label="day")
 
     venue = filters.NumberFilter(
-        field_name="venue__id",
+        field_name="venue_id",
         lookup_expr="exact",
         label="venue",
     )
 
     city = filters.NumberFilter(
-        field_name="venue__city__id",
+        field_name="venue__city_id",
         lookup_expr="exact",
         label="city",
     )
 
     state = filters.NumberFilter(
-        field_name="venue__city__state__id",
+        field_name="venue__city__state_id",
         lookup_expr="exact",
         label="state",
     )
     country = filters.NumberFilter(
-        field_name="venue__city__country__id",
+        field_name="venue__city__country_id",
         lookup_expr="exact",
         label="country",
     )
     run = filters.NumberFilter(
-        field_name="run__id",
+        field_name="run_id",
         lookup_expr="exact",
         label="event run",
     )
     artist = filters.NumberFilter(
-        field_name="artist__id",
+        field_name="artist_id",
         lookup_expr="exact",
         label="artist",
     )
     tour = filters.NumberFilter(
-        field_name="tour__id",
+        field_name="tour_id",
         lookup_expr="exact",
         label="tour",
     )
     leg = filters.NumberFilter(
-        field_name="leg__id",
+        field_name="leg_id",
         lookup_expr="exact",
         label="tour_leg",
     )
@@ -480,21 +491,84 @@ class EventsFilter(filters.FilterSet):
         field_name="user_event__user_id",
     )
 
-    latest = filters.BooleanFilter(
-        method="filter_latest",
-        label="latest",
+    search = filters.CharFilter(
+        method="filter_fulltext_search",
     )
 
-    upcoming = filters.BooleanFilter(
-        method="filter_upcoming",
-        label="upcoming",
-    )
+    def filter_fulltext_search(self, queryset, name, value):
+        if not value:
+            return queryset
 
-    def filter_latest(self, queryset, name, value):
-        return queryset.filter(date__lte=date)
+        # 1. Attempt to extract a valid year and/or month from the user's string
+        parsed_year = None
+        parsed_month = None
 
-    def filter_upcoming(self, queryset, name, value):
-        return queryset.filter(date__gt=date)
+        try:
+            # Use fuzzy=True so it ignores extraneous words like "events in Feb 1977"
+            # default=datetime(1, 1, 1) prevents dateutil from filling missing parts with the current year/day
+            parsed_date = parser.parse(
+                value,
+                fuzzy=True,
+                default=datetime.datetime(1, 1, 1),
+            )
+
+            # Check if a valid year was provided (1 represents the unfilled fallback value)
+            if parsed_date.year != 1:
+                parsed_year = parsed_date.year
+            if parsed_date.month != 1:
+                parsed_month = parsed_date.month
+        except (ValueError, OverflowError):
+            # The input value isn't a recognizable date at all; pass silently
+            pass
+
+        date_conditions = Q()
+        if parsed_year and parsed_month:
+            # Matches exact year and month (e.g., "Feb 1977", "1977-02", "02/1977")
+            date_conditions = Q(date__year=parsed_year, date__month=parsed_month)
+        elif parsed_year:
+            # Matches just the year (e.g., "1977")
+            date_conditions = Q(date__year=parsed_year)
+
+        query = SearchQuery(value, search_type="websearch")
+
+        vector = (
+            SearchVector("event_id", weight="A")
+            + SearchVector("date", weight="B")
+            + SearchVector("date__day", weight="B")
+            + SearchVector("early_late", weight="B")
+            + SearchVector("artist__name", weight="C")
+            + SearchVector("venue__name", weight="B")
+            + SearchVector("venue__city__name", weight="B")
+            + SearchVector("run__name", weight="D")
+        )
+
+        return (
+            queryset.annotate(
+                search=vector,
+                rank=Case(
+                    # TIER 1: If the user explicitly typed a partial/full Event ID, force top priority
+                    When(event_id__istartswith=value, then=Value(1.0)),
+                    # TIER 2: Fall back to your standard postgres weighted text ranking
+                    default=SearchRank(vector, query, weights=[0.1, 0.3, 0.6, 1.0]),
+                ),
+            )
+            .filter(
+                Q(event_id__startswith=str(value)) | date_conditions | Q(search=query),
+                rank__gt=0.1,
+            )
+            .order_by("event_id")[:25]
+        )
+
+    def filter_time_frame(self, queryset, name, value):
+        # FIX: Dynamic evaluation of the current date on every request
+        current_date = datetime.datetime.now(datetime.UTC).date()
+
+        if value == "latest":
+            return queryset.filter(date__lte=current_date)
+        if value == "upcoming":
+            return queryset.filter(date__gt=current_date)
+
+        return queryset
 
     class Meta:
         model = models.Events
@@ -513,6 +587,7 @@ class EventsFilter(filters.FilterSet):
             "leg",
             "relation",
             "band",
+            "time_frame",
         ]
 
 

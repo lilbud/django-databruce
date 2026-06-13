@@ -1,5 +1,6 @@
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.renderers import JSONRenderer
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 
@@ -12,7 +13,7 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
     default_limit_param = "limit"
     default_offset_param = "offset"
 
-    def get_limit(self, request):
+    def get_limit(self, request: Request):
         # Switch param key based on the format
         if request.accepted_renderer.format == "custom":
             self.limit_query_param = self.dt_limit_query_param
@@ -27,7 +28,7 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
 
         return super().get_limit(request)
 
-    def get_offset(self, request):
+    def get_offset(self, request: Request):
         if request.accepted_renderer.format == "custom":
             self.offset_query_param = self.dt_offset_query_param
         else:
@@ -45,7 +46,7 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
                     "data": data,
                 },
             )
-        # Otherwise, return the standard DRF limit/offset response
+
         return super().get_paginated_response(data)
 
 

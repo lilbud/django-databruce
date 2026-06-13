@@ -1,5 +1,5 @@
 DataTable.type('num', 'className', 'dt-center');
-DataTable.type('string', 'className', 'dt-left text-wrap');
+DataTable.type('string', 'className', 'dt-left');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
@@ -172,7 +172,7 @@ function dtCategorySelect({ layout, column_idx, values, label = false }) {
       text: element.label,
       className: 'button-page-length',
       action: function (e, dt, node, config) {
-        dt.column(column_idx).search(element.value, { regex: true }).draw();
+        dt.order([0, 'asc']).column(column_idx).search(element.value, { regex: true }).draw();
         node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
 
         node.parents('.dropdown-menu').find('.dt-button').each(function () {
@@ -230,7 +230,9 @@ song_table_columns = [
     'type': 'text',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      return renderLink('/events/', data.event_id, data.date.display_day);
+      if (type === 'display' && data) {
+        return renderLink('/events/', data.event_id, data.date.display_day);
+      }
     },
   },
   {
@@ -240,7 +242,9 @@ song_table_columns = [
     'type': 'text',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      return renderLink('/events/', data.event_id, data.date.display_day);
+      if (type === 'display' && data) {
+        return renderLink('/events/', data.event_id, data.date.display_day);
+      }
     },
   },
 ]
@@ -265,11 +269,11 @@ event_table_columns = [
     'data': 'has_setlist',
     'name': 'has_setlist',
     'width': '1rem',
-    'className': 'text-center text-sm',
+    'className': 'text-center',
     'orderable': false,
     'searchable': false,
     'render': function (data, type, row, meta) {
-      return data ? `<i class="bi bi-file-earmark-check d-none d-md-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i><div class="d-inline d-md-none">${row.has_setlist}</div>` : `<div class="d-inline d-md-none">${row.has_setlist}</div>`
+      return data ? `<i class="bi bi-check-lg d-block text-base" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
     },
   },
   {
@@ -277,7 +281,9 @@ event_table_columns = [
     'name': 'artist__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/bands/', data.uuid, data.name);
+      if (type === 'display' && data) {
+        return renderLink('/bands/', data.uuid, data.name);
+      }
     },
   },
   {
@@ -285,7 +291,9 @@ event_table_columns = [
     'name': 'venue__name, venue__detail',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/venues/', data.uuid, data.name);
+      if (type === 'display' && data) {
+        return renderLink('/venues/', data.uuid, data.name);
+      }
     },
   },
   {
@@ -293,7 +301,9 @@ event_table_columns = [
     'name': 'venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/cities/', data.uuid, data.formatted);
+      if (type === 'display' && data) {
+        return renderLink('/cities/', data.uuid, data.formatted);
+      }
     },
   },
   {
@@ -301,7 +311,9 @@ event_table_columns = [
     'name': 'tour__name',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return renderLink('/tours/', data.uuid, data.name);
+      if (type === 'display' && data) {
+        return renderLink('/tours/', data.uuid, data.name);
+      }
     },
   },
   {

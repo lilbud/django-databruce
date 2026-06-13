@@ -15,6 +15,16 @@
     --text-5xl: 3rem;
 }
 
+* {
+    box-sizing: border-box !important;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    cursor: not-allowed !important;
+}
+
 /* Text-size utility variables (keeps original sizes but centralized) */
 .text-3xs {
     font-size: var(--text-3xs);
@@ -271,6 +281,26 @@ a:link,
     padding: 0 !important;
 }
 
+/* Target your specific table */
+
+[data-bs-theme="light"] {
+    .info-card-row .card {
+        background-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
+        border-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
+    }
+}
+
+[data-bs-theme="dark"] {
+    .info-card-row .card {
+        background-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
+        border-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
+    }
+}
+
+span #usercount {
+    cursor: pointer !important;
+}
+
 /* card */
 /* custom message card */
 .card.message {
@@ -315,7 +345,7 @@ table th {
 
 td {
     line-height: 1rem !important;
-    padding: 0.15rem 0.5rem !important;
+    padding: 0.15rem 0.5rem 0.15rem 0.5rem !important;
 }
 
 table.dataTable tbody tr:not(.album-header) td,
@@ -372,26 +402,31 @@ td .badge {
     font-weight: 500 !important;
     font-size: var(--text-xs) !important;
     display: inline-flex;
-    padding: 0.1rem 0.3rem !important;
+    padding: 0.15rem 0.35rem !important;
     border-radius: calc(infinity * 1px) !important;
 }
 
-td .segue,
 td .check {
     vertical-align: middle;
 }
 
-td .segue,
 td .badge,
 td .check {
-    display: inline-flex;
     margin-top: -3px !important;
 }
 
 .segue {
-    font-size: var(--text-xl) !important;
-    font-weight: 300 !important;
-    color: var(--text-color-default) !important;
+    color: var(--color-primary-dark) !important;
+}
+
+.segue::before {
+    font-size: 27px !important;
+    display: inline-flex;
+    font-family: "bootstrap-icons" !important;
+    content: "\F135" !important;
+    line-height: 0 !important;
+    vertical-align: middle;
+    margin-top: -2px;
 }
 
 /* remove bottom margin from paragraphs in event note card */
@@ -457,14 +492,8 @@ div.dt-container label {
 .dt-search,
 .dt-buttons.btn-group.flex-wrap .btn-group {
     align-items: center;
-    display: flex;
+    /* display: flex; */
 }
-
-/* hide empty event note paragraphs, added by filter tag */
-/* .event-note p:empty,
-.event-note br:last-of-type {
-    display: none !important;
-} */
 
 /* calendar */
 td.fc-day {
@@ -480,8 +509,8 @@ td.fc-day {
 }
 
 .card,
-.card-body {
-    overflow-x: scroll;
+.card-body:not(.overflow-x-hidden) {
+    overflow-x: scroll !important;
 }
 
 /* dropdown items */
@@ -490,9 +519,9 @@ td.fc-day {
 }
 
 /* badges highlight on hover */
-.badge-row .badge:hover {
+/* .badge-row .badge:hover {
     box-shadow: inset 0 0 100px 100px 255, 255, 255, 0.1;
-}
+} */
 
 /* remove border from disabled buttons */
 button:disabled {
@@ -587,9 +616,14 @@ button.nav-link.active {
     font-weight: 600 !important;
 }
 
-button.nav-link:hover {
+/* button.nav-link:hover {
     background-color: color-mix(in oklab, var(--color-active) 80%, transparent) !important;
-}
+} */
+
+/* .nav-item .btn:hover {
+    color: white !important;
+    background-color: color-mix(in oklab, var(--color-active) 80%, transparent) !important;
+} */
 
 button.nav-link.active:hover {
     background-color: var(--color-primary-dark) !important;
@@ -653,6 +687,7 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 
 .set-1-closer,
 .main-set-closer,
+.set-2-closer,
 .pre-show-closer {
     background-color: var(--color-warning) !important;
 }
@@ -660,6 +695,18 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 .encore-opener,
 .show-closer {
     background-color: var(--color-danger) !important;
+}
+
+th.show-opener,
+th.set-2-opener,
+th.set-1-closer,
+th.main-set-closer,
+th.set-2-closer,
+th.pre-show-opener,
+th.pre-show-closer,
+th.encore-opener,
+th.show-closer {
+    color: #fff !important;
 }
 
 /* button icon */
@@ -673,7 +720,7 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 
 .nav-btn i {
     font-weight: 900 !important;
-    font-size: var(--text-2xl);
+    font-size: var(--text-xl);
 }
 
 .icon-button i {
@@ -820,6 +867,10 @@ button.nav-link .badge {
 .album-breakdown .list-group-item {
     font-size: var(--text-3xs) !important;
     background-color: var(--background-color-muted) !important;
+}
+
+#albums> :not(div:last-of-type) {
+    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
 }
 
 .py-0\.5 {
@@ -1142,4 +1193,65 @@ pre {
 
 #chart {
     height: 250px !important;
+}
+
+@media (max-width: 767px) {
+
+    /* Force DataTables layout grids to stack vertically */
+    .dt-container .row,
+    .dt-container .dt-layout-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px;
+        /* Adds comfortable space between items */
+    }
+
+    /* Force column cells inside the layout row to un-row and fill width naturally */
+    .dt-container .row>div,
+    .dt-container .dt-layout-cell {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        /* Stack text labels above input boxes */
+        align-items: stretch !important;
+        /* Make buttons comfortable to tap */
+        /* padding: 0 !important; */
+    }
+
+    /* Clean up inline spacing and labels on mobile views */
+    .dt-container label {
+        margin-bottom: 4px !important;
+        text-align: left !important;
+    }
+
+    /* Let individual dropdown buttons and search bars fill width evenly on mobile */
+    .dt-container .dt-buttons,
+    .dt-container .dt-button,
+    .dt-container select,
+    .dt-container input[type="search"],
+    .dt-container .dropdown-toggle,
+    .dt-container button {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    div.dt-container div.dt-search input,
+    #dropdown-btn {
+        margin-left: 0 !important;
+    }
+}
+
+.btn-rounded {
+    border-radius: calc(infinity * 1px) !important;
+}
+
+.next-arrow,
+.prev-arrow {
+    cursor: pointer;
+    font-weight: 900 !important;
+    font-size: var(--text-xl);
+    line-height: 1;
+    color: var(--text-color-default) !important;
+    vertical-align: middle !important;
 }

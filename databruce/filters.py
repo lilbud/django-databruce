@@ -1,14 +1,12 @@
 import django_filters
 from django import forms
-from django.core.exceptions import FieldDoesNotExist
 from django_filters import rest_framework as filters
-from rest_framework.filters import BaseFilterBackend
 
 from databruce import models
 
 
 class AdvancedEventSearchFilter(filters.FilterSet):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         # 1. Loop through all filters defined in Meta.fields
@@ -184,11 +182,6 @@ class AdvancedEventSearchFilter(filters.FilterSet):
     class Meta:
         model = models.Events
         fields = [
-            # "start_date",
-            # "end_date",
-            # "day_of_week",
-            # "month",
-            # "day",
             "venue",
             "city",
             "state",

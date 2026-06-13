@@ -1,19 +1,19 @@
-import zoneinfo
+from datetime import time
 
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import site
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.db import models as dj_models
-from django.db.models.functions import Cast, JSONObject
-from django.http import JsonResponse
-from django.urls import path
-from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin, StackedInline, TabularInline
-from unfold.contrib.filters.admin import AutocompleteSelectFilter
-from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+from django.db.models.functions import Cast
+from unfold.admin import ModelAdmin, StackedInline
+from unfold.forms import (
+    AdminPasswordChangeForm,
+    UserChangeForm,
+    UserCreationForm,
+)
 from unfold_markdown.widgets import MarkdownWidget
 
 from . import models
@@ -79,6 +79,8 @@ class OnstageInline(StackedInline):
 class SetlistInline(StackedInline):
     model = models.Setlists
     collapsible = True
+    template = "admin/custom_stacked.html"
+    ordering_field = "position"
 
     def get_queryset(self, request):
         return (
@@ -98,9 +100,8 @@ class SetlistInline(StackedInline):
         "song",
         "segue",
         "note",
-        "nobruce",
-        "instrumental",
-        "sign_request",
+        ("nobruce", "instrumental", "sign_request"),
+        "position",
     ]
     fk_name = "event"
     ordering = ("song_num",)
@@ -115,15 +116,15 @@ class ReleaseTrackInline(StackedInline):
         base_qs = super().get_queryset(request)
         return (
             base_qs.select_related("song", "release")
-            .prefetch_related("event", "discid")
+            .prefetch_related("event", "disc")
             .order_by("discnum", Cast("track", output_field=dj_models.IntegerField()))
         )
 
-    autocomplete_fields = ["song", "event", "discid"]
+    autocomplete_fields = ["song", "event", "disc"]
 
     fields = [
         "discnum",
-        "discid",
+        "disc",
         "track",
         "song",
         "event",
@@ -242,13 +243,11 @@ class CityAdmin(ModelAdmin):
     list_select_related = [
         "state",
         "country",
-        "first_event",
-        "last_event",
         "first_event__venue",
         "last_event__venue",
     ]
     autocomplete_fields = ["state", "country", "first_event", "last_event"]
-    list_display = ["id", "name", "state", "country"]
+    list_display = ["id", "name", "state", "country", "timezone"]
     list_display_links = ["id", "state", "country"]
 
 
@@ -296,9 +295,12 @@ class NugsAdmin(ModelAdmin):
 class EventForm(forms.ModelForm):
     note = forms.CharField(
         widget=MarkdownWidget(),
+        required=False,
     )
 
-    brucebase_url = dj_models.TextField()
+    exclude = "summary"
+
+    brucebase_url = dj_models.CharField()
     title = dj_models.CharField()
 
     class Meta:
@@ -309,28 +311,63 @@ class EventForm(forms.ModelForm):
         cleaned_data = super().clean()
         changed_data = self.changed_data
 
-        # scheduled_time = changed_data["scheduled_time"]
-        # start_time = changed_data["start_time"]
-        # end_time = changed_data["end_time"]
-
         location = cleaned_data.get("venue", None)
 
         if location:
-            tz_name = location.city.timezone
-            tz = zoneinfo.ZoneInfo(tz_name)
+            tz = location.city.timezone
 
-            if "scheduled_time" in changed_data:
-                cleaned_data["scheduled_time"] = cleaned_data.get("scheduled_time").replace(
+            # 1. FIX: Mutate AND explicitly save back to self.instance.
+            # Without explicitly binding to self.instance, Django admin completely
+            # drops your timezone manipulations and falls back to project default UTC.
+            if "scheduled_time" in changed_data and cleaned_data.get("scheduled_time"):
+                cleaned_data["scheduled_time"] = cleaned_data["scheduled_time"].replace(
                     tzinfo=tz,
                 )
+                self.instance.scheduled_time = cleaned_data["scheduled_time"]
 
-            if "start_time" in changed_data:
-                cleaned_data["start_time"] = cleaned_data.get("start_time").replace(
+            if "start_time" in changed_data and cleaned_data.get("start_time"):
+                cleaned_data["start_time"] = cleaned_data["start_time"].replace(
                     tzinfo=tz,
                 )
+                self.instance.start_time = cleaned_data["start_time"]
 
-            if "end_time" in changed_data:
-                cleaned_data["end_time"] = cleaned_data.get("end_time").replace(tzinfo=tz)
+            if "end_time" in changed_data and cleaned_data.get("end_time"):
+                cleaned_data["end_time"] = cleaned_data["end_time"].replace(tzinfo=tz)
+                self.instance.end_time = cleaned_data["end_time"]
+
+        # 2. FIX: Calculate length safely using the modified timezoned objects
+        # We look up the freshly altered cleaned_data first, falling back to
+        # what's currently assigned to the instance if a field wasn't changed.
+        start = cleaned_data.get("start_time") or getattr(
+            self.instance,
+            "start_time",
+            None,
+        )
+        end = cleaned_data.get("end_time") or getattr(self.instance, "end_time", None)
+
+        if start and end:
+            # Subtraction gives a Python timedelta object
+            duration = end - start
+            total_seconds = int(duration.total_seconds())
+
+            if total_seconds >= 0:
+                # Math to extract whole hours and remaining minutes
+                hours = total_seconds // 3600
+                minutes = (total_seconds % 3600) // 60
+
+                # 3. FIX: Convert the calculated duration into a datetime.time object
+                # This formatting is compatible with Django's TimeField requirements
+                self.instance.length = time(hour=hours, minute=minutes)
+                cleaned_data["length"] = time(hour=hours, minute=minutes)
+            else:
+                # Fallback error check if end time is configured before the start time
+                msg = "End time cannot be earlier than start time."
+                raise forms.ValidationError(
+                    msg,
+                )
+        else:
+            self.instance.length = None
+            cleaned_data["length"] = None
 
         return cleaned_data
 
@@ -350,15 +387,20 @@ class EventAdmin(ModelAdmin):
         "type",
     ]
 
-    formfield_overrides = {
-        dj_models.TextField: {
-            "widget": forms.Textarea(attrs={"style": "height: 200px;"}),
-        },
-    }
+    exclude = ("summary",)
 
     list_display = ["id", "date", "event_id"]
     list_display_links = ["id"]
     inlines = [SetlistInline, OnstageInline]
+
+    def save_model(self, request, obj, form, change):
+        # Grab every field name except 'summary'
+        fields_to_update = [
+            f.name for f in obj._meta.fields if f.name != "summary" and f.name != "id"
+        ]
+
+        # Save explicitly mapping only the valid database write targets
+        obj.save(update_fields=fields_to_update)
 
 
 @admin.register(models.EventTypes)
@@ -453,9 +495,9 @@ class ReleaseDiscAdmin(ModelAdmin):
 @admin.register(models.ReleaseTracks)
 class ReleaseTrackAdmin(ModelAdmin):
     search_fields = ["release__name", "song__name"]
-    list_select_related = ["release", "song", "event", "discid", "setlist"]
+    list_select_related = ["release", "song", "event", "disc", "setlist"]
     list_display = ["id", "release__name", "track", "song", "song__name"]
-    autocomplete_fields = ["release", "song", "event", "discid", "setlist"]
+    autocomplete_fields = ["release", "song", "event", "disc", "setlist"]
     list_display_links = ["id"]
 
 

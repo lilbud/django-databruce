@@ -27,6 +27,12 @@
   --primary-text: 4, 116, 176;
   --border: 209, 209, 209;
 
+  --default: #ffffff;
+  --subtle: #fbfcfe;
+  --muted: #eff2f8;
+  --highlight: #dfe4ed;
+  --emphasis: #c9d0de;
+
   /* Arrow for form select fields, set stroke to base-content above */
   .form-select {
     --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
@@ -41,6 +47,12 @@
   --base-content: 236, 249, 255;
   --primary-text: 52, 184, 255;
   --border: 70, 78, 85;
+
+  --default: #07080a;
+  --subtle: #111317;
+  --muted: #1d2025;
+  --highlight: #282c32;
+  --emphasis: #505763;
 
   /* Arrow for form select fields, set stroke to base-content above */
   .form-select,
@@ -85,6 +97,11 @@
   color: rgb(var(--accent-content)) !important;
 }
 
+.bg-warning {
+  background-color: rgb(var(--warning)) !important;
+  color: rgb(var(--warning-content)) !important;
+}
+
 .text-accent {
   color: rgb(var(--accent)) !important;
 }
@@ -119,27 +136,52 @@
   border-color: rgb(var(--accent)) !important;
 }
 
+.badge-primary {
+  background-color: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-content)) !important;
+}
+
+.badge-secondary {
+  background-color: rgb(var(--secondary)) !important;
+  color: rgb(var(--secondary-content)) !important;
+}
+
+.badge-warning {
+  background-color: rgb(var(--warning)) !important;
+  color: rgb(var(--warning-content)) !important;
+}
+
+.badge-accent {
+  background-color: rgb(var(--accent)) !important;
+  color: rgb(var(--accent-content)) !important;
+}
+
+.badge-info {
+  background-color: rgb(var(--info)) !important;
+  color: rgb(var(--info-content)) !important;
+}
+
 /* custom primary button, used for event detail links and user form */
-.btn-primary-dark {
+.btn-subtle {
   color: rgb(var(--base-content)) !important;
 }
 
-[data-bs-theme="light"] .btn-primary-dark {
+[data-bs-theme="light"] .btn-subtle {
   background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 20%) !important;
   border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 20%) !important;
 }
 
-[data-bs-theme="light"] .btn-primary-dark:hover {
+[data-bs-theme="light"] .btn-subtle:hover {
   background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 5%) !important;
   border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, black 5%) !important;
 }
 
-[data-bs-theme="dark"] .btn-primary-dark {
+[data-bs-theme="dark"] .btn-subtle {
   background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 50%) !important;
   border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 50%) !important;
 }
 
-[data-bs-theme="dark"] .btn-primary-dark:hover {
+[data-bs-theme="dark"] .btn-subtle:hover {
   background-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 25%) !important;
   border-color: color-mix(in srgb, rgb(var(--base-300)) 100%, white 25%) !important;
 }

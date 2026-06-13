@@ -13,7 +13,6 @@ import os
 import sys
 from pathlib import Path
 
-import sentry_sdk
 from django.templatetags.static import static
 from dotenv import load_dotenv
 
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "databruce.apps.DatabruceConfig",
     "django_browser_reload",
+    "django.contrib.humanize",
     "api",
     "blog",
     "rest_framework",
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "shortener",
     "django_extensions",
     "anymail",
+    "timezone_field",
 ]
 
 SITE_ID = 1

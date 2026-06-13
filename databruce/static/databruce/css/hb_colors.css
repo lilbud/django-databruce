@@ -473,6 +473,22 @@
     --hover-color: var(--color-white);
 }
 
+.nav-item>.btn {
+    --color: var(--color-white);
+    --bg: transparent;
+    --border-color: transparent;
+    --hover-bg: #0268a0;
+    --hover-color: var(--color-white);
+}
+
+.nav-btn {
+    --color: var(--color-white);
+    --bg: transparent;
+    --border-color: transparent;
+    --hover-bg: transparent;
+    --hover-color: var(--color-black);
+}
+
 .btn-primary-subtle {
     --color: var(--color-primary-dark);
     --bg: color-mix(in oklab, var(--color-primary) 30%, transparent);
@@ -811,7 +827,7 @@
 .btn {
     color: var(--color) !important;
     background-color: var(--bg) !important;
-    border-color: var(--border-color) !important;
+    border-color: transparent !important;
     border-width: 1px !important;
 }
 

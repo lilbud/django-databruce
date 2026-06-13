@@ -84,9 +84,7 @@ LOGGING = {
 }
 
 sentry_sdk.init(
-    dsn="https://4bea98b5514a66c07416cf721250770b@o4511055828156416.ingest.us.sentry.io/4511055837986816",
-    # Add data like request headers and IP for users,
-    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    dsn=os.getenv("SENTRY_DSN"),
     send_default_pii=True,
 )
 
@@ -128,7 +126,7 @@ encoded_pass = os.getenv("REDIS_PW")
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{quote_plus(encoded_pass)}@127.0.0.1:6379/0",
+        "LOCATION": f"redis://:{quote_plus(str(encoded_pass))}@127.0.0.1:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },

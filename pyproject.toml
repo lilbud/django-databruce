@@ -5,29 +5,31 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "deptry>=0.25.1",
     "django==6.0.2",
     "django-anymail[mailgun]>=14.0",
-    "django-autocomplete-light>=3.12.1",
     "django-browser-reload>=1.20.0",
     "django-debug-toolbar>=5.1.0",
     "django-extensions>=4.1",
     "django-filter>=25.2",
     "django-link-shortener>=1.0.1",
+    "django-timezone-field>=7.2.1",
+    "django-types>=0.24.0",
     "django-unfold>=0.77.1",
     "django-unfold-markdown>=0.1.2",
     "djangorestframework>=3.16.1",
+    "djangorestframework-stubs>=3.17.0",
     "djlint>=1.36.4",
     "gevent>=25.9.1",
     "gunicorn>=25.0.0",
-    "iommi>=7.22.1",
     "markdown>=3.7",
     "markdown-it-py>=4.0.0",
     "nh3>=0.3.4",
     "psycopg[binary,pool]>=3.2.9",
+    "python-dateutil>=2.9.0.post0",
     "python-dotenv>=1.1.0",
     "python-slugify>=8.0.4",
     "querystring-parser>=1.2.4",
-    "requests>=2.32.4",
     "sentry-sdk>=2.54.0",
 ]
 
@@ -42,3 +44,6 @@ unresolved-attribute = "ignore"
 no-matching-overload = "ignore"
 unsupported-operator = "ignore"
 unresolved-import = "ignore"
+
+[tool.djlint]
+format_attribute_template_tags = false

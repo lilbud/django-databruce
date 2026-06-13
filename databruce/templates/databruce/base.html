@@ -84,7 +84,7 @@
                 aria-label="Toggle navigation">
           <i class="bi bi-list"></i>
         </button>
-        <a class="navbar-brand p-auto p-xl-0 mx-auto mx-lg-2"
+        <a class="navbar-brand p-auto p-xl-0 mx-auto mx-xl-2"
            href="{% url 'index' %}">
           <div class="logo" role="img" aria-label="Databruce">
             <span class="sr-only">Databruce</span>
@@ -98,7 +98,8 @@
                href="{% url 'blog:blog' %}">News</a>
           </li>
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm dropdown-toggle
+                           {% if 'events' in request.resolver_match.route %}fw-bold{% endif %}"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">Events</button>
@@ -118,7 +119,8 @@
             </ul>
           </li>
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if 'tours' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm dropdown-toggle
+                           {% if 'tours' in request.resolver_match.route %}fw-bold{% endif %}"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">Tours</button>
@@ -132,7 +134,8 @@
             </ul>
           </li>
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if 'songs' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm dropdown-toggle
+                           {% if 'songs' in request.resolver_match.route %}fw-bold{% endif %}"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">Songs</button>
@@ -166,7 +169,8 @@
             </ul>
           </li>
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if 'relations' in request.resolver_match.route or 'bands' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm dropdown-toggle
+                           {% if 'relations' in request.resolver_match.route or 'bands' in request.resolver_match.route %}fw-bold{% endif %}"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">Relations and Bands</button>
@@ -180,7 +184,8 @@
             </ul>
           </li>
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if 'releases' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm dropdown-toggle
+                           {% if 'releases' in request.resolver_match.route %}fw-bold{% endif %}"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">Releases</button>
@@ -197,7 +202,8 @@
             </ul>
           </li>
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if 'search' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm dropdown-toggle
+                           {% if 'search' in request.resolver_match.route %}fw-bold{% endif %}"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">Search</button>
@@ -236,24 +242,32 @@
             </ul>
           </li>
         </ul>
-        <form role="search"
-              method="get"
-              action="{% url 'search' %}"
-              class="d-none d-xl-flex my-xl-auto">
-          {{ searchForm.date }}
-          <button type="submit"
-                  id="event-search-btn"
-                  class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
-        </form>
-        <div class="vr d-none d-xl-block"></div>
-        <ul class="navbar-nav my-2 my-xl-0 d-flex me-2 flex-wrap row-gap-1 column-gap-1">
-          <div class="d-none d-xxl-block">
+        {% comment %} <li class="nav-item d-flex d-xl-none"> {% endcomment %}
+        <button class="btn nav-btn btn-sm border-0 d-flex d-xl-none"
+                data-bs-toggle="modal"
+                data-bs-target="#searchModal">
+          <i class="bi bi-search text-xl fw-semibold"></i>
+        </button>
+        {% comment %} </li> {% endcomment %}
+        {% comment %} <div class="vr d-none d-xl-block"></div> {% endcomment %}
+        <ul class="navbar-nav my-2 my-xl-0 d-flex flex-wrap row-gap-1">
+          <div class="d-none d-xl-inline-flex">
+            <li class="nav-item">
+              <button class="btn nav-btn btn-sm border-0"
+                      data-bs-toggle="modal"
+                      data-bs-target="#searchModal">
+                <i class="bi bi-search text-xl fw-semibold"></i>
+              </button>
+            </li>
             {% if user.is_authenticated %}
               <li class="nav-item dropdown list-unstyled">
-                <button class="btn btn-sm px-0 dropdown-toggle {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+                <button class="btn btn-sm nav-btn
+                               {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
                         role="button"
                         data-bs-toggle="dropdown"
-                        aria-expanded="false">Profile</button>
+                        aria-expanded="false">
+                  <i class="bi bi-person-fill text-xl"></i>
+                </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>
                     <div class="text-sm px-4 py-1 dropdown-item pe-none">
@@ -296,7 +310,6 @@
               </li>
             {% endif %}
           </div>
-          <div class="vr d-none d-xl-block"></div>
           {% include "./partials/theme_toggler.html" %}
         </ul>
         <button class="btn nav-btn d-xl-none d-block py-0"
@@ -307,6 +320,7 @@
                 aria-label="Toggle navigation">
           <i class="bi bi-three-dots text-xl fw-semibold"></i>
         </button>
+        <!-- offcanvas nav -->
         <div class="offcanvas offcanvas-end d-xl-none"
              tabindex="-1"
              id="offcanvasNavbarEnd"
@@ -397,18 +411,6 @@
           <div class="offcanvas-body">
             <nav class="w-100" id="offcanvasNav" aria-label="Navigation">
               <ul class="bd-links-nav list-unstyled mb-0 pb-3">
-                <li class="bd-links-span-all">
-                  <form role="search"
-                        method="get"
-                        action="{% url 'search' %}"
-                        class="d-flex my-xl-auto">
-                    {{ searchForm.date }}
-                    <button type="submit"
-                            id="event-search-btn"
-                            class="btn btn-sm btn-success d-xl-none ms-1">Search</button>
-                  </form>
-                </li>
-                <li class="bd-links-span-all my-3 border-top"></li>
                 <li class="bd-links-group py-2">
                   <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-calendar-fill"></i>Events</span>
                   <ul class="list-unstyled pb-2">
@@ -469,7 +471,7 @@
                   <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm"><i class="bi bi-person-fill"></i>Relations</span>
                   <ul class="list-unstyled pb-2">
                     <li>
-                      <a class="bd-links-link"  href="{% url 'relations' %}">Relations</a>
+                      <a class="bd-links-link" href="{% url 'relations' %}">Relations</a>
                     </li>
                     <li>
                       <a class="bd-links-link" href="{% url 'bands' %}">Bands</a>
@@ -549,6 +551,45 @@
       {% endblock container %}
       {% include "./partials/searchbuilder.html" %}
     </div>
+    <div class="modal fade"
+         id="searchModal"
+         tabindex="-1"
+         aria-labelledby="searchModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="row mb-2">
+              <span class="text-muted">Note: Search is very much in beta. Best results will be when either using a date or part of a date + other field. Ex. Boston 1975</span>
+            </div>
+            <div class="row mb-3">
+              <form role="search"
+                    method="get"
+                    action="{% url 'event_search' %}"
+                    class="d-flex my-xl-auto">
+                <input type="search"
+                       id="search"
+                       name="q"
+                       class="form-control"
+                       placeholder="Search by date (yyyy-mm-dd), venue, city, etc."
+                       aria-label="Search">
+              </form>
+            </div>
+            <div class="row justify-content-center" id="loadingContainer">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <div class="row justify-content-center">
+              <div class="col">
+                <ul id="results" class="list-group">
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="footer mt-3">
       <div class="col-12">
         <div class="card">
@@ -559,96 +600,110 @@
       </div>
     </div>
     <script>
-      $(document).ready(function () {
-        const eventApi = "{% url 'api:event-list' %}";
+    $(document).ready(function () {
+      $('#results').hide();
+      $("#loadingContainer").hide();
 
-        $(".event-search").autocomplete({
-            delay: 500,
-            classes: {
-              "ui-autocomplete": "dropdown-menu"
-            },
-            source: function(request, response) {
-              $.ajax({
-                url: eventApi, // or .ashx, .asmx, etc.
-                dataType: "json",
-                data: {
-                  date: request.term
-                },
-                success: function(data) {
-                  response( $.map( data.results, function(item) {
-                    console.log(item)
-                    return {'id': item.event_id, 'value': `${item.date.display_day} - ${item.venue.city.formatted}`}
-                  }));
-                },
-                error: function() {
-                  response([]);
-                }
-              });
-            },
-            open: function(event, ui) {
-                // Target the autocomplete menu widget and fade it in
-                $(this).autocomplete("widget").addClass('show');
-            },
-            close: function() {
-                // The menu is already hidden by the widget; show it briefly to fade it out
-                $(this).autocomplete("widget").removeClass('show');
-            },
-            minLength: 7,
-            position: { my:"right top", at:"right bottom", to:"#eventSearch", collision:"fit" },
-            select: function (event, ui) {
-              window.location.href = "/events/" + ui.item.id;
-            }
-        });
-        
-        // masks all date forms to fill in dashes
-        $('.date-form').each(function() {
-          $(this).mask('0000-00-00');
-        });
+      let searchTimeout; // Ensure this is declared in an outer scope
 
-        // highlight link on offcanvas navbar if current page
-        const activePage = window.location.pathname;
-        const navLinks = $('a.bd-links-link').each(function(index, link) {
-          if (activePage === link.pathname){
-            link.classList.add('active');
-          }
-        })
+      $('#search').on('input', function () {
+        // 1. Clear the previous timer immediately to debounce properly
+        clearTimeout(searchTimeout);
 
-        let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+        // Clear the old results visually
+        results.innerHTML = '';
+        $('#results').hide(); // Hide results container until new data arrives
 
-        const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');
-        
-        tabElements.forEach(tabEl => {
-          tabEl.addEventListener('shown.bs.tab', (event) => {
-            var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
+        const query = $(this).val();
 
-            if (hash === '#mostplayed' || hash === "#rare") {
-              hash = "#songs"
-            };
-
-            if (hash) {
-              history.replaceState(null, null, hash);
-            }
-          });
-        });
-
-        function activatePillFromUrlHash() {
-          const url = window.location.href;
-          if (url.includes("#")) {
-            const hash = url.substring(url.indexOf("#"));
-            var trigger = document.querySelector(`[data-bs-target="${hash}"]`);
-
-            if (trigger) {
-              const bsPill = new bootstrap.Tab(trigger);
-              bsPill.show();
-            }
-          }
+        // Date formatting logic (kept exactly as you had it)
+        if (/^\d/.test(query)) {
+          let numbersOnly = query.replace(/\D/g, '');
+          let formatted = '';
+          if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
+          if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
+          if (numbersOnly.length > 6) formatted += '-' + numbersOnly.substring(6, 8);
+          $(this).val(formatted);
         }
 
-        activatePillFromUrlHash();
+        // 2. Only trigger the loading/search sequence if query is long enough
+        if (query.length >= 4) {
+          
+          // Show spinner now that we know we are actually going to search
+          $("#loadingContainer").show();
+
+          searchTimeout = setTimeout(function () {
+            fetch(`/api/v1/event_search/?search=${query}`)
+              .then(response => response.json())
+              .then(data => {
+                // Loop and append results
+                data.results.forEach(element => {
+                  $(results).append(
+                    `<a href="/events/${element.event_id}" class="list-group-item">
+                      ${element.date.display_day}<br>${element.venue} - ${element.artist}
+                    </a>`
+                  );
+                });
+
+                // 3. Perfect Sync: Reveal results and hide spinner together
+                $(results).show();
+              })
+              .catch(error => console.error('Error:', error))
+              .finally(() => {
+                // 4. Always hide the spinner when done, even if the request fails
+                $("#loadingContainer").hide();
+              });
+          }, 700);
+        } else {
+          // If the query is too short, ensure the spinner stays hidden
+          $("#loadingContainer").hide();
+        }
       });
+
+      // highlight link on offcanvas navbar if current page
+      const activePage = window.location.pathname;
+      const navLinks = $('a.bd-links-link').each(function (index, link) {
+        if (activePage === link.pathname) {
+          link.classList.add('active');
+        }
+      })
+
+      let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+
+      const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');
+
+      tabElements.forEach(tabEl => {
+        tabEl.addEventListener('shown.bs.tab', (event) => {
+          var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
+
+          if (hash === '#mostplayed' || hash === "#rare") {
+            hash = "#songs"
+          };
+
+          if (hash) {
+            history.replaceState(null, null, hash);
+          }
+        });
+      });
+
+      function activatePillFromUrlHash() {
+        const url = window.location.href;
+        if (url.includes("#")) {
+          const hash = url.substring(url.indexOf("#"));
+          var trigger = document.querySelector(`[data-bs-target="${hash}"]`);
+
+          if (trigger) {
+            const bsPill = new bootstrap.Tab(trigger);
+            bsPill.show();
+          }
+        }
+      }
+
+      activatePillFromUrlHash();
+    });
     </script>
   </body>
 </html>

@@ -7,8 +7,6 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, reverse_lazy
 from django.views.generic.base import TemplateView
 
-from databruce import models
-
 from . import views
 from .config import base as settings
 from .forms import CustomSetPasswordForm
@@ -54,6 +52,16 @@ urlpatterns = [
         "settings/",
         views.UserSettings.as_view(),
         name="settings",
+    ),
+    path(
+        "event_search/",
+        views.event_search,
+        name="event_search",
+    ),
+    path(
+        "change-password/",
+        views.UserChangePassword.as_view(),
+        name="change_password",
     ),
     path(
         "logout/",
@@ -119,6 +127,11 @@ urlpatterns = [
     path("events", views.Event.as_view(), name="events"),
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
+    path(
+        "events_mobile/<str:id>/",
+        views.EventDetailTest.as_view(),
+        name="event_details_mobile",
+    ),
     path("events/type/<slug:type>/", views.EventType.as_view(), name="events_by_type"),
     path("events/type", views.EventType.as_view(), name="events_type"),
     path("songs", views.Song.as_view(), name="songs"),

@@ -1,12 +1,37 @@
 #submit-row {
     position: sticky;
     bottom: 0;
-    padding: 10px;
-    /* background-color: #1e2939; */
-    /* border-top: 1px solid #e5e7eb; */
     z-index: 100;
 }
 
 .dark\:bg-base-900\/80:where(.dark, .dark *) {
     background-color: color-mix(in oklab, var(--color-base-800)80%, transparent);
+}
+
+/* 3. CONSTRAIN "SONG NUM" WIDTH (Applies to all screen sizes) */
+/* Targets the container or input for song_num specifically so it isn't unnecessarily wide */
+.field-song_num input[type="number"],
+.field-song_num input {
+    max-width: 120px !important;
+    width: 120px !important;
+}
+
+/* Target the related-widget-wrapper directly */
+
+@media (max-width: 768px) {
+    div.related-widget-wrapper {
+        flex-wrap: wrap !important;
+    }
+
+    /* Ensure the buttons drop nicely below the field on small viewports */
+    div.related-widget-wrapper>.unfold-autocomplete,
+    div.related-widget-wrapper>select {
+        flex: 1 1 auto;
+        min-width: 250px;
+    }
+
+    /* Optional: Add a gap between the buttons when they wrap */
+    div.related-widget-wrapper>a.related-widget-wrapper-link {
+        margin-top: 0.5rem;
+    }
 }

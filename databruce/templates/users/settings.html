@@ -1,49 +1,157 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n %}
 {% block title %}
-  {{ title }}
+{{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-md-6">
-    <div class="row mb-4">
-      <div class="text-2xl">{% translate "User Settings" %}</div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-header">{% translate "Update Profile" %}</div>
-      <div class="card-body">
-        {% if messages %}
-          <div class="row mb-3">
-            <div class="col">
-              {% for message in messages %}<div class="card message {{ message.tags }}">{{ message|safe }}</div>{% endfor %}
-            </div>
+<div class="col-12 col-md-6">
+  <div class="card mb-3">
+    <div class="card-header">{% translate "User Settings" %}</div>
+    <div class="card-body p-0 overflow-x-hidden">
+      <div class="col">
+        <div class="row mb-1 p-1 bg-highlight">
+          <div class="col text-xs text-center fw-semibold">
+            Profile
           </div>
-        {% endif %}
-        <form method="post" id="profileForm" action="{% url "settings" %}">
+        </div>
+        <form method="post" class="p-3" id="profileForm" action="{% url "settings" %}">
           {% csrf_token %}
+          <div class="row" id="profile-response-message">
+            <div class="col"></div>
+          </div>
           {% for field in form %}
-            <div class="row mb-2">
-              <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
-              {% if field.errors %}
-                <br>
-                <span class="text-sm text-danger">
-                  {% for error in field.errors %}
-                    {% translate error %}
-                  {% endfor %}
-                </span>
-              {% endif %}
-              <div class="mx-auto">{{ field }}</div>
-            </div>
+          <div class="row mb-2">
+            <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+            {% if field.errors %}
+            <br>
+            <span class="text-sm text-danger">
+              {% for error in field.errors %}
+              {% translate error %}
+              {% endfor %}
+            </span>
+            {% endif %}
+            <div class="mx-auto">{{ field }}</div>
+          </div>
           {% endfor %}
-          <div class="row mt-3">
+          <div class="row mt-3 justify-content-center">
             <div class="col-12">
               <button id="submit-button"
-                      type="submit"
-                      name="submit"
-                      class="btn btn-sm btn-success">{% translate "Update" %}</button>
+                type="submit"
+                name="submit"
+                class="btn btn-sm btn-primary">{% translate "Update" %}</button>
+            </div>
+          </div>
+        </form>
+        <div class="row my-1 p-1 bg-highlight fw-semibold">
+          <div class="col text-xs text-center">
+            Update Password
+          </div>
+        </div>
+
+        <form method="post" class="p-3" id="changePasswordForm" action="{% url "change_password" %}">
+          {% csrf_token %}
+
+          <div class="row" id="password-response-message">
+            <div class="col"></div>
+          </div>
+
+          {% for field in password_form %}
+          <div class="row {% if field.help_text %}mb-0{% else %}mb-2{% endif %}">
+            <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+            {% if field.errors %}
+            <br>
+            <span class="text-sm text-danger">
+              {% for error in field.errors %}
+              {% translate error %}
+              {% endfor %}
+            </span>
+            {% endif %}
+            <div class="mx-auto">{{ field }}</div>
+            {% if field.help_text %}
+                <div class="text-muted text-2xs py-2">{{ field.help_text|safe }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          <div class="row mt-3">
+            <div class="col-auto">
+              <button id="pw-submit-button"
+                type="submit"
+                name="submit"
+                class="btn btn-sm btn-primary">{% translate "Update Password" %}</button>
             </div>
           </div>
         </form>
       </div>
     </div>
   </div>
+</div>
 {% endblock content %}
+{% block scripts %}
+<script>
+
+  function passwordChange(data, messageDiv) {
+    if ($(messageDiv).is(':empty')) {
+      // Container is empty: show the card immediately
+      $(messageDiv).addClass('mb-3');
+      $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
+      $(messageDiv).parent().show();
+
+    } else {
+      // Container is not empty: hide parent and clear content
+      $(messageDiv).parent().hide();
+      $(messageDiv).empty(); // Safely clears the old card
+
+      // Wait 1 second (1000ms) before showing the new card
+      setTimeout(() => {
+        $(messageDiv).addClass('mb-3');
+        $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
+        $(messageDiv).parent().show();
+      }, 500);
+    }
+  }
+
+  document.getElementById('profileForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Stop standard form submission page reload
+
+    const formData = new FormData(this);
+    const messageDiv = $('#profile-response-message>.col');
+
+    fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest' // Helps Django identify AJAX requests
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        passwordChange(data.messages, messageDiv);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+
+  document.getElementById('changePasswordForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Stop standard form submission page reload
+
+    const formData = new FormData(this);
+    const messageDiv = $('#password-response-message>.col');
+
+    fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest' // Helps Django identify AJAX requests
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        passwordChange(data.messages, messageDiv);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+</script>
+{% endblock scripts %}

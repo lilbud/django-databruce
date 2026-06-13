@@ -1,11 +1,7 @@
 import string
 
 import markdown
-import nh3
 from django import template
-from django.template import Context
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -21,39 +17,8 @@ class EMarkdown(markdown.Markdown):
 md = EMarkdown()
 
 
-@register.simple_tag(takes_context=True)
-def render_includes(value):
-    """Render a string as a Django template within the current context."""
-    if not value:
-        return ""
-
-    value = nh3.clean(
-        value,
-        tags={"figure", "div", "br", "code", "blockquote", "p", "a", "img"},
-        attributes={
-            "div": {"class"},
-            "figure": {"class"},
-            "a": {"href"},
-            "img": {"src"},
-        },
-    )
-
-    md = markdown.Markdown(extensions=["fenced_code", "toc"])
-    post = md.convert(value)
-
-    return {"post": post, "toc": md.toc}
-
-    # # Create the template object from your database string
-    # template_obj = template.Template(post)
-
-    # context_new = Context({"body": context.get("post").body, "toc": md.toc})
-
-    # # Use the existing context (which is already a Context object)
-    # return mark_safe(template_obj.render(context_new))
-
-
 @register.filter(name="markdown")
-def markdown_convert(note: str) -> str:
+def markdown_convert(note: str) -> str | None:
     if note:
         return md.convert(note)
 

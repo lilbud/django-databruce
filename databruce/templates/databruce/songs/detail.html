@@ -28,10 +28,13 @@
                     </div>
                   </div>
                 {% endif %}
-                <div class="row mb-2">
+                {% if not info.original %}
+                  <div class="row mb-2">
                   <div class="fw-semibold">Original Artist</div>
                   <div>{{ info.original_artist }}</div>
                 </div>
+                {% endif %}
+                
                 <div class="row mb-2 d-flex-inline col-gap-2 justify-content-center justify-content-lg-start">
                   <div class="col-auto">
                     <div class="fw-semibold">Public</div>
@@ -52,6 +55,10 @@
                   <div class="col-auto">
                     <div class="fw-semibold">Closer</div>
                     <div>{{ info.closer }}</div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="fw-semibold">Frequency</div>
+                    <div>{{ frequency }}%</div>
                   </div>
                 </div>
                 <div class="row">
@@ -79,36 +86,36 @@
         <div class="card">
           <div class="card-header">
             <ul class="nav nav-pills items-end mb-2 text-sm gap-1" role="tablist">
-              <button class="nav-link active mb-1 mb-md-0"
+              <button class="nav-link active"
                       data-bs-toggle="pill"
                       data-bs-target="#events"
                       aria-controls="pills-events">
-                Performances<span class="badge badge-light rounded-pill text-bg-light"
-      id="event-count-badge">0</span>
+                Performances
+                <span class="badge badge-light rounded-pill text-bg-light" id="event-count-badge">0</span>
               </button>
-              <button class="nav-link mb-1 mb-md-0"
+              <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#snippets"
                       aria-controls="pills-snippets">
-                Snippets<span class="badge badge-light rounded-pill text-bg-light"
-      id="snippet-count-badge">0</span>
+                Snippets
+                <span class="badge badge-light rounded-pill text-bg-light" id="snippet-count-badge">0</span>
               </button>
-              <button class="nav-link mb-1 mb-md-0"
+              <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#included"
                       aria-controls="pills-included">
-                Included Songs<span class="badge badge-light rounded-pill text-bg-light"
-      id="included-count-badge">0</span>
+                Included Songs
+                <span class="badge badge-light rounded-pill text-bg-light" id="included-count-badge">0</span>
               </button>
-              <button class="nav-link mb-1 mb-md-0"
+              <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#stats"
                       aria-controls="pills-stats">Stats</button>
-              <button class="nav-link mb-1 mb-md-0"
+              <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#lyrics"
                       aria-controls="pills-stats">Lyrics</button>
-              <button class="nav-link mb-1 mb-md-0"
+              <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#links"
                       aria-controls="pills-links">Links</button>
@@ -554,7 +561,7 @@
             'name': 'first__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
               }
             },
           },
@@ -563,7 +570,7 @@
             'name': 'last__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display_day}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
               }
             },
           },

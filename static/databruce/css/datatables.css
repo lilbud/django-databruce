@@ -205,22 +205,6 @@ table th {
     width: 12rem !important;
 }
 
-/* @media only screen and (max-width: 768px) {
-    .songnum {
-        width: 4rem !important;
-        height: 1rem !important;
-    }
-} */
-
-/* td.songnum, span.songnum {
-    line-height: 1 !important;
-} */
-
-/* Hide Calendar Popup, it is very finicky and doesn't like to be placed */
-/* div.dt-datetime {
-    display: none !important;
-} */
-
 td[id*="snippet-head"],
 td[id*="snippet-foot"] {
     border: none !important;
@@ -280,33 +264,6 @@ td[colspan="5"] tr:hover td {
     box-shadow: inset 0 0 100px 100px rgba(0, 0, 0, 0.075);
 }
 
-/* #setlistTable td:nth-child(1) {
-    width: 30px !important;
-}
-
-#setlistTable td:nth-child(2) {
-min-width: 350px !important;
-max-width: 400px !important;
-}
-
-#setlistTable td:nth-child(5) {
-    width: 50px !important;
-    padding: 0.25rem 0.75rem !important;
-} */
-
-/* #setlistTable td:nth-child(6) {
-    width: 150px !important;
-} */
-
-/* #setlistTable td:nth-child(3), 
-#setlistTable td:nth-child(4) {
-    width: 50px !important;
-} */
-
-/* .dt-scroll-body thead {
-    display: none !important
-} */
-
 .note-button {
     height: 1rem !important;
     display: inline-block !important;
@@ -333,21 +290,6 @@ max-width: 400px !important;
 .card-body tbody .dtrg-group th {
     padding: 0 0.25rem 0.25rem 0 !important;
 }
-
-/* @media only screen and (min-width: 768px) {
-    td > .badge {
-        vertical-align: middle;
-        margin-top: -0.25em;
-    }
-} */
-/* 
-td.child {
-    background-color: #3a3f4b !important;
-} */
-
-/* .dt-hasChild td {
-    font-size: 0.875rem;
-} */
 
 tr:not(.dt-hasChild, .child) td:hover,
 tr:not(.dt-hasChild, .child):hover {

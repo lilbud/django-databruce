@@ -66,7 +66,7 @@
       <div class="card-header">
         <ul class="nav nav-pills nav-justified gap-0 column-gap-1 row-gap-1"
             role="tablist">
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+          <li class="nav-item" role="presentation">
             <button class="nav-link active"
                     id="pills-songs-tab"
                     data-bs-toggle="pill"
@@ -76,7 +76,7 @@
                     aria-controls="pills-profile"
                     aria-selected="false">Songs</button>
           </li>
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+          <li class="nav-item" role="presentation">
             <button class="nav-link"
                     id="pills-links-tab"
                     data-bs-toggle="pill"
@@ -92,14 +92,14 @@
         <div class="tab-content">
           <div id="songs" class="tab-pane fade show active">
             <div class="table-responsive">
-              <table class="table table-hover display" id="tracksTable">
+              <table class="table table-hover display" id="tracksTable" style="width: 100%">
                 <thead>
                   <tr class="header">
                     <th class="all">Track</th>
                     <th class="all">Song</th>
                     <th class="all">Length</th>
-                    <th class="all">Event Date</th>
-                    <th class="all">Note</th>
+                    <th class="min-tablet-l">Event Date</th>
+                    <th class="min-tablet-l">Note</th>
                   </tr>
                 </thead>
               </table>
@@ -153,13 +153,14 @@
         }
       },
       columnDefs: [
-        { targets: [0], type: 'text', width: '30px', className: 'dt-center' },
+        { targets: [0], type: 'text', className: 'dt-center' },
         { targets: '_all', columnControl: [] }
       ],
       columns: [
-        {'data': 'track', 'name': 'track', 'searchable': 'false' },
+        {'data': 'track', 'name': 'track', 'searchable': 'false', 'width': '1rem' },
         {
           'data': 'song',
+          'width': '16rem',
           'name': 'song__sort_song_name',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
@@ -167,17 +168,19 @@
             }
           },
         },
-        {'data': 'length', 'name': 'length', 'searchable': 'false' },
+        {'data': 'length', 'name': 'length', 'searchable': 'false', 'width': '5rem' },
         {
           'data': 'event',
-          'name': 'event__event_id', 'searchable': 'false',
+          'name': 'event__event_id',
+          'searchable': 'false',
+          'width': '6rem',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
               return data ? `<a href="/events/${data.event_id}">${data.date.display}</a>` : '';
             }
           },
         },
-        {'data': 'note', 'name': 'note' },
+        {'data': 'note', 'name': 'note', 'searchable': 'false', 'width': '6rem' },
       ],
     });
   });
