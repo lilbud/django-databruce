@@ -26,7 +26,9 @@ jobs:
             cd /home/lilbud/django-databruce
 
             # Pull the latest changes from GitHub
+            git stash
             git pull
+            git stash drop
 
             # Activate the virtual environment
             source .venv/bin/activate
