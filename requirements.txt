@@ -17,3 +17,4 @@ django-unfold
 django_redis
 redis
 django-anymail[mailgun]
+django-timezone-field
