@@ -30,10 +30,7 @@ jobs:
 
             # Activate the virtual environment
             source .venv/bin/activate
-            
-            # Install any new dependencies
-            pip install -r requirements.txt
-            
+
             # Stop Gunicorn
             sudo systemctl stop gunicorn gunicorn.socket
             
