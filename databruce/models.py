@@ -578,7 +578,39 @@ class Events(BaseModel):
     )
 
     note = models.TextField(default=None, blank=True, null=True)
-    summary = models.TextField(default=None, blank=True, null=True)
+    summary = models.TextField(
+        db_default=models.Func(
+            models.Func(
+                models.Func(
+                    models.Func(
+                        models.Func(
+                            models.Func(
+                                models.F("note"),
+                                models.Value("<[^>]*>"),
+                                models.Value(""),
+                                models.Value("g"),
+                                function="regexp_replace",
+                            ),
+                            models.Value(r"\[([^\]]+)\]\([^)]+\)"),
+                            models.Value(r"\1"),
+                            models.Value("g"),
+                            function="regexp_replace",
+                        ),
+                        models.Value(r"\s+"),
+                        models.Value(" "),
+                        models.Value("g"),
+                        function="regexp_replace",
+                    ),
+                    models.Value(1),
+                    models.Value(250),
+                    function="substring",
+                ),
+                function="TRIM",
+            ),
+            models.Value("..."),
+            function="CONCAT",
+        ),
+    )
 
     bootleg = models.BooleanField(default=False)
     is_stats_eligible = models.BooleanField(default=True)

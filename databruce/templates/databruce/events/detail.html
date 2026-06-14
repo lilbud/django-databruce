@@ -407,20 +407,24 @@
                 <div class="card-body">
                   <div class="justify-content-center text-center">
                     <div class="col text-xs">
-                      <div class="row row-cols-2 justify-content-between g-2">
-                        <div class="col">
-                          <div class="fw-semibold">{{ event.tour.name }}</div>
-                          <div>Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</div>
+                      <div class="row row-cols-1 justify-content-between g-2">
+                        {% comment %} <div class="col">
+                          <span class="fw-semibold">{{ event.tour.name }}</span>
+                          <span>Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
+                        </div> {% endcomment %}
+                        <div class="prefix-container">
+                          <span class="prefix">{{ event.tour.name }}</span>
+                          <span class="value">Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
                         </div>
                         {% if event.leg %}
-                          <div class="col">
-                            <div class="fw-semibold">{{ event.leg.name }}</div>
-                            <div>Show {{ rank_stats.tour_leg_num }} of {{ rank_stats.tour_leg_total }}</div>
+                          <div class="prefix-container">
+                            <span class="prefix">{{ event.leg.name }}</span>
+                            <span class="value">Show {{ rank_stats.tour_leg_num }} of {{ rank_stats.tour_leg_total }}</span>
                           </div>
                         {% endif %}
-                        <div class="col">
-                          <div class="fw-semibold">{{ event.venue.name }}</div>
-                          <div>Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</div>
+                        <div class="prefix-container">
+                          <span class="prefix">{{ event.venue.name }}</span>
+                          <span class="value">Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</span>
                         </div>
                       </div>
                     </div>

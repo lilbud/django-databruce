@@ -285,7 +285,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
     ordering_fields = ["-event_id"]
-    ordering = ["-event_id"]
+    # ordering = ["-event_id"]
 
 
 class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
@@ -789,9 +789,6 @@ class SongsPage(viewsets.ReadOnlyModelViewSet):
         .prefetch_related(
             "prev__song",
             "next__song",
-            "id__setlist_position",
-            "id__setlist_stats",
-            "id__setlist_stats__ltp",
             "id__setlist_notes",
             "id__event__venue__city__state",
         )

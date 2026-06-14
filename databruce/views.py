@@ -84,7 +84,6 @@ class Test(TemplateView):
 
 def event_search(request):
     query = request.GET.get("q", "")
-    print(query)
 
     results = (
         models.Events.objects.select_related("artist", "venue")
@@ -593,8 +592,6 @@ class EventDetail(PageTitleMixin, TemplateView):
             None,
         )
 
-        print(context["rank_stats"])
-
         all_ranked_events = list(
             models.Events.objects.filter(length__isnull=False)
             .annotate(
@@ -820,9 +817,9 @@ class Event(PageTitleMixin, TemplateView):
 
         try:
             if len(str(self.kwargs["year"])) == 4:
-                context["year"] = self.kwargs["year"]
+                context["year"] = int(self.kwargs["year"])
         except KeyError:
-            context["year"] = context["date"].year  # current year
+            context["year"] = int(context["date"].year)  # current year
 
         context["title"] = f"{context['year']} Events"
         context["description"] = f"{context['year']} Events"
