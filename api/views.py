@@ -265,6 +265,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "tour",
                 "venue__city__country",
                 "venue__venues_text",
+                "venue__parent",
                 "type",
             )
             .prefetch_related(
@@ -284,7 +285,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
-    ordering_fields = ["-event_id"]
+    ordering_fields = ["event_id"]
     # ordering = ["-event_id"]
 
 

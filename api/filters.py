@@ -433,10 +433,20 @@ class EventsFilter(filters.FilterSet):
 
     day = filters.NumberFilter(field_name="date__day", lookup_expr="exact", label="day")
 
+    # venue = filters.NumberFilter(
+    #     field_name="venue_id",
+    #     lookup_expr="exact",
+    #     label="venue",
+    # )
     venue = filters.NumberFilter(
-        field_name="venue_id",
-        lookup_expr="exact",
+        method="filter_by_venue_or_detail",
         label="venue",
+    )
+
+    venue_detail = filters.CharFilter(
+        field_name="venue__detail",
+        lookup_expr="icontains",
+        label="venue detail",
     )
 
     city = filters.NumberFilter(
@@ -569,6 +579,21 @@ class EventsFilter(filters.FilterSet):
             return queryset.filter(date__gt=current_date)
 
         return queryset
+
+    def filter_by_venue_or_detail(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        try:
+            return queryset.filter(
+                Q(venue_id=value) | Q(venue__parent=value),
+            )
+        except models.Venues.DoesNotExist:
+            # Fallback if the venue ID provided doesn't exist
+            pass
+
+        # 3. If no detail exists or venue wasn't found, just filter by the ID
+        return queryset.filter(venue_id=value)
 
     class Meta:
         model = models.Events

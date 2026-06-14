@@ -402,35 +402,33 @@
                         {% else %}
                           order-xl-1
                         {% endif %}">
-              <div class="card h-100">
-                <div class="card-header">Show Info</div>
-                <div class="card-body">
-                  <div class="justify-content-center text-center">
-                    <div class="col text-xs">
-                      <div class="row row-cols-1 justify-content-between g-2">
-                        {% comment %} <div class="col">
-                          <span class="fw-semibold">{{ event.tour.name }}</span>
-                          <span>Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
-                        </div> {% endcomment %}
-                        <div class="prefix-container">
-                          <span class="prefix">{{ event.tour.name }}</span>
-                          <span class="value">Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
-                        </div>
-                        {% if event.leg %}
+              {% if rank_stats %}
+                <div class="card h-100">
+                  <div class="card-header">Show Info</div>
+                  <div class="card-body">
+                    <div class="justify-content-center text-center">
+                      <div class="col text-xs">
+                        <div class="row row-cols-1 justify-content-between g-2">
                           <div class="prefix-container">
-                            <span class="prefix">{{ event.leg.name }}</span>
-                            <span class="value">Show {{ rank_stats.tour_leg_num }} of {{ rank_stats.tour_leg_total }}</span>
+                            <span class="prefix">{{ event.tour.name }}</span>
+                            <span class="value">Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
                           </div>
-                        {% endif %}
-                        <div class="prefix-container">
-                          <span class="prefix">{{ event.venue.name }}</span>
-                          <span class="value">Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</span>
+                          {% if event.leg %}
+                            <div class="prefix-container">
+                              <span class="prefix">{{ event.leg.name }}</span>
+                              <span class="value">Show {{ rank_stats.tour_leg_num }} of {{ rank_stats.tour_leg_total }}</span>
+                            </div>
+                          {% endif %}
+                          <div class="prefix-container">
+                            <span class="prefix">{{ event.venue.name }}</span>
+                            <span class="value">Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              {% endif %}
             </div>
             {% if setlist_certainty %}
               <div class="col-12 col-xl-12 order-3">

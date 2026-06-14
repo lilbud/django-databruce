@@ -616,15 +616,6 @@ button.nav-link.active {
     font-weight: 600 !important;
 }
 
-/* button.nav-link:hover {
-    background-color: color-mix(in oklab, var(--color-active) 80%, transparent) !important;
-} */
-
-/* .nav-item .btn:hover {
-    color: white !important;
-    background-color: color-mix(in oklab, var(--color-active) 80%, transparent) !important;
-} */
-
 button.nav-link.active:hover {
     background-color: var(--color-primary-dark) !important;
 }
@@ -954,17 +945,17 @@ button.nav-link .badge {
     text-wrap: wrap !important;
 }
 
-.prefix-container>.prefix {
+.prefix-container .prefix {
     font-weight: 500 !important;
     margin-right: 0.5rem !important;
     text-wrap: nowrap !important;
 }
 
-.prefix-container>.prefix::after {
+.prefix-container .prefix::after {
     content: ":";
 }
 
-.prefix-container>.value {
+.prefix-container .value {
     text-wrap: wrap !important;
 }
 

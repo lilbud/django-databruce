@@ -389,6 +389,15 @@ class Venues(BaseModel):
         null=True,
     )
 
+    parent = models.ForeignKey(
+        "self",
+        models.DO_NOTHING,
+        db_column="parent_id",
+        default=None,
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         db_table = "venues"
         verbose_name_plural = "venues"

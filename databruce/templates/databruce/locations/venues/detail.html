@@ -14,31 +14,33 @@
     </div>
     <div class="row">
       <div class="col-12">
-        {% if info.aliases %}
+        {% if info.aliases or shared_loc %}
           <div class="card mb-3">
             <div class="card-body text-sm">
               <div class="prefix-container">
                 <span class="prefix">Nicknames/AKA</span>
                 <span class="value">{{ info.aliases|join:'; ' }}</span>
               </div>
-              <div class="prefix-container">
-                <span class="prefix">Address</span>
-                <span class="value">{{ info.address }}</span>
+              <div>
+                <div class="fw-medium">Same Address As:</div>
+                <div>
+                  <ul>
+                    {% for venue in shared_loc %}
+                      <li>
+                        <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
         {% endif %}
-        {% if info.address %}
-          <div class="card mb-3">
-            <div class="card-body text-sm">
-              <div class="text-wrap">
-                <span class="fw-medium">Address:</span>
-                <div>{{ info.address }}</div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-        {% if info.note %}
+      </div>
+    </div>
+    {% if info.note %}
+      <div class="row">
+        <div class="col">
           <div class="card mb-3">
             <div class="card-body text-sm">
               <div class="text-wrap">
@@ -47,13 +49,12 @@
               </div>
             </div>
           </div>
-        {% endif %}
+        </div>
       </div>
-    </div>
+    {% endif %}
     <div class="card">
       <div class="card-header">
-        <ul class="nav nav-pills nav-justified gap-0 column-gap-1 row-gap-1"
-            role="tablist">
+        <ul class="nav nav-pills nav-justified gap-0 column-gap-1" role="tablist">
           <li class="nav-item mb-2 mb-lg-0" role="presentation">
             <button class="nav-link active"
                     id="pills-events-tab"
@@ -80,6 +81,18 @@
       id="song-count-badge">0</span>
             </button>
           </li>
+          {% if child_venues %}
+            <li class="nav-item mb-2 mb-lg-0" role="presentation">
+              <button class="nav-link text-nowrap"
+                      id="pills-children-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#children"
+                      type="button"
+                      role="tab"
+                      aria-controls="pills-children"
+                      aria-selected="false">Child Venues</button>
+            </li>
+          {% endif %}
           <li class="nav-item mb-2 mb-lg-0" role="presentation">
             <button class="nav-link"
                     id="pills-links-tab"
@@ -155,8 +168,34 @@
             </ul>
           </div>
           <div id="map" class="tab-pane fade">
-            <div class="map-container">
-              <div id="map-object"></div>
+            {% if info.address %}
+              <div class="prefix-container row mb-3 text-sm">
+                <div class="col">
+                  <span class="prefix">Address</span>
+                  <span class="value">{{ info.address }}</span>
+                </div>
+              </div>
+            {% endif %}
+            <div class="map-container row">
+              <div class="col">
+                <div id="map-object"></div>
+              </div>
+            </div>
+          </div>
+          <div id="children" class="tab-pane fade text-sm">
+            <div class="row mb-3">
+              <div>The following venues are/were located here:</div>
+            </div>
+            <div class="row text-sm">
+              <div class="col">
+                <ul>
+                  {% for venue in child_venues %}
+                    <li>
+                      <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -179,7 +218,7 @@
         },
         columnDefs: event_table_defs,
         columns: event_table_columns,
-        initComplete: function(settings, json){ 
+        initComplete: function(settings, json){
           var info = this.api().page.info();
           $('#event-count-badge').text(info.recordsTotal);
         }
@@ -205,7 +244,7 @@
       var lat = Number("{{ info.latitude }}");
       var lng = Number("{{ info.longitude }}");
 
-      var map = L.map('map').setView([lat, lng], 13);
+      var map = L.map('map-object').setView([lat, lng], 13);
       var marker = L.marker([lat, lng]).addTo(map);
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

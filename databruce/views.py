@@ -554,7 +554,7 @@ class EventDetail(PageTitleMixin, TemplateView):
         )
 
         ranked_events = list(
-            models.Events.objects.filter()
+            models.Events.objects.exclude(type_id__in=[21, 23, 6])
             .annotate(
                 tour_num=Window(
                     expression=RowNumber(),
@@ -858,7 +858,15 @@ class VenueDetail(PageTitleMixin, TemplateView):
         )
 
         venue = context["info"]
-        venue_name = getattr(venue, "name", "Unknown Venue")
+        venue_name = getattr(venue, "name", None)
+        venue_address = getattr(venue, "address", None)
+
+        if venue_address:
+            context["shared_loc"] = models.Venues.objects.exclude(id=venue.id).filter(
+                address=venue_address,
+            )[:5]
+
+        context["child_venues"] = models.Venues.objects.filter(parent=venue)
 
         context["title"] = f"{venue_name}"
         context["description"] = f"{venue_name}"

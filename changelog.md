@@ -231,7 +231,6 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Event Detail] Adjusted event table column widths
 - [User Profile] Added info row cards to user profile, removed from navigation buttons. Counts are done in views instead of tied to datatables
 - [Event Detail] Added user list on hover to attended button
-- [Venue Detail] Added "address" card
 - [Adv. Search] Fixed advanced search control spacing on mobile being busted
 - [General] General code cleanup, removed some unnecessary code to reduce queries
 - [User Profile] Added "change password" section
@@ -242,3 +241,9 @@ First public release of the site. Site was locked behind a login and accounts on
 - Add custom 404 page.
 - Add custom 500 page, also has link to contact and email if needed.
 - [Events] Fix issue where the "year" filter accepted any value rather than complete years.
+- [Venues] Fixed venue name/detail being wrong way around on many venues
+- [Venue Detail] Moved address to map tab
+- [Venue Detail] Added "Same Address As" to note card, lists venues at the same physical location.
+- [Venues] Added "child venues". Venues that are all at the same "location" (like studios at Rockerfeller Plaze, or different places on a college campus like Monmouth).
+- [Venue Detail] Events are now listed for that venue AND any child venues.
+- [Event Detail] Badge added to mark top 10 longest shows.
