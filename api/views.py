@@ -471,7 +471,7 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
-        filter = Q(set_name__in=VALID_SET_NAMES, event__public=True) | Q(
+        filter = Q(set_name__in=VALID_SET_NAMES, event__public=True, nobruce=False) | Q(
             set_name__in=["Recording", "Rehearsal"],
             event__public=False,
         )
