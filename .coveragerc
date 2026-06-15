@@ -1,0 +1,21 @@
+[run]
+source =
+    databruce
+omit =
+    *apps.py
+    *migrations*
+    *settings*
+    *urls.py
+    *wsgi.py
+    *asgi.py
+    manage.py
+    databruce/config/base.py
+    databruce/config/prod.py
+    databruce/config/local.py
+    *__init__.py
+    databruce\filters.py
+    databruce\middleware.py
+    databruce\pagination.py
+    databruce\forms.py
+    databruce\admin.py
+    databruce\templatetags\filters.py

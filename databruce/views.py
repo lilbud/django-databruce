@@ -934,11 +934,10 @@ class SongDetail(PageTitleMixin, TemplateView):
 
         context["positions"] = (
             context["setlists"]
-            .filter(setlist_position__position__isnull=False)
-            .values("setlist_position__position")
+            .filter(position__isnull=False)
+            .values("position")
             .annotate(
-                position=F("setlist_position__position"),
-                count=Count("setlist_position__position"),
+                count=Count("position"),
                 num=Min("song_num"),
             )
         ).order_by("num")

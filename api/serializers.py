@@ -67,7 +67,7 @@ class MinimalCitiesSerializer(BaseSerializer):
         except (models.Cities.state.RelatedObjectDoesNotExist, AttributeError):
             return f"{obj.name}, {obj.country.name}"
 
-        return f"{obj.name}, {obj.country.name}"
+        return f"{obj.name}"
 
     class Meta:
         model = models.Cities

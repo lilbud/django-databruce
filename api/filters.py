@@ -92,41 +92,41 @@ class DataTablesFilterBackend(BaseFilterBackend):
                 return None
         return None
 
-    def verify_fields(self, model, fields):
-        valid_fields = []
+    # def verify_fields(self, model, fields):
+    #     valid_fields = []
 
-        for path in fields:
-            current_model = model
-            parts = path.split("__")
-            is_valid = True
+    #     for path in fields:
+    #         current_model = model
+    #         parts = path.split("__")
+    #         is_valid = True
 
-            try:
-                for i, part in enumerate(parts):
-                    # 1. Try checking for a database field via _meta
-                    try:
-                        field = current_model._meta.get_field(part)
-                        if i < len(parts) - 1:
-                            if field.is_relation:
-                                current_model = field.related_model
-                            else:
-                                is_valid = False
-                                break
-                    except FieldDoesNotExist:
-                        # 2. Check if it's a @property on the model class
-                        # Properties only work at the end of a path for filtering/display
-                        if i == len(parts) - 1 and hasattr(current_model, part):
-                            attr = getattr(current_model, part)
-                            is_valid = bool(isinstance(attr, property))
-                        else:
-                            is_valid = False
-                        break
+    #         try:
+    #             for i, part in enumerate(parts):
+    #                 # 1. Try checking for a database field via _meta
+    #                 try:
+    #                     field = current_model._meta.get_field(part)
+    #                     if i < len(parts) - 1:
+    #                         if field.is_relation:
+    #                             current_model = field.related_model
+    #                         else:
+    #                             is_valid = False
+    #                             break
+    #                 except FieldDoesNotExist:
+    #                     # 2. Check if it's a @property on the model class
+    #                     # Properties only work at the end of a path for filtering/display
+    #                     if i == len(parts) - 1 and hasattr(current_model, part):
+    #                         attr = getattr(current_model, part)
+    #                         is_valid = bool(isinstance(attr, property))
+    #                     else:
+    #                         is_valid = False
+    #                     break
 
-                if is_valid:
-                    valid_fields.append(path)
-            except Exception:  # noqa: BLE001, S112
-                continue
+    #             if is_valid:
+    #                 valid_fields.append(path)
+    #         except Exception:
+    #             continue
 
-        return valid_fields
+    #     return valid_fields
 
     def filter_queryset(self, request, queryset, view):
         # --- 1. PRE-PROCESS COLUMN METADATA ---

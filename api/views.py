@@ -286,7 +286,6 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
     ordering_fields = ["event_id"]
-    # ordering = ["-event_id"]
 
 
 class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
@@ -840,7 +839,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
             .order_by("date")
         )
 
-    def list(self, request, *args, **kwargs) -> response.Response:
+    def list(self, request, *args, **kwargs) -> response.Response:  # noqa: ARG002
         queryset = self.get_queryset()  # Assuming the annotations from previous steps
         user = self.request.query_params.get("user")
         valid_sets = ["Show", "Encore", "Set 1", "Set 2", "Pre-Show", "Post-Show"]

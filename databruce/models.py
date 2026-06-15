@@ -165,7 +165,7 @@ class Bootlegs(BaseModel):
 class Cities(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    mbid = models.UUIDField(default=None, editable=False)
+    mbid = models.UUIDField(default=None, editable=False, null=True, blank=True)
     name = models.TextField(default=None, db_column="name")
 
     state = models.ForeignKey(
@@ -250,11 +250,13 @@ class Countries(BaseModel):
         on_delete=models.DO_NOTHING,
         db_column="continent",
         default=None,
+        blank=True,
+        null=True,
     )
 
     alpha_2 = models.TextField(default=None, max_length=2)
     aliases = models.TextField(default=None, blank=True, null=True)
-    mbid = models.UUIDField(default=None, editable=False)
+    mbid = models.UUIDField(default=None, editable=False, null=True, blank=True)
 
     first_event = models.ForeignKey(
         to="Events",
@@ -262,6 +264,8 @@ class Countries(BaseModel):
         related_name="country_first",
         db_column="first_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
     last_event = models.ForeignKey(
@@ -270,6 +274,8 @@ class Countries(BaseModel):
         related_name="country_last",
         db_column="last_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -309,13 +315,16 @@ class States(BaseModel):
     name = models.TextField(default=None, blank=True, null=True)
     country = models.ForeignKey(Countries, models.DO_NOTHING, db_column="country")
     num_events = models.IntegerField(default=0)
-    mbid = models.UUIDField(default=None, editable=False)
+    mbid = models.UUIDField(default=None, editable=False, null=True, blank=True)
 
     first_event = models.ForeignKey(
         "Events",
         models.DO_NOTHING,
         related_name="state_first",
         db_column="first_event",
+        default=None,
+        blank=True,
+        null=True,
     )
 
     last_event = models.ForeignKey(
@@ -323,6 +332,9 @@ class States(BaseModel):
         models.DO_NOTHING,
         related_name="state_last",
         db_column="last_event",
+        default=None,
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -587,39 +599,7 @@ class Events(BaseModel):
     )
 
     note = models.TextField(default=None, blank=True, null=True)
-    summary = models.TextField(
-        db_default=models.Func(
-            models.Func(
-                models.Func(
-                    models.Func(
-                        models.Func(
-                            models.Func(
-                                models.F("note"),
-                                models.Value("<[^>]*>"),
-                                models.Value(""),
-                                models.Value("g"),
-                                function="regexp_replace",
-                            ),
-                            models.Value(r"\[([^\]]+)\]\([^)]+\)"),
-                            models.Value(r"\1"),
-                            models.Value("g"),
-                            function="regexp_replace",
-                        ),
-                        models.Value(r"\s+"),
-                        models.Value(" "),
-                        models.Value("g"),
-                        function="regexp_replace",
-                    ),
-                    models.Value(1),
-                    models.Value(250),
-                    function="substring",
-                ),
-                function="TRIM",
-            ),
-            models.Value("..."),
-            function="CONCAT",
-        ),
-    )
+    summary = models.CharField(max_length=255, blank=True)
 
     bootleg = models.BooleanField(default=False)
     is_stats_eligible = models.BooleanField(default=True)
@@ -661,6 +641,25 @@ class Events(BaseModel):
             return f"{self.date.strftime('%Y-%m-%d [%a]')}"
 
         return format_fuzzy(self.event_id)
+
+    def save(self, *args, **kwargs):
+        if self.note:
+            # Strip out any raw HTML tag patterns
+            text = re.sub(r"<[^>]*>", "", self.note)
+            # Strip out markdown link formats like [anchor](url) -> anchor
+            text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+            # Normalize internal multi-space gaps into single spaces
+            text = re.sub(r"\s+", " ", text).strip()
+
+            # Truncate string to 250 characters and append trailing ellipses
+            if len(text) > 250:  # noqa: PLR2004
+                self.summary = text[:250] + "..."
+            else:
+                self.summary = text
+        else:
+            self.summary = ""
+
+        super().save(*args, **kwargs)
 
     def get_date(self) -> str:
         if self.date:
@@ -1264,6 +1263,9 @@ class Tours(BaseModel):
         models.DO_NOTHING,
         related_name="tour_band",
         db_column="band_id",
+        default=None,
+        blank=True,
+        null=True,
     )
 
     name = models.TextField(default=None, db_column="tour_name")
@@ -1276,6 +1278,8 @@ class Tours(BaseModel):
         related_name="tour_first",
         db_column="first_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
     last_event = models.ForeignKey(
@@ -1284,6 +1288,8 @@ class Tours(BaseModel):
         related_name="tour_last",
         db_column="last_event",
         default=None,
+        blank=True,
+        null=True,
     )
 
     num_shows = models.IntegerField(default=0)

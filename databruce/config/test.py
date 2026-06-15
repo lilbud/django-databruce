@@ -15,7 +15,15 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# 1. Get the directory where THIS file lives (e.g., /your_project/config/)
+CONFIG_DIR = Path(__file__).resolve().parent
+
+# 2. Point explicitly to the .env file sitting in this exact folder
+ENV_PATH = CONFIG_DIR / ".env"
+
+# 3. Force-load it using the absolute path string
+# Use override=True to guarantee values force-inject over lingering coverage shells
+load_dotenv(dotenv_path=ENV_PATH, override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+TEST_RUNNER = "test_runner.PostgresViewTestRunner"
 
 # Application definition
 INSTALLED_APPS = [
@@ -38,6 +47,13 @@ INSTALLED_APPS = [
     "databruce.apps.DatabruceConfig",
     "shortener",
     "anymail",
+    "django.contrib.humanize",
+    "api",
+    "blog",
+    "rest_framework",
+    "django_filters",
+    "django_extensions",
+    "timezone_field",
 ]
 
 SITE_ID = 1
@@ -72,15 +88,17 @@ TEMPLATES = [
         "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
+            "builtins": [
+                "django.template.defaulttags",
+                "databruce.templatetags.filters",
+            ],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "django.template.context_processors.request",
                 "databruce.context_processors.base_data",
             ],
-            "builtins": ["databruce.templatetags.filters"],
         },
     },
 ]
@@ -93,8 +111,13 @@ DATABASES = {
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
         "HOST": "localhost",
         "PORT": "5432",
-        "CONN_MAX_AGE": 600,
-        "CONN_HEALTH_CHECKS": True,
+        "CONN_MAX_AGE": 0,
+        "CONN_HEALTH_CHECKS": False,
+        "TEST": {
+            "NAME": os.getenv("DATABASE_NAME"),
+            "USER": os.getenv("DATABASE_USER"),
+            "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        },
     },
 }
 
