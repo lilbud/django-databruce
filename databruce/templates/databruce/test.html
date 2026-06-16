@@ -127,7 +127,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-9 px-0">
+      <div class="col-12 col-lg-9 px-0 order-2 order-lg-1">
         <div class="card">
           <div class="card-body px-0">
             <div class="table-responsive">
@@ -149,15 +149,15 @@
           </div>
         </div>
       </div>
-      <div class="col-3">
-        <div class="card">
+      <div class="col-12 col-lg-3 order-1 order-lg-2">
+        <div class="card mb-2">
           <div class="card-header">Filter by Artist</div>
           <div class="card-body">
             <ul class="list-unstyled" id="artistContainer">
             </ul>
           </div>
         </div>
-        <div class="card">
+        <div class="card mb-2">
           <div class="card-header">Filter by Tour</div>
           <div class="card-body">
             <ul class="list-unstyled" id="tourContainer">
@@ -177,7 +177,6 @@
     var table = new DataTable('#eventTable', {
       layout: layout,
       paging: false,
-      stateSave: true,
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=custom',
       },
@@ -259,11 +258,13 @@
     // 💡 LOCK: Fires the exact millisecond before the AJAX request leaves the browser
     table.on('preXhr', function () {
         $('#artistContainer').addClass('list-locked');
+        $('#tourContainer').addClass('list-locked');
     });
 
     // 🔓 UNLOCK: Fires the millisecond the server returns data (success or error)
     table.on('xhr', function () {
         $('#artistContainer').removeClass('list-locked');
+        $('#tourContainer').removeClass('list-locked');
     });
   });
   </script>

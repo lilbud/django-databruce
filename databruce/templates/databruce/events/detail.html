@@ -357,12 +357,11 @@
                   <div class="card-body">
                     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 g-2">
                       {% if scheduled_time %}
-                        <div class="col d-block d-lg-none">
+                        <div class="col">
                           <div class="fw-semibold text-xs">Scheduled</div>
                           <div class="text-sm">{{ scheduled_time }}</div>
                         </div>
-                      {% endif %}
-                      {% if start_time %}
+                      {% elif start_time %}
                         <div class="col">
                           <div class="fw-semibold text-xs">Start</div>
                           <div class="text-sm">{{ start_time }}</div>
