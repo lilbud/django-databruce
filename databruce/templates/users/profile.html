@@ -36,11 +36,11 @@
           <div class="card-body">
             <div class="text-sm text-nowrap fw-medium">First Show</div>
             <div class="text-base" id="user-first-show">
-              {% if first_event %}
-                <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
-              {% else %}
+              {% comment %} {% if first_event %} {% endcomment %}
+              <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
+              {% comment %} {% else %}
                 N/A
-              {% endif %}
+              {% endif %} {% endcomment %}
             </div>
           </div>
         </div>
@@ -50,11 +50,11 @@
           <div class="card-body">
             <div class="text-sm text-nowrap fw-medium">Latest Show</div>
             <div class="text-base" id="user-last-show">
-              {% if last_event %}
-                <a href="{% url 'event_details' id=last_event.event_id %}">{{ last_event }}</a>
-              {% else %}
+              {% comment %} {% if last_event %} {% endcomment %}
+              <a href="{% url 'event_details' id=last_event.event_id %}">{{ last_event }}</a>
+              {% comment %} {% else %}
                 N/A
-              {% endif %}
+              {% endif %} {% endcomment %}
             </div>
           </div>
         </div>
