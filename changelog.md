@@ -247,3 +247,8 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Venues] Added "child venues". Venues that are all at the same "location" (like studios at Rockerfeller Plaze, or different places on a college campus like Monmouth).
 - [Venue Detail] Events are now listed for that venue AND any child venues.
 - [Event Detail] Badge added to mark top 10 longest shows.
+
+# v1.17.1 (June 16, 2026)
+
+- Fixed issue where profiles with no events would cause an error when attempting to view profile page.
+- Fixed Advanced Search Song dropdown not including original artist. So "Fire (Jimi Hendrix)" and "Fire (Bruce Springsteen)" would show up as the same "Fire".

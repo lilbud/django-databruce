@@ -79,7 +79,10 @@ class Test(TemplateView):
     template_name = "databruce/test.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        return super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+        context["year"] = "2023"
+
+        return context
 
 
 def event_search(request):
@@ -211,21 +214,23 @@ class UserProfile(PageTitleMixin, TemplateView):
         context["title"] = f'User "{context["info"]}"'
         context["description"] = f"{context['info']} Profile"
 
-        context["user_events"] = models.Events.objects.filter(
+        user_events = models.Events.objects.filter(
             user_event__user_id=context["info"].pk,
         )
 
-        context["user_songs"] = (
+        context["user_event_count"] = user_events.count()
+
+        context["user_songs_count"] = (
             models.Setlists.objects.filter(
-                event__event_id__in=context["user_events"].values("event_id"),
+                event__event_id__in=user_events.values("event_id"),
                 set_name__in=VALID_SET_NAMES,
             )
             .distinct("song_id")
             .order_by("song_id")
-        )
+        ).count()
 
-        context["first_event"] = context["user_events"].order_by("event_id").first()
-        context["last_event"] = context["user_events"].order_by("-event_id").first()
+        context["first_event"] = user_events.order_by("event_id").first()
+        context["last_event"] = user_events.order_by("-event_id").first()
 
         return context
 

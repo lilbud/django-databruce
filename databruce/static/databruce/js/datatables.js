@@ -128,7 +128,8 @@ function getDatatableLayout({ columns = true, category = false }) {
         depthLimit: 1,
       });
 
-      dt.searchBuilder.container().appendTo('#modal-body');
+      var container = dt.searchBuilder.container();
+      container.appendTo('#modal-body');
     }
   };
 

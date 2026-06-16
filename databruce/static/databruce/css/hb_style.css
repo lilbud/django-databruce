@@ -1193,8 +1193,6 @@ pre {
     .dt-container .dt-layout-row {
         display: flex !important;
         flex-direction: column !important;
-        gap: 12px;
-        /* Adds comfortable space between items */
     }
 
     /* Force column cells inside the layout row to un-row and fill width naturally */
@@ -1204,10 +1202,7 @@ pre {
         max-width: 100% !important;
         display: flex !important;
         flex-direction: column !important;
-        /* Stack text labels above input boxes */
         align-items: stretch !important;
-        /* Make buttons comfortable to tap */
-        /* padding: 0 !important; */
     }
 
     /* Clean up inline spacing and labels on mobile views */
@@ -1216,15 +1211,42 @@ pre {
         text-align: left !important;
     }
 
+    .dt-layout-end {
+        columns: 2 !important;
+    }
+
+    /* .dt-buttons {
+        width: 200px !important;
+    } */
+
+    .dt-search {
+        width: 100% !important;
+    }
+
     /* Let individual dropdown buttons and search bars fill width evenly on mobile */
     .dt-container .dt-buttons,
     .dt-container .dt-button,
     .dt-container select,
     .dt-container input[type="search"],
-    .dt-container .dropdown-toggle,
-    .dt-container button {
-        width: 100% !important;
+    .dt-container .dropdown-toggle {
+        max-width: 100% !important;
         box-sizing: border-box !important;
+    }
+
+    .dt-container input[type="search"] {
+        width: 100% !important;
+    }
+
+    .dt-layout-start,
+    .dt-layout-end {
+        row-gap: 0.5rem !important;
+        display: flex !important;
+    }
+
+    .btn-group,
+    .dt-search {
+        gap: 8px !important;
+        display: flex !important;
     }
 
     div.dt-container div.dt-search input,
@@ -1245,4 +1267,42 @@ pre {
     line-height: 1;
     color: var(--text-color-default) !important;
     vertical-align: middle !important;
+}
+
+.dtsb-add,
+.dtsb-search {
+    margin-top: 1rem !important;
+}
+
+.modal-dialog {
+    max-width: 700px !important;
+}
+
+@media (max-width: 550px) {
+
+    div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria div.dtsb-inputCont select.dtsb-value,
+    div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria div.dtsb-inputCont input.dtsb-value,
+    div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria div.dtsb-inputCont input.dtsb-value:disabled {
+        width: 100%;
+    }
+}
+
+@media (min-width: 551px) {
+
+    div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria div.dtsb-inputCont select.dtsb-value,
+    div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria div.dtsb-inputCont input.dtsb-value,
+    div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria div.dtsb-inputCont input.dtsb-value:disabled {
+        width: 60%;
+    }
+}
+
+.list-locked {
+    pointer-events: none !important;
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Ensure the child list items also reflect the waiting cursor */
+.list-locked .filter-item {
+    cursor: wait !important;
 }

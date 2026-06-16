@@ -1,7 +1,7 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block extrajs %}
 {% endblock extrajs %}
-{% block content %}
+{% comment %} {% block content %}
   <div class="col">
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
@@ -10,8 +10,7 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-             id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
           <span class="badge badge-primary">Test</span>
           <span class="badge badge-primary-subtle">Test</span>
           <span class="badge badge-primary-outline">Test</span>
@@ -20,8 +19,7 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-             id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
           <span class="badge badge-secondary">Test</span>
           <span class="badge badge-secondary-subtle">Test</span>
           <span class="badge badge-secondary-outline">Test</span>
@@ -30,8 +28,7 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-             id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
           <span class="badge badge-success">Test</span>
           <span class="badge badge-success-subtle">Test</span>
           <span class="badge badge-success-outline">Test</span>
@@ -40,8 +37,7 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-             id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
           <span class="badge badge-warning">Test</span>
           <span class="badge badge-warning-subtle">Test</span>
           <span class="badge badge-warning-outline">Test</span>
@@ -50,8 +46,7 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-             id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
           <span class="badge badge-info">Test</span>
           <span class="badge badge-info-subtle">Test</span>
           <span class="badge badge-info-outline">Test</span>
@@ -60,8 +55,7 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-             id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
           <span class="badge badge-danger">Test</span>
           <span class="badge badge-danger-subtle">Test</span>
           <span class="badge badge-danger-outline">Test</span>
@@ -118,4 +112,159 @@
       </div>
     </div>
   </div>
+{% endblock content %} {% endcomment %}
+{% block content %}
+  <div class="col-12">
+    <div class="row">
+      <div class="d-flex justify-content-start mb-3">
+        <div class="text-2xl pe-2">Events</div>
+        <div id="year-select" class="pe-2">
+          <button class="btn btn-sm btn-primary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">{{ year }}</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-9 px-0">
+        <div class="card">
+          <div class="card-body px-0">
+            <div class="table-responsive">
+              <table class="table table-hover display nowrap" id="eventTable">
+                <thead>
+                  <tr>
+                    <th class="all">Date</th>
+                    <th class="all">Setlist</th>
+                    <th class="all">Band</th>
+                    <th class="all">Venue</th>
+                    <th class="all">Location</th>
+                    <th class="all">Tour</th>
+                    <th class="all">Detail</th>
+                    <th class="all">Public</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="card">
+          <div class="card-header">Filter by Artist</div>
+          <div class="card-body">
+            <ul class="list-unstyled" id="artistContainer">
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Filter by Tour</div>
+          <div class="card-body">
+            <ul class="list-unstyled" id="tourContainer">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% comment %} <div class="row">
+  </div> {% endcomment %}
+  <script>
+  $(document).ready(function () {
+    var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: false});
+    //dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+  
+    var table = new DataTable('#eventTable', {
+      layout: layout,
+      paging: false,
+      stateSave: true,
+      ajax: {
+        'url': '/api/v1/events/?year={{ year }}&format=custom',
+      },
+      columnDefs: event_table_defs,
+      columns: event_table_columns,
+      initComplete: function(settings, json) {
+        var table = this.api();
+        var ulList = $('#artistContainer');
+        var ulList1 = $('#tourContainer');
+
+        ulList.empty();
+        ulList1.empty();
+
+        ulList.append('<li class="filter-item active" data-value=""><a href="">Show All</a></li>');
+        ulList1.append('<li class="filter-item active" data-value=""><a href="">Show All</a></li>');
+
+        const artistValueCounts = json.data.reduce((acc, row) => {
+            const val = row.artist.name;
+            if (val) acc[val] = (acc[val] || 0) + 1;
+            return acc;
+        }, {});
+
+        const tourValueCounts = json.data.reduce((acc, row) => {
+            const val = row.tour.name;
+            if (val) acc[val] = (acc[val] || 0) + 1;
+            return acc;
+        }, {});
+
+        // 4. Append each unique value with its count to the <ul>
+        $.each(artistValueCounts, function (value, count) {
+            ulList.append(
+                `<li class="filter-item" data-value="${value}">
+                    <a href="">${value} (${count})</a>
+                </li>`
+            );
+        });
+  
+        $.each(tourValueCounts, function (value, count) {
+            ulList1.append(
+                `<li class="filter-item" data-value="${value}">
+                    <a href="">${value} (${count})</a>
+                </li>`
+            );
+        });
+
+        // 5. Handle clicks on the list items
+        ulList.off('click', '.filter-item').on('click', '.filter-item', function (e) {
+            e.preventDefault();
+
+            var selectedValue = $(this).attr('data-value');
+            
+            console.log("Selected Filter Value:", selectedValue);
+
+            // Toggle an 'active' visual class for CSS styling
+            ulList.find('.filter-item').removeClass('active');
+            $(this).addClass('active');
+
+            // Apply filter to column index 2 (office) and redraw the server-side table
+            table.column(2).search(selectedValue).draw();
+        });
+
+        ulList1.off('click', '.filter-item').on('click', '.filter-item', function (e) {
+            e.preventDefault();
+
+            var selectedValue = $(this).attr('data-value');
+            
+            console.log("Selected Filter Value:", selectedValue);
+
+            // Toggle an 'active' visual class for CSS styling
+            ulList.find('.filter-item').removeClass('active');
+            $(this).addClass('active');
+
+            // Apply filter to column index 2 (office) and redraw the server-side table
+            table.column(5).search(selectedValue).draw();
+        });
+      }
+    });
+
+    // 💡 LOCK: Fires the exact millisecond before the AJAX request leaves the browser
+    table.on('preXhr', function () {
+        $('#artistContainer').addClass('list-locked');
+    });
+
+    // 🔓 UNLOCK: Fires the millisecond the server returns data (success or error)
+    table.on('xhr', function () {
+        $('#artistContainer').removeClass('list-locked');
+    });
+  });
+  </script>
 {% endblock content %}

@@ -10,7 +10,7 @@ function get_options({ ajax_url = false }) {
     allowClear: true,
     placeholder: '',
     maximumSelectionLength: 3,
-    width: '100%', // need to override the changed default\
+    width: '100%', // need to override the changed default
     ajax: {
       delay: 500,
       url: '/api/v1/',
@@ -21,12 +21,17 @@ function get_options({ ajax_url = false }) {
         }
       },
       processResults: function (data) {
-        // Map your custom data to the Select2 format
         return {
           results: $.map(data.results, function (item) {
+            var text = item.name;
+
+            if (item.text) {
+              text = item.text;
+            }
+
             return {
-              id: item.id,   // Replace with your ID field name
-              text: item.name // Replace with your text field name
+              id: item.id,
+              text: text
             };
           })
         };

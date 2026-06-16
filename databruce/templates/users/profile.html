@@ -1,187 +1,190 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n %}
 {% block title %}
-{{ title }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-<div class="col-12">
-  <div class="row mb-3">
-    <div class="col">
-      {% if info.id == user.id %}
-      <div class="text-2xl">{% translate "Your Profile" %}</div>
-      {% else %}
-      <div class="text-2xl">{{ info.username }}'s Profile</div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="info-card-row mb-3 row row-cols-2 g-2 row-cols-lg-4">
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="text-sm text-nowrap fw-medium">Shows Seen</div>
-          <div class="text-base" id="user-event-count">{{ user_events.count }}</div>
-        </div>
+  <div class="col-12">
+    <div class="row mb-3">
+      <div class="col">
+        {% if info.id == user.id %}
+          <div class="text-2xl">{% translate "Your Profile" %}</div>
+        {% else %}
+          <div class="text-2xl">{{ info.username }}'s Profile</div>
+        {% endif %}
       </div>
     </div>
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="text-sm text-nowrap fw-medium">Songs Seen</div>
-          <div class="text-base" id="user-song-count">{{ user_songs.count }}</div>
-        </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="text-sm text-nowrap fw-medium">First Show</div>
-          <div class="text-base" id="user-first-show">
-            <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <div class="text-sm text-nowrap fw-medium">Latest Show</div>
-          <div class="text-base" id="user-first-show">
-            <a href="{% url 'event_details' id=first_event.event_id %}">{{ last_event }}</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row mb-2">
-    <div class="col">
-      <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
-        <li class="nav-item mb-2 mb-lg-0" role="presentation">
-          <button class="nav-link active"
-            id="pills-events-tab"
-            data-bs-toggle="pill"
-            data-bs-target="#events"
-            type="button"
-            role="tab"
-            aria-controls="pills-events"
-            aria-selected="true">
-            Shows
-          </button>
-        </li>
-        <li class="nav-item mb-2 mb-lg-0" role="presentation">
-          <button class="nav-link"
-            id="pills-songs-tab"
-            data-bs-toggle="pill"
-            data-bs-target="#songs"
-            type="button"
-            role="tab"
-            aria-controls="pills-songs"
-            aria-selected="false">
-            Songs
-          </button>
-        </li>
-        <li class="nav-item mb-2 mb-lg-0" role="presentation">
-          <button class="nav-link"
-            id="pills-albums-tab"
-            data-bs-toggle="pill"
-            data-bs-target="#albums"
-            type="button"
-            role="tab"
-            aria-controls="pills-album"
-            aria-selected="false">{% translate "Albums" %}</button>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="tab-content">
-      <div id="events" class="tab-pane fade show active">
+    <div class="info-card-row mb-3 row row-cols-2 g-2 row-cols-lg-4">
+      <div class="col">
         <div class="card">
-          <div class="card-body px-0">
-            <div class="table-responsive">
-              <table class="table table-hover display" id="eventTable">
-                <thead>
-                  <tr>
-                    <th class="all">Date</th>
-                    <th class="all">Setlist</th>
-                    <th class="all">Band</th>
-                    <th class="all">Venue</th>
-                    <th class="all">Location</th>
-                    <th class="all">Tour</th>
-                    <th class="all">Detail</th>
-                    <th class="all">Public</th>
-                  </tr>
-                </thead>
-              </table>
+          <div class="card-body">
+            <div class="text-sm text-nowrap fw-medium">Shows Seen</div>
+            <div class="text-base" id="user-event-count">{{ user_event_count }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-sm text-nowrap fw-medium">Songs Seen</div>
+            <div class="text-base" id="user-song-count">{{ user_songs_count }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-sm text-nowrap fw-medium">First Show</div>
+            <div class="text-base" id="user-first-show">
+              {% if first_event %}
+                <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
+              {% else %}
+                N/A
+              {% endif %}
             </div>
           </div>
         </div>
       </div>
-      <div id="songs" class="tab-pane fade">
-        <div class="row mb-3">
-          <div class="col">
-            <div class="card">
-              <div class="card-body px-1">
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="songTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Count</th>
-                        <th class="all">Name</th>
-                        <th class="all">Category</th>
-                        <th class="all">First</th>
-                        <th class="all">Last</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-sm text-nowrap fw-medium">Latest Show</div>
+            <div class="text-base" id="user-last-show">
+              {% if last_event %}
+                <a href="{% url 'event_details' id=last_event.event_id %}">{{ last_event }}</a>
+              {% else %}
+                N/A
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-2">
+      <div class="col">
+        <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link active"
+                    id="pills-events-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#events"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-events"
+                    aria-selected="true">Shows</button>
+          </li>
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-songs-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#songs"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-songs"
+                    aria-selected="false">Songs</button>
+          </li>
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-albums-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#albums"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-album"
+                    aria-selected="false">{% translate "Albums" %}</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="tab-content">
+        <div id="events" class="tab-pane fade show active">
+          <div class="card">
+            <div class="card-body px-0">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="eventTable">
+                  <thead>
+                    <tr>
+                      <th class="all">Date</th>
+                      <th class="all">Setlist</th>
+                      <th class="all">Band</th>
+                      <th class="all">Venue</th>
+                      <th class="all">Location</th>
+                      <th class="all">Tour</th>
+                      <th class="all">Detail</th>
+                      <th class="all">Public</th>
+                    </tr>
+                  </thead>
+                </table>
               </div>
             </div>
           </div>
         </div>
-        <div class="row mb-3">
-          <div class="col">
-            <div class="card">
-              <div class="card-header">Most Played Not Seen (100+ plays)</div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="notSeenTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Count</th>
-                        <th class="all">Name</th>
-                        <th class="all">Category</th>
-                        <th class="all">First</th>
-                        <th class="all">Last</th>
-                      </tr>
-                    </thead>
-                  </table>
+        <div id="songs" class="tab-pane fade">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="card">
+                <div class="card-body px-1">
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="songTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Count</th>
+                          <th class="all">Name</th>
+                          <th class="all">Category</th>
+                          <th class="all">First</th>
+                          <th class="all">Last</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="card">
-              <div class="card-header">
-                Rare Songs (<100 Plays)
+          <div class="row mb-3">
+            <div class="col">
+              <div class="card">
+                <div class="card-header">Most Played Not Seen (100+ plays)</div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="notSeenTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Count</th>
+                          <th class="all">Name</th>
+                          <th class="all">Category</th>
+                          <th class="all">First</th>
+                          <th class="all">Last</th>
+                        </tr>
+                      </thead>
+                    </table>
                   </div>
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table table-hover display" id="rareTable">
-                        <thead>
-                          <tr>
-                            <th class="all">Count</th>
-                            <th class="all">Name</th>
-                            <th class="all">Category</th>
-                            <th class="all">First</th>
-                            <th class="all">Last</th>
-                          </tr>
-                        </thead>
-                      </table>
-                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card">
+                <div class="card-header">
+                  Rare Songs (<100 Plays)
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover display" id="rareTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Count</th>
+                          <th class="all">Name</th>
+                          <th class="all">Category</th>
+                          <th class="all">First</th>
+                          <th class="all">Last</th>
+                        </tr>
+                      </thead>
+                    </table>
                   </div>
+                </div>
               </div>
             </div>
           </div>
@@ -189,7 +192,7 @@
         <div id="albums" class="tab-pane fade">
           <div class="col-12">
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mx-0 g-3"
-              id="cardContainer">
+                 id="cardContainer">
               <div class="col d-none" id="example">
                 <div class="card" id="album">
                   <div class="card-header py-0.5"></div>
@@ -444,4 +447,4 @@
       });
     })
   </script>
-  {% endblock content %}
+{% endblock content %}
