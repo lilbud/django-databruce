@@ -394,13 +394,27 @@ class EventAdmin(ModelAdmin):
     inlines = [SetlistInline, OnstageInline]
 
     def save_model(self, request, obj, form, change):
-        # Grab every field name except 'summary'
-        fields_to_update = [
-            f.name for f in obj._meta.fields if f.name != "summary" and f.name != "id"
-        ]
-
-        # Save explicitly mapping only the valid database write targets
-        obj.save(update_fields=fields_to_update)
+        if not change:
+            # IT IS A NEW CREATION
+            # Temporarily hide the 'summary' field from the ORM compiler for this save
+            original_fields = obj._meta.local_fields
+            try:
+                obj._meta.local_fields = [
+                    f for f in original_fields if f.name != "summary"
+                ]
+                obj.save()  # Performs a clean INSERT completely ignoring 'summary'
+            finally:
+                # Always restore the original fields list to prevent side-effects
+                obj._meta.local_fields = original_fields
+        else:
+            # IT IS AN UPDATE
+            # Grab every field name except 'summary' and 'id'
+            fields_to_update = [
+                f.name
+                for f in obj._meta.fields
+                if f.name != "summary" and f.name != "id"
+            ]
+            obj.save(update_fields=fields_to_update)
 
 
 @admin.register(models.EventTypes)

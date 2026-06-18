@@ -509,8 +509,6 @@ class Events(BaseModel):
         on_delete=models.DO_NOTHING,
         db_column="artist",
         default=None,
-        blank=True,
-        null=True,
     )
 
     brucebase_url = models.CharField(default=None, blank=True, null=True)
@@ -521,8 +519,6 @@ class Events(BaseModel):
         related_name="event_venue",
         db_column="venue_id",
         default=None,
-        blank=True,
-        null=True,
     )
 
     tour = models.ForeignKey(
@@ -530,8 +526,6 @@ class Events(BaseModel):
         on_delete=models.DO_NOTHING,
         db_column="tour_id",
         default=None,
-        blank=True,
-        null=True,
     )
 
     leg = models.ForeignKey(
@@ -557,8 +551,6 @@ class Events(BaseModel):
         on_delete=models.DO_NOTHING,
         db_column="event_type",
         default=None,
-        blank=True,
-        null=True,
     )
 
     title = models.CharField(

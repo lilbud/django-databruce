@@ -175,5 +175,4 @@ databruce/config/local.py
 api_v2/
 /static/*
 
-local.py
-databruce/config/local.py
+**/local.py
