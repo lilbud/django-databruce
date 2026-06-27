@@ -700,6 +700,20 @@ class UserForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}),
     )
 
+    verification = forms.CharField(
+        label="Verification",
+        required=True,
+        help_text="Enter the release year of Bruce's third album",
+        widget=forms.TextInput(
+            attrs={
+                "id": "signupVerify",
+                "name": "signupVerify",
+                "placeholder": "-",
+                "class": "form-control form-control-sm",
+            },
+        ),
+    )
+
     class Meta:
         model = User
         fields = [
@@ -707,6 +721,7 @@ class UserForm(UserCreationForm):
             "email",
             "password1",
             "password2",
+            "verification",
         ]
 
 

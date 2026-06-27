@@ -300,31 +300,40 @@ class SignUp(PageTitleMixin, TemplateView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
+            if form.cleaned_data["verification"] == os.environ.get(
+                "SIGNUP_VERIFICATION_ANSWER",
+            ):
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
 
-            current_site = get_current_site(request)
-            use_https = True
+                current_site = get_current_site(request)
+                use_https = True
 
-            context = {
-                "email": user.email,
-                "domain": current_site.domain,
-                "site_name": current_site.name,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "user": user,
-                "token": self.token_generator.make_token(user),
-                "protocol": "https" if use_https else "http",
-            }
+                context = {
+                    "email": user.email,
+                    "domain": current_site.domain,
+                    "site_name": current_site.name,
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "user": user,
+                    "token": self.token_generator.make_token(user),
+                    "protocol": "https" if use_https else "http",
+                }
 
-            self.send_mail(
-                context=context,
-                from_email=os.getenv("MAILGUN_EMAIL"),
-                to_email=user.email,
+                self.send_mail(
+                    context=context,
+                    from_email=os.getenv("MAILGUN_EMAIL"),
+                    to_email=user.email,
+                )
+
+                return redirect(reverse("signup_done"))
+
+            messages.error(request, "Incorrect verification answer")
+            return render(
+                request, template_name=self.template_name, context={"form": form}
             )
 
-            return redirect(reverse("signup_done"))
-
+        messages.error(request, "Signup Failed, see errors below")
         return render(request, template_name=self.template_name, context={"form": form})
 
     def send_mail(self, context, from_email, to_email):
@@ -625,10 +634,18 @@ class EventDetail(PageTitleMixin, TemplateView):
         context["title"] = f"{event_date} - {venue_name}"
         context["description"] = f"{event_date}<br>{event.artist}<br>{venue_name}"
 
-        if context["event"].setlist_certainty in (None, "", "Unknown"):
-            context["setlist_certainty"] = False
-        else:
-            context["setlist_certainty"] = True
+        context["setlist_certainty"] = bool(
+            context["event"].setlist_certainty not in (None, "", "Unknown"),
+        )
+
+        context["type_note"] = event.type.name in [  # type: ignore
+            "Rescheduled",
+            "Cancelled",
+            "Relocated",
+            "No Bruce",
+            "No Gig",
+            "Rumored",
+        ]
 
         if venue and venue.city and venue.city.timezone:
             tz_target = venue.city.timezone
@@ -669,18 +686,6 @@ class EventDetail(PageTitleMixin, TemplateView):
             neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
         )
 
-        # context["prev_tour_event"] = (
-        #     neighbor_qs.filter(event_id__lt=event.event_id, tour_id=event.tour.id)
-        #     .order_by("-event_id")
-        #     .first()
-        # )
-
-        # context["next_tour_event"] = (
-        #     neighbor_qs.filter(event_id__gt=event.event_id, tour_id=event.tour.id)
-        #     .order_by("event_id")
-        #     .first()
-        # )
-
         if not context["event"].date:
             messages.info(
                 self.request,
@@ -718,9 +723,9 @@ class EventDetail(PageTitleMixin, TemplateView):
         return context
 
 
-class EventDetailTest(PageTitleMixin, TemplateView):
-    template_name = "databruce/event_test.html"
-    description = "Event Detail Test"
+class EventDetailMobile(PageTitleMixin, TemplateView):
+    template_name = "databruce/event_mobile.html"
+    description = "Event Detail"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
@@ -808,6 +813,175 @@ class EventDetailTest(PageTitleMixin, TemplateView):
             .prefetch_related("event")
             .distinct("release_id", "release__date")
             .order_by("release__date")
+        )
+
+        return context
+
+
+class EventDetailTest(PageTitleMixin, TemplateView):
+    template_name = "databruce/event_test.html"
+    description = "Event Detail"
+
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        context = super().get_context_data(**kwargs)
+
+        context["id"] = self.kwargs["id"]
+
+        context["event"] = get_object_or_404(
+            models.Events.objects.select_related(
+                "venue",
+                "artist",
+                "tour",
+                "venue__city",
+            )
+            .prefetch_related("leg", "run", "archive_links", "nugs_event")
+            .annotate(),
+            event_id=self.kwargs["id"],
+        )
+
+        ranked_events = list(
+            models.Events.objects.exclude(type_id__in=[21, 23, 6])
+            .annotate(
+                tour_num=Window(
+                    expression=RowNumber(),
+                    partition_by=F("tour__id"),
+                    order_by=F("event_id").asc(),
+                ),
+                tour_total=Window(
+                    expression=Count("id"),
+                    partition_by=F("tour__id"),
+                ),
+                tour_leg_num=Window(
+                    expression=RowNumber(),
+                    partition_by=F("leg__id"),
+                    order_by=F("event_id").asc(),
+                ),
+                tour_leg_total=Window(
+                    expression=Count("id"),
+                    partition_by=F("leg__id"),
+                ),
+                venue_num=Window(
+                    expression=RowNumber(),
+                    partition_by=F("venue__id"),
+                    order_by=F("event_id").asc(),
+                ),
+                venue_total=Window(
+                    expression=Count("id"),
+                    partition_by=F("venue__id"),
+                ),
+            )
+            .values(),
+        )
+
+        context["rank_stats"] = next(
+            (e for e in ranked_events if e["event_id"] == self.kwargs["id"]),
+            None,
+        )
+
+        all_ranked_events = list(
+            models.Events.objects.filter(length__isnull=False)
+            .annotate(
+                rank=Window(
+                    expression=DenseRank(),
+                    order_by=F("length").desc(),
+                ),
+            )
+            .filter(rank__lte=10)
+            .values("event_id", "length", "rank"),
+        )
+
+        event_with_true_rank = next(
+            (e for e in all_ranked_events if e["event_id"] == self.kwargs["id"]),
+            None,
+        )
+
+        context["rank"] = event_with_true_rank["rank"] if event_with_true_rank else None
+
+        event = context["event"]
+        event_date = event.get_date()
+
+        venue = event.venue
+        venue_name = getattr(venue, "name", "Unknown Venue")
+
+        context["title"] = f"{event_date} - {venue_name}"
+        context["description"] = f"{event_date}<br>{event.artist}<br>{venue_name}"
+
+        if context["event"].setlist_certainty in (None, "", "Unknown"):
+            context["setlist_certainty"] = False
+        else:
+            context["setlist_certainty"] = True
+
+        if venue and venue.city and venue.city.timezone:
+            tz_target = venue.city.timezone
+        else:
+            tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
+
+        if event.scheduled_time:
+            context["scheduled_time"] = (
+                event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+            )
+
+        if event.start_time:
+            context["start_time"] = (
+                event.start_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+            )
+
+        if event.end_time:
+            context["end_time"] = (
+                event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+            )
+
+        if event.start_time and event.end_time and not event.length:
+            context["duration"] = event.end_time.astimezone(
+                tz_target,
+            ) - event.start_time.astimezone(tz_target)
+        elif event.length:
+            context["duration"] = event.length
+
+        neighbor_qs = models.Events.objects.select_related("venue", "artist", "tour")
+
+        context["prev_event"] = (
+            neighbor_qs.filter(event_id__lt=event.event_id)
+            .order_by("-event_id")
+            .first()
+        )
+
+        context["next_event"] = (
+            neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
+        )
+
+        if not context["event"].date:
+            messages.info(
+                self.request,
+                "This is a placeholder date, actual date unknown.",
+            )
+
+        context["official"] = (
+            models.Releases.objects.filter(
+                event__id=event.pk,
+            )
+            .prefetch_related("event")
+            .order_by("date")
+        )
+
+        context["official_tracks"] = (
+            models.ReleaseTracks.objects.filter(event__id=event.pk)
+            .select_related("release")
+            .prefetch_related("event")
+            .distinct("release_id", "release__date")
+            .order_by("release__date")
+        )
+
+        user = self.request.user
+
+        if user.is_authenticated:
+            context["user_attended"] = models.UserAttendedShows.objects.filter(
+                user=user.pk,
+                event__id=event.pk,
+            )
+
+        context["users"] = models.UserAttendedShows.objects.filter(
+            event__id=event.pk,
         )
 
         return context
