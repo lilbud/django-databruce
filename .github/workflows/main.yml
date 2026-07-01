@@ -40,11 +40,12 @@ jobs:
             sync
 
             # Pull the latest changes from GitHub
-            git stash
-            git fetch --all
-            git stash drop
+            # git stash
+            git pull
+            # git stash drop
 
-            echo "git fetch ran"
+            echo "▶ DEBUG: git fetch ran..."
+            sync
 
             # Activate the virtual environment
             source .venv/bin/activate
