@@ -21,6 +21,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           request_pty: true
+          debug: true
           script: |
             # Move into the application directory
             cd /home/lilbud/django-databruce
