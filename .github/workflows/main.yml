@@ -23,17 +23,25 @@ jobs:
           request_pty: true
           debug: true
           script: |
+            echo "▶ DEBUG: Starting script execution..."
+            sync
+
             # Move into the application directory
             cd /home/lilbud/django-databruce
+
+            echo "▶ DEBUG: Resetting Git environment..."
+            sync
 
             # 1. Force Git to run completely non-interactively
             export GIT_TERMINAL_PROMPT=0
             export GIT_PAGER=cat
 
+            echo "▶ DEBUG: Running git fetch..."
+            sync
+
             # Pull the latest changes from GitHub
             git stash
             git fetch --all
-            git reset --hard origin/main
             git stash drop
 
             echo "git fetch ran"
