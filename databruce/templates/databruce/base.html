@@ -668,9 +668,18 @@
         }
       })
 
-      let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      // Bootstrap 5 Example: Appending to the default allowlist
+      const myDefaultAllowList = bootstrap.Tooltip.Default.allowList;
+
+      // Allow 'class' attribute on span elements
+      myDefaultAllowList.span = ['class'];
+
+      let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      
       tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+          sanitize: false
+        });
       });
 
       const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');

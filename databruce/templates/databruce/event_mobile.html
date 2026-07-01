@@ -1,0 +1,326 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+{% block extrajs %}
+<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
+	integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
+	crossorigin="anonymous"
+	async></script>
+{% endblock extrajs %}
+{% block content %}
+<div class="col d-grid gap-0 gx-0">
+	<!-- next and last buttons-->
+	{% if not event.date %}
+	<!-- message cards -->
+	<div class="row mb-2 gx-0">
+		<div class="col">
+			<div class="card message info">This is a placeholder date, actual date unknown.</div>
+		</div>
+	</div>
+	{% endif %}
+	<!-- event info -->
+	<div class="row mb-3 gx-0">
+		<div class="col">
+			<div class="card">
+				<div class="card-body">
+					<div class="d-flex flex-wrap">
+						<div class="flex-grow-1 w-75 mb-0">
+							{% if event.title %}
+							<div class="row mb-2 text-center">
+								<div class="col">
+									<div id="title" class="text-wrap text-xs fst-italic fw-light">
+										<span class="mb-0">{{ event.title }}</span>
+									</div>
+								</div>
+							</div>
+							{% endif %}
+							<div class="row text-center">
+								<div class="col">
+									<div class="row">
+										<div class="text-wrap text-lg">
+											<span id="date">
+												{{ event.get_date }}
+											</span>
+
+											{% if event.type.name == 'Rescheduled' or event.type.name == 'Cancelled' or event.type.name == 'Relocated' or event.type.name == 'No Bruce' or event.type.name == 'No Gig' or event.type.name == 'Rumored' %}
+											<span class="text-danger fw-medium">[{{ event.type.name }}]</span>
+											{% endif %}
+										</div>
+									</div>
+
+									<div class="row text-wrap text-lg mt-1">
+										<div class="fw-medium text-reset"
+											id="artist">{{ event.artist }}</div>
+									</div>
+									<div class="row text-lg text-reset mt-1">
+										<div class="col">
+											<div class="text-reset fw-medium">{{ event.venue.get_name }}</div>
+											<div class="text-reset">{{ event.venue.city }}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- setlist and notes -->
+	<div class="tab-content" id="myTabContent">
+		<div class="tab-pane fade show active"
+			id="overview"
+			role="tabpanel"
+			aria-labelledby="overview-tab"
+			tabindex="0">
+			<div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
+				<div class="col-12">
+					{% if event.note %}
+					<div class="row mb-3 gx-0">
+						<div class="col">
+							{% partialdef event-note inline %}
+							<div class="card">
+								<div class="card-header">
+									Notes
+									<i class="bi bi-pencil"></i>
+								</div>
+								<div class="card-body event-note">{{ event.note|markdown|safe }}</div>
+							</div>
+							{% endpartialdef %}
+						</div>
+					</div>
+					{% endif %}
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header d-flex flex-column">
+								<div class="d-flex justify-content-between w-100">
+									Setlist
+								</div>
+								<div class="collapse row w-100" id="options">
+									<div class="col-12 px-0 pt-1">
+										<button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+									</div>
+								</div>
+							</div>
+							<div class="card-body p-0">
+								<div class="table-responsive">
+									<table class="table table-hover display wrap" id="setlistTable">
+										<thead>
+											<th class="all">#</th>
+											<th class="all">Song</th>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var counts = [];
+
+	$(document).ready(function () {
+		var event = "{{ event.id }}"
+
+		fetch(`/api/v1/setlist_breakdown/?event=${event}&format=json&ordering=-num`)
+			.then(response => response.json())
+			.then(data => {
+				data.results.forEach((item, index) => {
+					var album = slugify(item.category);
+					var percent = ((item.num / item.max) * 100).toFixed(0);
+					var complete_badge = "";
+
+					var songs = item.songs.map(song => {
+						if (song.original_artist !== 'Bruce Springsteen') {
+							return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
+						}
+
+						return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
+					}).join('');
+
+					if (item.album_complete) {
+						complete_badge = `<span class="badge badge-warning text-3xs">Complete</span>`
+					}
+
+					//var html = `
+					//<div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
+					//    <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
+					//        <div class="col-8 text-truncate ps-0 text-wrap category"><span class="text-truncate pe-2">${item.category}</span>${complete_badge}</div>
+					//        <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
+					//    </div>
+					//    <div class="progress px-0 mx-0">
+					//        <div class="progress-bar" style="width:${percent}%"></div>
+					//    </div>
+					//    <div class="collapse" id="${album}-collapse">
+					//        <ul class="list-group py-1">${songs}</ul>
+					//    </div>
+					//</div>`;
+
+
+					var html = `
+            <div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
+                <div class="row text-xs mx-0 d-flex-inline justify-content-between align-middle">
+                    <div class="col-3 col-lg-4 text-truncate px-0 me-2 category" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${item.category}">
+                      <div class="text-truncate">${item.category}</div>
+                      ${complete_badge}
+                    </div>
+                    <div class="col-8 col-lg-6 progress px-0 my-auto align-middle">
+                        <div class="progress-bar" style="width:${percent}%"></div>
+                    </div>
+                    <div class="col text-end px-0 text-nowrap percent">${percent}%</div>
+                </div>
+                <div class="collapse" id="${album}-collapse">
+                    <ul class="list-group py-1">${songs}</ul>
+                </div>
+            </div>`;
+
+					$('#albums').append(html);
+				});
+
+				$('#albums').find('.album-breakdown').each(function (index, row) {
+					var album = $(row).attr('album');
+
+					$(this).hover(function () {
+						$(this).css('cursor', "pointer");
+
+						$(`#setlistTable tbody tr:not(.set-header)`).each(function (index, row) {
+							if ($(row).attr('album') == album) {
+								$(row).css('opacity', '1');
+								$(row).children('td:not(.position)').addClass('highlighted');
+							} else {
+								$(row).css('opacity', '0.2');
+							}
+						});
+
+					}, function () {
+						$(`#setlistTable tr`).css('opacity', '1');
+						$(`#setlistTable tr`).children('td').removeClass('highlighted');
+					})
+				});
+
+				$('#album-breakdown-btn').click(function () {
+					var closed = $('#albums .collapse:not(.show)');
+					var all = $('#albums .collapse');
+
+					if (closed.length > 0) {
+						closed.each(function () {
+							const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+							bsCollapse.show();
+						})
+					} else {
+						all.each(function () {
+							const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
+							bsCollapse.hide();
+						})
+					}
+				})
+			}).catch(error => console.error('Error:', error));
+
+		var layout = getDatatableLayout({ columns: false, category: false });
+
+		$('#setlistTable').DataTable(
+			{
+				layout: layout,
+				serverSide: true,
+				processing: true,
+				paging: false,
+				ordering: false,
+				searching: false,
+				info: false,
+				scrollX: false,
+				fixedHeader: false,
+				autoWidth: false,
+				ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
+				rowGroup: {
+					dataSrc: 'set_name',
+					className: 'text-center set-header p-0 dtrg-group',
+					startRender: function (rows, group) {
+						const g = `<span>${group}</span>`;
+						const td = `<td colspan="${rows.columns().count()}" class="py-0">${g}</td>`;
+						return $('<tr />').addClass(slugify(group)).append(td);
+					}
+				},
+				createdRow: function (row, data, dataIndex) {
+					$(row).addClass(slugify(data.set_name));
+
+					var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+
+					if (allowedSets.includes(data.set_name)) {
+						var album = slugify(data.song.category);
+						$(row).attr('album', album);
+					}
+				},
+				columnDefs: [
+					{ 'targets': '_all', columnControl: [] }
+				],
+				columns: [
+					{
+						'data': 'song_num',
+						'className': 'dt-center col-songnum',
+						'width': '30px',
+						'render': function (data, type, row, meta) {
+							if (type === 'display' && data) {
+								return data;
+							}
+						},
+						'createdCell': function (td, cellData, rowData, row, col) {
+							$(td).addClass('songnum');
+
+							if (rowData.position) {
+								var position = slugify(rowData.position);
+								$(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
+							}
+
+							return td;
+						},
+					},
+					{
+						'data': 'song',
+						'name': 'song__sort_song_name',
+						'className': 'text-wrap col-song',
+						'render': function (data, type, row, meta) {
+							if (type === 'display' && data) {
+								var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
+								var segue = row.segue ? `<span class="segue"></span>` : '';
+
+								song = `${song} ${segue}`;
+
+								var badges = $('<span />').addClass('ms-2');
+								var baseBadge = `<span class="badge ms-1" data-bs-toggle="tooltip" data-bs-html="true"></span>`
+
+								if (row.instrumental) {
+									var badge = $(baseBadge).clone();
+									$(badge).addClass('badge-info').text('Inst.').attr('data-bs-title', 'Instrumental');
+									badges.append($(badge).prop('outerHTML'));
+								}
+
+								if (row.sign_request) {
+									var badge = $(baseBadge).clone();
+									$(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
+									$(badges).append($(badge).prop('outerHTML'));
+								}
+
+								if (row.nobruce) {
+									var badge = $(baseBadge).clone();
+									$(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
+									$(badges).append($(badge).prop('outerHTML'));
+								}
+
+								if (row.notes) {
+									var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes.join('; ')}</span>`;
+									return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
+								}
+
+								return badges ? song + $(badges).prop('outerHTML') : song;
+							}
+						},
+					},
+				],
+			})
+	});
+</script>
+{% endblock content %}

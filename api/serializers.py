@@ -155,6 +155,7 @@ class MinimalSongsSerializer(BaseSerializer):
             "album",
             "category",
             "uuid",
+            "original",
             "original_artist",
             "num_plays_public",
         ]
@@ -974,7 +975,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
     songs_map = {
         s.id: MinimalSongsSerializer(
             s,
-            include=["id", "name", "original_artist"],
+            include=["id", "name", "original_artist", "original"],
         ).data
         for s in models.Songs.objects.all()
     }
@@ -1006,7 +1007,6 @@ class SetlistBreakdownSerializer(BaseSerializer):
         fields = [
             "max",
             "num",
-            # "percent",
             "songs",
             "category",
             "album_complete",

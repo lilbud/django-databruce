@@ -727,7 +727,7 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
         event = self.request.query_params.get("event")
 
         song_filter = Q(
-            Q(event__id=event) & Q(set_name__in=VALID_SET_NAMES),
+            Q(event_id=event) & Q(set_name__in=VALID_SET_NAMES),
         )
 
         setlist_songs = (
@@ -772,7 +772,7 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
         )
 
     serializer_class = serializers.SetlistBreakdownSerializer
-    ordering = ["category", "max", "percent", "num"]
+    ordering = ["category", "max", "num"]
 
 
 class SongsPage(viewsets.ReadOnlyModelViewSet):

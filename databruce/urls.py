@@ -128,8 +128,13 @@ urlpatterns = [
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
     path(
         "events_mobile/<str:id>/",
-        views.EventDetailTest.as_view(),
+        views.EventDetailMobile.as_view(),
         name="event_details_mobile",
+    ),
+    path(
+        "events_test/<str:id>/",
+        views.EventDetailTest.as_view(),
+        name="event_details_test",
     ),
     path("events/type/<slug:type>/", views.EventType.as_view(), name="events_by_type"),
     path("events/type", views.EventType.as_view(), name="events_type"),

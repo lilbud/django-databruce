@@ -330,7 +330,9 @@ class SignUp(PageTitleMixin, TemplateView):
 
             messages.error(request, "Incorrect verification answer")
             return render(
-                request, template_name=self.template_name, context={"form": form}
+                request,
+                template_name=self.template_name,
+                context={"form": form},
             )
 
         messages.error(request, "Signup Failed, see errors below")
@@ -597,6 +599,15 @@ class EventDetail(PageTitleMixin, TemplateView):
                     expression=Count("id"),
                     partition_by=F("venue__id"),
                 ),
+                city_num=Window(
+                    expression=RowNumber(),
+                    partition_by=F("venue__city_id"),
+                    order_by=F("event_id").asc(),
+                ),
+                city_total=Window(
+                    expression=Count("id"),
+                    partition_by=F("venue__city_id"),
+                ),
             )
             .values(),
         )
@@ -652,6 +663,11 @@ class EventDetail(PageTitleMixin, TemplateView):
         else:
             tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
 
+        context["scheduled_time"] = None
+        context["start_time"] = None
+        context["end_time"] = None
+        context["duration"] = None
+
         if event.scheduled_time:
             context["scheduled_time"] = (
                 event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
@@ -666,13 +682,6 @@ class EventDetail(PageTitleMixin, TemplateView):
             context["end_time"] = (
                 event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
             )
-
-        if event.start_time and event.end_time and not event.length:
-            context["duration"] = event.end_time.astimezone(
-                tz_target,
-            ) - event.start_time.astimezone(tz_target)
-        elif event.length:
-            context["duration"] = event.length
 
         neighbor_qs = models.Events.objects.select_related("venue", "artist", "tour")
 
