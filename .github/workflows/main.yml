@@ -24,9 +24,11 @@ jobs:
             # Move into the application directory
             cd /home/lilbud/django-databruce
 
+            export GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes"
+
             # Pull the latest changes from GitHub
             git stash
-            # git pull
+            git pull
             git stash drop
 
             # Activate the virtual environment
