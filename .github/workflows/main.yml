@@ -27,13 +27,13 @@ jobs:
             # 1. Force Git to run completely non-interactively
             export GIT_TERMINAL_PROMPT=0
 
-
-
             # Pull the latest changes from GitHub
             git stash
             git fetch --all
             git reset --hard origin/main
             git stash drop
+
+            echo "git fetch ran"
 
             # Activate the virtual environment
             source .venv/bin/activate
