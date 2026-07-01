@@ -27,6 +27,7 @@ jobs:
 
             # 1. Force Git to run completely non-interactively
             export GIT_TERMINAL_PROMPT=0
+            export GIT_PAGER=cat
 
             # Pull the latest changes from GitHub
             git stash
