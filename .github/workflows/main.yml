@@ -25,24 +25,24 @@ jobs:
             cd /home/lilbud/django-databruce
 
             # Pull the latest changes from GitHub
-            git stash
-            git pull
-            git stash drop
+            # git stash
+            # git pull
+            # git stash drop
 
             # Activate the virtual environment
-            source .venv/bin/activate
+            # source .venv/bin/activate
 
             # Stop Gunicorn
-            sudo systemctl stop gunicorn gunicorn.socket
+            # sudo systemctl stop gunicorn gunicorn.socket
             
             # Remove Old Static
-            rm -rf static/
+            # rm -rf static/
             
             # Remove Local Settings If Present
-            rm -rf databruce/config/local.py
+            # rm -rf databruce/config/local.py
             
             # Collect New Static
-            ./manage.py collectstatic --noinput
+            # ./manage.py collectstatic --noinput
             
             # Reload Gunicorn using systemd
             sudo systemctl restart gunicorn
