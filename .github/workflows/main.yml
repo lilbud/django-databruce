@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -21,20 +21,13 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "▶ DEBUG: Starting script execution..."
-            sync
-
             # Move into the application directory
             cd /home/lilbud/django-databruce
 
-            echo "▶ DEBUG: Running git fetch..."
-            sync
-
             # Pull the latest changes from GitHub
+            git stash
             git pull
-
-            echo "▶ DEBUG: git fetch ran..."
-            sync
+            git stash drop
 
             # Activate the virtual environment
             source .venv/bin/activate
