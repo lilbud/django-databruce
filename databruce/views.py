@@ -649,14 +649,17 @@ class EventDetail(PageTitleMixin, TemplateView):
             context["event"].setlist_certainty not in (None, "", "Unknown"),
         )
 
-        context["type_note"] = event.type.name in [  # type: ignore
-            "Rescheduled",
-            "Cancelled",
-            "Relocated",
-            "No Bruce",
-            "No Gig",
-            "Rumored",
-        ]
+        try:
+            context["type_note"] = event.type.name in [  # type: ignore
+                "Rescheduled",
+                "Cancelled",
+                "Relocated",
+                "No Bruce",
+                "No Gig",
+                "Rumored",
+            ]
+        except models.Events.type.RelatedObjectDoesNotExist:
+            context["type_note"] = False
 
         if venue and venue.city and venue.city.timezone:
             tz_target = venue.city.timezone
