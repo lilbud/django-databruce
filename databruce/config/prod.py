@@ -112,7 +112,7 @@ DATABASES = {
         "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
         "HOST": os.getenv("SUPABASE_HOST"),
         "PORT": "5432",
-        "CONN_MAX_AGE": 60,
+        "CONN_MAX_AGE": 600,
         "CONN_HEALTH_CHECKS": True,
         "OPTIONS": {
             "options": "-c search_path=public,extensions",
