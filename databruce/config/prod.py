@@ -107,15 +107,14 @@ DATABASES = {
     # },
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("SUPABASE_DATABASE"),
-        "USER": os.getenv("SUPABASE_USER"),
-        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-        "HOST": os.getenv("SUPABASE_HOST"),
-        "PORT": "5432",
-        "CONN_MAX_AGE": 600,
-        "CONN_HEALTH_CHECKS": True,
+        "NAME": os.getenv("SUPABASE_POOL_DATABASE"),
+        "USER": os.getenv("SUPABASE_POOL_USER"),
+        "PASSWORD": os.getenv("SUPABASE_POOL_PASSWORD"),
+        "HOST": os.getenv("SUPABASE_POOL_HOST"),
+        "PORT": os.getenv("SUPABASE_POOL_PORT"),
         "OPTIONS": {
             "options": "-c search_path=public,extensions",
+            "pool": True,
         },
     },
 }
