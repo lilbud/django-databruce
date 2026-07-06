@@ -109,7 +109,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("SUPABASE_POOL_DATABASE"),
         "USER": os.getenv("SUPABASE_POOL_USER"),
-        "PASSWORD": os.getenv("SUPABASE_POOL_PASSWORD"),
+        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
         "HOST": os.getenv("SUPABASE_POOL_HOST"),
         "PORT": os.getenv("SUPABASE_POOL_PORT"),
         "OPTIONS": {
