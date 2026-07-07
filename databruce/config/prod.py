@@ -115,7 +115,6 @@ DATABASES = {
         "OPTIONS": {
             "options": "-c search_path=public,extensions",
             "pool": True,
-            "DISABLE_SERVER_SIDE_CURSORS": True,
         },
     },
 }
