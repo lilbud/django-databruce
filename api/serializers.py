@@ -971,11 +971,12 @@ class SetlistBreakdownSerializer(BaseSerializer):
     max = serializers.IntegerField(required=False)
     num = serializers.IntegerField(required=False)
     category = serializers.CharField(required=False)
+    category_slug = serializers.CharField(required=False)
 
     songs_map = {
         s.id: MinimalSongsSerializer(
             s,
-            include=["id", "name", "original_artist", "original"],
+            include=["id", "name", "original_artist", "original", "category_slug"],
         ).data
         for s in models.Songs.objects.all()
     }
@@ -1010,6 +1011,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
             "songs",
             "category",
             "album_complete",
+            "category_slug",
         ]
 
 

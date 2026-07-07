@@ -205,6 +205,9 @@ class UserTests(BaseDataTest):
             "email": "test@example.com",
             "password1": "faiasd87gf9s",
             "password2": "faiasd87gf9s",
+            "verification": os.getenv(
+                "VERIFICATION_ANSWER",
+            ),
         }
 
         response = self.client.post(signup_url, user_data)
@@ -386,7 +389,7 @@ class TestViews(BaseDataTest):
 
     def test_event_mobile(self):
         response = self.client.get(
-            reverse("event_details_mobile", args=[self.event.event_id])
+            reverse("event_details_mobile", args=[self.event.event_id]),
         )
         assert response.status_code == 200
 

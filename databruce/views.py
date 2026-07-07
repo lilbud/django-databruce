@@ -23,15 +23,12 @@ from django.core.mail import send_mail
 from django.db.models import (
     Count,
     Exists,
-    F,
     Min,
     OuterRef,
     Q,
     QuerySet,
     Subquery,
-    Window,
 )
-from django.db.models.functions import DenseRank, RowNumber
 from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -60,6 +57,7 @@ from databruce.forms import (
     UpdateUserForm,
     UserForm,
 )
+from databruce.templatetags.filters import currency
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
@@ -300,8 +298,8 @@ class SignUp(PageTitleMixin, TemplateView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            if form.cleaned_data["verification"] == os.environ.get(
-                "SIGNUP_VERIFICATION_ANSWER",
+            if form.cleaned_data["verification"] == os.getenv(
+                "VERIFICATION_ANSWER",
             ):
                 user = form.save(commit=False)
                 user.is_active = False
@@ -563,78 +561,15 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "artist",
                 "tour",
                 "venue__city",
-            )
-            .prefetch_related("leg", "run", "archive_links", "nugs_event")
-            .annotate(),
+            ).prefetch_related(
+                "leg",
+                "run",
+                "archive_links",
+                "nugs_event",
+                "rank_stats",
+            ),
             event_id=self.kwargs["id"],
         )
-
-        ranked_events = list(
-            models.Events.objects.exclude(type_id__in=[21, 23, 6])
-            .annotate(
-                tour_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("tour__id"),
-                    order_by=F("event_id").asc(),
-                ),
-                tour_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("tour__id"),
-                ),
-                tour_leg_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("leg__id"),
-                    order_by=F("event_id").asc(),
-                ),
-                tour_leg_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("leg__id"),
-                ),
-                venue_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("venue__id"),
-                    order_by=F("event_id").asc(),
-                ),
-                venue_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("venue__id"),
-                ),
-                city_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("venue__city_id"),
-                    order_by=F("event_id").asc(),
-                ),
-                city_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("venue__city_id"),
-                ),
-            )
-            .values(),
-        )
-
-        context["rank_stats"] = next(
-            (e for e in ranked_events if e["event_id"] == self.kwargs["id"]),
-            None,
-        )
-
-        all_ranked_events = list(
-            models.Events.objects.filter(length__isnull=False)
-            .annotate(
-                rank=Window(
-                    expression=DenseRank(),
-                    order_by=F("length").desc(),
-                ),
-            )
-            .filter(rank__lte=10)
-            .values("event_id", "length", "rank"),
-        )
-
-        event_with_true_rank = next(
-            (e for e in all_ranked_events if e["event_id"] == self.kwargs["id"]),
-            None,
-        )
-
-        context["rank"] = event_with_true_rank["rank"] if event_with_true_rank else None
 
         event = context["event"]
         event_date = event.get_date()
@@ -658,7 +593,7 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "No Gig",
                 "Rumored",
             ]
-        except models.Events.type.RelatedObjectDoesNotExist:
+        except (models.Events.type.RelatedObjectDoesNotExist, AttributeError):
             context["type_note"] = False
 
         if venue and venue.city and venue.city.timezone:
@@ -706,14 +641,14 @@ class EventDetail(PageTitleMixin, TemplateView):
 
         context["official"] = (
             models.Releases.objects.filter(
-                event__id=event.pk,
+                event_id=event.pk,
             )
             .prefetch_related("event")
             .order_by("date")
         )
 
         context["official_tracks"] = (
-            models.ReleaseTracks.objects.filter(event__id=event.pk)
+            models.ReleaseTracks.objects.filter(event_id=event.pk)
             .select_related("release")
             .prefetch_related("event")
             .distinct("release_id", "release__date")
@@ -725,12 +660,38 @@ class EventDetail(PageTitleMixin, TemplateView):
         if user.is_authenticated:
             context["user_attended"] = models.UserAttendedShows.objects.filter(
                 user=user.pk,
-                event__id=event.pk,
+                event_id=event.pk,
             )
 
         context["users"] = models.UserAttendedShows.objects.filter(
-            event__id=event.pk,
+            event_id=event.pk,
         )
+
+        if context["event"].run:
+            if context["event"].run.ticket_range:
+                context["ticket_range"] = [
+                    currency(float(x))
+                    for x in context["event"].run.ticket_range.split("/")  # type: ignore
+                ]
+            else:
+                context["ticket_range"] = [
+                    currency(context["event"].run.ticket_min),
+                    currency(context["event"].run.ticket_max),
+                ]
+        elif context["event"].ticket_range:
+            context["ticket_range"] = [
+                currency(float(x)) for x in context["event"].ticket_range.split("/")
+            ]
+        else:
+            context["ticket_range"] = [
+                currency(context["event"].ticket_min),
+                currency(context["event"].ticket_max),
+            ]
+
+        try:
+            context["ticket_range"] = " / ".join(context["ticket_range"])
+        except TypeError:
+            pass
 
         return context
 
@@ -850,65 +811,6 @@ class EventDetailTest(PageTitleMixin, TemplateView):
             .annotate(),
             event_id=self.kwargs["id"],
         )
-
-        ranked_events = list(
-            models.Events.objects.exclude(type_id__in=[21, 23, 6])
-            .annotate(
-                tour_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("tour__id"),
-                    order_by=F("event_id").asc(),
-                ),
-                tour_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("tour__id"),
-                ),
-                tour_leg_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("leg__id"),
-                    order_by=F("event_id").asc(),
-                ),
-                tour_leg_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("leg__id"),
-                ),
-                venue_num=Window(
-                    expression=RowNumber(),
-                    partition_by=F("venue__id"),
-                    order_by=F("event_id").asc(),
-                ),
-                venue_total=Window(
-                    expression=Count("id"),
-                    partition_by=F("venue__id"),
-                ),
-            )
-            .values(),
-        )
-
-        context["rank_stats"] = next(
-            (e for e in ranked_events if e["event_id"] == self.kwargs["id"]),
-            None,
-        )
-
-        all_ranked_events = list(
-            models.Events.objects.filter(length__isnull=False)
-            .annotate(
-                rank=Window(
-                    expression=DenseRank(),
-                    order_by=F("length").desc(),
-                ),
-            )
-            .filter(rank__lte=10)
-            .values("event_id", "length", "rank"),
-        )
-
-        event_with_true_rank = next(
-            (e for e in all_ranked_events if e["event_id"] == self.kwargs["id"]),
-            None,
-        )
-
-        context["rank"] = event_with_true_rank["rank"] if event_with_true_rank else None
-
         event = context["event"]
         event_date = event.get_date()
 
@@ -1716,6 +1618,19 @@ class RunDetail(PageTitleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
         context["title"] = f"{context['info']}"
+
+        if context["info"].ticket_range:
+            context["ticket_range"] = [
+                currency(float(x))
+                for x in context["info"].ticket_range.split("/")  # type: ignore
+            ]
+        else:
+            context["ticket_range"] = [
+                currency(context["info"].ticket_min),
+                currency(context["info"].ticket_max),
+            ]
+
+        context["ticket_range"] = " / ".join(context["ticket_range"])
 
         return context
 

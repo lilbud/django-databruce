@@ -39,11 +39,6 @@
     line-height: 1.5rem;
 }
 
-.text-base.bi-check-lg {
-    font-size: var(--text-base) !important;
-    line-height: 1 !important;
-}
-
 .text-lg {
     font-size: var(--text-lg);
     line-height: 1.75rem;
@@ -263,19 +258,18 @@ a:link,
     overflow: hidden !important;
 }
 
+.row:has(>div[class*="dt-layout-"]:empty),
+.dt-layout-full,
+.dt-layout-table {
+    margin-top: 0 !important;
+}
+
 .row:has(>div[class*="dt-layout-"]:empty) {
     display: none !important;
-    margin-top: 0 !important;
 }
 
 .dt-layout-full {
     padding: 0 !important;
-    margin-top: 0 !important;
-}
-
-#setlistTable_wrapper>.dt-layout-table,
-.index .dt-layout-table {
-    margin-top: 0 !important;
 }
 
 /* card */

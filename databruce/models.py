@@ -551,6 +551,8 @@ class Events(BaseModel):
         on_delete=models.DO_NOTHING,
         db_column="event_type",
         default=None,
+        blank=True,
+        null=True,
     )
 
     title = models.CharField(
@@ -618,6 +620,27 @@ class Events(BaseModel):
     end_time = models.DateTimeField(blank=True, null=True, default=None)
     scheduled_time = models.DateTimeField(blank=True, null=True, default=None)
     length = models.TimeField(blank=True, null=True, default=None)
+
+    sales = models.BigIntegerField(blank=True, null=True)
+    capacity = models.BigIntegerField(blank=True, null=True)
+    gross = models.BigIntegerField(blank=True, null=True)
+    ticket_min = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    ticket_max = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    box_office_source = models.TextField(blank=True, null=True)
+    box_office_note = models.TextField(blank=True, null=True)
+    sellout = models.BooleanField(blank=True, null=True)
+    ticket_range = models.TextField(blank=True, null=True)
+    promo_company = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = "events"
@@ -956,7 +979,7 @@ class SetlistNotes(models.Model):
     note = models.TextField(default=None, blank=True, null=True)
 
     class Meta:
-        managed = True  # Created from a view. Don't remove.
+        managed = True
         db_table = "setlist_notes"
         verbose_name_plural = "Setlist Notes"
 
@@ -1025,6 +1048,12 @@ class Songs(BaseModel):
     lyrics = models.BooleanField(default=False)
 
     category = models.TextField(default=None, blank=True, null=True)
+    category_slug = models.TextField(
+        default=None,
+        blank=True,
+        null=True,
+        db_column="category_slug",
+    )
     spotify_id = models.TextField(default=None, blank=True, null=True)
 
     mbid = models.UUIDField(default=None, editable=False, null=True, blank=True)
@@ -1390,6 +1419,27 @@ class Runs(BaseModel):
         default=None,
     )
     note = models.TextField(default=None, blank=True, null=True)
+    total_sales = models.IntegerField(blank=True, null=True)
+    total_capacity = models.IntegerField(blank=True, null=True)
+    total_gross = models.BigIntegerField(blank=True, null=True)
+    ticket_min = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    ticket_max = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    ticket_range = models.TextField(blank=True, null=True)
+    box_office_source = models.TextField(blank=True, null=True)
+    box_office_note = models.TextField(blank=True, null=True)
+    sellout = models.BooleanField(blank=True, null=True)
+    promo_company = models.TextField(blank=True, null=True)
+    num_sellout = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = "runs"
@@ -1400,6 +1450,43 @@ class Runs(BaseModel):
             return ""
 
         return self.name
+
+
+class EventRankStat(models.Model):
+    event = models.OneToOneField(
+        Events,
+        on_delete=models.DO_NOTHING,
+        primary_key=True,
+        db_column="id",
+        related_name="rank_stats",
+    )
+
+    # Tour Stats
+    tour_num = models.IntegerField()
+    tour_total = models.IntegerField()
+
+    # Leg Stats
+    tour_leg_num = models.IntegerField(null=True, blank=True)
+    tour_leg_total = models.IntegerField(null=True, blank=True)
+
+    # Run Stats
+    run_num = models.IntegerField(null=True, blank=True)
+    run_total = models.IntegerField(null=True, blank=True)
+
+    # Venue Stats
+    venue_num = models.IntegerField()
+    venue_total = models.IntegerField()
+
+    # City Stats
+    city_num = models.IntegerField()
+    city_total = models.IntegerField()
+
+    # Length Rank
+    length_rank = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = "event_rank_stats"
 
 
 class StudioSessions(BaseModel):

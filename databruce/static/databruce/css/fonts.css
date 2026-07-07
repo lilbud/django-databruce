@@ -13,4 +13,7 @@
         "ROND" 0;
     font-optical-sizing: auto;
     font-style: normal;
+    /* CRITICAL: Force the browser to balance the top and bottom margins */
+    ascent-override: 90%;
+    descent-override: 20%;
 }

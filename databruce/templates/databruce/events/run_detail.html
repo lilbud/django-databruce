@@ -1,4 +1,5 @@
 {% extends "databruce/narrow_layout.html" %}
+{% load humanize %}
 {% block title %}
   Event Run "{{ title }}"
 {% endblock title %}
@@ -65,7 +66,17 @@
                       role="tab"
                       aria-controls="pills-profile"
                       aria-selected="false">Slots</button>
-            {% endif %}
+            </li>
+          {% endif %}
+          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+            <button class="nav-link"
+                    id="pills-stats-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#stats"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-stats"
+                    aria-selected="false">Stats</button>
           </li>
         </ul>
       </div>
@@ -119,6 +130,81 @@
                   </tr>
                 </thead>
               </table>
+            </div>
+          </div>
+          <div id="stats" class="tab-pane fade">
+            <div class="col px-3">
+              <div class="row mb-2">
+                <div class="col">
+                  <div class="card divider">
+                    <div class="card-body text-center fw-semibold text-base p-1">Box Office Stats</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                <div class="col">
+                  <div class="card info-card">
+                    <div class="title">Tickets Sold / Total</div>
+                    <div class="value">
+                      {% if info.total_sales %}
+                        {{ info.total_sales|intcomma }}
+                      {% else %}
+                        -
+                      {% endif %}
+                      /
+                      {% if info.total_capacity %}
+                        {{ info.total_capacity|intcomma }}
+                      {% elif info.sellout %}
+                        {{ info.total_sales|intcomma }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </div>
+                    <small>Across All Shows on Run</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="card info-card">
+                    <div class="title">Gross</div>
+                    <div class="value">
+                      {% if info.total_gross %}
+                        {{ info.total_gross|currency }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </div>
+                    <small>Across All Shows on Run</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="card info-card">
+                    <div class="title">Ticket Price Range</div>
+                    <div class="value">{{ ticket_range|default_if_none:"-" }}</div>
+                    <small>Across All Shows on Run</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="card info-card">
+                    <div class="title">Promoter</div>
+                    <div class="value">{{ info.promo_company|default_if_none:"-" }}</div>
+                    <small>Across All Shows on Run</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="card info-card">
+                    <div class="title">Shows/Sellouts</div>
+                    <div class="value">{{ info.num_sellout|default_if_none:"-" }} / {{ info.num_shows|default_if_none:"-" }}</div>
+                    <small>Across All Shows on Run</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="card info-card">
+                    <div class="title">Source</div>
+                    <div class="value">{{ info.box_office_source|default_if_none:"-" }}</div>
+                    <small>Across All Shows on Run</small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -291,6 +291,14 @@
     color: var(--text-color-subtle) !important;
 }
 
+[data-bs-theme="light"] .text-primary {
+    color: var(--color-primary) !important;
+}
+
+[data-bs-theme="dark"] .text-primary {
+    color: var(--color-primary-dark) !important;
+}
+
 .text-muted {
     color: var(--text-color-muted) !important;
 }

@@ -61,9 +61,16 @@ const slugify = (str) => {
   return str
     .toLowerCase() // Convert to lowercase
     .trim() // Trim leading/trailing whitespace
-    .replace(/[^\w\s-]/g, '') // Remove all non-word chars (except spaces and hyphens)
-    .replace(/[\s_-]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
+    .replace(/[^a-z0-9]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+};
+
+const escapeHtml = (str) => {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 };
 
 function getDatatableLayout({ columns = true, category = false }) {
@@ -271,7 +278,7 @@ event_table_columns = [
     'orderable': false,
     'searchable': false,
     'render': function (data, type, row, meta) {
-      return data ? `<i class="bi bi-check-lg d-block text-base" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
+      return data ? `<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
     },
   },
   {

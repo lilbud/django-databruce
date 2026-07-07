@@ -53,3 +53,11 @@ def format_fuzzy(value):
         day = "01"
 
     return f"{year}-{month}-{day}"
+
+
+@register.filter
+def currency(value):
+    try:
+        return f"${value:,.2f}"
+    except (ValueError, TypeError):
+        return value

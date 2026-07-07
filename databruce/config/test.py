@@ -114,7 +114,7 @@ DATABASES = {
         "CONN_MAX_AGE": 0,
         "CONN_HEALTH_CHECKS": False,
         "TEST": {
-            "NAME": os.getenv("DATABASE_NAME"),
+            "NAME": "databruce_test",
             "USER": os.getenv("DATABASE_USER"),
             "PASSWORD": os.getenv("DATABASE_PASSWORD"),
         },

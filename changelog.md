@@ -252,3 +252,13 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Fixed issue where profiles with no events would cause an error when attempting to view profile page.
 - Fixed Advanced Search Song dropdown not including original artist. So "Fire (Jimi Hendrix)" and "Fire (Bruce Springsteen)" would show up as the same "Fire".
+
+# v1.18 (July 2026)
+
+- [User] Signup now requires answering a verification question.
+- [Event Detail] Minor page redesign, header updated date/artist to be bigger size while shrinking venue/city. Very much inspired by WTED Archives.
+- [Event Detail] New "Stats" tab. Show stats like venue/tour/tour leg/etc have been moved from overview sidebar to here. Stats tab layout inspired by speedrun.org.
+- Box Office Data is now part of Databruce! This data was manually compiled from Billboard Magazine and Pollstar Magazine. Events now have how many tickets sold, min/max price, price range and promoter company. If an event is part of a "run", then the data is a aggregrate of all shows on the run. The data pulled gives info on shows from 1976 up through 2026. 2023-26 had to be pulled from "touringdata.org", and doesn't list ticket prices. Pre-1976 data doesn't seem to have been published anywhere.
+- [Event Detail] Album cover images now show in-place of their names on the album breakdown. The list of songs will also show on hover as well. Clicking will still expand a list like before. Idea borrowed from Dripfield.pro.
+- [Event Detail] Album breakdown now changes the progress bar color if the album is "complete" at a show. I couldn't have both the album image AND the complete badge without the layout breaking.
+- [Event Detail] Updated "show times" card. This contains the scheduled time (from ticket stub), actual start/end time if known, and show length (dependent on the previous being present). Times were pulled from ticket stubs sourced from Brucebase, and are shown in venue local time. To speed up the process, AI was used to first OCR the stub images to extract the times. This data was then reviewed and corrected manually before being inserted into the database.

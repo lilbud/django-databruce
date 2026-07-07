@@ -43,7 +43,7 @@ DATABASES = {
             "options": "-c search_path=public,extensions",
         },
     },
-    # "supabase": {
+    # "default": {
     #     "ENGINE": "django.db.backends.postgresql",
     #     "NAME": os.getenv("SUPABASE_DATABASE"),
     #     "USER": os.getenv("SUPABASE_USER"),

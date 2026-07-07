@@ -49,11 +49,6 @@ textarea:disabled {
     line-height: 1.5rem;
 }
 
-.text-base.bi-check-lg {
-    font-size: var(--text-base) !important;
-    line-height: 1 !important;
-}
-
 .text-lg {
     font-size: var(--text-lg);
     line-height: 1.75rem;
@@ -135,6 +130,15 @@ body {
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
+    /* Smooths fonts on WebKit browsers (Safari, Chrome) specifically on macOS */
+    -webkit-font-smoothing: antialiased !important;
+
+    /* Smooths fonts on Firefox specifically on macOS */
+    -moz-osx-font-smoothing: grayscale !important;
+
+    /* Optimizes legibility and enables ligatures across platforms */
+    text-rendering: optimizeLegibility !important;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004) !important;
 }
 
 /* Force the main content area to grow and fill available space */
@@ -281,12 +285,35 @@ a:link,
     padding: 0 !important;
 }
 
-/* Target your specific table */
+.info-card {
+    background-color: var(--background-color-muted) !important;
+    padding: 0.5rem !important;
+}
+
+.info-card .title {
+    font-size: var(--text-xs);
+    line-height: 1.1rem;
+    white-space: nowrap !important;
+}
+
+.info-card .title::after {
+    content: ":";
+}
+
+.info-card .value {
+    font-size: var(--text-sm);
+    line-height: 1.5rem;
+    font-weight: 500;
+}
 
 [data-bs-theme="light"] {
     .info-card-row .card {
         background-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
         border-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
+    }
+
+    .info-card {
+        border-color: var(--border-color-base) !important;
     }
 }
 
@@ -295,10 +322,15 @@ a:link,
         background-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
         border-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
     }
+
+    .info-card {
+        border-color: var(--border-color-base) !important;
+    }
 }
 
 span #usercount {
     cursor: pointer !important;
+    pointer-events: none !important;
 }
 
 /* card */
@@ -318,9 +350,13 @@ span #usercount {
 .card-footer,
 .card,
 .list-group-item {
-    background-color: var(--background-color-subtle) !important;
-    border-color: var(--border-color-base) !important;
-    color: var(--text-color-default) !important;
+    background-color: var(--background-color-subtle);
+    border-color: var(--border-color-base);
+    color: var(--text-color-default);
+}
+
+.card.divider {
+    background-color: var(--background-color-default) !important;
 }
 
 th,
@@ -336,19 +372,27 @@ tr:not(.set-header) td:not(.songnum, .position, .highlighted) {
 /* song number cell background when not position */
 td.songnum:not(:is([class*="opener"], [class*="closer"])) {
     background-color: var(--background-color-muted) !important;
-    color: var(--text-color-default) !important;
+    color: var(--text-color-default);
+}
+
+/* song number cell background when position */
+td.songnum[class*="opener"],
+td.songnum[class*="closer"] {
+    color: var(--color-contrast);
 }
 
 table th {
-    font-size: var(--text-sm) !important;
+    font-size: var(--text-xs) !important;
+    background-color: var(--background-color-subtle) !important;
+    padding: 0.2rem 0.5rem 0.15rem 0.5rem !important;
+    font-weight: 500 !important;
 }
 
-td {
-    line-height: 1rem !important;
-    padding: 0.15rem 0.5rem 0.15rem 0.5rem !important;
+.set-header {
+    font-size: var(--text-2xs) !important;
 }
 
-table.dataTable tbody tr:not(.album-header) td,
+table.dataTable tbody tr:not(.album-header, .set-header) td,
 tr.album-header>th {
     font-size: var(--text-xs) !important;
 }
@@ -387,14 +431,39 @@ td:not(.fc-day) {
     vertical-align: middle !important;
 }
 
-.badge {
-    padding: 0.2em 0.45em !important;
-    border-radius: calc(infinity * 1px) !important;
-    font-weight: 500 !important;
+td {
+    line-height: 1.1rem !important;
+    padding: 0.15rem 0.5rem !important;
+}
+
+tbody tr:not(.set-header) {
+    height: 24px !important;
+    line-height: 1.1rem !important;
 }
 
 td .badge {
-    font-size: var(--text-2xs) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 16px !important;
+    padding: 0.2em 0.45em !important;
+    margin-top: -2px !important;
+    vertical-align: middle !important;
+    font-size: var(--text-3xs) !important;
+    border-radius: calc(infinity * 1px) !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+}
+
+.bi.bi-check-lg {
+    height: 14px !important;
+    width: 14px !important;
+    font-size: var(--text-sm) !important;
+}
+
+/* font size clamp for event header. Inspired by WTED Archives */
+.event-header-date {
+    font-size: clamp(var(--text-xl), 3.8vw, var(--text-2xl)) !important;
 }
 
 /* custom badges for the badge row on event detail */
@@ -404,15 +473,6 @@ td .badge {
     display: inline-flex;
     padding: 0.15rem 0.35rem !important;
     border-radius: calc(infinity * 1px) !important;
-}
-
-td .check {
-    vertical-align: middle;
-}
-
-td .badge,
-td .check {
-    margin-top: -3px !important;
 }
 
 .segue {
@@ -445,9 +505,12 @@ blockquote {
     font-size: 0.7rem !important;
 }
 
+.info-card small {
+    margin-top: 0.1rem !important;
+    color: var(--text-color-muted) !important;
+}
+
 /* fix for scrolling table in card  */
-/* does this value seem odd? yes */
-/* why? because it is the absolute max width that the scrollable table can go before it affects the rest of the page */
 @media (max-width: 992px) {
 
     .dt-scroll,
@@ -455,13 +518,6 @@ blockquote {
     .dt-scroll-body,
     .list-group {
         max-width: calc(100vw - 1.5rem) !important;
-    }
-}
-
-@media (min-width: 992px) {
-    .text-lg-base {
-        font-size: var(--text-base);
-        line-height: 1.5rem;
     }
 }
 
@@ -492,7 +548,6 @@ div.dt-container label {
 .dt-search,
 .dt-buttons.btn-group.flex-wrap .btn-group {
     align-items: center;
-    /* display: flex; */
 }
 
 /* calendar */
@@ -517,11 +572,6 @@ td.fc-day {
 .dropdown-item:hover {
     background-color: var(--color-hover) !important;
 }
-
-/* badges highlight on hover */
-/* .badge-row .badge:hover {
-    box-shadow: inset 0 0 100px 100px 255, 255, 255, 0.1;
-} */
 
 /* remove border from disabled buttons */
 button:disabled {
@@ -562,19 +612,51 @@ button:disabled {
     background-color: var(--background-color-emphasis) !important;
 }
 
-.col.percent {
+/* .col.percent {
     max-width: 30px !important;
-}
+} */
 
-/* album breakdown on hover */
-.album-breakdown:hover {
-    cursor: pointer;
-    background-color: color-mix(in oklab, var(--color-active) 15%, transparent) !important;
+.album-breakdown.complete .progress-bar {
+    background-color: var(--color-warning);
 }
 
 .progress-bar {
     border-radius: inherit !important;
-    background-color: var(--color-primary) !important;
+    background-color: var(--color-primary);
+}
+
+/* album breakdown on hover */
+.album-breakdown:hover {
+    background-color: color-mix(in oklab, var(--color-active) 15%, transparent) !important;
+}
+
+.tooltip-songs .song {
+    font-weight: 600 !important;
+    text-wrap: nowrap !important;
+}
+
+.tooltip-songs .artist {
+    font-weight: 300 !important;
+}
+
+
+
+/* Custom CSS override */
+.tooltip .tooltip-inner {
+    font-family: "Google Sans Flex", sans-serif;
+    white-space: nowrap;
+    max-width: none;
+    font-size: var(--text-xs) !important;
+}
+
+.tooltip-songs {
+    line-height: normal !important;
+    font-size: var(--text-2xs) !important;
+}
+
+.tooltip hr {
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
 }
 
 /* hide empty table cells */
@@ -584,10 +666,8 @@ button:disabled {
 
 /* hide debug and edit button on print */
 @media print {
-    #djDebug {
-        display: none !important;
-    }
 
+    #djDebug,
     #admin-btn {
         display: none !important;
     }
@@ -654,6 +734,7 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 /* set-header default color */
 .set-header td {
     background-color: var(--background-color-emphasis) !important;
+    border: none !important;
 }
 
 .set-header span,
@@ -662,7 +743,7 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 }
 
 .songnum {
-    color: var(--color-contrast) !important;
+    color: var(--text-color-default);
 }
 
 /* set-header colors and badge colors */
@@ -948,7 +1029,7 @@ button.nav-link .badge {
 .prefix-container .prefix {
     font-weight: 500 !important;
     margin-right: 0.5rem !important;
-    text-wrap: nowrap !important;
+    text-wrap: wrap !important;
 }
 
 .prefix-container .prefix::after {
@@ -1178,8 +1259,9 @@ pre {
 }
 
 .album-breakdown .badge {
-    padding: 0.1em 0.3em !important;
+    padding: 0.15em 0.35em !important;
     font-size: var(--text-3xs) !important;
+    font-weight: 300 !important;
 }
 
 #chart {
@@ -1243,7 +1325,7 @@ pre {
         display: flex !important;
     }
 
-    .btn-group,
+    .btn-group:not(.attended-btn),
     .dt-search {
         gap: 8px !important;
         display: flex !important;

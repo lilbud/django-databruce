@@ -1,126 +1,127 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
-{{ title }}
+  {{ title }}
 {% endblock title %}
 {% block extrajs %}
-<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
-	integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
-	crossorigin="anonymous"
-	async></script>
+  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
+          integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
+          crossorigin="anonymous"
+          async></script>
 {% endblock extrajs %}
 {% block content %}
-<div class="col d-grid gap-0 gx-0">
-	<!-- next and last buttons-->
-	{% if not event.date %}
-	<!-- message cards -->
-	<div class="row mb-2 gx-0">
-		<div class="col">
-			<div class="card message info">This is a placeholder date, actual date unknown.</div>
-		</div>
-	</div>
-	{% endif %}
-	<!-- event info -->
-	<div class="row mb-3 gx-0">
-		<div class="col">
-			<div class="card">
-				<div class="card-body">
-					<div class="d-flex flex-wrap">
-						<div class="flex-grow-1 w-75 mb-0">
-							{% if event.title %}
-							<div class="row mb-2 text-center">
-								<div class="col">
-									<div id="title" class="text-wrap text-xs fst-italic fw-light">
-										<span class="mb-0">{{ event.title }}</span>
-									</div>
-								</div>
-							</div>
-							{% endif %}
-							<div class="row text-center">
-								<div class="col">
-									<div class="row">
-										<div class="text-wrap text-lg">
-											<span id="date">
-												{{ event.get_date }}
-											</span>
-
-											{% if event.type.name == 'Rescheduled' or event.type.name == 'Cancelled' or event.type.name == 'Relocated' or event.type.name == 'No Bruce' or event.type.name == 'No Gig' or event.type.name == 'Rumored' %}
-											<span class="text-danger fw-medium">[{{ event.type.name }}]</span>
-											{% endif %}
-										</div>
-									</div>
-
-									<div class="row text-wrap text-lg mt-1">
-										<div class="fw-medium text-reset"
-											id="artist">{{ event.artist }}</div>
-									</div>
-									<div class="row text-lg text-reset mt-1">
-										<div class="col">
-											<div class="text-reset fw-medium">{{ event.venue.get_name }}</div>
-											<div class="text-reset">{{ event.venue.city }}</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- setlist and notes -->
-	<div class="tab-content" id="myTabContent">
-		<div class="tab-pane fade show active"
-			id="overview"
-			role="tabpanel"
-			aria-labelledby="overview-tab"
-			tabindex="0">
-			<div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
-				<div class="col-12">
-					{% if event.note %}
-					<div class="row mb-3 gx-0">
-						<div class="col">
-							{% partialdef event-note inline %}
-							<div class="card">
-								<div class="card-header">
-									Notes
-									<i class="bi bi-pencil"></i>
-								</div>
-								<div class="card-body event-note">{{ event.note|markdown|safe }}</div>
-							</div>
-							{% endpartialdef %}
-						</div>
-					</div>
-					{% endif %}
-					<div class="col-12">
-						<div class="card">
-							<div class="card-header d-flex flex-column">
-								<div class="d-flex justify-content-between w-100">
-									Setlist
-								</div>
-								<div class="collapse row w-100" id="options">
-									<div class="col-12 px-0 pt-1">
-										<button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-									</div>
-								</div>
-							</div>
-							<div class="card-body p-0">
-								<div class="table-responsive">
-									<table class="table table-hover display wrap" id="setlistTable">
-										<thead>
-											<th class="all">#</th>
-											<th class="all">Song</th>
-										</thead>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<script>
+  <div class="col d-grid gap-0 gx-0">
+    <!-- next and last buttons-->
+    {% if not event.date %}
+      <!-- message cards -->
+      <div class="row mb-2 gx-0">
+        <div class="col">
+          <div class="card message info">This is a placeholder date, actual date unknown.</div>
+        </div>
+      </div>
+    {% endif %}
+    <!-- event info -->
+    <div class="row mb-3 gx-0">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-wrap">
+              <div class="flex-grow-1 w-75 mb-0">
+                {% if event.title %}
+                  <div class="row mb-2 text-center">
+                    <div class="col">
+                      <div id="title" class="text-wrap text-xs fw-light">
+                        <span class="mb-0">{{ event.title }}</span>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="row text-center">
+                  <div class="col">
+                    <div class="row">
+                      <div class="text-wrap fw-semibold text-xl">
+                        <span class="text-primary" id="date">{{ event.get_date }}</span>
+                        {% if type_note %}<span class="text-lg text-danger">[{{ event.type.name }}]</span>{% endif %}
+                      </div>
+                    </div>
+                    <div class="row text-wrap text-xl">
+                      <div class="fw-semibold text-reset" id="event-header-artist">{{ event.artist }}</div>
+                    </div>
+                    <div class="row text-sm text-reset">
+                      <div class="col event-header-venue">
+                        <div class="text-reset fw-semibold">{{ event.venue.get_name }}</div>
+                        {% if event.venue.city %}<div class="fw-light">{{ event.venue.city }}</div>{% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row text-center justify-content-center mt-2">
+                  <div class="col-auto">
+                    <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+                         id="badge-row">
+                      {% if event.tour %}<span class="badge badge-primary">{{ event.tour }}</span>{% endif %}
+                      {% if event.leg %}<span class="badge badge-primary">{{ event.leg.name }}</span>{% endif %}
+                      {% if event.run %}<span class="badge badge-primary">{{ event.run.name }}</span>{% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- setlist and notes -->
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active"
+           id="overview"
+           role="tabpanel"
+           aria-labelledby="overview-tab"
+           tabindex="0">
+        <div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
+          <div class="col-12">
+            {% if event.note %}
+              <div class="row mb-3 gx-0">
+                <div class="col">
+                  {% partialdef event-note inline %}
+                    <div class="card">
+                      <div class="card-header">
+                        Notes
+                        <i class="bi bi-pencil"></i>
+                      </div>
+                      <div class="card-body event-note">{{ event.note|markdown|safe }}</div>
+                    </div>
+                  {% endpartialdef %}
+                </div>
+              </div>
+            {% endif %}
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header d-flex flex-column">
+                  <div class="d-flex justify-content-between w-100">Setlist</div>
+                  <div class="collapse row w-100" id="options">
+                    <div class="col-12 px-0 pt-1">
+                      <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover display wrap" id="setlistTable">
+                      <thead>
+                        <th class="all">#</th>
+                        <th class="all">Song</th>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
 	var counts = [];
 
 	$(document).ready(function () {
@@ -322,5 +323,5 @@
 				],
 			})
 	});
-</script>
+  </script>
 {% endblock content %}

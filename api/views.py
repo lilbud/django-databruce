@@ -766,6 +766,7 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
                 num=Count("id"),
                 max=SubqueryCount(setlist_songs),
                 songs=ArraySubquery(songs),
+                category_slug=F("song__category_slug"),
                 album_songs=ArraySubquery(album_songs.values("song_id")),
             )
             .order_by("-num")
