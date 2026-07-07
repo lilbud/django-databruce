@@ -617,6 +617,8 @@
                       {{ event.sales|intcomma }}
                     {% elif event.run.total_sales %}
                       {{ event.run.total_sales|intcomma }}
+                    {% else %}
+                      -
                     {% endif %}
                     /
                     {% if event.capacity %}

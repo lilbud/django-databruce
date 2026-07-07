@@ -691,7 +691,7 @@ class EventDetail(PageTitleMixin, TemplateView):
         try:
             context["ticket_range"] = " / ".join(context["ticket_range"])
         except TypeError:
-            pass
+            context["ticket_range"] = "- / -"
 
         return context
 
