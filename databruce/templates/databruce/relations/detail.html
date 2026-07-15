@@ -12,42 +12,39 @@
     </div>
     {% if info.start_date or info.end_date %}
       <div class="card mb-2">
-        <div class="card-body text-sm">
-          {% if info.start_date %}
-            <div class="prefix-container">
-              <span class="prefix">Born</span>
-              <span class="value">{{ info.start_date|date:'Y-m-d' }}</span>
-            </div>
-          {% endif %}
-          {% if info.end_date %}
-            <div class="prefix-container">
-              <span class="prefix">Died</span>
-              <span class="value">{{ info.end_date|date:'Y-m-d' }}</span>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    {% endif %}
-    {% if bands %}
-      <div class="card mb-2">
-        <div class="card-body text-sm">
-          <div class="prefix-container">
-            <div class="prefix">Appeared With</div>
-            <div class="value">
-              {% for band in bands %}
-                <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            </div>
+        <div class="card-body">
+          <div class="row d-flex gy-2 gy-md-0">
+            {% if info.start_date %}
+              <div class="prefix-container">
+                <span class="prefix">Born</span>
+                <span class="value">{{ info.start_date|date:'Y-m-d' }}</span>
+              </div>
+            {% endif %}
+            {% if info.end_date %}
+              <div class="prefix-container">
+                <span class="prefix">Died</span>
+                <span class="value">{{ info.end_date|date:'Y-m-d' }}</span>
+              </div>
+            {% endif %}
+            {% if bands %}
+              <div class="prefix-container">
+                <div class="prefix">Appeared With</div>
+                <div class="value">
+                  {% for band in bands %}
+                    <a href="{% url "band_details" id=band.band.uuid %}">{{ band.band.name }}</a>
+                    {% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
     {% endif %}
     <div class="card">
       <div class="card-header">
-        <ul class="nav nav-pills nav-justified gap-0 column-gap-1 row-gap-1"
-            role="tablist">
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+        <ul class="nav nav-pills" role="tablist">
+          <li class="nav-item" role="presentation">
             <button class="nav-link active"
                     id="pills-events-tab"
                     data-bs-toggle="pill"
@@ -56,11 +53,10 @@
                     role="tab"
                     aria-controls="pills-home"
                     aria-selected="true">
-              Events<span class="badge badge-light rounded-pill text-bg-light"
-      id="event-count-badge">0</span>
+              Events<span class="badge badge-count" id="event-count-badge">0</span>
             </button>
           </li>
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+          <li class="nav-item" role="presentation">
             <button class="nav-link"
                     id="pills-links-tab"
                     data-bs-toggle="pill"
@@ -84,7 +80,6 @@
                     <th class="all">Setlist</th>
                     <th class="all">Band</th>
                     <th class="all">Venue</th>
-                    <th class="all">Location</th>
                     <th class="all">Tour</th>
                     <th class="all">Detail</th>
                     <th class="all">Public</th>
@@ -115,7 +110,7 @@
   <script>
     $(document).ready(function() {
       var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
-      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+      dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
 
       new DataTable('#eventTable', {
         layout: layout,
@@ -124,7 +119,7 @@
         ajax: {
           'url': '/api/v1/events/?relation={{ info.id }}&format=custom',
         },
-        columnDefs: event_table_defs,
+  
         columns: event_table_columns,
         initComplete: function(settings, json){ 
           var info = this.api().page.info();

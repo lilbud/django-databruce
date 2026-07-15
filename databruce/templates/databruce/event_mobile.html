@@ -1,117 +1,212 @@
-{% extends "databruce/narrow_layout.html" %}
-{% block title %}
-  {{ title }}
-{% endblock title %}
-{% block extrajs %}
-  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
-          integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
-          crossorigin="anonymous"
-          async></script>
-{% endblock extrajs %}
-{% block content %}
-  <div class="col d-grid gap-0 gx-0">
-    <!-- next and last buttons-->
-    {% if not event.date %}
-      <!-- message cards -->
-      <div class="row mb-2 gx-0">
-        <div class="col">
-          <div class="card message info">This is a placeholder date, actual date unknown.</div>
-        </div>
-      </div>
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    {% load i18n static %}
+    {% if not debug %}
+      <script defer
+              src="https://cloud.umami.is/script.js"
+              data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
     {% endif %}
-    <!-- event info -->
-    <div class="row mb-3 gx-0">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex flex-wrap">
-              <div class="flex-grow-1 w-75 mb-0">
-                {% if event.title %}
-                  <div class="row mb-2 text-center">
-                    <div class="col">
-                      <div id="title" class="text-wrap text-xs fw-light">
-                        <span class="mb-0">{{ event.title }}</span>
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
-                <div class="row text-center">
-                  <div class="col">
-                    <div class="row">
-                      <div class="text-wrap fw-semibold text-xl">
-                        <span class="text-primary" id="date">{{ event.get_date }}</span>
-                        {% if type_note %}<span class="text-lg text-danger">[{{ event.type.name }}]</span>{% endif %}
-                      </div>
-                    </div>
-                    <div class="row text-wrap text-xl">
-                      <div class="fw-semibold text-reset" id="event-header-artist">{{ event.artist }}</div>
-                    </div>
-                    <div class="row text-sm text-reset">
-                      <div class="col event-header-venue">
-                        <div class="text-reset fw-semibold">{{ event.venue.get_name }}</div>
-                        {% if event.venue.city %}<div class="fw-light">{{ event.venue.city }}</div>{% endif %}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="row text-center justify-content-center mt-2">
-                  <div class="col-auto">
-                    <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-                         id="badge-row">
-                      {% if event.tour %}<span class="badge badge-primary">{{ event.tour }}</span>{% endif %}
-                      {% if event.leg %}<span class="badge badge-primary">{{ event.leg.name }}</span>{% endif %}
-                      {% if event.run %}<span class="badge badge-primary">{{ event.run.name }}</span>{% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
+    <meta name="keywords" content="Databruce, Setlists, Springsteen">
+    <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="{{ title|default_if_none:"Databruce" }}">
+    <meta property="og:site_name" content="Databruce">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:description"
+          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
+    <link rel="icon"
+          type="image/png"
+          href="{% static "databruce/img/favicon-96x96.png" %}"
+          sizes="96x96" />
+    <link rel="icon"
+          type="image/svg+xml"
+          href="{% static "databruce/img/favicon.svg" %}" />
+    <link rel="shortcut icon" href="{% static "databruce/img/favicon.ico" %}" />
+    <link rel="apple-touch-icon"
+          sizes="180x180"
+          href="{% static "databruce/img/apple-touch-icon.png" %}" />
+    <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
+    <title>
+      {{ title }}
+      | Databruce
+    </title>
+    <!-- leaflet.js-->
+    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
+    <script src="{% static 'databruce/js/leaflet.js' %}"></script>
+    <!--JQuery-->
+    <link rel="stylesheet"
+          href="{% static 'databruce/css/jquery-ui.min.css' %}">
+    <script src="{% static 'databruce/js/jquery-4.0.0.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery.mask.min.js' %}"></script>
+    <!--Bootstrap-->
+    <link rel="stylesheet"
+          href="{% static 'databruce/css/bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="{% static 'databruce/js/bootstrap.bundle.min.js' %}"></script>
+    <!--Datatables-->
+    <link href="{% static 'databruce/css/datatables.min.css' %}"
+          rel="stylesheet">
+    <script src="{% static 'databruce/js/datatables.min.js' %}"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_style.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_select2.css' %}" />
+    <!-- Other -->
+    <script src="{% static 'databruce/js/datatables.js' %}"></script>
+    <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
+    <script src="{% static 'databruce/js/html2canvas.min.js' %}"></script>
+  </head>
+  <body>
+    <div id="capture-area">
+      <nav class="navbar navbar-expand-xl p-0 border-bottom">
+        <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
+          <a class="navbar-brand-mobile p-xl-0 mx-auto p-auto mx-xl-2"
+             href="{% url 'index' %}">
+            <img height="auto"
+                 width="135px"
+                 src="{% static 'databruce/img/logo.png' %}"
+                 alt="Databruce">
+          </a>
+          <li class="nav-item d-none d-xl-block"
+              id="toggle-container"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              data-bs-title="Toggle Theme">
+            <button class="btn btn-sm nav-btn border-0 bd-theme-btn"
+                    id="bd-theme"
+                    type="button"
+                    aria-label="Toggle Theme">
+              <i class="bi bi-sun-fill theme-icon text-xl" aria-hidden="true"></i>
+              <i class="bi bi-moon-stars-fill theme-icon text-xl" aria-hidden="true"></i>
+              <span class="d-lg-none my-auto" id="bd-theme-text">Toggle Theme</span>
+            </button>
+          </li>
         </div>
-      </div>
-    </div>
-    <!-- setlist and notes -->
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active"
-           id="overview"
-           role="tabpanel"
-           aria-labelledby="overview-tab"
-           tabindex="0">
-        <div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
-          <div class="col-12">
-            {% if event.note %}
+      </nav>
+      {% comment %} <div id="download-btn" class="btn btn-primary mb-3 text-xs">Download</div> {% endcomment %}
+      <div class="padded-body">
+        <div class="container-lg">
+          <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
+            <div class="col d-grid gap-0 gx-0">
+              <!-- next and last buttons-->
+              {% if not event.date %}
+                <!-- message cards -->
+                <div class="row mb-2 gx-0">
+                  <div class="col">
+                    <div class="card message info">This is a placeholder date, actual date unknown.</div>
+                  </div>
+                </div>
+              {% endif %}
+              <!-- event info -->
               <div class="row mb-3 gx-0">
                 <div class="col">
-                  {% partialdef event-note inline %}
-                    <div class="card">
-                      <div class="card-header">
-                        Notes
-                        <i class="bi bi-pencil"></i>
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex flex-wrap">
+                        <div class="flex-grow-1 w-75 mb-0">
+                          {% if event.title %}
+                            <div class="row mb-2 text-center">
+                              <div class="col">
+                                <div id="title" class="text-wrap text-xs fw-light">
+                                  <span class="mb-0">{{ event.title }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          {% endif %}
+                          <div class="row text-center">
+                            <div class="col">
+                              <div class="row">
+                                <div class="text-wrap fw-semibold text-xl">
+                                  <span class="text-primary" id="date">{{ event.get_date }}</span>
+                                  {% if type_note %}<span class="text-lg text-danger">[{{ event.type.name }}]</span>{% endif %}
+                                </div>
+                              </div>
+                              <div class="row text-wrap text-xl">
+                                <div class="fw-semibold text-reset" id="event-header-artist">{{ event.artist }}</div>
+                              </div>
+                              <div class="row text-sm text-reset">
+                                <div class="col event-header-venue">
+                                  <div class="text-reset fw-semibold">{{ event.venue.get_name }}</div>
+                                  {% if event.venue.city %}<div class="fw-light">{{ event.venue.city }}</div>{% endif %}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row text-center justify-content-center mt-2">
+                            <div class="col-md-12">
+                              <div class="badge-row text-center justify-content-center d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+                                   id="badge-row">
+                                {% if event.tour %}<span class="badge badge-primary">{{ event.tour }}</span>{% endif %}
+                                {% if event.leg %}<span class="badge badge-primary">{{ event.leg.name }}</span>{% endif %}
+                                {% if event.run %}<span class="badge badge-primary">{{ event.run.name }}</span>{% endif %}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div class="card-body event-note">{{ event.note|markdown|safe }}</div>
-                    </div>
-                  {% endpartialdef %}
-                </div>
-              </div>
-            {% endif %}
-            <div class="col-12">
-              <div class="card">
-                <div class="card-header d-flex flex-column">
-                  <div class="d-flex justify-content-between w-100">Setlist</div>
-                  <div class="collapse row w-100" id="options">
-                    <div class="col-12 px-0 pt-1">
-                      <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
                     </div>
                   </div>
                 </div>
-                <div class="card-body p-0">
-                  <div class="table-responsive">
-                    <table class="table table-hover display wrap" id="setlistTable">
-                      <thead>
-                        <th class="all">#</th>
-                        <th class="all">Song</th>
-                      </thead>
-                    </table>
+              </div>
+              <!-- setlist and notes -->
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active"
+                     id="overview"
+                     role="tabpanel"
+                     aria-labelledby="overview-tab"
+                     tabindex="0">
+                  <div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
+                    <div class="col-12">
+                      {% if event.note %}
+                        <div class="row mb-3 gx-0">
+                          <div class="col">
+                            {% partialdef event-note inline %}
+                              <div class="card">
+                                <div class="card-header">
+                                  Notes
+                                  <i class="bi bi-pencil"></i>
+                                </div>
+                                <div class="card-body event-note">{{ event.note|markdown|safe }}</div>
+                              </div>
+                            {% endpartialdef %}
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="col-12">
+                        <div class="card">
+                          <div class="card-header d-flex flex-column">
+                            <div class="d-flex justify-content-between w-100">Setlist</div>
+                            <div class="collapse row w-100" id="options">
+                              <div class="col-12 px-0 pt-1">
+                                <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body p-0">
+                            <div class="table-responsive">
+                              <table class="table table-hover display wrap" id="setlistTable">
+                                <thead>
+                                  <th class="all">#</th>
+                                  <th class="all">Song</th>
+                                </thead>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -120,107 +215,12 @@
         </div>
       </div>
     </div>
-  </div>
-  <script>
+    <script>
 	var counts = [];
 
 	$(document).ready(function () {
-		var event = "{{ event.id }}"
-
-		fetch(`/api/v1/setlist_breakdown/?event=${event}&format=json&ordering=-num`)
-			.then(response => response.json())
-			.then(data => {
-				data.results.forEach((item, index) => {
-					var album = slugify(item.category);
-					var percent = ((item.num / item.max) * 100).toFixed(0);
-					var complete_badge = "";
-
-					var songs = item.songs.map(song => {
-						if (song.original_artist !== 'Bruce Springsteen') {
-							return `<li class="list-group-item px-1 py-0.5">${song.name} [${song.original_artist}]</li>`
-						}
-
-						return `<li class="list-group-item px-1 py-0.5">${song.name}</li>`
-					}).join('');
-
-					if (item.album_complete) {
-						complete_badge = `<span class="badge badge-warning text-3xs">Complete</span>`
-					}
-
-					//var html = `
-					//<div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
-					//    <div class="row text-2xs mx-0 pb-1 d-flex-inline justify-content-between align-middle">
-					//        <div class="col-8 text-truncate ps-0 text-wrap category"><span class="text-truncate pe-2">${item.category}</span>${complete_badge}</div>
-					//        <div class="col-3 text-end px-0 text-nowrap">${item.num}/${item.max} (${percent}%)</div>
-					//    </div>
-					//    <div class="progress px-0 mx-0">
-					//        <div class="progress-bar" style="width:${percent}%"></div>
-					//    </div>
-					//    <div class="collapse" id="${album}-collapse">
-					//        <ul class="list-group py-1">${songs}</ul>
-					//    </div>
-					//</div>`;
-
-
-					var html = `
-            <div class="col px-2 py-1 border-bottom album-breakdown" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
-                <div class="row text-xs mx-0 d-flex-inline justify-content-between align-middle">
-                    <div class="col-3 col-lg-4 text-truncate px-0 me-2 category" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${item.category}">
-                      <div class="text-truncate">${item.category}</div>
-                      ${complete_badge}
-                    </div>
-                    <div class="col-8 col-lg-6 progress px-0 my-auto align-middle">
-                        <div class="progress-bar" style="width:${percent}%"></div>
-                    </div>
-                    <div class="col text-end px-0 text-nowrap percent">${percent}%</div>
-                </div>
-                <div class="collapse" id="${album}-collapse">
-                    <ul class="list-group py-1">${songs}</ul>
-                </div>
-            </div>`;
-
-					$('#albums').append(html);
-				});
-
-				$('#albums').find('.album-breakdown').each(function (index, row) {
-					var album = $(row).attr('album');
-
-					$(this).hover(function () {
-						$(this).css('cursor', "pointer");
-
-						$(`#setlistTable tbody tr:not(.set-header)`).each(function (index, row) {
-							if ($(row).attr('album') == album) {
-								$(row).css('opacity', '1');
-								$(row).children('td:not(.position)').addClass('highlighted');
-							} else {
-								$(row).css('opacity', '0.2');
-							}
-						});
-
-					}, function () {
-						$(`#setlistTable tr`).css('opacity', '1');
-						$(`#setlistTable tr`).children('td').removeClass('highlighted');
-					})
-				});
-
-				$('#album-breakdown-btn').click(function () {
-					var closed = $('#albums .collapse:not(.show)');
-					var all = $('#albums .collapse');
-
-					if (closed.length > 0) {
-						closed.each(function () {
-							const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-							bsCollapse.show();
-						})
-					} else {
-						all.each(function () {
-							const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-							bsCollapse.hide();
-						})
-					}
-				})
-			}).catch(error => console.error('Error:', error));
-
+		var event = "{{ event.id }}";
+		var event_id = "{{ event.event_id }}";
 		var layout = getDatatableLayout({ columns: false, category: false });
 
 		$('#setlistTable').DataTable(
@@ -290,27 +290,42 @@
 
 								song = `${song} ${segue}`;
 
-								var badges = $('<span />').addClass('ms-2');
-								var baseBadge = `<span class="badge ms-1" data-bs-toggle="tooltip" data-bs-html="true"></span>`
+								var badges = $('<span />').addClass('ms-2 gx-1');
+								var baseBadge = `<span class="badge"></span>`
 
 								if (row.instrumental) {
 									var badge = $(baseBadge).clone();
-									$(badge).addClass('badge-info').text('Inst.').attr('data-bs-title', 'Instrumental');
+									$(badge).addClass('badge-info').text('Instrumental');
 									badges.append($(badge).prop('outerHTML'));
 								}
 
 								if (row.sign_request) {
 									var badge = $(baseBadge).clone();
-									$(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
+									$(badge).addClass('badge-info').text('Sign Request');
 									$(badges).append($(badge).prop('outerHTML'));
 								}
 
 								if (row.nobruce) {
 									var badge = $(baseBadge).clone();
-									$(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
+									$(badge).addClass('badge-warning').text('No Boss');
 									$(badges).append($(badge).prop('outerHTML'));
 								}
 
+                if (row.last == 0) {
+                  gap = null;
+                } else {
+                  gap = row.last;
+                }
+
+                var debut = row.debut;
+                var premiere = row.premiere;
+
+                if (premiere) {
+                  var badge = $(baseBadge).clone();
+                  $(badge).addClass('badge-secondary').text(`First`);
+                  $(badges).append($(badge).prop('outerHTML'));
+                }
+                
 								if (row.notes) {
 									var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes.join('; ')}</span>`;
 									return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
@@ -321,7 +336,77 @@
 						},
 					},
 				],
-			})
+			});
+
+        document.getElementById('download-btn').addEventListener('click', function () {
+            const originalElement = document.getElementById('capture-area');
+
+            const width = 540;
+
+            // 1. Create a clone to manipulate safely
+            const clone = originalElement.cloneNode(true);
+
+            const badgeRow = clone.querySelector('.badge-row');
+            if (badgeRow) {
+                // Force the row to a narrower boundary so the badges are forced to wrap
+                // Adjust this pixel value (e.g., 300px, 350px) to match the wrapping breakpoint you want
+                badgeRow.style.maxWidth = '320px'; 
+                badgeRow.style.marginLeft = 'auto';  // Keep it perfectly centered inside the 600px canvas
+                badgeRow.style.marginRight = 'auto';
+            }
+
+            // 2. Lock the width, but let the height auto-expand to fit everything
+            clone.style.width = `${width}px`;
+            clone.style.height = 'auto'; 
+            
+            // Hide it far off-screen so the user doesn't see the layout shift
+            clone.style.position = 'fixed';
+            clone.style.top = '-9999px';
+            clone.style.left = '-9999px';
+
+            // 3. Append clone to the DOM so the browser calculates its true height
+            document.body.appendChild(clone);
+
+            // 4. Measure the exact full height of the expanded element
+            const fullHeight = clone.scrollHeight;
+
+            // 5. Tell html2canvas to capture the exact dimensions of the clone
+            const options = {
+                scale: 2,             // High resolution rendering
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                width: width,           // Strict target width
+                height: fullHeight    // Dynamic full height
+            };
+
+            const badges = clone.querySelectorAll('.badge');
+            badges.forEach(badge => {
+                // Step A: Keep original badge layout intact, extract text string
+                const textContent = badge.textContent.trim();
+                
+                // Step B: Replace text with a micro-positioned sub-element
+                // This targets only the text character alignment without altering the badge container's structural box model
+                badge.innerHTML = `
+                    <span style="line-height: 1 !important; vertical-align: middle; position: relative; top: -1px;">${textContent}</span>
+                `;
+            });
+
+            html2canvas(clone, options).then(function (canvas) {
+                // Convert to image and trigger download
+                const imageURL = canvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageURL;
+                downloadLink.download = `databruce_${event_id}.png`;
+                
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                // 6. Clean up the DOM
+                document.body.removeChild(clone);
+            });
+        });
 	});
-  </script>
-{% endblock content %}
+    </script>
+  </body>
+</html>

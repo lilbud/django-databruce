@@ -15,7 +15,6 @@
       <th class="all">Name</th>
       <th class="all">Band</th>
       <th class="all">Venue</th>
-      <th class="all">Location</th>
       <th class="all">Events</th>
       <th class="all">Songs</th>
       <th class="all">First</th>
@@ -26,7 +25,7 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout({columns: [1, 2, 3, 4, 5, 6, 7, 8], category: false});
+      var layout = getDatatableLayout({columns: [1, 2, 3, 4, 5, 6, 7], category: false});
 
       var table = new DataTable('#runTable', {
           layout: layout,
@@ -62,17 +61,7 @@
               'name': 'venue__name',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
-                  return '<a href="/venues/' + data.uuid + '">'+ data.name +'</a>';
-                }
-              },
-            },
-            {
-              'data': 'venue',
-              'name': 'venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
-              'className': 'text-nowrap',
-              'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return '<a href="/cities/' + data.city.uuid + '">'+ data.city.formatted +'</a>';
+                  return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
                 }
               },
             },
@@ -84,7 +73,7 @@
               'width': '10rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
-                  return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                  return `<a href="/events/${data.event_id}">${data.date.display}</a>`
                 }
               },
             },
@@ -94,7 +83,7 @@
               'width': '10rem',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
-                  return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                  return `<a href="/events/${data.event_id}">${data.date.display}</a>`
                 }
               },
             },

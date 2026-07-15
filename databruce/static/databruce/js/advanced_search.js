@@ -25,6 +25,10 @@ function get_options({ ajax_url = false }) {
           results: $.map(data.results, function (item) {
             var text = item.name;
 
+            if (item.original_artist) {
+              text = `${item.name} (${item.original_artist})`;
+            }
+
             if (item.text) {
               text = item.text;
             }

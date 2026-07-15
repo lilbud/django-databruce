@@ -36,7 +36,7 @@ class CustomChoiceField(forms.ChoiceField):
 
 
 class CustomMultipleChoiceField(forms.MultipleChoiceField):
-    def valid_value(self):
+    def valid_value(self, value):
         # This bypasses the 'Select a valid choice' check against self.choices
         return True
 

@@ -44,7 +44,7 @@
                   eventsList.push(
                     {
                       title: title,
-                      start: val.date.filter,
+                      start: val.date.display,
                       url: `/events/${val.event_id}`,
                       allDay: false,
                       className: 'calendar event show px-1'
@@ -64,8 +64,8 @@
                   eventsList.push(
                     {
                       title: val.name,
-                      start: val.first_event.date.filter,
-                      end: `${val.last_event.date.filter}T23:59:59`,
+                      start: val.first_event.date.display,
+                      end: `${val.last_event.date.display}T23:59:59`,
                       url: `/events/runs/${val.uuid}`,
                       className: 'px-1 calendar event event-run',
                     }

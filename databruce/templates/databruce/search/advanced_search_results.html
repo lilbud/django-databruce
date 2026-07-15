@@ -48,7 +48,6 @@
                 <th class="all">Setlist</th>
                 <th class="all">Band</th>
                 <th class="all">Venue</th>
-                <th class="all">Location</th>
                 <th class="all">Tour</th>
                 <th class="all">Detail</th>
                 <th class="all">Public</th>
@@ -62,7 +61,7 @@
                   </td>
                   <td class="text-nowrap">
                     {% if event.has_setlist %}
-                      <i class="bi bi-check-lg d-block text-base"
+                      <i class="bi bi-check-lg"
                          data-bs-toggle="tooltip"
                          data-bs-placement="top"
                          data-bs-title="Has Setlist"></i>
@@ -73,12 +72,8 @@
                   </td>
                   <td class="text-nowrap">
                     <a href="{% url "venue_details" id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
-                  </td>
-                  <td class="text-nowrap">
-                    {% if event.venue.city %}
-                      <a target="_blank"
-                         href="{% url "city_details" id=event.venue.city.uuid %}">{{ event.venue.city }}</a>
-                    {% endif %}
+                    <br>
+                    <small>{{ event.venue.city }}</small>
                   </td>
                   <td class="text-nowrap">
                     {% if event.tour %}
@@ -110,18 +105,18 @@
     $(document).ready(function () {
 
       var urlParams = new URLSearchParams(window.location.search);
-      var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
-      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+      var layout = getDatatableLayout({columns: [2,3,4,5], category: true});
+      dtLayoutCategorySelect({layout: layout, column_idx: 6, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
 
       new DataTable('#eventTable', {
         layout: layout,
         serverSide: false,
         columnDefs: [
-          { targets: [1], orderable: false, className: 'text-center text-sm', width: '1rem', columnControl: [] },
+          { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', columnControl: [] },
           { targets: [-1], visible: false },
-          { targets: [0], width: '8rem', className:'text-nowrap' },
+          { targets: [0], width: '8rem', className: 'text-nowrap' },
           { targets: [2,3,4,5], width: '12rem' },
-          { targets: [6], width: '15rem' },
+          { targets: [5], width: '15rem' },
         ],
       });
       

@@ -31,7 +31,7 @@
   <script>
     $(document).ready(function () {
       var layout = getDatatableLayout({columns: [0,1,2,3,4,5], category: true});
-      dtCategorySelect({layout: layout, column_idx: 5, values: [{'label': 'First Friday', 'value': 'true'}, {'label': 'Not First Friday', 'value': 'false'}], label: 'Category'});
+      dtLayoutCategorySelect({layout: layout, column_idx: 5, values: [{'label': 'First Friday', 'value': 'true'}, {'label': 'Not First Friday', 'value': 'false'}], label: 'Category'});
 
       new DataTable('#releasesTable', {
         layout: layout,
@@ -60,7 +60,7 @@
             'name': 'event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -78,7 +78,7 @@
             'name': 'event__venue__city__name, event__venue__city__state__abbrev',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
+                return `<a href="/cities/${row.city.uuid}">${row.city.formatted}</a>`
               }
             },
           },

@@ -36,7 +36,7 @@
   <script>
     $(document).ready(function () {
       var layout = getDatatableLayout({columns: [1,2,3,4,5], category: true});
-      dtCategorySelect({layout: layout, column_idx: 3, values: [{'label': 'English', 'value': 'English'}, {'label': 'German', 'value': 'German'}], label: 'Language'});
+      //dtLayoutCategorySelect({layout: layout, column_idx: 3, values: [{'label': 'English', 'value': 'English'}, {'label': 'German', 'value': 'German'}], label: 'Language'});
 
       new DataTable('#lyricTable', {
           layout: layout,
@@ -50,9 +50,9 @@
               'data': 'song.name',
               'name': 'song__sort_song_name',
               'render': function (data, type, row, meta) {
-                  if (type === 'display' && data) {
-                      return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
-                  }
+                if (type === 'display' && data) {
+                    return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
+                }
               },
             },
             {'data': 'version', 'name': 'version'},
@@ -60,6 +60,17 @@
             {'data': 'language', 'name': 'language'},
             {'data': 'note', 'name': 'note'},
           ],
+          initComplete: function(settings, json) {
+            var table = this.api();
+            var values = table.column(3).data().unique().toArray();
+            var languages = [];
+            
+            values.forEach(element => {
+              languages.push({'label': element, 'value': element});
+            });
+
+            dtCategorySelect({ table: table, column_idx: 3, values: languages, label: 'Language' });
+          }
       });
     });
   </script>

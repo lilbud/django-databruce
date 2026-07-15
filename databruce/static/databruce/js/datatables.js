@@ -140,19 +140,25 @@ function getDatatableLayout({ columns = true, category = false }) {
     }
   };
 
-  if (columns) {
-    layout.topEnd.features.push({ 'buttons': [searchbuilder] });
-  }
+  try {
+    if (columns) {
+      layout.topEnd.features.push({ 'buttons': [searchbuilder] });
+    }
 
-  if (!category) {
-    layout.topEnd.features.splice(0, 1);
-  };
+    if (!category) {
+      layout.topEnd.features.splice(0, 1);
+    };
+  } catch ({ name, message }) {
+    console.log(message);
+  }
 
   return layout;
 };
 
-function dtCategorySelect({ layout, column_idx, values, label = false }) {
+function dtLayoutCategorySelect({ layout, column_idx, values, label = false }) {
   var div = $('<label />')
+
+  console.log(values);
 
   $(div).attr('for', 'dropdown-btn');
   $(div).text(`${label.replace(":", "")}:`);
@@ -183,16 +189,62 @@ function dtCategorySelect({ layout, column_idx, values, label = false }) {
         node.parents('.dropdown-menu').find('.dt-button').each(function () {
           $(this).removeClass('dt-button-active-a');
         });
+
         node.toggleClass('dt-button-active-a');
       },
     };
 
     layout.topEnd.features[0].buttons[0].buttons.push(button);
+    console.log(button)
   });
 
-  $(document).ready(function () {
-    $(div).insertBefore($('#dropdown-btn'));
-  })
+  $(div).insertBefore($('#dropdown-btn'));
+}
+
+function dtCategorySelect({ table, column_idx, values, label = false }) {
+  var div = $('<label />');
+
+  $(div).attr('for', 'dropdown-btn');
+  $(div).text(`${label.replace(":", "")}:`);
+
+  var dropdownButtons = [];
+
+  // Add all button
+  dropdownButtons.push({
+    text: 'All',
+    className: 'button-page-length dt-button-active-a',
+    action: function (e, dt, node, config) {
+      dt.column(column_idx).search('.*', { regex: true }).draw();
+      node.parents('.btn-group').find('.dropdown-toggle').text('All');
+      node.parents('.dropdown-menu').find('.dt-button').each(function () {
+        $(this).removeClass('dt-button-active-a');
+      });
+      node.toggleClass('dt-button-active-a');
+    },
+  });
+
+  // Add each language option
+  values.forEach(element => {
+    dropdownButtons.push({
+      text: element.label,
+      className: 'button-page-length',
+      action: function (e, dt, node, config) {
+        dt.order([0, 'asc']).column(column_idx).search(element.value, { regex: true }).draw();
+        node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
+
+        node.parents('.dropdown-menu').find('.dt-button').each(function () {
+          $(this).removeClass('dt-button-active-a');
+        });
+
+        node.toggleClass('dt-button-active-a');
+      },
+    });
+  });
+
+  // 2. Safely swap the built button array directly inside your collection dropdown
+  table.button('category-select:name').collectionRebuild(dropdownButtons);
+
+  $(div).insertBefore($('#dropdown-btn'));
 }
 
 function renderLink(url, data, text) {
@@ -223,7 +275,7 @@ song_table_columns = [
     'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return renderLink('/songs/', data.uuid, data.name);
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -254,18 +306,13 @@ song_table_columns = [
   },
 ]
 
-event_table_defs = [
-  { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', searchable: false, columnControl: [] },
-  { targets: [0], className: 'text-nowrap' },
-  { targets: [-1], visible: false },
-]
-
 event_table_columns = [
   {
     'data': 'date',
     'name': 'event_id',
     'type': 'text',
-    'className': 'all text-nowrap',
+    'width': '1rem',
+    'className': 'text-nowrap',
     'render': function (data, type, row, meta) {
       return renderLink('/events/', row.event_id, data.display_day);
     },
@@ -274,9 +321,10 @@ event_table_columns = [
     'data': 'has_setlist',
     'name': 'has_setlist',
     'width': '1rem',
-    'className': 'text-center',
+    'className': 'text-center text-xs',
     'orderable': false,
     'searchable': false,
+    'columnControl': [],
     'render': function (data, type, row, meta) {
       return data ? `<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
     },
@@ -284,40 +332,41 @@ event_table_columns = [
   {
     'data': 'artist',
     'name': 'artist__name',
+    'className': 'text-wrap',
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return renderLink('/bands/', data.uuid, data.name);
+        return `<a href="/bands/${data.uuid}">${data.name}</a>`
       }
     },
   },
   {
     'data': 'venue',
-    'name': 'venue__name, venue__detail',
+    'name': 'venue__name, venue__detail, venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
+    'className': 'text-nowrap',
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return renderLink('/venues/', data.uuid, data.name);
-      }
-    },
-  },
-  {
-    'data': 'venue.city',
-    'name': 'venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/cities/', data.uuid, data.formatted);
+        if (row.city) {
+          return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
+        }
+
+        return `<a href="/venues/${data.uuid}">${data.name}</a>`
       }
     },
   },
   {
     'data': 'tour',
     'name': 'tour__name',
-    'width': '12rem',
+    'width': '10rem',
+    'className': 'text-wrap',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return renderLink('/tours/', data.uuid, data.name);
+        if (row.leg) {
+          return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg.name}</small>`
+        }
+
+        return `<a href="/tours/${data.uuid}">${data.name}</a>`
       }
     },
   },

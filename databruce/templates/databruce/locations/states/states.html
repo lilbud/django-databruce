@@ -23,8 +23,9 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
+      
       new DataTable('#stateTable', {
-        layout: getDatatableLayout({category: true}),
+        layout: getDatatableLayout({category: false}),
         serverSide: true,
         processing: true,
         ajax: {
@@ -34,7 +35,7 @@
           { targets: [0], width: '1rem' },
         ],
         columns: [
-          {'data': 'count', 'name': 'count'},
+          {'data': 'num_events', 'name': 'num_events'},
           {
             'data': 'name',
             'name': 'name',
@@ -58,7 +59,7 @@
             'name': 'first_event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -67,7 +68,7 @@
             'name': 'last_event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },        
           },

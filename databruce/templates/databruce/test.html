@@ -1,7 +1,7 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block extrajs %}
 {% endblock extrajs %}
-{% comment %} {% block content %}
+{% block content %}
   <div class="col">
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
@@ -10,7 +10,8 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
           <span class="badge badge-primary">Test</span>
           <span class="badge badge-primary-subtle">Test</span>
           <span class="badge badge-primary-outline">Test</span>
@@ -19,7 +20,8 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
           <span class="badge badge-secondary">Test</span>
           <span class="badge badge-secondary-subtle">Test</span>
           <span class="badge badge-secondary-outline">Test</span>
@@ -28,7 +30,8 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
           <span class="badge badge-success">Test</span>
           <span class="badge badge-success-subtle">Test</span>
           <span class="badge badge-success-outline">Test</span>
@@ -37,7 +40,8 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
           <span class="badge badge-warning">Test</span>
           <span class="badge badge-warning-subtle">Test</span>
           <span class="badge badge-warning-outline">Test</span>
@@ -46,7 +50,8 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
           <span class="badge badge-info">Test</span>
           <span class="badge badge-info-subtle">Test</span>
           <span class="badge badge-info-outline">Test</span>
@@ -55,7 +60,8 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
-        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1" id="badge-row">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
           <span class="badge badge-danger">Test</span>
           <span class="badge badge-danger-subtle">Test</span>
           <span class="badge badge-danger-outline">Test</span>
@@ -112,17 +118,14 @@
       </div>
     </div>
   </div>
-{% endblock content %} {% endcomment %}
-{% block content %}
+{% endblock content %}
+{% comment %} {% block content %}
   <div class="col-12">
     <div class="row">
       <div class="d-flex justify-content-start mb-3">
         <div class="text-2xl pe-2">Events</div>
         <div id="year-select" class="pe-2">
-          <button class="btn btn-sm btn-primary dropdown-toggle"
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false">{{ year }}</button>
+          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ year }}</button>
         </div>
       </div>
     </div>
@@ -138,7 +141,6 @@
                     <th class="all">Setlist</th>
                     <th class="all">Band</th>
                     <th class="all">Venue</th>
-                    <th class="all">Location</th>
                     <th class="all">Tour</th>
                     <th class="all">Detail</th>
                     <th class="all">Public</th>
@@ -167,12 +169,11 @@
       </div>
     </div>
   </div>
-  {% comment %} <div class="row">
-  </div> {% endcomment %}
-  <script>
+</div>
+<script>
   $(document).ready(function () {
     var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: false});
-    //dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+    //dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
   
     var table = new DataTable('#eventTable', {
       layout: layout,
@@ -180,7 +181,7 @@
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=custom',
       },
-      columnDefs: event_table_defs,
+
       columns: event_table_columns,
       initComplete: function(settings, json) {
         var table = this.api();
@@ -267,5 +268,6 @@
         $('#tourContainer').removeClass('list-locked');
     });
   });
-  </script>
+</script>
 {% endblock content %}
+{% endcomment %}

@@ -857,7 +857,7 @@
             'className': 'dt-center text-nowrap col-ltp',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-reset" href="/events/${data.event_id}">${data.date.filter}</a>`;
+                return `<a class="text-reset" href="/events/${data.event_id}">${data.date.display}</a>`;
               }
             },
           },

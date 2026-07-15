@@ -74,7 +74,7 @@
     {% endblock extrajs %}
   </head>
   <body>
-    <nav class="navbar navbar-expand-xl p-0 sticky-top border-bottom">
+    <nav class="navbar navbar-expand-xl p-0 border-bottom">
       <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
         <button class="btn nav-btn d-xl-none d-block py-0"
                 type="button"
@@ -84,8 +84,7 @@
                 aria-label="Toggle navigation">
           <i class="bi bi-list"></i>
         </button>
-        <a class="navbar-brand p-auto p-xl-0 mx-auto mx-xl-2"
-           href="{% url 'index' %}">
+        <a class="navbar-brand p-xl-0 mx-auto mx-xl-2" href="{% url 'index' %}">
           <div class="logo" role="img" aria-label="Databruce">
             <span class="sr-only">Databruce</span>
           </div>
@@ -242,14 +241,11 @@
             </ul>
           </li>
         </ul>
-        {% comment %} <li class="nav-item d-flex d-xl-none"> {% endcomment %}
         <button class="btn nav-btn btn-sm border-0 d-flex d-xl-none"
                 data-bs-toggle="modal"
                 data-bs-target="#searchModal">
           <i class="bi bi-search text-xl fw-semibold"></i>
         </button>
-        {% comment %} </li> {% endcomment %}
-        {% comment %} <div class="vr d-none d-xl-block"></div> {% endcomment %}
         <ul class="navbar-nav my-2 my-xl-0 d-flex flex-wrap row-gap-1">
           <div class="d-none d-xl-inline-flex">
             <li class="nav-item">
@@ -610,13 +606,11 @@
         // 1. Clear the previous timer immediately to debounce properly
         clearTimeout(searchTimeout);
 
-        // Clear the old results visually
         results.innerHTML = '';
-        $('#results').hide(); // Hide results container until new data arrives
+        $('#results').hide();
 
         const query = $(this).val();
 
-        // Date formatting logic (kept exactly as you had it)
         if (/^\d/.test(query)) {
           let numbersOnly = query.replace(/\D/g, '');
           let formatted = '';
@@ -626,10 +620,9 @@
           $(this).val(formatted);
         }
 
-        // 2. Only trigger the loading/search sequence if query is long enough
+        // Only trigger search if input longer than 4 characters
         if (query.length >= 4) {
-          
-          // Show spinner now that we know we are actually going to search
+          // Show spinner
           $("#loadingContainer").show();
 
           searchTimeout = setTimeout(function () {
@@ -645,15 +638,15 @@
                   );
                 });
 
-                // 3. Perfect Sync: Reveal results and hide spinner together
+                // show results
                 $(results).show();
               })
               .catch(error => console.error('Error:', error))
               .finally(() => {
-                // 4. Always hide the spinner when done, even if the request fails
+                // Hide the spinner when done, even if the request fails
                 $("#loadingContainer").hide();
               });
-          }, 700);
+          }, 1000);
         } else {
           // If the query is too short, ensure the spinner stays hidden
           $("#loadingContainer").hide();
@@ -668,18 +661,10 @@
         }
       })
 
-      // Bootstrap 5 Example: Appending to the default allowlist
-      const myDefaultAllowList = bootstrap.Tooltip.Default.allowList;
-
-      // Allow 'class' attribute on span elements
-      myDefaultAllowList.span = ['class'];
-
       let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
       
       tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl, {
-          sanitize: false
-        });
+        return new bootstrap.Tooltip(tooltipTriggerEl);
       });
 
       const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');

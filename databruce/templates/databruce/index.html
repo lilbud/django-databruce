@@ -148,7 +148,7 @@
 
         data.results.forEach((item, index) => {
           var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date.display}</a></div>`
-          var item2 = `<div class="col-9 py-0 text-wrap"><a href="/venues/${item.venue.uuid}">${item.venue.display}</a></div>`
+          var item2 = `<div class="col-9 py-0 text-wrap"><a href="/venues/${item.venue.uuid}">${item.venue.name}</a></div>`
 
           var listItem = createListItem(item1, item2);
           $(list).append(listItem);
@@ -180,9 +180,9 @@
         container.append(loadingList);
       })
 
-      getEventData(`/api/v1/events/?month=${month}&day=${day}&limit=5&format=json`, '#otd')
-      getEventData('/api/v1/events/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
-      getEventData('/api/v1/events/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
+      getEventData(`/api/v1/events_index/?month=${month}&day=${day}&limit=5&format=json`, '#otd')
+      getEventData('/api/v1/events_index/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
+      getEventData('/api/v1/events_index/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
 
       fetch('/api/v1/updates/?format=json&limit=10')
         .then(response => response.json())
@@ -220,7 +220,7 @@
         columnDefs: [
           {'targets': '_all', columnControl: [] }
         ],
-        ajax: '/api/v1/setlists/?event={{ latest_event.event_id }}&format=custom&show_only=true',
+        ajax: '/api/v1/setlists_index/?event={{ latest_event.event_id }}&format=custom&show_only=true',
         rowGroup: {
           dataSrc: 'set_name',
           className: 'text-center set-header p-0 dtrg-group',
@@ -257,34 +257,46 @@
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                var song = `<a class="fw-medium text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
-
-                var segue = row.segue ? $('<span />').addClass('segue').text('>').prop('outerHTML') : ''
+                var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
+                var segue = row.segue ? `<span class="segue"></span>` : '';
 
                 song = `${song} ${segue}`;
 
-                var badge = $('<span />').addClass('ms-2 badge d-inline-flex')
+                var badges = $('<span />');
+                var baseBadge = `<span class="badge"></span>`;
 
                 if (row.instrumental) {
+                  var badge = $(baseBadge).clone();
                   $(badge).addClass('text-bg-info').text('Instrumental');
+                  $(badges).append($(badge).prop('outerHTML'));
                 } else if (row.sign_request) {
+                  var badge = $(baseBadge).clone();
                   $(badge).addClass('text-bg-info').text('Sign Request');
+                  $(badges).append($(badge).prop('outerHTML'));
                 } else if (row.nobruce) {
+                  var badge = $(baseBadge).clone();
                   $(badge).addClass('badge-warning').text('No Bruce');
+                  $(badges).append($(badge).prop('outerHTML'));
                 } else if (row.premiere) {
+                  var badge = $(baseBadge).clone();
                   $(badge).addClass('badge-warning').text('First');
+                  $(badges).append($(badge).prop('outerHTML'));
                 } else if (row.debut && !row.premiere) {
+                  var badge = $(baseBadge).clone();
                   $(badge).addClass('badge-warning').text('TD');
+                  $(badges).append($(badge).prop('outerHTML'));
                 } else if (row.last >= 50 && !row.debut) {
+                  var badge = $(baseBadge).clone();
                   $(badge).addClass('badge-warning').text('Bust');
+                  $(badges).append($(badge).prop('outerHTML'));
                 }
 
                 if (row.notes) {
-                  var notes = $('<span />').addClass('text-xs text-wrap fw-light setlist-note').text(row.notes.join('; ').replaceAll("''", "'"))
-                  return badge ? song + $(badge).prop('outerHTML') + '<br>' + notes.prop('outerHTML') : song
+                  var notes = `<br><span class="text-wrap fw-light setlist-note">${row.notes}</span>`;
+                  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song;
                 }
 
-                return badge ? song + $(badge).prop('outerHTML') : song;
+                return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
               }
             },
           },

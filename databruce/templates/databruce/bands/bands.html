@@ -25,7 +25,7 @@
   $(document).ready(function () {
 
     var layout = getDatatableLayout({columns: [0,1,2,3], category: true});
-    dtCategorySelect({layout: layout, column_idx: 4, values: [{'label': 'Bruce Bands', 'value': 'True'}, {'label': 'Guests', 'value': 'False'}], label: 'Category'});
+    dtLayoutCategorySelect({layout: layout, column_idx: 4, values: [{'label': 'Bruce Bands', 'value': 'True'}, {'label': 'Guests', 'value': 'False'}], label: 'Category'});
 
     new DataTable('#bandTable', {
       layout: layout,
@@ -52,7 +52,7 @@
           'name': 'first_event__event_id, first_event__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a href="/events/${data.event_id}">${data.date.filter}</a>`;
+              return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
             }
           },
         },
@@ -61,7 +61,7 @@
           'name': 'last_event__event_id, last_event__early_late',
           'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-              return `<a href="/events/${data.event_id}">${data.date.filter}</a>`;
+              return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
             }
           },      
         },

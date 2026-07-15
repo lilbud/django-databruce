@@ -16,9 +16,8 @@
     </div>
     <div class="card mt-3">
       <div class="card-header">
-        <ul class="nav nav-pills nav-justified gap-0 column-gap-1 row-gap-1"
-            role="tablist">
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+        <ul class="nav nav-pills" role="tablist">
+          <li class="nav-item" role="presentation">
             <button class="nav-link active"
                     id="pills-events-tab"
                     data-bs-toggle="pill"
@@ -32,7 +31,7 @@
                     id="event-count-badge">0</span>
             </button>
           </li>
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+          <li class="nav-item" role="presentation">
             <button class="nav-link"
                     id="pills-songs-tab"
                     data-bs-toggle="pill"
@@ -45,7 +44,7 @@
       id="song-count-badge">0</span>
             </button>
           </li>
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
+          <li class="nav-item" role="presentation">
             <button class="nav-link"
                     id="pills-slots-tab"
                     data-bs-toggle="pill"
@@ -68,7 +67,6 @@
                     <th class="all">Setlist</th>
                     <th class="all">Band</th>
                     <th class="all">Venue</th>
-                    <th class="all">Location</th>
                     <th class="all">Tour</th>
                     <th class="all">Detail</th>
                     <th class="all">Public</th>
@@ -116,14 +114,14 @@
   <script>
     $(document).ready(function () {
       var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
-      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+      dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
 
       new DataTable('#eventTable', {
         layout: layout,
         ajax: {
           'url': '/api/v1/events/?leg={{ info.id }}&format=custom',
         },
-        columnDefs: event_table_defs,
+  
         columns: event_table_columns,
         initComplete: function(settings, json){ 
           var info = this.api().page.info();

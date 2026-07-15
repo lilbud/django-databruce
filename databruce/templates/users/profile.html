@@ -60,11 +60,11 @@
         </div>
       </div>
     </div>
-    <div class="row mb-2">
+    <div class="row mb-3">
       <div class="col">
         <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
-            <button class="nav-link active"
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active button"
                     id="pills-events-tab"
                     data-bs-toggle="pill"
                     data-bs-target="#events"
@@ -73,8 +73,8 @@
                     aria-controls="pills-events"
                     aria-selected="true">Shows</button>
           </li>
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
-            <button class="nav-link"
+          <li class="nav-item" role="presentation">
+            <button class="nav-link button"
                     id="pills-songs-tab"
                     data-bs-toggle="pill"
                     data-bs-target="#songs"
@@ -83,8 +83,8 @@
                     aria-controls="pills-songs"
                     aria-selected="false">Songs</button>
           </li>
-          <li class="nav-item mb-2 mb-lg-0" role="presentation">
-            <button class="nav-link"
+          <li class="nav-item" role="presentation">
+            <button class="nav-link button"
                     id="pills-albums-tab"
                     data-bs-toggle="pill"
                     data-bs-target="#albums"
@@ -102,14 +102,13 @@
           <div class="card">
             <div class="card-body px-0">
               <div class="table-responsive">
-                <table class="table table-hover display" id="eventTable">
+                <table class="table table-hover display nowrap" id="eventTable">
                   <thead>
                     <tr>
                       <th class="all">Date</th>
                       <th class="all">Setlist</th>
                       <th class="all">Band</th>
                       <th class="all">Venue</th>
-                      <th class="all">Location</th>
                       <th class="all">Tour</th>
                       <th class="all">Detail</th>
                       <th class="all">Public</th>
@@ -124,7 +123,8 @@
           <div class="row mb-3">
             <div class="col">
               <div class="card">
-                <div class="card-body px-1">
+                <div class="card-header">Songs Seen</div>
+                <div class="card-body px-0">
                   <div class="table-responsive">
                     <table class="table table-hover display" id="songTable">
                       <thead>
@@ -191,7 +191,7 @@
         </div>
         <div id="albums" class="tab-pane fade">
           <div class="col-12">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mx-0 g-3"
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"
                  id="cardContainer">
               <div class="col d-none" id="example">
                 <div class="card" id="album">
@@ -250,12 +250,8 @@
         ajax: {
           'url': '/api/v1/events/?user={{ info.id }}&format=custom'
         },
-        columnDefs: event_table_defs,
+  
         columns: event_table_columns,
-        // initComplete: function (settings, json) {
-        //   var info = this.api().page.info();
-        //   $('#user-event-count').text(info.recordsTotal);
-        // }
       });
 
       new DataTable('#songTable', {
@@ -303,7 +299,7 @@
             'name': 'first_event',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -312,7 +308,7 @@
             'name': 'last_event',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -370,7 +366,7 @@
             'name': 'first_event',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -379,7 +375,7 @@
             'name': 'last_event',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -430,7 +426,7 @@
             'name': 'first_event',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -439,7 +435,7 @@
             'name': 'last_event',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },

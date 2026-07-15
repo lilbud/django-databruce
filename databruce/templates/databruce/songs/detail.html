@@ -30,11 +30,10 @@
                 {% endif %}
                 {% if not info.original %}
                   <div class="row mb-2">
-                  <div class="fw-semibold">Original Artist</div>
-                  <div>{{ info.original_artist }}</div>
-                </div>
+                    <div class="fw-semibold">Original Artist</div>
+                    <div>{{ info.original_artist }}</div>
+                  </div>
                 {% endif %}
-                
                 <div class="row mb-2 d-flex-inline col-gap-2 justify-content-center justify-content-lg-start">
                   <div class="col-auto">
                     <div class="fw-semibold">Public</div>
@@ -85,27 +84,27 @@
       <div class="col">
         <div class="card">
           <div class="card-header">
-            <ul class="nav nav-pills items-end mb-2 text-sm gap-1" role="tablist">
+            <ul class="nav nav-pills" role="tablist">
               <button class="nav-link active"
                       data-bs-toggle="pill"
                       data-bs-target="#events"
                       aria-controls="pills-events">
                 Performances
-                <span class="badge badge-light rounded-pill text-bg-light" id="event-count-badge">0</span>
+                <span class="badge" id="event-count-badge">0</span>
               </button>
               <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#snippets"
                       aria-controls="pills-snippets">
                 Snippets
-                <span class="badge badge-light rounded-pill text-bg-light" id="snippet-count-badge">0</span>
+                <span class="badge" id="snippet-count-badge">0</span>
               </button>
               <button class="nav-link"
                       data-bs-toggle="pill"
                       data-bs-target="#included"
                       aria-controls="pills-included">
                 Included Songs
-                <span class="badge badge-light rounded-pill text-bg-light" id="included-count-badge">0</span>
+                <span class="badge" id="included-count-badge">0</span>
               </button>
               <button class="nav-link"
                       data-bs-toggle="pill"
@@ -131,7 +130,6 @@
                         <th class="all">Date</th>
                         <th class="all">Act</th>
                         <th class="all">Venue</th>
-                        <th class="all">Location</th>
                         <th class="all">Tour</th>
                         <th class="all">Position</th>
                         <th class="all">Gap</th>
@@ -153,7 +151,6 @@
                         <th class="all">Date</th>
                         <th class="all">Act</th>
                         <th class="all">Venue</th>
-                        <th class="all">Location</th>
                         <th class="all">During Song</th>
                         <th class="all">Note</th>
                       </tr>
@@ -288,7 +285,7 @@
   
     $(document).ready(function () {
       var layout = getDatatableLayout({category: true});
-      dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': '^' + set_names.join('|') + '$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}], label: 'Category'})
+      dtLayoutCategorySelect({layout: layout, column_idx: 6, values: [{'label': 'Public', 'value': '^' + set_names.join('|') + '$'}, {'label': 'Private', 'value': '^Soundcheck|Rehearsal|Recording|Interview$'}], label: 'Category'})
 
       new DataTable('#songTable', {
         layout: layout,
@@ -330,16 +327,6 @@
             },
           },
           {
-            'data': 'event.venue',
-            'name': 'id__event__venue__city__name, id__event__venue__city__state__abbrev, id__event__venue__city__state__name, id__event__venue__city__country__name',
-            'width': '16rem',
-            'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
-              };
-            },
-          },
-          {
             'data': 'event.tour',
             'name': 'id__event__tour__name',
             'width': '12rem',
@@ -351,12 +338,14 @@
           },
           {
             'data': 'position',
-            'name': 'id__setlist_position__position',
+            'name': 'id__position',
             'width': '6rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 var className = slugify(data);
+
+                console.log(data)
 
                 if (className == "show-opener") {
                   return `<span class="badge badge-primary align-middle">${data}</span>`
@@ -371,8 +360,8 @@
             },
           },
           {
-            'data': 'stats',
-            'name': 'id__setlist_stats__gap',
+            'data': 'id',
+            'name': 'id__last',
             'width': '1rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
@@ -394,7 +383,6 @@
                 } else {
                   return data.gap;
                 }
-
               }
             },
           },
@@ -462,7 +450,7 @@
           {
             'data': 'event',
             'name': 'setlist__event__event_id',
-            'width': '8rem',
+            'width': '6rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return `<a href="/events/${data.event_id}">${data.date.display}</a>`
@@ -480,27 +468,21 @@
             },
           },
           {
-            'data': 'event.venue',
+            'data': 'venue',
             'name': 'setlist__event__venue__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
+                  if (data.city) {
+                    return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${data.city.formatted}</small>`
+                  }
+
                   return `<a href="/venues/${data.uuid}">${data.name}</a>`
                 }
             },
           },
           {
-            'data': 'event.venue',
-            'name': 'setlist__event__venue__city__name',
-            'width': '12rem',
-            'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/cities/${data.city.uuid}">${data.city.formatted}</a>`
-              };
-            },
-          },
-          {
-            'data': 'setlist.song',
+            'data': 'song',
             'name': 'setlist__song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
@@ -509,7 +491,16 @@
               }
             },
           },
-          {'data': 'note', 'name': 'note'},
+          {
+            'data': 'notes',
+            'name': 'setlist__setlist_notes__note',
+            'className': 'text-nowrap',
+            'render': function (data, type, row, meta) {
+              if (type === 'display' && data) {
+                return `<span class="setlist-note">${data.join('; ')}</span>`
+              }
+            },
+          },
         ],
         initComplete: function(settings, json){ 
           var info = this.api().page.info();
@@ -561,7 +552,7 @@
             'name': 'first__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -570,7 +561,7 @@
             'name': 'last__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },

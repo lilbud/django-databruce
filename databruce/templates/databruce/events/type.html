@@ -36,7 +36,6 @@
                     <th class="all">Setlist</th>
                     <th class="all">Band</th>
                     <th class="all">Venue</th>
-                    <th class="all">Location</th>
                     <th class="all">Tour</th>
                     <th class="all">Detail</th>
                     <th class="all">Public</th>
@@ -52,7 +51,7 @@
   <script>
   $(document).ready(function () {
     var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
-    dtCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
+    dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
   
     var table = new DataTable('#eventTable', {
       layout: layout,
@@ -60,7 +59,7 @@
       ajax: {
         'url': '/api/v1/events/?type={{ type.id }}&format=custom',
       },
-      columnDefs: event_table_defs,
+
       columns: event_table_columns,
     });
 

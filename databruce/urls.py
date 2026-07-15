@@ -140,6 +140,7 @@ urlpatterns = [
     path("events/type", views.EventType.as_view(), name="events_type"),
     path("songs", views.Song.as_view(), name="songs"),
     path("songs/<uuid:id>", views.SongDetail.as_view(), name="song_details"),
+    path("songs/<str:slug>", views.SongDetail.as_view(), name="song_details"),
     path("lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
     path(
         "lyrics/<uuid:id>",

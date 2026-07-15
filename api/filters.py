@@ -433,11 +433,6 @@ class EventsFilter(filters.FilterSet):
 
     day = filters.NumberFilter(field_name="date__day", lookup_expr="exact", label="day")
 
-    # venue = filters.NumberFilter(
-    #     field_name="venue_id",
-    #     lookup_expr="exact",
-    #     label="venue",
-    # )
     venue = filters.NumberFilter(
         method="filter_by_venue_or_detail",
         label="venue",
@@ -487,12 +482,12 @@ class EventsFilter(filters.FilterSet):
     )
 
     relation = django_filters.BaseInFilter(
-        field_name="onstage__relation_id",
+        field_name="onstage_event__relation_id",
         label="onstage relation",
     )
 
     band = django_filters.BaseInFilter(
-        field_name="onstage__band_id",
+        field_name="onstage_event__band_id",
         distinct=True,
         label="onstage band",
     )
@@ -509,41 +504,57 @@ class EventsFilter(filters.FilterSet):
         if not value:
             return queryset
 
-        # 1. Attempt to extract a valid year and/or month from the user's string
         parsed_year = None
         parsed_month = None
+        parsed_day = None
 
         try:
-            # Use fuzzy=True so it ignores extraneous words like "events in Feb 1977"
-            # default=datetime(1, 1, 1) prevents dateutil from filling missing parts with the current year/day
-            parsed_date = parser.parse(
+            # Trick to detect if a day/month/year was explicitly provided:
+            # Parse twice with different defaults. If the value changes between parses,
+            # it means dateutil used the default fallback rather than user input.
+            parsed_date_1 = parser.parse(
                 value,
                 fuzzy=True,
                 default=datetime.datetime(1, 1, 1),
             )
+            parsed_date_2 = parser.parse(
+                value,
+                fuzzy=True,
+                default=datetime.datetime(2, 2, 2),
+            )
 
-            # Check if a valid year was provided (1 represents the unfilled fallback value)
-            if parsed_date.year != 1:
-                parsed_year = parsed_date.year
-            if parsed_date.month != 1:
-                parsed_month = parsed_date.month
+            if parsed_date_1.year == parsed_date_2.year:
+                parsed_year = parsed_date_1.year
+            if parsed_date_1.month == parsed_date_2.month:
+                parsed_month = parsed_date_1.month
+            if parsed_date_1.day == parsed_date_2.day:
+                parsed_day = parsed_date_1.day
+
         except (ValueError, OverflowError):
-            # The input value isn't a recognizable date at all; pass silently
             pass
 
+        # Build date conditions based on specificity
         date_conditions = Q()
-        if parsed_year and parsed_month:
-            # Matches exact year and month (e.g., "Feb 1977", "1977-02", "02/1977")
+
+        if parsed_year and parsed_month and parsed_day:
+            # TIER 1: Exact Date Match (e.g., "1977-02-15")
+            date_conditions = Q(
+                date__year=parsed_year,
+                date__month=parsed_month,
+                date__day=parsed_day,
+            )
+        elif parsed_year and parsed_month:
+            # TIER 2: Exact Month/Year Match (e.g., "Feb 1977")
             date_conditions = Q(date__year=parsed_year, date__month=parsed_month)
         elif parsed_year:
-            # Matches just the year (e.g., "1977")
+            # TIER 3: Exact Year Match (e.g., "1977")
             date_conditions = Q(date__year=parsed_year)
 
         query = SearchQuery(value, search_type="websearch")
 
         vector = (
-            SearchVector("event_id", weight="A")
-            + SearchVector("date", weight="B")
+            SearchVector("event_id", weight="B")
+            + SearchVector("date", weight="A")
             + SearchVector("date__day", weight="B")
             + SearchVector("early_late", weight="B")
             + SearchVector("artist__name", weight="C")
@@ -552,13 +563,28 @@ class EventsFilter(filters.FilterSet):
             + SearchVector("run__name", weight="D")
         )
 
+        # If the user provided a full exact date, boost it to the very top (similar to Event ID)
+        exact_date_match = Q()
+
+        # Build the conditional ranking cases dynamically
+        ranking_cases = [
+            When(event_id__istartswith=value, then=Value(1.0)),
+        ]
+
+        # Only inject the exact date boost if we actually have a full valid date
+        if parsed_year and parsed_month and parsed_day:
+            exact_date_match = Q(
+                date__year=parsed_year,
+                date__month=parsed_month,
+                date__day=parsed_day,
+            )
+            ranking_cases.append(When(exact_date_match, then=Value(0.95)))
+
         return (
             queryset.annotate(
                 search=vector,
                 rank=Case(
-                    # TIER 1: If the user explicitly typed a partial/full Event ID, force top priority
-                    When(event_id__istartswith=value, then=Value(1.0)),
-                    # TIER 2: Fall back to your standard postgres weighted text ranking
+                    *ranking_cases,  # Unpack the valid cases here safely
                     default=SearchRank(vector, query, weights=[0.1, 0.3, 0.6, 1.0]),
                 ),
             )
@@ -566,7 +592,7 @@ class EventsFilter(filters.FilterSet):
                 Q(event_id__startswith=str(value)) | date_conditions | Q(search=query),
                 rank__gt=0.1,
             )
-            .order_by("event_id")[:25]
+            .order_by("-rank")[:25]
         )
 
     def filter_time_frame(self, queryset, name, value):
@@ -967,7 +993,7 @@ class SetlistSongsFilter(filters.FilterSet):
 
 
 class SnippetFilter(filters.FilterSet):
-    snippet = filters.NumberFilter(field_name="snippet__id", lookup_expr="exact")
+    snippet = filters.NumberFilter(field_name="snippet_id", lookup_expr="exact")
 
     song = filters.NumberFilter(
         field_name="setlist__song_id",

@@ -17,7 +17,7 @@
 {% block table %}
   <thead>
     <tr>
-      <th class="all">Title</th>
+      <th class="all">Detail</th>
       <th class="all">Label</th>
       <th class="all">Source</th>
       <th class="all">Type</th>
@@ -74,7 +74,7 @@
             'name': 'event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },

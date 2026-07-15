@@ -253,7 +253,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Fixed issue where profiles with no events would cause an error when attempting to view profile page.
 - Fixed Advanced Search Song dropdown not including original artist. So "Fire (Jimi Hendrix)" and "Fire (Bruce Springsteen)" would show up as the same "Fire".
 
-# v1.18 (July 2026)
+# v1.18 (July 6, 2026)
 
 - [User] Signup now requires answering a verification question.
 - [Event Detail] Minor page redesign, header updated date/artist to be bigger size while shrinking venue/city. Very much inspired by WTED Archives.
@@ -262,3 +262,13 @@ First public release of the site. Site was locked behind a login and accounts on
 - [Event Detail] Album cover images now show in-place of their names on the album breakdown. The list of songs will also show on hover as well. Clicking will still expand a list like before. Idea borrowed from Dripfield.pro.
 - [Event Detail] Album breakdown now changes the progress bar color if the album is "complete" at a show. I couldn't have both the album image AND the complete badge without the layout breaking.
 - [Event Detail] Updated "show times" card. This contains the scheduled time (from ticket stub), actual start/end time if known, and show length (dependent on the previous being present). Times were pulled from ticket stubs sourced from Brucebase, and are shown in venue local time. To speed up the process, AI was used to first OCR the stub images to extract the times. This data was then reviewed and corrected manually before being inserted into the database.
+
+# v1.18.1 (July 15, 2026)
+
+- Cleaned up API code. Reduced response size and as a result many pages have seen improvements in API
+- Songs Snippet Tab now shows setlist notes
+- Card Header tabs have been redesigned to no longer use buttons but tabs
+- Album Breakdown will no longer mark an album as "complete" if all songs present but NOT in sequential order.
+- Event Table now shows city/state under venue name
+- Event Table now shows Tour Leg under Tour name
+- Added setlist image generation to Event Details page under the "Setlist Options". This will generate an image of the setlist and show info and prompt you to download. Image generation is done entirely in browser, and *should* work on most browsers. Consider this to be a beta addition for the time being.

@@ -33,7 +33,7 @@
           { width: '1rem', targets: [0] },
         ],
         columns: [
-          {'data': 'count', 'name': 'count'},
+          {'data': 'num_events', 'name': 'num_events'},
           {
             'data': 'name',
             'name': 'name',
@@ -48,7 +48,7 @@
             'name': 'first_event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },
@@ -57,7 +57,7 @@
             'name': 'last_event__event_id',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.filter}</a>`
+                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
               }
             },
           },

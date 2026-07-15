@@ -1,13 +1,10 @@
 {% extends "databruce/narrow_layout.html" %}
-{% load humanize %}
+{% load humanize static %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"
-          integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D"
-          crossorigin="anonymous"
-          async></script>
+  <script src="{% static 'databruce/js/html2canvas.min.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
@@ -273,7 +270,7 @@
                   gy-3 gx-0">
         <div class="col-12 {% if setlist_certainty %}col-xl-9 pe-xl-3{% endif %}">
           {% if event.note %}
-            <div class="row d-xl-none mb-3 gx-0">
+            <div class="row d-xl-none mb-3 mt-0 mt-md-3 gx-0">
               <div class="col">
                 {% partialdef event-note inline %}
                   <div class="card">
@@ -298,7 +295,7 @@
                           data-bs-html="true"
                           data-bs-title="Setlist Options">
                       <a role="button"
-                         class="btn btn-sm btn-primary icon-button px-1"
+                         class="btn btn-sm btn-primary icon-button p-1"
                          data-bs-toggle="collapse"
                          href="#options">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -314,7 +311,8 @@
                   </div>
                   <div class="collapse row w-100" id="options">
                     <div class="col-12 px-0 pt-1">
-                      <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+                      <button id="copySetlist" class="btn btn-sm btn-primary text-2xs px-2 py-0.5">Copy Setlist</button>
+                      <button id="download-btn" class="btn btn-primary btn-sm text-2xs px-2 py-0.5">Download</button>
                     </div>
                   </div>
                 </div>
@@ -336,7 +334,7 @@
             </div>
           {% endif %}
         </div>
-        <div class="col-12 mt-3 {% if setlist_certainty %}col-xl-3{% endif %}">
+        <div class="col-12 {% if setlist_certainty %}col-xl-3{% endif %}">
           <div class="row row-cols-2
                       {% if setlist_certainty %}row-cols-xl-1{% endif %}
                       gy-3 gx-2">
@@ -383,7 +381,7 @@
                             {% else %}
                               -
                             {% endif %}
-                            {% if event.rank_stats.length_rank %}
+                            {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
                               <span data-bs-toggle="tooltip"
                                     data-bs-title="{% if event.rank_stats.length_rank == 1 %}
                                                      Longest Show to Date
@@ -693,11 +691,13 @@
     </div>
   </div>
 </div>
+<script src="{% static 'databruce/js/share-card.js' %}"></script>
 <script>
   var counts = [];
 
   $(document).ready(function () {
-    var event = "{{ event.id }}"
+    var event = "{{ event.id }}";
+    var event_id = "{{ event.event_id }}";
 
     // only fetch if the albums div exists
     if ($('#albums').length) {
@@ -705,9 +705,9 @@
         .then(response => response.json())
         .then(data => {
           data.results.forEach((item, index) => {
-            var album = slugify(item.category);
+            var album = item.category_slug;
             var percent = ((item.num / item.max) * 100).toFixed(0);
-            var rowClass = "col px-2 py-1 album-breakdown";
+            var rowClass = "col px-2 py-0.5 album-breakdown";
 
             var songs = item.songs.map(song => {
               var item = `${song.name}`
@@ -721,22 +721,22 @@
 
             var tooltip_songs = item.songs.map(song => {
               if (!(song.original)) {
-                return `<span><span class='song'>${song.name}</span> <span class='artist'>[${escapeHtml(song.original_artist)}]</span></span>`;
+                return `<span><span class='song'>${escapeHtml(song.name)}</span> <span class='artist'>[${escapeHtml(song.original_artist)}]</span></span>`;
               }
 
-              return `<span class='song'>${song.name}</span>`
+              return `<span class='song'>${escapeHtml(song.name)}</span>`
             }).join('<br>');
 
-            var tooltip = `<div class='text-start'><span class='text-xs'>${item.category}</span><hr><span class='tooltip-songs'>${tooltip_songs}</span></div>`;
+            var tooltip = `<div class='text-start'><span class='text-xs'>${item.category}</span><hr><span class='tooltip-songs'>${tooltip_songs}</span></div>`
 
             if (item.album_complete) {
-              tooltip = `<div class='text-start'><span class='text-xs'>${item.category} (Complete)</span><hr><span class='tooltip-songs'>${tooltip_songs}</span></div>`;
+              tooltip = `<div class='text-start'><span class='text-xs'>${item.category} (Complete)</span><hr><span class='tooltip-songs'>${tooltip_songs}</span></div>`
               rowClass = "col px-2 py-1 album-breakdown complete"
             }
 
             var html = `
               <div class="${rowClass}" data-bs-toggle="collapse" album="${album}" href="#${album}-collapse">
-                  <div class="row mx-0 d-flex-inline justify-content-between align-middle" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" data-bs-title="${tooltip}">
+                  <div class="row mx-0 d-flex-inline justify-content-between align-middle" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="${tooltip}">
                       <div class="col-1 col-lg-1 px-0 me-2 category align-middle">
                         <img class="rounded border" src="/static/databruce/img/albums/${item.category_slug}.jpg" height="24px" onerror="this.onerror=null; this.src='/static/databruce/img/albums/default.jpg';" alt="${item.category}">
                       </div>
@@ -751,6 +751,12 @@
               </div>`;
 
             $('#albums').append(html);
+          });
+
+          let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    
+          tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
           });
 
           $('#albums').find('.album-breakdown').each(function (index, row) {
@@ -794,7 +800,7 @@
     };
 
     var layout = getDatatableLayout({ columns: false, category: false });
-
+    
     $('#onstageTable').DataTable(
       {
         layout: layout,
@@ -856,7 +862,6 @@
         ordering: false,
         searching: false,
         info: false,
-        fixedHeader: false,
         autoWidth: false,
         ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
         rowGroup: {
@@ -874,7 +879,7 @@
           var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
           if (allowedSets.includes(data.set_name)) {
-            var album = slugify(data.song.category);
+            var album = data.song.category_slug;
             $(row).attr('album', album);
           }
         },
@@ -909,7 +914,7 @@
             'width': '18rem',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
+                var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
                 var segue = row.segue ? `<span class="segue"></span>` : '';
 
                 song = `${song} ${segue}`;
@@ -935,9 +940,11 @@
                   $(badges).append($(badge).prop('outerHTML'));
                 }
 
+                console.log(row.notes)
+
                 if (row.notes) {
-                  var notes = `<br><span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes.join('; ')}</span>`;
-                  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song;
+                  var notes = `<br><span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes}</span>`;
+                  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;
                 }
 
                 return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
@@ -951,10 +958,10 @@
             'render': function (data, type, row, meta) {
               var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
-              if (row.last == 0) {
+              if (row.gap == 0) {
                 gap = null;
               } else {
-                gap = row.last;
+                gap = row.gap;
               }
 
               var debut = row.debut;
@@ -1011,7 +1018,7 @@
             'className': 'dt-center text-nowrap col-ltp',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<a class="text-reset" href="/events/${data.event_id}">${data.date.filter}</a>`;
+                return `<a class="text-reset" href="/events/${data.event_id}">${data.date.display}</a>`;
               }
             },
           },
@@ -1022,7 +1029,7 @@
             'className': 'text-wrap text-xs col-notes',
             'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
-                return `<span class="setlist-note">${row.notes.join('; ').replaceAll("''", "'")}</span>`
+                return `<span class="setlist-note">${row.notes.replaceAll("''", "'")}</span>`
               }
             },
           }
@@ -1084,6 +1091,16 @@
           };
         },
       });
+    });
+
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+
+    initializeShareCardGenerator({
+        buttonId: 'download-btn',
+        ajaxUrl: "/api/v1/setlists/?event={{ id }}&format=custom", // Safely generates the API route
+        downloadFilename: `databruce_${event_id}`,
+        activeTheme: currentTheme,
+        layout: layout
     });
   });
 </script>

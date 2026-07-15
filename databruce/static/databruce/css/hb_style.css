@@ -141,6 +141,12 @@ body {
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004) !important;
 }
 
+#capture-area {
+    -webkit-text-stroke-width: 0.2px;
+    -webkit-text-stroke-color: transparent;
+    /* Smooths out the jagged sub-pixel text steps */
+}
+
 /* Force the main content area to grow and fill available space */
 .padded-body {
     flex: 1 0 auto;
@@ -195,15 +201,23 @@ ul:last-child {
 
 .navbar .nav-item,
 .navbar .nav-item .btn,
-.nav-btn,
 .navbar button.dropdown-toggle {
     color: var(--color-white) !important;
     border: none !important;
 }
 
 /* logo needs font size 0 to be centered, as it is an SVG */
-.navbar-brand {
+.navbar-brand,
+.navbar-brand-mobile {
     font-size: 0 !important;
+    padding-top: var(--bs-navbar-brand-padding-y) !important;
+    padding-bottom: var(--bs-navbar-brand-padding-y) !important;
+}
+
+@media (max-width: 1200px) {
+    .navbar-brand {
+        padding-left: 2.3rem !important;
+    }
 }
 
 /* optional for screen readers */
@@ -244,6 +258,11 @@ a:link,
     padding: 0.35rem 0.75rem !important;
 }
 
+.card-header:has(.nav-pills) {
+    font-size: var(--text-sm) !important;
+    padding: 0.1rem 0 !important;
+}
+
 #album .card-header {
     font-size: var(--text-2xs) !important;
     font-weight: 500 !important;
@@ -268,6 +287,12 @@ a:link,
     overflow: hidden !important;
 }
 
+thead tr:first-child th {
+    position: sticky;
+    z-index: 12;
+    top: 0;
+    /* background: white; */
+}
 
 .row:has(>div[class*="dt-layout-"]:empty),
 .dt-layout-full,
@@ -278,7 +303,6 @@ a:link,
 
 .row:has(>div[class*="dt-layout-"]:empty) {
     display: none !important;
-
 }
 
 .dt-layout-full {
@@ -349,14 +373,34 @@ span #usercount {
 .card-header,
 .card-footer,
 .card,
-.list-group-item {
+.list-group-item,
+.accordion-item {
     background-color: var(--background-color-subtle);
     border-color: var(--border-color-base);
     color: var(--text-color-default);
 }
 
-.card.divider {
+.card.divider,
+.card .form-control,
+.card .form-select {
     background-color: var(--background-color-default) !important;
+}
+
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-value,
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-value,
+div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-condition {
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+#searchBuilderContainer .btn {
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+    border: transparent !important;
+}
+
+#searchBuilderContainer .btn:hover {
+    background-color: var(--color-primary-dark) !important;
 }
 
 th,
@@ -367,6 +411,7 @@ tr:not(.set-header) td:not(.songnum, .position, .highlighted) {
 .form-control,
 .form-select {
     background-color: var(--background-color-muted) !important;
+    border-color: var(--border-color-base) !important;
 }
 
 /* song number cell background when not position */
@@ -381,10 +426,19 @@ td.songnum[class*="closer"] {
     color: var(--color-contrast);
 }
 
-table th {
+table th:not(.fc-day) {
+    font-size: var(--text-xs) !important;
+    font-weight: 500 !important;
+}
+
+table th:not(.fc-day, [class*="opener"], [class*="closer"]) {
+    background-color: var(--background-color-subtle) !important;
+}
+
+th.fc-day {
+    /* padding: 0.2rem 0.5rem 0.15rem 0.5rem !important; */
     font-size: var(--text-xs) !important;
     background-color: var(--background-color-subtle) !important;
-    padding: 0.2rem 0.5rem 0.15rem 0.5rem !important;
     font-weight: 500 !important;
 }
 
@@ -431,14 +485,13 @@ td:not(.fc-day) {
     vertical-align: middle !important;
 }
 
-td {
+tbody tr:not(.set-header) {
+    height: 25px !important;
     line-height: 1.1rem !important;
-    padding: 0.15rem 0.5rem !important;
 }
 
-tbody tr:not(.set-header) {
-    height: 24px !important;
-    line-height: 1.1rem !important;
+:not(.fc-scrollgrid-section, .set-header)>td {
+    padding: 0.15rem 0.5rem !important;
 }
 
 td .badge {
@@ -448,6 +501,8 @@ td .badge {
     height: 16px !important;
     padding: 0.2em 0.45em !important;
     margin-top: -2px !important;
+    white-space: nowrap !important;
+    width: max-content !important;
     vertical-align: middle !important;
     font-size: var(--text-3xs) !important;
     border-radius: calc(infinity * 1px) !important;
@@ -639,8 +694,6 @@ button:disabled {
     font-weight: 300 !important;
 }
 
-
-
 /* Custom CSS override */
 .tooltip .tooltip-inner {
     font-family: "Google Sans Flex", sans-serif;
@@ -673,31 +726,91 @@ button:disabled {
     }
 }
 
-/* active nav button and datatables control color */
-button.nav-link.active,
+.nav-pills {
+    gap: 0.25rem !important;
+}
+
+button.nav-link:not(.button).active {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    /* border-bottom: 3px solid var(--color-primary) !important; */
+    box-shadow: 0 3px 0 0 var(--color-primary) !important;
+    border-radius: 0px !important;
+    color: var(--text-color-default) !important;
+    font-weight: 500 !important;
+}
+
+.nav-link.button.active {
+    background-color: var(--color-primary) !important;
+    border-color: transparent !important;
+    color: var(--color-white) !important;
+    font-weight: 500 !important;
+}
+
+.nav-link.button:not(.active) {
+    background-color: var(--background-color-emphasis) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--text-color-default) !important;
+    font-weight: 300 !important;
+}
+
+button.nav-link:not(.active) {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: var(--color-primary-dark) !important;
+    font-weight: 500 !important;
+}
+
+button>.badge {
+    border-radius: calc(1px * infinity) !important;
+}
+
+button:not(.active)>.badge {
+    background-color: var(--color-blue-600) !important;
+    color: var(--color-blue-50) !important;
+}
+
+[data-bs-theme="dark"] {
+
+    button.active:hover>.badge,
+    button:not(.active):hover>.badge,
+    button.active>.badge {
+        background-color: var(--color-gray-500) !important;
+        color: var(--color-white) !important;
+    }
+
+    .nav-pills button:not(.active):hover {
+        color: var(--color-white) !important;
+    }
+}
+
+[data-bs-theme="light"] {
+
+    button.active:hover>.badge,
+    button:not(.active):hover>.badge,
+    button.active>.badge {
+        background-color: var(--color-gray-500) !important;
+        color: var(--color-white) !important;
+    }
+
+    .nav-pills button:not(.active):hover {
+        color: var(--color-black) !important;
+    }
+}
+
 .dt-paging-button.page-item.active>button.page-link {
+    color: var(--color-white) !important;
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
 }
 
 .dt-paging-button.page-item:not(.active)>button.page-link {
-    color: var(--color-primary) !important;
+    color: var(--color-primary-dark) !important;
 }
 
-/* inactive nav button color and font */
-button.nav-link:not(.active) {
-    font-weight: 300 !important;
-    color: var(--color-white) !important;
-    background-color: var(--color-active) !important;
-}
-
-/* active nav button font weight */
-button.nav-link.active {
-    font-weight: 600 !important;
-}
-
-button.nav-link.active:hover {
-    background-color: var(--color-primary-dark) !important;
+.page-link {
+    padding: 0.3rem 0.7rem !important;
+    font-size: var(--text-sm) !important;
 }
 
 /* inactive nav link color */
@@ -803,6 +916,7 @@ th.show-closer {
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    /* padding: 0.25rem !important; */
 }
 
 /* Apply margin to everything EXCEPT the very last element */
@@ -836,6 +950,11 @@ th.show-closer {
     }
 }
 
+/* :not(.nav-item)>.btn-sm:not(.icon-button, #usercount) {
+    font-size: var(--text-2xs) !important;
+    padding: 0.2rem 0.3rem !important;
+} */
+
 div.dt-scroll-body {
     border-bottom-width: 0px !important;
 }
@@ -847,7 +966,7 @@ div.dt-scroll-body {
 }
 
 .btn,
-button.nav-link {
+button {
     gap: 0.5rem !important;
     align-items: center !important;
     vertical-align: middle !important;
@@ -914,13 +1033,7 @@ button.nav-link {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-}
-
-button.nav-link * {
-    display: inline-flex;
-    vertical-align: middle;
-    justify-content: center;
-    align-items: center;
+    text-wrap: nowrap !important;
 }
 
 button.nav-link .badge {
@@ -1024,12 +1137,15 @@ button.nav-link .badge {
 .prefix-container {
     display: flex !important;
     text-wrap: wrap !important;
+    font-size: var(--text-sm) !important;
+    width: 100% !important;
+    flex-direction: column !important;
 }
 
 .prefix-container .prefix {
     font-weight: 500 !important;
     margin-right: 0.5rem !important;
-    text-wrap: wrap !important;
+    text-wrap: nowrap !important;
 }
 
 .prefix-container .prefix::after {
@@ -1038,6 +1154,12 @@ button.nav-link .badge {
 
 .prefix-container .value {
     text-wrap: wrap !important;
+}
+
+@media (min-width: 576px) {
+    .prefix-container {
+        flex-direction: row !important;
+    }
 }
 
 .map-container {
@@ -1178,7 +1300,7 @@ pre {
 
 .form-control,
 .form-select {
-    border: 1px solid var(--border-color-base);
+    border: 1px solid var(--bs-border-color);
 }
 
 .form-select-sm {
@@ -1191,6 +1313,16 @@ pre {
 .bi.bi-star-fill {
     height: 16px;
     width: 16px;
+}
+
+/* Ensure the arrow smoothly transitions when rotating */
+.custom-accordion-toggle .toggle-arrow {
+    transition: transform 0.2s ease-in-out;
+}
+
+/* When the accordion link is expanded, flip the arrow 180 degrees upside down */
+.custom-accordion-toggle[aria-expanded="true"] .toggle-arrow {
+    transform: rotate(180deg);
 }
 
 /* offcanvas links */

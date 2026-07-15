@@ -712,7 +712,9 @@ class NugsReleases(BaseModel):
         db_column="event_id",
         related_name="nugs_event",
     )
-    date = models.DateTimeField(default=None, db_column="release_date")
+    date = models.DateTimeField(
+        default=None, db_column="release_date", blank=True, null=True
+    )
     url = models.TextField(default=None, db_column="nugs_url")
     thumbnail = models.TextField(default=None, db_column="thumbnail_url")
     name = models.TextField(default=None, blank=True, null=True)
@@ -788,7 +790,7 @@ class Onstage(BaseModel):
         to=Events,
         on_delete=models.DO_NOTHING,
         db_column="event_id",
-        related_name="onstage",
+        related_name="onstage_event",
         default=None,
         db_index=True,
     )
@@ -1581,7 +1583,7 @@ class Lyrics(BaseModel):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
-    song = models.OneToOneField(
+    song = models.ForeignKey(
         Songs,
         models.DO_NOTHING,
         null=True,

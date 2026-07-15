@@ -695,6 +695,15 @@ class EventDetail(PageTitleMixin, TemplateView):
 
         return context
 
+    def get_template_names(self):
+        """Dynamically route requests to the simplified share layout
+        if called via JavaScript fetch.
+        """
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return ["databruce/event_mobile.html"]
+
+        return [self.template_name]
+
 
 class EventDetailMobile(PageTitleMixin, TemplateView):
     template_name = "databruce/event_mobile.html"
@@ -955,7 +964,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
         venue_address = getattr(venue, "address", None)
 
         if venue_address:
-            context["shared_loc"] = models.Venues.objects.exclude(id=venue.id).filter(
+            context["shared_loc"] = models.Venues.objects.exclude(id=venue.pk).filter(
                 address=venue_address,
             )[:5]
 

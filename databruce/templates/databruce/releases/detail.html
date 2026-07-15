@@ -23,7 +23,12 @@
           </div>
         </div>
       {% endif %}
-      <div class="info-card-row row row-cols-2 g-2 {% if info.event %}row-cols-lg-4{% else %}row-cols-lg-3{% endif %}">
+      <div class="info-card-row row row-cols-2 g-2
+                  {% if info.event %}
+                    row-cols-lg-4
+                  {% else %}
+                    row-cols-lg-3
+                  {% endif %}">
         <div class="col">
           <div class="card">
             <div class="card-body">
@@ -64,8 +69,7 @@
     </div>
     <div class="card">
       <div class="card-header">
-        <ul class="nav nav-pills nav-justified gap-0 column-gap-1 row-gap-1"
-            role="tablist">
+        <ul class="nav nav-pills" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link active"
                     id="pills-songs-tab"
@@ -92,7 +96,9 @@
         <div class="tab-content">
           <div id="songs" class="tab-pane fade show active">
             <div class="table-responsive">
-              <table class="table table-hover display" id="tracksTable" style="width: 100%">
+              <table class="table table-hover display"
+                     id="tracksTable"
+                     style="width: 100%">
                 <thead>
                   <tr class="header">
                     <th class="all">Track</th>
