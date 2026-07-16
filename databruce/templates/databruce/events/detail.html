@@ -941,8 +941,6 @@
                   $(badges).append($(badge).prop('outerHTML'));
                 }
 
-                console.log(row.notes)
-
                 if (row.notes) {
                   var notes = `<br><span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes}</span>`;
                   return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;

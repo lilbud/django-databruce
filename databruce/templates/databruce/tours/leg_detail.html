@@ -153,7 +153,6 @@
         },
         columns: setlist_slots,
         initComplete: function () {
-          console.log(this.api())
           this.api().columns().every(function () {
             var columnData = this.data().join(''); // Combine all cell data into one string
 

@@ -116,7 +116,7 @@
     var layout = getDatatableLayout({columns: false, category: false});
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    console.log(timezone); // Output: "America/New_York"
+    {% comment %} console.log(timezone); // Output: "America/New_York" {% endcomment %}
 
     function createPlaceholderItem() {
       return `

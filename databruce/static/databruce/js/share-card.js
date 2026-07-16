@@ -215,6 +215,7 @@ function initializeShareCardGenerator(config) {
           useCORS: true,
           backgroundColor: canvasBgColor,
           scrollX: 0,
+          letterRendering: true,
           scrollY: 0,
           x: 0,
           y: 0,
