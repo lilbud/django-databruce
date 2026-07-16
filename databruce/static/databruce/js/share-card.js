@@ -12,7 +12,6 @@ function initializeShareCardGenerator(config) {
     })
       .then(response => response.text())
       .then(htmlContent => {
-        console.log(htmlContent);
         const sandbox = document.createElement('div');
         sandbox.style.position = 'fixed';
         sandbox.style.top = '-9999px';
@@ -97,7 +96,7 @@ function initializeShareCardGenerator(config) {
 
                     song = `${song} ${segue}`;
 
-                    var badges = $('<span />').addClass('ms-2 gx-1');
+                    var badges = $('<span />').addClass('ms-2 d-inline-flex gap-1');
                     var baseBadge = `<span class="badge"></span>`
 
                     if (row.instrumental) {
