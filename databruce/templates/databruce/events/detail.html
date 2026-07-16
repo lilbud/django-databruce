@@ -311,8 +311,9 @@
                   </div>
                   <div class="collapse row w-100" id="options">
                     <div class="col-12 px-0 pt-1">
-                      <button id="copySetlist" class="btn btn-sm btn-primary text-2xs px-2 py-0.5">Copy Setlist</button>
-                      <button id="download-btn" class="btn btn-primary btn-sm text-2xs px-2 py-0.5">Download</button>
+                      <button id="copySetlist" class="btn btn-sm btn-primary text-2xs px-2 py-1">Copy Setlist</button>
+                      <button id="download-btn"
+                              class="btn btn-primary btn-sm icon-button text-2xs px-2 py-1">Download</button>
                     </div>
                   </div>
                 </div>
@@ -1097,7 +1098,7 @@
 
     initializeShareCardGenerator({
         buttonId: 'download-btn',
-        ajaxUrl: "/api/v1/setlists/?event={{ id }}&format=custom", // Safely generates the API route
+        ajaxUrl: "/api/v1/setlists_mobile/?event={{ id }}&format=custom&show_only=true", // Safely generates the API route
         downloadFilename: `databruce_${event_id}`,
         activeTheme: currentTheme,
         layout: layout

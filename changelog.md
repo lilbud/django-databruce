@@ -272,3 +272,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - Event Table now shows city/state under venue name
 - Event Table now shows Tour Leg under Tour name
 - Added setlist image generation to Event Details page under the "Setlist Options". This will generate an image of the setlist and show info and prompt you to download. Image generation is done entirely in browser, and *should* work on most browsers. Consider this to be a beta addition for the time being.
+- Fixed event search not returning correct results for date only.

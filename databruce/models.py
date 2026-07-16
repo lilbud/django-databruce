@@ -713,7 +713,10 @@ class NugsReleases(BaseModel):
         related_name="nugs_event",
     )
     date = models.DateTimeField(
-        default=None, db_column="release_date", blank=True, null=True
+        default=None,
+        db_column="release_date",
+        blank=True,
+        null=True,
     )
     url = models.TextField(default=None, db_column="nugs_url")
     thumbnail = models.TextField(default=None, db_column="thumbnail_url")
@@ -1004,6 +1007,13 @@ class Songs(BaseModel):
     short_name = models.TextField(
         default=None,
         verbose_name="Short Name",
+        blank=True,
+        null=True,
+    )
+
+    slug = models.TextField(
+        default=None,
+        verbose_name="Slug",
         blank=True,
         null=True,
     )

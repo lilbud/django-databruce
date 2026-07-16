@@ -31,6 +31,9 @@ router.register(
 )
 router.register(r"releases", views.ReleasesViewSet, basename="release")
 router.register(r"setlists", views.SetlistViewSet, basename="setlist")
+router.register(
+    r"setlists_mobile", views.SetlistMobileViewSet, basename="setlists_mobile"
+)
 router.register(r"snippets", views.SnippetViewSet, basename="snippet")
 router.register(r"states", views.StatesViewSet, basename="state")
 router.register(r"songs", views.SongsViewSet, basename="songs")

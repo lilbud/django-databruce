@@ -235,7 +235,7 @@
 				scrollX: false,
 				fixedHeader: false,
 				autoWidth: false,
-				ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
+				ajax: '/api/v1/setlists/?event={{ id }}&format=custom&show_only=true',
 				rowGroup: {
 					dataSrc: 'set_name',
 					className: 'text-center set-header p-0 dtrg-group',
@@ -251,7 +251,7 @@
 					var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
 					if (allowedSets.includes(data.set_name)) {
-						var album = slugify(data.song.category);
+						var album = data.song.category_slug;
 						$(row).attr('album', album);
 					}
 				},
@@ -325,9 +325,15 @@
                   $(badge).addClass('badge-secondary').text(`First`);
                   $(badges).append($(badge).prop('outerHTML'));
                 }
+
+                if (debut) {
+                  var badge = $(baseBadge).clone();
+                  $(badge).addClass('badge-secondary').text(`Tour Debut`);
+                  $(badges).append($(badge).prop('outerHTML'));
+                }
                 
 								if (row.notes) {
-									var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes.join('; ')}</span>`;
+									var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes}</span>`;
 									return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
 								}
 
@@ -337,75 +343,6 @@
 					},
 				],
 			});
-
-        document.getElementById('download-btn').addEventListener('click', function () {
-            const originalElement = document.getElementById('capture-area');
-
-            const width = 540;
-
-            // 1. Create a clone to manipulate safely
-            const clone = originalElement.cloneNode(true);
-
-            const badgeRow = clone.querySelector('.badge-row');
-            if (badgeRow) {
-                // Force the row to a narrower boundary so the badges are forced to wrap
-                // Adjust this pixel value (e.g., 300px, 350px) to match the wrapping breakpoint you want
-                badgeRow.style.maxWidth = '320px'; 
-                badgeRow.style.marginLeft = 'auto';  // Keep it perfectly centered inside the 600px canvas
-                badgeRow.style.marginRight = 'auto';
-            }
-
-            // 2. Lock the width, but let the height auto-expand to fit everything
-            clone.style.width = `${width}px`;
-            clone.style.height = 'auto'; 
-            
-            // Hide it far off-screen so the user doesn't see the layout shift
-            clone.style.position = 'fixed';
-            clone.style.top = '-9999px';
-            clone.style.left = '-9999px';
-
-            // 3. Append clone to the DOM so the browser calculates its true height
-            document.body.appendChild(clone);
-
-            // 4. Measure the exact full height of the expanded element
-            const fullHeight = clone.scrollHeight;
-
-            // 5. Tell html2canvas to capture the exact dimensions of the clone
-            const options = {
-                scale: 2,             // High resolution rendering
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                width: width,           // Strict target width
-                height: fullHeight    // Dynamic full height
-            };
-
-            const badges = clone.querySelectorAll('.badge');
-            badges.forEach(badge => {
-                // Step A: Keep original badge layout intact, extract text string
-                const textContent = badge.textContent.trim();
-                
-                // Step B: Replace text with a micro-positioned sub-element
-                // This targets only the text character alignment without altering the badge container's structural box model
-                badge.innerHTML = `
-                    <span style="line-height: 1 !important; vertical-align: middle; position: relative; top: -1px;">${textContent}</span>
-                `;
-            });
-
-            html2canvas(clone, options).then(function (canvas) {
-                // Convert to image and trigger download
-                const imageURL = canvas.toDataURL('image/png');
-                const downloadLink = document.createElement('a');
-                downloadLink.href = imageURL;
-                downloadLink.download = `databruce_${event_id}.png`;
-                
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-
-                // 6. Clean up the DOM
-                document.body.removeChild(clone);
-            });
-        });
 	});
     </script>
   </body>

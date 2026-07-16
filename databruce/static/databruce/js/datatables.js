@@ -57,7 +57,7 @@ $(document).ready(function () {
   });
 });
 
-const slugify = (str) => {
+const slugify = (str = '') => {
   return str
     .toLowerCase() // Convert to lowercase
     .trim() // Trim leading/trailing whitespace
@@ -156,12 +156,10 @@ function getDatatableLayout({ columns = true, category = false }) {
 };
 
 function dtLayoutCategorySelect({ layout, column_idx, values, label = false }) {
-  var div = $('<label />')
+  // var div = $('<label />')
 
-  console.log(values);
-
-  $(div).attr('for', 'dropdown-btn');
-  $(div).text(`${label.replace(":", "")}:`);
+  // $(div).attr('for', 'dropdown-btn');
+  // $(div).text(`${label.replace(":", "")}:`);
 
   var all_button = {
     text: 'All',
@@ -176,6 +174,12 @@ function dtLayoutCategorySelect({ layout, column_idx, values, label = false }) {
     },
   };
 
+  // 2. Format the label string safely
+  var labelText = label ? `${label.replace(":", "")}:` : '';
+  var labelHtml = label ? `<label for="dropdown-btn">${labelText}</label> ` : '';
+
+  // 3. Inject the label into the DataTables feature button configuration
+  layout.topEnd.features[0].buttons[0].prefix = labelHtml;
   layout.topEnd.features[0].buttons[0].buttons = [all_button];
 
   values.forEach(element => {
@@ -195,10 +199,9 @@ function dtLayoutCategorySelect({ layout, column_idx, values, label = false }) {
     };
 
     layout.topEnd.features[0].buttons[0].buttons.push(button);
-    console.log(button)
   });
 
-  $(div).insertBefore($('#dropdown-btn'));
+  // $(div).insertBefore($('#dropdown-btn'));
 }
 
 function dtCategorySelect({ table, column_idx, values, label = false }) {

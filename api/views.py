@@ -450,6 +450,24 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
 
 
+class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = (
+        models.Setlists.objects.all()
+        .select_related(
+            "event",
+            "song",
+        )
+        .prefetch_related(
+            "setlist_notes",
+        )
+        .order_by("event", F("song_num").asc(nulls_first=True))
+    )
+
+    serializer_class = serializers.SetlistMobileSerializer
+    filterset_class = filters.SetlistFilter
+    ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
+
+
 class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.SetlistEntries.objects.all()

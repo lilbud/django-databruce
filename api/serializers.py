@@ -113,7 +113,7 @@ class MinimalEventSerializer(BaseSerializer):
 
     class Meta:
         model = models.Events
-        fields = ["date", "event_id"]
+        fields = ["date", "event_id", "early_late"]
 
 
 class MinimalTourLegsSerializer(BaseSerializer):
@@ -141,6 +141,7 @@ class MinimalSongsSerializer(BaseSerializer):
             "name",
             "album",
             "category_slug",
+            "slug",
             "category",
             "uuid",
             "original",
@@ -653,6 +654,7 @@ class SongsSerializer(BaseSerializer):
             "has_lyrics",
             "sort_song_name",
             "uuid",
+            "slug",
         ]
 
 
@@ -664,8 +666,27 @@ class SetlistStatsSerializer(BaseSerializer):
         fields = "__all__"
 
 
+class SetlistMobileSerializer(BaseSerializer):
+    song = MinimalSongsSerializer(include=["name", "uuid", "slug"])
+    notes = serializers.SerializerMethodField()
+
+    def get_notes(self, obj):
+        if not obj.setlist_notes.exists():
+            return None
+
+        return "; ".join(
+            list(
+                filter(None, [item.note for item in obj.setlist_notes.all()]),
+            ),
+        )
+
+    class Meta:
+        model = models.Setlists
+        fields = "__all__"
+
+
 class SetlistSerializer(BaseSerializer):
-    song = MinimalSongsSerializer(include=["name", "uuid", "category_slug"])
+    song = MinimalSongsSerializer(include=["name", "uuid", "category_slug", "slug"])
     last_event = MinimalEventSerializer(
         source="ltp",
         required=False,
@@ -674,7 +695,6 @@ class SetlistSerializer(BaseSerializer):
     event = MinimalEventSerializer(include=["date", "event_id"])
     count = serializers.IntegerField(required=False)
     notes = serializers.SerializerMethodField()
-    # gap = serializers.IntegerField(required=False, source="last")
     gap = serializers.SerializerMethodField()
 
     def get_gap(self, obj):

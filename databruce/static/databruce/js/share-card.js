@@ -57,8 +57,8 @@ function initializeShareCardGenerator(config) {
 
               var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
-              if (allowedSets.includes(data.set_name)) {
-                var album = slugify(data.song.category);
+              if (allowedSets.includes(data.set_name) && data.song) {
+                var album = data.song.category_slug;
                 $(row).attr('album', album);
               }
             },
@@ -133,8 +133,14 @@ function initializeShareCardGenerator(config) {
                       $(badges).append($(badge).prop('outerHTML'));
                     }
 
+                    if (debut) {
+                      var badge = $(baseBadge).clone();
+                      $(badge).addClass('badge-primary').text(`Tour Debut`);
+                      $(badges).append($(badge).prop('outerHTML'));
+                    }
+
                     if (row.notes) {
-                      var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes.join('; ')}</span>`;
+                      var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes}</span>`;
                       return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
                     }
 
