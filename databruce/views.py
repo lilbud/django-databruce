@@ -578,7 +578,8 @@ class EventDetail(PageTitleMixin, TemplateView):
         venue_name = getattr(venue, "name", "Unknown Venue")
 
         context["title"] = f"{event_date} - {venue_name}"
-        context["description"] = f"{event_date}<br>{event.artist}<br>{venue_name}"
+
+        context["description"] = f"{event.summary}"
 
         context["setlist_certainty"] = bool(
             context["event"].setlist_certainty not in (None, "", "Unknown"),
