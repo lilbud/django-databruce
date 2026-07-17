@@ -1012,14 +1012,22 @@ class SongDetail(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-
-        context["info"] = get_object_or_404(
-            models.Songs.objects.prefetch_related(
-                "album",
-                "last_event",
-            ),
-            uuid=self.kwargs["id"],
-        )
+        try:
+            context["info"] = get_object_or_404(
+                models.Songs.objects.prefetch_related(
+                    "album",
+                    "last_event",
+                ),
+                uuid=self.kwargs["id"],
+            )
+        except KeyError:
+            context["info"] = get_object_or_404(
+                models.Songs.objects.prefetch_related(
+                    "album",
+                    "last_event",
+                ),
+                slug=self.kwargs["slug"],
+            )
 
         song = context["info"]
         song_name = getattr(song, "name", "Unknown Song")
@@ -1629,17 +1637,21 @@ class RunDetail(PageTitleMixin, TemplateView):
         context["title"] = f"{context['info']}"
 
         if context["info"].ticket_range:
-            context["ticket_range"] = [
-                currency(float(x))
-                for x in context["info"].ticket_range.split("/")  # type: ignore
-            ]
+            context["ticket_range"] = " / ".join(
+                [
+                    currency(float(x))
+                    for x in context["info"].ticket_range.split("/")  # type: ignore
+                ],
+            )
+        elif context["info"].ticket_min and context["info"].ticket_max:
+            context["ticket_range"] = " / ".join(
+                [
+                    currency(context["info"].ticket_min),
+                    currency(context["info"].ticket_max),
+                ],
+            )
         else:
-            context["ticket_range"] = [
-                currency(context["info"].ticket_min),
-                currency(context["info"].ticket_max),
-            ]
-
-        context["ticket_range"] = " / ".join(context["ticket_range"])
+            context["ticket_range"] = None
 
         return context
 
