@@ -466,7 +466,7 @@
 
       $('#PublicityFilter').on('change', function () {
           var selectedValue = this.value;
-          table.column(10).search(selectedValue ? selectedValue : '', true, false).draw();
+          table.order([[0, 'asc']]).column(10).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       new DataTable('#snippetTable', {

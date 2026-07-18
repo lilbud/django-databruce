@@ -124,7 +124,7 @@
 
       $('#PublicityFilter').on('change', function () {
         var selectedValue = this.value;
-        table.column(3).search(selectedValue ? selectedValue : '', true, false).draw();
+        table.order([[4, 'asc']]).column(3).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       tableSearch(table, 'search');

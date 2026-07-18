@@ -161,7 +161,7 @@
 
       $('#PublicityFilter').on('change', function () {
           var selectedValue = this.value;
-          table.column(6).search(selectedValue ? selectedValue : '', true, false).draw();
+          table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
       });
       
       $('button#short-url').click(function () {

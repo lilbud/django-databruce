@@ -287,3 +287,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - Nearly all of the event/song tables have been simplified, consolidating all of them into functions with common settings. Makes it much easier to work with.
 - Fixed the "included songs" table on the song detail page. It was working but not finding all songs and only showing a count of 1 regardless of the actual number.
 - Event Table publicity filter now orders by event date before searching
+- Update table filters to sort table before applying filter.

@@ -18,7 +18,7 @@
               <div class="col-12 col-md-1">
                 <label for="PublicityFilter" class="pb-1">Show Misc.</label>
                 <select id="PublicityFilter" class="form-select form-select-sm">
-                  <option value="^.*Misc.*$">Show</option>
+                  <option value="^.*$">Show</option>
                   <option value="^(?!.*Misc).*$">Hide</option>
                 </select>
               </div>
@@ -124,7 +124,7 @@
 
     $('#PublicityFilter').on('change', function () {
       var selectedValue = this.value;
-      table.column(0).search(selectedValue ? selectedValue : '', true, false).draw();
+      table.order([[3, 'desc']]).column(0).search(selectedValue ? selectedValue : '', true, false).draw();
     });
 
     tableSearch(table, 'search');
