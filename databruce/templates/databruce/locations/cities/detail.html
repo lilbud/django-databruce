@@ -52,42 +52,10 @@
           </li>
         </ul>
       </div>
-      <div class="card-body px-0">
+      <div class="card-body">
         <div class="tab-content">
-          <div id="events" class="tab-pane fade show active">
-            {% comment %} {% include "databruce/partials/event_table.html" with events=events %} {% endcomment %}
-            <div class="table-responsive">
-              <table class="table table-hover display" id="eventTable">
-                <thead>
-                  <tr class="custom">
-                    <th class="all">Date</th>
-                    <th class="all">Setlist</th>
-                    <th class="all">Band</th>
-                    <th class="all">Venue</th>
-                    <th class="all">Tour</th>
-                    <th class="all">Detail</th>
-                    <th class="all">Public</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
-          <div id="songs" class="tab-pane fade">
-            {% comment %} {% include "databruce/partials/song_position_table.html" with songs=songs %} {% endcomment %}
-            <div class="table-responsive">
-              <table class="table table-hover display" id="songTable">
-                <thead>
-                  <tr>
-                    <th class="all">Plays</th>
-                    <th class="all">Song</th>
-                    <th class="all">Category</th>
-                    <th class="all">First</th>
-                    <th class="all">Last</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
+          <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+          <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
           <div id="links" class="tab-pane fade">
             <ul>
               {% if info.mbid %}
@@ -103,40 +71,8 @@
   </div>
   <script>
     $(document).ready(function () {
-      
-      var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: true});
-      //dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
-
-      new DataTable('#eventTable', {
-        layout: layout,
-        serverSide: true,
-        processing: true,
-        ajax: {
-          'url': '/api/v1/events/?city={{ info.id }}&format=custom',
-        },
-  
-        columns: event_table_columns,
-        initComplete: function(settings, json){ 
-          var info = this.api().page.info();
-          $('#event-count-badge').text(info.recordsTotal);
-        }
-      });
-
-      new DataTable('#songTable', {
-        layout: getDatatableLayout({category: false}),
-        serverSide: true,
-        processing: true,
-        ajax: {
-          'url': '/api/v1/setlist_songs/?city={{ info.id }}&format=custom',
-        },
-        order: [[0, 'asc']],
-        columnDefs: song_table_defs,
-        columns: song_table_columns,
-        initComplete: function(settings, json){ 
-          var info = this.api().page.info();
-          $('#song-count-badge').text(info.recordsTotal);
-        }
-      });
+      eventTableSearch('/api/v1/events/?city={{ info.id }}&format=custom');
+      songTable('/api/v1/setlist_songs/?city={{ info.id }}&format=custom');
     })
   </script>
 {% endblock content %}

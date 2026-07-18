@@ -135,9 +135,13 @@ class MinimalRelationsSerializer(BaseSerializer):
 
 
 class MinimalSongsSerializer(BaseSerializer):
+    first_event = MinimalEventSerializer(required=False)
+    last_event = MinimalEventSerializer(required=False)
+
     class Meta:
         model = models.Songs
         fields = [
+            "id",
             "name",
             "album",
             "category_slug",
@@ -147,6 +151,8 @@ class MinimalSongsSerializer(BaseSerializer):
             "original",
             "original_artist",
             "num_plays_public",
+            "first_event",
+            "last_event",
         ]
 
 
@@ -655,6 +661,7 @@ class SongsSerializer(BaseSerializer):
             "sort_song_name",
             "uuid",
             "slug",
+            "original",
         ]
 
 
@@ -825,9 +832,48 @@ class SnippetSerializer(BaseSerializer):
         fields = ["event", "song", "venue", "notes"]
 
 
+class IncludedSerializer(BaseSerializer):
+    count = serializers.IntegerField(required=False)
+
+    event_map = {
+        s.event_id: MinimalEventSerializer(s).data for s in models.Events.objects.all()
+    }
+
+    song_map = {
+        s.id: MinimalSongsSerializer(
+            s,
+            include=["uuid", "name", "category", "original"],
+        ).data
+        for s in models.Songs.objects.all()
+    }
+
+    first_event = serializers.SerializerMethodField()
+    last_event = serializers.SerializerMethodField()
+    snippet = serializers.SerializerMethodField()
+
+    def get_snippet(self, obj):
+        return self.song_map[obj["snippet_id"]]
+
+    def get_first_event(self, obj):
+        return self.event_map[obj["first_event"]]
+
+    def get_last_event(self, obj):
+        return self.event_map[obj["last_event"]]
+
+    class Meta:
+        model = models.Snippets
+        fields = [
+            "count",
+            "snippet",
+            "first_event",
+            "last_event",
+        ]
+
+
 class TourLegsSerializer(BaseSerializer):
     first_event = MinimalEventSerializer()
     last_event = MinimalEventSerializer()
+    tour = MinimalToursSerializer()
 
     class Meta:
         model = models.TourLegs
@@ -835,6 +881,7 @@ class TourLegsSerializer(BaseSerializer):
             "id",
             "uuid",
             "name",
+            "tour",
             "first_event",
             "last_event",
             "num_shows",
@@ -950,7 +997,18 @@ class SetlistSongsSerializer(BaseSerializer):
     }
 
     song_map = {
-        s.id: MinimalSongsSerializer(s, include=["uuid", "name", "category"]).data
+        s.id: MinimalSongsSerializer(
+            s,
+            include=[
+                "uuid",
+                "name",
+                "category",
+                "original",
+                "first_event",
+                "last_event",
+                "num_plays_public",
+            ],
+        ).data
         for s in models.Songs.objects.all()
     }
 

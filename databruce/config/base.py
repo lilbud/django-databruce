@@ -175,7 +175,7 @@ REST_FRAMEWORK = {
         "api.filters.DataTablesFilterBackend",
         "rest_framework.filters.OrderingFilter",
     ],
-    "PAGE_SIZE": 100,
+    "PAGE_SIZE": 50,
 }
 
 ANYMAIL = {

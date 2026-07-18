@@ -1,43 +1,35 @@
-{% extends "databruce/category.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
-{% block info_row %}
-  <div class="text-2xl">Event Search</div>
-  <div class="text-base">Event Date: {{ request.GET.date }}</div>
-{% endblock info_row %}
-{% block table_id %}
-  eventTable
-{% endblock table_id %}
-{% block table %}
-  <thead>
-    <tr class="custom">
-      <th class="all">Date</th>
-      <th class="all">Setlist</th>
-      <th class="all">Band</th>
-      <th class="all">Venue</th>
-      <th class="all">Tour</th>
-      <th class="all">Detail</th>
-      <th class="all">Public</th>
-    </tr>
-  </thead>
-{% endblock table %}
-{% block scripts %}
+{% block content %}
+  <div class="col-12">
+    <div class="row">
+      <div class="col">
+        <div class="text-2xl text-nowrap mb-2">Event Search</div>
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="row d-flex gy-2 gy-md-0">
+              <div class="prefix-container">
+                <span class="prefix">Event Date</span>
+                <span class="value">{{ request.GET.date }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
-  $(document).ready(function () {
-    var layout = getDatatableLayout({category: true});
-    dtLayoutCategorySelect({layout: layout, column_idx: 6, values: [{'label': 'Public', 'value': 'True'}, {'label': 'Private', 'value': 'False'}], label: 'Category'});
-
-    new DataTable('#eventTable', {
-      layout: layout,
-      serverSide: true,
-      processing: true,
-      ajax: {
-        'url': '/api/v1/events/?date={{ request.GET.date }}&format=custom',
-      },
-
-      columns: event_table_columns,
+    $(document).ready(function () {
+      eventTableSearch('/api/v1/events/?date={{ request.GET.date }}&format=custom');
     });
-  })
   </script>
-{% endblock scripts %}
+{% endblock content %}

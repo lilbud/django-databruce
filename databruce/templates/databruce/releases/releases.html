@@ -1,34 +1,73 @@
-{% extends "databruce/category.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   {{ title }}
 {% endblock title %}
-{% block info_row %}
-  <div class="text-2xl">Releases</div>
-  <div class="text-base">Various retail releases that Bruce appears on.</div>
-{% endblock info_row %}
-{% block table_id %}
-  releasesTable
-{% endblock table_id %}
-{% block table %}
-  <thead>
-    <tr class="header">
-      <th class="all">Name</th>
-      <th class="all">Date</th>
-      <th class="all">Type</th>
-      <th class="all">Length</th>
-    </tr>
-  </thead>
-{% endblock table %}
-{% block scripts %}
+{% block content %}
+  <div class="col-12">
+    <div class="row mb-3">
+      <div class="col">
+        <div class="text-2xl">Releases</div>
+        <div class="text-base">Various retail releases that Bruce appears on.</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-end d-flex row-gap-2 gx-1 mb-3">
+              <div class="col-12 col-md-1">
+                <label for="PublicityFilter" class="pb-1">Category</label>
+                <select id="PublicityFilter" class="form-select form-select-sm">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <!-- Search -->
+              <div class="col">
+                <label for="search" class="pb-1">Search</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input type="text"
+                         id="search"
+                         class="form-control form-control-sm"
+                         placeholder="Type to search table...">
+                </div>
+              </div>
+              <div class="col-12 col-md-auto mt-2 mt-md-0">
+                <button type="button"
+                        id="sbButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#sbModal"
+                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">
+                  Searchbuilder
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="releasesTable">
+                  <thead>
+                    <tr class="header">
+                      <th class="all">Name</th>
+                      <th class="all">Date</th>
+                      <th class="all">Type</th>
+                      <th class="all">Length</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout({columns: [0,1,2], category: true});
-      dtLayoutCategorySelect({layout: layout, column_idx: 2, values: [{'label': 'Studio', 'value': 'Studio'}, {'label': 'Live', 'value': 'Live'}, {'label': 'Compilation', 'value': 'Compilation'}], label: 'Category'});
+      let sb_columns = [0,1,2];
 
-      new DataTable('#releasesTable', {
-        layout: layout,
-        serverSide: true,
-        processing: true,
+      var table = new DataTable('#releasesTable', {
         ajax: {
           'url': '/api/v1/releases/?format=custom',
         },
@@ -45,8 +84,26 @@
           {'data': 'date', 'name': 'date_str', 'type': 'text'},
           {'data': 'type', 'name': 'type'},
           {'data': 'length', 'name': 'length' },
-        ]
+        ],
+        initComplete: function(settings, json) {
+          var table = this.api();
+          var values = table.column(2).data().unique().toArray();
+          var container = $('#PublicityFilter');
+          
+          values.forEach(element => {
+            var option = `<option value="${element}">${element}</option>`;
+            container.append(option);
+          })
+        }
       });
+
+      $('#PublicityFilter').on('change', function () {
+          var selectedValue = this.value;
+          table.column(2).search(selectedValue ? selectedValue : '', true, false).draw();
+      });
+
+      tableSearch(table, 'search');
+      searchBuilder(table, sb_columns);
     });
   </script>
-{% endblock scripts %}
+{% endblock content %}

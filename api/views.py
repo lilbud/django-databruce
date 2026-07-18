@@ -542,6 +542,33 @@ class SnippetViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.SnippetFilter
 
 
+class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+    def get_queryset(self):
+        queryset = models.Snippets.objects.all().select_related(
+            "setlist__song",
+            "setlist__event__artist",
+            "setlist__event__venue",
+            "snippet",
+        )
+
+        queryset = (
+            queryset.values("snippet_id")
+            .annotate(
+                count=Count("id", distinct=True),
+                first_event=Min("setlist__event__event_id"),
+                last_event=Max("setlist__event__event_id"),
+            )
+            .order_by("-count")
+        )
+
+        return self.filter_queryset(queryset)
+
+    serializer_class = serializers.IncludedSerializer
+    filterset_class = filters.IncludedFilter
+
+
 class StatesViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
@@ -845,6 +872,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
 
         # 5. Enrich the map with "times_seen" and "user_seen"
         songs_map = {}
+
         for song_data in serialized_songs:
             s_id = song_data["id"]
             count = count_map.get(s_id, 0)

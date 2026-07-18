@@ -1520,3 +1520,36 @@ pre {
 .list-locked .filter-item {
     cursor: wait !important;
 }
+
+.btn-prev:disabled,
+.btn-next:disabled {
+    color: var(--color-focus) !important;
+}
+
+.btn-prev,
+.btn-next {
+    color: var(--color-disabled-color) !important;
+    font-weight: 700 !important;
+}
+
+.btn-prev:hover,
+.btn-next:hover {
+    color: var(--color-primary) !important;
+}
+
+.bi-chevron-right::before,
+.bi-chevron-left::before {
+    font-weight: 700 !important;
+}
+
+.dt-layout-full:has(#paging-container) {
+    justify-content: center !important;
+}
+
+.dt-layout-start,
+.dt-layout-end,
+.dt-layout-full {
+    column-gap: 0.5rem !important;
+    row-gap: 0.5rem !important;
+    display: flex !important;
+}

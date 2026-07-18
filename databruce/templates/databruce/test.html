@@ -172,16 +172,10 @@
 </div>
 <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout({columns: [1,2,3,4,5,6,7], category: false});
-    //dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
-  
     var table = new DataTable('#eventTable', {
-      layout: layout,
-      paging: false,
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=custom',
       },
-
       columns: event_table_columns,
       initComplete: function(settings, json) {
         var table = this.api();

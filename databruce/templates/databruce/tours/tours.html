@@ -1,31 +1,76 @@
-{% extends "databruce/category.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
   Tours
 {% endblock title %}
-{% block info_row %}
-  <div class="text-2xl">Tours</div>
-{% endblock info_row %}
-{% block table_id %}
-  tourTable
-{% endblock table_id %}
-{% block table %}
-  <thead>
-    <tr class="header">
-      <th class="all">Name</th>
-      <th class="all">Band</th>
-      <th class="all">First</th>
-      <th class="all">Last</th>
-      <th class="all">Shows</th>
-      <th class="all">Songs</th>
-      <th class="all">Legs</th>
-    </tr>
-  </thead>
-{% endblock table %}
-{% block scripts %}
+{% block content %}
+  <div class="col-12">
+    <div class="row mb-3">
+      <div class="col">
+        <div class="text-2xl">Tours</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-end d-flex row-gap-2 gx-1 mb-3">
+              <!-- Search -->
+              <div class="col-12 col-md-1">
+                <label for="PublicityFilter" class="pb-1">Show Misc.</label>
+                <select id="PublicityFilter" class="form-select form-select-sm">
+                  <option value="^.*Misc.*$">Show</option>
+                  <option value="^(?!.*Misc).*$">Hide</option>
+                </select>
+              </div>
+              <div class="col">
+                <label for="search" class="pb-1">Search</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input type="text"
+                         id="search"
+                         class="form-control form-control-sm"
+                         placeholder="Type to search table...">
+                </div>
+              </div>
+              <div class="col-12 col-md-auto mt-2 mt-md-0">
+                <button type="button"
+                        id="sbButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#sbModal"
+                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">
+                  Searchbuilder
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="tourTable">
+                  <thead>
+                    <tr class="header">
+                      <th class="all">Name</th>
+                      <th class="all">Band</th>
+                      <th class="all">First</th>
+                      <th class="all">Last</th>
+                      <th class="all">Shows</th>
+                      <th class="all">Songs</th>
+                      <th class="all">Legs</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
-  $(document).ready(function () {
-    new DataTable('#tourTable', {
-      layout: getDatatableLayout({columns: [1, 2, 3, 4, 5, 6]}),
+    $(document).ready(function () {
+    let sb_columns = [1,2,3,4,5,6];
+
+    var table = new DataTable('#tourTable', {
       ajax: {
         'url': '/api/v1/tours/?format=custom',
       },
@@ -76,6 +121,14 @@
         { 'data': 'num_legs', 'name': 'num_legs'  },
       ]
     });
+
+    $('#PublicityFilter').on('change', function () {
+      var selectedValue = this.value;
+      table.column(0).search(selectedValue ? selectedValue : '', true, false).draw();
+    });
+
+    tableSearch(table, 'search');
+    searchBuilder(table, sb_columns);
   });
   </script>
-{% endblock scripts %}
+{% endblock content %}

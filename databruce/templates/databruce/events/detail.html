@@ -310,10 +310,10 @@
                     </span>
                   </div>
                   <div class="collapse row w-100" id="options">
-                    <div class="col-12 px-0 pt-1">
-                      <button id="copySetlist" class="btn btn-sm btn-primary text-2xs px-2 py-1">Copy Setlist</button>
+                    <div class="col-12 px-0 py-2">
+                      <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
                       <button id="download-btn"
-                              class="btn btn-primary btn-sm icon-button text-2xs px-2 py-1">Download</button>
+                              class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
                     </div>
                   </div>
                 </div>
@@ -504,6 +504,13 @@
                     <span>({{ release.release.date }})</span>
                   </li>
                 {% endfor %}
+              </ul>
+            {% endif %}
+            {% if event.brucebase_url %}
+              <ul class="ps-3">
+                <li class="ps-0">
+                  <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
+                </li>
               </ul>
             {% endif %}
           </div>
@@ -799,12 +806,10 @@
           })
         }).catch(error => console.error('Error:', error));
     };
-
-    var layout = getDatatableLayout({ columns: false, category: false });
     
     $('#onstageTable').DataTable(
       {
-        layout: layout,
+        layout: null,
         serverSide: true,
         processing: true,
         ordering: false,
@@ -856,7 +861,7 @@
 
     $('#setlistTable').DataTable(
       {
-        layout: layout,
+        layout: null,
         serverSide: true,
         processing: true,
         paging: false,

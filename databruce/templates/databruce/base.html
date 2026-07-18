@@ -68,6 +68,9 @@
     <!-- Other -->
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
+    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+    <script src="{% static 'databruce/js/songTable.js' %}"></script>
+    <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
     {% block extrastyle %}
     {% endblock extrastyle %}
     {% block extrajs %}
@@ -564,7 +567,7 @@
                     action="{% url 'event_search' %}"
                     class="d-flex my-xl-auto">
                 <input type="search"
-                       id="search"
+                       id="eventSearch"
                        name="q"
                        class="form-control"
                        placeholder="Search by date (yyyy-mm-dd), venue, city, etc."
@@ -602,7 +605,7 @@
 
       let searchTimeout; // Ensure this is declared in an outer scope
 
-      $('#search').on('input', function () {
+      $('#eventSearch').on('input', function () {
         // 1. Clear the previous timer immediately to debounce properly
         clearTimeout(searchTimeout);
 

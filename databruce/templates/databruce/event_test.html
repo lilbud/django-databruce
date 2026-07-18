@@ -639,12 +639,10 @@
           })
         }).catch(error => console.error('Error:', error));
     };
-
-    var layout = getDatatableLayout({ columns: false, category: false });
     
     $('#onstageTable').DataTable(
       {
-        layout: layout,
+        layout: null,
         serverSide: true,
         processing: true,
         ordering: false,
@@ -695,7 +693,7 @@
     );
     $('#setlistTable').DataTable(
       {
-        layout: layout,
+        layout: null,
         serverSide: true,
         processing: true,
         paging: false,

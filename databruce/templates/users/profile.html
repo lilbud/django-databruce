@@ -100,23 +100,7 @@
       <div class="tab-content">
         <div id="events" class="tab-pane fade show active">
           <div class="card">
-            <div class="card-body px-0">
-              <div class="table-responsive">
-                <table class="table table-hover display nowrap" id="eventTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Setlist</th>
-                      <th class="all">Band</th>
-                      <th class="all">Venue</th>
-                      <th class="all">Tour</th>
-                      <th class="all">Detail</th>
-                      <th class="all">Public</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
+            <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
           </div>
         </div>
         <div id="songs" class="tab-pane fade">
@@ -124,21 +108,7 @@
             <div class="col">
               <div class="card">
                 <div class="card-header">Songs Seen</div>
-                <div class="card-body px-0">
-                  <div class="table-responsive">
-                    <table class="table table-hover display" id="songTable">
-                      <thead>
-                        <tr>
-                          <th class="all">Count</th>
-                          <th class="all">Name</th>
-                          <th class="all">Category</th>
-                          <th class="all">First</th>
-                          <th class="all">Last</th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
-                </div>
+                <div class="card-body">{% include "databruce/partials/song_table.html" %}</div>
               </div>
             </div>
           </div>
@@ -147,18 +117,44 @@
               <div class="card">
                 <div class="card-header">Most Played Not Seen (100+ plays)</div>
                 <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover display" id="notSeenTable">
-                      <thead>
-                        <tr>
-                          <th class="all">Count</th>
-                          <th class="all">Name</th>
-                          <th class="all">Category</th>
-                          <th class="all">First</th>
-                          <th class="all">Last</th>
-                        </tr>
-                      </thead>
-                    </table>
+                  <div class="row align-items-end d-flex row-gap-2 gx-2 mb-3">
+                    <div class="col-12 col-md-1">
+                      <label for="categoryFilter" class="pb-1">Category</label>
+                      <select id="categoryFilter" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="true">Original</option>
+                        <option value="false">Covers</option>
+                      </select>
+                    </div>
+                    <!-- Search -->
+                    <div class="col-12 col-md-11">
+                      <label for="unseen-song-search" class="pb-1">Search</label>
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text">
+                          <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text"
+                               id="unseen-song-search"
+                               class="form-control form-control-sm"
+                               placeholder="Type to search table...">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="table-responsive">
+                      <table class="table table-hover display" id="notSeenTable">
+                        <thead>
+                          <tr>
+                            <th class="all">Count</th>
+                            <th class="all">Name</th>
+                            <th class="all">Category</th>
+                            <th class="all">First</th>
+                            <th class="all">Last</th>
+                            <th class="all">Original</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -171,18 +167,44 @@
                   Rare Songs (<100 Plays)
                 </div>
                 <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover display" id="rareTable">
-                      <thead>
-                        <tr>
-                          <th class="all">Count</th>
-                          <th class="all">Name</th>
-                          <th class="all">Category</th>
-                          <th class="all">First</th>
-                          <th class="all">Last</th>
-                        </tr>
-                      </thead>
-                    </table>
+                  <div class="row align-items-end d-flex row-gap-2 gx-2 mb-3">
+                    <div class="col-12 col-md-1">
+                      <label for="categoryFilter" class="pb-1">Category</label>
+                      <select id="categoryFilter" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="true">Original</option>
+                        <option value="false">Covers</option>
+                      </select>
+                    </div>
+                    <!-- Search -->
+                    <div class="col-12 col-md-11">
+                      <label for="song-search" class="pb-1">Search</label>
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text">
+                          <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text"
+                               id="rare-song-search"
+                               class="form-control form-control-sm"
+                               placeholder="Type to search table...">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="table-responsive">
+                      <table class="table table-hover display" id="rareTable">
+                        <thead>
+                          <tr>
+                            <th class="all">Count</th>
+                            <th class="all">Name</th>
+                            <th class="all">Category</th>
+                            <th class="all">First</th>
+                            <th class="all">Last</th>
+                            <th class="all">Original</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -208,6 +230,7 @@
   <script>
     $(document).ready(function () {
       /* album breakdown */
+
       fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
         .then(response => response.json()) // Parse JSON response
         .then(data => {
@@ -240,105 +263,25 @@
 
         })
         .catch(error => console.error('Error:', error));
-
+      
       /* datatables */
-      var layout = getDatatableLayout({ category: false });
-      layout.topStart = null;
+      eventTableSearch('/api/v1/events/?user={{ info.id }}&format=custom');
+      songTable('/api/v1/setlist_songs/?user={{ info.id }}&format=custom', '30vh');
 
-      new DataTable('#eventTable', {
-        layout: layout,
-        ajax: {
-          'url': '/api/v1/events/?user={{ info.id }}&format=custom'
-        },
-  
-        columns: event_table_columns,
-      });
-
-      new DataTable('#songTable', {
-        layout: layout,
-        scrollY: '30vh',
-        ajax: {
-          'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom'
-        },
-        order: [0, 'desc'],
-        columnDefs: [
-          { target: [0], width: '1rem', className: 'dt-center' },
-          { target: '_all', className: 'text-nowrap' },
-        ],
-        columns: [
-          {
-            'data': 'count',
-            'name': 'count',
-            'searchable': 'false',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return data
-              }
-            },
-          },
-          {
-            'data': 'song',
-            'name': 'song__sort_song_name',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/songs/${data.uuid}">${data.name}</a>`
-              }
-            },
-          },
-          {
-            'data': 'song.category',
-            'name': 'song__category',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return data
-              }
-            },
-          },
-          {
-            'data': 'first_event',
-            'name': 'first_event',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
-              }
-            },
-          },
-          {
-            'data': 'last_event',
-            'name': 'last_event',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
-              }
-            },
-          },
-        ],
-        // initComplete: function (settings, json) {
-        //   var info = this.api().page.info();
-        //   $('#user-song-count').text(info.recordsTotal);
-        // }
-      });
-
-      var layout = getDatatableLayout({ columns: [0, 2] })
-      layout.topStart = null;
-
-      new DataTable('#notSeenTable', {
-        layout: layout,
+      var notSeenTable = new DataTable('#notSeenTable', {
         scrollY: '30vh',
         ajax: {
           'url': '/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom'
         },
-        order: [0, 'desc'],
-        columnDefs: [
-          { target: [0], width: '1rem', className: 'dt-center' },
-          { target: '_all', className: 'text-nowrap' },
-        ],
+        columnDefs: song_table_defs,
         columns: [
           {
             'data': 'song.num_plays_public',
             'name': 'song__num_plays_public',
+            'width': '1rem',
+            'className': 'all text-center',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return data
               }
             },
@@ -346,101 +289,50 @@
           {
             'data': 'song',
             'name': 'song__sort_song_name',
+            'width': '15rem',
+            'className': 'all',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (type === 'display' && data) {
                 return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
           },
+          { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': '' },
           {
-            'data': 'song.category',
-            'name': 'song__category',
+            'data': 'song.first_event',
+            'name': 'song__first_event',
+            'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return data
+              if (type === 'display' && data) {
+                return renderLink('/events/', data.event_id, data.date.display_day);
               }
             },
           },
           {
-            'data': 'first_event',
-            'name': 'first_event',
+            'data': 'song.last_event',
+            'name': 'song__last_event',
+            'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (type === 'display' && data) {
+                return renderLink('/events/', data.event_id, data.date.display_day);
               }
             },
           },
-          {
-            'data': 'last_event',
-            'name': 'last_event',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
-              }
-            },
-          },
-        ]
+          { 'data': 'song__original', 'name': 'song__original', 'visible': false, 'orderable': false },
+        ],
       });
 
-      new DataTable('#rareTable', {
-        layout: layout,
-        scrollY: '30vh',
-        order: [0, 'desc'],
+      tableSearch(notSeenTable, 'unseen-song-search');
+
+      var rareTable = new DataTable('#rareTable', {
         ajax: {
-          'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom&ordering=-count'
+          'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom'
         },
-        columnDefs: [
-          { target: [0], width: '1rem', className: 'dt-center' },
-          { target: '_all', className: 'text-nowrap' },
-        ],
-        columns: [
-          {
-            'data': 'song.num_plays_public',
-            'name': 'song__num_plays_public',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return data
-              }
-            },
-          },
-          {
-            'data': 'song',
-            'name': 'song__sort_song_name',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/songs/${data.uuid}">${data.name}</a>`
-              }
-            },
-          },
-          {
-            'data': 'song.category',
-            'name': 'song__category',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return data
-              }
-            },
-          },
-          {
-            'data': 'first_event',
-            'name': 'first_event',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
-              }
-            },
-          },
-          {
-            'data': 'last_event',
-            'name': 'last_event',
-            'render': function (data, type, row, meta) {
-              if (type === 'display') {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
-              }
-            },
-          },
-        ]
+        columnDefs: song_table_defs,
+        columns: song_table_columns,
       });
+
+      tableSearch(rareTable, 'rare-song-search');
     })
   </script>
 {% endblock content %}

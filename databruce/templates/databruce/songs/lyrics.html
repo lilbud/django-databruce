@@ -1,47 +1,86 @@
-{% extends "databruce/category.html" %}
+{% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  {{ title }}
+  Lyrics
 {% endblock title %}
-{% block info_row %}
-  <div class="text-2xl mb-3">Lyrics</div>
-  <div class="card">
-    <div class="card-body text-sm">
-      <div class="text-wrap">
-        <span class="fw-medium">Note:</span>
-        <div>
-          English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
-          The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
-          I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
-          Credit to each translator provided when it was listed in the original files.
+{% block content %}
+  <div class="col-12">
+    <div class="row mb-3">
+      <div class="col">
+        <div class="text-2xl mb-3">Lyrics</div>
+        <div class="card">
+          <div class="card-body text-sm">
+            <div class="text-wrap">
+              <span class="fw-medium">Note:</span>
+              <div>
+                English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
+                The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
+                I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
+                Credit to each translator provided when it was listed in the original files.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-end d-flex row-gap-2 gx-1 mb-3">
+              <div class="col-12 col-md-1">
+                <label for="PublicityFilter" class="pb-1">Category</label>
+                <select id="PublicityFilter" class="form-select form-select-sm">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <!-- Search -->
+              <div class="col">
+                <label for="search" class="pb-1">Search</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input type="text"
+                         id="search"
+                         class="form-control form-control-sm"
+                         placeholder="Type to search table...">
+                </div>
+              </div>
+              <div class="col-12 col-md-auto mt-2 mt-md-0">
+                <button type="button"
+                        id="sbButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#sbModal"
+                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">
+                  Searchbuilder
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="lyricTable">
+                  <thead>
+                    <tr>
+                      <th class="all">Song</th>
+                      <th class="all">Version</th>
+                      <th class="all">Source</th>
+                      <th class="all">Language</th>
+                      <th class="all">Note</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-{% endblock info_row %}
-{% block table_id %}
-  lyricTable
-{% endblock table_id %}
-{% block table %}
-  <thead>
-    <tr>
-      <th class="all">Song</th>
-      <th class="all">Version</th>
-      <th class="all">Source</th>
-      <th class="all">Language</th>
-      <th class="all">Note</th>
-    </tr>
-  </thead>
-{% endblock table %}
-{% block scripts %}
   <script>
     $(document).ready(function () {
-      var layout = getDatatableLayout({columns: [1,2,3,4,5], category: true});
-      //dtLayoutCategorySelect({layout: layout, column_idx: 3, values: [{'label': 'English', 'value': 'English'}, {'label': 'German', 'value': 'German'}], label: 'Language'});
+      let sb_columns = [0,1,2,3,4];
 
-      new DataTable('#lyricTable', {
-          layout: layout,
-          serverSide: true,
-          processing: true,
+      var table = new DataTable('#lyricTable', {
           ajax: {
             'url': '/api/v1/lyrics/?format=custom',
           },
@@ -51,7 +90,7 @@
               'name': 'song__sort_song_name',
               'render': function (data, type, row, meta) {
                 if (type === 'display' && data) {
-                    return '<a href="/lyrics/' + row.uuid + '">'+ data +'</a>';
+                  return `<a href="/lyrics/${row.uuid}">${data}</a>`
                 }
               },
             },
@@ -61,17 +100,25 @@
             {'data': 'note', 'name': 'note'},
           ],
           initComplete: function(settings, json) {
-            var table = this.api();
-            var values = table.column(3).data().unique().toArray();
-            var languages = [];
-            
-            values.forEach(element => {
-              languages.push({'label': element, 'value': element});
-            });
-
-            dtCategorySelect({ table: table, column_idx: 3, values: languages, label: 'Language' });
-          }
+          var table = this.api();
+          var values = table.column(3).data().unique().toArray();
+          var container = $('#PublicityFilter');
+          
+          values.forEach(element => {
+            var option = `<option value="${element}">${element}</option>`;
+            container.append(option);
+          })
+        }
       });
+
+      $('#PublicityFilter').on('change', function () {
+        var selectedValue = this.value;
+        table.column(3).search(selectedValue ? selectedValue : '', true, false).draw();
+      });
+
+      tableSearch(table, 'search');
+      searchBuilder(table, sb_columns);
+
     });
   </script>
-{% endblock scripts %}
+{% endblock content %}

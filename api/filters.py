@@ -992,6 +992,35 @@ class SetlistSongsFilter(filters.FilterSet):
         return queryset.exclude(song__id__in=songs).filter(song__num_plays_public__gt=0)
 
 
+class IncludedFilter(filters.FilterSet):
+    snippet = filters.NumberFilter(field_name="snippet_id", lookup_expr="exact")
+
+    song = filters.NumberFilter(
+        field_name="setlist__song_id",
+        lookup_expr="exact",
+        label="song",
+    )
+
+    unique = filters.BooleanFilter(
+        field_name="snippet_id",
+        method="filter_unique",
+        label="unique",
+    )
+
+    def filter_unique(self, queryset, name, value):
+        if value:
+            # Get the IDs of only the first instance of each snippet
+            unique_ids = (
+                models.Snippets.objects.order_by("snippet_id", "id")
+                .distinct("snippet_id")
+                .values_list("snippet_id")
+            )
+
+            return queryset.filter(snippet_id__in=unique_ids).distinct("snippet_id")
+
+        return queryset
+
+
 class SnippetFilter(filters.FilterSet):
     snippet = filters.NumberFilter(field_name="snippet_id", lookup_expr="exact")
 
@@ -1016,6 +1045,7 @@ class SnippetFilter(filters.FilterSet):
                 .values_list("id", flat=True)
             )
             return queryset.filter(id__in=Subquery(unique_ids))
+
         return queryset
 
 

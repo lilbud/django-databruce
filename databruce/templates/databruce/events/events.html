@@ -27,115 +27,15 @@
     <div class="row">
       <div class="col-12">
         <div class="card">
-          <div class="card-body">
-            <div class="col">
-              <div class="row align-items-end d-flex row-gap-2 gx-2 mb-4">
-                <!-- row count -->
-                <div class="col-6 col-md-1">
-                  <label class="pb-1" for="customLengthMenu">Show</label>
-                  <select id="customLengthMenu" class="form-select form-select-sm">
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100" selected>100</option>
-                  </select>
-                </div>
-                <div class="col-6 col-md-1">
-                  <label for="privacyFilter" class="pb-1">Filter Public</label>
-                  <select id="privacyFilter" class="form-select form-select-sm">
-                    <option value="">All</option>
-                    <option value="true">Public</option>
-                    <option value="false">Private</option>
-                  </select>
-                </div>
-                <!-- Search -->
-                <div class="col">
-                  <label for="customSearchInput" class="pb-1">Search</label>
-                  <input type="text"
-                         id="customSearchInput"
-                         class="form-control form-control-sm"
-                         placeholder="Type to search table...">
-                </div>
-                <div class="col-12 col-md-auto mt-2 mt-md-0">
-                  <button type="button"
-                          id="sbButton"
-                          data-bs-toggle="modal"
-                          data-bs-target="#sbModal"
-                          class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">
-                    Searchbuilder
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="table-responsive">
-                <table class="table table-hover display nowrap" id="eventTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Date</th>
-                      <th class="all">Setlist</th>
-                      <th class="all">Band</th>
-                      <th class="all">Venue</th>
-                      <th class="all">Tour</th>
-                      <th class="all">Detail</th>
-                      <th class="all">Public</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
+          <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
         </div>
       </div>
     </div>
   </div>
   <script>
   $(document).ready(function () {
-    var sb_columns = [1,2,3,4,5,6,7];
+    eventTableSearch('/api/v1/events/?year={{ year }}&format=custom');
   
-    var table = new DataTable('#eventTable', {
-      layout: null,
-      fixedHeader: {
-        header: true,
-      },
-      ajax: {
-        'url': '/api/v1/events/?year={{ year }}&format=custom',
-      },
-      columns: event_table_columns,
-    });
-
-    new DataTable.SearchBuilder(table, {
-        liveSearch: false,
-        depthLimit: 1,
-        columns: sb_columns,
-    });
-
-    var container = table.searchBuilder.container();
-    $('#modal-body').append(container);
-
-    let searchTimeout;
-
-    $('#customSearchInput').on('keyup change clear', function() {
-        const value = $(this).val();
-        clearTimeout(searchTimeout);
-
-        searchTimeout = setTimeout(function () {
-          table.search(value).draw();
-        }, 500);
-    });
-
-    $('#privacyFilter').on('change', function() {
-        var selectedValue = this.value;
-        
-        table.column(6)
-             .search(selectedValue ? '^' + selectedValue + '$' : '', true, false)
-             .draw();
-    });
-
-    $('#customLengthMenu').on('change', function() {
-        var length = parseInt(this.value, 10);
-        table.page.len(length).draw();
-    });
-
     $(function(){
       // bind change event to select
       $('#year_select').on('change', function () {

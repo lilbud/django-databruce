@@ -7,7 +7,7 @@
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="runs" item=info.id %}
   {% endif %}
-  <div class="col">
+  <div class="col-12">
     <div class="text-2xl text-wrap mb-3">
       <a href="{% url "runs" %}">Runs</a>
       &gt; {{ info }}
@@ -79,59 +79,13 @@
           </li>
         </ul>
       </div>
-      <div class="card-body px-0">
+      <div class="card-body">
         <div class="tab-content">
-          <div id="events" class="tab-pane fade show active">
-            <div class="table-responsive">
-              <table class="table table-hover display" id="eventTable">
-                <thead>
-                  <tr class="custom">
-                    <th class="all">Date</th>
-                    <th class="all">Setlist</th>
-                    <th class="all">Band</th>
-                    <th class="all">Venue</th>
-                    <th class="all">Tour</th>
-                    <th class="all">Detail</th>
-                    <th class="all">Public</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
-          <div id="songs" class="tab-pane fade">
-            <div class="table-responsive">
-              <table class="table table-hover display" id="songTable">
-                <thead>
-                  <tr>
-                    <th class="all">Plays</th>
-                    <th class="all">Song</th>
-                    <th class="all">Category</th>
-                    <th class="all">First</th>
-                    <th class="all">Last</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
-          <div id="slots" class="tab-pane fade">
-            <div class="table-responsive">
-              <table class="table table-hover display" id="slotTable">
-                <thead>
-                  <tr>
-                    <th class="text-nowrap all">Event</th>
-                    <th class="text-nowrap all show-opener">Show Opener</th>
-                    <th class="text-nowrap all set-1-closer">Set 1 Closer</th>
-                    <th class="text-nowrap all set-2-opener">Set 2 Opener</th>
-                    <th class="text-nowrap all main-set-closer">Main Set Closer</th>
-                    <th class="text-nowrap all encore-opener">Encore Opener</th>
-                    <th class="text-nowrap all show-closer">Show Closer</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-          </div>
+          <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+          <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
+          <div id="slots" class="tab-pane fade">{% include "databruce/partials/slot_table.html" %}</div>
           <div id="stats" class="tab-pane fade">
-            <div class="col px-3">
+            <div class="col">
               <div class="row mb-2">
                 <div class="col">
                   <div class="card divider">
@@ -211,60 +165,11 @@
   </div>
   <script>
     $(document).ready(function () {
+      eventTableSearch('/api/v1/events/?run={{ info.id }}&format=custom');
+      songTable('/api/v1/setlist_songs/?run={{ info.id }}&format=custom');
 
-      var layout = getDatatableLayout({columns: [2,3,4,5,6,7], category: true});
-      dtLayoutCategorySelect({layout: layout, column_idx: 7, values: [{'label': 'Public', 'value': 'true'}, {'label': 'Private', 'value': 'false'}], label: 'Category'});
-
-      new DataTable('#eventTable', {
-        layout: layout,
-        scrollX: true,
-        ajax: {
-          'url': '/api/v1/events/?run={{ info.id }}&format=custom',
-        },
-  
-        columns: event_table_columns,
-        initComplete: function(settings, json){ 
-          var info = this.api().page.info();
-          $('#event-count-badge').text(info.recordsTotal);
-        }
-      });
-
-      new DataTable('#songTable', {
-        layout: getDatatableLayout({columns: [1,2], category: false}),
-        ajax: {
-          'url': '/api/v1/setlist_songs/?run={{ info.id }}&format=custom',
-        },
-        scrollX: true,
-        columnDefs: song_table_defs,
-        columns: song_table_columns,
-        initComplete: function(settings, json){ 
-          var info = this.api().page.info();
-          $('#song-count-badge').text(info.recordsTotal);
-        }
-      });
-
-      
-      var table = new DataTable('#slotTable', {
-        layout: getDatatableLayout({columns: false, category: false}),
-        fixedColumns: {
-            start: 1
-        },
-        ajax: {
-          'url': '/api/v1/setlist_entries/?run={{ info.id }}&format=custom',
-        },
-        columns: setlist_slots,
-        initComplete: function () {
-          table.columns().every(function () {
-            var columnData = this.data().join(''); // Combine all cell data into one string
-          
-            // Check if the combined string is empty
-            if (columnData.length === 0) {
-              // If empty, hide the column
-              this.visible(false);
-            }
-          });
-        }
-      });
+      $('.dtsb-searchBuilder').remove();
+      slotTable('/api/v1/setlist_entries/?run={{ info.id }}&format=custom');
     })
   </script>
 {% endblock content %}

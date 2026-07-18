@@ -113,10 +113,7 @@
     </div>
   </div>
   <script>
-    var layout = getDatatableLayout({columns: false, category: false});
-
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    {% comment %} console.log(timezone); // Output: "America/New_York" {% endcomment %}
 
     function createPlaceholderItem() {
       return `
@@ -210,7 +207,7 @@
 
       new DataTable('#setlistTable',
       {
-        layout: layout,
+        layout: null,
         responsive: true,
         scrollX: false,
         paging: false,

@@ -132,11 +132,7 @@
   </div>
   <script>
   $(document).ready(function () {
-    var layout = getDatatableLayout({columns: false, category: false});
-    layout.topStart = null;
-
     new DataTable('#tracksTable', {
-      layout: layout,
       ajax: '/api/v1/release_tracks/?release={{ info.id }}&format=custom',
       ordering: false,
       rowGroup: {

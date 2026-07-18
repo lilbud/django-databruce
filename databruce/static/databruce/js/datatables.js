@@ -4,7 +4,7 @@ DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
-DataTable.defaults.column.columnControl = ['order', ['orderAsc', 'orderDesc', 'orderClear', 'orderAddAsc', 'orderAddDesc']];
+DataTable.defaults.column.columnControl = [['orderAsc', 'orderDesc', 'orderClear', 'orderAddAsc', 'orderAddDesc']];
 
 set_names = [
   "Show",
@@ -14,6 +14,53 @@ set_names = [
   "Pre-Show",
   "Post-Show",
 ]
+
+DataTable.feature.register('customInputPaging', function (settings) {
+  const api = new DataTable.Api(settings);
+
+  // Create UI container elements
+  const container = document.createElement('div');
+  container.className = 'd-inline-flex align-items-center justify-content-center gap-2 m-0';
+  container.id = 'paging-container';
+  container.innerHTML = `
+        <button class="btn btn-sm border-0 btn-prev" aria-label="Previous page"><i class="bi bi-chevron-left"></i></button>
+        <input type="text" class="form-control form-control-sm text-center page-input m-0" min="1" value="1" style="width: 30px; height: calc(1.5em + 0.5rem + 2px);">
+        <span class="total-pages align-middle">of 1</span>
+        <button class="btn btn-sm border-0 btn-next" aria-label="Next page"><i class="bi bi-chevron-right"></i></button>
+    `;
+
+  const input = container.querySelector('.page-input');
+  const prevBtn = container.querySelector('.btn-prev');
+  const nextBtn = container.querySelector('.btn-next');
+  const totalSpan = container.querySelector('.total-pages');
+
+  // Update UI whenever the table redraws / changes pages
+  api.on('draw', () => {
+    const pageInfo = api.page.info();
+    input.value = pageInfo.page + 1;
+    input.max = pageInfo.pages;
+    totalSpan.textContent = `of ${pageInfo.pages || 1}`;
+
+    // Handle button states
+    prevBtn.disabled = pageInfo.page === 0;
+    nextBtn.disabled = pageInfo.page >= pageInfo.pages - 1;
+  });
+
+  // Jump to page typed into input box
+  input.addEventListener('change', () => {
+    let val = parseInt(input.value, 10) - 1;
+    const max = api.page.info().pages - 1;
+    if (val < 0) val = 0;
+    if (val > max) val = max;
+    api.page(val).draw('page');
+  });
+
+  // Click navigation button events
+  prevBtn.addEventListener('click', () => api.page('previous').draw('page'));
+  nextBtn.addEventListener('click', () => api.page('next').draw('page'));
+
+  return container;
+});
 
 $.extend(true, DataTable.defaults, {
   searching: true,
@@ -32,14 +79,22 @@ $.extend(true, DataTable.defaults, {
     indicators: false,
     handler: true
   },
-  pageLength: 100,
+  fixedHeader: {
+    header: true,
+  },
+  pageLength: 50,
   lengthMenu: [25, 50, 100],
   language: {
     searchBuilder: {
       button: '&nbspFilter',
       className: 'test',
       title: '',
-    }
+    },
+
+    info: "_TOTAL_ records found",
+    infoEmpty: "No records available",
+    infoFiltered: "(filtered from _MAX_ total records)"
+
   },
   search: {
     regex: true
@@ -47,6 +102,14 @@ $.extend(true, DataTable.defaults, {
   order: [],
   drawCallback: function (settings) {
     $('[data-bs-toggle="tooltip"]').tooltip();
+  },
+  layout: {
+    topStart: null,
+    bottomStart: null,
+    topEnd: null,
+    bottomEnd: null,
+    top: ['customInputPaging', 'info'],
+    bottom: ['customInputPaging', 'info'],
   },
 });
 
@@ -155,108 +218,12 @@ function getDatatableLayout({ columns = true, category = false }) {
   return layout;
 };
 
-function dtLayoutCategorySelect({ layout, column_idx, values, label = false }) {
-  // var div = $('<label />')
-
-  // $(div).attr('for', 'dropdown-btn');
-  // $(div).text(`${label.replace(":", "")}:`);
-
-  var all_button = {
-    text: 'All',
-    className: 'button-page-length dt-button-active-a',
-    action: function (e, dt, node, config) {
-      dt.column(column_idx).search('.*', { regex: true }).draw();
-      node.parents('.btn-group').find('.dropdown-toggle').text('All');
-      node.parents('.dropdown-menu').find('.dt-button').each(function () {
-        $(this).removeClass('dt-button-active-a');
-      });
-      node.toggleClass('dt-button-active-a');
-    },
-  };
-
-  // 2. Format the label string safely
-  var labelText = label ? `${label.replace(":", "")}:` : '';
-  var labelHtml = label ? `<label for="dropdown-btn">${labelText}</label> ` : '';
-
-  // 3. Inject the label into the DataTables feature button configuration
-  layout.topEnd.features[0].buttons[0].prefix = labelHtml;
-  layout.topEnd.features[0].buttons[0].buttons = [all_button];
-
-  values.forEach(element => {
-    var button = {
-      text: element.label,
-      className: 'button-page-length',
-      action: function (e, dt, node, config) {
-        dt.order([0, 'asc']).column(column_idx).search(element.value, { regex: true }).draw();
-        node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
-
-        node.parents('.dropdown-menu').find('.dt-button').each(function () {
-          $(this).removeClass('dt-button-active-a');
-        });
-
-        node.toggleClass('dt-button-active-a');
-      },
-    };
-
-    layout.topEnd.features[0].buttons[0].buttons.push(button);
-  });
-
-  // $(div).insertBefore($('#dropdown-btn'));
-}
-
-function dtCategorySelect({ table, column_idx, values, label = false }) {
-  var div = $('<label />');
-
-  $(div).attr('for', 'dropdown-btn');
-  $(div).text(`${label.replace(":", "")}:`);
-
-  var dropdownButtons = [];
-
-  // Add all button
-  dropdownButtons.push({
-    text: 'All',
-    className: 'button-page-length dt-button-active-a',
-    action: function (e, dt, node, config) {
-      dt.column(column_idx).search('.*', { regex: true }).draw();
-      node.parents('.btn-group').find('.dropdown-toggle').text('All');
-      node.parents('.dropdown-menu').find('.dt-button').each(function () {
-        $(this).removeClass('dt-button-active-a');
-      });
-      node.toggleClass('dt-button-active-a');
-    },
-  });
-
-  // Add each language option
-  values.forEach(element => {
-    dropdownButtons.push({
-      text: element.label,
-      className: 'button-page-length',
-      action: function (e, dt, node, config) {
-        dt.order([0, 'asc']).column(column_idx).search(element.value, { regex: true }).draw();
-        node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
-
-        node.parents('.dropdown-menu').find('.dt-button').each(function () {
-          $(this).removeClass('dt-button-active-a');
-        });
-
-        node.toggleClass('dt-button-active-a');
-      },
-    });
-  });
-
-  // 2. Safely swap the built button array directly inside your collection dropdown
-  table.button('category-select:name').collectionRebuild(dropdownButtons);
-
-  $(div).insertBefore($('#dropdown-btn'));
-}
-
 function renderLink(url, data, text) {
   return `<a href="${url}${data}">${text}</a>`
 }
 
 song_table_defs = [
   { targets: '_all', className: 'text-wrap text-xs' },
-  { targets: [0], width: '1rem' },
 ]
 
 // below are some common table column definitions
@@ -266,9 +233,11 @@ song_table_columns = [
     'data': 'count',
     'name': 'count',
     'width': '1rem',
-    'className': 'all',
+    'className': 'all text-center',
     'render': function (data, type, row, meta) {
-      return data
+      if (type === 'display' && data) {
+        return data
+      }
     },
   },
   {
@@ -287,8 +256,6 @@ song_table_columns = [
     'data': 'first_event',
     'name': 'first_event',
     'width': '10rem',
-    'type': 'text',
-    'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return renderLink('/events/', data.event_id, data.date.display_day);
@@ -299,14 +266,13 @@ song_table_columns = [
     'data': 'last_event',
     'name': 'last_event',
     'width': '10rem',
-    'type': 'text',
-    'className': 'all',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return renderLink('/events/', data.event_id, data.date.display_day);
       }
     },
   },
+  { 'data': 'song__original', 'name': 'song__original', 'visible': false, 'orderable': false },
 ]
 
 event_table_columns = [
@@ -394,9 +360,10 @@ event_table_columns = [
 setlist_slots = [
   {
     'data': 'event',
-    'name': 'event__event_id, event__early_late',
-    'width': '10rem',
+    'name': 'event__event_id',
+    'width': '8rem',
     'className': 'all text-nowrap',
+    'searchable': false,
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
         return '<a href="/events/' + data.event_id + '">' + data.date.display_day + '</a>';
@@ -409,7 +376,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -419,7 +386,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -429,7 +396,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -439,7 +406,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -449,7 +416,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -459,8 +426,45 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
+        return `<a href="/songs/${data.uuid}">${data.name}</a>`
       }
     },
   },
 ]
+
+function searchBuilder(table, columns) {
+  new DataTable.SearchBuilder(table, {
+    liveSearch: false,
+    depthLimit: 1,
+    columns: columns,
+  });
+
+  var container = table.searchBuilder.container();
+  $('#modal-body').append(container);
+}
+
+function slotTable(url) {
+  var slotTable = new DataTable('#slotTable', {
+    scrollY: '60vh',
+    fixedColumns: {
+      start: 1
+    },
+    ajax: {
+      'url': url,
+    },
+    columns: setlist_slots,
+    initComplete: function () {
+      slotTable.columns().every(function () {
+        var columnData = this.data().join(''); // Combine all cell data into one string
+
+        // Check if the combined string is empty
+        if (columnData.length === 0) {
+          // If empty, hide the column
+          this.visible(false);
+        }
+      });
+    }
+  });
+
+  searchBuilder(slotTable, [0, 1, 2, 3, 4, 5, 6]);
+}
