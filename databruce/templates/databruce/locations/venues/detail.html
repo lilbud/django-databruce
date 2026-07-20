@@ -175,7 +175,7 @@
   </div>
   <script>
     $(document).ready(function () {
-      eventTableSearch('/api/v1/events/?venue={{ info.id }}&format=custom');
+      eventTable('/api/v1/events/?venue={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?venue={{ info.id }}&format=custom');
 
       L.Icon.Default.imagePath = "{% static 'databruce/img/images/' %}";

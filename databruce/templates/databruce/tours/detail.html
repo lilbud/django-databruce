@@ -130,7 +130,7 @@
   </div>
   <script>
     $(document).ready(function () {
-      eventTableSearch('/api/v1/events/?tour={{ info.id }}&format=custom');
+      eventTable('/api/v1/events/?tour={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?tour={{ info.id }}&format=custom');
 
       var legTable = new DataTable('#legTable', {

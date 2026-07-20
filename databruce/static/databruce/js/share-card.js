@@ -32,7 +32,7 @@ function initializeShareCardGenerator(config) {
         return new Promise((resolve) => {
           $sandboxTable.DataTable({
             ajax: config.ajaxUrl, // <-- Loaded dynamically from config
-            layout: config.layout,
+            layout: null,
             serverSide: true,
             processing: true,
             paging: false,

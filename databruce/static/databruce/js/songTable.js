@@ -1,3 +1,54 @@
+song_table_defs = [
+    { targets: '_all', className: 'text-wrap text-xs' },
+]
+
+song_table_columns = [
+    {
+        'data': 'count',
+        'name': 'count',
+        'width': '1rem',
+        'className': 'all text-center',
+        'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+                return data
+            }
+        },
+    },
+    {
+        'data': 'song',
+        'name': 'song__sort_song_name',
+        'width': '15rem',
+        'className': 'all',
+        'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+                return `<a href="/songs/${data.uuid}">${data.name}</a>`
+            }
+        },
+    },
+    { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': '' },
+    {
+        'data': 'first_event',
+        'name': 'first_event',
+        'width': '10rem',
+        'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+                return renderLink('/events/', data.event_id, data.date.display_day);
+            }
+        },
+    },
+    {
+        'data': 'last_event',
+        'name': 'last_event',
+        'width': '10rem',
+        'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+                return renderLink('/events/', data.event_id, data.date.display_day);
+            }
+        },
+    },
+    { 'data': 'song__original', 'name': 'song__original', 'visible': false, 'orderable': false },
+]
+
 function songTable(url, height) {
     let searchTimeout;
 
@@ -6,14 +57,6 @@ function songTable(url, height) {
     }
 
     var table = new DataTable('#songTable', {
-        layout: {
-            topStart: null,
-            bottomStart: null,
-            topEnd: null,
-            bottomEnd: null,
-            top: ['customInputPaging', 'info'],
-            bottom: ['customInputPaging', 'info'],
-        },
         ajax: {
             'url': url,
         },

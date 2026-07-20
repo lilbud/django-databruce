@@ -67,7 +67,7 @@
   </div>
   <script>
     $(document).ready(function () {
-      eventTableSearch('/api/v1/events/?leg={{ info.id }}&format=custom');
+      eventTable('/api/v1/events/?leg={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?leg={{ info.id }}&format=custom');
 
       $('.dtsb-searchBuilder').remove();

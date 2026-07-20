@@ -265,7 +265,7 @@
         .catch(error => console.error('Error:', error));
       
       /* datatables */
-      eventTableSearch('/api/v1/events/?user={{ info.id }}&format=custom');
+      eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?user={{ info.id }}&format=custom', '30vh');
 
       var notSeenTable = new DataTable('#notSeenTable', {

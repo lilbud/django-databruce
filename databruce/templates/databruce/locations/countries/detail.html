@@ -71,7 +71,7 @@
   </div>
   <script>
   $(document).ready(function () {
-    eventTableSearch('/api/v1/events/?country={{ info.id }}&format=custom');
+    eventTable('/api/v1/events/?country={{ info.id }}&format=custom');
     songTable('/api/v1/setlist_songs/?country={{ info.id }}&format=custom');
   })
   </script>
