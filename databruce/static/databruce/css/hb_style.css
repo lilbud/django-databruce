@@ -498,14 +498,13 @@ td .badge {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    height: 16px !important;
-    padding: 0.2em 0.45em !important;
-    margin-top: -2px !important;
+    height: 18px !important;
+    padding: 0.3em 0.5em !important;
+    margin-top: 0 !important;
     white-space: nowrap !important;
     width: max-content !important;
     vertical-align: middle !important;
     font-size: var(--text-3xs) !important;
-    border-radius: calc(infinity * 1px) !important;
     font-weight: 500 !important;
     line-height: 1 !important;
 }
@@ -526,8 +525,6 @@ td .badge {
     font-weight: 500 !important;
     font-size: var(--text-xs) !important;
     display: inline-flex;
-    padding: 0.15rem 0.35rem !important;
-    border-radius: calc(infinity * 1px) !important;
 }
 
 .segue {
@@ -1041,8 +1038,6 @@ button.nav-link .badge {
     font-size: 0.75rem !important;
     display: inline-flex;
     vertical-align: middle;
-    padding: 0.2em 0.45em !important;
-    border-radius: calc(infinity * 1px) !important;
 }
 
 #albumTable_wrapper>.dt-layout-table {
@@ -1388,12 +1383,6 @@ pre {
 .placeholder {
     height: 1.1rem !important;
     background-color: var(--color-active) !important;
-}
-
-.album-breakdown .badge {
-    padding: 0.15em 0.35em !important;
-    font-size: var(--text-3xs) !important;
-    font-weight: 300 !important;
 }
 
 #chart {
