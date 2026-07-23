@@ -266,12 +266,13 @@ a:link,
     padding: 1rem !important;
 }
 
-.card-body:not(#albums, #eventHeader, .list-card, :has(.table-responsive), .event-note),
+.card-body:not(#albums, #eventHeader, .list-card, :has(.table-responsive, #headimg), .event-note),
 #setlistCard {
     padding: 0.5rem 0 0 0 !important;
 }
 
-.card-body.list-card {
+.card-body.list-card,
+.card-body:has(#headimg) {
     padding: 0 !important;
 }
 
