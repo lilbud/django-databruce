@@ -91,7 +91,7 @@ $.extend(true, DataTable.defaults, {
       title: '',
     },
 
-    info: "_TOTAL_ records found",
+    info: "Showing _START_ to _END_ of _TOTAL_ entries",
     infoEmpty: "No records available",
     infoFiltered: "(filtered from _MAX_ total records)"
 

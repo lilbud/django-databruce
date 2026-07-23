@@ -245,8 +245,8 @@ a:link,
 
 .card-header,
 .card-footer {
-    font-size: var(--text-base) !important;
-    font-weight: 600 !important;
+    font-size: var(--text-sm) !important;
+    font-weight: 500 !important;
     line-height: 1.5rem;
     display: flex !important;
     align-items: center !important;
@@ -259,8 +259,27 @@ a:link,
 }
 
 .card-header:has(.nav-pills) {
-    font-size: var(--text-sm) !important;
     padding: 0.1rem 0 !important;
+}
+
+.card-body.event-note {
+    padding: 1rem !important;
+}
+
+.card-body:not(#albums, #eventHeader, .list-card, :has(.table-responsive), .event-note) {
+    padding: 0.5rem 0 0 0 !important;
+}
+
+.card-body.list-card {
+    padding: 0 !important;
+}
+
+#tableControls {
+    padding: 0 1rem 1rem 1rem !important;
+}
+
+.card-body:has(.table):not(#setlistCard) {
+    padding: 1rem 0 !important;
 }
 
 #album .card-header {
@@ -615,11 +634,6 @@ td.fc-day {
     word-wrap: break-word !important;
 }
 
-.card,
-.card-body:not(.overflow-x-hidden) {
-    overflow-x: scroll !important;
-}
-
 /* dropdown items */
 .dropdown-item:hover {
     background-color: var(--color-hover) !important;
@@ -663,10 +677,6 @@ button:disabled {
     border-radius: calc(infinity * 1px) !important;
     background-color: var(--background-color-emphasis) !important;
 }
-
-/* .col.percent {
-    max-width: 30px !important;
-} */
 
 .album-breakdown.complete .progress-bar {
     background-color: var(--color-warning);
@@ -947,11 +957,6 @@ th.show-closer {
     }
 }
 
-/* :not(.nav-item)>.btn-sm:not(.icon-button, #usercount) {
-    font-size: var(--text-2xs) !important;
-    padding: 0.2rem 0.3rem !important;
-} */
-
 div.dt-scroll-body {
     border-bottom-width: 0px !important;
 }
@@ -1042,6 +1047,10 @@ button.nav-link .badge {
 
 #albumTable_wrapper>.dt-layout-table {
     margin-top: 0 !important;
+}
+
+.list-group-item * {
+    font-size: clamp(var(--text-3xs), 0.625rem + 0.139vw, var(--text-xs)) !important;
 }
 
 .album-breakdown .list-group-item {

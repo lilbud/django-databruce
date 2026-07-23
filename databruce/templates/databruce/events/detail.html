@@ -46,7 +46,7 @@
     <div class="row mb-3 gx-0">
       <div class="col">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body" id='eventHeader'>
             <div class="d-flex flex-wrap">
               <div class="flex-grow-1 w-75 mb-3 mb-md-0">
                 {% if event.title %}
@@ -164,6 +164,7 @@
                     {% csrf_token %}
                     <div class="btn-group input-group input-group-sm attended-btn"
                          role="group"
+                         id="attendedBtnGroup"
                          aria-label="Add show to user profile">
                       {% spaceless %}
                         <button id="addshow"
@@ -317,7 +318,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0" id="setlistCard">
                   <div class="table-responsive">
                     <table class="table table-hover display wrap" id="setlistTable">
                       <thead>

@@ -191,6 +191,13 @@ function initializeShareCardGenerator(config) {
         }
         const targetCard = sandbox.querySelector('#capture-area') || sandbox.firstElementChild;
 
+        const items = targetCard.querySelectorAll("p, span, div");
+        items.forEach(el => {
+          if (el.children.length === 0) { // Target final text nodes
+            el.innerHTML = el.innerHTML.replace(/ /g, '&nbsp;');
+          }
+        });
+
         const canvasBgColor = (config.activeTheme === 'dark') ? '#07080a' : '#ffffff'; // Match your dark background hex color
 
         // Hide the theme button from the image view, but keep it in the template code tree

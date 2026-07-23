@@ -123,7 +123,8 @@
           <div class="card-body">
             <div class="tab-content">
               <div id="events" class="tab-pane fade show active">
-                <div class="row align-items-end d-flex row-gap-2 gx-2 mb-3">
+                <div class="row align-items-end d-flex row-gap-2 gx-2 mb-3"
+                     id="tableControls">
                   <div class="col-12 col-md-1">
                     <label for="PublicityFilter" class="pb-1">Publicity</label>
                     <select id="PublicityFilter" class="form-select form-select-sm">
@@ -136,9 +137,6 @@
                   <div class="col">
                     <label for="song-search" class="pb-1">Search</label>
                     <div class="input-group input-group-sm">
-                      <span class="input-group-text">
-                        <i class="bi bi-search"></i>
-                      </span>
                       <input type="text"
                              id="song-search"
                              class="form-control form-control-sm"
