@@ -92,31 +92,31 @@ sentry_sdk.init(
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("DATABASE_NAME"),
-    #     "USER": os.getenv("DATABASE_USER"),
-    #     "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-    #     "HOST": "localhost",
-    #     "PORT": "",
-    #     "CONN_MAX_AGE": 60,
-    #     "CONN_HEALTH_CHECKS": True,
-    #     "OPTIONS": {
-    #         "options": "-c search_path=public,extensions",
-    #     },
-    # },
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("SUPABASE_POOL_DATABASE"),
-        "USER": os.getenv("SUPABASE_POOL_USER"),
-        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-        "HOST": os.getenv("SUPABASE_POOL_HOST"),
-        "PORT": os.getenv("SUPABASE_POOL_PORT"),
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "HOST": "localhost",
+        "PORT": "",
+        "CONN_MAX_AGE": 60,
+        "CONN_HEALTH_CHECKS": True,
         "OPTIONS": {
             "options": "-c search_path=public,extensions",
-            "pool": True,
         },
     },
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": os.getenv("SUPABASE_POOL_DATABASE"),
+    #     "USER": os.getenv("SUPABASE_POOL_USER"),
+    #     "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+    #     "HOST": os.getenv("SUPABASE_POOL_HOST"),
+    #     "PORT": os.getenv("SUPABASE_POOL_PORT"),
+    #     "OPTIONS": {
+    #         "options": "-c search_path=public,extensions",
+    #         "pool": True,
+    #     },
+    # },
 }
 
 encoded_pass = os.getenv("REDIS_PW")
