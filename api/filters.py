@@ -1074,12 +1074,6 @@ class SongsPageFilter(filters.FilterSet):
     song = filters.NumberFilter(field_name="id__song_id", lookup_expr="exact")
 
 
-class SongsPageNewFilter(filters.FilterSet):
-    song = filters.NumberFilter(field_name="id__song_id", lookup_expr="exact")
-    next = filters.NumberFilter(field_name="next__song_id", lookup_expr="exact")
-    prev = filters.NumberFilter(field_name="prev__song_id", lookup_expr="exact")
-
-
 class SongsFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="iregex")
     lyrics = filters.BooleanFilter()

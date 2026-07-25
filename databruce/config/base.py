@@ -37,10 +37,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "databruce.apps.DatabruceConfig",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
     "django.contrib.sites",
-    "databruce.apps.DatabruceConfig",
     "django_browser_reload",
     "django.contrib.humanize",
     "api",
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "anymail",
     "timezone_field",
+    "django_watchfiles",
 ]
 
 SITE_ID = 1

@@ -43,32 +43,32 @@ DATABASES = {
             "options": "-c search_path=public,extensions",
         },
     },
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("SUPABASE_DATABASE"),
-    #     "USER": os.getenv("SUPABASE_USER"),
-    #     "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-    #     "HOST": os.getenv("SUPABASE_HOST"),
-    #     "PORT": os.getenv("SUPABASE_PORT"),
-    #     "CONN_MAX_AGE": 10,
-    #     "CONN_HEALTH_CHECKS": True,
-    #     "OPTIONS": {
-    #         "options": "-c search_path=public,extensions",
-    #     },
-    # },
-    # "digital_ocean": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("DO_DATABASE_NAME"),
-    #     "USER": os.getenv("DO_DATABASE_USER"),
-    #     "PASSWORD": os.getenv("DO_DATABASE_PASSWORD"),
-    #     "HOST": os.getenv("DO_DATABASE_HOST"),
-    #     "PORT": "5432",
-    #     "CONN_MAX_AGE": 10,
-    #     "CONN_HEALTH_CHECKS": True,
-    #     "OPTIONS": {
-    #         "options": "-c search_path=public,extensions",
-    #     },
-    # },
+    "supabase": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("SUPABASE_DATABASE"),
+        "USER": os.getenv("SUPABASE_USER"),
+        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+        "HOST": os.getenv("SUPABASE_HOST"),
+        "PORT": os.getenv("SUPABASE_PORT"),
+        "CONN_MAX_AGE": 10,
+        "CONN_HEALTH_CHECKS": True,
+        "OPTIONS": {
+            "options": "-c search_path=public,extensions",
+        },
+    },
+    "digital_ocean": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DO_DATABASE_NAME"),
+        "USER": os.getenv("DO_DATABASE_USER"),
+        "PASSWORD": os.getenv("DO_DATABASE_PASSWORD"),
+        "HOST": os.getenv("DO_DATABASE_HOST"),
+        "PORT": "5432",
+        "CONN_MAX_AGE": 10,
+        "CONN_HEALTH_CHECKS": True,
+        "OPTIONS": {
+            "options": "-c search_path=public,extensions",
+        },
+    },
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

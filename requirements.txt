@@ -24,8 +24,7 @@ psycopg[binary,pool]
 python-dateutil
 python-dotenv
 python-slugify
-querystring-parser
 querystring_parser
 redis
 sentry-sdk
-coverage
+django-watchfiles

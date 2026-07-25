@@ -262,11 +262,10 @@ a:link,
     padding: 0.1rem 0 !important;
 }
 
-.card-body.event-note {
+.card-body {
     padding: 1rem !important;
 }
 
-.card-body:not(#albums, #eventHeader, .list-card, :has(.table-responsive, #headimg), .event-note),
 #setlistCard {
     padding: 0.5rem 0 0 0 !important;
 }
