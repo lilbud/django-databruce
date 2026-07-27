@@ -986,40 +986,111 @@ class SetlistEntrySerializer(BaseSerializer):
         ]
 
 
+# class SetlistSongsSerializer(BaseSerializer):
+#     count = serializers.IntegerField(required=False)
+#     song = serializers.SerializerMethodField(required=False)
+#     first_event = serializers.SerializerMethodField(required=False)
+#     last_event = serializers.SerializerMethodField(required=False)
+
+#     @cached_property
+#     def event_map(self):
+#         return {
+#             s.event_id: MinimalEventSerializer(s).data
+#             for s in models.Events.objects.all()
+#         }
+
+#     @cached_property
+#     def song_map(self):
+#         """Will ONLY run the first time a song lookup is requested.
+
+#         completely bypassing Django system checks and startup freezes.
+#         """
+#         return {
+#             s.id: MinimalSongsSerializer(
+#                 s,
+#                 include=[
+#                     "uuid",
+#                     "name",
+#                     "category",
+#                     "original",
+#                     "num_plays_public",
+#                 ],
+#             ).data
+#             for s in models.Songs.objects.all()
+#         }
+
+#     def get_song(self, obj):
+#         # Access via self.song_map (cached_property attaches to the instance)
+#         return self.song_map[obj["song_id"]]
+
+#     def get_first_event(self, obj):
+#         return self.event_map[obj["first_event"]]
+
+#     def get_last_event(self, obj):
+#         return self.event_map[obj["last_event"]]
+
+#     class Meta:
+#         model = models.Setlists
+#         fields = [
+#             "song",
+#             "count",
+#             "first_event",
+#             "last_event",
+#         ]
+
+
 class SetlistSongsSerializer(BaseSerializer):
     count = serializers.IntegerField(required=False)
     song = serializers.SerializerMethodField(required=False)
     first_event = serializers.SerializerMethodField(required=False)
     last_event = serializers.SerializerMethodField(required=False)
 
-    event_map = {
-        s.event_id: MinimalEventSerializer(s).data for s in models.Events.objects.all()
-    }
+    def to_representation(self, instance):
+        if not hasattr(self, "_page_maps_loaded"):
+            page_data = (
+                self.parent.instance
+                if self.parent and hasattr(self.parent, "instance")
+                else [instance]
+            )
 
-    song_map = {
-        s.id: MinimalSongsSerializer(
-            s,
-            include=[
-                "uuid",
-                "name",
-                "category",
-                "original",
-                "first_event",
-                "last_event",
-                "num_plays_public",
-            ],
-        ).data
-        for s in models.Songs.objects.all()
-    }
+            song_ids = {item["song_id"] for item in page_data if "song_id" in item}
+            event_ids = {
+                e_id
+                for item in page_data
+                for e_id in (item.get("first_event"), item.get("last_event"))
+                if e_id
+            }
+
+            songs = models.Songs.objects.filter(id__in=song_ids)
+            events = models.Events.objects.filter(event_id__in=event_ids)
+
+            self._song_map = {
+                s.id: MinimalSongsSerializer(
+                    s,
+                    include=[
+                        "uuid",
+                        "name",
+                        "category",
+                        "original",
+                    ],
+                ).data
+                for s in songs
+            }
+            self._event_map = {
+                e.event_id: MinimalEventSerializer(e).data for e in events
+            }
+            self._page_maps_loaded = True
+
+        return super().to_representation(instance)
 
     def get_song(self, obj):
-        return self.song_map[obj["song_id"]]
+        return self._song_map.get(obj["song_id"])
 
     def get_first_event(self, obj):
-        return self.event_map[obj["first_event"]]
+        return self._event_map.get(obj["first_event"])
 
     def get_last_event(self, obj):
-        return self.event_map[obj["last_event"]]
+        return self._event_map.get(obj["last_event"])
 
     class Meta:
         model = models.Setlists

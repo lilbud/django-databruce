@@ -497,9 +497,6 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
             event__public=False,
         )
 
-        # set_name in valid and event public
-        # set_name in recording and event not public
-
         queryset = (
             models.Setlists.objects.filter(filter)
             .select_related("song", "event")

@@ -262,7 +262,7 @@ a:link,
     padding: 0.1rem 0 !important;
 }
 
-.card-body {
+.card-body:not(:has([class*="p-"])) {
     padding: 1rem !important;
 }
 
@@ -1534,6 +1534,11 @@ pre {
 .btn-prev:hover,
 .btn-next:hover {
     color: var(--color-primary) !important;
+}
+
+.badge:hover,
+.btn:hover {
+    box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.2) !important;
 }
 
 .bi-chevron-right::before,
