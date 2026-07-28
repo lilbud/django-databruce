@@ -403,7 +403,22 @@ class EventsFilter(filters.FilterSet):
     )
 
     id = filters.CharFilter(field_name="event_id", lookup_expr="exact")
-    type = filters.CharFilter(field_name="type_id", lookup_expr="exact")
+    event_type = filters.BaseInFilter(
+        field_name="type_id",
+        lookup_expr="exact",
+        method="filter_by_event_type",
+    )
+
+    def filter_by_event_type(self, queryset, name, value):
+        if type(value) == str:
+            value = int(value)
+
+            return queryset.filter(type_id=value)
+
+        if type(value) == list:
+            return queryset.filter(type_id__in=[int(x) for x in value])
+
+        return queryset
 
     start_date = filters.DateTimeFilter(
         field_name="date",
@@ -498,6 +513,12 @@ class EventsFilter(filters.FilterSet):
 
     search = filters.CharFilter(
         method="filter_fulltext_search",
+    )
+
+    song = filters.NumberFilter(
+        field_name="setlist_event__song_id",
+        lookup_expr="exact",
+        label="song",
     )
 
     def filter_fulltext_search(self, queryset, name, value):

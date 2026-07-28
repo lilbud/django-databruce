@@ -158,6 +158,11 @@ urlpatterns = [
         name="adv_search",
     ),
     path(
+        "test/search/",
+        views.AdvSearch.as_view(),
+        name="adv_search_test",
+    ),
+    path(
         "search/advanced/results",
         views.AdvancedSearchResults.as_view(),
         name="adv_search_results",

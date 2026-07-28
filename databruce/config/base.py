@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "anymail",
     "timezone_field",
     "django_watchfiles",
-    "sentry-sdk",
+    "sentry_sdk",
 ]
 
 SITE_ID = 1

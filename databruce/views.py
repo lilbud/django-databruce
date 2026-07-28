@@ -23,6 +23,7 @@ from django.core.mail import send_mail
 from django.db.models import (
     Count,
     Exists,
+    F,
     Min,
     OuterRef,
     Q,
@@ -37,7 +38,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.http import urlencode, urlsafe_base64_decode, urlsafe_base64_encode
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
@@ -96,7 +97,7 @@ def event_search(request):
             + SearchVector("venue__name", weight="D"),
         )
         .filter(search=query)
-        .annotate(rank=SearchRank(search, query))
+        .annotate(rank=SearchRank(F("search"), query))
         .values()
     )
 
@@ -246,7 +247,7 @@ class ResendActivation(PageTitleMixin, TemplateView):
         else:
             messages.error(request, "No inactive account found with that email.")
 
-        return render(request, template_name=self.template_name)
+        return render(request, template_name=self.template_name)  # type: ignore
 
 
 class Login(PageTitleMixin, LoginView):
@@ -329,12 +330,12 @@ class SignUp(PageTitleMixin, TemplateView):
             messages.error(request, "Incorrect verification answer")
             return render(
                 request,
-                template_name=self.template_name,
+                template_name=self.template_name,  # type: ignore
                 context={"form": form},
             )
 
         messages.error(request, "Signup Failed, see errors below")
-        return render(request, template_name=self.template_name, context={"form": form})
+        return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
 
     def send_mail(self, context, from_email, to_email):
         subject = loader.render_to_string(self.subject_template_name, context).strip()
@@ -408,7 +409,7 @@ class SignUpConfirm(PageTitleMixin, TemplateView):
                     self.request.session[token_key] = token
 
                     group = Group.objects.get(name="Users")
-                    self.user.groups.add(group)
+                    self.user.groups.add(group)  # type: ignore
                     self.user.is_active = True
                     self.user.save()
 
@@ -965,7 +966,7 @@ class VenueDetail(PageTitleMixin, TemplateView):
         venue_address = getattr(venue, "address", None)
 
         if venue_address:
-            context["shared_loc"] = models.Venues.objects.exclude(id=venue.pk).filter(
+            context["shared_loc"] = models.Venues.objects.exclude(id=venue.pk).filter(  # type: ignore
                 address=venue_address,
             )[:5]
 
@@ -1179,13 +1180,13 @@ class Contact(PageTitleMixin, TemplateView):
             messages.error(request, "Incorrect verification answer")
             return render(
                 request,
-                template_name=self.template_name,
+                template_name=self.template_name,  # type: ignore
                 context={"form": form, "verification_err": True},
             )
 
         messages.error(request, "Message not sent, see errors below")
 
-        return render(request, template_name=self.template_name, context={"form": form})
+        return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
 
 
 class SetlistNotesSearch(PageTitleMixin, TemplateView):
@@ -1275,17 +1276,17 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
         event_form = self.form_class(self.request.GET)
         formset = self.formset_class(self.request.GET)
 
-        pos_choices = dict(formset.form.base_fields["position"].choices)
+        pos_choices = dict(formset.form.base_fields["position"].choices)  # type: ignore
 
         next_song = (
             models.Setlists.objects.select_related("song")
             .filter(
                 set_name=OuterRef("set_name"),
-                event__id=OuterRef("event__id"),
+                event_id=OuterRef("event_id"),
                 song_num__gt=OuterRef("song_num"),
             )
             .order_by("event", "song_num")
-            .values("song__id")[:1]
+            .values("song_id")[:1]
         )
 
         setlist_qs = (
@@ -1303,7 +1304,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
             .values("event_id")
             .annotate(
                 songs_list=ArrayAgg(
-                    "song__id",
+                    "song_id",
                     filter=Q(set_name__in=VALID_SET_NAMES),
                     distinct=True,
                 ),
@@ -1312,11 +1313,11 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
 
         event_filter = event_form.get_filters()
         sl_filter = Q()
-        event_queries = []
-        display_queries = []
+        event_search_queries = []
+        setlist_search_display_queries = []
 
         for f in event_filter.children:
-            sl_filter &= Q(**{f"event__{f[0]}": f[1]})
+            sl_filter &= Q(**{f"event__{f[0]}": f[1]})  # type: ignore
 
         if formset.is_valid() and formset.has_changed():
             song_ids = [
@@ -1324,6 +1325,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                 for f in formset.cleaned_data
                 if f.get("song1")
             ]
+
             song_ids.extend(
                 [
                     str(f["song2"]).replace("'", "")
@@ -1381,7 +1383,7 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                     if not choice:
                         condition &= ~pos_filter  # type: ignore
                     else:
-                        condition &= pos_filter
+                        condition &= pos_filter  # type: ignore
 
                     summary = f"{s1_name} ({choice_str} {pos_display})"
 
@@ -1399,34 +1401,37 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                         setlist_qs.filter(condition).values_list("event_id", flat=True),
                     )
 
-                event_queries.append(matched_events)
-                display_queries.append(summary)
+                event_search_queries.append(matched_events)
+                setlist_search_display_queries.append(summary)
 
         final_events = set()
 
-        if event_queries:
+        if event_search_queries:
             conjunction = event_form.cleaned_data["conjunction"]
             if conjunction == "or":
-                final_events = set.union(*event_queries)
+                final_events = set.union(*event_search_queries)
             else:
-                final_events = set.intersection(*event_queries)
+                final_events = set.intersection(*event_search_queries)
 
             event_filter &= Q(id__in=final_events)
 
         context["events"] = (
             models.Events.objects.filter(event_filter)
             .select_related(
-                "venue",
-                "venue__city",
                 "venue__city__country",
                 "artist",
                 "tour",
                 "type",
             )
-            .prefetch_related("venue__city__state", "setlist_event")
+            .prefetch_related(
+                "venue__city__state",
+                "onstage_event",
+            )
             .annotate(
                 has_setlist=Exists(
-                    Subquery(models.Setlists.objects.filter(event_id=OuterRef("id"))),
+                    Subquery(
+                        models.Setlists.objects.filter(event_id=OuterRef("id")),
+                    ),
                 ),
             )
         ).order_by("event_id")
@@ -1446,22 +1451,34 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
                     display["data"] = " OR ".join(
                         event_form.cleaned_data[f].values_list("name", flat=True),
                     )
+                elif type(event_form.cleaned_data[f]) is dict:
+                    display["data"] = event_form.cleaned_data[f]["value"]
+                else:
+                    display["data"] = event_form.cleaned_data[f].__str__()
 
                 context["display_fields"].append(display)
 
-        context["search_summary"] = display_queries
+        context["search_summary"] = setlist_search_display_queries
 
         context["conjunction"] = event_form.cleaned_data.get(
             "conjunction",
             "and",
         )
 
-        query_display = f" {context['conjunction']} ".join(display_queries)
-        field_display = ",".join(
+        query_display = f" {context['conjunction']} ".join(
+            setlist_search_display_queries,
+        )
+
+        field_display = ", ".join(
             [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
         )
 
-        context["description"] = f"Songs: {query_display}, {field_display}"
+        if query_display == "":
+            context["description"] = f"{field_display}"
+        elif query_display and field_display == "":
+            context["description"] = f"Songs: {query_display}"
+        else:
+            context["description"] = f"Songs: {query_display}, {field_display}"
 
         return context
 
@@ -1480,6 +1497,194 @@ class ShortenURL(PageTitleMixin, TemplateView):
 class Relation(PageTitleMixin, TemplateView):
     template_name = "databruce/relations/relations.html"
     title = "Relations"
+
+
+class AdvSearch(PageTitleMixin, TemplateView):
+    template_name = "databruce/test_advsearch.html"
+    title = "Advanced Search"
+    form_class = AdvancedEventSearch
+    formset = SetlistSearch
+    formset_class = formset_factory(formset)
+
+    position_filters = {
+        "show_opener": Q(is_opener=True),
+        "in_show": Q(set_name="show"),
+        "in_set_one": Q(set_name="set 1"),
+        "set_one_opener": Q(set_name="set 1", is_set_opener=True),
+        "set_one_closer": Q(set_name="set 1", is_set_closer=True),
+        "in_set_two": Q(set_name="set 2"),
+        "set_two_opener": Q(set_name="set 2", is_set_opener=True),
+        "set_two_closer": Q(set_name="set 2", is_set_closer=True),
+        "main_set_closer": Q(is_main_set_closer=True),
+        "encore_opener": Q(set_name="encore", is_set_opener=True),
+        "in_encore": Q(set_name="encore"),
+        "in_preshow": Q(set_name="pre-show"),
+        "in_recording": Q(set_name="recording"),
+        "in_soundcheck": Q(set_name="soundcheck"),
+        "show_closer": Q(is_closer=True),
+        "anywhere": Q(),  # No additional filters
+        "premiere": Q(premiere=True),
+        "debut": Q(debut=True),
+        "nobruce": Q(nobruce=True),
+        "request": Q(sign_request=True),
+    }
+
+    def get(self, request, *args, **kwargs):
+        if request.GET:
+            clean_params = {}
+
+            for key, value in request.GET.items():
+                stripped_val = value.strip()
+
+                # 1. Skip if the field value is entirely empty
+                if not stripped_val:
+                    continue
+
+                # 2. Skip if it is an '_exclude' field set to 'False'
+                if key.endswith("_exclude") and stripped_val.lower() == "false":
+                    continue
+
+                # If it passes both checks, keep the parameter
+                clean_params[key] = value
+
+            # If parameters were removed, redirect to the clean URL
+            if len(clean_params) != len(request.GET):
+                redirect_url = request.path
+                if clean_params:
+                    redirect_url += "?" + urlencode(clean_params)
+
+                return redirect(redirect_url)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["title"] = self.title
+        context["display_fields"] = []
+
+        event_form = self.form_class(self.request.GET)
+        formset = self.formset_class(self.request.GET)
+
+        if event_form.is_valid():
+            for f in event_form.changed_data:
+                if "_exclude" not in f and f != "conjunction":
+                    display = {
+                        "label": event_form[f].label,
+                        "data": event_form.cleaned_data[f],
+                    }
+
+                    if type(event_form.cleaned_data[f]) is list:
+                        display["data"] = " OR ".join(event_form.cleaned_data[f])
+                    elif type(event_form.cleaned_data[f]) is QuerySet:
+                        display["data"] = " OR ".join(
+                            event_form.cleaned_data[f].values_list("name", flat=True),
+                        )
+                    elif type(event_form.cleaned_data[f]) is dict:
+                        display["data"] = event_form.cleaned_data[f]["value"]
+                    else:
+                        display["data"] = event_form.cleaned_data[f].__str__()
+
+                    context["display_fields"].append(display)
+
+        pos_choices = dict(formset.form.base_fields["position"].choices)  # type: ignore
+
+        # 1. Access the request query parameters from the request object
+        query_params = self.request.GET
+
+        # 2. Extract global non-formset elements
+        conjunction = query_params.get("conjunction", "and")
+
+        try:
+            total_forms = int(query_params.get("form-TOTAL_FORMS", 0))
+        except ValueError:
+            total_forms = 0
+
+        # 3. Restructure the flat query strings into a clean list of search dicts
+        search_queries = []
+
+        event_search_queries = []
+        setlist_search_display_queries = []
+
+        for i in range(total_forms):
+            song_id = query_params.get(f"form-{i}-song1")
+            choice = query_params.get(f"form-{i}-choice")
+            position = query_params.get(f"form-{i}-position")
+
+            if song_id:
+                search_queries.append(
+                    {
+                        "song_id": song_id,
+                        "choice": f"{choice == 'True'}",
+                        "position": position,
+                    },
+                )
+
+        # 5. Inject the structured query properties back into the template context
+        context["logical_operator"] = conjunction
+        context["parsed_queries"] = search_queries
+
+        song_ids = [
+            str(f["song1"]).replace("'", "")
+            for f in formset.cleaned_data
+            if f.get("song1")
+        ]
+
+        song_ids.extend(
+            [
+                str(f["song2"]).replace("'", "")
+                for f in formset.cleaned_data
+                if f.get("song2")
+            ],
+        )
+
+        song_map = {
+            str(s.id): s.name for s in models.Songs.objects.filter(id__in=song_ids)
+        }
+
+        if formset.is_valid():
+            for form in formset.cleaned_data:
+                if not form.get("song1"):
+                    continue
+
+                choice = form.get("choice", True)
+                pos = form.get("position")
+                s1_name = song_map.get(str(form["song1"]).replace("'", ""))
+
+                choice_str = "is" if choice else "not"
+
+                summary = f"{s1_name} ({choice_str} anywhere)"
+
+                if pos == "followed_by" and form.get("song2"):
+                    s2_name = song_map.get(str(form["song2"]).replace("'", ""))
+                    summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
+
+                else:
+                    pos_display = pos_choices.get(pos)
+
+                    summary = f"{s1_name} ({choice_str} {pos_display})"
+
+                setlist_search_display_queries.append(summary)
+
+            context["search_summary"] = setlist_search_display_queries
+
+        context["conjunction"] = conjunction
+
+        query_display = f" {context['conjunction']} ".join(
+            setlist_search_display_queries,
+        )
+
+        field_display = ", ".join(
+            [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
+        )
+
+        if query_display == "":
+            context["description"] = f"{field_display}"
+        elif query_display and field_display == "":
+            context["description"] = f"Songs: {query_display}"
+        else:
+            context["description"] = f"Songs: {query_display}, {field_display}"
+
+        return context
 
 
 class RelationDetail(PageTitleMixin, TemplateView):

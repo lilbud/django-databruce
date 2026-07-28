@@ -219,7 +219,6 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         return (
             models.Events.objects.all()
             .select_related(
-                "venue",
                 "artist",
                 "tour",
                 "venue__city__country",
@@ -230,13 +229,116 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 "run",
                 "venue__city__state",
                 "leg",
-                Prefetch("onstage", queryset=onstage_qs),
+                "setlist_event",
+                Prefetch("onstage_event", queryset=onstage_qs),
             )
         ).order_by("event_id")
 
+    def filter_queryset(self, queryset):
+        # 1. Let django-filter process the standard form fields first
+        queryset = super().filter_queryset(queryset)
+
+        # Base structure mapping positions to Q objects
+        position_filters = {
+            "show_opener": Q(setlist_event__is_opener=True),
+            "in_show": Q(setlist_event__set_name="show"),
+            "in_set_one": Q(setlist_event__set_name="set 1"),
+            "set_one_opener": Q(setlist_event__set_name="set 1", is_set_opener=True),
+            "set_one_closer": Q(setlist_event__set_name="set 1", is_set_closer=True),
+            "in_set_two": Q(setlist_event__set_name="set 2"),
+            "set_two_opener": Q(setlist_event__set_name="set 2", is_set_opener=True),
+            "set_two_closer": Q(setlist_event__set_name="set 2", is_set_closer=True),
+            "main_set_closer": Q(setlist_event__is_main_set_closer=True),
+            "encore_opener": Q(setlist_event__set_name="encore", is_set_opener=True),
+            "in_encore": Q(setlist_event__set_name="encore"),
+            "in_preshow": Q(setlist_event__set_name="pre-show"),
+            "in_recording": Q(setlist_event__set_name="recording"),
+            "in_soundcheck": Q(setlist_event__set_name="soundcheck"),
+            "show_closer": Q(setlist_event__is_closer=True),
+            "anywhere": Q(),
+            "premiere": Q(setlist_event__premiere=True),
+            "debut": Q(setlist_event__debut=True),
+            "nobruce": Q(setlist_event__nobruce=True),
+            "request": Q(setlist_event__sign_request=True),
+        }
+
+        # 2. Extract query parameters for the dynamic formset
+        query_params = self.request.query_params
+        conjunction = query_params.get("conjunction", "and").lower()
+
+        try:
+            total_forms = int(query_params.get("form-TOTAL_FORMS", 0))
+        except ValueError:
+            total_forms = 0
+
+        if total_forms == 0:
+            return queryset
+
+        # 3. Parse and collect all valid formset queries
+        formset_queries = []
+        for i in range(total_forms):
+            song_1 = query_params.get(f"form-{i}-song1")
+            song_2 = query_params.get(f"form-{i}-song2")
+            choice = query_params.get(f"form-{i}-choice")
+            position = query_params.get(f"form-{i}-position")
+
+            if song_1:
+                formset_queries.append(
+                    {
+                        "song_1": song_1,
+                        "choice": choice == "True" or choice == "true",
+                        "position": position,
+                        "song_2": song_2,
+                    },
+                )
+
+        if not formset_queries:
+            return queryset
+
+        # =========================================================================
+        # 4. CHOP UP FILTERS ACCORDING TO LOGICAL OPERATOR (THE FIX)
+        # =========================================================================
+        if conjunction == "or":
+            # For OR operations, a single combined filter is required.
+            or_filter = Q()
+            for query in formset_queries:
+                condition = self._build_form_condition(query, position_filters)
+                or_filter |= condition
+
+            queryset = queryset.filter(or_filter)
+        else:
+            # For AND operations, loop and CHAIN discrete .filter() statements.
+            # This isolates the SQL multi-joins per row instead of cross-contaminating them.
+            for query in formset_queries:
+                condition = self._build_form_condition(query, position_filters)
+                queryset = queryset.filter(condition)
+
+        # 5. Prevent duplicate entries from Many-To-Many relational joins
+        return queryset.distinct()
+
+    def _build_form_condition(self, query, position_filters) -> Q:
+        if query["position"] == "followed_by" and query["song_2"]:
+            condition = Q(
+                setlist_event__songs_page__id__song_id=query["song_1"],
+            ) & Q(
+                setlist_event__songs_page__next__song_id=query["song_2"],
+            )
+        else:
+            condition = Q(setlist_event__song_id=query["song_1"])
+            if query["position"] and query["position"] not in [
+                "anywhere",
+                "followed_by",
+            ]:
+                condition &= position_filters.get(query["position"], Q())
+
+        # Invert condition if choice is False (NOT evaluation)
+        if query["choice"] is False:
+            condition = ~condition
+
+        return condition
+
     serializer_class = serializers.EventsSerializer
     filterset_class = filters.EventsFilter
-    ordering = ["event_id"]  # Default ordering
 
 
 class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):

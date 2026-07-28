@@ -1,0 +1,87 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load filters %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block content %}
+  <div class="col">
+    <div class="text-2xl text-nowrap mb-2">Advanced Search Results</div>
+    <div class="card mb-3">
+      <div class="card-body text-sm">
+        <div id="row">
+          <div class="d-flex flex-column">
+            {% if display_fields %}
+              {% for field in display_fields %}
+                <div>
+                  <span class="pe-2 fw-semibold">{{ field.label }}:</span>
+                  {% if field.choice %}({{ field.choice }}){% endif %}
+                  {{ field.data.value|default:field.data }}
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% if search_summary %}
+              <div class="pe-2 fw-semibold">Songs:</div>
+              {% for field in search_summary %}
+                {{ field }}
+                {% if not forloop.last %}<div class="col-1">{{ conjunction|upper }}</div>{% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 1. Extract the GET parameters from the current URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const parsedQueries = {{ parsed_queries|safe|default:"[]" }};
+        const conjunction = "{{ logical_operator|escapejs }}";
+        let searchTimeout;
+
+        // If there are no search parameters, stop here
+        if (urlParams.size === 0) return;
+
+        try {
+            var url = `/api/v1/adv_search/?${urlParams.toString()}&format=custom`
+
+            console.log(urlParams.toString())
+
+            var table = new DataTable('#eventTable', {
+                layout: {
+                    topStart: null,
+                    bottomStart: null,
+                    topEnd: null,
+                    bottomEnd: null,
+                    top: ['customInputPaging', 'info'],
+                    bottom: ['customInputPaging', 'info'],
+                },
+                ajax: {
+                  'url': url,
+                },
+                columns: event_table_columns,
+            });
+
+        } catch (error) {
+            console.error('Failed to fetch results:', error);
+        }
+
+        $('#search').on('keyup change clear', function () {
+            const value = $(this).val();
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(function () {
+                table.search(value).draw();
+            }, 500);
+        });
+
+        $('#PublicityFilter').on('change', function () {
+            var selectedValue = this.value;
+            table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
+        });
+    });
+  </script>
+{% endblock content %}

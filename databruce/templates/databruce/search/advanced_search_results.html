@@ -82,6 +82,7 @@
                       <a href="{% url "event_details" id=event.event_id %}">{{ event.get_date }}</a>
                     </td>
                     <td class="text-nowrap">
+                      {% comment %} {{ event.setlist_event }} {% endcomment %}
                       {% if event.has_setlist %}
                         <i class="bi bi-check-lg"
                            data-bs-toggle="tooltip"

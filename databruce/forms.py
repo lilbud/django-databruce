@@ -110,6 +110,7 @@ class AdvancedEventSearch(forms.Form):
                 continue
 
             value = self.cleaned_data.get(field)
+
             if not value:
                 continue
 
@@ -317,7 +318,7 @@ class AdvancedEventSearch(forms.Form):
 
     relation = CustomCharField(
         label="Relation",
-        lookup_path="onstage__relation_id",
+        lookup_path="onstage_event__relation_id",
         required=False,
         widget=forms.Select(
             attrs={
