@@ -322,6 +322,7 @@ dependencies = [
     { name = "djlint" },
     { name = "gevent" },
     { name = "gunicorn" },
+    { name = "html2image" },
     { name = "markdown" },
     { name = "markdown-it-py" },
     { name = "msgspec" },
@@ -363,6 +364,7 @@ requires-dist = [
     { name = "djlint", specifier = ">=1.36.4" },
     { name = "gevent", specifier = ">=25.9.1" },
     { name = "gunicorn", specifier = ">=25.0.0" },
+    { name = "html2image", specifier = ">=2.0.7" },
     { name = "markdown", specifier = ">=3.7" },
     { name = "markdown-it-py", specifier = ">=4.0.0" },
     { name = "msgspec", specifier = ">=0.21.1" },
@@ -686,6 +688,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/46/4d/74e685d22a7d8dcc920e4e84da2842c057141236757143e1c167e7bd64df/gunicorn-25.0.0.tar.gz", hash = "sha256:4b1ab820ffc316352da7146005a9e66044a131434b17a7d2a9fb0604f1268864", size = 9618408 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bf/9e/1be849edbea786424848e206e38a8b6025d140b7b9430037c5dc91e8a83f/gunicorn-25.0.0-py3-none-any.whl", hash = "sha256:b9b88f0ebc5a0fcd1e9e29a1f045f56f5402c6423ee3e3f675f679d0db5345d1", size = 169675 },
+]
+
+[[package]]
+name = "html2image"
+version = "2.0.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+    { name = "websocket-client" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ac/3a/74472f59c11d0667add3cbd8abea101e9756f6ffec3dce27a8eb62415f8b/html2image-2.0.7.tar.gz", hash = "sha256:8644fd424cff2805977f4583f965b0235733f9eb08569e4c02f6befe6e7fafcc", size = 719888 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/52/ee/967dd1f3ee63c56288ddcb6ceccecf0ce7e0a2fb0fb519c4e4013d7333e5/html2image-2.0.7-py3-none-any.whl", hash = "sha256:1806df797e8320ba3246f45149e7034314911be6a285787cbff3edf5bbe9de40", size = 31948 },
 ]
 
 [[package]]
@@ -1308,6 +1323,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/56/fe/cb8ef3d6f929d14158fdaaad9925985b7310abc9384dcd4d82dd0016fb59/watchfiles-1.2.0-cp315-cp315-manylinux_2_31_riscv64.whl", hash = "sha256:cee9d5efd929efdac5f7e58f72b3376f676b64050a91c5b99a7094c5b2317488", size = 465096 },
     { url = "https://files.pythonhosted.org/packages/25/91/80908e835e100527a9267147b08c0eee1fa6ab0ffec15edc04d1d44885f7/watchfiles-1.2.0-cp315-cp315-musllinux_1_1_aarch64.whl", hash = "sha256:b718bf356bbc15e559bd8ef41782b573b8ae0e3f177ab244b440568d7ea02cfb", size = 630638 },
     { url = "https://files.pythonhosted.org/packages/46/4b/95ab2f256bb4af3cb2eb23b9317bda984ee6e0f11733a5c004a6c95b06e3/watchfiles-1.2.0-cp315-cp315-musllinux_1_1_x86_64.whl", hash = "sha256:922c0e019fe68b3ae392965a766b02a71ba1168c932cebc3733cd52c5fe5b377", size = 657684 },
+]
+
+[[package]]
+name = "websocket-client"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/41/aa4bf9664e4cda14c3b39865b12251e8e7d239f4cd0e3cc1b6c2ccde25c1/websocket_client-1.9.0.tar.gz", hash = "sha256:9e813624b6eb619999a97dc7958469217c3176312b3a16a4bd1bc7e08a46ec98", size = 70576 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/34/db/b10e48aa8fff7407e67470363eac595018441cf32d5e1001567a7aeba5d2/websocket_client-1.9.0-py3-none-any.whl", hash = "sha256:af248a825037ef591efbf6ed20cc5faa03d3b47b9e5a2230a529eeee1c1fc3ef", size = 82616 },
 ]
 
 [[package]]

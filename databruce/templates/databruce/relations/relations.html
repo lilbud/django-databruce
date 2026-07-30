@@ -14,7 +14,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-1 mb-3">
+            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
@@ -65,14 +65,11 @@
       let sb_columns = [0,1,2,3,4];
 
       var table = new DataTable('#relationsTable', {
-        columnDefs: [
-          { targets: [0], width: '1rem' },
-        ],
         ajax: {
           'url': '/api/v1/relations/?format=custom',
         },
         columns: [
-          {'data': 'appearances', 'name': 'appearances'},
+          {'data': 'appearances', 'name': 'appearances', 'width': '1rem', 'className': 'dt-center'},
           {
             'data': 'name',
             'name': 'name',

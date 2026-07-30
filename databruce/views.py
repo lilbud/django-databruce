@@ -722,7 +722,7 @@ class EventDetailMobile(PageTitleMixin, TemplateView):
                 "artist",
                 "tour",
                 "venue__city",
-            ).prefetch_related("leg", "run", "archive_links", "nugs_event"),
+            ).prefetch_related("leg", "run"),
             event_id=self.kwargs["id"],
         )
 
@@ -738,66 +738,11 @@ class EventDetailMobile(PageTitleMixin, TemplateView):
             f"{event_date}<br>{context['event'].artist}<br>{venue_name}"
         )
 
-        if venue and venue.city and venue.city.timezone:
-            tz_target = venue.city.timezone
-        else:
-            tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
-
-        if event.scheduled_time:
-            context["scheduled_time"] = (
-                event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
-
-        if event.start_time:
-            context["start_time"] = (
-                event.start_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
-
-        if event.end_time:
-            context["end_time"] = (
-                event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
-
-        if event.start_time and event.end_time and not event.length:
-            context["duration"] = event.end_time.astimezone(
-                tz_target,
-            ) - event.start_time.astimezone(tz_target)
-        elif event.length:
-            context["duration"] = event.length
-
-        neighbor_qs = models.Events.objects.select_related("venue", "artist")
-
-        context["prev_event"] = (
-            neighbor_qs.filter(event_id__lt=event.event_id)
-            .order_by("-event_id")
-            .first()
-        )
-
-        context["next_event"] = (
-            neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
-        )
-
         if not context["event"].date:
             messages.info(
                 self.request,
                 "This is a placeholder date, actual date unknown.",
             )
-
-        context["official"] = (
-            models.Releases.objects.filter(
-                event__id=event.pk,
-            )
-            .prefetch_related("event")
-            .order_by("date")
-        )
-
-        context["official_tracks"] = (
-            models.ReleaseTracks.objects.filter(event__id=event.pk)
-            .select_related("release")
-            .prefetch_related("event")
-            .distinct("release_id", "release__date")
-            .order_by("release__date")
-        )
 
         return context
 

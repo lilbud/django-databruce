@@ -39,15 +39,8 @@
       {{ title }}
       | Databruce
     </title>
-    <!-- leaflet.js-->
-    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
-    <script src="{% static 'databruce/js/leaflet.js' %}"></script>
     <!--JQuery-->
-    <link rel="stylesheet"
-          href="{% static 'databruce/css/jquery-ui.min.css' %}">
     <script src="{% static 'databruce/js/jquery-4.0.0.min.js' %}"></script>
-    <script src="{% static 'databruce/js/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'databruce/js/jquery.mask.min.js' %}"></script>
     <!--Bootstrap-->
     <link rel="stylesheet"
           href="{% static 'databruce/css/bootstrap.min.css' %}">
@@ -178,7 +171,7 @@
                                   Notes
                                   <i class="bi bi-pencil"></i>
                                 </div>
-                                <div class="card-body event-note">{{ event.note|markdown|safe }}</div>
+                                <div class="card-body event-note text-wrap">{{ event.note|markdown|safe }}</div>
                               </div>
                             {% endpartialdef %}
                           </div>

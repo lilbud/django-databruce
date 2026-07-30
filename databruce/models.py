@@ -1433,7 +1433,7 @@ class Runs(BaseModel):
         blank=True,
         default=None,
     )
-    note = models.TextField(default=None, blank=True)
+    note = models.TextField(default=None, blank=True, null=True)
     total_sales = models.IntegerField(blank=True)
     total_capacity = models.IntegerField(blank=True)
     total_gross = models.BigIntegerField(blank=True)

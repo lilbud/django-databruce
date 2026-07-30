@@ -26,6 +26,7 @@ dependencies = [
     "djlint>=1.36.4",
     "gevent>=25.9.1",
     "gunicorn>=25.0.0",
+    "html2image>=2.0.7",
     "markdown>=3.7",
     "markdown-it-py>=4.0.0",
     "msgspec>=0.21.1",

@@ -150,26 +150,46 @@ function initializeShareCardGenerator(config) {
             ],
 
             initComplete: function () {
-              // Badge wrap fix
-              const badgeRow = sandbox.querySelector('#badge-row');
-              if (badgeRow) {
-                badgeRow.style.maxWidth = '320px';
-                badgeRow.style.marginLeft = 'auto';
-                badgeRow.style.marginRight = 'auto';
-              }
 
-              const notes = sandbox.querySelectorAll('td > .text-wrap');
 
-              for (let i = 0; i < notes.length; i++) {
-                notes[i].style.maxWidth = '475px';
-                notes[i].style = 'word-break: break-word;';
-              }
 
-              // Font alignment fix
-              const badges = sandbox.querySelectorAll('span.badge');
-              badges.forEach(badge => {
-                const textContent = badge.textContent.trim();
-                badge.innerHTML = `
+              setTimeout(() => resolve(sandbox), 50);
+            }
+          });
+        });
+      })
+      .then(sandbox => {
+        const badgeRow = sandbox.querySelector('#badge-row');
+        if (badgeRow) {
+          badgeRow.style.maxWidth = '500px';
+          badgeRow.style.marginLeft = 'auto';
+          badgeRow.style.marginRight = 'auto';
+        }
+
+        const eventNote = sandbox.querySelector('.event-note');
+        if (eventNote) {
+          eventNote.style.maxWidth = '530px';
+          eventNote.style.marginLeft = 'auto';
+          eventNote.style.marginRight = 'auto';
+          eventNote.style.wordBreak = 'break-word';
+          eventNote.style.overflowWrap = 'break-word';
+        }
+
+        const notes = sandbox.querySelectorAll('td > .text-wrap');
+
+        for (let i = 0; i < notes.length; i++) {
+          notes[i].style.maxWidth = '470px';
+          notes[i].style.marginLeft = 'auto';
+          notes[i].style.marginRight = 'auto';
+          notes[i].style.wordBreak = 'break-word';
+          notes[i].style.overflowWrap = 'break-word';
+        }
+
+        // Font alignment fix
+        const badges = sandbox.querySelectorAll('span.badge');
+        badges.forEach(badge => {
+          const textContent = badge.textContent.trim();
+          badge.innerHTML = `
                                 <span style="
                                     display: inline-block;
                                     line-height: 1 !important;
@@ -178,14 +198,7 @@ function initializeShareCardGenerator(config) {
                                     top: -1.5px;
                                 ">${textContent}</span>
                             `;
-              });
-
-              setTimeout(() => resolve(sandbox), 50);
-            }
-          });
         });
-      })
-      .then(sandbox => {
         const logoBrandLink = sandbox.querySelector('.navbar-brand-mobile');
         if (logoBrandLink) {
           // Wipe out Bootstrap float, margins, padding, and flex properties
@@ -234,7 +247,9 @@ function initializeShareCardGenerator(config) {
           x: 0,
           y: 0,
           width: width,
-          height: totalRect.height
+          height: totalRect.height,
+          windowWidth: width,
+          windowHeight: totalRect.height
         };
 
         return html2canvas(marginWrapper, options).then(canvas => {
