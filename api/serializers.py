@@ -96,7 +96,7 @@ class MinimalVenuesSerializer(BaseSerializer):
 class MinimalToursSerializer(BaseSerializer):
     class Meta:
         model = models.Tours
-        fields = ["id", "name", "uuid"]
+        fields = ["name", "uuid"]
 
 
 class MinimalUserSerializer(BaseSerializer):
@@ -199,9 +199,9 @@ def get_date_from_instance(obj):
     result["display"] = date.strftime("%Y-%m-%d")
     result["display_day"] = date.strftime("%Y-%m-%d [%a]")
 
-    if early_late:
-        result["display"] = f"{date.strftime('%Y-%m-%d')} ({early_late})"
-        result["display_day"] = f"{date.strftime('%Y-%m-%d [%a]')} ({early_late})"
+    # if early_late:
+    #     result["display"] = f"{date.strftime('%Y-%m-%d')} ({early_late})"
+    #     result["display_day"] = f"{date.strftime('%Y-%m-%d [%a]')} ({early_late})"
 
     return result
 
@@ -285,7 +285,11 @@ class VenuesSerializer(BaseSerializer):
     country = MinimalCountriesSerializer(required=False, source="city.country")
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
-    formatted = serializers.CharField(source="venues_text.formatted", required=False)
+    formatted = serializers.CharField(
+        source="venues_text.formatted",
+        required=False,
+        max_length=255,
+    )
 
     def get_name(self, obj):
         if obj.detail:
@@ -312,7 +316,7 @@ class VenuesSerializer(BaseSerializer):
 class EventRunSerializer(BaseSerializer):
     band = MinimalBandsSerializer()
     venue = MinimalVenuesSerializer(include=["uuid", "name"])
-    city = serializers.CharField(source="venue.city", required=False)
+    city = serializers.CharField(source="venue.city", required=False, max_length=255)
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
 
@@ -382,11 +386,19 @@ class EventTypeSerializer(BaseSerializer):
 
 class EventSearchSerializer(BaseSerializer):
     date = serializers.SerializerMethodField(method_name="get_date")
-    venue = serializers.CharField(required=False, source="venue.venues_text.formatted")
-    city = serializers.CharField(required=False, source="venue.city.name")
-    artist = serializers.CharField(required=False, source="artist.name")
-    type = serializers.CharField(required=False, source="type.name")
-    run = serializers.CharField(required=False, source="run.name")
+    venue = serializers.CharField(
+        required=False,
+        source="venue.venues_text.formatted",
+        max_length=255,
+    )
+    city = serializers.CharField(
+        required=False,
+        source="venue.city.name",
+        max_length=255,
+    )
+    artist = serializers.CharField(required=False, source="artist.name", max_length=255)
+    type = serializers.CharField(required=False, source="type.name", max_length=255)
+    run = serializers.CharField(required=False, source="run.name", max_length=255)
     rank = serializers.FloatField(required=False)
 
     def get_date(self, obj):
@@ -452,7 +464,8 @@ class IndexEventsSerializer(BaseSerializer):
 
 class EventsSerializer(BaseSerializer):
     date = serializers.SerializerMethodField(method_name="get_date")
-    run = MinimalEventRunSerializer(required=False)
+    early_late = serializers.CharField(required=False, max_length=255)
+    # run = MinimalEventRunSerializer(required=False)
     artist = MinimalBandsSerializer(required=False)
     tour = MinimalToursSerializer(required=False)
     venue = MinimalVenuesSerializer(
@@ -462,13 +475,15 @@ class EventsSerializer(BaseSerializer):
     city = MinimalCitiesSerializer(
         required=False,
         source="venue.city",
-        include=["name", "formatted"],
+        include=["uuid", "name", "formatted"],
     )
-    leg = MinimalTourLegsSerializer(required=False, include=["name"])
+
+    leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
-    type = MinimalEventTypeSerializer(required=False, include=["name"])
+    type = serializers.CharField(required=False, source="type.name", max_length=255)
     rank = serializers.IntegerField(required=False)
     event_status = serializers.SerializerMethodField()
+    public = serializers.BooleanField(required=False)
 
     def get_has_setlist(self, obj):
         return bool(obj.setlist_event.exists())
@@ -491,7 +506,7 @@ class EventsSerializer(BaseSerializer):
         model = models.Events
         fields = [
             "date",
-            "run",
+            # "run",
             "artist",
             "tour",
             "venue",
@@ -503,6 +518,8 @@ class EventsSerializer(BaseSerializer):
             "event_status",
             "event_id",
             "title",
+            "public",
+            "early_late",
         ]
 
 
@@ -1053,10 +1070,10 @@ class SetlistSongsSerializer(BaseSerializer):
                 else [instance]
             )
 
-            song_ids = {item["song_id"] for item in page_data if "song_id" in item}
+            song_ids = {item["song_id"] for item in page_data if "song_id" in item}  # type: ignore
             event_ids = {
                 e_id
-                for item in page_data
+                for item in page_data  # type: ignore
                 for e_id in (item.get("first_event"), item.get("last_event"))
                 if e_id
             }
@@ -1115,7 +1132,7 @@ class UpdatesSerializer(BaseSerializer):
 
 class UsersSerializer(BaseSerializer):
     event_count = serializers.IntegerField()
-    user_slug = serializers.CharField()
+    user_slug = serializers.CharField(max_length=255)
 
     date_joined = serializers.SerializerMethodField()
 
@@ -1149,8 +1166,8 @@ class UserAttendedShowsSerializer(BaseSerializer):
 class SetlistBreakdownSerializer(BaseSerializer):
     max = serializers.IntegerField(required=False)
     num = serializers.IntegerField(required=False)
-    category = serializers.CharField(required=False)
-    category_slug = serializers.CharField(required=False)
+    category = serializers.CharField(required=False, max_length=255)
+    category_slug = serializers.CharField(required=False, max_length=255)
 
     songs_map = {
         s.id: MinimalSongsSerializer(

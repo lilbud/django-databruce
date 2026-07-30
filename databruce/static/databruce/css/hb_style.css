@@ -262,13 +262,13 @@ a:link,
     padding: 0.1rem 0 !important;
 }
 
-.card-body:not(:has([class*="p-"])) {
+.card-body:not(#setlistCard, [class*="p-0"]) {
     padding: 1rem !important;
 }
 
-#setlistCard {
+/* #setlistCard {
     padding: 0.5rem 0 0 0 !important;
-}
+} */
 
 .card-body.list-card,
 .card-body:has(#headimg) {
@@ -424,7 +424,7 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-condition {
 }
 
 th,
-tr:not(.set-header) td:not(.songnum, .position, .highlighted) {
+tr:not(.set-header) td:not(.songnum, .position, .highlighted, .sorting_1) {
     background-color: var(--background-color-subtle) !important;
 }
 
@@ -856,6 +856,10 @@ table.dataTable span.dtcc span.dtcc-button-icon,
 .set-header td {
     background-color: var(--background-color-emphasis) !important;
     border: none !important;
+}
+
+.sorting_1 {
+    background-color: var(--background-color-muted) !important;
 }
 
 .set-header span,
@@ -1556,4 +1560,8 @@ pre {
     column-gap: 0.5rem !important;
     row-gap: 0.5rem !important;
     display: flex !important;
+}
+
+a[href="https://datatables.net/tn/25"] {
+    color: red !important;
 }

@@ -13,10 +13,17 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
     default_limit_param = "limit"
     default_offset_param = "offset"
 
+    # Cap maximum returned results when pagination is "disabled" to protect your database
+    max_limit = 100000
+
     def get_limit(self, request: Request):
-        # Switch param key based on the format
         if request.accepted_renderer.format == "custom":
             self.limit_query_param = self.dt_limit_query_param
+
+            # 1. Intercept DataTables 'All' request (-1)
+            raw_limit = request.query_params.get(self.dt_limit_query_param)
+            if raw_limit == "-1":
+                return self.max_limit
 
             if self.default_limit_param in request.query_params:
                 try:
@@ -36,7 +43,6 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
         return super().get_offset(request)
 
     def get_paginated_response(self, data):
-        # Only return the DataTables-specific JSON structure if format is custom
         if self.request.accepted_renderer.format == "custom":
             return Response(
                 {
@@ -56,7 +62,8 @@ class DatatablesRenderer(JSONRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         # Only apply the "data" wrapper if this specific format was selected
-        if renderer_context and renderer_context.get("format") == "custom":  # noqa: SIM102
+        if renderer_context and renderer_context.get("format") == "custom":
             if data is not None and "data" not in data:
                 data = {"data": data}
+
         return super().render(data, accepted_media_type, renderer_context)

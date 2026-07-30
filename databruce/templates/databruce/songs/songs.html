@@ -14,7 +14,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-1 mb-3">
+            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
               <div class="col-12 col-md-1">
                 <label for="PublicityFilter" class="pb-1">Category</label>
                 <select id="PublicityFilter" class="form-select form-select-sm">
@@ -27,9 +27,6 @@
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
                 <div class="input-group input-group-sm">
-                  <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                  </span>
                   <input type="text"
                          id="search"
                          class="form-control form-control-sm"
@@ -77,11 +74,6 @@
     let sb_columns = [0,1,2,3,4,5,6,7,8];
 
     var table = new DataTable('#songsTable', {
-      columnDefs: [
-        { targets: '_all', defaultContent: '' },
-        { targets: [1,6,7,8], width: "1rem", className: 'text-center' },
-        { targets: [1], orderable: false, columnControl: [] },
-      ],
       ajax: {
         'url': '/api/v1/songs/?format=custom',
       },
@@ -100,8 +92,11 @@
           'data': 'has_lyrics',
           'name': 'has_lyrics',
           'searchable': false,
+          'orderable': false,
           'type': 'boolean',
           'width': '1rem',
+          'className': 'dt-center',
+          'columnControl': [],
           'render': function (data, type, row, meta) {
               if (type === 'display' && data) {
                 return data ? '<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i>' : '';
@@ -130,11 +125,11 @@
               }
           },        
         },
-        {'data': 'num_plays_public', 'name': 'num_plays_public', 'width': '1rem'},
-        {'data': 'num_plays_private', 'name': 'num_plays_private', 'width': '1rem'},
-        {'data': 'opener', 'name': 'opener', 'width': '1rem'},
-        {'data': 'closer', 'name': 'closer', 'width': '1rem'},
-        {'data': 'original', 'name': 'original', 'width': '1rem', 'visible': 'false', 'orderable': 'false'},
+        {'data': 'num_plays_public', 'name': 'num_plays_public', 'width': '1rem', 'className': 'dt-center'},
+        {'data': 'num_plays_private', 'name': 'num_plays_private', 'width': '1rem', 'className': 'dt-center'},
+        {'data': 'opener', 'name': 'opener', 'width': '1rem', 'className': 'dt-center'},
+        {'data': 'closer', 'name': 'closer', 'width': '1rem', 'className': 'dt-center'},
+        {'data': 'original', 'name': 'original', 'width': '1rem', 'visible': false, 'orderable': false},
       ]
     });
 

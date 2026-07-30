@@ -41,9 +41,6 @@
       {% endblock title %}
       | Databruce
     </title>
-    <!-- leaflet.js-->
-    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
-    <script src="{% static 'databruce/js/leaflet.js' %}"></script>
     <!--JQuery-->
     <link rel="stylesheet"
           href="{% static 'databruce/css/jquery-ui.min.css' %}">
@@ -57,10 +54,9 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="{% static 'databruce/js/bootstrap.bundle.min.js' %}"></script>
     <!--Datatables-->
-    <link href="{% static 'databruce/css/datatables.min.css' %}"
+    <link href="{% static 'databruce/css/datatables-3.0.min.css' %}"
           rel="stylesheet">
-    <script src="{% static 'databruce/js/datatables.min.js' %}"></script>
-    {% comment %} <script src="{% static 'databruce/js/dt_plus_remove.js' %}"></script> {% endcomment %}
+    <script src="{% static 'databruce/js/datatables-3.0.min.js' %}"></script>
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" />
@@ -69,12 +65,8 @@
     <!-- Other -->
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
     <!-- Datatables Scripts -->
-    <script src="{% static 'databruce/js/datatables.js' %}"></script>
-    <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+    {% comment %} <script src="{% static 'databruce/js/datatables.js' %}"></script> {% endcomment %}
     <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
-    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
-    <script src="{% static 'databruce/js/songTable.js' %}"></script>
-    <script src="{% static 'databruce/js/slotTable.js' %}"></script>
     {% block extrastyle %}
     {% endblock extrastyle %}
     {% block extrajs %}
@@ -550,161 +542,180 @@
       </div>
     </nav>
     <div class="padded-body">
-      {% block container %}
-      {% endblock container %}
-      {% include "./partials/searchbuilder.html" %}
-    </div>
-    <div class="modal fade"
-         id="searchModal"
-         tabindex="-1"
-         aria-labelledby="searchModalLabel"
-         aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-body">
-            <div class="row mb-2">
-              <span class="text-muted">Note: Search is very much in beta. Best results will be when either using a date or part of a date + other field. Ex. Boston 1975</span>
-            </div>
-            <div class="row mb-3">
-              <form role="search"
-                    method="get"
-                    action="{% url 'event_search' %}"
-                    class="d-flex my-xl-auto">
-                <input type="search"
-                       id="eventSearch"
-                       name="q"
-                       class="form-control"
-                       placeholder="Search by date (yyyy-mm-dd), venue, city, etc."
-                       aria-label="Search">
-              </form>
-            </div>
-            <div class="row justify-content-center" id="loadingContainer">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+      <div class="container-lg">
+        <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
+          <div class="col-12">
+            <div class="text-2xl text-wrap mb-2">Advanced Search Results</div>
+            <div class="card">
+              <div class="card-body px-3">
+                <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+                  <!-- Publicity Filter -->
+                  <div class="col-12 col-md-1">
+                    <label for="PublicityFilter" class="pb-1">Publicity</label>
+                    <select id="PublicityFilter" class="form-select form-select-sm">
+                      <option value="">All</option>
+                      <option value="true">Public</option>
+                      <option value="false">Private</option>
+                    </select>
+                  </div>
+                  <!-- Search -->
+                  <div class="col-12 col-md-11">
+                    <label for="search" class="pb-1">Search</label>
+                    <div class="input-group input-group-sm">
+                      <input type="text"
+                             id="search"
+                             class="form-control form-control-sm"
+                             placeholder="Type to search table...">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="table-responsive">
+                    <table class="table table-hover display nowrap" id="eventTable">
+                      <thead>
+                        <tr>
+                          <th class="all">Date</th>
+                          <th class="all">Setlist</th>
+                          <th class="all">Band</th>
+                          <th class="all">Venue</th>
+                          <th class="all">Tour</th>
+                          <th class="all">Detail</th>
+                          <th class="all">Public</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="row justify-content-center">
-              <div class="col">
-                <ul id="results" class="list-group">
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="footer mt-3">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body text-center py-2">
-            Copyright ©{% now "Y" %}, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
           </div>
         </div>
       </div>
     </div>
     <script>
-    $(document).ready(function () {
-      $('#results').hide();
-      $("#loadingContainer").hide();
+  	$(document).ready(function () {
+      columns = [
+        {
+          'data': 'date',
+          'name': 'event_id',
+          'type': 'text',
+          'width': '8rem',
+          'className': 'text-wrap',
+          'render': function (data, type, row, meta) {
+            return `<a href="/events/${row.event_id}">${data.display_day}</a>`
+          },
+        },
+        {
+          'data': 'has_setlist',
+          'name': 'has_setlist',
+          'width': '1rem',
+          'className': 'text-center text-xs',
+          'orderable': false,
+          'searchable': false,
+          'columnControl': [],
+          'render': function (data, type, row, meta) {
+            return data ? `<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
+          },
+        },
+        {
+          'data': 'artist',
+          'name': 'artist__name',
+          'className': 'text-wrap',
+          'width': '12rem',
+          'render': function (data, type, row, meta) {
+            if (data) {
+              return `<a href="/bands/${data.uuid}">${data.name}</a>`
+            }
+          },
+        },
+        {
+          'data': 'venue',
+          'name': 'venue__name, venue__detail, venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
+          'className': 'text-wrap',
+          'width': '12rem',
+          'render': function (data, type, row, meta) {
+            if (data) {
+              if (row.city) {
+                return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
+              }
 
-      let searchTimeout; // Ensure this is declared in an outer scope
+              return `<a href="/venues/${data.uuid}">${data.name}</a>`
+            }
+          },
+        },
+        {
+          'data': 'tour',
+          'name': 'tour__name',
+          'width': '10rem',
+          'className': 'text-wrap',
+          'render': function (data, type, row, meta) {
+            if (data) {
+              if (row.leg) {
+                return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg.name}</small>`
+              }
 
-      $('#eventSearch').on('input', function () {
-        // 1. Clear the previous timer immediately to debounce properly
-        clearTimeout(searchTimeout);
+              return `<a href="/tours/${data.uuid}">${data.name}</a>`
+            }
+          },
+        },
+        {
+          'data': 'title',
+          'name': 'title',
+          'width': '15rem',
+          'className': 'text-wrap',
+          'render': function (data, type, row, meta) {
+            if (row.event_status) {
+              if (data) {
+                return `<span class="text-danger fw-semibold">[${row.type.name}] ${data}</span>`
+              }
+              return `<span class="text-danger fw-semibold">[${row.type.name}]</span>`
+            }
 
-        results.innerHTML = '';
-        $('#results').hide();
+            return data;
+          },
+        },
+        { 
+          'data': 'public',
+          'name': 'public',
+          'visible': false,
+          'orderable': false,
+          'width': '1rem',
+          'className': 'text-wrap',
+          'render': function (data, type, row, meta) {
+            if (data != null) {
+              return data;
+            }
+          },
+        },
+      ];
 
-        const query = $(this).val();
-
-        if (/^\d/.test(query)) {
-          let numbersOnly = query.replace(/\D/g, '');
-          let formatted = '';
-          if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
-          if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
-          if (numbersOnly.length > 6) formatted += '-' + numbersOnly.substring(6, 8);
-          $(this).val(formatted);
-        }
-
-        // Only trigger search if input longer than 4 characters
-        if (query.length >= 4) {
-          // Show spinner
-          $("#loadingContainer").show();
-
-          searchTimeout = setTimeout(function () {
-            fetch(`/api/v1/event_search/?search=${query}`)
-              .then(response => response.json())
-              .then(data => {
-                // Loop and append results
-                data.results.forEach(element => {
-                  $(results).append(
-                    `<a href="/events/${element.event_id}" class="list-group-item">
-                      ${element.date.display_day}<br>${element.venue} - ${element.artist}
-                    </a>`
-                  );
-                });
-
-                // show results
-                $(results).show();
-              })
-              .catch(error => console.error('Error:', error))
-              .finally(() => {
-                // Hide the spinner when done, even if the request fails
-                $("#loadingContainer").hide();
-              });
-          }, 1000);
-        } else {
-          // If the query is too short, ensure the spinner stays hidden
-          $("#loadingContainer").hide();
-        }
-      });
-
-      // highlight link on offcanvas navbar if current page
-      const activePage = window.location.pathname;
-      const navLinks = $('a.bd-links-link').each(function (index, link) {
-        if (activePage === link.pathname) {
-          link.classList.add('active');
-        }
+      var table = $('#eventTable').DataTable({
+        ajax: '/api/v1/events/?year=1978&format=custom',
+        columns: columns,
+        cardView: true,
+        responsive: true,
+        searching: true,
+        fixedHeader: true,
+        info: true,
+        scrollX: true,
+        scrollCollapse: true,
+        serverSide: true,
+        processing: true,
+        columnControl: ['order', ['orderAsc', 'orderDesc', 'orderRemove']],
+        ordering: {
+          indicators: false,
+          handler: true
+        },
+        autoWidth: true,
       })
 
-      let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      
-      tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+      tableSearch(table, 'search');
+
+      $('#PublicityFilter').on('change', function () {
+          var selectedValue = this.value;
+          table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
       });
-
-      const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');
-
-      tabElements.forEach(tabEl => {
-        tabEl.addEventListener('shown.bs.tab', (event) => {
-          var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
-
-          if (hash === '#mostplayed' || hash === "#rare") {
-            hash = "#songs"
-          };
-
-          if (hash) {
-            history.replaceState(null, null, hash);
-          }
-        });
-      });
-
-      function activatePillFromUrlHash() {
-        const url = window.location.href;
-        if (url.includes("#")) {
-          const hash = url.substring(url.indexOf("#"));
-          var trigger = document.querySelector(`[data-bs-target="${hash}"]`);
-
-          if (trigger) {
-            const bsPill = new bootstrap.Tab(trigger);
-            bsPill.show();
-          }
-        }
-      }
-
-      activatePillFromUrlHash();
-    });
+  	});
     </script>
   </body>
 </html>

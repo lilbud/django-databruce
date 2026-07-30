@@ -1499,6 +1499,11 @@ class Relation(PageTitleMixin, TemplateView):
     title = "Relations"
 
 
+# class TestTable(PageTitleMixin, TemplateView):
+#     template_name = "databruce/test_table.html"
+#     title = "Table"
+
+
 class AdvSearch(PageTitleMixin, TemplateView):
     template_name = "databruce/test_advsearch.html"
     title = "Advanced Search"
@@ -1534,7 +1539,7 @@ class AdvSearch(PageTitleMixin, TemplateView):
             clean_params = {}
 
             for key, value in request.GET.items():
-                stripped_val = value.strip()
+                stripped_val = value.strip()  # type: ignore
 
                 # 1. Skip if the field value is entirely empty
                 if not stripped_val:

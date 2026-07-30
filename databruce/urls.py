@@ -162,6 +162,11 @@ urlpatterns = [
         views.AdvSearch.as_view(),
         name="adv_search_test",
     ),
+    # path(
+    #     "test_table/",
+    #     views.TestTable.as_view(),
+    #     name="test_table",
+    # ),
     path(
         "search/advanced/results",
         views.AdvancedSearchResults.as_view(),

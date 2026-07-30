@@ -1,10 +1,10 @@
-DataTable.type('num', 'className', 'dt-center');
-// DataTable.type('string', 'className', 'dt-left');
+//DataTable.type('num', 'className', 'dt-center');
+//DataTable.type('string', 'className', 'dt-left');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
-DataTable.defaults.column.columnControl = [['orderAsc', 'orderDesc', 'orderClear', 'orderAddAsc', 'orderAddDesc']];
+DataTable.defaults.column.columnControl = ['order', ['orderAsc', 'orderDesc', 'orderRemove']];
 
 set_names = [
   "Show",
@@ -62,6 +62,8 @@ DataTable.feature.register('customInputPaging', function (settings) {
   return container;
 });
 
+$.fn.dataTable === DataTable
+
 $.extend(true, DataTable.defaults, {
   searching: true,
   fixedHeader: true,
@@ -70,41 +72,26 @@ $.extend(true, DataTable.defaults, {
   scrollCollapse: true,
   serverSide: true,
   processing: true,
-  responsive: {
-    details: false
-  },
-  autoWidth: false,
   paging: true,
+  autoWidth: true,
   ordering: {
     indicators: false,
     handler: true
   },
-  fixedHeader: {
-    header: true,
-  },
   pageLength: 50,
-  lengthMenu: [25, 50, 100],
   language: {
-    searchBuilder: {
-      button: '&nbspFilter',
-      className: 'test',
-      title: '',
-    },
-
     info: "Showing _START_ to _END_ of _TOTAL_ entries",
     infoEmpty: "No records available",
     infoFiltered: "(filtered from _MAX_ total records)"
-
   },
   search: {
     regex: true
   },
+  // cardView: true,
+  responsive: true,
   order: [],
-  drawCallback: function (settings) {
-    $('[data-bs-toggle="tooltip"]').tooltip();
-  },
   layout: {
-    topStart: null,
+    topStart: [],
     bottomStart: null,
     topEnd: null,
     bottomEnd: null,

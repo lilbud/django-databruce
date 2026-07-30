@@ -28,7 +28,7 @@
     <div class="row row-cols-1 row-cols-lg-3 gx-3 row-gap-3">
       <div class="col">
         <div class="card mb-3">
-          <div class="card-body">
+          <div class="card-body p-0">
             <img class="img-fluid card-img-top object-fit-cover"
                  id="headimg"
                  src="{% static 'databruce/img/june26header.webp' %}"
@@ -48,13 +48,13 @@
                class="btn btn-sm btn-primary text-xs py-0.5 px-1"
                href="{% url 'updates' %}">See More</a>
           </div>
-          <div class="card-body list-card" id="update"></div>
+          <div class="card-body p-0 list-card" id="update"></div>
         </div>
       </div>
       <div class="col">
         <div class="card">
           <div class="card-header">Featured Show</div>
-          <div class="card-body" id="setlistCard">
+          <div class="card-body p-0" id="setlistCard">
             <div class="col-12">
               {% with latest=latest_event %}
                 <div class="col-12 px-2">
@@ -88,13 +88,13 @@
           <div class="col">
             <div class="card">
               <div class="card-header">Latest</div>
-              <div class="card-body list-card" id="recent"></div>
+              <div class="card-body p-0 list-card" id="recent"></div>
             </div>
           </div>
           <div class="col">
             <div class="card">
               <div class="card-header">Upcoming</div>
-              <div class="card-body list-card" id="upcoming"></div>
+              <div class="card-body p-0 list-card" id="upcoming"></div>
             </div>
           </div>
           <div class="col">
@@ -105,7 +105,7 @@
                    class="btn btn-sm btn-primary text-xs py-0.5 px-1"
                    href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
               </div>
-              <div class="card-body list-card" id="otd"></div>
+              <div class="card-body p-0 list-card" id="otd"></div>
             </div>
           </div>
         </div>

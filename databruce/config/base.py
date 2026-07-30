@@ -13,16 +13,11 @@ import os
 import sys
 from pathlib import Path
 
-import sentry_sdk
 from django.templatetags.static import static
 from dotenv import load_dotenv
 
 load_dotenv()
 
-sentry_sdk.init(
-    dsn=os.getenv("SENTRY_DSN"),
-    send_default_pii=True,
-)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import django_filters
 from dateutil import parser
@@ -12,7 +13,9 @@ from django.db.models import (
     Case,
     CharField,
     F,
+    Model,
     Q,
+    QuerySet,
     Subquery,
     TextField,
     Value,
@@ -20,6 +23,8 @@ from django.db.models import (
 )
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
+from rest_framework.request import Request
+from rest_framework.views import APIView
 
 from databruce import models
 
@@ -38,12 +43,12 @@ date = datetime.datetime.now(tz=datetime.UTC).date()
 class DataTablesFilterBackend(BaseFilterBackend):
     def get_sb_filter(
         self,
-        column: str,
-        condition: str,
-        value: str = "",
-        value2: str = "",
-        sb_type: str = "",
-    ):
+        column: str | None,
+        condition: str | None,
+        value: str | None,
+        value2: str | None,
+        sb_type: str | None,
+    ) -> Q | None:
         filter_types = {
             "=": Q(**{f"{column}__iexact": value}),
             "!=": ~Q(**{f"{column}__iexact": value}),
@@ -73,130 +78,146 @@ class DataTablesFilterBackend(BaseFilterBackend):
             filter_types["null"] = Q(**{f"{column}": False})
             filter_types["!null"] = Q(**{f"{column}": True})
 
-        return filter_types.get(condition)
+        if condition:
+            return filter_types.get(condition)
 
-    def get_final_field(self, model, path):
+        return None
+
+    def get_final_field(self, model: Model, path: str):
         """Traverses the model __ path and returns the final Django field object."""
         parts = path.split("__")
-        current_model = model
 
         for i, part in enumerate(parts):
             try:
-                field = current_model._meta.get_field(part)
+                field = model._meta.get_field(part)  # noqa: SLF001
                 # If there are more parts and this is a relation, move to the next model
                 if i < len(parts) - 1 and field.is_relation:
-                    current_model = field.related_model
+                    model = field.related_model  # type: ignore
                 else:
                     return field
             except FieldDoesNotExist:
                 return None
+
         return None
 
-    # def verify_fields(self, model, fields):
-    #     valid_fields = []
+    def get_param(self, request: Request, param: str, default=None) -> str | None:
+        return request.query_params.get(param, default)
 
-    #     for path in fields:
-    #         current_model = model
-    #         parts = path.split("__")
-    #         is_valid = True
+    def parse_query(self, request: Request, view: APIView):
+        ret = {}
+        ret["fields"] = self.get_fields(request)
+        ret["search_value"] = self.get_param(request, "search[value]")
+        ret["search_regex"] = self.get_param(request, "search[regex]") == "true"
+        return ret
 
-    #         try:
-    #             for i, part in enumerate(parts):
-    #                 # 1. Try checking for a database field via _meta
-    #                 try:
-    #                     field = current_model._meta.get_field(part)
-    #                     if i < len(parts) - 1:
-    #                         if field.is_relation:
-    #                             current_model = field.related_model
-    #                         else:
-    #                             is_valid = False
-    #                             break
-    #                 except FieldDoesNotExist:
-    #                     # 2. Check if it's a @property on the model class
-    #                     # Properties only work at the end of a path for filtering/display
-    #                     if i == len(parts) - 1 and hasattr(current_model, part):
-    #                         attr = getattr(current_model, part)
-    #                         is_valid = bool(isinstance(attr, property))
-    #                     else:
-    #                         is_valid = False
-    #                     break
-
-    #             if is_valid:
-    #                 valid_fields.append(path)
-    #         except Exception:
-    #             continue
-
-    #     return valid_fields
-
-    def filter_queryset(self, request, queryset, view):
-        # --- 1. PRE-PROCESS COLUMN METADATA ---
-        column_configs = []
-        col_index = 0
+    def get_ordering_fields(self, request, view, fields):
+        order_list = []
+        i = 0
 
         while True:
-            col_prefix = f"columns[{col_index}]"
-            name_param = request.query_params.get(f"{col_prefix}[name]")
+            col = f"order[{i}]"
+            col_idx_param = self.get_param(request, f"{col}[column]")
 
-            if name_param is None:
+            if col_idx_param is None:
                 break
 
-            fields = [f.strip().replace(".", "__") for f in name_param.split(",")]
+            try:
+                field = fields[int(col_idx_param)]
+            except IndexError:
+                i += 1
+                continue
+            if not field["orderable"]:
+                i += 1
+                continue
 
-            # filter invalid field names
-            # fields = self.verify_fields(queryset.model, fields)
+            direction = self.get_param(request, f"{col}[dir]", "asc")
+            order = F(f"{field['order_value']}").asc(nulls_last=True)
+
+            if direction == "desc":
+                order = F(f"{field['order_value']}").desc(nulls_last=True)
+
+            order_list.append(order)
+            i += 1
+
+        return order_list
+
+    def get_fields(self, request):
+        fields = []
+        i = 0
+
+        while True:
+            col = f"columns[{i}]"
+            name = self.get_param(request, f"{col}[name]")
+
+            if name is None:
+                break
+
+            field = [f.strip() for f in name.replace(".", "__").split(",")]
 
             config = {
-                "index": str(col_index),
-                "fields": fields,
-                "data": request.query_params.get(f"{col_prefix}[data]"),
-                "searchable": request.query_params.get(f"{col_prefix}[searchable]")
-                == "true",
-                "orderable": request.query_params.get(f"{col_prefix}[orderable]")
-                == "true",
-                "order_value": request.query_params.get(f"{col_prefix}[orderable]")
-                == "true",
-                "order_dir": request.query_params.get(
-                    f"[order][{col_prefix}][dir]",
+                "name": field,
+                "data": self.get_param(request, f"{col}[data]"),
+                "searchable": self.get_param(request, f"{col}[searchable]") == "true",
+                "orderable": self.get_param(request, f"{col}[orderable]") == "true",
+                "order_value": field[0],
+                "order_dir": self.get_param(
+                    request,
+                    f"order[{i}][dir]",
                 ),
-                "search_value": request.query_params.get(
-                    f"{col_prefix}[search][value]",
+                "search_value": self.get_param(
+                    request,
+                    f"{col}[search][value]",
                 ),
-                "search_regex": request.query_params.get(
-                    f"{col_prefix}[search][regex]",
+                "search_regex": self.get_param(
+                    request,
+                    f"{col}[search][regex]",
                 )
                 == "true",
-                "sb_criteria": request.query_params.get(
+                "sb_criteria": self.get_param(
+                    request,
                     "[searchBuilder][logic]",
                 ),
             }
 
-            if config["orderable"] and fields:
-                config["order_value"] = fields[0]
+            fields.append(config)
+            i += 1
 
-            column_configs.append(config)
+        return fields
 
-            col_index += 1
+    def is_valid_regex(self, regex: str):
+        """Helper function that checks regex for validity."""
+        try:
+            re.compile(regex)
+        except re.error:
+            return False
+        else:
+            return True
+
+    def filter_queryset(self, request: Request, queryset: QuerySet, view: APIView):
+        # --- 1. PRE-PROCESS COLUMN METADATA ---
+        query = self.parse_query(request, view)
+        fields = query["fields"]
 
         # --- 2. SEARCHING LOGIC ---
-        global_search_value = request.query_params.get("search[value]")
-        global_search_regex = request.query_params.get("search[regex]")
+        search_value = query["search_value"]
+        search_regex = query["search_regex"]
 
         is_filtered = False
         global_q = Q()
         column_q = Q()
         search_type = "icontains"
 
-        if global_search_regex == "true":
+        if search_regex:
             search_type = "iregex"
 
-        for config in column_configs:
+        for config in fields:
             if not config["searchable"]:
                 continue
 
-            if global_search_value:
+            if search_value:
                 is_filtered = True
 
-                for field in config["fields"]:
+                for field in config["name"]:
                     lookup = f"{field}__{search_type}"
 
                     try:
@@ -208,11 +229,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
                     except FieldDoesNotExist:
                         continue
 
-                    global_q |= Q(
-                        **{
-                            lookup: global_search_value,
-                        },
-                    )
+                    global_q |= Q(**{lookup: search_value})
 
             if config["search_value"]:
                 is_filtered = True
@@ -220,7 +237,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
                 if config["search_regex"]:
                     search_type = "iregex"
 
-                for field in config["fields"]:
+                for field in config["name"]:
                     lookup = f"{field}__{search_type}"
 
                     try:
@@ -232,40 +249,10 @@ class DataTablesFilterBackend(BaseFilterBackend):
                     except FieldDoesNotExist:
                         continue
 
-                    column_q &= Q(
-                        **{lookup: config["search_value"]},
-                    )
+                    column_q &= Q(**{lookup: config["search_value"]})
 
         # --- 3. ORDERING LOGIC ---
-        order_list = []
-        order_index = 0
-
-        while True:
-            order_prefix = f"order[{order_index}]"
-            col_idx_param = request.query_params.get(f"{order_prefix}[column]")
-
-            if col_idx_param is None:
-                break
-
-            # Find the config matching this index
-            target_config = next(
-                (c for c in column_configs if c["index"] == col_idx_param),
-                None,
-            )
-
-            if target_config and target_config["orderable"]:
-                direction = request.query_params.get(f"{order_prefix}[dir]", "asc")
-
-                if direction == "asc":
-                    order_list.append(
-                        F(f"{target_config['fields'][0]}").asc(nulls_last=True),
-                    )
-                else:
-                    order_list.append(
-                        F(f"{target_config['fields'][0]}").desc(nulls_last=True),
-                    )
-
-            order_index += 1
+        order_list = self.get_ordering_fields(request, view, fields)
 
         sb_index = 0
         sb_filter = Q()
@@ -273,26 +260,33 @@ class DataTablesFilterBackend(BaseFilterBackend):
         # searchbuilder
         while True:
             searchbuilder_prefix = f"searchBuilder[criteria][{sb_index}]"
-            col_idx_param = request.query_params.get(
+
+            col_idx_param = self.get_param(
+                request,
                 f"{searchbuilder_prefix}[origData]",
             )
 
-            criteria = request.query_params.get("searchBuilder[logic]")
+            criteria = self.get_param(request, "searchBuilder[logic]")
+
+            if not criteria:
+                break
 
             if col_idx_param is None:
                 break
 
-            name = next(c for c in column_configs if c["data"] == col_idx_param)
+            name = next(c for c in fields if c["data"] == col_idx_param)
 
-            for field in name["fields"]:
+            for field in name["name"]:
                 sb_field_filter = self.get_sb_filter(
                     column=field,
-                    condition=request.query_params.get(
+                    condition=self.get_param(
+                        request,
                         f"{searchbuilder_prefix}[condition]",
                     ),
-                    value=request.query_params.get(f"{searchbuilder_prefix}[value1]"),
-                    value2=request.query_params.get(f"{searchbuilder_prefix}[value2]"),
-                    sb_type=request.query_params.get(
+                    value=self.get_param(request, f"{searchbuilder_prefix}[value1]"),
+                    value2=self.get_param(request, f"{searchbuilder_prefix}[value2]"),
+                    sb_type=self.get_param(
+                        request,
                         f"{searchbuilder_prefix}[type]",
                         "text",
                     ),
@@ -305,13 +299,12 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
             sb_index += 1
 
-        if is_filtered:
-            queryset = queryset.filter(global_q & column_q)
+        queryset = queryset.filter(global_q & column_q)
 
         if sb_filter:
             queryset = queryset.filter(sb_filter)
 
-        if is_filtered or order_list:
+        if order_list:
             return queryset.order_by(*order_list).distinct()
 
         return queryset

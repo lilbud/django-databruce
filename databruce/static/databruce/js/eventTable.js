@@ -6,7 +6,7 @@ event_table_columns = [
         'width': '1rem',
         'className': 'text-nowrap',
         'render': function (data, type, row, meta) {
-            return renderLink('/events/', row.event_id, data.display_day);
+            return `<a href="/events/${row.event_id}">${data.display_day}</a>`
         },
     },
     {
@@ -27,7 +27,7 @@ event_table_columns = [
         'className': 'text-wrap',
         'width': '12rem',
         'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
                 return `<a href="/bands/${data.uuid}">${data.name}</a>`
             }
         },
@@ -38,7 +38,7 @@ event_table_columns = [
         'className': 'text-nowrap',
         'width': '12rem',
         'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
                 if (row.city) {
                     return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
                 }
@@ -53,9 +53,9 @@ event_table_columns = [
         'width': '10rem',
         'className': 'text-wrap',
         'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
                 if (row.leg) {
-                    return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg.name}</small>`
+                    return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg}</small>`
                 }
 
                 return `<a href="/tours/${data.uuid}">${data.name}</a>`
@@ -69,37 +69,41 @@ event_table_columns = [
         'render': function (data, type, row, meta) {
             if (row.event_status) {
                 if (data) {
-                    return `<span class="text-danger fw-semibold">[${row.type.name}] ${data}</span>`
+                    return `<span class="text-danger fw-semibold">[${row.type}] ${data}</span>`
                 }
-                return `<span class="text-danger fw-semibold">[${row.type.name}]</span>`
+                return `<span class="text-danger fw-semibold">[${row.type}]</span>`
             }
 
             return data;
         },
     },
-    { 'data': 'public', 'name': 'public', 'visible': false, 'orderable': false },
+    {
+        'data': 'public',
+        'name': 'public',
+        'visible': false,
+        'orderable': false,
+        'render': function (data, type, row, meta) {
+            if (data != null) {
+                return data;
+            }
+        },
+    },
 ]
 
 function eventTable(url) {
-    let searchTimeout;
-
     var table = new DataTable('#eventTable', {
-        layout: {
-            topStart: null,
-            bottomStart: null,
-            topEnd: null,
-            bottomEnd: null,
-            top: ['customInputPaging', 'info'],
-            bottom: ['customInputPaging', 'info'],
-        },
         ajax: {
             'url': url,
         },
         columns: event_table_columns,
-        initComplete: function (settings, json) {
-            var info = this.api().page.info();
-            $('#event-count-badge').text(info.recordsTotal);
-        }
+        serverSide: true,
+        processing: true,
+        paging: false,
+        pageLength: -1,
+        // initComplete: function (settings, json) {
+        //     var info = this.api().page.info();
+        //     $('#event-count-badge').text(info.recordsTotal);
+        // }
     });
 
     tableSearch(table, 'search');

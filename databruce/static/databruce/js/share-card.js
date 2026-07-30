@@ -158,8 +158,15 @@ function initializeShareCardGenerator(config) {
                 badgeRow.style.marginRight = 'auto';
               }
 
+              const notes = sandbox.querySelectorAll('td > .text-wrap');
+
+              for (let i = 0; i < notes.length; i++) {
+                notes[i].style.maxWidth = '475px';
+                notes[i].style = 'word-break: break-word;';
+              }
+
               // Font alignment fix
-              const badges = sandbox.querySelectorAll('.badge-row span.badge');
+              const badges = sandbox.querySelectorAll('span.badge');
               badges.forEach(badge => {
                 const textContent = badge.textContent.trim();
                 badge.innerHTML = `
