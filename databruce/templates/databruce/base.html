@@ -623,7 +623,7 @@
           let formatted = '';
           if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
           if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
-          if (numbersOnly.length > 6) formatted += '-' + numbersOnly.substring(6, 8);
+          if (numbersOnly.length >= 6) formatted += '-' + numbersOnly.substring(6, 8);
           $(this).val(formatted);
         }
 
@@ -631,6 +631,8 @@
         if (query.length >= 4) {
           // Show spinner
           $("#loadingContainer").show();
+
+          console.log(query)
 
           searchTimeout = setTimeout(function () {
             fetch(`/api/v1/event_search/?search=${query}`)

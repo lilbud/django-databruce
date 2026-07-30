@@ -193,12 +193,17 @@ class DataTablesFilterBackend(BaseFilterBackend):
         else:
             return True
 
+    def check_renderer_format(self, request):
+        return request.accepted_renderer.format == "custom"
+
     def filter_queryset(self, request: Request, queryset: QuerySet, view: APIView):
-        # --- 1. PRE-PROCESS COLUMN METADATA ---
+
+        if not self.check_renderer_format(request):
+            return queryset
+
         query = self.parse_query(request, view)
         fields = query["fields"]
 
-        # --- 2. SEARCHING LOGIC ---
         search_value = query["search_value"]
         search_regex = query["search_regex"]
 
@@ -299,7 +304,8 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
             sb_index += 1
 
-        queryset = queryset.filter(global_q & column_q)
+        if is_filtered:
+            queryset = queryset.filter(global_q & column_q)
 
         if sb_filter:
             queryset = queryset.filter(sb_filter)
@@ -606,7 +612,7 @@ class EventsFilter(filters.FilterSet):
                 Q(event_id__startswith=str(value)) | date_conditions | Q(search=query),
                 rank__gt=0.1,
             )
-            .order_by("-rank")[:25]
+            .order_by("event_id")[:25]
         )
 
     def filter_time_frame(self, queryset, name, value):

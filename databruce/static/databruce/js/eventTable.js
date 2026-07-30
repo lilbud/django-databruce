@@ -100,10 +100,10 @@ function eventTable(url) {
         processing: true,
         paging: false,
         pageLength: -1,
-        // initComplete: function (settings, json) {
-        //     var info = this.api().page.info();
-        //     $('#event-count-badge').text(info.recordsTotal);
-        // }
+        initComplete: function (settings, json) {
+            var info = this.api().page.info();
+            $('#event-count-badge').text(info.recordsTotal);
+        }
     });
 
     tableSearch(table, 'search');
