@@ -149,6 +149,13 @@ function initializeShareCardGenerator(config) {
           });
       })
       .then(sandbox => {
+        const badgeRow = sandbox.querySelector('#badge-row');
+        if (badgeRow) {
+          badgeRow.style.maxWidth = '380px';
+          badgeRow.style.marginLeft = 'auto';
+          badgeRow.style.marginRight = 'auto';
+        }
+
         const logoBrandLink = sandbox.querySelector('.navbar-brand-mobile');
         if (logoBrandLink) {
           // Wipe out Bootstrap float, margins, padding, and flex properties
