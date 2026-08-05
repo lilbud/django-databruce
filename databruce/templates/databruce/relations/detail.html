@@ -2,6 +2,9 @@
 {% block title %}
   Relation "{{ title }}"
 {% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="relations" item=info.id %}

@@ -14,7 +14,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
@@ -67,7 +67,7 @@
             'data': 'is_staff',
             'name': 'is_staff',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (data) {
                 return data ? `<i class="bi bi-check-lg text-base check"></i>` : '';
               }
             },
@@ -77,7 +77,7 @@
             'data': 'uuid',
             'name': 'user_slug',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (data) {
                 return `<a href="/profile/${data}">${row.username}</a>`
               }
             },

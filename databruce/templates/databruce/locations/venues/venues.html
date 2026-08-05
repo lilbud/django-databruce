@@ -14,7 +14,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
@@ -80,7 +80,7 @@
           'name': 'name, detail',
           'width': '12rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
               return '<a href="/venues/' + row.uuid + '">'+ data +'</a>';
             }
           },
@@ -90,7 +90,7 @@
           'name': 'city__name, city__aliases',
           'width': '10rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
               return '<a href="/cities/' + data.uuid + '">'+ data.name +'</a>';
             }
           },
@@ -100,7 +100,7 @@
           'name': 'city__state__name, city__state__abbrev',
           'width': '8rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
               return '<a href="/states/' + data.uuid + '">'+ data.name +'</a>';
             }
           },
@@ -110,7 +110,7 @@
           'name': 'city__country__name, city__country__alpha_2',
           'width': '10rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
               return '<a href="/countries/' + data.uuid + '">'+ data.name +'</a>';
             }
           },        
@@ -120,8 +120,8 @@
           'name': 'first_event__event_id, first_event__early_late',
           'width': '8rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
-              return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`
             }
           },
         },
@@ -130,8 +130,8 @@
           'name': 'last_event__event_id, last_event__early_late',
           'width': '8rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
-              return `<a href="/events/${data.event_id}">${data.date.display}</a>`              
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`              
             }
           },
         },

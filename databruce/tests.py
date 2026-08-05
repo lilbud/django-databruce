@@ -222,7 +222,7 @@ class UserTests(BaseDataTest):
         email_body = mail.outbox[0].body
 
         # 3. Extract the activation link from the email body
-        link_match = re.search(r"https://example.com.*", email_body)
+        link_match = re.search(r"https://example.com.*", email_body) # type: ignore
         assert link_match, "Activation link not found in email"
         activation_url = link_match.group(0)  # type: ignore
 

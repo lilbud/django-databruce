@@ -1,3 +1,5 @@
+
+
 function initializeShareCardGenerator(config) {
   document.getElementById(config.buttonId).addEventListener('click', function () {
     const button = this;
@@ -29,240 +31,173 @@ function initializeShareCardGenerator(config) {
           sandbox.setAttribute('data-bs-theme', 'light');
         }
 
-        return new Promise((resolve) => {
-          $sandboxTable.DataTable({
-            ajax: config.ajaxUrl, // <-- Loaded dynamically from config
-            layout: null,
-            serverSide: true,
-            processing: true,
-            paging: false,
-            ordering: false,
-            searching: false,
-            info: false,
-            scrollX: false,
-            fixedHeader: false,
-            autoWidth: false,
-            rowGroup: {
-              dataSrc: 'set_name',
-              className: 'text-center set-header p-0 dtrg-group',
-              startRender: function (rows, group) {
-                const g = `<span>${group}</span>`;
-                const td = `<td colspan="${rows.columns().count()}" class="py-0">${g}</td>`;
-                return $('<tr />').addClass(slugify(group)).append(td);
-              }
-            },
-            createdRow: function (row, data, dataIndex) {
-              $(row).addClass(slugify(data.set_name));
+        var url = config.ajaxUrl;
 
-              var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+        let setlistOptions = {
+          createdRow: function (row, data) {
+            row.addClass(slugify(data.set_name));
 
-              if (allowedSets.includes(data.set_name) && data.song) {
-                var album = data.song.category_slug;
-                $(row).attr('album', album);
-              }
-            },
-            columnDefs: [
-              { 'targets': '_all', columnControl: [] }
-            ],
-            columns: [
-              {
-                'data': 'song_num',
-                'className': 'dt-center col-songnum',
-                'width': '30px',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display' && data) {
-                    return data;
-                  }
-                },
-                'createdCell': function (td, cellData, rowData, row, col) {
-                  $(td).addClass('songnum');
+            var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
-                  if (rowData.position) {
-                    var position = slugify(rowData.position);
-                    $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
-                  }
-
-                  return td;
-                },
-              },
-              {
-                'data': 'song',
-                'name': 'song__sort_song_name',
-                'className': 'text-wrap col-song',
-                'render': function (data, type, row, meta) {
-                  if (type === 'display' && data) {
-                    var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
-                    var segue = row.segue ? `<span class="segue"></span>` : '';
-
-                    song = `${song} ${segue}`;
-
-                    var badges = $('<span />').addClass('ms-2 d-inline-flex gap-1');
-                    var baseBadge = `<span class="badge"></span>`
-
-                    if (row.instrumental) {
-                      var badge = $(baseBadge).clone();
-                      $(badge).addClass('badge-info').text('Instrumental');
-                      badges.append($(badge).prop('outerHTML'));
-                    }
-
-                    if (row.sign_request) {
-                      var badge = $(baseBadge).clone();
-                      $(badge).addClass('badge-info').text('Sign Request');
-                      $(badges).append($(badge).prop('outerHTML'));
-                    }
-
-                    if (row.nobruce) {
-                      var badge = $(baseBadge).clone();
-                      $(badge).addClass('badge-warning').text('No Boss');
-                      $(badges).append($(badge).prop('outerHTML'));
-                    }
-
-                    if (row.last == 0) {
-                      gap = null;
-                    } else {
-                      gap = row.last;
-                    }
-
-                    var debut = row.debut;
-                    var premiere = row.premiere;
-
-                    if (premiere) {
-                      var badge = $(baseBadge).clone();
-                      $(badge).addClass('badge-secondary').text(`First`);
-                      $(badges).append($(badge).prop('outerHTML'));
-                    }
-
-                    if (debut) {
-                      var badge = $(baseBadge).clone();
-                      $(badge).addClass('badge-primary').text(`Tour Debut`);
-                      $(badges).append($(badge).prop('outerHTML'));
-                    }
-
-                    if (row.notes) {
-                      var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes}</span>`;
-                      return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
-                    }
-
-                    return badges ? song + $(badges).prop('outerHTML') : song;
-                  }
-                },
-              },
-            ],
-
-            initComplete: function () {
-
-
-
-              setTimeout(() => resolve(sandbox), 50);
+            if (allowedSets.includes(data.set_name)) {
+              var album = data.song.category_slug;
+              row.attr('data-album', album);
             }
+
+            return row
+          },
+          rowGroup: {
+            groupVal: 'set_name'
+          }
+        }
+
+        let setlistColumns = [
+          {
+            'data': 'song_num',
+            'className': 'text-center',
+            'width': '',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return data
+              }
+
+              return ''
+            },
+            'createdCell': function (td, cellData, rowData, row, col) {
+              $(td).addClass('songnum');
+
+              if (rowData.position) {
+                var position = slugify(rowData.position);
+                $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
+              }
+
+              return td;
+            },
+          },
+          {
+            'data': 'song',
+            'className': 'text-wrap',
+            'width': '',
+            'render': function (data, type, row, meta) {
+              var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+              var segue = row.segue ? `<span class="segue-mobile"></span>` : '';
+
+              song = `${song} ${segue}`;
+
+              var badges = $('<span />');
+              var baseBadge = `<span class="badge ms-1" data-bs-toggle="tooltip" data-bs-html="true"></span>`
+
+              if (row.instrumental) {
+                var badge = $(baseBadge).clone();
+                $(badge).addClass('badge-info').text('Instrumental');
+                badges.append($(badge).prop('outerHTML'));
+              }
+
+              if (row.sign_request) {
+                var badge = $(baseBadge).clone();
+                $(badge).addClass('badge-info').text('Sign Request');
+                $(badges).append($(badge).prop('outerHTML'));
+              }
+
+              if (row.nobruce) {
+                var badge = $(baseBadge).clone();
+                $(badge).addClass('badge-warning').text('No Boss');
+                $(badges).append($(badge).prop('outerHTML'));
+              }
+
+              if (row.last == 0) {
+                gap = null;
+              } else {
+                gap = row.last;
+              }
+
+              var debut = row.debut;
+              var premiere = row.premiere;
+
+              if (premiere) {
+                var badge = $(baseBadge).clone();
+                $(badge).addClass('badge-secondary').text(`First`);
+                $(badges).append($(badge).prop('outerHTML'));
+              }
+
+              if (debut) {
+                var badge = $(baseBadge).clone();
+                $(badge).addClass('badge-primary').text(`Tour Debut`);
+                $(badges).append($(badge).prop('outerHTML'));
+              }
+
+              if (row.notes) {
+                var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes}</span>`;
+                return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
+              }
+
+              return badges ? song + $(badges).prop('outerHTML') : song;
+            }
+          },
+        ]
+
+        // 2. FIXED Syntax: Return the native async promise chain directly.
+        // 3. FIXED Reference: Pass the actual sandbox jQuery element ($sandboxTable) instead of '#setlistTable'
+        return createTable(url, setlistColumns, $sandboxTable, setlistOptions)
+          .then(() => {
+            return new Promise((resolveRendering) => {
+              // A tiny 50ms pause lets the browser render the newly appended table rows and tooltips completely
+
+              resolveRendering(sandbox);
+
+            });
           });
-        });
       })
       .then(sandbox => {
-        const badgeRow = sandbox.querySelector('#badge-row');
-        if (badgeRow) {
-          badgeRow.style.maxWidth = '500px';
-          badgeRow.style.marginLeft = 'auto';
-          badgeRow.style.marginRight = 'auto';
-        }
-
-        const eventNote = sandbox.querySelector('.event-note');
-        if (eventNote) {
-          eventNote.style.maxWidth = '530px';
-          eventNote.style.marginLeft = 'auto';
-          eventNote.style.marginRight = 'auto';
-          eventNote.style.wordBreak = 'break-word';
-          eventNote.style.overflowWrap = 'break-word';
-        }
-
-        const notes = sandbox.querySelectorAll('td > .text-wrap');
-
-        for (let i = 0; i < notes.length; i++) {
-          notes[i].style.maxWidth = '470px';
-          notes[i].style.marginLeft = 'auto';
-          notes[i].style.marginRight = 'auto';
-          notes[i].style.wordBreak = 'break-word';
-          notes[i].style.overflowWrap = 'break-word';
-        }
-
-        // Font alignment fix
-        const badges = sandbox.querySelectorAll('span.badge');
-        badges.forEach(badge => {
-          const textContent = badge.textContent.trim();
-          badge.innerHTML = `
-                                <span style="
-                                    display: inline-block;
-                                    line-height: 1 !important;
-                                    vertical-align: middle;
-                                    position: relative;
-                                    top: -1.5px;
-                                ">${textContent}</span>
-                            `;
-        });
         const logoBrandLink = sandbox.querySelector('.navbar-brand-mobile');
         if (logoBrandLink) {
           // Wipe out Bootstrap float, margins, padding, and flex properties
-          // logoBrandLink.className = '';
+          logoBrandLink.className = '';
 
           // Force an explicit, centered block layout framework
           logoBrandLink.style.display = 'block';
           logoBrandLink.style.width = '100%';
           logoBrandLink.style.textAlign = 'center';
         }
+
         const targetCard = sandbox.querySelector('#capture-area') || sandbox.firstElementChild;
-
-        const items = targetCard.querySelectorAll("p, span, div");
-        items.forEach(el => {
-          if (el.children.length === 0) { // Target final text nodes
-            el.innerHTML = el.innerHTML.replace(/ /g, '&nbsp;');
-          }
-        });
-
         const canvasBgColor = (config.activeTheme === 'dark') ? '#07080a' : '#ffffff'; // Match your dark background hex color
 
         // Hide the theme button from the image view, but keep it in the template code tree
         const themeToggle = sandbox.querySelector('#toggle-container, .bd-theme-btn');
+
         if (themeToggle) {
           themeToggle.style.setProperty('display', 'none', 'important');
         }
 
         const marginWrapper = document.createElement('div');
         marginWrapper.style.backgroundColor = canvasBgColor;
-        marginWrapper.style.paddingTop = '0';
-        marginWrapper.style.paddingBottom = '12px';
+        marginWrapper.style.paddingBottom = '4px';
         marginWrapper.style.width = `${width}px`;
 
         targetCard.parentNode.insertBefore(marginWrapper, targetCard);
         marginWrapper.appendChild(targetCard);
 
-        const totalRect = marginWrapper.getBoundingClientRect();
+        const captureArea = marginWrapper;
 
-        const options = {
+        if (!captureArea) {
+          console.error("Capture area target '#capture-area' not found in sandbox.");
+          sandbox.remove(); // Clean up memory
+          return;
+        }
+
+        // 2. Fire Snapdom's native image exporter and download pipeline
+        return snapdom.download(marginWrapper, {
+          format: 'png',
+          filename: `${config.downloadFilename}.png`,
           scale: 2,
-          useCORS: true,
-          backgroundColor: canvasBgColor,
-          scrollX: 0,
-          letterRendering: true,
-          scrollY: 0,
-          x: 0,
-          y: 0,
-          width: width,
-          height: totalRect.height,
-          windowWidth: width,
-          windowHeight: totalRect.height
-        };
-
-        return html2canvas(marginWrapper, options).then(canvas => {
-          const imageURL = canvas.toDataURL('image/png');
-          const downloadLink = document.createElement('a');
-          downloadLink.href = imageURL;
-          downloadLink.download = `${config.downloadFilename}.png`;
-
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
-          document.body.removeChild(sandbox);
-        });
+          iconFonts: ['bootstrap-icons'], // Forces Snapdom to fetch and package the bootstrap-icon glyf data maps
+          embedFonts: true // Forces style parsing from parent document head
+        })
+          .then(() => {
+            // 3. Remove sandbox container after file compiles safely
+            sandbox.remove();
+          });
       })
       .catch(err => {
         console.error('Render pipeline crash:', err);

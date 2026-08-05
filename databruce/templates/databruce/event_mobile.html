@@ -40,17 +40,17 @@
       | Databruce
     </title>
     <!--JQuery-->
-    <script src="{% static 'databruce/js/jquery-4.0.0.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery/jquery-4.0.0.min.js' %}"></script>
     <!--Bootstrap-->
     <link rel="stylesheet"
           href="{% static 'databruce/css/bootstrap.min.css' %}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="{% static 'databruce/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'databruce/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
     <!--Datatables-->
     <link href="{% static 'databruce/css/datatables.min.css' %}"
           rel="stylesheet">
-    <script src="{% static 'databruce/js/datatables.min.js' %}"></script>
+    <script src="{% static 'databruce/js/datatables/datatables-3.1.min.js' %}"></script>
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" />
@@ -60,6 +60,7 @@
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
     <script src="{% static 'databruce/js/html2canvas.min.js' %}"></script>
+    <script src="{% static 'databruce/js/table.js' %}"></script>
   </head>
   <body>
     <div id="capture-area">
@@ -154,7 +155,7 @@
                 </div>
               </div>
               <!-- setlist and notes -->
-              <div class="tab-content" id="myTabContent">
+              <div class="tab-content overflow-hidden" id="myTabContent">
                 <div class="tab-pane fade show active"
                      id="overview"
                      role="tabpanel"
@@ -188,7 +189,7 @@
                             </div>
                           </div>
                           <div class="card-body p-0" id="setlistCard">
-                            <div class="table-responsive">
+                            <div class="table-responsive" id="mobileTable">
                               <table class="table table-hover display wrap" id="setlistTable">
                                 <thead>
                                   <th class="all">#</th>
@@ -209,7 +210,95 @@
       </div>
     </div>
     <script>
-	var counts = [];
+    $(document).ready(function() {
+      var event = "{{ event.id }}";
+      var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
+
+    let setlistOptions = {
+      createdRow: function (row, data) {
+        row.addClass(slugify(data.set_name));
+
+        var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+
+        if (allowedSets.includes(data.set_name)) {
+          var album = data.song.category_slug;
+          row.attr('data-album', album);
+        }
+
+        return row
+      },
+      rowGroup: {
+        groupVal: 'set_name'
+      }
+    }
+
+    let setlistColumns = [
+      {
+        'data': 'song_num',
+        'className': 'text-center',
+        'width': '',
+        'render': function (data, type, row, meta) {
+          if (data) {
+            return data
+          }
+          
+          return ''
+        },
+        'createdCell': function (td, cellData, rowData, row, col) {
+          $(td).addClass('songnum');
+
+          if (rowData.position) {
+            var position = slugify(rowData.position);
+            $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
+          }
+
+          return td;
+        },
+      },
+      {
+        'data': 'song',
+        'className': 'text-wrap',
+        'width': '',
+        'render': function (data, type, row, meta) {
+          var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+          var segue = row.segue ? `<span class="segue"></span>` : '';
+
+          song = `${song} ${segue}`;
+
+          var badges = $('<span />');
+          var baseBadge = `<span class="badge" data-bs-toggle="tooltip" data-bs-html="true"></span>`
+
+          if (row.instrumental) {
+            var badge = $(baseBadge).clone();
+            $(badge).addClass('badge-info').text('Inst.').attr('data-bs-title', 'Instrumental');
+            badges.append($(badge).prop('outerHTML'));
+          }
+
+          if (row.sign_request) {
+            var badge = $(baseBadge).clone();
+            $(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
+            $(badges).append($(badge).prop('outerHTML'));
+          }
+
+          if (row.nobruce) {
+            var badge = $(baseBadge).clone();
+            $(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
+            $(badges).append($(badge).prop('outerHTML'));
+          }
+
+          if (row.notes) {
+            var notes = `<br><span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes}</span>`;
+            return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;
+          }
+
+          return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
+        }
+      },
+    ]
+
+    createTable(url, setlistColumns, '#setlistTable', setlistOptions);
+    })
+	{% comment %} var counts = [];
 
 	$(document).ready(function () {
 		var event = "{{ event.id }}";
@@ -227,7 +316,7 @@
 				scrollX: false,
 				fixedHeader: false,
 				autoWidth: false,
-				ajax: '/api/v1/setlists/?event={{ id }}&format=custom&show_only=true',
+				ajax: '/api/v1/setlists/?event={{ event.id }}&format=custom&show_only=true',
 				rowGroup: {
 					dataSrc: 'set_name',
 					className: 'text-center set-header p-0 dtrg-group',
@@ -256,7 +345,7 @@
 						'className': 'dt-center col-songnum',
 						'width': '30px',
 						'render': function (data, type, row, meta) {
-							if (type === 'display' && data) {
+							if (data) {
 								return data;
 							}
 						},
@@ -276,7 +365,7 @@
 						'name': 'song__sort_song_name',
 						'className': 'text-wrap col-song',
 						'render': function (data, type, row, meta) {
-							if (type === 'display' && data) {
+							if (data) {
 								var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
 								var segue = row.segue ? `<span class="segue"></span>` : '';
 
@@ -335,7 +424,7 @@
 					},
 				],
 			});
-	});
+}); {% endcomment %}
     </script>
   </body>
 </html>

@@ -2,6 +2,11 @@
 {% block title %}
   Tour "{{ title }}"
 {% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/slotTable.js' %}"></script>
+  <script src="{% static 'databruce/js/songTable.js' %}"></script>
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="tours" item=info.id %}
@@ -81,7 +86,7 @@
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
           <div id="legs" class="tab-pane fade">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="legSearch" class="pb-1">Search</label>
@@ -148,7 +153,7 @@
             'name': 'name',
             'width': '20rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
+                if (data) {
                   return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
                 }
             },
@@ -160,8 +165,8 @@
             'name': 'first_event__event_id, first_event__early_late',
             'width': '6rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
+                if (data) {
+                  return `<a href="/events/${data.event_id}">${data.date}</a>`;
                 }
             },
           },
@@ -170,8 +175,8 @@
             'name': 'last_event__event_id, last_event__early_late',
             'width': '6rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
-                  return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
+                if (data) {
+                  return `<a href="/events/${data.event_id}">${data.date}</a>`;
                 }
             },
           },

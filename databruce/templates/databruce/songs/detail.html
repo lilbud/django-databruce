@@ -2,11 +2,6 @@
 {% block title %}
   Song "{{ title }}"
 {% endblock title %}
-{% block extrajs %}
-  <link href="https://cdn.datatables.net/columncontrol/1.0.7/css/columnControl.dataTables.min.css"
-        rel="stylesheet">
-  <script src="https://cdn.datatables.net/columncontrol/1.0.7/js/dataTables.columnControl.min.js"></script>
-{% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="songs" item=info.id %}
@@ -123,7 +118,7 @@
           <div class="card-body">
             <div class="tab-content">
               <div id="events" class="tab-pane fade show active">
-                <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+                <div id="tableControls">
                   <div class="col-12 col-md-1">
                     <label for="PublicityFilter" class="pb-1">Publicity</label>
                     <select id="PublicityFilter" class="form-select form-select-sm">
@@ -326,8 +321,8 @@
             'name': 'id__event__event_id',
             'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },
@@ -336,7 +331,7 @@
             'name': 'id__event__artist__name',
             'width': '14rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/bands/${data.id}">${data.name}</a>`
               }
             },
@@ -346,7 +341,7 @@
             'name': 'id__event__venue__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/venues/${data.uuid}">${data.name}</a>`
               }
             },
@@ -356,7 +351,7 @@
             'name': 'id__event__tour__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/tours/${data.uuid}">${data.name}</a>`
               }
             },
@@ -367,7 +362,7 @@
             'width': '6rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 var className = slugify(data);
 
                 if (className == "show-opener") {
@@ -388,7 +383,7 @@
             'width': '1rem',
             'className': 'dt-center',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 var badge = $('<span />').addClass('badge').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
                 if (data.gap >= 50 && !data.debut) {
@@ -415,7 +410,7 @@
             'name': 'prev__song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 if (data.segue) {
                   return `<a href="/songs/${data.song.uuid}">${data.song.name} \></a>`
                 }
@@ -428,7 +423,7 @@
             'name': 'next__song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 if (row.segue) {
                   return `<a href="/songs/${data.song.uuid}">\> ${data.song.name}</a>`
                 } else if (data.segue) {
@@ -445,7 +440,7 @@
             'columnControl': [],
             'orderable': false,
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<span class="setlist-note">${data.join('; ')}</span>`
               }
             },
@@ -488,8 +483,8 @@
             'name': 'setlist__event__event_id',
             'width': '6rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },
@@ -498,7 +493,7 @@
             'name': 'setlist__event__artist__name',
             'width': '14rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
+                if (data) {
                   return `<a href="/bands/${data.uuid}">${data.name}</a>`
                 }
             },
@@ -508,7 +503,7 @@
             'name': 'setlist__event__venue__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-                if (type === 'display' && data) {
+                if (data) {
                   if (data.city) {
                     return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${data.city.formatted}</small>`
                   }
@@ -522,7 +517,7 @@
             'name': 'setlist__song__name',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
@@ -532,7 +527,7 @@
             'name': 'setlist__setlist_notes__note',
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<span class="setlist-note">${data.join('; ')}</span>`
               }
             },
@@ -566,7 +561,7 @@
             'name': 'count',
             'width': '1rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return data
               }
             },
@@ -575,7 +570,7 @@
             'data': 'snippet',
             'name': 'snippet__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display') {
+              if (data) {
                 return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
@@ -584,8 +579,8 @@
             'data': 'first_event',
             'name': 'first_event',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },
@@ -593,8 +588,8 @@
             'data': 'last_event',
             'name': 'last_event',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },

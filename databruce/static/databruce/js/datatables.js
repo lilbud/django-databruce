@@ -88,7 +88,7 @@ $.extend(true, DataTable.defaults, {
     regex: true
   },
   // cardView: true,
-  responsive: true,
+  responsive: false,
   order: [],
   layout: {
     topStart: [],
@@ -107,21 +107,24 @@ $(document).ready(function () {
   });
 });
 
-const slugify = (str = '') => {
-  return str
+function slugify(str) {
+  if (!str) return '';
+  return String(str)
     .toLowerCase() // Convert to lowercase
     .trim() // Trim leading/trailing whitespace
     .replace(/[^a-z0-9]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-};
+}
 
-const escapeHtml = (str) => {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-};
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 function renderLink(url, data, text) {
   return `<a href="${url}${data}">${text}</a>`

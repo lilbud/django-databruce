@@ -19,7 +19,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <div class="col-12 col-md-1">
                 <label for="PublicityFilter" class="pb-1">Type</label>
                 <select id="PublicityFilter" class="form-select form-select-sm">
@@ -83,7 +83,7 @@
             'data': 'title',
             'name': 'title',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return '<a href="https://www.springsteenlyrics.com/bootlegs.php?item=' + row.slid + '">'+ data +'</a>';
               }
             },
@@ -95,8 +95,8 @@
             'data': 'event',
             'name': 'event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },
@@ -104,7 +104,7 @@
             'data': 'archive.url',
             'name': 'archive__url',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a target="_blank" rel="noopener noreferrer" href="https://archive.org/details/${data}">Archive.org</a>`
               }
             },         

@@ -17,7 +17,7 @@
     </div>
     <div class="card">
       <div class="card-body">
-        <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+        <div id="tableControls">
           <!-- Search -->
           <div class="col">
             <label for="search" class="pb-1">Search</label>
@@ -77,8 +77,8 @@
             'width': '8rem',
             'type': 'text',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return '<a href="/events/' + data.event_id + '">' + data.date.display + '</a>';
+              if (data) {
+                return '<a href="/events/' + data.event_id + '">' + data.date + '</a>';
               }
             },
           },
@@ -88,7 +88,7 @@
             'className': 'text-nowrap all',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
               }
             },
@@ -105,7 +105,7 @@
             'className': 'text-nowrap',
             'width': '12rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return '<a href="/songs/' + data.id + '">' + data.name + '</a>';
               }
             },

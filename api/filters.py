@@ -598,7 +598,7 @@ class EventsFilter(filters.FilterSet):
                 date__month=parsed_month,
                 date__day=parsed_day,
             )
-            ranking_cases.append(When(exact_date_match, then=Value(0.95)))
+            ranking_cases.append(When(exact_date_match, then=Value(1.0)))
 
         return (
             queryset.annotate(
@@ -785,7 +785,7 @@ class SetlistStatsFilter(filters.FilterSet):
 
 class SetlistFilter(filters.FilterSet):
     event = filters.CharFilter(
-        field_name="event__event_id",
+        field_name="event_id",
         lookup_expr="exact",
         label="event",
     )

@@ -6,7 +6,7 @@ event_table_columns = [
         'width': '1rem',
         'className': 'text-nowrap',
         'render': function (data, type, row, meta) {
-            return `<a href="/events/${row.event_id}">${data.display_day}</a>`
+            return `<a href="/events/${row.event_id}">${data}</a>`
         },
     },
     {
@@ -40,7 +40,7 @@ event_table_columns = [
         'render': function (data, type, row, meta) {
             if (data) {
                 if (row.city) {
-                    return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
+                    return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
                 }
 
                 return `<a href="/venues/${data.uuid}">${data.name}</a>`
@@ -98,8 +98,6 @@ function eventTable(url) {
         columns: event_table_columns,
         serverSide: true,
         processing: true,
-        paging: false,
-        pageLength: -1,
         initComplete: function (settings, json) {
             var info = this.api().page.info();
             $('#event-count-badge').text(info.recordsTotal);

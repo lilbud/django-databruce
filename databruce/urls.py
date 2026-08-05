@@ -136,7 +136,7 @@ urlpatterns = [
         views.EventDetailTest.as_view(),
         name="event_details_test",
     ),
-    path("events/type/<slug:type>/", views.EventType.as_view(), name="events_by_type"),
+    path("events/type/<str:slug>/", views.EventType.as_view(), name="events_by_type"),
     path("events/type", views.EventType.as_view(), name="events_type"),
     path("songs", views.Song.as_view(), name="songs"),
     path("songs/<uuid:id>", views.SongDetail.as_view(), name="song_details"),
@@ -162,11 +162,16 @@ urlpatterns = [
         views.AdvSearch.as_view(),
         name="adv_search_test",
     ),
-    # path(
-    #     "test_table/",
-    #     views.TestTable.as_view(),
-    #     name="test_table",
-    # ),
+    path(
+        "test_table/",
+        views.TestTable.as_view(),
+        name="test_table",
+    ),
+    path(
+        "test_event/",
+        views.TestEvent.as_view(),
+        name="test_table",
+    ),
     path(
         "search/advanced/results",
         views.AdvancedSearchResults.as_view(),

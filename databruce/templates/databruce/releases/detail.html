@@ -165,7 +165,7 @@
           'width': '16rem',
           'name': 'song__sort_song_name',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
               return `<a href="/songs/${data.uuid}">${data.name}</a>`;
             }
           },
@@ -177,8 +177,8 @@
           'searchable': 'false',
           'width': '6rem',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
-              return data ? `<a href="/events/${data.event_id}">${data.date.display}</a>` : '';
+            if (data) {
+              return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : '';
             }
           },
         },

@@ -7,7 +7,7 @@ setlist_slots = [
         'searchable': false,
         'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-                return '<a href="/events/' + data.event_id + '">' + data.date.display_day + '</a>';
+                return '<a href="/events/' + data.event_id + '">' + data.date_day + '</a>';
             }
         },
     },

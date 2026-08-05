@@ -32,7 +32,7 @@ song_table_columns = [
         'width': '10rem',
         'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-                return renderLink('/events/', data.event_id, data.date.display_day);
+                return renderLink('/events/', data.event_id, data.date_day);
             }
         },
     },
@@ -42,7 +42,7 @@ song_table_columns = [
         'width': '10rem',
         'render': function (data, type, row, meta) {
             if (type === 'display' && data) {
-                return renderLink('/events/', data.event_id, data.date.display_day);
+                return renderLink('/events/', data.event_id, data.date_day);
             }
         },
     },

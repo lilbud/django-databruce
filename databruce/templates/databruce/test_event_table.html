@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    {% load i18n static %}
+    {% if not debug %}
+      <script defer
+              src="https://cloud.umami.is/script.js"
+              data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
+    {% endif %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
+    <meta name="keywords" content="Databruce, Setlists, Springsteen">
+    <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="{{ title|default_if_none:"Databruce" }}">
+    <meta property="og:site_name" content="Databruce">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:description"
+          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
+    <link rel="icon"
+          type="image/png"
+          href="{% static "databruce/img/favicon-96x96.png" %}"
+          sizes="96x96" />
+    <link rel="icon"
+          type="image/svg+xml"
+          href="{% static "databruce/img/favicon.svg" %}" />
+    <link rel="shortcut icon" href="{% static "databruce/img/favicon.ico" %}" />
+    <link rel="apple-touch-icon"
+          sizes="180x180"
+          href="{% static "databruce/img/apple-touch-icon.png" %}" />
+    <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
+    <title>
+      {% block title %}
+        Home
+      {% endblock title %}
+      | Databruce
+    </title>
+    <!-- leaflet.js-->
+    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
+    <script src="{% static 'databruce/js/leaflet.js' %}"></script>
+    <!--JQuery-->
+    <link rel="stylesheet"
+          href="{% static 'databruce/css/jquery-ui.min.css' %}">
+    <script src="{% static 'databruce/js/jquery-4.0.0.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery.mask.min.js' %}"></script>
+    <!--Bootstrap-->
+    <link rel="stylesheet"
+          href="{% static 'databruce/css/bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="{% static 'databruce/js/bootstrap.bundle.min.js' %}"></script>
+    <!--Datatables-->
+    {% comment %} <link href="{% static 'databruce/css/datatables-3.1.min.css' %}" rel="stylesheet">
+    <script src="{% static 'databruce/js/datatables-3.1.min.js' %}"></script> {% endcomment %}
+    <link href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.min.css"
+          rel="stylesheet"
+          integrity="sha384-IkYzSBi8dm4Cg6IWFobByqhtleZ+PI1q8HYZXz9QgfRw+9LiJ3uVKcGDIWZFa+0k"
+          crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/cardview/1.0.1/css/cardView.dataTables.min.css"
+          rel="stylesheet"
+          integrity="sha384-YMsWjOCTxk6/EEqNSVyWnWoJzYdyVFCg2RK1jle+vNkfxts+tRgLL464i2T+ofn2"
+          crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/buttons/4.0.1/css/buttons.dataTables.min.css"
+          rel="stylesheet"
+          integrity="sha384-6XzpP2g0NoE5c1xdtMLmwyXuL99L6BX3/Ale4TYo6eSOD+dVs2o9PTTp2jw5MYhV"
+          crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/responsive/4.0.1/css/responsive.dataTables.min.css"
+          rel="stylesheet"
+          integrity="sha384-rD9iFEGdmnGBfe9oe/nZnuBTF91n27kh4fXP+vDi05QaEVQ/nLvsSmFIjeYbNJYS"
+          crossorigin="anonymous">
+    <script src="https://cdn.datatables.net/3.0.1/js/dataTables.min.js"
+            integrity="sha384-stLBvQI26SIgZOke0kAZbmVfcxb89mRjkgJ/aRVpYms4krlKaYvhLnDow4tbqS4U"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/4.0.1/js/dataTables.buttons.min.js"
+            integrity="sha384-lnmZrBuLlzWz9qGhfn0/0MTMN7gEMk3UMg4XlCGPvLGQtwHsP+6EXEMUQrwrF9a2"
+            crossorigin="anonymous"></script>
+    <script src="https://nightly.datatables.net/cardview/js/dataTables.cardView.js?2026-08-03"></script>
+    <script src="https://cdn.datatables.net/responsive/4.0.1/js/dataTables.responsive.min.js"
+            integrity="sha384-C0VOmWDEHSWlpFIv8zJotfCUs4Ejf8BYURTNmgfGzfRq7nrdQXO9Z0VcyrQ5GMGn"
+            crossorigin="anonymous"></script>
+    {% comment %} <script src="{% static 'databruce/js/dt_plus_remove.js' %}"></script> {% endcomment %}
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_style.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/hb_select2.css' %}" />
+    <!-- Other -->
+    <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
+    <!-- Datatables Scripts -->
+    <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+    <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
+    {% block extrastyle %}
+    {% endblock extrastyle %}
+    {% block extrajs %}
+    {% endblock extrajs %}
+  </head>
+  <body>
+    {% include "./partials/navbar.html" %}
+    <div class="padded-body">
+      <div class="container-lg">
+        <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
+          <div class="col-12">
+            <div class="row">
+              <div class="col">
+                <div class="d-flex justify-content-start mb-3">
+                  <div class="text-2xl pe-2">Events</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="table-responsive">
+                        <table class="table table-hover display nowrap" id="eventTable">
+                          <thead>
+                            <tr>
+                              <th class="all">Date</th>
+                              <th class="all">Setlist</th>
+                              <th class="all">Band</th>
+                              <th class="all">Venue</th>
+                              <th class="all">Tour</th>
+                              <th class="all">Detail</th>
+                              <th class="all">Public</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>
+            $(document).ready(function () {
+                columns = [
+                    {
+                        'data': 'date',
+                        'name': 'event_id',
+                        'type': 'text',
+                        'width': '1rem',
+                        'className': 'text-nowrap',
+                        'render': function (data, type, row, meta) {
+                            return `<a href="/events/${row.event_id}">${data}</a>`
+                        },
+                    },
+                    {
+                        'data': 'has_setlist',
+                        'name': 'has_setlist',
+                        'width': '1rem',
+                        'className': 'text-center text-xs',
+                        'orderable': false,
+                        'searchable': false,
+                        'columnControl': [],
+                        'render': function (data, type, row, meta) {
+                            return data ? `<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
+                        },
+                    },
+                    {
+                        'data': 'artist',
+                        'name': 'artist__name',
+                        'className': 'text-wrap',
+                        'width': '12rem',
+                        'render': function (data, type, row, meta) {
+                            if (data) {
+                                return `<a href="/bands/${data.uuid}">${data.name}</a>`
+                            }
+                        },
+                    },
+                    {
+                        'data': 'venue',
+                        'name': 'venue__name, venue__detail, venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
+                        'className': 'text-nowrap',
+                        'width': '12rem',
+                        'render': function (data, type, row, meta) {
+                            if (data) {
+                                if (row.city) {
+                                    return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
+                                }
+
+                                return `<a href="/venues/${data.uuid}">${data.name}</a>`
+                            }
+                        },
+                    },
+                    {
+                        'data': 'tour',
+                        'name': 'tour__name',
+                        'width': '10rem',
+                        'className': 'text-wrap',
+                        'render': function (data, type, row, meta) {
+                            if (data) {
+                                if (row.leg) {
+                                    return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg}</small>`
+                                }
+
+                                return `<a href="/tours/${data.uuid}">${data.name}</a>`
+                            }
+                        },
+                    },
+                    {
+                        'data': 'title',
+                        'name': 'title',
+                        'width': '15rem',
+                        'render': function (data, type, row, meta) {
+                            if (row.event_status) {
+                                if (data) {
+                                    return `<span class="text-danger fw-semibold">[${row.type}] ${data}</span>`
+                                }
+                                return `<span class="text-danger fw-semibold">[${row.type}]</span>`
+                            }
+
+                            return data;
+                        },
+                    },
+                    {
+                        'data': 'public',
+                        'name': 'public',
+                        'visible': false,
+                        'orderable': false,
+                        'render': function (data, type, row, meta) {
+                            if (data != null) {
+                                return data;
+                            }
+                        },
+                    },
+                ]
+
+                var table = $('#eventTable').DataTable({
+                  ajax: '/api/v1/events/?year=1978&format=custom',
+                  columns: columns,
+                  cardView: true,
+                  responsive: false,
+                  serverSide: true,
+                  processing: true,
+
+                })
+            });
+          </script>
+        </div>
+      </div>
+      {% include "./partials/searchbuilder.html" %}
+    </div>
+    <div class="footer mt-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center py-2">
+            Copyright ©{% now "Y" %}, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+
+    });
+    </script>
+  </body>
+</html>

@@ -18,7 +18,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
@@ -58,7 +58,7 @@
             'data': 'created_at',
             'name': 'created_at',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return data
               }
             },
@@ -67,7 +67,7 @@
             'data': 'msg',
             'name': 'msg',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 if (row.view) {
                   return `${data} <a class='text-reset fw-medium text-accent' href='/${row.view}/${row.item_id}'>${row.value}</a>`
                 }

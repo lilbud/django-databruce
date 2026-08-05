@@ -554,8 +554,6 @@ class EventDetail(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["id"] = self.kwargs["id"]
-
         context["event"] = get_object_or_404(
             models.Events.objects.select_related(
                 "venue",
@@ -714,8 +712,6 @@ class EventDetailMobile(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        context["id"] = self.kwargs["id"]
-
         context["event"] = get_object_or_404(
             models.Events.objects.select_related(
                 "venue",
@@ -753,8 +749,6 @@ class EventDetailTest(PageTitleMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
-
-        context["id"] = self.kwargs["id"]
 
         context["event"] = get_object_or_404(
             models.Events.objects.select_related(
@@ -1444,9 +1438,14 @@ class Relation(PageTitleMixin, TemplateView):
     title = "Relations"
 
 
-# class TestTable(PageTitleMixin, TemplateView):
-#     template_name = "databruce/test_table.html"
-#     title = "Table"
+class TestTable(PageTitleMixin, TemplateView):
+    template_name = "databruce/test_table.html"
+    title = "Table"
+
+
+class TestEvent(PageTitleMixin, TemplateView):
+    template_name = "databruce/test_event_table.html"
+    title = "Table"
 
 
 class AdvSearch(PageTitleMixin, TemplateView):
@@ -1760,7 +1759,10 @@ class EventType(PageTitleMixin, TemplateView):
                 slug=self.kwargs["type"],
             )
         except KeyError:
-            context["type"] = "Concert"
+            context["type"] = get_object_or_404(
+                models.EventTypes,
+                slug="concert",
+            )
 
         context["title"] = f"Event Type '{context['type']}'"
 

@@ -288,3 +288,16 @@ First public release of the site. Site was locked behind a login and accounts on
 - Fixed the "included songs" table on the song detail page. It was working but not finding all songs and only showing a count of 1 regardless of the actual number.
 - Event Table publicity filter now orders by event date before searching
 - Update table filters to sort table before applying filter.
+
+# v1.19 (August 5, 2026)
+
+- General code cleanup, moved a lot of JS to their own files.
+- Event Detail tables no longer use DataTables, instead just using Vanilla JS/JQuery. DT is very inflexible and the setlist table in particular has given me a ton of grief. Rewriting it to use JS just made things easier.
+- Updated DataTables to 3.1
+- Shrunk Album images down to 300px, replaced `default` with an SVG
+- Replaced `html2canvas.js` with `snapdom.js`. Easier to work with and less issues.
+- Standardized table controls and table layouts.
+- Moved navbar to it's own partial file, fixed many missing accessibility attributes.
+- Rewrote `albumBreakdown` to work a little nicer.
+- Added custom table creation code, modelled after DataTables. Currently only in use on EventDetail page, might flesh out and add everywhere.
+- Numerous style tweaks.

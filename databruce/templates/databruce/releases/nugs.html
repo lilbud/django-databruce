@@ -19,7 +19,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <div class="col-12 col-md-1">
                 <label for="PublicityFilter" class="pb-1">First Friday</label>
                 <select id="PublicityFilter" class="form-select form-select-sm">
@@ -90,7 +90,7 @@
             'className': 'text-nowrap',
             'type': 'text',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${data.time}">${data.date}</span>`
               }
             },
@@ -99,8 +99,8 @@
             'data': 'event',
             'name': 'event__event_id',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },
@@ -108,7 +108,7 @@
             'data': 'event.venue',
             'name': 'event__venue__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/venues/${data.uuid}">${data.name}</a>`;
               }
             },
@@ -117,7 +117,7 @@
             'data': 'event.venue',
             'name': 'event__venue__city__name, event__venue__city__state__abbrev',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/cities/${row.city.uuid}">${row.city.formatted}</a>`
               }
             },
@@ -126,7 +126,7 @@
             'data': 'url',
             'name': 'url',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a target="_blank" rel="noopener noreferrer" href="${data}">${row.name}</a>`
               }
             },
@@ -135,7 +135,7 @@
             'data': 'first_friday',
             'name': 'first_friday',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return data;
               }
             },

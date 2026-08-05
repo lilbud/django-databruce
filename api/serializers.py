@@ -19,6 +19,39 @@ VALID_SET_NAMES = [
 ]
 
 
+def get_date_from_instance(obj):
+    """Get event date from instance, creating date from id if needed."""
+    event_id = getattr(obj, "event_id", None)
+    date = getattr(obj, "date", None)
+    early_late = getattr(obj, "early_late", None)
+
+    if event_id is None:
+        return None
+
+    # result = {}
+
+    if not date:
+        date = datetime.datetime.strptime(format_fuzzy(event_id), "%Y-%m-%d")
+
+    # result["display"] = date.strftime("%Y-%m-%d")
+    # result["display_day"] = date.strftime("%Y-%m-%d [%a]")
+
+    if early_late:
+        return f"{date.strftime('%Y-%m-%d')} ({early_late})"
+
+    return date.strftime("%Y-%m-%d")
+
+
+def get_formatted_city(obj):
+    if obj.state:
+        if getattr(obj.country, "alpha_2", "").upper() == "US":
+            return f"{obj.name}, {obj.state.abbrev}"
+
+        return f"{obj.name}, {obj.state.abbrev}, {obj.country.name}"
+
+    return f"{obj.name}, {obj.country.name}"
+
+
 class BaseSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs) -> None:
         # Don't pass 'fields' up to the superclass
@@ -61,16 +94,7 @@ class MinimalCitiesSerializer(BaseSerializer):
     formatted = serializers.SerializerMethodField()
 
     def get_formatted(self, obj):
-        try:
-            if obj.state and obj.country_id in (2, 6, 37):
-                return f"{obj.name}, {obj.state.abbrev}"
-        except (models.Cities.state.RelatedObjectDoesNotExist, AttributeError):
-            return f"{obj.name}, {obj.country.name}"
-
-        try:
-            return f"{obj.name}, {obj.country.name}"
-        except AttributeError:
-            return f"{obj.name}"
+        return get_formatted_city(obj)
 
     class Meta:
         model = models.Cities
@@ -106,14 +130,14 @@ class MinimalUserSerializer(BaseSerializer):
 
 
 class MinimalEventSerializer(BaseSerializer):
-    date = serializers.SerializerMethodField(method_name="get_date")
+    date = serializers.SerializerMethodField()
 
     def get_date(self, obj):
         return get_date_from_instance(obj)
 
     class Meta:
         model = models.Events
-        fields = ["date", "event_id", "early_late"]
+        fields = ["date", "event_id"]
 
 
 class MinimalTourLegsSerializer(BaseSerializer):
@@ -182,30 +206,6 @@ class MinimalEventTypeSerializer(BaseSerializer):
         fields = ["id", "name"]
 
 
-def get_date_from_instance(obj):
-    """Get event date from instance, creating date from id if needed."""
-    event_id = getattr(obj, "event_id", None)
-    date = getattr(obj, "date", None)
-    early_late = getattr(obj, "early_late", None)
-
-    if event_id is None:
-        return None
-
-    result = {}
-
-    if not date:
-        date = datetime.datetime.strptime(format_fuzzy(event_id), "%Y-%m-%d")
-
-    result["display"] = date.strftime("%Y-%m-%d")
-    result["display_day"] = date.strftime("%Y-%m-%d [%a]")
-
-    # if early_late:
-    #     result["display"] = f"{date.strftime('%Y-%m-%d')} ({early_late})"
-    #     result["display_day"] = f"{date.strftime('%Y-%m-%d [%a]')} ({early_late})"
-
-    return result
-
-
 class StatesSerializer(BaseSerializer):
     first_event = MinimalEventSerializer(required=False)
     last_event = MinimalEventSerializer(required=False)
@@ -241,10 +241,7 @@ class CitiesSerializer(BaseSerializer):
     formatted = serializers.SerializerMethodField()
 
     def get_formatted(self, obj):
-        if obj.state and obj.country_id in (2, 6, 37):
-            return f"{obj.name}, {obj.state.abbrev}"
-
-        return f"{obj.name}, {obj.country.name}"
+        return get_formatted_city(obj)
 
     class Meta:
         model = models.Cities
@@ -317,8 +314,8 @@ class EventRunSerializer(BaseSerializer):
     band = MinimalBandsSerializer()
     venue = MinimalVenuesSerializer(include=["uuid", "name"])
     city = serializers.CharField(source="venue.city", required=False, max_length=255)
-    first_event = MinimalEventSerializer(required=False)
-    last_event = MinimalEventSerializer(required=False)
+    first_event = MinimalEventSerializer(required=False, include=["event_id", "date"])
+    last_event = MinimalEventSerializer(required=False, include=["event_id", "date"])
 
     class Meta:
         model = models.Runs
@@ -369,19 +366,18 @@ class ToursSerializer(BaseSerializer):
 
 
 class OnstageSerializer(BaseSerializer):
-    event = MinimalEventSerializer()
-    relation = MinimalRelationsSerializer()
+    relation = MinimalRelationsSerializer(include=["uuid", "name"])
     band = MinimalBandsSerializer(required=False)
 
     class Meta:
         model = models.Onstage
-        fields = ["event", "relation", "band", "guest", "uuid", "note"]
+        fields = ["relation", "band", "guest", "note"]
 
 
 class EventTypeSerializer(BaseSerializer):
     class Meta:
         model = models.EventTypes
-        fields = "__all__"
+        fields = ["name", "slug"]
 
 
 class EventSearchSerializer(BaseSerializer):
@@ -451,32 +447,27 @@ class IndexSetlistSerializer(BaseSerializer):
 
 
 class IndexEventsSerializer(BaseSerializer):
-    venue = MinimalVenuesSerializer(required=False, include=["uuid", "name", "detail"])
-    date = serializers.SerializerMethodField(method_name="get_date")
-
-    def get_date(self, obj):
-        return get_date_from_instance(obj)
+    venue = serializers.CharField(source="venue.name", max_length=255)
+    date = serializers.CharField(max_length=255)
 
     class Meta:
         model = models.Events
-        fields = ["id", "event_id", "date", "venue"]
+        fields = ["event_id", "date", "venue"]
 
 
 class EventsSerializer(BaseSerializer):
     date = serializers.SerializerMethodField(method_name="get_date")
     early_late = serializers.CharField(required=False, max_length=255)
-    # run = MinimalEventRunSerializer(required=False)
     artist = MinimalBandsSerializer(required=False)
     tour = MinimalToursSerializer(required=False)
     venue = MinimalVenuesSerializer(
         required=False,
-        include=["uuid", "name", "detail", "formatted"],
-    )
-    city = MinimalCitiesSerializer(
-        required=False,
-        source="venue.city",
         include=["uuid", "name", "formatted"],
     )
+    city = serializers.SerializerMethodField()
+
+    def get_city(self, obj):
+        return get_formatted_city(obj.venue.city)
 
     leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
@@ -506,7 +497,6 @@ class EventsSerializer(BaseSerializer):
         model = models.Events
         fields = [
             "date",
-            # "run",
             "artist",
             "tour",
             "venue",
@@ -716,7 +706,6 @@ class SetlistSerializer(BaseSerializer):
         required=False,
         include=["date", "event_id"],
     )
-    event = MinimalEventSerializer(include=["date", "event_id"])
     count = serializers.IntegerField(required=False)
     notes = serializers.SerializerMethodField()
     gap = serializers.SerializerMethodField()
@@ -741,7 +730,6 @@ class SetlistSerializer(BaseSerializer):
         model = models.Setlists
         fields = [
             "song",
-            "event",
             "ltp",
             "segue",
             "debut",
@@ -972,7 +960,7 @@ class SongsPageSerializer(BaseSerializer):
 
 
 class LyricsSerializer(BaseSerializer):
-    song = MinimalSongsSerializer(include=["name", "uuid"])
+    song = serializers.CharField(source="song.name", max_length=255)
 
     class Meta:
         model = models.Lyrics
@@ -1172,7 +1160,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
     songs_map = {
         s.id: MinimalSongsSerializer(
             s,
-            include=["id", "name", "original_artist", "original", "category_slug"],
+            include=["id", "name", "original_artist", "original"],
         ).data
         for s in models.Songs.objects.all()
     }
@@ -1196,7 +1184,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
         # if album_len > setlist_len:
         #     return False
 
-        print(album_songs, setlist_songs)
+        # print(album_songs, setlist_songs)
 
         return any(
             setlist_songs[i : i + album_len] == album_songs

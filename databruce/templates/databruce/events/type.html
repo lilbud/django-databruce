@@ -2,6 +2,9 @@
 {% block title %}
   {{ title }}
 {% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
   <div class="col-12">
     <div class="row">
@@ -16,7 +19,7 @@
             <ul class="dropdown-menu">
               {% for i in types %}
                 <li>
-                  <a class="dropdown-item" href="{% url "events_by_type" type=i.slug %}">{{ i.name }}</a>
+                  <a class="dropdown-item" href="{% url "events_by_type" slug=i.slug %}">{{ i.name }}</a>
                 </li>
               {% endfor %}
             </ul>

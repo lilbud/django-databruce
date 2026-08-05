@@ -3,6 +3,10 @@
 {% block title %}
   Venue "{{ info.get_name }}"
 {% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/songTable.js' %}"></script>
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="venues" item=info.id %}
@@ -22,6 +26,14 @@
                   <span class="prefix">Nicknames/AKA</span>
                   <span class="value">{{ info.aliases|join:'; ' }}</span>
                 </div>
+                {% if info.address %}
+                  <div class="prefix-container">
+                    <div class="col">
+                      <span class="prefix">Address</span>
+                      <span class="value">{{ info.address }}</span>
+                    </div>
+                  </div>
+                {% endif %}
                 <div>
                   <div class="fw-medium">Same Address As:</div>
                   <div>
@@ -139,14 +151,6 @@
             </ul>
           </div>
           <div id="map" class="tab-pane fade">
-            {% if info.address %}
-              <div class="prefix-container row mb-3 text-sm">
-                <div class="col">
-                  <span class="prefix">Address</span>
-                  <span class="value">{{ info.address }}</span>
-                </div>
-              </div>
-            {% endif %}
             <div class="map-container row">
               <div class="col">
                 <div id="map-object"></div>

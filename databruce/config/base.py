@@ -107,6 +107,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "databruce.context_processors.base_data",
+                "databruce.context_processors.navbar_context",
             ],
             "builtins": ["databruce.templatetags.filters"],
         },

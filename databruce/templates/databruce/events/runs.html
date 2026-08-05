@@ -14,7 +14,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
@@ -77,7 +77,7 @@
             'data': 'name',
             'name': 'name',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return '<a href="/events/runs/' + row.uuid + '">'+ row.name +'</a>';
               }
             },
@@ -86,7 +86,7 @@
             'data': 'band',
             'name': 'band__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return '<a href="/bands/' + data.uuid + '">'+ data.name +'</a>';
               }
             },
@@ -95,7 +95,7 @@
             'data': 'venue',
             'name': 'venue__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
               }
             },
@@ -107,8 +107,8 @@
             'name': 'first_event__event_id, first_event__early_late',
             'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },
@@ -117,8 +117,8 @@
             'name': 'last_event__event_id, last_event__early_late',
             'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`
               }
             },
           },

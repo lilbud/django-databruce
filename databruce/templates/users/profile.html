@@ -3,6 +3,10 @@
 {% block title %}
   {{ title }}
 {% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/songTable.js' %}"></script>
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
   <div class="col-12">
     <div class="row mb-3">
@@ -117,7 +121,7 @@
               <div class="card">
                 <div class="card-header">Most Played Not Seen (100+ plays)</div>
                 <div class="card-body">
-                  <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+                  <div id="tableControls">
                     <div class="col-12 col-md-1">
                       <label for="categoryFilter" class="pb-1">Category</label>
                       <select id="categoryFilter" class="form-select form-select-sm">
@@ -164,7 +168,7 @@
                   Rare Songs (<100 Plays)
                 </div>
                 <div class="card-body">
-                  <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+                  <div id="tableControls">
                     <div class="col-12 col-md-1">
                       <label for="categoryFilter" class="pb-1">Category</label>
                       <select id="categoryFilter" class="form-select form-select-sm">
@@ -278,7 +282,7 @@
             'width': '1rem',
             'className': 'all text-center',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return data
               }
             },
@@ -289,7 +293,7 @@
             'width': '15rem',
             'className': 'all',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/songs/${data.uuid}">${data.name}</a>`
               }
             },
@@ -300,8 +304,8 @@
             'name': 'song__first_event',
             'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return renderLink('/events/', data.event_id, data.date.display_day);
+              if (data) {
+                return renderLink('/events/', data.event_id, data.date_day);
               }
             },
           },
@@ -310,8 +314,8 @@
             'name': 'song__last_event',
             'width': '10rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return renderLink('/events/', data.event_id, data.date.display_day);
+              if (data) {
+                return renderLink('/events/', data.event_id, data.date_day);
               }
             },
           },

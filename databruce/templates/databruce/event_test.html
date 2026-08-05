@@ -93,7 +93,7 @@
                     <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                          id="badge-row">
                       {% if event.type %}
-                        <a href="{% url 'events_by_type' type=event.type.slug %}"><span class="badge badge-primary">{{ event.type }}</span></a>
+                        <a href="{% url 'events_by_type' slug=event.type.slug %}"><span class="badge badge-primary">{{ event.type }}</span></a>
                       {% endif %}
                       {% if event.tour %}
                         <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">{{ event.tour }}</span></a>
@@ -663,7 +663,7 @@
             'className': 'dt-center text-base',
             'width': '38px',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return $('<i />').addClass('bi bi-check-lg text-base check').prop('outerHTML')
               }
             },
@@ -673,7 +673,7 @@
             'name': 'relation__name',
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a class="text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
               }
             },
@@ -683,7 +683,7 @@
             'name': 'band__name',
             'className': 'text-nowrap',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a class="text-reset" href="/bands/${data.uuid}">${data.name}</a>`;
               }
             },
@@ -702,7 +702,7 @@
         info: false,
         fixedHeader: false,
         autoWidth: false,
-        ajax: '/api/v1/setlists/?event={{ id }}&format=custom',
+        ajax: '/api/v1/setlists/?event={{ event.id }}&format=custom',
         rowGroup: {
           dataSrc: 'set_name',
           className: 'text-center set-header p-0 border-none dtrg-group',
@@ -731,7 +731,7 @@
             'className': 'dt-center col-songnum',
             'width': '15px',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return data;
               }
             },
@@ -752,7 +752,7 @@
             'className': 'text-wrap col-song',
             'width': '16rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
                 var segue = row.segue ? `<span class="segue"></span>` : '';
 
@@ -804,7 +804,7 @@
               var debut = row.debut;
               var premiere = row.premiere;
 
-              if (type === 'display') {
+              if (data) {
                 if (gap >= 50 && !debut) {
                   $(badge).addClass('badge-primary').text(`${gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
                   return $(badge).prop('outerHTML');
@@ -828,7 +828,7 @@
             'className': 'dt-center col-tour',
             'width': '4rem',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 var num = row.tour_num;
                 var total = row.tour_total;
 
@@ -854,8 +854,8 @@
             'width': '5rem',
             'className': 'dt-center text-nowrap col-ltp',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a class="text-reset" href="/events/${data.event_id}">${data.date.display}</a>`;
+              if (data) {
+                return `<a class="text-reset" href="/events/${data.event_id}">${data.date}</a>`;
               }
             },
           },
@@ -865,7 +865,7 @@
             'width': '15rem',
             'className': 'text-wrap text-xs col-notes',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<span class="setlist-note">${row.notes.join('; ').replaceAll("''","'")}</span>`
               }
             },
@@ -876,7 +876,7 @@
     $('#copySetlist').click(function () {
       var btn = this;
 
-      fetch('/api/v1/setlists/?event={{ id }}&format=json')
+      fetch('/api/v1/setlists/?event={{ event.id }}&format=json')
         .then(response => response.json())
         .then(data => {
           var lines = [];

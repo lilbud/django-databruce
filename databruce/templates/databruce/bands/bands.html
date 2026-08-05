@@ -14,7 +14,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <div class="col-12 col-md-1">
                 <label for="PublicityFilter" class="pb-1">Category</label>
                 <select id="PublicityFilter" class="form-select form-select-sm">
@@ -84,7 +84,7 @@
           'data': 'name',
           'name': 'name',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
+            if (data) {
               return `<a href="/bands/${row.uuid}">${data}</a>`;
             }
           },
@@ -93,8 +93,8 @@
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
-              return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`;
             }
           },
         },
@@ -102,8 +102,8 @@
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
           'render': function (data, type, row, meta) {
-            if (type === 'display' && data) {
-              return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`;
             }
           },      
         },

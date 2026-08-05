@@ -2,6 +2,9 @@
 {% block title %}
   Band "{{ info.name }}"
 {% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="bands" item=info.id %}
@@ -65,7 +68,7 @@
         <div class="tab-content">
           <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
           <div id="members" class="tab-pane fade">
-            <div class="row align-items-end d-flex row-gap-2 gx-2" id="tableControls">
+            <div id="tableControls">
               <!-- Search -->
               <div class="col">
                 <label for="search" class="pb-1">Search</label>
@@ -143,7 +146,7 @@
             'data': 'relation',
             'name': 'relation__name',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
+              if (data) {
                 return `<a href="/relations/${data.uuid}">${data.name}</a>`;
               }
             },
@@ -155,8 +158,8 @@
             'data': 'first',
             'name': 'first__id',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`;
               }
             },
           },
@@ -164,8 +167,8 @@
             'data': 'last',
             'name': 'last__id',
             'render': function (data, type, row, meta) {
-              if (type === 'display' && data) {
-                return `<a href="/events/${data.event_id}">${data.date.display}</a>`;
+              if (data) {
+                return `<a href="/events/${data.event_id}">${data.date}</a>`;
               }
             },          
           },
