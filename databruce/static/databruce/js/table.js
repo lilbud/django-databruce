@@ -8,11 +8,32 @@ function slugify(str) {
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 }
 
+function showTablePlaceholder($tbody, colCount, rowCount = 3) {
+  const placeholderRows = Array(rowCount).fill(`
+    <tr class="placeholder-row">
+      <td colspan="${colCount}" class="p-0">
+        <div class="placeholder-glow">
+          <span class="placeholder col-12"></span>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  $tbody.html(placeholderRows);
+}
+
 function rowGroup(data, groupVal) {
   return Object.groupBy(data ?? [], (item) => item[groupVal]);
 }
 
 async function createTable(url, columns, tableSelectorOrElem, options) {
+  const $table = $(tableSelectorOrElem);
+  const $tbody = $table.find('tbody').length ? $table.find('tbody') : $('<tbody>').appendTo($table);
+  const colCount = $table.find('thead th').length || columns.length;
+
+  // Show multiple placeholder rows
+  showTablePlaceholder($tbody, colCount, 3);
+
   try {
     const response = await fetch(url);
 
@@ -94,7 +115,7 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
     }
 
     // Append everything in a single DOM update
-    tbody.append(fragment);
+    tbody.empty().append(fragment);
 
   } catch (error) {
     console.error('Fetch operation failed:', error);

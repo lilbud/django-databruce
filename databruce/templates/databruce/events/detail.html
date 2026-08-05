@@ -14,7 +14,7 @@
   {% endif %}
   <div class="col d-grid gap-0 gx-0">
     <!-- next and last buttons-->
-    <div class="row mb-2 gx-0">
+    <div class="row mb-2 mb-xl-3 gx-0">
       <div class="col gap-0 column-gap-1 d-flex justify-content-end">
         {% if prev_event %}
           <a role="button"
@@ -45,7 +45,7 @@
       </div>
     {% endif %}
     <!-- event info -->
-    <div class="row mb-3 gx-0">
+    <div class="row mb-2 mb-xl-3 gx-0">
       <div class="col">
         <div class="card">
           <div class="card-body" id="eventHeader">
@@ -278,7 +278,7 @@
                   g-3">
         <div class="col-12 {% if setlist_certainty %}col-xl-9{% endif %}">
           {% if event.note %}
-            <div class="row d-xl-none mb-2 mt-0 mt-lg-2 gx-0">
+            <div class="row d-xl-none mb-2 mt-0 gx-0">
               <div class="col">
                 {% partialdef event-note inline %}
                   <div class="card">

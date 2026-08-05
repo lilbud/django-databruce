@@ -4,6 +4,7 @@
   {{ title }}
 {% endblock title %}
 {% block extrajs %}
+  <script src="{% static 'databruce/js/table.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
   <div class="col">
@@ -73,10 +74,12 @@
                 <table class="table table-hover display" id="setlistTable">
                   <thead>
                     <tr>
-                      <th class="all">#</th>
-                      <th class="all">Song</th>
+                      <th class="song_num">#</th>
+                      <th class="song">Song</th>
                     </tr>
                   </thead>
+                  <tbody>
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -204,62 +207,50 @@
 
           $(container).html($(list).prop('outerHTML'));
         }).catch(error => console.error('Error:', error));
+            var event = "{{ event.id }}";
 
-      new DataTable('#setlistTable',
-      {
-        layout: null,
-        responsive: true,
-        scrollX: false,
-        paging: false,
-        ordering: false,
-        info: false,
-        searching: false,
-        columnDefs: [
-          {'targets': '_all', columnControl: [] }
-        ],
-        ajax: '/api/v1/setlists_index/?event={{ latest_event.id }}&format=custom&show_only=true',
+      var url = '/api/v1/setlists_index/?event={{ latest_event.id }}&format=json&show_only=true';
+
+      let setlistOptions = {
         rowGroup: {
-          dataSrc: 'set_name',
-          className: 'text-center set-header p-0 dtrg-group',
-          startRender: function(rows, group) {
-            const g = `<span>${group}</span>`;
-            const td = `<td colspan="${rows.columns().count()}" class="py-0">${g}</td>`;
-            return $('<tr />').addClass(slugify(group)).append(td);
-          }
-        },
-        columns: [
-          {
-            'data': 'song_num',
-            'className': 'dt-center',
-            'width': '38px',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data;
-              }
-            },
-            'createdCell': function(td, cellData, rowData, row, col) {
-              $(td).addClass('songnum');
+          groupVal: 'set_name'
+        }
+      }
 
-              if (rowData.position) {
-                var position = slugify(rowData.position);
-                $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
-              }
-
-              return td;
-            },
+      let setlistColumns = [
+        {
+          'data': 'song_num',
+          'className': 'text-center',
+          'width': '',
+          'render': function (data, type, row, meta) {
+            if (data) {
+              return data
+            }
+            
+            return ''
           },
-          {
-            'data': 'song',
-            'name': 'song__sort_song_name',
-            'className': 'text-nowrap',
-            'render': function (data, type, row, meta) {
-              if (data) {
+          'createdCell': function (td, cellData, rowData, row, col) {
+            $(td).addClass('songnum');
+
+            if (rowData.position) {
+              var position = slugify(rowData.position);
+              $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
+            }
+
+            return td;
+          },
+        },
+        {
+          'data': 'song',
+          'className': 'text-wrap',
+          'width': '',
+          'render': function (data, type, row, meta) {
                 var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
                 var segue = row.segue ? `<span class="segue"></span>` : '';
 
                 song = `${song} ${segue}`;
 
-                var badges = $('<span />');
+                var badges = $('<span />').addClass('ms-2');
                 var baseBadge = `<span class="badge"></span>`;
 
                 if (row.instrumental) {
@@ -290,15 +281,15 @@
 
                 if (row.notes) {
                   var notes = `<br><span class="text-wrap fw-light setlist-note">${row.notes}</span>`;
-                  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song;
+                  return badges.children().length > 0 ? song + $(badges).prop('outerHTML') + notes : song;
                 }
 
-                return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
-              }
-            },
-          },
-        ],
-      })
+                return badges.children().length > 0 ? song + $(badges).prop('outerHTML') : song;
+          }
+        },
+      ]
+
+      createTable(url, setlistColumns, '#setlistTable', setlistOptions);
     })
   
   </script>

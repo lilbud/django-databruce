@@ -1599,8 +1599,9 @@ a[href="https://datatables.net/tn/25"] {
 
 .table .song_num,
 .table .guest {
-  text-align: center !important;
-  width: 25px !important;
+  width: 25px;
+  min-width: 25px;
+  text-align: center;
 }
 
 .table td.song_num,
@@ -1616,29 +1617,31 @@ a[href="https://datatables.net/tn/25"] {
 
 .gap,
 .tour_num {
-  width: 4rem !important;
+  width: 4rem;
+  min-width: 4rem;
 }
 
 .last_event {
-  width: 6rem !important;
+  width: 6rem;
+  min-width: 6rem;
 }
 
 .notes {
-  max-width: 12rem !important;
+  width: 18rem;
+  min-width: 18rem;
+  font-size: 0.7rem;
+  font-weight: 300;
+}
+
+/* Song fills remaining space and pushes others right */
+.song {
+  width: 100%;
+  min-width: 0;
 }
 
 td.notes {
   text-wrap: wrap !important;
   word-wrap: break-word !important;
-}
-
-.song {
-  min-width: 18rem !important;
-}
-
-.notes {
-  font-size: 0.7rem;
-  font-weight: 300;
 }
 
 @media (max-width: 767px) {
@@ -1678,8 +1681,6 @@ td.notes {
   background-position: center;
   border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
   border-radius: var(--bs-border-radius) !important;
-
-
 }
 
 .album-thumb img {
@@ -1702,7 +1703,7 @@ td.notes {
   min-width: 1.5rem;
 }
 
-@media (max-width: 517px) {
+@media (max-width: 518px) {
   #eventHeader .flex-grow-1 {
     margin-bottom: 1rem !important;
   }

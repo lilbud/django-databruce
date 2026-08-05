@@ -301,3 +301,5 @@ First public release of the site. Site was locked behind a login and accounts on
 - Rewrote `albumBreakdown` to work a little nicer.
 - Added custom table creation code, modelled after DataTables. Currently only in use on EventDetail page, might flesh out and add everywhere.
 - Numerous style tweaks.
+- Setlist Table widths have been fixed
+- Add placeholder to setlist table while loading.
