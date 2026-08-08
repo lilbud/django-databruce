@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     "blog",
     "rest_framework",
     "django_filters",
-    "django_extensions",
     "timezone_field",
 ]
 

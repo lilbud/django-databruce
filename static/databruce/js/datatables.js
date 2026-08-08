@@ -1,10 +1,10 @@
-DataTable.type('num', 'className', 'dt-center');
-// DataTable.type('string', 'className', 'dt-left');
+//DataTable.type('num', 'className', 'dt-center');
+//DataTable.type('string', 'className', 'dt-left');
 DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
 DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
-DataTable.defaults.column.columnControl = ['order', ['orderAsc', 'orderDesc', 'orderClear', 'orderAddAsc', 'orderAddDesc']];
+DataTable.defaults.column.columnControl = ['order', ['orderAsc', 'orderDesc', 'orderRemove']];
 
 set_names = [
   "Show",
@@ -15,6 +15,55 @@ set_names = [
   "Post-Show",
 ]
 
+DataTable.feature.register('customInputPaging', function (settings) {
+  const api = new DataTable.Api(settings);
+
+  // Create UI container elements
+  const container = document.createElement('div');
+  container.className = 'd-inline-flex align-items-center justify-content-center gap-2 m-0';
+  container.id = 'paging-container';
+  container.innerHTML = `
+        <button class="btn btn-sm border-0 btn-prev" aria-label="Previous page"><i class="bi bi-chevron-left"></i></button>
+        <input type="text" class="form-control form-control-sm text-center page-input m-0" min="1" value="1" style="width: 30px; height: calc(1.5em + 0.5rem + 2px);">
+        <span class="total-pages align-middle">of 1</span>
+        <button class="btn btn-sm border-0 btn-next" aria-label="Next page"><i class="bi bi-chevron-right"></i></button>
+    `;
+
+  const input = container.querySelector('.page-input');
+  const prevBtn = container.querySelector('.btn-prev');
+  const nextBtn = container.querySelector('.btn-next');
+  const totalSpan = container.querySelector('.total-pages');
+
+  // Update UI whenever the table redraws / changes pages
+  api.on('draw', () => {
+    const pageInfo = api.page.info();
+    input.value = pageInfo.page + 1;
+    input.max = pageInfo.pages;
+    totalSpan.textContent = `of ${pageInfo.pages || 1}`;
+
+    // Handle button states
+    prevBtn.disabled = pageInfo.page === 0;
+    nextBtn.disabled = pageInfo.page >= pageInfo.pages - 1;
+  });
+
+  // Jump to page typed into input box
+  input.addEventListener('change', () => {
+    let val = parseInt(input.value, 10) - 1;
+    const max = api.page.info().pages - 1;
+    if (val < 0) val = 0;
+    if (val > max) val = max;
+    api.page(val).draw('page');
+  });
+
+  // Click navigation button events
+  prevBtn.addEventListener('click', () => api.page('previous').draw('page'));
+  nextBtn.addEventListener('click', () => api.page('next').draw('page'));
+
+  return container;
+});
+
+$.fn.dataTable === DataTable
+
 $.extend(true, DataTable.defaults, {
   searching: true,
   fixedHeader: true,
@@ -23,30 +72,31 @@ $.extend(true, DataTable.defaults, {
   scrollCollapse: true,
   serverSide: true,
   processing: true,
-  responsive: {
-    details: false
-  },
-  autoWidth: false,
   paging: true,
+  autoWidth: true,
   ordering: {
     indicators: false,
     handler: true
   },
-  pageLength: 100,
-  lengthMenu: [25, 50, 100],
+  pageLength: 50,
   language: {
-    searchBuilder: {
-      button: '&nbspFilter',
-      className: 'test',
-      title: '',
-    }
+    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+    infoEmpty: "No records available",
+    infoFiltered: "(filtered from _MAX_ total records)"
   },
   search: {
     regex: true
   },
+  // cardView: true,
+  responsive: false,
   order: [],
-  drawCallback: function (settings) {
-    $('[data-bs-toggle="tooltip"]').tooltip();
+  layout: {
+    topStart: [],
+    bottomStart: null,
+    topEnd: null,
+    bottomEnd: null,
+    top: ['customInputPaging', 'info'],
+    bottom: ['customInputPaging', 'info'],
   },
 });
 
@@ -57,350 +107,25 @@ $(document).ready(function () {
   });
 });
 
-const slugify = (str) => {
-  return str
+function slugify(str) {
+  if (!str) return '';
+  return String(str)
     .toLowerCase() // Convert to lowercase
     .trim() // Trim leading/trailing whitespace
-    .replace(/[^\w\s-]/g, '') // Remove all non-word chars (except spaces and hyphens)
-    .replace(/[\s_-]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
+    .replace(/[^a-z0-9]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-};
+}
 
-function getDatatableLayout({ columns = true, category = false }) {
-  var layout = {
-    topEnd: {
-      features: [
-        {
-          buttons: [
-            {
-              extend: 'collection',
-              text: 'All',
-              fade: 100,
-              name: 'category-select',
-              attr: {
-                id: 'dropdown-btn',
-              },
-              className: 'btn btn-sm btn-primary category-btn w-auto',
-              buttons: []
-            }
-          ],
-        },
-        {
-          search: {
-            processing: true,
-            regex: true
-          }
-        },
-      ],
-    },
-    topStart: {
-      buttons: [
-        {
-          extend: 'pageLength',
-          className: 'btn btn-sm btn-primary w-auto',
-          fade: 100,
-        },
-      ]
-    },
-    bottomEnd: {
-      paging: {
-        numbers: 3
-      }
-    }
-  };
-
-  var searchbuilder = {
-    text: ' Filter',
-    className: "btn-sm btn-primary bi bi-search my-2 d-lg-inline search",
-    config: {
-      liveSearch: false,
-      columns: columns,
-    },
-    attr: {
-      id: 'sbButton',
-      'data-bs-toggle': 'modal',
-      'data-bs-target': '#sbModal',
-    },
-    action: function (e, dt, node, config, cb) {
-      new DataTable.SearchBuilder(dt, {
-        liveSearch: false,
-        columns: columns,
-        depthLimit: 1,
-      });
-
-      dt.searchBuilder.container().appendTo('#modal-body');
-    }
-  };
-
-  if (columns) {
-    layout.topEnd.features.push({ 'buttons': [searchbuilder] });
-  }
-
-  if (!category) {
-    layout.topEnd.features.splice(0, 1);
-  };
-
-  return layout;
-};
-
-function dtCategorySelect({ layout, column_idx, values, label = false }) {
-  var div = $('<label />')
-
-  $(div).attr('for', 'dropdown-btn');
-  $(div).text(`${label.replace(":", "")}:`);
-
-  var all_button = {
-    text: 'All',
-    className: 'button-page-length dt-button-active-a',
-    action: function (e, dt, node, config) {
-      dt.column(column_idx).search('.*', { regex: true }).draw();
-      node.parents('.btn-group').find('.dropdown-toggle').text('All');
-      node.parents('.dropdown-menu').find('.dt-button').each(function () {
-        $(this).removeClass('dt-button-active-a');
-      });
-      node.toggleClass('dt-button-active-a');
-    },
-  };
-
-  layout.topEnd.features[0].buttons[0].buttons = [all_button];
-
-  values.forEach(element => {
-    var button = {
-      text: element.label,
-      className: 'button-page-length',
-      action: function (e, dt, node, config) {
-        dt.order([0, 'asc']).column(column_idx).search(element.value, { regex: true }).draw();
-        node.parents('.btn-group').find('.dropdown-toggle').text(element.label);
-
-        node.parents('.dropdown-menu').find('.dt-button').each(function () {
-          $(this).removeClass('dt-button-active-a');
-        });
-        node.toggleClass('dt-button-active-a');
-      },
-    };
-
-    layout.topEnd.features[0].buttons[0].buttons.push(button);
-  });
-
-  $(document).ready(function () {
-    $(div).insertBefore($('#dropdown-btn'));
-  })
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function renderLink(url, data, text) {
   return `<a href="${url}${data}">${text}</a>`
 }
-
-song_table_defs = [
-  { targets: '_all', className: 'text-wrap text-xs' },
-  { targets: [0], width: '1rem' },
-]
-
-// below are some common table column definitions
-// tables like songs/events don't change from page to page
-song_table_columns = [
-  {
-    'data': 'count',
-    'name': 'count',
-    'width': '1rem',
-    'className': 'all',
-    'render': function (data, type, row, meta) {
-      return data
-    },
-  },
-  {
-    'data': 'song',
-    'name': 'song__sort_song_name',
-    'width': '15rem',
-    'className': 'all',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/songs/', data.uuid, data.name);
-      }
-    },
-  },
-  { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': '' },
-  {
-    'data': 'first_event',
-    'name': 'first_event',
-    'width': '10rem',
-    'type': 'text',
-    'className': 'all',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/events/', data.event_id, data.date.display_day);
-      }
-    },
-  },
-  {
-    'data': 'last_event',
-    'name': 'last_event',
-    'width': '10rem',
-    'type': 'text',
-    'className': 'all',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/events/', data.event_id, data.date.display_day);
-      }
-    },
-  },
-]
-
-event_table_defs = [
-  { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', searchable: false, columnControl: [] },
-  { targets: [0], className: 'text-nowrap' },
-  { targets: [-1], visible: false },
-]
-
-event_table_columns = [
-  {
-    'data': 'date',
-    'name': 'event_id',
-    'type': 'text',
-    'className': 'all text-nowrap',
-    'render': function (data, type, row, meta) {
-      return renderLink('/events/', row.event_id, data.display_day);
-    },
-  },
-  {
-    'data': 'has_setlist',
-    'name': 'has_setlist',
-    'width': '1rem',
-    'className': 'text-center',
-    'orderable': false,
-    'searchable': false,
-    'render': function (data, type, row, meta) {
-      return data ? `<i class="bi bi-check-lg d-block text-base" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
-    },
-  },
-  {
-    'data': 'artist',
-    'name': 'artist__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/bands/', data.uuid, data.name);
-      }
-    },
-  },
-  {
-    'data': 'venue',
-    'name': 'venue__name, venue__detail',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/venues/', data.uuid, data.name);
-      }
-    },
-  },
-  {
-    'data': 'venue.city',
-    'name': 'venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/cities/', data.uuid, data.formatted);
-      }
-    },
-  },
-  {
-    'data': 'tour',
-    'name': 'tour__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return renderLink('/tours/', data.uuid, data.name);
-      }
-    },
-  },
-  {
-    'data': 'title',
-    'name': 'title',
-    'width': '15rem',
-    'render': function (data, type, row, meta) {
-      if (row.event_status) {
-        if (data) {
-          return `<span class="text-danger fw-semibold">[${row.type.name}] ${data}</span>`
-        }
-        return `<span class="text-danger fw-semibold">[${row.type.name}]</span>`
-      }
-
-      return data;
-    },
-  },
-  { 'data': 'public', 'name': 'public', 'visible': false, 'orderable': false },
-]
-
-setlist_slots = [
-  {
-    'data': 'event',
-    'name': 'event__event_id, event__early_late',
-    'width': '10rem',
-    'className': 'all text-nowrap',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/events/' + data.event_id + '">' + data.date.display_day + '</a>';
-      }
-    },
-  },
-  {
-    'data': 'show_opener',
-    'name': 'show_opener__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
-      }
-    },
-  },
-  {
-    'data': 's1_closer',
-    'name': 's1_closer__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
-      }
-    },
-  },
-  {
-    'data': 's2_opener',
-    'name': 's2_opener__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
-      }
-    },
-  },
-  {
-    'data': 'main_closer',
-    'name': 'main_closer__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
-      }
-    },
-  },
-  {
-    'data': 'encore_opener',
-    'name': 'encore_opener__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
-      }
-    },
-  },
-  {
-    'data': 'show_closer',
-    'name': 'show_closer__name',
-    'width': '12rem',
-    'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return '<a href="/songs/' + data.uuid + '">' + data.name + '</a>';
-      }
-    },
-  },
-]

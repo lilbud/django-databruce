@@ -32,7 +32,7 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
   const colCount = $table.find('thead th').length || columns.length;
 
   // Show multiple placeholder rows
-  showTablePlaceholder($tbody, colCount, 3);
+  // showTablePlaceholder($tbody, colCount, 3);
 
   try {
     const response = await fetch(url);

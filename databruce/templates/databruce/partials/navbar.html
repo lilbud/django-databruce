@@ -30,27 +30,14 @@
         {% if item.children %}
           <!-- Dropdown Nav Item -->
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle
-                           {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}fw-bold{% endif %}
-                           {% if item.match_keywords %}
-                             {% for kw in item.match_keywords %}
-                               {% if kw in request.resolver_match.route %}fw-bold{% endif %}
-                             {% endfor %}
-                           {% endif %}"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                    id="nav-dropdown-{{ forloop.counter }}">{{ item.name }}</button>
+            <button class="btn btn-sm dropdown-toggle {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}fw-bold{% endif %} {% if item.match_keywords %} {% for kw in item.match_keywords %} {% if kw in request.resolver_match.route %}fw-bold{% endif %} {% endfor %} {% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="nav-dropdown-{{ forloop.counter }}">{{ item.name }}</button>
             <ul class="dropdown-menu"
                 aria-labelledby="nav-dropdown-{{ forloop.counter }}">
               {% for child in item.children %}
                 {% if child.name != "News" %}
                   <li>
                     <a class="dropdown-item"
-                       href=" {% if child.kwargs %} {% url child.url slug=child.kwargs.slug %} {% else %} {% url child.url %} {% endif %}">
-                      {{ child.name }}
-                    </a>
+                       href=" {% if child.kwargs %} {% url child.url slug=child.kwargs.slug %} {% else %} {% url child.url %} {% endif %}">{{ child.name }}</a>
                   </li>
                 {% endif %}
               {% endfor %}
@@ -86,8 +73,7 @@
         </li>
         {% if user.is_authenticated %}
           <li class="nav-item dropdown list-unstyled">
-            <button class="btn btn-sm nav-btn
-                           {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm nav-btn {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
@@ -263,9 +249,7 @@
                     {% for child in item.children %}
                       <li>
                         <a class="bd-links-link"
-                           href="{% if child.kwargs %}{% url child.url slug=child.kwargs.slug %}{% else %}{% url child.url %}{% endif %}">
-                          {{ child.name }}
-                        </a>
+                           href="{% if child.kwargs %}{% url child.url slug=child.kwargs.slug %}{% else %}{% url child.url %}{% endif %}">{{ child.name }}</a>
                       </li>
                     {% endfor %}
                   </ul>

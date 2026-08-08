@@ -179,13 +179,7 @@
                         <button id="addshow"
                                 type="submit"
                                 name="submit"
-                                class="btn btn-sm text-nowrap
-                                       {% if user_attended %}
-                                         btn-primary
-                                       {% else %}
-                                         btn-neutral
-                                       {% endif %}
-                                       icon-button">
+                                class="btn btn-sm text-nowrap {% if user_attended %} btn-primary {% else %} btn-neutral {% endif %} icon-button">
                           {% if user_attended %}
                             <i class="bi bi-star-fill" id="star"></i>
                           {% else %}
@@ -199,350 +193,338 @@
                             {% endif %}
                           </span>
                         </button>
-                        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>Users Present:<br><div>
+                        <span class="d-inline-block"
+                              tabindex="0"
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
+                              data-bs-html="true"
+                              data-bs-title="<small>Users Present:<br><div>
                           {% for user in users %}{{ user.user }}<br>{% endfor %}
                         </div></small>">
-                        <button type="button"
-                                id="usercount"
-                                disabled
-                                class="btn rounded-start-0 btn-sm
-                                       {% if user_attended %}
-                                         btn-primary
-                                       {% else %}
-                                         btn-neutral
-                                       {% endif %}">8</button>
-                      </span>
-                    {% endspaceless %}
-                  </div>
-                </form>
-              {% endif %}
+                          <button type="button"
+                                  id="usercount"
+                                  disabled
+                                  class="btn rounded-start-0 btn-sm {% if user_attended %} btn-primary {% else %} btn-neutral {% endif %}">8</button>
+                        </span>
+                      {% endspaceless %}
+                    </div>
+                  </form>
+                {% endif %}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="card-footer py-0 px-1" id="eventInfoFooter">
-          <nav class="nav nav-underline px-2">
-            <a class="nav-link active text-sm"
-               id="overview-tab"
-               data-bs-toggle="pill"
-               data-bs-target="#overview"
-               type="button"
-               role="tab"
-               aria-controls="overview"
-               aria-selected="true">Overview</a>
-            <a class="nav-link text-sm"
-               id="onstage-tab"
-               data-bs-toggle="pill"
-               data-bs-target="#onstage"
-               type="button"
-               role="tab"
-               aria-controls="notes"
-               aria-selected="false">Onstage</a>
-            <a class="nav-link text-sm"
-               id="notes-tab"
-               data-bs-toggle="pill"
-               data-bs-target="#notes"
-               type="button"
-               role="tab"
-               aria-controls="notes"
-               aria-selected="false">Notes</a>
-            <a class="nav-link text-sm"
-               id="links-tab"
-               data-bs-toggle="pill"
-               data-bs-target="#links"
-               type="button"
-               role="tab"
-               aria-controls="notes"
-               aria-selected="false">Links</a>
-          </nav>
+          <div class="card-footer py-0 px-1" id="eventInfoFooter">
+            <nav class="nav nav-underline px-2">
+              <a class="nav-link active text-sm"
+                 id="overview-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#overview"
+                 type="button"
+                 role="tab"
+                 aria-controls="overview"
+                 aria-selected="true">Overview</a>
+              <a class="nav-link text-sm"
+                 id="onstage-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#onstage"
+                 type="button"
+                 role="tab"
+                 aria-controls="notes"
+                 aria-selected="false">Onstage</a>
+              <a class="nav-link text-sm"
+                 id="notes-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#notes"
+                 type="button"
+                 role="tab"
+                 aria-controls="notes"
+                 aria-selected="false">Notes</a>
+              <a class="nav-link text-sm"
+                 id="links-tab"
+                 data-bs-toggle="pill"
+                 data-bs-target="#links"
+                 type="button"
+                 role="tab"
+                 aria-controls="notes"
+                 aria-selected="false">Links</a>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- setlist and notes -->
-  <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active"
-         id="overview"
-         role="tabpanel"
-         aria-labelledby="overview-tab"
-         tabindex="0">
-      <div class="row row-cols-1
-                  {% if setlist_certainty %}row-cols-xl-2{% endif %}
-                  gy-3 gx-0">
-        <div class="col-12
-                    {% if setlist_certainty %}
-                      col-xl-9 pe-xl-3
-                    {% else %}
-                      mt-lg-0
-                    {% endif %}">
-          {% if event.note %}
-            <div class="row d-xl-none mb-3 gx-0">
-              <div class="col">
-                {% partialdef event-note inline %}
-                  <div class="card">
-                    <div class="card-header">
-                      Notes
-                      <i class="bi bi-pencil"></i>
-                    </div>
-                    <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
-                  </div>
-                {% endpartialdef %}
-              </div>
-            </div>
-          {% endif %}
-          {% if setlist_certainty %}
-            <div class="col-12">
-              <div class="card">
-                <div class="card-header d-flex flex-column">
-                  <div class="d-flex justify-content-between w-100">
-                    Setlist
-                    <span class="text-sm my-auto"
-                          data-bs-toggle="tooltip"
-                          data-bs-html="true"
-                          data-bs-title="Setlist Options">
-                      <a role="button"
-                         class="btn btn-sm btn-primary icon-button px-1"
-                         data-bs-toggle="collapse"
-                         href="#options">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             class="bi bi-three-dots"
-                             viewBox="0 0 16 16">
-                          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                        </svg>
-                      </a>
-                    </span>
-                  </div>
-                  <div class="collapse row w-100" id="options">
-                    <div class="col-12 px-0 pt-1">
-                      <button id="copySetlist" class="btn btn-sm btn-primary text-xs">Copy Setlist</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="card-body p-0">
-                  <div class="table-responsive">
-                    <table class="table table-hover display wrap" id="setlistTable">
-                      <thead>
-                        <th class="all">#</th>
-                        <th class="all">Song</th>
-                        <th class="all">Gap</th>
-                        <th class="all">Tour</th>
-                        <th class="all">Last</th>
-                        <th class="min-tablet-l">Note</th>
-                      </thead>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-        </div>
-        <div class="col-12{% if setlist_certainty %} col-xl-3{% endif %}">
-          <div class="row row-cols-2 row-cols-xl-1 gy-3 gx-2">
+    <!-- setlist and notes -->
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active"
+           id="overview"
+           role="tabpanel"
+           aria-labelledby="overview-tab"
+           tabindex="0">
+        <div class="row row-cols-1 {% if setlist_certainty %}row-cols-xl-2{% endif %} gy-3 gx-0">
+          <div class="col-12 {% if setlist_certainty %} col-xl-9 pe-xl-3 {% else %} mt-lg-0 {% endif %}">
             {% if event.note %}
-              <div class="col-12 col-md-6 col-xl-12 d-none d-xl-block order-1">{% partial event-note %}</div>
+              <div class="row d-xl-none mb-3 gx-0">
+                <div class="col">
+                  {% partialdef event-note inline %}
+                    <div class="card">
+                      <div class="card-header">
+                        Notes
+                        <i class="bi bi-pencil"></i>
+                      </div>
+                      <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
+                    </div>
+                  {% endpartialdef %}
+                </div>
+              </div>
             {% endif %}
-            {% if start_time or scheduled_time %}
-              <div class="col-6 col-md-6 col-xl-12 order-2">
-                <div class="card h-100">
-                  <div class="card-header">
-                    <span>Set Times
-                      <i class="bi bi-question-circle-fill"
-                         data-bs-toggle="tooltip"
-                         data-bs-title="Local Time Shown"></i>
-                    </span>
-                    <i class="bi bi-clock"></i>
+            {% if setlist_certainty %}
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header d-flex flex-column">
+                    <div class="d-flex justify-content-between w-100">
+                      Setlist
+                      <span class="text-sm my-auto"
+                            data-bs-toggle="tooltip"
+                            data-bs-html="true"
+                            data-bs-title="Setlist Options">
+                        <a role="button"
+                           class="btn btn-sm btn-primary icon-button px-1"
+                           data-bs-toggle="collapse"
+                           href="#options">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                               width="16"
+                               height="16"
+                               fill="currentColor"
+                               class="bi bi-three-dots"
+                               viewBox="0 0 16 16">
+                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                          </svg>
+                        </a>
+                      </span>
+                    </div>
+                    <div class="collapse row w-100" id="options">
+                      <div class="col-12 px-0 pt-1">
+                        <button id="copySetlist" class="btn btn-sm btn-primary text-xs">Copy Setlist</button>
+                      </div>
+                    </div>
                   </div>
-                  <div class="card-body">
-                    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 g-2">
-                      {% if scheduled_time %}
-                        <div class="col">
-                          <div class="fw-semibold text-xs">Scheduled</div>
-                          <div class="text-sm">{{ scheduled_time }}</div>
-                        </div>
-                      {% elif start_time %}
-                        <div class="col">
-                          <div class="fw-semibold text-xs">Start</div>
-                          <div class="text-sm">{{ start_time }}</div>
-                        </div>
-                      {% endif %}
-                      {% if end_time %}
-                        <div class="col">
-                          <div class="fw-semibold text-xs">End</div>
-                          <div class="text-sm">{{ end_time }}</div>
-                        </div>
-                      {% endif %}
-                      {% if event.length %}
-                        <div class="col-auto">
-                          <div class="fw-semibold text-xs">Length</div>
-                          <div class="text-sm text-nowrap m-0 d-inline-flex align-items-center gap-1">
-                            {{ event.length|time:"h:i:s" }}
-                            {% if rank %}
-                              <span data-bs-toggle="tooltip"
-                                    data-bs-title="{% if rank == 1 %}
+                  <div class="card-body p-0">
+                    <div class="table-responsive">
+                      <table class="table table-hover display wrap" id="setlistTable">
+                        <thead>
+                          <th class="all">#</th>
+                          <th class="all">Song</th>
+                          <th class="all">Gap</th>
+                          <th class="all">Tour</th>
+                          <th class="all">Last</th>
+                          <th class="min-tablet-l">Note</th>
+                        </thead>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-12{% if setlist_certainty %} col-xl-3{% endif %}">
+            <div class="row row-cols-2 row-cols-xl-1 gy-3 gx-2">
+              {% if event.note %}
+                <div class="col-12 col-md-6 col-xl-12 d-none d-xl-block order-1">{% partial event-note %}</div>
+              {% endif %}
+              {% if start_time or scheduled_time %}
+                <div class="col-6 col-md-6 col-xl-12 order-2">
+                  <div class="card h-100">
+                    <div class="card-header">
+                      <span>Set Times
+                        <i class="bi bi-question-circle-fill"
+                           data-bs-toggle="tooltip"
+                           data-bs-title="Local Time Shown"></i>
+                      </span>
+                      <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="card-body">
+                      <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 g-2">
+                        {% if scheduled_time %}
+                          <div class="col">
+                            <div class="fw-semibold text-xs">Scheduled</div>
+                            <div class="text-sm">{{ scheduled_time }}</div>
+                          </div>
+                        {% elif start_time %}
+                          <div class="col">
+                            <div class="fw-semibold text-xs">Start</div>
+                            <div class="text-sm">{{ start_time }}</div>
+                          </div>
+                        {% endif %}
+                        {% if end_time %}
+                          <div class="col">
+                            <div class="fw-semibold text-xs">End</div>
+                            <div class="text-sm">{{ end_time }}</div>
+                          </div>
+                        {% endif %}
+                        {% if event.length %}
+                          <div class="col-auto">
+                            <div class="fw-semibold text-xs">Length</div>
+                            <div class="text-sm text-nowrap m-0 d-inline-flex align-items-center gap-1">
+                              {{ event.length|time:"h:i:s" }}
+                              {% if rank %}
+                                <span data-bs-toggle="tooltip"
+                                      data-bs-title="{% if rank == 1 %}
                                                      Longest Show to Date
                                                    {% else %}
                                                      {{ rank|ordinal }} longest show
                                                    {% endif %}"
-                                    class="badge text-2xs badge-primary">#{{ rank }}</span>
-                            {% endif %}
-                          </div>
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
-            <div class="col-6 col-md-6 col-xl-12 order-2
-                        {% if event.note %}
-                          order-xl-2
-                        {% else %}
-                          order-xl-1
-                        {% endif %}">
-              {% if rank_stats %}
-                <div class="card h-100">
-                  <div class="card-header">Show Info</div>
-                  <div class="card-body">
-                    <div class="justify-content-center text-center">
-                      <div class="col text-xs">
-                        <div class="row row-cols-2 row-cols-lg-1 justify-content-between g-2">
-                          <div class="prefix-container">
-                            <span class="prefix text-wrap">{{ event.tour.name }}</span>
-                            <span class="value">Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
-                          </div>
-                          {% if event.leg %}
-                            <div class="prefix-container">
-                              <span class="prefix text-wrap">{{ event.leg.name }}</span>
-                              <span class="value">Show {{ rank_stats.tour_leg_num }} of {{ rank_stats.tour_leg_total }}</span>
+                                      class="badge text-2xs badge-primary">#{{ rank }}</span>
+                              {% endif %}
                             </div>
-                          {% endif %}
-                          <div class="prefix-container">
-                            <span class="prefix text-wrap">{{ event.venue.name }}</span>
-                            <span class="value">Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</span>
                           </div>
-                        </div>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
                 </div>
               {% endif %}
-            </div>
-            {% if setlist_certainty %}
-              <div class="col-12 col-xl-12 order-3">
-                <div class="card h-100">
-                  <div class="card-header">
-                    Albums
-                    <span class="text-sm my-auto"
-                          data-bs-toggle="tooltip"
-                          data-bs-html="true"
-                          data-bs-title="Expand/Collapse All Rows">
-                      <a role="button"
-                         id="album-breakdown-btn"
-                         class="btn btn-sm btn-primary icon-button px-1"
-                         data-bs-toggle="collapse">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             class="bi bi-three-dots"
-                             viewBox="0 0 16 16">
-                          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                        </svg>
-                      </a>
-                    </span>
+              <div class="col-6 col-md-6 col-xl-12 order-2 {% if event.note %} order-xl-2 {% else %} order-xl-1 {% endif %}">
+                {% if rank_stats %}
+                  <div class="card h-100">
+                    <div class="card-header">Show Info</div>
+                    <div class="card-body">
+                      <div class="justify-content-center text-center">
+                        <div class="col text-xs">
+                          <div class="row row-cols-2 row-cols-lg-1 justify-content-between g-2">
+                            <div class="prefix-container">
+                              <span class="prefix text-wrap">{{ event.tour.name }}</span>
+                              <span class="value">Show {{ rank_stats.tour_num }} of {{ rank_stats.tour_total }}</span>
+                            </div>
+                            {% if event.leg %}
+                              <div class="prefix-container">
+                                <span class="prefix text-wrap">{{ event.leg.name }}</span>
+                                <span class="value">Show {{ rank_stats.tour_leg_num }} of {{ rank_stats.tour_leg_total }}</span>
+                              </div>
+                            {% endif %}
+                            <div class="prefix-container">
+                              <span class="prefix text-wrap">{{ event.venue.name }}</span>
+                              <span class="value">Show {{ rank_stats.venue_num }} of {{ rank_stats.venue_total }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="card-body p-0" id="albums"></div>
-                </div>
+                {% endif %}
               </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="tab-pane fade"
-         id="onstage"
-         role="tabpanel"
-         aria-labelledby="onstage-tab"
-         tabindex="1">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">Onstage</div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover display wrap" id="onstageTable">
-                <thead>
-                  <th class="all">Guest</th>
-                  <th class="all">Person</th>
-                  <th class="all">Band</th>
-                </thead>
-              </table>
+              {% if setlist_certainty %}
+                <div class="col-12 col-xl-12 order-3">
+                  <div class="card h-100">
+                    <div class="card-header">
+                      Albums
+                      <span class="text-sm my-auto"
+                            data-bs-toggle="tooltip"
+                            data-bs-html="true"
+                            data-bs-title="Expand/Collapse All Rows">
+                        <a role="button"
+                           id="album-breakdown-btn"
+                           class="btn btn-sm btn-primary icon-button px-1"
+                           data-bs-toggle="collapse">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                               width="16"
+                               height="16"
+                               fill="currentColor"
+                               class="bi bi-three-dots"
+                               viewBox="0 0 16 16">
+                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                          </svg>
+                        </a>
+                      </span>
+                    </div>
+                    <div class="card-body p-0" id="albums"></div>
+                  </div>
+                </div>
+              {% endif %}
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="tab-pane fade"
-         id="notes"
-         role="tabpanel"
-         aria-labelledby="notes-tab"
-         tabindex="2">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">Notes</div>
-          <div class="card-body"></div>
+      <div class="tab-pane fade"
+           id="onstage"
+           role="tabpanel"
+           aria-labelledby="onstage-tab"
+           tabindex="1">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">Onstage</div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover display wrap" id="onstageTable">
+                  <thead>
+                    <th class="all">Guest</th>
+                    <th class="all">Person</th>
+                    <th class="all">Band</th>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="tab-pane fade"
-         id="links"
-         role="tabpanel"
-         aria-labelledby="links-tab"
-         tabindex="3">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">Links</div>
-          <div class="card-body">
-            {% if event.archive_links.count > 0 %}
-              <div class="text-sm">Radio Nowhere:</div>
-              <ul>
-                {% for link in event.archive_links.all %}
-                  <li>
-                    <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-            {% if official %}
-              <div class="text-sm">Released In Full On:</div>
-              <ul>
-                {% for release in official %}
-                  <li>
-                    <a href="{% url "release_details" id=release.uuid %}">{{ release.name }}</a>
-                    <span>({{ release.date }})</span>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-            {% if official_tracks %}
-              <div class="text-sm">Included On:</div>
-              <ul>
-                {% for release in official_tracks %}
-                  <li>
-                    <a href="{% url "release_details" id=release.release.uuid %}">{{ release.release.name }}</a>
-                    <span>({{ release.release.date }})</span>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
+      <div class="tab-pane fade"
+           id="notes"
+           role="tabpanel"
+           aria-labelledby="notes-tab"
+           tabindex="2">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">Notes</div>
+            <div class="card-body"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade"
+           id="links"
+           role="tabpanel"
+           aria-labelledby="links-tab"
+           tabindex="3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">Links</div>
+            <div class="card-body">
+              {% if event.archive_links.count > 0 %}
+                <div class="text-sm">Radio Nowhere:</div>
+                <ul>
+                  {% for link in event.archive_links.all %}
+                    <li>
+                      <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% if official %}
+                <div class="text-sm">Released In Full On:</div>
+                <ul>
+                  {% for release in official %}
+                    <li>
+                      <a href="{% url "release_details" id=release.uuid %}">{{ release.name }}</a>
+                      <span>({{ release.date }})</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% if official_tracks %}
+                <div class="text-sm">Included On:</div>
+                <ul>
+                  {% for release in official_tracks %}
+                    <li>
+                      <a href="{% url "release_details" id=release.release.uuid %}">{{ release.release.name }}</a>
+                      <span>({{ release.release.date }})</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<script>
+  <script>
   var counts = [];
 
   $(document).ready(function () {
@@ -930,5 +912,5 @@
       });
     });
   });
-</script>
+  </script>
 {% endblock content %}

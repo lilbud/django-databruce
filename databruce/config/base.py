@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "shortener",
-    "django_extensions",
     "anymail",
     "timezone_field",
     "django_watchfiles",

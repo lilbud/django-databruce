@@ -57,19 +57,19 @@ DATABASES = {
     #         "connect_timeout": 5,
     #     },
     # },
-    "digital_ocean": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DO_DATABASE_NAME"),
-        "USER": os.getenv("DO_DATABASE_USER"),
-        "PASSWORD": os.getenv("DO_DATABASE_PASSWORD"),
-        "HOST": os.getenv("DO_DATABASE_HOST"),
-        "PORT": "5432",
-        "CONN_MAX_AGE": 10,
-        "CONN_HEALTH_CHECKS": True,
-        "OPTIONS": {
-            "options": "-c search_path=public,extensions",
-        },
-    },
+    # "digital_ocean": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": os.getenv("DO_DATABASE_NAME"),
+    #     "USER": os.getenv("DO_DATABASE_USER"),
+    #     "PASSWORD": os.getenv("DO_DATABASE_PASSWORD"),
+    #     "HOST": os.getenv("DO_DATABASE_HOST"),
+    #     "PORT": "5432",
+    #     "CONN_MAX_AGE": 10,
+    #     "CONN_HEALTH_CHECKS": True,
+    #     "OPTIONS": {
+    #         "options": "-c search_path=public,extensions",
+    #     },
+    # },
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

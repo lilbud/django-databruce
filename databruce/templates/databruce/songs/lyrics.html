@@ -12,10 +12,11 @@
             <div class="text-wrap">
               <span class="fw-medium">Note:</span>
               <div>
-                English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct Bruce fan site.
-                The lyrics were contributed by multiple people, who translated the lyrics manually throughout the early 2000s.
-                I do not speak German, so these lyrics are provided "as-is", and I cannot speak to the quality of the translations.
-                Credit to each translator provided when it was listed in the original files.
+                English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct German Bruce fan site. Italian lyrics source from loose-ends.it, an Italian Bruce fan site.
+                <br>
+                <br>
+                Lyrics were contributed by multiple people, and credit has been listed when known.
+                I only speak English, and cannot vouch for the quality of the translations, so they're provided "as-is".
               </div>
             </div>
           </div>
@@ -51,9 +52,7 @@
                         id="sbButton"
                         data-bs-toggle="modal"
                         data-bs-target="#sbModal"
-                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">
-                  Searchbuilder
-                </button>
+                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
               </div>
             </div>
             <div class="row">
@@ -65,6 +64,7 @@
                       <th class="all">Version</th>
                       <th class="all">Source</th>
                       <th class="all">Language</th>
+                      <th class="all">Translator</th>
                       <th class="all">Note</th>
                     </tr>
                   </thead>
@@ -97,6 +97,7 @@
             {'data': 'version', 'name': 'version'},
             {'data': 'source', 'name': 'source'},
             {'data': 'language', 'name': 'language'},
+            {'data': 'translator', 'name': 'translator'},
             {'data': 'note', 'name': 'note'},
           ],
           initComplete: function(settings, json) {

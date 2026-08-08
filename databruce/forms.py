@@ -162,6 +162,7 @@ class AdvancedEventSearch(forms.Form):
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
                 "class": "form-control form-control-sm date-form col-6",
+                "data-mask": "0000-00-00",
             },
         ),
     )
@@ -178,6 +179,7 @@ class AdvancedEventSearch(forms.Form):
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
                 "class": "form-control form-control-sm date-form col-6",
+                "data-mask": "0000-00-00",
             },
         ),
     )

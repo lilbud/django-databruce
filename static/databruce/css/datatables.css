@@ -133,10 +133,10 @@ div.dt-scroll-body thead tr th {
 .setHeader>th {
     color: var(--base-content) !important;
     font-weight: 600 !important;
-    font-size: 0.8rem !important;
+    font-size: var(--text-2xs) !important;
     line-height: 1 !important;
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
+    /* padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important; */
     /* position: relative; */
     vertical-align: middle !important;
     background-color: #717f8e !important;
@@ -173,11 +173,11 @@ table {
     width: 100% !important;
 }
 
-table th {
+/* table th {
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
     font-size: 0.875rem !important;
-}
+} */
 
 .dropdown-menu {
     --bs-dropdown-min-width: 11rem;
@@ -205,23 +205,6 @@ table th {
     width: 12rem !important;
 }
 
-td[id*="snippet-head"],
-td[id*="snippet-foot"] {
-    border: none !important;
-    line-height: 0.7rem !important;
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-}
-
-tr[id*="snippet-row"] td {
-    border: none !important;
-}
-
-tr[id*="snippet"]:hover *,
-td[id*="snippet"]:hover {
-    box-shadow: none !important;
-}
-
 .dtsb-button {
     background-color: var(--primary) !important;
     color: var(--primary-content) !important;
@@ -246,18 +229,6 @@ div.dt-button-background {
 
 td>table>tbody>tr>td:first-child {
     border-bottom-left-radius: 0% !important;
-}
-
-td[colspan="5"]:not(.setHeader, .child) {
-    padding: 0% !important;
-}
-
-:not(td) td:not(.fc-day, [role="presentation"], .songnum) {
-    padding: 0.25rem 0.5rem !important;
-}
-
-td.songnum {
-    padding: 0.25rem !important;
 }
 
 td[colspan="5"] tr:hover td {
@@ -287,9 +258,9 @@ td[colspan="5"] tr:hover td {
     border-bottom: 0 !important;
 }
 
-.card-body tbody .dtrg-group th {
+/* .card-body tbody .dtrg-group th {
     padding: 0 0.25rem 0.25rem 0 !important;
-}
+} */
 
 tr:not(.dt-hasChild, .child) td:hover,
 tr:not(.dt-hasChild, .child):hover {
@@ -302,17 +273,16 @@ td.child:hover {
     box-shadow: none !important;
 }
 
-.dt-container .row>div {
+/* .dt-container .row>div {
     display: flex !important;
     align-items: center;
     width: auto !important;
-    /* Stop 100% width block stretching */
-}
+} */
 
 /* Force the actual select buttons/dropdowns to a fixed or natural width */
-.dt-container .dt-buttons,
+/* .dt-container .dt-buttons,
 .dt-container select,
 .dt-container .dropdown-toggle {
     width: auto !important;
     display: inline-block !important;
-}
+} */

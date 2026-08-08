@@ -41,56 +41,34 @@
       {% endblock title %}
       | Databruce
     </title>
-    <!-- leaflet.js-->
-    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
-    <script src="{% static 'databruce/js/leaflet.js' %}"></script>
     <!--JQuery-->
     <link rel="stylesheet"
           href="{% static 'databruce/css/jquery-ui.min.css' %}">
-    <script src="{% static 'databruce/js/jquery-4.0.0.min.js' %}"></script>
-    <script src="{% static 'databruce/js/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'databruce/js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery/jquery-4.0.0.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'databruce/js/jquery/jquery.mask.min.js' %}"></script>
     <!--Bootstrap-->
     <link rel="stylesheet"
           href="{% static 'databruce/css/bootstrap.min.css' %}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="{% static 'databruce/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'databruce/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
     <!--Datatables-->
     {% comment %} <link href="{% static 'databruce/css/datatables-3.1.min.css' %}" rel="stylesheet">
-    <script src="{% static 'databruce/js/datatables-3.1.min.js' %}"></script> {% endcomment %}
-    <link href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.min.css"
+    <script src="{% static 'databruce/js/datatables/datatables-3.1.min.js' %}"></script> {% endcomment %}
+    <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-3.0.1/b-4.0.1/cv-1.0.1/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.1/rg-2.0.0/sb-2.0.0/datatables.min.css"
           rel="stylesheet"
-          integrity="sha384-IkYzSBi8dm4Cg6IWFobByqhtleZ+PI1q8HYZXz9QgfRw+9LiJ3uVKcGDIWZFa+0k"
+          integrity="sha384-7fK2O26zZr0a9/xxSEMBcZ4MtmysVLqDKQTabAdYbdIvirkCf8h+57g3xN/cSYPT"
           crossorigin="anonymous">
-    <link href="https://cdn.datatables.net/cardview/1.0.1/css/cardView.dataTables.min.css"
-          rel="stylesheet"
-          integrity="sha384-YMsWjOCTxk6/EEqNSVyWnWoJzYdyVFCg2RK1jle+vNkfxts+tRgLL464i2T+ofn2"
-          crossorigin="anonymous">
-    <link href="https://cdn.datatables.net/buttons/4.0.1/css/buttons.dataTables.min.css"
-          rel="stylesheet"
-          integrity="sha384-6XzpP2g0NoE5c1xdtMLmwyXuL99L6BX3/Ale4TYo6eSOD+dVs2o9PTTp2jw5MYhV"
-          crossorigin="anonymous">
-    <link href="https://cdn.datatables.net/responsive/4.0.1/css/responsive.dataTables.min.css"
-          rel="stylesheet"
-          integrity="sha384-rD9iFEGdmnGBfe9oe/nZnuBTF91n27kh4fXP+vDi05QaEVQ/nLvsSmFIjeYbNJYS"
-          crossorigin="anonymous">
-    <script src="https://cdn.datatables.net/3.0.1/js/dataTables.min.js"
-            integrity="sha384-stLBvQI26SIgZOke0kAZbmVfcxb89mRjkgJ/aRVpYms4krlKaYvhLnDow4tbqS4U"
+    <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-3.0.1/b-4.0.1/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.1/rg-2.0.0/sb-2.0.0/datatables.min.js"
+            integrity="sha384-MzpligBHTFM0HdFifmid2MvwUUYD+se8z2K/gv0SmoNJKq/TpEKcNP0SwkqboH3R"
             crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/buttons/4.0.1/js/dataTables.buttons.min.js"
-            integrity="sha384-lnmZrBuLlzWz9qGhfn0/0MTMN7gEMk3UMg4XlCGPvLGQtwHsP+6EXEMUQrwrF9a2"
-            crossorigin="anonymous"></script>
-    <script src="https://nightly.datatables.net/cardview/js/dataTables.cardView.js?2026-08-03"></script>
-    <script src="https://cdn.datatables.net/responsive/4.0.1/js/dataTables.responsive.min.js"
-            integrity="sha384-C0VOmWDEHSWlpFIv8zJotfCUs4Ejf8BYURTNmgfGzfRq7nrdQXO9Z0VcyrQ5GMGn"
-            crossorigin="anonymous"></script>
-    {% comment %} <script src="{% static 'databruce/js/dt_plus_remove.js' %}"></script> {% endcomment %}
+    <script src="{% static 'databruce/js/datatables/dataTables.cardView.js' %}"></script>
+    {% comment %} <script src="{% static 'databruce/js/datatables/dt_plus_remove.js' %}"></script> {% endcomment %}
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/hb_colors.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/hb_style.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/hb_select2.css' %}" />
     <!-- Other -->
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
     <!-- Datatables Scripts -->
@@ -238,10 +216,10 @@
                   ajax: '/api/v1/events/?year=1978&format=custom',
                   columns: columns,
                   cardView: true,
+                  pageLength: 50,
                   responsive: false,
                   serverSide: true,
                   processing: true,
-
                 })
             });
           </script>

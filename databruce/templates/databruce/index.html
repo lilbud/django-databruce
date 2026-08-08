@@ -32,14 +32,14 @@
           <div class="card-body p-0">
             <img class="img-fluid card-img-top object-fit-cover"
                  id="headimg"
-                 src="{% static 'databruce/img/june26header.webp' %}"
+                 src="{% static 'databruce/img/header-august-26.webp' %}"
                  alt=""
                  height="640"
                  width="auto">
           </div>
           <div class="card-footer">
-            <span class="text-sm">Philly - May 31, 2026</span>
-            <span class="text-sm">(photo by <a class="text-reset" href="https://www.instagram.com/redemartin">Rob Demartin</a>)</span>
+            <span class="text-sm">Minneapolis - March 31, 2026</span>
+            <span class="text-sm">(photo by <a class="text-reset" href="https://www.instagram.com/ozbone">Ozzie Melendez</a>)</span>
           </div>
         </div>
         <div class="card">
@@ -207,7 +207,6 @@
 
           $(container).html($(list).prop('outerHTML'));
         }).catch(error => console.error('Error:', error));
-            var event = "{{ event.id }}";
 
       var url = '/api/v1/setlists_index/?event={{ latest_event.id }}&format=json&show_only=true';
 

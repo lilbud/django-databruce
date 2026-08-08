@@ -23,12 +23,7 @@
           </div>
         </div>
       {% endif %}
-      <div class="info-card-row row row-cols-2 g-2
-                  {% if info.event %}
-                    row-cols-lg-4
-                  {% else %}
-                    row-cols-lg-3
-                  {% endif %}">
+      <div class="info-card-row row row-cols-2 g-2 {% if info.event %} row-cols-lg-4 {% else %} row-cols-lg-3 {% endif %}">
         <div class="col">
           <div class="card">
             <div class="card-body">

@@ -148,6 +148,9 @@ function addForm() {
 $(document).ready(function () {
   var row = $('#setlist-search').find('.song-row').last();
 
+  $('#start_date').mask('0000-00-00');
+  $('#end_date').mask('0000-00-00');
+
   $('#city').select2(get_options({ ajax_url: 'cities/' }));
   $('#state').select2(get_options({ ajax_url: 'states/' }));
   $('#country').select2(get_options({ ajax_url: 'countries/' }));

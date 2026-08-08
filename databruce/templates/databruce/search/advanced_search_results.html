@@ -1,200 +1,210 @@
-{% extends "databruce/narrow_layout.html" %}
-{% load filters %}
+{% extends 'databruce/narrow_layout.html' %}
+{% load filters static %}
 {% block title %}
-  {{ title }}
-{% endblock title %}
+{{ title }}
+{% endblock %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+{% endblock extrajs %}
 {% block content %}
-  <div class="col">
-    <div class="text-2xl text-nowrap">Advanced Search Results</div>
-    <div class="text-base mb-2">
-      Click link below to copy a short url to these results (the links are very long and look awful).
-    </div>
-    <div id="short_url" class="mb-3">
-      <button id="short-url" class="btn btn-sm btn-primary">Get Short URL</button>
-      <span id="shortLink" class="px-2 d-none text-sm"></span>
-      <button class="btn btn-sm btn-primary d-none" id="copyButton">Copy</button>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body text-sm">
-        <div id="row">
-          <div class="d-flex flex-column">
-            {% if display_fields %}
-              {% for field in display_fields %}
-                <div>
-                  <span class="pe-2 fw-semibold">{{ field.label }}:</span>
-                  {% if field.choice %}({{ field.choice }}){% endif %}
-                  {{ field.data.value|default:field.data }}
-                </div>
-              {% endfor %}
+<div class="col-12">
+  <div class="text-2xl text-nowrap">Advanced Search Results</div>
+  <div class="text-base mb-2">Click link below to copy a short url to these results (the links are very long and look awful).</div>
+  <div id="short_url" class="mb-3">
+    <button id="short-url" class="btn btn-sm btn-primary">Get Short URL</button>
+    <span id="shortLink" class="px-2 d-none text-sm"></span>
+    <button class="btn btn-sm btn-primary d-none" id="copyButton">Copy</button>
+  </div>
+  <div class="card mb-3">
+    <div class="card-body text-sm">
+      <div id="row">
+        <div class="d-flex flex-column">
+          {% if display_fields %}
+          {% for field in display_fields %}
+          <div>
+            <span class="pe-2 fw-semibold">{{ field.label }}:</span>
+            {% if field.choice %}
+            ({{ field.choice }})
             {% endif %}
-            {% if search_summary %}
-              <div class="pe-2 fw-semibold">Songs:</div>
-              {% for field in search_summary %}
-                {{ field }}
-                {% if not forloop.last %}<div class="col-1">{{ conjunction|upper }}</div>{% endif %}
-              {% endfor %}
-            {% endif %}
+            {{ field.data.value|default:field.data }}
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-body">
-        <div id="tableControls">
-          <!-- Publicity Filter -->
-          <div class="col-12 col-md-1">
-            <label for="PublicityFilter" class="pb-1">Publicity</label>
-            <select id="PublicityFilter" class="form-select form-select-sm">
-              <option value="">All</option>
-              <option value="true">Public</option>
-              <option value="false">Private</option>
-            </select>
-          </div>
-          <!-- Search -->
-          <div class="col">
-            <label for="search" class="pb-1">Search</label>
-            <div class="input-group input-group-sm">
-              <input type="text"
-                     id="search"
-                     class="form-control form-control-sm"
-                     placeholder="Type to search table...">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="table-responsive">
-            <table class="table table-hover display" id="eventTable">
-              <thead>
-                <tr class="custom">
-                  <th class="all">Date</th>
-                  <th class="all">Setlist</th>
-                  <th class="all">Band</th>
-                  <th class="all">Venue</th>
-                  <th class="all">Tour</th>
-                  <th class="all">Detail</th>
-                  <th class="all">Public</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for event in events %}
-                  <tr>
-                    <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
-                      <a href="{% url "event_details" id=event.event_id %}">{{ event.get_date }}</a>
-                    </td>
-                    <td class="text-nowrap">
-                      {% comment %} {{ event.setlist_event }} {% endcomment %}
-                      {% if event.has_setlist %}
-                        <i class="bi bi-check-lg"
-                           data-bs-toggle="tooltip"
-                           data-bs-placement="top"
-                           data-bs-title="Has Setlist"></i>
-                      {% endif %}
-                    </td>
-                    <td class="text-nowrap">
-                      <a href="{% url "band_details" id=event.artist.uuid %}">{{ event.artist }}</a>
-                    </td>
-                    <td class="text-nowrap">
-                      <a href="{% url "venue_details" id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
-                      <br>
-                      <small>{{ event.venue.city }}</small>
-                    </td>
-                    <td class="text-nowrap">
-                      {% if event.tour %}
-                        <a href="{% url "tour_details" id=event.tour.uuid %}">{{ event.tour.name }}</a>
-                      {% endif %}
-                    </td>
-                    <td class="text-nowrap">
-                      {% if event.type.name in danger_event_types %}
-                        <span class="text-danger fw-semibold">[{{ event.type.name }}]</span>
-                      {% endif %}
-                      {{ event.title|default_if_none:"" }}
-                    </td>
-                    <td class="text-nowrap">{{ event.public }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+          {% endfor %}
+          {% endif %}
+          {% if search_summary %}
+          <div class="pe-2 fw-semibold">Songs:</div>
+          {% for field in search_summary %}
+          {{ field }}
+          {% if not forloop.last %}
+          <div class="col-1">{{ conjunction|upper }}</div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
-  <script>
-    function copy_to_clipboard() {
-      var text = document.getElementById('shortLink').innerHTML;
-      navigator.clipboard.writeText( text );
-      console.log('copied URL')
-    };
+  <div class="card">
+    <div class="card-body">
+      <div id="tableControls">
+        <!-- Publicity Filter -->
+        <div class="col-12 col-md-1">
+          <label for="PublicityFilter" class="pb-1">Publicity</label>
+          <select id="PublicityFilter" class="form-select form-select-sm">
+            <option value="">All</option>
+            <option value="true">Public</option>
+            <option value="false">Private</option>
+          </select>
+        </div>
+        <!-- Search -->
+        <div class="col">
+          <label for="search" class="pb-1">Search</label>
+          <div class="input-group input-group-sm">
+            <input type="text"
+              id="search"
+              class="form-control form-control-sm"
+              placeholder="Type to search table..." />
+          </div>
+        </div>
+        <div class="col-12 col-md-auto mt-2 mt-md-0">
+          <button type="button"
+            id="sbButton"
+            data-bs-toggle="modal"
+            data-bs-target="#sbModal"
+            class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="table-responsive">
+          <table class="table table-hover display nowrap" id="eventTable">
+            <thead>
+              <tr>
+                <th class="all">Date</th>
+                <th class="all">Setlist</th>
+                <th class="all">Band</th>
+                <th class="all">Venue</th>
+                <th class="all">Tour</th>
+                <th class="all">Detail</th>
+                <th class="all">Public</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in events %}
+              <tr>
+                <td data-sort="{{ event.get_date }}" data-filter="{{ event.get_date }}">
+                  <a href="{% url 'event_details' id=event.event_id %}">{{ event.get_date }}</a>
+                </td>
+                <td class="text-nowrap">
+                  {% if event.has_setlist %}
+                  <i class="bi bi-check-lg"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Has Setlist"></i>
+                  {% endif %}
+                </td>
+                <td class="text-nowrap">
+                  <a href="{% url 'band_details' id=event.artist.uuid %}">{{ event.artist }}</a>
+                </td>
+                <td class="text-nowrap">
+                  <a href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
+                  <br />
+                  <small>{{ event.venue.city }}</small>
+                </td>
+                <td class="text-nowrap">
+                  {% if event.tour %} <a href="{% url 'tour_details' id=event.tour.uuid %}">{{ event.tour.name }}</a> {% endif %}
+                </td>
+                <td class="text-nowrap">
+                  {% if event.type.name in danger_event_types %}
+                  <span class="text-danger fw-semibold">[{{ event.type.name }}]</span>
+                  {% endif %}
+                  {{ event.title|default_if_none:'' }}
+                </td>
+                <td class="text-nowrap">{{ event.public }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function copy_to_clipboard() {
+    var text = document.getElementById('shortLink').innerHTML
+    navigator.clipboard.writeText(text)
+    console.log('copied URL')
+  }
 
-    $(document).ready(function () {
-      let searchTimeout;
-      
-      var table = new DataTable('#eventTable', {
-        layout: {
-            topStart: null,
-            bottomStart: null,
-            topEnd: null,
-            bottomEnd: null,
-            top: ['customInputPaging', 'info'],
-            bottom: ['customInputPaging', 'info'],
-        },
-        serverSide: false,
-        columnDefs: [
-          { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', columnControl: [] },
-          { targets: [-1], visible: false },
-          { targets: [0], width: '8rem', className: 'text-nowrap' },
-          { targets: [2,3,4,5], width: '12rem' },
-          { targets: [5], width: '15rem' },
-        ],
-      });
+  $(document).ready(function () {
+    let searchTimeout;
+    let sb_columns = [0,1,2,3,4,5];
 
-      $('#search').on('keyup change clear', function () {
-          const value = $(this).val();
-          clearTimeout(searchTimeout);
-
-          searchTimeout = setTimeout(function () {
-              table.search(value).draw();
-          }, 500);
-      });
-
-      $('#PublicityFilter').on('change', function () {
-          var selectedValue = this.value;
-          table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
-      });
-      
-      $('button#short-url').click(function () {
-        var received_data  = "{{ request.build_absolute_uri|safe }}"
-        
-        $.ajax({
-            url: "/short_url/",
-            type: "GET",
-            data: {'url': received_data},
-            cache: false,
-            dataType: "json",
-            success: function(resp) {
-              $('#shortLink').removeClass('d-none');
-              $('#shortLink').text(`${resp.short_url}`);
-              $('#copyButton').removeClass('d-none');
-            }
-        });
-
-        $('#short-url').prop('disabled', true);
-      });
-
-      $('#copyButton').click(function() {
-        var btn = this;
-
-        var link = $('#shortLink').text();
-        navigator.clipboard.writeText(link);
-
-        $(btn).text('Copied');
-        $(btn).removeClass('btn-primary').addClass('btn-success');
-
-        setTimeout(function () {
-          $(btn).removeClass('btn-success').addClass('btn-primary');
-          $(btn).text('Copy');
-        }, 3000);
-      })
+    var table = new DataTable('#eventTable', {
+      layout: {
+        topStart: null,
+        bottomStart: null,
+        topEnd: null,
+        bottomEnd: null,
+        top: ['customInputPaging', 'info'],
+        bottom: ['customInputPaging', 'info']
+      },
+      serverSide: false,
+      columnDefs: [
+        { targets: [1], orderable: false, className: 'text-center text-xs', width: '1rem', columnControl: [] },
+        { targets: [-1], visible: false },
+        { targets: [0], width: '8rem', className: 'text-nowrap' },
+        { targets: [2, 3, 4, 5], width: '12rem' },
+        { targets: [5], width: '15rem' }
+      ],
+      initComplete: function() {
+        searchBuilder(this.api(), sb_columns); 
+      }
     });
-  </script>
-{% endblock content %}
+
+    tableSearch(table, 'search');
+
+    $('#PublicityFilter').on('change', function () {
+      var selectedValue = this.value
+      table
+        .order([[0, 'asc']])
+        .column(6)
+        .search(selectedValue ? selectedValue : '', true, false)
+        .draw()
+    })
+
+    $('button#short-url').click(function () {
+      var received_data = '{{ request.build_absolute_uri|safe }}'
+
+      $.ajax({
+        url: '/short_url/',
+        type: 'GET',
+        data: { url: received_data },
+        cache: false,
+        dataType: 'json',
+        success: function (resp) {
+          $('#shortLink').removeClass('d-none')
+          $('#shortLink').text(`${resp.short_url}`)
+          $('#copyButton').removeClass('d-none')
+        }
+      })
+
+      $('#short-url').prop('disabled', true)
+    })
+
+    $('#copyButton').click(function () {
+      var btn = this
+
+      var link = $('#shortLink').text()
+      navigator.clipboard.writeText(link)
+
+      $(btn).text('Copied')
+      $(btn).removeClass('btn-primary').addClass('btn-success')
+
+      setTimeout(function () {
+        $(btn).removeClass('btn-success').addClass('btn-primary')
+        $(btn).text('Copy')
+      }, 3000)
+    })
+  })
+</script>
+{% endblock %}

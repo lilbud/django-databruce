@@ -2,7 +2,6 @@ django
 django-anymail[mailgun]
 django-browser-reload
 django-debug-toolbar
-django-extensions
 django-filter
 django-link-shortener
 django-redis
@@ -11,9 +10,10 @@ django-unfold
 django-unfold-markdown
 djangorestframework
 djlint
+Markdown
 gevent
 gunicorn
-Markdown
+redis
 markdown-it-py
 nh3
 psycopg[binary,pool]
@@ -21,6 +21,5 @@ python-dateutil
 python-dotenv
 python-slugify
 querystring_parser
-redis
 sentry-sdk
 django-watchfiles

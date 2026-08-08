@@ -63,12 +63,12 @@
           const numCols = $this.eq(-1).children().length;
           $parent.append(
             '<tr class="' +
-              options.addCssClass +
-              '"><td colspan="' +
-              numCols +
-              '"><a href="#">' +
-              options.addText +
-              "</a></tr>"
+            options.addCssClass +
+            '"><td colspan="' +
+            numCols +
+            '"><a href="#">' +
+            options.addText +
+            "</a></tr>"
           );
           addButton = $parent.find("tr:last a");
         } else {
@@ -77,10 +77,10 @@
             .filter(":last")
             .after(
               '<div class="' +
-                options.addCssClass +
-                '"><a href="#">' +
-                options.addText +
-                "</a></div>"
+              options.addCssClass +
+              '"><a href="#">' +
+              options.addText +
+              "</a></div>"
             );
           addButton = $this.filter(":last").next().find("a");
         }
@@ -149,20 +149,20 @@
           .children(":last")
           .append(
             '<div><a class="' +
-              options.deleteCssClass +
-              '" href="#">' +
-              options.deleteText +
-              "</a></div>"
+            options.deleteCssClass +
+            '" href="#">' +
+            options.deleteText +
+            "</a></div>"
           );
       } else if (row.is("ul") || row.is("ol")) {
         // If they're laid out as an ordered/unordered list,
         // insert an <li> after the last list item:
         row.append(
           '<li><a class="' +
-            options.deleteCssClass +
-            '" href="#">' +
-            options.deleteText +
-            "</a></li>"
+          options.deleteCssClass +
+          '" href="#">' +
+          options.deleteText +
+          "</a></li>"
         );
       } else {
         // Otherwise, just insert the remove button as the
@@ -171,10 +171,10 @@
           .children(":first")
           .append(
             '<span><a class="' +
-              options.deleteCssClass +
-              '" href="#">' +
-              options.deleteText +
-              "</a></span>"
+            options.deleteCssClass +
+            '" href="#">' +
+            options.deleteText +
+            "</a></span>"
           );
       }
       // Add delete handler for each row.
@@ -268,10 +268,10 @@
       .parent()
       .find(
         "." +
-          options.formCssClass +
-          ":not(.has_original):not(." +
-          options.emptyCssClass +
-          ")"
+        options.formCssClass +
+        ":not(.has_original):not(." +
+        options.emptyCssClass +
+        ")"
       )
       .each(function () {
         addInlineDeleteButton($(this));
@@ -343,10 +343,10 @@
         $.each(dependency_list, function (i, field_name) {
           dependencies.push(
             "#" +
-              row
-                .find(".field-" + field_name)
-                .find("input, select, textarea")
-                .attr("id")
+            row
+              .find(".field-" + field_name)
+              .find("input, select, textarea")
+              .attr("id")
           );
         });
         if (dependencies.length) {

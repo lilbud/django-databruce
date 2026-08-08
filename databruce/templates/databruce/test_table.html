@@ -222,7 +222,7 @@
     ]
 
     createTable(url, columns, '#setlistTable', setlistOptions);
-    albumBreakdown(`/api/v1/setlist_breakdown/?event=${event_id}&format=json&ordering=-num`)
+    await albumBreakdown(`/api/v1/setlist_breakdown/?event=${event_id}&format=json&ordering=-num`)
 
     {% comment %} const myTable = new Table("#setlistTable", setlistOptions); {% endcomment %}
 

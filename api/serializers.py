@@ -23,33 +23,27 @@ def get_date_from_instance(obj):
     """Get event date from instance, creating date from id if needed."""
     event_id = getattr(obj, "event_id", None)
     date = getattr(obj, "date", None)
-    early_late = getattr(obj, "early_late", None)
 
     if event_id is None:
         return None
 
-    # result = {}
-
     if not date:
         date = datetime.datetime.strptime(format_fuzzy(event_id), "%Y-%m-%d")
-
-    # result["display"] = date.strftime("%Y-%m-%d")
-    # result["display_day"] = date.strftime("%Y-%m-%d [%a]")
-
-    if early_late:
-        return f"{date.strftime('%Y-%m-%d')} ({early_late})"
 
     return date.strftime("%Y-%m-%d")
 
 
 def get_formatted_city(obj):
-    if obj.state:
-        if getattr(obj.country, "alpha_2", "").upper() == "US":
-            return f"{obj.name}, {obj.state.abbrev}"
+    try:
+        if obj.state:
+            if getattr(obj.country, "alpha_2", "").upper() == "US":
+                return f"{obj.name}, {obj.state.abbrev}"
 
-        return f"{obj.name}, {obj.state.abbrev}, {obj.country.name}"
+            return f"{obj.name}, {obj.state.abbrev}, {obj.country.name}"
 
-    return f"{obj.name}, {obj.country.name}"
+        return f"{obj.name}, {obj.country.name}"
+    except AttributeError:
+        return None
 
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -464,7 +458,7 @@ class EventsSerializer(BaseSerializer):
         required=False,
         include=["uuid", "name", "formatted"],
     )
-    city = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField(required=False)
 
     def get_city(self, obj):
         return get_formatted_city(obj.venue.city)
@@ -964,7 +958,7 @@ class LyricsSerializer(BaseSerializer):
 
     class Meta:
         model = models.Lyrics
-        fields = ["song", "version", "source", "language", "note", "uuid"]
+        fields = ["song", "version", "source", "language", "note", "uuid", "translator"]
 
 
 class SetlistEntrySerializer(BaseSerializer):
@@ -1152,8 +1146,8 @@ class UserAttendedShowsSerializer(BaseSerializer):
 
 
 class SetlistBreakdownSerializer(BaseSerializer):
-    max = serializers.IntegerField(required=False)
-    num = serializers.IntegerField(required=False)
+    total_setlist_songs = serializers.IntegerField(required=False)
+    song_count = serializers.IntegerField(required=False)
     category = serializers.CharField(required=False, max_length=255)
     category_slug = serializers.CharField(required=False, max_length=255)
 
@@ -1168,28 +1162,45 @@ class SetlistBreakdownSerializer(BaseSerializer):
     album_complete = serializers.SerializerMethodField(required=False)
 
     def get_album_complete(self, obj):
-        """Check if all songs on album are present in setlist."""
-        # intros that shouldn't be counted in setlist for album check
+        """Check if all songs on album are present in setlist in order."""
+        # intros/outros that shouldn't be counted in setlist for album check
         remove = [689, 1021, 514]
 
-        if obj["category"] == "Covers" or obj["category"] == "Originals":
+        # Skip non-album categories
+        if obj["category"] in ("Covers", "Originals"):
             return False
 
-        album_songs = obj["album_songs"]
-        setlist_songs = [song for song in obj["songs"] if song not in remove]
+        album_songs = obj.get("album_songs", [])
+        setlist_songs = obj.get("songs", [])
 
-        album_len = len(album_songs)
-        setlist_len = len(setlist_songs)
+        # Edge case: empty album is trivially complete
+        if not album_songs:
+            return True
 
-        # if album_len > setlist_len:
-        #     return False
+        # Edge case: no setlist songs to check
+        if not setlist_songs:
+            return False
 
-        # print(album_songs, setlist_songs)
+        ignore_set = set(remove)
+        filtered_setlist = [
+            song_id for song_id in setlist_songs if song_id not in ignore_set
+        ]
 
-        return any(
-            setlist_songs[i : i + album_len] == album_songs
-            for i in range(setlist_len - album_len + 1)
-        )
+        if not filtered_setlist:
+            return False
+
+        # Check if album songs appear in order within filtered setlist
+        album_idx = 0
+
+        for song_id in filtered_setlist:
+            if song_id == album_songs[album_idx]:
+                album_idx += 1
+                # Found all album songs in order
+                if album_idx == len(album_songs):
+                    return True
+
+        # Check if we found all album songs in order
+        return album_idx == len(album_songs)
 
     songs = serializers.SerializerMethodField(required=False)
 
@@ -1202,8 +1213,8 @@ class SetlistBreakdownSerializer(BaseSerializer):
     class Meta:
         model = models.Setlists
         fields = [
-            "max",
-            "num",
+            "total_setlist_songs",
+            "song_count",
             "songs",
             "category",
             "album_complete",

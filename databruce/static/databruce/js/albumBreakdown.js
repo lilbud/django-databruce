@@ -1,3 +1,15 @@
+
+// Helper utility function for escaping HTML
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function createSongListItem(song) {
   const display = song.original
     ? song.name
@@ -33,12 +45,12 @@ async function albumBreakdown(url) {
     const { results } = await response.json();
     const tooltips = [];
 
-    const maxNum = Math.max(...results.map(obj => obj.num));
+    const maxNum = Math.max(...results.map(obj => obj.song_count));
 
     // Build HTML in memory to minimize DOM reflows
     for (const item of results) {
       const album = item.category_slug;
-      const percent = ((item.num / maxNum) * 100).toFixed(0);
+      const percent = ((item.song_count / maxNum) * 100).toFixed(0);
       const rowClass = item.album_complete
         ? "col px-2 py-1 album-breakdown complete"
         : "col px-2 py-1 album-breakdown";
@@ -69,7 +81,7 @@ async function albumBreakdown(url) {
                 <div class="col progress px-0">
                     <div class="progress-bar" style="width:${percent}%"></div>
                 </div>
-                <div class="col-auto percent text-center pe-0 text-xs text-nowrap">${item.num}</div>
+                <div class="col-auto percent text-center pe-0 text-xs text-nowrap">${item.song_count}</div>
             </div>
             <div class="collapse" id="${album}-collapse">
                 <ul class="list-group py-1">${songs}</ul>
@@ -129,13 +141,3 @@ async function albumBreakdown(url) {
   }
 }
 
-// Helper utility function for escaping HTML
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}

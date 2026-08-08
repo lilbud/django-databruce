@@ -32,15 +32,12 @@
                         id="sbButton"
                         data-bs-toggle="modal"
                         data-bs-target="#sbModal"
-                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">
-                  Searchbuilder
-                </button>
+                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
               </div>
             </div>
             <div class="row">
               <div class="table-responsive">
-                <table class="table table-hover display"
-                       id="{% spaceless %}
+                <table class="table table-hover display" id="{% spaceless %}
                              {% block table_id %}
                              {% endblock table_id %}
                            {% endspaceless %}">

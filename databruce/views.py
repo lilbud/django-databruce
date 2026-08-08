@@ -560,12 +560,13 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "artist",
                 "tour",
                 "venue__city",
+                "type",
             ).prefetch_related(
                 "leg",
                 "run",
                 "archive_links",
                 "nugs_event",
-                "rank_stats",
+                "release_event",
             ),
             event_id=self.kwargs["id"],
         )
@@ -639,29 +640,13 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "This is a placeholder date, actual date unknown.",
             )
 
-        context["official"] = (
-            models.Releases.objects.filter(
-                event_id=event.pk,
-            )
-            .prefetch_related("event")
-            .order_by("date")
-        )
-
-        context["official_tracks"] = (
-            models.ReleaseTracks.objects.filter(event_id=event.pk)
-            .select_related("release")
-            .prefetch_related("event")
-            .distinct("release_id", "release__date")
-            .order_by("release__date")
-        )
-
         user = self.request.user
 
         if user.is_authenticated:
             context["user_attended"] = models.UserAttendedShows.objects.filter(
-                user=user.pk,
+                user_id=user.pk,
                 event_id=event.pk,
-            )
+            ).first()
 
         context["users"] = models.UserAttendedShows.objects.filter(
             event_id=event.pk,
@@ -696,9 +681,7 @@ class EventDetail(PageTitleMixin, TemplateView):
         return context
 
     def get_template_names(self):
-        """Dynamically route requests to the simplified share layout
-        if called via JavaScript fetch.
-        """
+        """Dynamically route requests to the simplified share layout."""
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return ["databruce/event_mobile.html"]
 

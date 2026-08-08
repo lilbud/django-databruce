@@ -1,5 +1,5 @@
 {% extends "databruce/narrow_layout.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}
   {{ title }}
 {% endblock title %}
@@ -170,6 +170,5 @@
       </div>
     </div>
   </div>
-  {% load static %}
   <script src="{% static 'databruce/js/advanced_search.js' %}"></script>
 {% endblock content %}

@@ -263,7 +263,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         }
 
         # 2. Extract query parameters for the dynamic formset
-        query_params = self.request.query_params
+        query_params = self.request.query_params  # type: ignore
         conjunction = query_params.get("conjunction", "and").lower()
 
         try:
@@ -286,7 +286,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 formset_queries.append(
                     {
                         "song_1": song_1,
-                        "choice": choice == "True" or choice == "true",
+                        "choice": choice.lower() == "true",
                         "position": position,
                         "song_2": song_2,
                     },
@@ -507,8 +507,8 @@ class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
         models.Releases.objects.all()
         .prefetch_related("event")
         .annotate(
-            date_str=Cast("date", output_field=CharField()),
-            time_str=Cast("length", output_field=CharField()),
+            date_str=Cast("date", output_field=CharField(max_length=10)),
+            time_str=Cast("length", output_field=CharField(max_length=10)),
         )
         .order_by("-date")
     )
@@ -830,58 +830,114 @@ class UsersAttendedShowsViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.UserAttendedShowsFilter
 
 
+from rest_framework.exceptions import ValidationError
+
+
 class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
-    def get_queryset(self):
-        event = self.request.query_params.get("event")
-
-        song_filter = Q(
-            Q(event_id=event) & Q(set_name__in=VALID_SET_NAMES),
-        )
-
-        setlist_songs = (
-            models.Setlists.objects.select_related("song", "event")
-            .filter(
-                song_filter,
-            )
-            .order_by("song_num")
-        )
-
-        album_filter = Q(
-            Q(release__songs__category=OuterRef("song__category")),
-        )
-
-        album_songs = (
-            models.ReleaseTracks.objects.prefetch_related("release__songs__category")
-            .filter(
-                album_filter,
-            )
-            .values("song_id")
-            .distinct("position", "song_id")
-            .order_by("position", "song_id")
-        )
-
-        songs = (
-            setlist_songs.filter(song__category=OuterRef("song__category"))
-            .order_by("song_num")
-            .values(
-                "song_id",
-            )
-        )
-
-        return (
-            setlist_songs.values(category=F("song__category"))
-            .annotate(
-                num=Count("id"),
-                max=SubqueryCount(setlist_songs),
-                songs=ArraySubquery(songs),
-                category_slug=F("song__category_slug"),
-                album_songs=ArraySubquery(album_songs.values("song_id")),
-            )
-            .order_by("-num")
-        )
+    """Return setlist breakdown by category with album completion status."""
 
     serializer_class = serializers.SetlistBreakdownSerializer
-    ordering = ["category", "max", "num"]
+    ordering = ["category", "-num", "max"]
+
+    def get_queryset(self):
+        event_id = self.request.query_params.get("event")
+
+        if not event_id:
+            raise ValidationError({"event": "This parameter is required."})
+
+        # Base setlist for this event (reused for total count and filtering)
+        event_setlist = models.Setlists.objects.filter(
+            event_id=event_id,
+            set_name__in=VALID_SET_NAMES,
+        )
+
+        # Total songs in entire setlist (for percentage calculations, etc.)
+        total_setlist_songs = event_setlist.annotate(
+            cnt=Count("id"),
+        ).values("cnt")
+
+        # Album songs subquery: songs from releases matching this category
+        album_songs_subquery = (
+            models.ReleaseTracks.objects.filter(
+                release__songs__category=OuterRef("song__category"),
+            )
+            .order_by("position")
+            .values("song_id")
+        )
+
+        # Setlist songs subquery: songs from this event matching this category
+        setlist_songs_subquery = (
+            event_setlist.filter(
+                song__category=OuterRef("song__category"),
+            )
+            .order_by("song_num")
+            .values("song_id")
+        )
+
+        # Aggregate by category
+        return (
+            event_setlist.select_related("song", "event")
+            .values(category=F("song__category"))
+            .annotate(
+                song_count=Count("id"),  # songs in this category
+                total_setlist_songs=SubqueryCount(
+                    total_setlist_songs,
+                ),  # total songs in setlist
+                songs=ArraySubquery(setlist_songs_subquery),
+                category_slug=F("song__category_slug"),
+                album_songs=ArraySubquery(album_songs_subquery),
+            )
+        )
+
+
+# class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
+#     def get_queryset(self):
+#         event = self.request.query_params.get("event")  # type: ignore
+
+#         song_filter = Q(
+#             Q(event_id=event) & Q(set_name__in=VALID_SET_NAMES),
+#         )
+
+#         setlist_songs = (
+#             models.Setlists.objects.select_related("song", "event")
+#             .filter(
+#                 song_filter,
+#             )
+#             .order_by("song_num")
+#         )
+
+#         album_filter = Q(
+#             Q(release__songs__category=OuterRef("song__category")),
+#         )
+
+#         album_songs = (
+#             models.ReleaseTracks.objects.prefetch_related("release__songs__category")
+#             .filter(
+#                 album_filter,
+#             )
+#             .values("song_id")
+#             .distinct("discnum", "position", "song_id")
+#             .order_by("discnum", "position", "song_id")
+#         )
+
+#         songs = (
+#             setlist_songs.filter(song__category=OuterRef("song__category"))
+#             .order_by("song_num")
+#             .values(
+#                 "song_id",
+#             )
+#         )
+
+#         return setlist_songs.values(category=F("song__category")).annotate(
+#             song_count=Count("id"),
+#             total_setlist_songs=SubqueryCount(setlist_songs),
+#             songs=ArraySubquery(songs),
+#             category_slug=F("song__category_slug"),
+#             album_songs=ArraySubquery(album_songs.values("song_id")),
+#         )
+
+#     serializer_class = serializers.SetlistBreakdownSerializer
+#     ordering = ["category", "total_setlist_songs", "song_count"]
 
 
 class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -892,7 +948,7 @@ class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
-        user = self.request.query_params.get("user")
+        user = self.request.query_params.get("user")  # type: ignore
 
         filter = Q(
             Q(release_tracks__song__setlists__event__user_event__user_id=user)
@@ -927,7 +983,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, *args, **kwargs) -> response.Response:  # noqa: ARG002
         queryset = self.get_queryset()  # Assuming the annotations from previous steps
-        user = self.request.query_params.get("user")
+        user = self.request.query_params.get("user")  # type: ignore
         valid_sets = ["Show", "Encore", "Set 1", "Set 2", "Pre-Show", "Post-Show"]
 
         # 1. Get all ReleaseTracks for these albums to maintain Disc/Track order
