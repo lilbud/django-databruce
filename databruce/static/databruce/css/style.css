@@ -315,7 +315,7 @@ a:link,
   font-size: var(--text-xs) !important;
   font-weight: 500 !important;
   line-height: 1.25rem;
-  display: flex !important;
+  display: block !important;
   align-items: center !important;
   justify-content: space-between !important;
   padding: 0.25rem 0.7rem !important;
