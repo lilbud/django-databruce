@@ -9,6 +9,7 @@ dependencies = [
     "django-anymail[mailgun]>=14.0",
     "django-browser-reload>=1.20.0",
     "django-debug-toolbar==5.0.0",
+    "django-erd-generator>=0.1.7",
     "django-filter>=25.2",
     "django-link-shortener>=1.0.1",
     "django-redis>=7.0.0",

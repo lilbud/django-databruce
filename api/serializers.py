@@ -1182,6 +1182,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
             return False
 
         ignore_set = set(remove)
+
         filtered_setlist = [
             song_id for song_id in setlist_songs if song_id not in ignore_set
         ]
@@ -1192,12 +1193,10 @@ class SetlistBreakdownSerializer(BaseSerializer):
         # Check if album songs appear in order within filtered setlist
         album_idx = 0
 
-        for song_id in filtered_setlist:
-            if song_id == album_songs[album_idx]:
-                album_idx += 1
-                # Found all album songs in order
-                if album_idx == len(album_songs):
-                    return True
+        if set(setlist_songs).issubset(set(album_songs)) and len(setlist_songs) == len(
+            album_songs,
+        ):
+            return True
 
         # Check if we found all album songs in order
         return album_idx == len(album_songs)
@@ -1222,35 +1221,74 @@ class SetlistBreakdownSerializer(BaseSerializer):
         ]
 
 
-class UserAlbumBreakdownSerializer(BaseSerializer):
-    album_song_count = serializers.IntegerField(read_only=True)
-    user_album_count = serializers.IntegerField(read_only=True)
-    album_percent = serializers.FloatField(read_only=True)
-    songs = serializers.SerializerMethodField()  # Single unified list
+class ReleaseTrackSongSerializer(serializers.ModelSerializer):
+    """Serializes tracks on a release along with user-specific play count."""
+
+    id = serializers.IntegerField(source="song.id")
+    name = serializers.CharField(source="song.name", max_length=255)
+    slug = serializers.CharField(source="song.slug", max_length=255)
+    times_seen = serializers.IntegerField(default=0)
+
+    class Meta:
+        model = models.ReleaseTracks
+        fields = ["id", "name", "slug", "times_seen"]
+
+
+class UserAlbumBreakdownSerializer(serializers.ModelSerializer):
+    songs = serializers.SerializerMethodField()
+    user_album_count = serializers.SerializerMethodField()
+    album_song_count = serializers.SerializerMethodField()
+    album_percent = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Releases
         fields = [
             "id",
             "name",
-            "uuid",
-            "mbid",
+            "slug",
             "songs",
-            "album_song_count",
             "user_album_count",
+            "album_song_count",
             "album_percent",
         ]
 
-    def get_songs(self, obj):
-        # Retrieve maps from context
-        songs_map = self.context.get("songs_map", {})
-        tracks_by_release = self.context.get("tracks_by_release", {})
+    def _get_tracks(self, obj) -> list:
+        """Helper to retrieve tracks queryset/list safely."""
+        # Handles whether related_name returns a Manager or a single instance
+        tracks = getattr(obj, "release_tracks", [])
 
-        # Get the ordered song IDs for this specific release
-        ordered_song_ids = tracks_by_release.get(obj.id, [])
+        if hasattr(tracks, "all"):
+            return list(tracks.all())
 
-        # Return the enriched song data in order
-        return [songs_map.get(s_id) for s_id in ordered_song_ids if s_id in songs_map]
+        return list(tracks) if isinstance(tracks, (list, tuple)) else [tracks]
+
+    def get_songs(self, obj) -> list[dict]:
+        tracks = self._get_tracks(obj)
+        return ReleaseTrackSongSerializer(tracks, many=True).data  # type: ignore
+
+    def get_user_album_count(self, obj) -> int:
+        tracks = self._get_tracks(obj)
+        # Count distinct songs seen at least once (times_seen > 0)
+        seen_song_ids = {
+            track.song_id for track in tracks if getattr(track, "times_seen", 0) > 0
+        }
+        return len(seen_song_ids)
+
+    def get_album_song_count(self, obj) -> int:
+        tracks = self._get_tracks(obj)
+
+        # Count total distinct songs on the album
+        distinct_song_ids = {track.song_id for track in tracks if track.song_id}
+        return len(distinct_song_ids)
+
+    def get_album_percent(self, obj) -> float:
+        total = self.get_album_song_count(obj)
+
+        if not total:
+            return 0.0
+
+        seen = self.get_user_album_count(obj)
+        return round((seen / total) * 100, 2)
 
 
 class YearSongBreakdownSerializer(BaseSerializer):

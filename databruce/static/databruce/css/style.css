@@ -265,9 +265,16 @@ a:link,
   font-size: var(--text-sm) !important;
   font-weight: 500 !important;
   line-height: 1.5rem;
-  display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
+}
+
+:not(#album)>.card-header {
+  display: flex !important;
+}
+
+#album .progress {
+  height: 6px !important;
 }
 
 .card-header,
@@ -305,12 +312,30 @@ a:link,
 }
 
 #album .card-header {
-  font-size: var(--text-2xs) !important;
+  font-size: var(--text-xs) !important;
   font-weight: 500 !important;
   line-height: 1.25rem;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
+  padding: 0.25rem 0.7rem !important;
+}
+
+#album .list-group-item {
+  padding: 0.15rem 0.7rem !important;
+}
+
+.song-seen>a {
+  color: var(--color-primary) !important;
+  font-weight: 600 !important;
+}
+
+.song-seen>.seenCount {
+  color: var(--text-color-default) !important;
+}
+
+.song-unseen>.song-name {
+  color: var(--text-color-default) !important;
 }
 
 /* Remove the border from the last row of cells to prevent card overlap */
@@ -1738,4 +1763,16 @@ div.dtcv-container div.dtcv-card {
   padding: 1rem !important;
   background-color: var(--background-color-default) !important;
   color: var(--text-color-default) !important;
+}
+
+.dt-ordering-asc {
+  box-shadow: inset 0 3px 0 0 var(--color-primary) !important;
+}
+
+.dt-ordering-desc {
+  box-shadow: inset 0 -3px 0 0 var(--color-primary) !important;
+}
+
+table.dataTable th.dt-type-numeric div.dt-column-header {
+  flex-direction: row;
 }

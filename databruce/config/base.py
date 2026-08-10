@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "timezone_field",
     "django_watchfiles",
     "sentry_sdk",
+    "django_erd_generator",
 ]
 
 SITE_ID = 1

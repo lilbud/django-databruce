@@ -217,6 +217,7 @@ dependencies = [
     { name = "django-anymail" },
     { name = "django-browser-reload" },
     { name = "django-debug-toolbar" },
+    { name = "django-erd-generator" },
     { name = "django-filter" },
     { name = "django-link-shortener" },
     { name = "django-redis" },
@@ -247,6 +248,7 @@ requires-dist = [
     { name = "django-anymail", extras = ["mailgun"], specifier = ">=14.0" },
     { name = "django-browser-reload", specifier = ">=1.20.0" },
     { name = "django-debug-toolbar", specifier = "==5.0.0" },
+    { name = "django-erd-generator", specifier = ">=0.1.7" },
     { name = "django-filter", specifier = ">=25.2" },
     { name = "django-link-shortener", specifier = ">=1.0.1" },
     { name = "django-redis", specifier = ">=7.0.0" },
@@ -282,6 +284,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/46/e0/89be915ba11ffb2e5a0479951e04cfe8475018e08ca2b2c00f3551a79829/django_debug_toolbar-5.0.0.tar.gz", hash = "sha256:fec95ca1a0a0836e620d22ab58827a7c4b260585653b1b934ccbaaa25c79f88c", size = 295961 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a2/99/4a81344baa2a7bfc25e34051279aa2e223bfd460a1b2427eed9e7434ab14/django_debug_toolbar-5.0.0-py3-none-any.whl", hash = "sha256:679108872459486a77fa4818bdb2f02c43ba3d49dd5a9c70dcefb8b376e90475", size = 260037 },
+]
+
+[[package]]
+name = "django-erd-generator"
+version = "0.1.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/39/c3f6810153c78c402a9453d394169448bf0f8e8127b4deb6e02401abbcb5/django_erd_generator-0.1.7.tar.gz", hash = "sha256:6344783ebeb92475e073c80daad1be146c62c57c35ff8bc83421e45e2e37a99a", size = 202497 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/51/9348efdf226271f261abac101c4c165eaa708fb1b00cbecbad69d8b916b9/django_erd_generator-0.1.7-py3-none-any.whl", hash = "sha256:a83d534fd9e0e1520cabbb333be1d72bfe159055f3adec1c4d92b586c353770f", size = 26350 },
 ]
 
 [[package]]

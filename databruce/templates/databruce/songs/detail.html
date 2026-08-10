@@ -23,7 +23,7 @@
                     </div>
                   </div>
                 {% endif %}
-                {% if not info.original %}
+                {% if info.original == False %}
                   <div class="row mb-2">
                     <div class="fw-semibold">Original Artist</div>
                     <div>{{ info.original_artist }}</div>
@@ -52,7 +52,7 @@
                   </div>
                   <div class="col-auto">
                     <div class="fw-semibold">Frequency</div>
-                    <div>{{ frequency }}%</div>
+                    <div>{{ frequency|default_if_none:"0" }}%</div>
                   </div>
                 </div>
                 <div class="row">

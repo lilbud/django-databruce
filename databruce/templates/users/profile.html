@@ -6,6 +6,7 @@
 {% block extrajs %}
   <script src="{% static 'databruce/js/songTable.js' %}"></script>
   <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+  <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
   <div class="col-12">
@@ -131,7 +132,7 @@
                       </select>
                     </div>
                     <!-- Search -->
-                    <div class="col-12 col-md-11">
+                    <div class="col">
                       <label for="unseen-song-search" class="pb-1">Search</label>
                       <div class="input-group input-group-sm">
                         <input type="text"
@@ -178,7 +179,7 @@
                       </select>
                     </div>
                     <!-- Search -->
-                    <div class="col-12 col-md-11">
+                    <div class="col">
                       <label for="song-search" class="pb-1">Search</label>
                       <div class="input-group input-group-sm">
                         <span class="input-group-text">
@@ -214,11 +215,11 @@
         </div>
         <div id="albums" class="tab-pane fade">
           <div class="col-12">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"
+            <div class="row g-3"
                  id="cardContainer">
-              <div class="col d-none" id="example">
+              <div class="col-12 col-md-6 col-lg-4 d-none" id="example">
                 <div class="card" id="album">
-                  <div class="card-header py-0.5"></div>
+                  <div class="card-header d-block py-0.5"></div>
                   <div class="card-body p-0"></div>
                 </div>
               </div>
@@ -233,37 +234,74 @@
       /* album breakdown */
 
       fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
-        .then(response => response.json()) // Parse JSON response
-        .then(data => {
-          var container = $('#cardContainer');
+      .then(response => response.json()) // Parse JSON response
+      .then(data => {
+        var container = $('#cardContainer');
+        var itemsToAppend = []; // Temporary array to hold all cloned jQuery elements
 
-          data.forEach((item, index) => {
-            var col = $('#example').clone();
-            var list = $('<ul />').addClass('list-group list-group-flush');
+        data.results.forEach((item, index) => {
+          var col = $('#example').clone();
+          const album = item.slug;
+          var list = $('<ul />').addClass('list-group list-group-flush');
+          let albumArtUrl = `/static/databruce/img/albums/${album}.jpg`;
+          const percent = item.album_percent.toFixed(0)
 
-            $(col).removeClass('d-none');
-            $(col).find('.card-header').append(`<span><a href="/releases/${item.uuid}" class="fw-semibold text-reset">${item.name}</a></span>`).append(`<span>${Math.round(item.album_percent)}%</span>`);
-            $(col).attr('id', `album-${index}`);
+          if (!album) {
+            albumArtUrl = '/static/databruce/img/albums/default.svg';
+          }
 
-            item.songs.forEach((i, index) => {
-              var listItem = $('<li />').addClass('list-group-item py-0.5 breakdown')
+          col.removeClass('d-none');
+          //col.find('.card-header').append(`<span class="fw-semibold text-reset">${item.name}</span>`).append(`<span><img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.category)}"></span>`);
+          col.attr('id', `album-${index}`);
 
-              if (i.user_seen) {
-                listItem.addClass('fw-semibold');
-                listItem.append(`<span><a href="/songs/${i.uuid}" class="text-reset text-base-content">${i.name}</a> (${i.times_seen})</span>`);
-              } else {
-                listItem.append(`<span><a href="/songs/${i.uuid}" class="text-reset text-base-content">${i.name}</a></span>`);
-              }
+          const html = `
+          <div class="row justify-content-between align-items-center">
+              <div class="col fw-semibold text-reset text-nowrap">${item.name}</div>
+              <div class="col-auto">
+                <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.name)}">
+              </div>
+            </div>
+          `;
 
-              $(list).append(listItem);
-            });
+          col.find('.card-header').append(html)
 
-            $(col).find('.card-body').append($(list).prop('outerHTML'))
-            $(container).append($(col).prop('outerHTML'));
+          console.log(col.find('.card-header').prop('outerHTML'))
+
+          item.songs.forEach((i) => {
+            var listItem = $('<li />').addClass('list-group-item d-inline-flex gap-1')
+
+            if (i.times_seen > 0) {
+              listItem.addClass('song-seen')
+              listItem.append(`<a class="song-name" href="/songs/${i.slug}">${i.name}</a>`);
+              listItem.append(`<span class="seenCount">(${i.times_seen})</span>`);
+            } else {
+              listItem.addClass('song-unseen')
+              listItem.append(`<a class="song-name" href="/songs/${i.slug}">${i.name}</a>`);
+            }
+
+            list.append(listItem);
           });
 
-        })
-        .catch(error => console.error('Error:', error));
+          $(col).find('.card-body').append(list);
+          itemsToAppend.push(col[0]);
+        });
+
+        container.append(itemsToAppend);
+
+        // Initialize Masonry cleanly on the fully populated container
+        container.masonry({
+          itemSelector: '.col-lg-4:not(.d-none)',
+          percentPosition: true,
+          horizontalOrder: true // CRITICAL: Forces Masonry to layout items left-to-right first
+        });
+
+      }).catch(error => console.error('Error:', error));
+      
+      // needed to initalize masonry when tab is loaded correctly
+      $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+        console.log('switched tab to albums')
+        $('#cardContainer').masonry('layout');
+      });
       
       /* datatables */
       eventTable('/api/v1/events/?user={{ info.id }}&format=custom');

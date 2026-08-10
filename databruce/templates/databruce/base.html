@@ -146,9 +146,18 @@
   </div>
   <script>
     $(document).ready(function () {
+      $("#loadingContainer").hide();
+      let searchTimer;
+
       $('#eventSearch').on('input', function () {
         const query = $(this).val();
-        eventSearch(query);
+
+        clearTimeout(searchTimer);
+
+        // Wait 500 milliseconds before calling the function
+        searchTimer = setTimeout(function () {
+          eventSearch(query);
+        }, 500);
       });
 
       // highlight link on offcanvas navbar if current page
@@ -170,10 +179,6 @@
       tabElements.forEach(tabEl => {
         tabEl.addEventListener('shown.bs.tab', (event) => {
           var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
-
-          if (hash === '#mostplayed' || hash === "#rare") {
-            hash = "#songs"
-          };
 
           if (hash) {
             history.replaceState(null, null, hash);

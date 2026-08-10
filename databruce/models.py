@@ -52,23 +52,16 @@ class RegexpReplace(Func):
     arg_joiner = ", "
 
 
-# class CustomManager(models.Manager):
-#     def get_queryset(self):
-#         return super().get_queryset().fetch_mode(models.FETCH_PEERS)
-
-
 class BaseModel(models.Model):
     created_at = models.DateTimeField(db_index=True, default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-
-    # objects = CustomManager()
 
     class Meta:
         abstract = True
         managed = True
 
 
-class ArchiveLinks(BaseModel):
+class ArchiveLinks(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     event = models.ForeignKey(
@@ -92,7 +85,7 @@ class ArchiveLinks(BaseModel):
         return self.url
 
 
-class Bands(BaseModel):
+class Bands(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_url = models.TextField(default=None, blank=True, null=True)
@@ -128,10 +121,13 @@ class Bands(BaseModel):
         verbose_name_plural = "bands"
 
     def __str__(self) -> str:
+        if not self.name:
+            return ""
+
         return self.name
 
 
-class Bootlegs(BaseModel):
+class Bootlegs(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     slid = models.IntegerField(default=0)
@@ -168,8 +164,14 @@ class Bootlegs(BaseModel):
         db_table = "bootlegs"
         verbose_name_plural = "bootlegs"
 
+    def __str__(self) -> str:
+        if not self.title:
+            return ""
 
-class Cities(BaseModel):
+        return self.title
+
+
+class Cities(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     mbid = models.UUIDField(default=None, editable=False, null=True)
@@ -232,7 +234,7 @@ class Cities(BaseModel):
         return f"{self.name}, {self.country}"
 
 
-class Continents(BaseModel):
+class Continents(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     name = models.TextField(default=None, db_column="continent_name")
@@ -246,7 +248,7 @@ class Continents(BaseModel):
         return self.name
 
 
-class Countries(BaseModel):
+class Countries(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     name = models.TextField(unique=True, default=None)
@@ -293,7 +295,7 @@ class Countries(BaseModel):
         return self.name
 
 
-class Covers(BaseModel):
+class Covers(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     event_date = models.TextField(default=None, blank=True, null=True)
@@ -310,8 +312,11 @@ class Covers(BaseModel):
         db_table = "covers"
         verbose_name_plural = "covers"
 
+    def __str__(self) -> str:
+        return self.url
 
-class States(BaseModel):
+
+class States(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     abbrev = models.TextField(
@@ -359,7 +364,7 @@ class States(BaseModel):
         return self.name
 
 
-class Venues(BaseModel):
+class Venues(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_url = models.TextField(default=None, blank=True, null=True)
@@ -477,7 +482,7 @@ class VenuesText(models.Model):
         return self.formatted
 
 
-class VenueAliases(BaseModel):
+class VenueAliases(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     venue = models.ForeignKey("Venues", on_delete=models.DO_NOTHING, null=True)
@@ -487,8 +492,11 @@ class VenueAliases(BaseModel):
     class Meta:
         db_table = "venue_aliases"
 
+    def __str__(self) -> str:
+        return self.name
 
-class Events(BaseModel):
+
+class Events(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     num = models.IntegerField(
         db_column="event_num",
@@ -720,7 +728,7 @@ class Events(BaseModel):
         )
 
 
-class NugsReleases(BaseModel):
+class NugsReleases(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     nugs_id = models.IntegerField(default=0)
@@ -750,7 +758,7 @@ class NugsReleases(BaseModel):
         return str(self.nugs_id)
 
 
-class Relations(BaseModel):
+class Relations(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     mbid = models.UUIDField(default=None, editable=False, null=True)
@@ -792,7 +800,7 @@ class Relations(BaseModel):
         return self.name
 
 
-class RelationAliases(BaseModel):
+class RelationAliases(BaseModel, models.Model):
     id = models.UUIDField(primary_key=True)
     relation = models.ForeignKey(Relations, on_delete=models.DO_NOTHING, null=True)
     name = models.TextField()
@@ -801,8 +809,11 @@ class RelationAliases(BaseModel):
     class Meta:
         db_table = "relation_aliases"
 
+    def __str__(self) -> str:
+        return self.name
 
-class Onstage(BaseModel):
+
+class Onstage(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
 
     uuid = models.UUIDField(default=uuid4, editable=False)
@@ -855,10 +866,10 @@ class Onstage(BaseModel):
         return f"Relation: [{self.relation_id}] {name}"  # type: ignore
 
 
-class ReleaseTracks(BaseModel):
+class ReleaseTracks(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    release = models.OneToOneField(
+    release = models.ForeignKey(
         "Releases",
         models.DO_NOTHING,
         db_column="release_id",
@@ -920,7 +931,7 @@ class ReleaseTracks(BaseModel):
         return f"Disc {self.discnum} - {self.song.name}"
 
 
-class Releases(BaseModel):
+class Releases(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_id = models.TextField(default=None, blank=True, null=True)
@@ -972,6 +983,7 @@ class Releases(BaseModel):
         blank=True,
         null=True,
     )
+    slug = models.TextField(default=None, blank=True, null=True)
 
     class Meta:
         db_table = "releases"
@@ -1015,7 +1027,7 @@ class SetlistNotes(models.Model):
         return self.note
 
 
-class Songs(BaseModel):
+class Songs(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_url = models.TextField(default=None, blank=True, null=True)
@@ -1130,7 +1142,7 @@ class Songs(BaseModel):
         return f"{self.name}"
 
 
-class Setlists(BaseModel):
+class Setlists(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1188,7 +1200,7 @@ class Setlists(BaseModel):
         ("Show Opener", "Show Opener"),
     ]
 
-    note = models.TextField(default=None, db_column="song_note", blank=True, null=True)
+    note = models.TextField(default=None, db_column="song_note", blank=True)
     segue = models.BooleanField(default=False)
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
@@ -1237,15 +1249,6 @@ class Setlists(BaseModel):
 
         return f"{event} - {self.set_name} - {self.song}"
 
-    VALID_SET_NAMES = [
-        "Show",
-        "Set 1",
-        "Set 2",
-        "Encore",
-        "Pre-Show",
-        "Post-Show",
-    ]
-
 
 class SetlistsBySetAndDate(models.Model):
     id = models.AutoField(primary_key=True)
@@ -1271,7 +1274,7 @@ class SetlistsBySetAndDate(models.Model):
         return f"{self.event} - {self.set_name}"
 
 
-class Snippets(BaseModel):
+class Snippets(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1301,8 +1304,11 @@ class Snippets(BaseModel):
         db_table = "snippets"
         verbose_name_plural = "snippets"
 
+    def __str__(self) -> str:
+        return f"{self.setlist} - {self.snippet}"
 
-class Tours(BaseModel):
+
+class Tours(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     brucebase_id = models.TextField(default=None, blank=True, null=True)
@@ -1354,7 +1360,7 @@ class Tours(BaseModel):
         return self.name
 
 
-class TourLegs(BaseModel):
+class TourLegs(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1395,7 +1401,7 @@ class TourLegs(BaseModel):
         return self.name
 
 
-class Runs(BaseModel):
+class Runs(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1521,7 +1527,7 @@ class EventRankStat(models.Model):
         return f"{self.event}"
 
 
-class StudioSessions(BaseModel):
+class StudioSessions(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     band = models.ForeignKey(
@@ -1561,8 +1567,14 @@ class StudioSessions(BaseModel):
         db_table = "studio_sessions"
         verbose_name_plural = "studio_sessions"
 
+    def __str__(self) -> str:
+        if not self.name:
+            return ""
 
-class UserAttendedShows(BaseModel):
+        return self.name
+
+
+class UserAttendedShows(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1585,8 +1597,11 @@ class UserAttendedShows(BaseModel):
         verbose_name_plural = "user_attended_shows"
         unique_together = ("user", "event")
 
+    def __str__(self) -> str:
+        return f"{self.event} - {self.user}"
 
-class Guests(BaseModel):
+
+class Guests(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1608,8 +1623,11 @@ class Guests(BaseModel):
         db_table = "guests"
         verbose_name_plural = "guests"
 
+    def __str__(self) -> str:
+        return f"{self.guest}"
 
-class Lyrics(BaseModel):
+
+class Lyrics(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1644,6 +1662,9 @@ class Lyrics(BaseModel):
         db_table = "lyrics"
         verbose_name_plural = "lyrics"
 
+    def __str__(self) -> str:
+        return f"{self.song}"
+
 
 class Updates(models.Model):
     id = models.AutoField(primary_key=True)
@@ -1662,7 +1683,7 @@ class Updates(models.Model):
         return f"{self.item}: {self.value}"
 
 
-class SiteUpdates(BaseModel):
+class SiteUpdates(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     description = models.TextField()
 
@@ -1670,6 +1691,9 @@ class SiteUpdates(BaseModel):
 
     class Meta:
         db_table = "update_table"
+
+    def __str__(self) -> str:
+        return f"{self.description}"
 
 
 class OnstageBandMembers(models.Model):
@@ -1712,7 +1736,7 @@ class OnstageBandMembers(models.Model):
         return f"{self.relation}: {self.count}"
 
 
-class ReleaseDiscs(BaseModel):
+class ReleaseDiscs(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     release = models.ForeignKey(Releases, on_delete=models.DO_NOTHING)
     disc_num = models.IntegerField()
@@ -1787,7 +1811,7 @@ class SetlistEntries(models.Model):
         return f"{self.event}"
 
 
-class Notes(BaseModel):
+class Notes(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     event = models.ForeignKey(
         Events,
@@ -1815,7 +1839,7 @@ class Notes(BaseModel):
         return re.sub("'{2,}", "'", self.note)
 
 
-class Contact(BaseModel):
+class Contact(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     email = models.EmailField()
 
@@ -1970,7 +1994,7 @@ class SetlistStats(models.Model):
         return f"{self.setlist}"
 
 
-class EventTypes(BaseModel):
+class EventTypes(BaseModel, models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
     name = models.TextField()
     slug = models.TextField()
@@ -1984,7 +2008,7 @@ class EventTypes(BaseModel):
         return self.name
 
 
-class BlogCategory(BaseModel):
+class BlogCategory(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -2000,7 +2024,7 @@ class BlogCategory(BaseModel):
         return self.name
 
 
-class BlogTags(BaseModel):
+class BlogTags(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -2013,7 +2037,7 @@ class BlogTags(BaseModel):
         return self.name
 
 
-class BlogPosts(BaseModel):
+class BlogPosts(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
@@ -2118,13 +2142,16 @@ class BlogPostCategories(models.Model):
         return f"{self.post} - {self.category}"
 
 
-class BlogAuthors(BaseModel):
+class BlogAuthors(BaseModel, models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     class Meta:
         db_table = "blog_authors"
         verbose_name_plural = "blog authors"
+
+    def __str__(self) -> str:
+        return f"{self.author}"
 
 
 class Tags(models.Model):

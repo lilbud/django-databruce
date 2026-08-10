@@ -303,3 +303,17 @@ First public release of the site. Site was locked behind a login and accounts on
 - Numerous style tweaks.
 - Setlist Table widths have been fixed
 - Add placeholder to setlist table while loading.
+
+# v1.19.1 (August 10, 2026)
+
+- Updated site to Django 6.1
+- Improved User Album Breakdown and Setlist Breakdown views, they now load a bit faster
+- User Album Breakdown now makes use of the `Masonry` library. Which means that the cards will nest together regardless of height.
+- User Album Breakdown style tweaks, album art is now shown if present. Inspired by WTED Archives.
+- Improved eventSearch, fixed issue where artist/venue didn't show.
+- Fixed songDetail page showing "Original Artist" when empty
+- Fixed songDetail page showing "None%" for frequency
+- Fixed eventDetail showing Radio Nowhere button when there are no shows in that collection for the event.
+- Added `user` filter to Setlist Breakdown, no clue what I'll do with it but it is there now.
+- Added `Tags` model for events, unpopulated right now but plan to add event tags later.
+- Datatables now have a colored indicator for sorted column. Right now it is a blue stroke at top/bottom. Inspired by tdarr's interface.

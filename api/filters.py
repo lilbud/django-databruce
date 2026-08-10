@@ -1124,6 +1124,12 @@ class SetlistBreakdownFilter(filters.FilterSet):
         lookup_expr="exact",
     )
 
+    user = filters.NumberFilter(
+        field_name="setlists__event__user_event__user_id",
+        lookup_expr="exact",
+        label="user",
+    )
+
 
 class EventTypeFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
@@ -1136,6 +1142,7 @@ class UserAlbumBreakdownFilter(filters.FilterSet):
     user = filters.NumberFilter(
         field_name="event__user_event__user_id",
         lookup_expr="exact",
+        label="user",
     )
 
 

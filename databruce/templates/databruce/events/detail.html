@@ -142,7 +142,7 @@
                             Nugs
                           </a>
                         {% endif %}
-                        {% if event.archive_links %}
+                        {% if event.archive_links.count > 0 %}
                           <a role="button"
                              target="_blank"
                              href="https://archive.org/details/radionowhere?tab=collection&query={{ event.date|date:" Y-m-d" }}"
