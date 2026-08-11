@@ -3,16 +3,6 @@ function eventSearch(query) {
   results.innerHTML = '';
   $('#results').hide();
 
-  // If the query is a date, format to YYYY-MM-DD
-  if (/^\d/.test(query)) {
-    let numbersOnly = query.replace(/\D/g, '');
-    let formatted = '';
-    if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
-    if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
-    if (numbersOnly.length >= 6) formatted += '-' + numbersOnly.substring(6, 8);
-    $(this).val(formatted);
-  }
-
   // Only trigger search if input longer than 4 characters
   if (query.length >= 4) {
     // Show spinner
