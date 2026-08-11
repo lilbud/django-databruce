@@ -29,7 +29,6 @@ INTERNAL_IPS = [
 
 INSTALLED_APPS += [
     "django_erd_generator",
-    "drf_spectacular",
 ]
 
 # Database
