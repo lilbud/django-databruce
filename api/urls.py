@@ -104,6 +104,16 @@ router.register(
     views.YearSongBreakdown,
     basename="year_song_breakdown",
 )
+router.register(
+    r"event_tags",
+    views.EventTagsViewSet,
+    basename="event_tags",
+)
+router.register(
+    r"tags",
+    views.TagsViewSet,
+    basename="tags",
+)
 
 
 # The API URLs are now determined automatically by the router.

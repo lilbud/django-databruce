@@ -78,7 +78,7 @@
             'type': 'text',
             'render': function (data, type, row, meta) {
               if (data) {
-                return '<a href="/events/' + data.event_id + '">' + data.date + '</a>';
+                return `<a href="/events/${data.event_id}">${data.date}</a>`;
               }
             },
           },
@@ -89,24 +89,24 @@
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (data) {
-                return '<a href="/venues/' + data.id + '">' + data.name + '</a>';
+                return `<a href="/venues/${data.uuid}">${data.name}</a>`
               }
             },
           },
           {
-            'data': 'setlist.set_name',
+            'data': 'set_name',
             'name': 'setlist__set_name',
             'className': 'text-nowrap',
             'width': '8rem',
           },
           {
-            'data': 'setlist.song',
+            'data': 'song',
             'name': 'setlist__song__name',
             'className': 'text-nowrap',
             'width': '12rem',
             'render': function (data, type, row, meta) {
               if (data) {
-                return '<a href="/songs/' + data.id + '">' + data.name + '</a>';
+                return `<a href="/songs/${data.slug}">${data.name}</a>`;
               }
             },
           },

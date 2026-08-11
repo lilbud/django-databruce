@@ -298,8 +298,7 @@ class Countries(BaseModel, models.Model):
 class Covers(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
-    event_date = models.TextField(default=None, blank=True, null=True)
-    url = models.TextField(unique=True, default=None, db_column="cover_url")
+    url = models.TextField(unique=True, default=None)
 
     event = models.ForeignKey(
         to="Events",
@@ -2158,12 +2157,13 @@ class Tags(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
     slug = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "tags"
 
     def __str__(self) -> str:
@@ -2172,11 +2172,16 @@ class Tags(models.Model):
 
 class EventTags(models.Model):
     id = models.AutoField(primary_key=True)
-    event = models.ForeignKey(Events, on_delete=models.DO_NOTHING)
+    event = models.ForeignKey(
+        Events,
+        on_delete=models.DO_NOTHING,
+        db_column="event_id",
+        related_name="event_tags",
+    )
     tag = models.ForeignKey(Tags, on_delete=models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "event_tags"
 
     def __str__(self) -> str:

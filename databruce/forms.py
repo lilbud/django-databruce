@@ -56,6 +56,7 @@ class AdvancedEventSearch(forms.Form):
             "day",
             "conjunction",
             "event_type",
+            "event_tag",
         ]
 
         for field_name in list(self.fields.keys()):
@@ -235,6 +236,20 @@ class AdvancedEventSearch(forms.Form):
                 "class": "form-select form-select-sm select2-multi",
                 "id": "type",
                 "name": "event_type",
+                "placeholder": "Choose multiple",
+            },
+        ),
+    )
+
+    event_tag = CustomMultipleChoiceField(
+        label="Event Tag",
+        lookup_path="event_tags__tag_id",
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={
+                "class": "form-select form-select-sm select2-multi",
+                "id": "tag",
+                "name": "event_tag",
                 "placeholder": "Choose multiple",
             },
         ),
@@ -446,6 +461,17 @@ class AdvancedEventSearch(forms.Form):
                 )
 
             return models.EventTypes.objects.get(id=self.cleaned_data["event_type"])
+
+        return None
+
+    def clean_event_tag(self):
+        if self.cleaned_data["event_tag"]:
+            if isinstance(self.cleaned_data["event_tag"], list):
+                return models.Tags.objects.filter(
+                    id__in=self.cleaned_data["event_tag"],
+                )
+
+            return models.Tags.objects.get(id=self.cleaned_data["event_tag"])
 
         return None
 

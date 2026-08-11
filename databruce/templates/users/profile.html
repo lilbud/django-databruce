@@ -251,7 +251,6 @@
           }
 
           col.removeClass('d-none');
-          //col.find('.card-header').append(`<span class="fw-semibold text-reset">${item.name}</span>`).append(`<span><img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.category)}"></span>`);
           col.attr('id', `album-${index}`);
 
           const html = `
@@ -264,8 +263,6 @@
           `;
 
           col.find('.card-header').append(html)
-
-          console.log(col.find('.card-header').prop('outerHTML'))
 
           item.songs.forEach((i) => {
             var listItem = $('<li />').addClass('list-group-item d-inline-flex gap-1')
@@ -294,7 +291,6 @@
           percentPosition: true,
           horizontalOrder: true // CRITICAL: Forces Masonry to layout items left-to-right first
         });
-
       }).catch(error => console.error('Error:', error));
       
       // needed to initalize masonry when tab is loaded correctly
@@ -306,72 +302,9 @@
       /* datatables */
       eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?user={{ info.id }}&format=custom', '30vh');
+      songTable('/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom', '30vh', '#notSeenTable');
+      songTable('/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom', '30vh', '#rareTable');
 
-      var notSeenTable = new DataTable('#notSeenTable', {
-        scrollY: '30vh',
-        ajax: {
-          'url': '/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom'
-        },
-        columnDefs: song_table_defs,
-        columns: [
-          {
-            'data': 'song.num_plays_public',
-            'name': 'song__num_plays_public',
-            'width': '1rem',
-            'className': 'all text-center',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data
-              }
-            },
-          },
-          {
-            'data': 'song',
-            'name': 'song__sort_song_name',
-            'width': '15rem',
-            'className': 'all',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/songs/${data.uuid}">${data.name}</a>`
-              }
-            },
-          },
-          { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': '' },
-          {
-            'data': 'song.first_event',
-            'name': 'song__first_event',
-            'width': '10rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return renderLink('/events/', data.event_id, data.date_day);
-              }
-            },
-          },
-          {
-            'data': 'song.last_event',
-            'name': 'song__last_event',
-            'width': '10rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return renderLink('/events/', data.event_id, data.date_day);
-              }
-            },
-          },
-          { 'data': 'song__original', 'name': 'song__original', 'visible': false, 'orderable': false },
-        ],
-      });
-
-      tableSearch(notSeenTable, 'unseen-song-search');
-
-      var rareTable = new DataTable('#rareTable', {
-        ajax: {
-          'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom'
-        },
-        columnDefs: song_table_defs,
-        columns: song_table_columns,
-      });
-
-      tableSearch(rareTable, 'rare-song-search');
     })
   </script>
 {% endblock content %}

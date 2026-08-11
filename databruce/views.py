@@ -1239,7 +1239,10 @@ class AdvancedSearchResults(PageTitleMixin, TemplateView):
         setlist_search_display_queries = []
 
         for f in event_filter.children:
-            sl_filter &= Q(**{f"event__{f[0]}": f[1]})  # type: ignore
+            if type(f) == Q:
+                sl_filter &= f
+            else:
+                sl_filter &= Q(**{f"event__{f[0]}": f[1]})  # type: ignore
 
         if formset.is_valid() and formset.has_changed():
             song_ids = [
@@ -1753,6 +1756,32 @@ class EventType(PageTitleMixin, TemplateView):
             "id",
             "name",
             "uuid",
+            "slug",
+        )
+
+        return context
+
+
+class EventTag(PageTitleMixin, TemplateView):
+    template_name = "databruce/events/tag.html"
+    title = "Events by Tag"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        if "slug" not in self.kwargs:
+            context["tag"] = models.Tags.objects.first()
+        else:
+            context["tag"] = get_object_or_404(
+                models.Tags,
+                slug=self.kwargs["slug"],
+            )
+
+        context["title"] = f"Event Tag '{context['tag']}'"
+
+        context["tags"] = models.Tags.objects.values(
+            "id",
+            "name",
             "slug",
         )
 

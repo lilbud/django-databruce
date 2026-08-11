@@ -6,6 +6,11 @@ from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, reverse_lazy
 from django.views.generic.base import TemplateView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 from . import views
 from .config import base as settings
@@ -137,6 +142,8 @@ urlpatterns = [
         name="event_details_test",
     ),
     path("events/type/<str:slug>/", views.EventType.as_view(), name="events_by_type"),
+    path("events/tag/<str:slug>/", views.EventTag.as_view(), name="events_by_tag"),
+    path("events/tag", views.EventTag.as_view(), name="events_tag"),
     path("events/type", views.EventType.as_view(), name="events_type"),
     path("songs", views.Song.as_view(), name="songs"),
     path("songs/<uuid:id>", views.SongDetail.as_view(), name="song_details"),
@@ -235,3 +242,19 @@ urlpatterns = [
 
 if not settings.TESTING:
     urlpatterns = [*urlpatterns, *debug_toolbar_urls()]
+
+urlpatterns += [
+    # Downloads the raw schema file (YAML/JSON)
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    # Optional UI interactive interfaces
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
+]

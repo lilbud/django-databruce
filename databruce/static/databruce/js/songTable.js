@@ -49,14 +49,18 @@ song_table_columns = [
   { 'data': 'song__original', 'name': 'song__original', 'visible': false, 'orderable': false },
 ]
 
-function songTable(url, height) {
+function songTable(url, height, tableID) {
   let searchTimeout;
+
+  if (!tableID) {
+    tableID = '#songTable';
+  }
 
   if (!height) {
     height = 'auto';
   }
 
-  var table = new DataTable('#songTable', {
+  var table = new DataTable(tableID, {
     ajax: {
       'url': url,
     },

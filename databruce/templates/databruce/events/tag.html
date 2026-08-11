@@ -1,0 +1,67 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load static %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+{% endblock extrajs %}
+{% block content %}
+  <div class="col-12">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-start mb-3">
+          <div class="text-2xl pe-2">Events by Tag</div>
+          <div id="type-select" class="pe-2">
+            <button class="btn btn-sm btn-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ tag }}</button>
+            <ul class="dropdown-menu">
+              {% for i in tags %}
+                <li>
+                  <a class="dropdown-item" href="{% url "events_by_tag" slug=i.slug %}">{{ i.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-2">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="prefix-container">
+                <span class="prefix">Description</span>
+                <span class="value">{{ tag.description }}</span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  $(document).ready(function () {
+    eventTable('/api/v1/events/?tag={{ tag.id }}&format=custom');
+
+    $(function(){
+      // bind change event to select
+      $('#type_select').on('change', function () {
+          var url = $(this).val() // get selected value
+          if (url) { // require a URL
+              window.location = url; // redirect
+          }
+          return false;
+      });
+    });
+  });
+  </script>
+{% endblock content %}

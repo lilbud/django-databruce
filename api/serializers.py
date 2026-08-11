@@ -371,7 +371,22 @@ class OnstageSerializer(BaseSerializer):
 class EventTypeSerializer(BaseSerializer):
     class Meta:
         model = models.EventTypes
-        fields = ["name", "slug"]
+        fields = ["id", "name", "slug"]
+
+
+class TagsSerializer(BaseSerializer):
+    class Meta:
+        model = models.Tags
+        fields = ["id", "name", "slug", "description"]
+
+
+class EventTagSerializer(BaseSerializer):
+    event = MinimalEventSerializer()
+    tag = TagsSerializer()
+
+    class Meta:
+        model = models.EventTags
+        fields = ["id", "event", "tag"]
 
 
 class EventSearchSerializer(BaseSerializer):
@@ -560,7 +575,7 @@ class ContinentsSerializer(BaseSerializer):
 class CoversSerializer(BaseSerializer):
     class Meta:
         model = models.Covers
-        fields = "__all__"
+        fields = ["id", "url"]
 
 
 class NugsSerializer(BaseSerializer):
@@ -700,7 +715,7 @@ class SetlistSerializer(BaseSerializer):
         required=False,
         include=["date", "event_id"],
     )
-    count = serializers.IntegerField(required=False)
+    # count = serializers.IntegerField(required=False)
     notes = serializers.SerializerMethodField()
     gap = serializers.SerializerMethodField()
 
@@ -729,7 +744,6 @@ class SetlistSerializer(BaseSerializer):
             "debut",
             "premiere",
             "set_name",
-            "count",
             "gap",
             "nobruce",
             "sign_request",
@@ -795,12 +809,13 @@ class SetlistFilterSerializer(BaseSerializer):
 
 
 class SetlistNotesSerializer(BaseSerializer):
-    event = EventsSerializer(include=["id", "event_id", "name", "venue", "date"])
-    setlist = MinimalSetlistSerializer()
+    event = EventsSerializer(include=["event_id", "venue", "date"])
+    song = MinimalSongsSerializer(source="setlist.song", include=["name", "slug"])
+    set_name = serializers.CharField(source="setlist.set_name", max_length=255)
 
     class Meta:
         model = models.SetlistNotes
-        fields = "__all__"
+        fields = ["event", "song", "set_name", "note"]
 
 
 class SnippetSerializer(BaseSerializer):
@@ -1136,13 +1151,13 @@ class UsersSerializer(BaseSerializer):
 
 class UserAttendedShowsSerializer(BaseSerializer):
     event = EventsSerializer(
-        include=["id", "event_id", "date", "venue", "tour", "artist", "has_setlist"],
+        include=["event_id", "date"],
     )
     user = MinimalUserSerializer()
 
     class Meta:
         model = models.UserAttendedShows
-        fields = "__all__"
+        fields = ["event", "user"]
 
 
 class SetlistBreakdownSerializer(BaseSerializer):
@@ -1258,7 +1273,7 @@ class UserAlbumBreakdownSerializer(serializers.ModelSerializer):
         tracks = getattr(obj, "release_tracks", [])
 
         if hasattr(tracks, "all"):
-            return list(tracks.all())
+            return list(tracks.all())  # type: ignore
 
         return list(tracks) if isinstance(tracks, (list, tuple)) else [tracks]
 

@@ -83,6 +83,11 @@
           <div class="col-9 col-md-4">{{ form.event_type }}</div>
         </div>
         <div class="row">
+          {{ form.event_tag.errors }}
+          <div class="form-label text-sm text-nowrap">{{ form.event_tag.label }}</div>
+          <div class="col-9 col-md-4">{{ form.event_tag }}</div>
+        </div>
+        <div class="row">
           {{ form.city.errors }}
           <label class="form-label text-sm">{{ form.city.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.city_exclude }}</div>

@@ -1,6 +1,6 @@
 # databruce - Data Dictionary
 
-Commit `17f408623f48929941b2df0bbec7527dcec83a93`
+Commit `d90db54d6c8e65966d5d6dacbd57e37e40ae5a2b`
 
 ---
 
@@ -545,7 +545,7 @@ Django provides full support for anonymous sessions. The session
 
 #### Releases[#](#releases)
 
-`Releases(created_at, updated_at, id, uuid, brucebase_id, name, length, spotify_link, type, format, date, short_name, thumb, note, mbid, event)`
+`Releases(created_at, updated_at, id, uuid, brucebase_id, name, length, spotify_link, type, format, date, short_name, thumb, note, mbid, event, slug)`
 
 | pk | field_name | data_type | related_model | description | nullable | unique | choices | max_length | db_index |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -565,6 +565,7 @@ Django provides full support for anonymous sessions. The session
 |  | note | `text` |  |  | ✓ |  |  |  |  |
 |  | mbid | `uuid` |  |  | ✓ |  |  | 32 |  |
 |  | event_id | `integer` | [Events](#events) |  | ✓ |  |  |  | ✓ |
+|  | slug | `text` |  |  | ✓ |  |  |  |  |
 
 #### SetlistNotes[#](#setlistnotes)
 

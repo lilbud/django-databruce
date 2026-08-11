@@ -33,6 +33,10 @@ function get_options({ ajax_url = false }) {
               text = item.text;
             }
 
+            if (ajax_url.includes('tags')) {
+              text = item.slug;
+            }
+
             return {
               id: item.id,
               text: text
@@ -160,6 +164,7 @@ $(document).ready(function () {
   $('#band').select2(get_options({ ajax_url: 'bands/' }));
   $('#venue').select2(get_options({ ajax_url: 'venues/' }));
   $('#type').select2(get_options({ ajax_url: 'event_types/' }));
+  $('#tag').select2(get_options({ ajax_url: 'tags/' }));
 
   row.find('.song2').parent().hide();
   row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));

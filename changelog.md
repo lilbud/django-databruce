@@ -317,3 +317,13 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added `user` filter to Setlist Breakdown, no clue what I'll do with it but it is there now.
 - Added `Tags` model for events, unpopulated right now but plan to add event tags later.
 - Datatables now have a colored indicator for sorted column. Right now it is a blue stroke at top/bottom. Inspired by tdarr's interface.
+
+# v1.19.2 (August 11, 2026)
+
+- Cleaned up several more API views/filters
+- Added `Event Tags`. These are tags that can be added to events for marking certain attributes about an event. Right now the list mostly consists of marking Full Album Performances, with some others added in. Inspired by Jerrybase.
+- Added view for Event Tag
+- Improved `Setlist Note Search`, now a tad faster.
+- All tables on User Profile page are now consistent, and also have the "count" column populated again.
+- Added `Event Tag` as a searchable field on Advanced Search
+- Removed button row on EventDetail header. These have been moved to the "Links" tab

@@ -22,8 +22,14 @@ function showTablePlaceholder($tbody, colCount, rowCount = 3) {
   $tbody.html(placeholderRows);
 }
 
+const getNestedValue = (obj, path) => {
+  return path.split('.').reduce((acc, part) => acc?.[part], obj);
+};
+
 function rowGroup(data, groupVal) {
-  return Object.groupBy(data ?? [], (item) => item[groupVal]);
+  return Object.groupBy(data ?? [], (item) => {
+    return getNestedValue(item, groupVal) ?? "Unknown";
+  });
 }
 
 async function createTable(url, columns, tableSelectorOrElem, options) {
@@ -60,8 +66,11 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
     if (options && options.rowGroup) {
       Object.entries(data).forEach(([key, value]) => {
         const columnsCount = tbody.closest('table').find('thead th').length || 2;
-        const setHeader = $(`<tr class="set-header"><td class="py-0" colspan="${columnsCount}"><span>${key}</span></td></tr>`);
-        fragment.append(setHeader);
+        let setHeader = $(`<tr class="set-header"><td class="py-0" colspan="${columnsCount}"><span>${key}</span></td></tr>`);
+
+        if (key !== "Unknown") {
+          fragment.append(setHeader);
+        }
 
         value.forEach((rowVal) => {
           let row = $('<tr />');

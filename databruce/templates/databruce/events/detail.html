@@ -90,21 +90,21 @@
                     <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                          id="badge-row">
                       {% if event.type %}
-                        <a href="{% url 'events_by_type' slug=event.type.slug %}"><span class="badge badge-primary">{{ event.type }}</span></a>
+                        <a href="{% url 'events_by_type' slug=event.type.slug %}"><span class="badge badge-primary">Type: {{ event.type }}</span></a>
                       {% endif %}
                       {% if event.tour %}
-                        <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">{{ event.tour }}</span></a>
+                        <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>
                       {% endif %}
                       {% if event.leg %}
-                        <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge badge-primary">{{ event.leg.name }}</span></a>
+                        <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge badge-primary">Tour Leg: {{ event.leg.name }}</span></a>
                       {% endif %}
                       {% if event.run %}
-                        <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge badge-primary">{{ event.run.name }}</span></a>
+                        <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge badge-primary">Run: {{ event.run.name }}</span></a>
                       {% endif %}
                     </div>
                   </div>
                 </div>
-                {% if event.brucebase_url or event.nugs_event.count > 0 %}
+                {% comment %} {% if event.brucebase_url or event.nugs_event.count > 0 %}
                   <div class="row mt-3">
                     <div class="col-auto">
                       <div class="badge-row d-flex-inline flex-sm-wrap flex-nowrap gap-0 row-gap-1 column-gap-1"
@@ -161,7 +161,7 @@
                       </div>
                     </div>
                   </div>
-                {% endif %}
+                {% endif %} {% endcomment %}
               </div>
               <div class="flex-shrink-1">
                 {% if user.is_authenticated and event.public %}
@@ -425,6 +425,25 @@
                   </div>
                 </div>
               {% endif %}
+              {% if event.event_tags %}
+              <div class="col-12 col-lg-12 order-4">
+                  <div class="card h-100">
+                    <div class="card-header">
+                      <span>Tags</span>
+                      <i class="bi bi-tag"></i>
+                    </div>
+                    <div class="card-body" id="tags">
+                      {% for tag in event.event_tags.all %}
+                      <span class='badge badge-secondary text-2xs'>
+                        {{ tag.tag.slug }}
+                      </span>
+                        
+                      {% endfor %}
+
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -443,7 +462,6 @@
                   <thead>
                     <th class="all">Guest</th>
                     <th class="all">Person</th>
-                    <th class="all">Band</th>
                   </thead>
                   <tbody>
                   </tbody>
@@ -507,11 +525,18 @@
                   </ul>
                 {% endfor %}
               {% endif %}
-              {% if event.brucebase_url %}
+              {% if event.brucebase_url or event.nugs %}
                 <ul class="ps-3">
-                  <li class="ps-0">
-                    <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
-                  </li>
+                  {% if event.brucebase_url %}
+                    <li class="ps-0">
+                      <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
+                    </li>
+                  {% endif %}
+                  {% if event.nugs %}
+                    <li class="ps-0">
+                      <a href="{{ event.nugs_event.url }}">Nugs Release</a>
+                    </li>
+                  {% endif %}
                 </ul>
               {% endif %}
             </div>
@@ -710,6 +735,12 @@
 
     await albumBreakdown(`/api/v1/setlist_breakdown/?event={{ event.id }}&format=json&ordering=-song_count`);
 
+    let onstageOptions = {
+      rowGroup: {
+        groupVal: 'band.name'
+      }
+    }
+
     onstageColumns = [
       {
         'data': 'guest',
@@ -729,18 +760,9 @@
           }
         },
       },
-      {
-        'data': 'band',
-        'className': 'text-nowrap',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return `<a class="text-reset" href="/bands/${data.uuid}">${data.name}</a>`;
-          }
-        },
-      },
     ]
     
-    createTable('/api/v1/onstage/?event={{ id }}&format=json', onstageColumns, '#onstageTable');
+    createTable('/api/v1/onstage/?event={{ event.id }}&format=json', onstageColumns, '#onstageTable', onstageOptions);
 
     var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
 
