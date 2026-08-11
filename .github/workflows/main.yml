@@ -33,7 +33,7 @@ jobs:
             source .venv/bin/activate
 
             # install requirements
-            uv add -r requirements.txt
+            HOME/.local/bin/uv add -r requirements.txt
 
             # Stop Gunicorn
             sudo systemctl stop gunicorn gunicorn.socket
