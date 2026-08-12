@@ -1,5 +1,6 @@
+import msgspec
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.renderers import JSONRenderer
+from rest_framework.renderers import BaseRenderer
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -56,14 +57,43 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
         return super().get_paginated_response(data)
 
 
-class DatatablesRenderer(JSONRenderer):
+class DatatablesRenderer(BaseRenderer):
     media_type = "application/json"
     format = "custom"  # Triggered by ?format=custom
+    charset = "utf-8"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        if data is None:
+            return b""
+
         # Only apply the "data" wrapper if this specific format was selected
         if renderer_context and renderer_context.get("format") == "custom":
-            if data is not None and "data" not in data:
+            if isinstance(data, dict) and "data" not in data:
+                data = {"data": data}
+            elif not isinstance(data, dict):
+                # Handles primitives, lists, or msgspec.Struct objects safely
                 data = {"data": data}
 
-        return super().render(data, accepted_media_type, renderer_context)
+        # msgspec returns bytes directly, which DRF expects
+        return msgspec.json.encode(data)
+
+
+class JSONRenderer(BaseRenderer):
+    media_type = "application/json"
+    format = "json"  # Triggered by ?format=custom
+    charset = "utf-8"
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if data is None:
+            return b""
+
+        # Only apply the "data" wrapper if this specific format was selected
+        if renderer_context and renderer_context.get("format") == "custom":
+            if isinstance(data, dict) and "data" not in data:
+                data = {"data": data}
+            elif not isinstance(data, dict):
+                # Handles primitives, lists, or msgspec.Struct objects safely
+                data = {"data": data}
+
+        # msgspec returns bytes directly, which DRF expects
+        return msgspec.json.encode(data)

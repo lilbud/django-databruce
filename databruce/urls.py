@@ -4,7 +4,7 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
-from django.urls import include, path, reverse_lazy
+from django.urls import include, path, re_path, reverse_lazy
 from django.views.generic.base import TemplateView
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -123,12 +123,12 @@ urlpatterns = [
         views.SignUpConfirm.as_view(),
         name="signup_confirm",
     ),
-    path(
-        "users",
+    re_path(
+        "^users/?$",
         views.Users.as_view(),
         name="users",
     ),
-    path("events", views.Event.as_view(), name="events"),
+    re_path("^events/?$", views.Event.as_view(), name="events"),
     path("events/<int:year>", views.Event.as_view(), name="events_year"),
     path("events/<str:id>/", views.EventDetail.as_view(), name="event_details"),
     path(
@@ -142,21 +142,21 @@ urlpatterns = [
         name="event_details_test",
     ),
     path("events/type/<str:slug>/", views.EventType.as_view(), name="events_by_type"),
-    path("events/tag/<str:slug>/", views.EventTag.as_view(), name="events_by_tag"),
-    path("events/tag", views.EventTag.as_view(), name="events_tag"),
+    path("events/tags/<str:slug>/", views.EventTag.as_view(), name="events_by_tag"),
+    path("events/tags", views.EventTag.as_view(), name="events_tag"),
     path("events/type", views.EventType.as_view(), name="events_type"),
-    path("songs", views.Song.as_view(), name="songs"),
+    re_path("^songs/?$", views.Song.as_view(), name="songs"),
     path("songs/<uuid:id>", views.SongDetail.as_view(), name="song_details"),
     path("songs/<str:slug>", views.SongDetail.as_view(), name="song_details"),
-    path("lyrics", views.SongLyrics.as_view(), name="song_lyrics"),
+    re_path("^lyrics/?$", views.SongLyrics.as_view(), name="song_lyrics"),
     path(
         "lyrics/<uuid:id>",
         views.SongLyricDetail.as_view(),
         name="lyric_detail",
     ),
-    path("venues", views.Venue.as_view(), name="venues"),
+    re_path("^venues/?$", views.Venue.as_view(), name="venues"),
     path("venues/<uuid:id>", views.VenueDetail.as_view(), name="venue_details"),
-    path("tours", views.Tour.as_view(), name="tours"),
+    re_path("^tours/?$", views.Tour.as_view(), name="tours"),
     path("tours/<uuid:id>", views.TourDetail.as_view(), name="tour_details"),
     path("search/results", views.EventSearch.as_view(), name="search"),
     path(
@@ -194,13 +194,13 @@ urlpatterns = [
         views.SetlistNotesSearch.as_view(),
         name="note_search",
     ),
-    path("relations", views.Relation.as_view(), name="relations"),
+    re_path("^relations/?$", views.Relation.as_view(), name="relations"),
     path(
         "relations/<uuid:id>",
         views.RelationDetail.as_view(),
         name="relation_details",
     ),
-    path("bands", views.Band.as_view(), name="bands"),
+    re_path("^bands/?$", views.Band.as_view(), name="bands"),
     path("bands/<uuid:id>", views.BandDetail.as_view(), name="band_details"),
     path("releases/", views.Release.as_view(), name="releases"),
     path("releases/<uuid:id>", views.ReleaseDetail.as_view(), name="release_details"),
@@ -236,7 +236,7 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    path("updates", views.Updates.as_view(), name="updates"),
+    re_path("^updates/?$", views.Updates.as_view(), name="updates"),
 ]
 
 

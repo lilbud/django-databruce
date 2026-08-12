@@ -24,6 +24,11 @@ def get_navbar_links():
                     "url": "events_by_type",
                     "kwargs": {"slug": "concert"},
                 },
+                {
+                    "name": "Events By Tag",
+                    "url": "events_by_tag",
+                    "kwargs": {"slug": "full-greetings"},
+                },
                 {"name": "Event Calendar", "url": "calendar"},
             ],
         },

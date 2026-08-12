@@ -327,3 +327,11 @@ First public release of the site. Site was locked behind a login and accounts on
 - All tables on User Profile page are now consistent, and also have the "count" column populated again.
 - Added `Event Tag` as a searchable field on Advanced Search
 - Removed button row on EventDetail header. These have been moved to the "Links" tab
+
+# v1.19.3 (August 12, 2026)
+
+- Style tweaks, updated table head to highlight when that column is sorting
+- Updated EventDetail to get user list and count via JS instead of Django
+- updated EventDetail tags to link to that event tag page
+- modified urls to work with trailing slash or none
+- added `events_by_tag` to navbar

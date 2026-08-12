@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django_watchfiles",
     "sentry_sdk",
     "drf_spectacular",
+    "django_msgspec",
 ]
 
 SITE_ID = 1
@@ -166,7 +167,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
-        "rest_framework.renderers.JSONRenderer",
+        "databruce.pagination.JSONRenderer",
         "databruce.pagination.DatatablesRenderer",
     ),
     "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",

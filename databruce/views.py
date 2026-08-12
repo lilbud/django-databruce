@@ -648,10 +648,6 @@ class EventDetail(PageTitleMixin, TemplateView):
                 event_id=event.pk,
             ).first()
 
-        context["users"] = models.UserAttendedShows.objects.filter(
-            event_id=event.pk,
-        )
-
         if context["event"].run:
             if context["event"].run.ticket_range:
                 context["ticket_range"] = [

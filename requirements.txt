@@ -24,3 +24,4 @@ querystring_parser
 sentry-sdk
 django-watchfiles
 drf-spectacular
+django-msgspec

@@ -56,6 +56,8 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
       tbody = table.find('tbody');
     }
 
+    showTablePlaceholder($tbody, colCount, data.count);
+
     if (options && options.rowGroup) {
       data = rowGroup(data.results, options.rowGroup.groupVal);
     }

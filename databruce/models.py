@@ -704,9 +704,9 @@ class Events(BaseModel, models.Model):
     def get_date(self) -> str:
         if self.date:
             if self.early_late:
-                return f"{self.date.strftime('%Y-%m-%d [%a]')} ({self.early_late})"
+                return f"{self.date.strftime('%Y-%m-%d')} ({self.early_late})"
 
-            return f"{self.date.strftime('%Y-%m-%d [%a]')}"
+            return f"{self.date.strftime('%Y-%m-%d')}"
 
         return format_fuzzy(self.event_id)
 

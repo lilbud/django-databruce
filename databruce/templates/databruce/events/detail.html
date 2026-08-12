@@ -190,16 +190,15 @@
                         </button>
                         <span class="d-inline-block"
                               tabindex="0"
+                              id="user-list"
                               data-bs-toggle="tooltip"
                               data-bs-placement="top"
                               data-bs-html="true"
-                              data-bs-title="<small>Users Present:<br><div>
-                          {% for user in users %}{{ user.user }}<br>{% endfor %}
-                        </div></small>">
+                              >
                           <button type="button"
                                   id="usercount"
                                   disabled
-                                  class="btn rounded-start-0 btn-sm {% if user_attended %} btn-primary {% else %} btn-neutral {% endif %}">{{ users.count }}</button>
+                                  class="btn rounded-start-0 btn-sm {% if user_attended %} btn-primary {% else %} btn-neutral {% endif %}">0</button>
                         </span>
                       {% endspaceless %}
                     </div>
@@ -432,14 +431,14 @@
                       <span>Tags</span>
                       <i class="bi bi-tag"></i>
                     </div>
-                    <div class="card-body" id="tags">
+                    <div class="card-body p-2" id="tags">
                       {% for tag in event.event_tags.all %}
-                      <span class='badge badge-secondary text-2xs'>
-                        {{ tag.tag.slug }}
-                      </span>
-                        
-                      {% endfor %}
+                      <a href="{% url "events_by_tag" slug=tag.tag.slug %}">
 
+                      <span class='badge tag-badge'>
+                        {{ tag.tag.slug }}
+                      </span></a>
+                      {% endfor %}
                     </div>
                   </div>
                 </div>
@@ -733,6 +732,20 @@
     var event = "{{ event.id }}";
     var event_id = "{{ event.event_id }}";
 
+    fetch(`/api/v1/user_attended_shows/?user=&event=${event}&format=json`)
+      .then(response => response.json())
+      .then(data => {
+        const userCount = data.count;
+        const tooltipUsers = data.results.map(item => {
+          return `${item.user.username}`
+        }).join('<br>');
+
+        var html = `<small>Users Present:<br><div>${tooltipUsers}</div></small>`;
+
+        $('#user-list').attr('data-bs-title', html);
+        $('#usercount').text(userCount);
+      }).catch(error => console.error('Error:', error));
+
     await albumBreakdown(`/api/v1/setlist_breakdown/?event={{ event.id }}&format=json&ordering=-song_count`);
 
     let onstageOptions = {
@@ -768,13 +781,12 @@
 
     let setlistOptions = {
       createdRow: function (row, data) {
-        row.addClass(slugify(data.set_name));
-
+        $(row).attr('data-set-name', slugify(data.set_name));
+        
         var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
         if (allowedSets.includes(data.set_name)) {
-          var album = data.song.category_slug;
-          row.attr('data-album', album);
+          $(row).attr('data-album', data.song.category_slug);
         }
 
         return row
@@ -932,24 +944,30 @@
 
     $('#copySetlist').click(function () {
       var btn = this;
+      var lines = [];
 
-      fetch('/api/v1/setlists/?event={{ event.id }}&format=json')
-        .then(response => response.json())
-        .then(data => {
-          var lines = [];
+      // 1. Select all table rows where data-set-name is exactly "Show"
+      $('table td.song').each(function() {
+        var song = $(this).find('a').text().trim();
+        var segue = $(this).find('span.segue');
+        var line = segue.length > 0 ? `${song} >` : song;
 
-          data.results.forEach(function (item) {
-            var song = item.segue ? `${item.song.name} >` : item.song.name;
-            lines.push(song);
-          });
+        lines.push(line);
+      });
 
-          try {
-            navigator.clipboard.writeText(lines.join('\n'));
-            console.log('Text copied to clipboard successfully!');
-          } catch (err) {
+      var textToCopy = lines.join('\n');
+
+      if (textToCopy) {
+        navigator.clipboard.writeText(textToCopy)
+          .then(function() {
+            console.log('List copied to clipboard!'); // Optional success feedback
+          })
+          .catch(function(err) {
             console.error('Failed to copy text: ', err);
-          }
-        });
+          });
+      } else {
+        alert('No setlist found to copy.');
+      }
 
       $(this).text('Setlist Copied').removeClass('btn-primary').addClass('btn-success');
 
@@ -959,31 +977,34 @@
       }, 3000);
     });
 
-    $('#userForm').submit(function (e) {
+    $('#userForm').submit(async function (e) {
       e.preventDefault();
-      var serializedData = $(this).serialize();
+      const formData = new FormData(this); 
 
-      $.ajax({
-        type: "POST",
-        url: "{% url 'add_show' %}",
-        data: serializedData,
-        success: function (data) {
-          $("#usercount").text(data['count']);
+      try {
+        const response = await fetch("{% url 'add_show' %}", {
+          method: 'POST',
+          body: FormData
+        });
 
-          if (data['action'] === 'added') {
-            $("#star").addClass('bi-star-fill').removeClass('bi-star');
-            $("#attended").text('Attended');
-            $("#addshow").addClass('btn-primary').removeClass('btn-neutral');
-            $("#usercount").addClass('btn-primary').removeClass('btn-neutral');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-          } else if (data['action'] === 'removed') {
-            $("#star").addClass('bi-star').removeClass('bi-star-fill');
-            $("#attended").text('Attended?');
-            $("#addshow").removeClass('btn-primary').addClass('btn-neutral');
-            $("#usercount").removeClass('btn-primary').addClass('btn-neutral');
-          };
-        },
-      });
+        const data = await response.json(); // Parses the JSON response body
+
+        $("#usercount").text(data['count']);
+        
+        const isAdded = data['action'] === 'added';
+
+        $("#star").toggleClass('bi-star-fill', isAdded).toggleClass('bi-star', !isAdded);
+        $("#addshow, #usercount").toggleClass('btn-primary', isAdded).toggleClass('btn-neutral', !isAdded);
+
+        $("#attended").text(isAdded ? 'Attended' : 'Attended?');
+
+      } catch (error) {
+        console.error('Error during POST request:', error);
+      }
     });
 
     const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';

@@ -1153,6 +1153,7 @@ class UserAttendedShowsSerializer(BaseSerializer):
     event = EventsSerializer(
         include=["event_id", "date"],
     )
+
     user = MinimalUserSerializer()
 
     class Meta:
