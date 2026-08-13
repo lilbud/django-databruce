@@ -441,8 +441,8 @@ class Venues(BaseModel, models.Model):
         if self.detail:
             name = f"{self.name}, {self.detail}"
 
-        if self.city and name:
-            name += f" ({self.city.name})"
+        # if self.city_id and name:
+        #     name += f" ({self.city.name})"
 
         return name
 
@@ -540,6 +540,8 @@ class Events(BaseModel, models.Model):
         related_name="event_venue",
         db_column="venue_id",
         default=None,
+        blank=True,
+        null=True,
     )
 
     tour = models.ForeignKey(
@@ -656,7 +658,12 @@ class Events(BaseModel, models.Model):
     ticket_range = models.TextField(blank=True, null=True, default=None)
     promo_company = models.TextField(blank=True, null=True, default=None)
 
-    # objects = CustomManager()
+    type = models.ManyToManyField(
+        "Types",
+        through="EventTypes",
+        related_name="types",
+    )
+    tags = models.ManyToManyField("Tags", through="EventTags", related_name="tags")
 
     class Meta:
         db_table = "events"
@@ -987,12 +994,13 @@ class Releases(BaseModel, models.Model):
 
 
 class SetlistNotes(models.Model):
+    id = models.AutoField(primary_key=True)
+
     setlist = models.ForeignKey(
         "Setlists",
         models.DO_NOTHING,
-        related_name="setlist_notes",
         db_column="setlist_id",
-        primary_key=True,
+        related_name="setlist_notes",
     )
 
     event = models.ForeignKey(
@@ -1801,34 +1809,6 @@ class SetlistEntries(models.Model):
         return f"{self.event}"
 
 
-class Notes(BaseModel, models.Model):
-    id = models.AutoField(primary_key=True)
-    event = models.ForeignKey(
-        Events,
-        on_delete=models.CASCADE,
-        db_column="event_id",
-    )
-    num = models.IntegerField()
-    note = models.TextField()
-    gap = models.TextField()
-    last = models.TextField()
-    last_date = models.TextField()
-    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
-    updated_at = models.DateTimeField(null=True)
-
-    setlist = models.ForeignKey(
-        Setlists,
-        on_delete=models.CASCADE,
-        db_column="setlist_id",
-    )
-
-    class Meta:
-        db_table = "notes"
-
-    def __str__(self) -> str:
-        return re.sub("'{2,}", "'", self.note)
-
-
 class Contact(BaseModel, models.Model):
     id = models.AutoField(primary_key=True)
     email = models.EmailField()
@@ -2184,12 +2164,14 @@ class Tags(models.Model):
 
 class EventTags(models.Model):
     id = models.AutoField(primary_key=True)
+
     event = models.ForeignKey(
         Events,
         on_delete=models.DO_NOTHING,
         db_column="event_id",
         related_name="event_tags",
     )
+
     tag = models.ForeignKey(Tags, on_delete=models.DO_NOTHING)
 
     class Meta:

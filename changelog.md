@@ -1,4 +1,6 @@
+```
 Note: While I have posted updates in various places, I've never compiled them together like this. This is a somewhat broad overview of changes to the site. The version numbers are largely arbitrary, and definitely don't follow "best practices". This is being written well after the fact, and the numbers are just to mark progress.
+```
 
 I had intended to create "releases" on Github, but you can't easily backdate them. And this really isn't a project with "releases", so it wouldn't make sense.
 
@@ -335,3 +337,10 @@ First public release of the site. Site was locked behind a login and accounts on
 - updated EventDetail tags to link to that event tag page
 - modified urls to work with trailing slash or none
 - added `events_by_tag` to navbar
+
+# v1.19.4 (August 13, 2026)
+
+- Advanced Search migrated to API, should be basically identical to the normal but consider it beta.
+- Changed Event Type to allow for multiple types per event. Each still only has 1 for the timebeing.
+- Removed `Unknown Venue`, which was a default venue for completely unknown events. The 3 events there were moved to known venues or ones marked `unknown, city`.
+- `Tours` updated to add note about Misc. Tours.

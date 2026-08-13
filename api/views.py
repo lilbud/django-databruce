@@ -6,6 +6,7 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import (
     CharField,
     Count,
+    Exists,
     F,
     IntegerField,
     Max,
@@ -60,8 +61,7 @@ class EventSearch(viewsets.ReadOnlyModelViewSet):
             "tour",
             "venue__city",
             "venue__venues_text",
-            "type",
-        ).prefetch_related("run", "leg")
+        ).prefetch_related("run", "leg", "event_type")
     ).order_by("event_id")
 
     serializer_class = api_serializers.EventSearchSerializer
@@ -214,13 +214,17 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
             "band",
         )
 
+        status_check = models.EventTypes.objects.filter(
+            event_id=OuterRef("pk"),
+            type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
+        )
+
         return (
             models.Events.objects.all()
             .select_related(
                 "artist",
                 "tour",
                 "venue__city__country",
-                "type",
                 "venue__venues_text",
             )
             .prefetch_related(
@@ -228,8 +232,11 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 "venue__city__state",
                 "leg",
                 "setlist_event",
+                "tags",
+                "type",
                 Prefetch("onstage_event", queryset=onstage_qs),
             )
+            .annotate(event_status=Exists(status_check))
         ).order_by("event_id")
 
     def filter_queryset(self, queryset):
@@ -373,6 +380,11 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
     def get_queryset(self):
+        status_check = models.EventTypes.objects.filter(
+            event_id=OuterRef("pk"),
+            type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
+        )
+
         return (
             models.Events.objects.select_related(
                 "artist",
@@ -380,15 +392,20 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "venue__city__country",
                 "venue__venues_text",
                 "venue__parent",
-            ).prefetch_related(
+            )
+            .prefetch_related(
                 "run",
                 "venue__city__state",
                 "leg",
                 "onstage_event",
                 "user_event",
                 "setlist_event",
-                "event_type",
+                "setlist_event__song",
+                "setlist_event__setlist_notes",
+                "type",
+                "tags",
             )
+            .annotate(event_status=Exists(status_check))
         ).order_by("event_id")
 
     serializer_class = api_serializers.EventsSerializer
@@ -403,11 +420,10 @@ class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
             "venue",
             "artist",
             "tour",
-            "type",
             "venue__city__country",
             "venue__venues_text",
         )
-        .prefetch_related("onstage", "run", "venue__city__state", "leg")
+        .prefetch_related("onstage", "run", "venue__city__state", "leg", "event_type")
         .order_by("event_id")
     )
 
@@ -536,8 +552,8 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
             "song",
         )
         .prefetch_related(
-            "setlist_notes",
             "ltp",
+            "setlist_notes",
         )
         .order_by("event__event_id", F("song_num").asc(nulls_first=True))
     )
@@ -555,7 +571,7 @@ class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
             "song",
         )
         .prefetch_related(
-            "setlist_notes",
+            "notes",
         )
         .order_by("event", F("song_num").asc(nulls_first=True))
     )

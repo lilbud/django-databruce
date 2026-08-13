@@ -74,6 +74,7 @@
     <!-- Datatables Scripts -->
     <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
     <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
     {% block extrastyle %}
     {% endblock extrastyle %}
     {% block extrajs %}
@@ -93,139 +94,77 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="table-responsive">
-                        <table class="table table-hover display nowrap" id="eventTable">
-                          <thead>
-                            <tr>
-                              <th class="all">Date</th>
-                              <th class="all">Setlist</th>
-                              <th class="all">Band</th>
-                              <th class="all">Venue</th>
-                              <th class="all">Tour</th>
-                              <th class="all">Detail</th>
-                              <th class="all">Public</th>
-                            </tr>
-                          </thead>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="col-12" id="eventContainer"></div>
             </div>
           </div>
           <script>
-            $(document).ready(function () {
-                columns = [
-                    {
-                        'data': 'date',
-                        'name': 'event_id',
-                        'type': 'text',
-                        'width': '1rem',
-                        'className': 'text-nowrap',
-                        'render': function (data, type, row, meta) {
-                            return `<a href="/events/${row.event_id}">${data}</a>`
-                        },
-                    },
-                    {
-                        'data': 'has_setlist',
-                        'name': 'has_setlist',
-                        'width': '1rem',
-                        'className': 'text-center text-xs',
-                        'orderable': false,
-                        'searchable': false,
-                        'columnControl': [],
-                        'render': function (data, type, row, meta) {
-                            return data ? `<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
-                        },
-                    },
-                    {
-                        'data': 'artist',
-                        'name': 'artist__name',
-                        'className': 'text-wrap',
-                        'width': '12rem',
-                        'render': function (data, type, row, meta) {
-                            if (data) {
-                                return `<a href="/bands/${data.uuid}">${data.name}</a>`
-                            }
-                        },
-                    },
-                    {
-                        'data': 'venue',
-                        'name': 'venue__name, venue__detail, venue__city__name, venue__city__state__abbrev, venue__city__state__name, venue__city__country__name',
-                        'className': 'text-nowrap',
-                        'width': '12rem',
-                        'render': function (data, type, row, meta) {
-                            if (data) {
-                                if (row.city) {
-                                    return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
-                                }
+            $(document).ready(async function () {
+                async function eventList() {
+                  try {
+                    const response = await fetch(`/api/v1/events/?year=1985&format=json`);
 
-                                return `<a href="/venues/${data.uuid}">${data.name}</a>`
-                            }
-                        },
-                    },
-                    {
-                        'data': 'tour',
-                        'name': 'tour__name',
-                        'width': '10rem',
-                        'className': 'text-wrap',
-                        'render': function (data, type, row, meta) {
-                            if (data) {
-                                if (row.leg) {
-                                    return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg}</small>`
-                                }
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
 
-                                return `<a href="/tours/${data.uuid}">${data.name}</a>`
-                            }
-                        },
-                    },
-                    {
-                        'data': 'title',
-                        'name': 'title',
-                        'width': '15rem',
-                        'render': function (data, type, row, meta) {
-                            if (row.event_status) {
-                                if (data) {
-                                    return `<span class="text-danger fw-semibold">[${row.type}] ${data}</span>`
-                                }
-                                return `<span class="text-danger fw-semibold">[${row.type}]</span>`
-                            }
+                    const data = await response.json();
+                    const container = $('#eventContainer');
 
-                            return data;
-                        },
-                    },
-                    {
-                        'data': 'public',
-                        'name': 'public',
-                        'visible': false,
-                        'orderable': false,
-                        'render': function (data, type, row, meta) {
-                            if (data != null) {
-                                return data;
-                            }
-                        },
-                    },
-                ]
+                    data.results.forEach((item) => {
+                      var row = $('<div />').addClass('row');
 
-                var table = $('#eventTable').DataTable({
-                  ajax: '/api/v1/events/?year=1978&format=custom',
-                  columns: columns,
-                  cardView: true,
-                  pageLength: 50,
-                  responsive: false,
-                  serverSide: true,
-                  processing: true,
-                })
+                      var title = `<a class="text-xl" href="/events/${item.event_id}">${item.date} - ${item.venue.name}, ${item.city}</a>`;
+                      row.append(title);
+
+                      
+
+                      if (item.setlist.length > 0) {
+                        var setlist_group = Object.groupBy(item.setlist, (item) => item.set_name);
+
+                        var setlist = $('<span />');
+
+                        Object.entries(setlist_group).forEach(([key, value]) => {
+                          var set_name = `<strong>${key}: </strong>`;
+
+                          var songs = value.map(song => {
+                            return song.segue ? `${song.song.name} >` : `${song.song.name}`
+                          }).join(" , ");
+
+                          songs = songs.replaceAll('> ,', ' > ');
+
+                          $(setlist).append(`${set_name} ${songs}<br>`);
+                        })
+
+                        var setlistRow = `<span class="text-sm mb-2">${setlist.prop('outerHTML')}</span>`
+                        row.append(setlistRow);
+                        
+                      } else {
+                        row.append(`<span class="text-sm mb-2 fw-semibold">No Setlist Known</span>`)
+                      }
+
+                      
+
+                      if (item.note) {
+                        var noteRow = `<span class="text-sm">${marked.parse(item.note)}</span>`
+                        row.append(noteRow);
+                      }
+
+
+                      
+                      container.append(row);
+                      container.append('<hr>');
+                    })
+                    
+                  } catch (error) {
+                    console.error('Error fetching album breakdown:', error);
+                  }
+                }
+
+                await eventList()
             });
           </script>
         </div>
       </div>
-      {% include "./partials/searchbuilder.html" %}
     </div>
     <div class="footer mt-3">
       <div class="col-12">
@@ -236,10 +175,5 @@
         </div>
       </div>
     </div>
-    <script>
-    $(document).ready(function () {
-
-    });
-    </script>
   </body>
 </html>

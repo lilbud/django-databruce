@@ -585,18 +585,6 @@ class EventDetail(PageTitleMixin, TemplateView):
             context["event"].setlist_certainty not in (None, "", "Unknown"),
         )
 
-        try:
-            context["type_note"] = event.event_type.type.name in [  # type: ignore
-                "Rescheduled",
-                "Cancelled",
-                "Relocated",
-                "No Bruce",
-                "No Gig",
-                "Rumored",
-            ]
-        except AttributeError:
-            context["type_note"] = False
-
         if venue and venue.city and venue.city.timezone:
             tz_target = venue.city.timezone
         else:
@@ -1738,7 +1726,7 @@ class EventType(PageTitleMixin, TemplateView):
         try:
             context["type"] = get_object_or_404(
                 models.Types,
-                slug=self.kwargs["type"],
+                slug=self.kwargs["slug"],
             )
         except KeyError:
             context["type"] = get_object_or_404(

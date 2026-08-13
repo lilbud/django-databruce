@@ -227,9 +227,9 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    event_type = CustomMultipleChoiceField(
+    type = CustomMultipleChoiceField(
         label="Event Type",
-        lookup_path="type_id",
+        lookup_path="event_types__type_id",
         required=False,
         widget=forms.SelectMultiple(
             attrs={
@@ -241,7 +241,7 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    event_tag = CustomMultipleChoiceField(
+    tag = CustomMultipleChoiceField(
         label="Event Tag",
         lookup_path="event_tags__tag_id",
         required=False,
@@ -453,25 +453,25 @@ class AdvancedEventSearch(forms.Form):
 
         return None
 
-    def clean_event_type(self):
-        if self.cleaned_data["event_type"]:
-            if isinstance(self.cleaned_data["event_type"], list):
+    def clean_type(self):
+        if self.cleaned_data["type"]:
+            if isinstance(self.cleaned_data["type"], list):
                 return models.EventTypes.objects.filter(
-                    id__in=self.cleaned_data["event_type"],
+                    id__in=self.cleaned_data["type"],
                 )
 
-            return models.EventTypes.objects.get(id=self.cleaned_data["event_type"])
+            return models.EventTypes.objects.get(id=self.cleaned_data["type"])
 
         return None
 
-    def clean_event_tag(self):
-        if self.cleaned_data["event_tag"]:
-            if isinstance(self.cleaned_data["event_tag"], list):
+    def clean_tag(self):
+        if self.cleaned_data["tag"]:
+            if isinstance(self.cleaned_data["tag"], list):
                 return models.Tags.objects.filter(
-                    id__in=self.cleaned_data["event_tag"],
+                    id__in=self.cleaned_data["tag"],
                 )
 
-            return models.Tags.objects.get(id=self.cleaned_data["event_tag"])
+            return models.Tags.objects.get(id=self.cleaned_data["tag"])
 
         return None
 

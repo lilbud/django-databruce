@@ -32,6 +32,7 @@ dependencies = [
     "python-slugify>=8.0.4",
     "querystring-parser>=1.2.4",
     "redis>=8.0.0",
+    "regex>=2026.7.19",
     "sentry-sdk>=2.54.0",
 ]
 

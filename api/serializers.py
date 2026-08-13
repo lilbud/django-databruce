@@ -426,17 +426,12 @@ class EventSearchSerializer(BaseSerializer):
 
 class IndexSetlistSerializer(BaseSerializer):
     song = MinimalSongsSerializer(include=["name", "uuid"])
-    notes = serializers.SerializerMethodField()
-
-    def get_notes(self, obj):
-        if not obj.setlist_notes.exists():
-            return None
-
-        return "; ".join(
-            list(
-                filter(None, [item.note for item in obj.setlist_notes.all()]),
-            ),
-        )
+    notes = serializers.SlugRelatedField(
+        source="setlist_notes",
+        many=True,
+        read_only=True,
+        slug_field="note",
+    )
 
     class Meta:
         model = models.Setlists
@@ -452,6 +447,7 @@ class IndexSetlistSerializer(BaseSerializer):
             "last",
             "notes",
             "set_name",
+            "segue",
         ]
 
 
@@ -496,20 +492,23 @@ class EventsSerializer(BaseSerializer):
     leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
 
-    type = serializers.SerializerMethodField(required=False)
+    type = TypesSerializer(many=True, required=False)
+    tags = TagsSerializer(many=True, required=False)
 
     rank = serializers.IntegerField(required=False)
-    # event_status = serializers.SerializerMethodField(required=False)
+    event_status = serializers.BooleanField(required=False)
     public = serializers.BooleanField(required=False)
 
-    def get_type(self, obj):
-        return [TypesSerializer(item.type).data for item in obj.event_type.all()]
+    setlist = IndexSetlistSerializer(
+        source="setlist_event",
+        many=True,
+        required=False,
+        read_only=True,
+        include=["song", "notes", "set_name", "debut", "premiere", "nobruce", "segue"],
+    )
 
     def get_has_setlist(self, obj):
         return bool(obj.setlist_event.exists())
-
-    # def get_event_status(self, obj):
-    #     return bool(obj.event_type and obj.event_type in [21, 22, 6])
 
     def get_bands(self, obj):
         return list({item.band_id for item in obj.onstage.all() if item.band_id})
@@ -532,13 +531,16 @@ class EventsSerializer(BaseSerializer):
             "city",
             "leg",
             "has_setlist",
+            "setlist",
             "rank",
-            # "event_status",
+            "event_status",
             "event_id",
             "title",
             "public",
             "early_late",
             "type",
+            "tags",
+            "note",
         ]
 
 
@@ -711,21 +713,39 @@ class SetlistStatsSerializer(BaseSerializer):
 
 class SetlistMobileSerializer(BaseSerializer):
     song = MinimalSongsSerializer(include=["name", "uuid", "slug"])
-    notes = serializers.SerializerMethodField()
+    # notes = serializers.SerializerMethodField()
 
-    def get_notes(self, obj):
-        if not obj.setlist_notes.exists():
-            return None
+    # def get_notes(self, obj):
+    #     if not obj.setlist_notes.exists():
+    #         return None
 
-        return "; ".join(
-            list(
-                filter(None, [item.note for item in obj.setlist_notes.all()]),
-            ),
-        )
+    #     return "; ".join(
+    #         list(
+    #             filter(None, [item.note for item in obj.setlist_notes.all()]),
+    #         ),
+    #     )
 
     class Meta:
         model = models.Setlists
         fields = "__all__"
+
+
+class SetlistNotesSerializer(BaseSerializer):
+    event = EventsSerializer(include=["event_id", "venue", "date"], required=False)
+    song = MinimalSongsSerializer(
+        source="setlist.song",
+        include=["name", "slug"],
+        required=False,
+    )
+    set_name = serializers.CharField(
+        source="setlist.set_name",
+        max_length=255,
+        required=False,
+    )
+
+    class Meta:
+        model = models.SetlistNotes
+        fields = ["event", "song", "set_name", "note"]
 
 
 class SetlistSerializer(BaseSerializer):
@@ -735,8 +755,15 @@ class SetlistSerializer(BaseSerializer):
         required=False,
         include=["date", "event_id"],
     )
-    # count = serializers.IntegerField(required=False)
-    notes = serializers.SerializerMethodField()
+
+    notes = serializers.SlugRelatedField(
+        source="setlist_notes",
+        many=True,
+        read_only=True,
+        required=False,
+        slug_field="note",
+    )
+
     gap = serializers.SerializerMethodField()
 
     def get_gap(self, obj):
@@ -744,16 +771,6 @@ class SetlistSerializer(BaseSerializer):
             return None
 
         return obj.last
-
-    def get_notes(self, obj):
-        if not obj.setlist_notes.exists():
-            return None
-
-        return "; ".join(
-            list(
-                filter(None, [item.note for item in obj.setlist_notes.all()]),
-            ),
-        )
 
     class Meta:
         model = models.Setlists
@@ -811,14 +828,6 @@ class ReleaseTracksSerializer(BaseSerializer):
         ]
 
 
-class NotesSerializer(BaseSerializer):
-    event = EventsSerializer()
-
-    class Meta:
-        model = models.Notes
-        fields = "__all__"
-
-
 class SetlistFilterSerializer(BaseSerializer):
     count = serializers.IntegerField()
     song = MinimalSongsSerializer()
@@ -826,16 +835,6 @@ class SetlistFilterSerializer(BaseSerializer):
     class Meta:
         model = models.Setlists
         fields = "__all__"
-
-
-class SetlistNotesSerializer(BaseSerializer):
-    event = EventsSerializer(include=["event_id", "venue", "date"])
-    song = MinimalSongsSerializer(source="setlist.song", include=["name", "slug"])
-    set_name = serializers.CharField(source="setlist.set_name", max_length=255)
-
-    class Meta:
-        model = models.SetlistNotes
-        fields = ["event", "song", "set_name", "note"]
 
 
 class SnippetSerializer(BaseSerializer):

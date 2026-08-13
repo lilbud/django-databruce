@@ -321,8 +321,8 @@ class EventForm(forms.ModelForm):
 
     exclude = ["summary", "type"]
 
-    brucebase_url = dj_models.CharField()
-    title = dj_models.CharField()
+    brucebase_url = dj_models.CharField(max_length=255)
+    title = dj_models.CharField(max_length=255)
 
     class Meta:
         model = models.Events
@@ -668,6 +668,10 @@ class VenueAdmin(ModelAdmin):
         "last_event",
         "city__name",
     ]
+
+    def get_queryset(self, request):
+        base_qs = super().get_queryset(request)
+        return base_qs.prefetch_related("city")
 
     def get_search_results(self, request, queryset, search_term):
         queryset, may_have_duplicates = super().get_search_results(

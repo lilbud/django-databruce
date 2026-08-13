@@ -16,7 +16,14 @@
             <div id="tableControls">
               <!-- Search -->
               <div class="col-12 col-md-1">
-                <label for="PublicityFilter" class="pb-1">Show Misc.</label>
+                <label for="PublicityFilter" class="pb-1">
+                  <span data-bs-toggle="tooltip"
+                        class="text-decoration-underline"
+                        data-bs-html="true"
+                        data-bs-title="Miscellaneous tours are for events that don't belong to a proper Tour.<br>One has been made for each year rather than a 'Non-Tour Events' tour."></i>
+                    Show Misc. Tours
+                  </span>
+                </label>
                 <select id="PublicityFilter" class="form-select form-select-sm">
                   <option value="^.*$">Show</option>
                   <option value="^(?!.*Misc).*$">Hide</option>

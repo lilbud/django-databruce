@@ -380,7 +380,7 @@ class EventsFilter(filters.FilterSet):
 
     id = filters.NumberFilter(lookup_expr="exact")
 
-    event_type = filters.BaseInFilter(
+    type = filters.BaseInFilter(
         field_name="event_type__type_id",
         lookup_expr="exact",
         method="filter_by_event_type",
