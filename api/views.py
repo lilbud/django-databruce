@@ -380,7 +380,6 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "venue__city__country",
                 "venue__venues_text",
                 "venue__parent",
-                "type",
             ).prefetch_related(
                 "run",
                 "venue__city__state",
@@ -388,6 +387,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "onstage_event",
                 "user_event",
                 "setlist_event",
+                "event_type",
             )
         ).order_by("event_id")
 

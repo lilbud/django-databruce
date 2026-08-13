@@ -54,6 +54,28 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
 
 
+class TypeInline(StackedInline):
+    model = models.EventTypes
+    autocomplete_fields = ["type"]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "event",
+                "type",
+            )
+        )
+
+    collapsible = True
+
+    fields = ["event", "type"]
+    fk_name = "event"
+    ordering = ("type__name",)
+    extra = 0
+
+
 class OnstageInline(StackedInline):
     model = models.Onstage
     collapsible = True
@@ -79,7 +101,6 @@ class OnstageInline(StackedInline):
 class SetlistInline(StackedInline):
     model = models.Setlists
     collapsible = True
-    template = "admin/custom_stacked.html"
     ordering_field = "position"
 
     def get_queryset(self, request):
@@ -298,7 +319,7 @@ class EventForm(forms.ModelForm):
         required=False,
     )
 
-    exclude = "summary"
+    exclude = ["summary", "type"]
 
     brucebase_url = dj_models.CharField()
     title = dj_models.CharField()
@@ -375,7 +396,7 @@ class EventForm(forms.ModelForm):
 @admin.register(models.Events)
 class EventAdmin(ModelAdmin):
     form = EventForm
-    search_fields = ["id", "event_id", "date", "type__name"]
+    search_fields = ["id", "event_id", "date"]
     autocomplete_fields = [
         "venue",
         "artist",
@@ -384,14 +405,13 @@ class EventAdmin(ModelAdmin):
         "leg",
         "nugs_id",
         "official_id",
-        "type",
     ]
 
-    exclude = ("summary",)
+    exclude = ("summary", "type")
 
     list_display = ["id", "date", "event_id"]
     list_display_links = ["id"]
-    inlines = [SetlistInline, OnstageInline]
+    inlines = [TypeInline, SetlistInline, OnstageInline]
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -417,10 +437,18 @@ class EventAdmin(ModelAdmin):
             obj.save(update_fields=fields_to_update)
 
 
-@admin.register(models.EventTypes)
-class EventTypeAdmin(ModelAdmin):
+@admin.register(models.Types)
+class TypeAdmin(ModelAdmin):
     search_fields = ["name", "slug"]
     list_display = ["id", "name"]
+    list_display_links = ["id"]
+
+
+@admin.register(models.EventTypes)
+class EventTypeAdmin(ModelAdmin):
+    search_fields = ["type__name", "type__slug"]
+    list_display = ["id", "event", "type"]
+    list_select_related = ["event", "type"]
     list_display_links = ["id"]
 
 

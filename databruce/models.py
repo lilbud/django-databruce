@@ -567,15 +567,6 @@ class Events(BaseModel, models.Model):
         null=True,
     )
 
-    type = models.ForeignKey(
-        to="EventTypes",
-        on_delete=models.DO_NOTHING,
-        db_column="event_type",
-        default=None,
-        blank=True,
-        null=True,
-    )
-
     title = models.CharField(
         default=None,
         db_column="event_title",
@@ -1993,18 +1984,39 @@ class SetlistStats(models.Model):
         return f"{self.setlist}"
 
 
-class EventTypes(BaseModel, models.Model):
-    id = models.AutoField(primary_key=True, db_column="id")
+class Types(BaseModel, models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.TextField()
     slug = models.TextField()
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     class Meta:
-        db_table = "event_types"
-        verbose_name_plural = "event types"
+        db_table = "types"
+        verbose_name_plural = "Types"
 
     def __str__(self) -> str:
         return self.name
+
+
+class EventTypes(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    event = models.ForeignKey(
+        "Events",
+        on_delete=models.DO_NOTHING,
+        related_name="event_type",
+    )
+
+    type = models.ForeignKey("Types", on_delete=models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = "event_types"
+        unique_together = ("event", "type")
+        verbose_name_plural = "Event Types"
+
+    def __str__(self) -> str:
+        return f"{self.type}"
 
 
 class BlogCategory(BaseModel, models.Model):

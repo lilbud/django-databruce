@@ -68,7 +68,7 @@
                         <a class="text-reset"
                            href="{% url 'band_details' id=event.artist.uuid %}"
                            id="artist">{{ event.artist }}</a>
-                        {% if type_note %}<span class="text-lg text-danger">[{{ event.type.name }}]</span>{% endif %}
+                        {% if type_note %}<span class="text-lg text-danger">[{{ event.event_type.type.name }}]</span>{% endif %}
                       </div>
                     </div>
                     <div class="row text-sm text-reset">
@@ -89,8 +89,8 @@
                   <div class="col-auto">
                     <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                          id="badge-row">
-                      {% if event.type %}
-                        <a href="{% url 'events_by_type' slug=event.type.slug %}"><span class="badge badge-primary">Type: {{ event.type }}</span></a>
+                      {% if event.event_type.length > 0 %}
+                        <a href="{% url 'events_by_type' slug=event.event_type.type.slug %}"><span class="badge badge-primary">Type: {{ event.event_type.type.name }}</span></a>
                       {% endif %}
                       {% if event.tour %}
                         <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>

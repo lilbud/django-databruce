@@ -464,6 +464,21 @@ class IndexEventsSerializer(BaseSerializer):
         fields = ["event_id", "date", "venue"]
 
 
+class TypesSerializer(BaseSerializer):
+    class Meta:
+        model = models.Types
+        fields = ["id", "name", "slug"]
+
+
+class EventTypesSerializer(BaseSerializer):
+    event = MinimalEventSerializer()
+    type = TypesSerializer()
+
+    class Meta:
+        model = models.EventTypes
+        fields = ["id", "name", "slug"]
+
+
 class EventsSerializer(BaseSerializer):
     date = serializers.SerializerMethodField(method_name="get_date")
     early_late = serializers.CharField(required=False, max_length=255)
@@ -480,16 +495,21 @@ class EventsSerializer(BaseSerializer):
 
     leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
-    type = serializers.CharField(required=False, source="type.name", max_length=255)
+
+    type = serializers.SerializerMethodField(required=False)
+
     rank = serializers.IntegerField(required=False)
-    event_status = serializers.SerializerMethodField()
+    # event_status = serializers.SerializerMethodField(required=False)
     public = serializers.BooleanField(required=False)
+
+    def get_type(self, obj):
+        return [TypesSerializer(item.type).data for item in obj.event_type.all()]
 
     def get_has_setlist(self, obj):
         return bool(obj.setlist_event.exists())
 
-    def get_event_status(self, obj):
-        return bool(obj.type and obj.type_id in [21, 22, 6])
+    # def get_event_status(self, obj):
+    #     return bool(obj.event_type and obj.event_type in [21, 22, 6])
 
     def get_bands(self, obj):
         return list({item.band_id for item in obj.onstage.all() if item.band_id})
@@ -512,13 +532,13 @@ class EventsSerializer(BaseSerializer):
             "city",
             "leg",
             "has_setlist",
-            "type",
             "rank",
-            "event_status",
+            # "event_status",
             "event_id",
             "title",
             "public",
             "early_late",
+            "type",
         ]
 
 

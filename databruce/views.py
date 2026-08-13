@@ -560,13 +560,13 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "artist",
                 "tour",
                 "venue__city",
-                "type",
             ).prefetch_related(
                 "leg",
                 "run",
                 "archive_links",
                 "nugs_event",
                 "release_event",
+                "event_type",
             ),
             event_id=self.kwargs["id"],
         )
@@ -586,7 +586,7 @@ class EventDetail(PageTitleMixin, TemplateView):
         )
 
         try:
-            context["type_note"] = event.type.name in [  # type: ignore
+            context["type_note"] = event.event_type.type.name in [  # type: ignore
                 "Rescheduled",
                 "Cancelled",
                 "Relocated",
@@ -594,7 +594,7 @@ class EventDetail(PageTitleMixin, TemplateView):
                 "No Gig",
                 "Rumored",
             ]
-        except (models.Events.type.RelatedObjectDoesNotExist, AttributeError):
+        except AttributeError:
             context["type_note"] = False
 
         if venue and venue.city and venue.city.timezone:
@@ -1737,21 +1737,20 @@ class EventType(PageTitleMixin, TemplateView):
 
         try:
             context["type"] = get_object_or_404(
-                models.EventTypes,
+                models.Types,
                 slug=self.kwargs["type"],
             )
         except KeyError:
             context["type"] = get_object_or_404(
-                models.EventTypes,
+                models.Types,
                 slug="concert",
             )
 
         context["title"] = f"Event Type '{context['type']}'"
 
-        context["types"] = models.EventTypes.objects.values(
+        context["types"] = models.Types.objects.values(
             "id",
             "name",
-            "uuid",
             "slug",
         )
 

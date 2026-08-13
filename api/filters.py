@@ -381,7 +381,7 @@ class EventsFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
 
     event_type = filters.BaseInFilter(
-        field_name="type_id",
+        field_name="event_type__type_id",
         lookup_expr="exact",
         method="filter_by_event_type",
     )
@@ -390,10 +390,10 @@ class EventsFilter(filters.FilterSet):
         if type(value) == str:
             value = int(value)
 
-            return queryset.filter(type_id=value)
+            return queryset.filter(event_type__type_id=value)
 
         if type(value) == list:
-            return queryset.filter(type_id__in=[int(x) for x in value])
+            return queryset.filter(event_type__type_id__in=[int(x) for x in value])
 
         return queryset
 
