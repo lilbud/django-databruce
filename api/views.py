@@ -209,6 +209,9 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
+    serializer_class = api_serializers.AdvSearchSerializer
+    filterset_class = filters.EventsFilter
+
     def get_queryset(self):
         onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
             "band",
@@ -231,10 +234,15 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 "run",
                 "venue__city__state",
                 "leg",
-                "setlist_event",
                 "tags",
                 "type",
-                Prefetch("onstage_event", queryset=onstage_qs),
+                Prefetch("onstage_event", queryset=onstage_qs, to_attr="onstage"),
+                Prefetch(
+                    "setlist_event",
+                    queryset=models.Setlists.objects.select_related(
+                        "song",
+                    ).prefetch_related("setlist_notes"),
+                ),
             )
             .annotate(event_status=Exists(status_check))
         ).order_by("event_id")
@@ -342,9 +350,6 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
 
         return condition
 
-    serializer_class = api_serializers.EventsSerializer
-    filterset_class = filters.EventsFilter
-
 
 class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
@@ -385,6 +390,10 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
         )
 
+        onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
+            "band",
+        )
+
         return (
             models.Events.objects.select_related(
                 "artist",
@@ -397,11 +406,13 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
                 "run",
                 "venue__city__state",
                 "leg",
-                "onstage_event",
-                "user_event",
-                "setlist_event",
-                "setlist_event__song",
-                "setlist_event__setlist_notes",
+                Prefetch("onstage_event", queryset=onstage_qs, to_attr="onstage"),
+                Prefetch(
+                    "setlist_event",
+                    queryset=models.Setlists.objects.select_related(
+                        "song",
+                    ).prefetch_related("setlist_notes"),
+                ),
                 "type",
                 "tags",
             )
@@ -422,12 +433,20 @@ class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
             "tour",
             "venue__city__country",
             "venue__venues_text",
+            "type",
+            "tags",
         )
-        .prefetch_related("onstage", "run", "venue__city__state", "leg", "event_type")
+        .prefetch_related(
+            "onstage",
+            "run",
+            "venue__city__state",
+            "leg",
+            "setlist_event",
+        )
         .order_by("event_id")
     )
 
-    serializer_class = api_serializers.EventsSerializer
+    serializer_class = api_serializers.AdvSearchSerializer
     filterset_class = filters.EventsFilter
 
 

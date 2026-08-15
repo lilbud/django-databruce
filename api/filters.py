@@ -658,6 +658,180 @@ class EventsFilter(filters.FilterSet):
         ]
 
 
+class AdvSearchFilter(filters.FilterSet):
+    year = filters.CharFilter(
+        field_name="event_id",
+        lookup_expr="startswith",
+        label="year",
+    )
+
+    type = filters.BaseInFilter(
+        field_name="event_type__type_id",
+        lookup_expr="exact",
+        method="filter_by_event_type",
+    )
+
+    def filter_by_event_type(self, queryset, name, value):
+        if type(value) == str:
+            value = int(value)
+
+            return queryset.filter(event_type__type_id=value)
+
+        if type(value) == list:
+            return queryset.filter(event_type__type_id__in=[int(x) for x in value])
+
+        return queryset
+
+    tag = filters.BaseInFilter(
+        field_name="event_tags__tag_id",
+        lookup_expr="exact",
+        label="event tag id",
+        method="filter_by_tag",
+    )
+
+    def filter_by_tag(self, queryset, name, value):
+        if type(value) == str:
+            value = int(value)
+
+            return queryset.filter(event_tags__tag_id=value)
+
+        if type(value) == list:
+            return queryset.filter(event_tags__tag_id__in=[int(x) for x in value])
+
+        return queryset
+
+    start_date = filters.DateTimeFilter(
+        field_name="date",
+        lookup_expr="gte",
+        label="start date",
+    )
+
+    end_date = filters.DateTimeFilter(
+        field_name="date",
+        lookup_expr="lte",
+        label="end date",
+    )
+
+    day_of_week = filters.NumberFilter(
+        field_name="date__week_day",
+        lookup_expr="exact",
+        label="day of week",
+    )
+
+    date = filters.CharFilter(field_name="date", lookup_expr="startswith")
+
+    month = filters.NumberFilter(
+        field_name="date__month",
+        lookup_expr="exact",
+        label="month",
+    )
+
+    day = filters.NumberFilter(field_name="date__day", lookup_expr="exact", label="day")
+
+    venue = filters.NumberFilter(
+        method="filter_by_venue_or_detail",
+        label="venue",
+    )
+
+    venue_detail = filters.CharFilter(
+        field_name="venue__detail",
+        lookup_expr="icontains",
+        label="venue detail",
+    )
+
+    city = filters.NumberFilter(
+        field_name="venue__city_id",
+        lookup_expr="exact",
+        label="city",
+    )
+
+    state = filters.NumberFilter(
+        field_name="venue__city__state_id",
+        lookup_expr="exact",
+        label="state",
+    )
+    country = filters.NumberFilter(
+        field_name="venue__city__country_id",
+        lookup_expr="exact",
+        label="country",
+    )
+    run = filters.NumberFilter(
+        field_name="run_id",
+        lookup_expr="exact",
+        label="event run",
+    )
+    artist = filters.NumberFilter(
+        field_name="artist_id",
+        lookup_expr="exact",
+        label="artist",
+    )
+    tour = filters.NumberFilter(
+        field_name="tour_id",
+        lookup_expr="exact",
+        label="tour",
+    )
+    leg = filters.NumberFilter(
+        field_name="leg_id",
+        lookup_expr="exact",
+        label="tour_leg",
+    )
+
+    relation = filters.BaseInFilter(
+        field_name="onstage_event__relation_id",
+        label="onstage relation",
+    )
+
+    band = filters.BaseInFilter(
+        field_name="onstage_event__band_id",
+        distinct=True,
+        label="onstage band",
+    )
+
+    user = filters.NumberFilter(
+        field_name="user_event__user_id",
+    )
+
+    song = filters.NumberFilter(
+        field_name="setlist_event__song_id",
+        lookup_expr="exact",
+        label="song",
+    )
+
+    def filter_by_venue_or_detail(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        try:
+            return queryset.filter(
+                Q(venue_id=value) | Q(venue__parent=value),
+            )
+        except models.Venues.DoesNotExist:
+            # Fallback if the venue ID provided doesn't exist
+            pass
+
+        # 3. If no detail exists or venue wasn't found, just filter by the ID
+        return queryset.filter(venue_id=value)
+
+    class Meta:
+        model = models.Events
+        fields = [
+            "year",
+            "date",
+            "month",
+            "day",
+            "venue",
+            "city",
+            "state",
+            "country",
+            "run",
+            "artist",
+            "tour",
+            "leg",
+            "relation",
+            "band",
+        ]
+
+
 class OnstageFilter(filters.FilterSet):
     relation = filters.NumberFilter(
         field_name="relation_id",

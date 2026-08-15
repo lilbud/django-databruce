@@ -344,3 +344,12 @@ First public release of the site. Site was locked behind a login and accounts on
 - Changed Event Type to allow for multiple types per event. Each still only has 1 for the timebeing.
 - Removed `Unknown Venue`, which was a default venue for completely unknown events. The 3 events there were moved to known venues or ones marked `unknown, city`.
 - `Tours` updated to add note about Misc. Tours.
+
+# v1.19.5 (August 15, 2026)
+
+- "Featured Show" on the home page now defaults to a select show from this day in history. Certain qualifers are used to pick the show:
+  - Must have a setlist
+  - Tour must not be: Broadway, or a Misc. tour
+  - Setlist must be confirmed, meaning a recording exists or very reliable recollection
+- New site logo! Been kicking around ideas as I wanted a proper logo for the site. Settled on this which I think doesn't look bad.
+- Fixed issue where event type `Interview` wasn't loading properly.

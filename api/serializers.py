@@ -487,7 +487,10 @@ class EventsSerializer(BaseSerializer):
     city = serializers.SerializerMethodField(required=False)
 
     def get_city(self, obj):
-        return get_formatted_city(obj.venue.city)
+        try:
+            return get_formatted_city(obj.venue.city)
+        except AttributeError:
+            return None
 
     leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
@@ -498,6 +501,9 @@ class EventsSerializer(BaseSerializer):
     rank = serializers.IntegerField(required=False)
     event_status = serializers.BooleanField(required=False)
     public = serializers.BooleanField(required=False)
+
+    bands = serializers.SerializerMethodField(required=False)
+    relations = serializers.SerializerMethodField(required=False)
 
     setlist = IndexSetlistSerializer(
         source="setlist_event",
@@ -511,11 +517,11 @@ class EventsSerializer(BaseSerializer):
         return bool(obj.setlist_event.exists())
 
     def get_bands(self, obj):
-        return list({item.band_id for item in obj.onstage.all() if item.band_id})
+        return list({item.band_id for item in obj.onstage if item.band_id})
 
     def get_relations(self, obj):
         return list(
-            {item.relation_id for item in obj.onstage.all() if item.relation_id},
+            {item.relation_id for item in obj.onstage if item.relation_id},
         )
 
     def get_date(self, obj):
@@ -541,6 +547,83 @@ class EventsSerializer(BaseSerializer):
             "type",
             "tags",
             "note",
+            "bands",
+            "relations",
+        ]
+
+
+class AdvSearchSerializer(BaseSerializer):
+    date = serializers.SerializerMethodField(method_name="get_date")
+    early_late = serializers.CharField(required=False, max_length=255)
+    artist = MinimalBandsSerializer(required=False)
+    tour = MinimalToursSerializer(required=False)
+    venue = MinimalVenuesSerializer(
+        required=False,
+        include=["uuid", "name", "formatted"],
+    )
+    city = serializers.SerializerMethodField(required=False)
+
+    def get_city(self, obj):
+        return get_formatted_city(obj.venue.city)
+
+    leg = serializers.CharField(required=False, source="leg.name", max_length=255)
+    has_setlist = serializers.SerializerMethodField()
+
+    type = TypesSerializer(many=True, required=False)
+    tags = TagsSerializer(many=True, required=False)
+
+    rank = serializers.IntegerField(required=False)
+    event_status = serializers.BooleanField(required=False)
+    public = serializers.BooleanField(required=False)
+
+    bands = serializers.SerializerMethodField(required=False)
+    relations = serializers.SerializerMethodField(required=False)
+
+    def get_bands(self, obj):
+        return list({item.band_id for item in obj.onstage if item.band_id})
+
+    def get_relations(self, obj):
+        return list(
+            {item.relation_id for item in obj.onstage if item.relation_id},
+        )
+
+    setlist = IndexSetlistSerializer(
+        source="setlist_event",
+        many=True,
+        required=False,
+        read_only=True,
+        include=["song", "notes", "set_name", "debut", "premiere", "nobruce", "segue"],
+    )
+
+    def get_has_setlist(self, obj):
+        return bool(obj.setlist_event.exists())
+
+    def get_date(self, obj):
+        return get_date_from_instance(obj)
+
+    class Meta:
+        model = models.Events
+        fields = [
+            "date",
+            "artist",
+            "tour",
+            "venue",
+            "city",
+            "leg",
+            "bands",
+            "relations",
+            "has_setlist",
+            "rank",
+            "event_status",
+            "event_id",
+            "title",
+            "public",
+            "early_late",
+            "type",
+            "tags",
+            "note",
+            # "onstage",
+            "setlist",
         ]
 
 

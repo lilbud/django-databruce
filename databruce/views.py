@@ -133,22 +133,35 @@ class Index(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
-        queryset = models.Events.objects.select_related(
-            "artist",
-            "venue",
-            "venue__city",
-            "venue__venues_text",
-        ).prefetch_related("venue__city__state", "setlist_event")
+        date = datetime.datetime.today()
+        month = date.month
+        day = date.day
 
-        latest = (
-            models.Setlists.objects.filter(set_name__in=VALID_SET_NAMES)
-            .select_related("event")
-            .order_by("-event__event_id")
-            .values_list("event_id", flat=True)
+        event_filter = Q(
+            Q(event__date__month=month)
+            & Q(event__date__day=day)
+            & Q(event__artist__springsteen_band=True)
+            & Q(set_name__in=VALID_SET_NAMES)
+            & Q(event__setlist_certainty="Confirmed")
+            & ~Q(event__tour__name__icontains="misc.")
+            & ~Q(event__tour_id__in=[25, 48]),
+        )
+
+        queryset = (
+            models.Setlists.objects.select_related(
+                "event__artist",
+                "event__venue",
+                "event__tour",
+            )
+            .filter(
+                event_filter,
+            )
+            .distinct("event_id")
+            .order_by("-event_id")
             .first()
         )
 
-        context["latest_event"] = queryset.get(id=latest)
+        context["latest_event"] = queryset
 
         return context
 
@@ -1524,43 +1537,43 @@ class AdvSearch(PageTitleMixin, TemplateView):
         event_search_queries = []
         setlist_search_display_queries = []
 
-        for i in range(total_forms):
-            song_id = query_params.get(f"form-{i}-song1")
-            choice = query_params.get(f"form-{i}-choice")
-            position = query_params.get(f"form-{i}-position")
-
-            if song_id:
-                search_queries.append(
-                    {
-                        "song_id": song_id,
-                        "choice": f"{choice == 'True'}",
-                        "position": position,
-                    },
-                )
-
-        # 5. Inject the structured query properties back into the template context
-        context["logical_operator"] = conjunction
-        context["parsed_queries"] = search_queries
-
-        song_ids = [
-            str(f["song1"]).replace("'", "")
-            for f in formset.cleaned_data
-            if f.get("song1")
-        ]
-
-        song_ids.extend(
-            [
-                str(f["song2"]).replace("'", "")
-                for f in formset.cleaned_data
-                if f.get("song2")
-            ],
-        )
-
-        song_map = {
-            str(s.id): s.name for s in models.Songs.objects.filter(id__in=song_ids)
-        }
-
         if formset.is_valid():
+            for i in range(total_forms):
+                song_id = query_params.get(f"form-{i}-song1")
+                choice = query_params.get(f"form-{i}-choice")
+                position = query_params.get(f"form-{i}-position")
+
+                if song_id:
+                    search_queries.append(
+                        {
+                            "song_id": song_id,
+                            "choice": f"{choice == 'True'}",
+                            "position": position,
+                        },
+                    )
+
+            # 5. Inject the structured query properties back into the template context
+            context["logical_operator"] = conjunction
+            context["parsed_queries"] = search_queries
+
+            song_ids = [
+                str(f["song1"]).replace("'", "")
+                for f in formset.cleaned_data
+                if f.get("song1")
+            ]
+
+            song_ids.extend(
+                [
+                    str(f["song2"]).replace("'", "")
+                    for f in formset.cleaned_data
+                    if f.get("song2")
+                ],
+            )
+
+            song_map = {
+                str(s.id): s.name for s in models.Songs.objects.filter(id__in=song_ids)
+            }
+
             for form in formset.cleaned_data:
                 if not form.get("song1"):
                     continue
