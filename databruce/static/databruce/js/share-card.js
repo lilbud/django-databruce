@@ -156,7 +156,8 @@ function initializeShareCardGenerator(config) {
           badgeRow.style.marginRight = 'auto';
         }
 
-        const logoBrandLink = sandbox.querySelector('.navbar-brand-mobile');
+        const logoBrandLink = sandbox.querySelector('.navbar-brand');
+
         if (logoBrandLink) {
           // Wipe out Bootstrap float, margins, padding, and flex properties
           logoBrandLink.className = '';
@@ -165,6 +166,7 @@ function initializeShareCardGenerator(config) {
           logoBrandLink.style.display = 'block';
           logoBrandLink.style.width = '100%';
           logoBrandLink.style.textAlign = 'center';
+          logoBrandLink.style.height = '32px';
         }
 
         const targetCard = sandbox.querySelector('#capture-area') || sandbox.firstElementChild;

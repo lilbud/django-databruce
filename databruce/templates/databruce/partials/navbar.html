@@ -14,7 +14,10 @@
     <a class="navbar-brand p-xl-0 mx-auto mx-xl-2"
        href="{% url 'index' %}"
        aria-label="Databruce Home">
-      <div class="logo" role="img" aria-label="Databruce">
+      <div class="logo-icon d-none d-xl-block" role="img" aria-label="Databruce">
+        <span class="sr-only">Databruce</span>
+      </div>
+      <div class="logo d-block d-xl-none" role="img" aria-label="Databruce">
         <span class="sr-only">Databruce</span>
       </div>
     </a>
@@ -30,7 +33,18 @@
         {% if item.children %}
           <!-- Dropdown Nav Item -->
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}fw-bold{% endif %} {% if item.match_keywords %} {% for kw in item.match_keywords %} {% if kw in request.resolver_match.route %}fw-bold{% endif %} {% endfor %} {% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="nav-dropdown-{{ forloop.counter }}">{{ item.name }}</button>
+            <button class="btn btn-sm dropdown-toggle
+                           {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}fw-bold{% endif %}
+                           {% if item.match_keywords %}
+                             {% for kw in item.match_keywords %}
+                               {% if kw in request.resolver_match.route %}fw-bold{% endif %}
+                             {% endfor %}
+                           {% endif %}"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    id="nav-dropdown-{{ forloop.counter }}">{{ item.name }}</button>
             <ul class="dropdown-menu"
                 aria-labelledby="nav-dropdown-{{ forloop.counter }}">
               {% for child in item.children %}
@@ -73,7 +87,8 @@
         </li>
         {% if user.is_authenticated %}
           <li class="nav-item dropdown list-unstyled">
-            <button class="btn btn-sm nav-btn {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+            <button class="btn btn-sm nav-btn
+                           {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"

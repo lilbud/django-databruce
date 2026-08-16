@@ -590,7 +590,7 @@ class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
             "song",
         )
         .prefetch_related(
-            "notes",
+            "setlist_notes",
         )
         .order_by("event", F("song_num").asc(nulls_first=True))
     )

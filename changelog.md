@@ -353,3 +353,10 @@ First public release of the site. Site was locked behind a login and accounts on
   - Setlist must be confirmed, meaning a recording exists or very reliable recollection
 - New site logo! Been kicking around ideas as I wanted a proper logo for the site. Settled on this which I think doesn't look bad.
 - Fixed issue where event type `Interview` wasn't loading properly.
+- Redid all favicons to match new logo
+- Fixed issue with setlist image generation not working due to changes in setlist view API
+- Updated home page:
+  - Removed band image
+  - Removed list of updates
+  - Moved to 2 column layout
+  - Added full new logo
