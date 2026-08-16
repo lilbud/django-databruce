@@ -11,8 +11,8 @@
     <div class="row">
       <div class="col">
         <div class="d-flex justify-content-start mb-3">
-          <div class="text-2xl pe-2">Events</div>
-          <div id="year-select" class="pe-2">
+          <div class="text-2xl pe-2">{{ year }} Events</div>
+          {% comment %} <div id="year-select" class="pe-2">
             <button class="btn btn-sm btn-primary dropdown-toggle"
                     type="button"
                     data-bs-toggle="dropdown"
@@ -24,7 +24,15 @@
                 </li>
               {% endfor %}
             </ul>
-          </div>
+          </div> {% endcomment %}
+        </div>
+        <div class="row my-3 d-flex-inline text-center text-sm">
+          <p>
+            {% for year in years reversed %}
+              <a class="fw-medium mx-1" href="{% url "events_year" year=year %}">{{ year }}</a>
+              {% if not forloop.last %}/{% endif %}
+            {% endfor %}
+          </p>
         </div>
       </div>
     </div>

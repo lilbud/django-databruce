@@ -209,7 +209,7 @@ ul:last-child {
   mask-repeat: no-repeat;
   mask-position: center;
   /* Vital Dimensions */
-  height: 30px;
+  height: 25px;
   aspect-ratio: 6 / 1;
   background-color: var(--color-white);
 }
@@ -227,7 +227,7 @@ ul:last-child {
   mask-repeat: no-repeat;
   mask-position: center;
   /* Vital Dimensions */
-  height: 50px;
+  height: 40px;
   aspect-ratio: 1 / 1;
   background-color: var(--color-white);
 }
@@ -1403,14 +1403,16 @@ a>img {
   justify-content: center !important;
 }
 
-figure:not(.half) a {
+/* figure:not(.half) a {
   width: 50% !important;
   height: auto !important;
-}
+} */
 
 figure.full a {
-  width: 100% !important;
+  width: 70% !important;
   height: auto !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 figure.half a {

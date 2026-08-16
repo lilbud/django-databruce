@@ -639,7 +639,7 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = (
             queryset.values("song_id")
             .annotate(
-                count=F("song__num_plays_public"),
+                count=Count("id", distinct=True),
                 first_event=Min("event__event_id"),
                 last_event=Max("event__event_id"),
             )
