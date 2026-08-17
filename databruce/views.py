@@ -202,7 +202,7 @@ class Calendar(PageTitleMixin, TemplateView):
             if re.search(
                 r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
                 self.request.GET["start"],
-            ):
+            ):  # type: ignore
                 context["start_date"] = self.request.GET["start"]
         except MultiValueDictKeyError:
             context["start_date"] = context["date"].strftime("%Y-%m-%d")
@@ -838,15 +838,21 @@ class Event(PageTitleMixin, TemplateView):
     def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
+        context["years"] = (
+            models.Events.objects.values_list("date__year", flat=True)
+            .exclude(date__isnull=True)
+            .distinct()
+            .order_by("-date__year")
+        )
+
         try:
-            if len(str(self.kwargs["year"])) == 4:
+            if self.kwargs["year"] in context["years"]:
                 context["year"] = int(self.kwargs["year"])
         except KeyError:
             context["year"] = int(context["date"].year)  # current year
 
         context["title"] = f"{context['year']} Events"
         context["description"] = f"{context['year']} Events"
-        context["years"] = list(range(context["date"].year, 1964, -1))
 
         return context
 

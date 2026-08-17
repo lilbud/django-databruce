@@ -57,6 +57,7 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 class TypeInline(StackedInline):
     model = models.EventTypes
     autocomplete_fields = ["type"]
+    search_fields = ["type__name"]
 
     def get_queryset(self, request):
         return (
@@ -710,7 +711,7 @@ class RunAdmin(ModelAdmin):
         "first_event__venue__city",
         "last_event__venue__city",
     ]
-    list_display = ["id", "name", "band", "num_shows", "first_event", "last_event"]
+    list_display = ["id", "name", "band", "num_events", "first_event", "last_event"]
     list_display_links = ["id"]
 
 

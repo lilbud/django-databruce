@@ -1346,7 +1346,7 @@ class Tours(BaseModel, models.Model):
         null=True,
     )
 
-    num_shows = models.IntegerField(default=0)
+    num_events = models.IntegerField(default=0)
     num_songs = models.IntegerField(default=0)
     num_legs = models.IntegerField(default=0)
 
@@ -1384,7 +1384,7 @@ class TourLegs(BaseModel, models.Model):
         db_column="last_event",
     )
 
-    num_shows = models.IntegerField(default=0)
+    num_events = models.IntegerField(default=0)
     num_songs = models.IntegerField(default=0)
     note = models.TextField(default=None, blank=True, null=True)
 
@@ -1421,16 +1421,12 @@ class Runs(BaseModel, models.Model):
     )
     name = models.TextField(max_length=255)
 
-    num_shows = models.IntegerField(
-        null=True,
-        blank=True,
-        default=None,
+    num_events = models.IntegerField(
+        default=0,
     )
 
     num_songs = models.IntegerField(
-        null=True,
-        blank=True,
-        default=None,
+        default=0,
     )
 
     first_event = models.ForeignKey(
@@ -1536,7 +1532,7 @@ class StudioSessions(BaseModel, models.Model):
     )
     name = models.TextField()
     num_events = models.IntegerField(default=0)
-    num_songs = models.IntegerField(null=True)
+    num_songs = models.IntegerField(default=0)
 
     first_event = models.ForeignKey(
         Events,

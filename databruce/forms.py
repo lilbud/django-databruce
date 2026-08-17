@@ -50,8 +50,8 @@ class AdvancedEventSearch(forms.Form):
         super().__init__(*args, **kwargs)
 
         ignore = [
-            "first_date",
-            "last_date",
+            "start_date",
+            "end_date",
             "month",
             "day",
             "conjunction",
@@ -151,7 +151,7 @@ class AdvancedEventSearch(forms.Form):
         ("7", "Saturday"),
     ]
 
-    first_date = CustomCharField(
+    start_date = CustomCharField(
         label="Start Date",
         lookup_path="date__gte",
         required=False,
@@ -168,7 +168,7 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    last_date = CustomCharField(
+    end_date = CustomCharField(
         label="Last Date",
         lookup_path="date__lte",
         required=False,
@@ -373,13 +373,13 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    def clean_first_date(self):
+    def clean_start_date(self):
         # the first year tracked in the database is 1965, so that is the start date
-        if self.cleaned_data["first_date"]:
+        if self.cleaned_data["start_date"]:
             # partial date, get first of month
-            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["first_date"]):
+            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["start_date"]):
                 date = (
-                    datetime.datetime.strptime(self.cleaned_data["first_date"], "%Y-%m")
+                    datetime.datetime.strptime(self.cleaned_data["start_date"], "%Y-%m")
                     .replace(day=1)
                     .date()
                 )
@@ -390,9 +390,9 @@ class AdvancedEventSearch(forms.Form):
                 }
 
             # specific date
-            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["first_date"]):
+            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["start_date"]):
                 date = datetime.datetime.strptime(
-                    self.cleaned_data["first_date"],
+                    self.cleaned_data["start_date"],
                     "%Y-%m-%d",
                 ).date()
 
@@ -403,13 +403,13 @@ class AdvancedEventSearch(forms.Form):
 
         return None
 
-    def clean_last_date(self):
+    def clean_end_date(self):
         # default end date is last day of current year
-        if self.cleaned_data["last_date"]:
+        if self.cleaned_data["end_date"]:
             # partial date
-            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["last_date"]):
+            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["end_date"]):
                 dt = datetime.datetime.strptime(
-                    self.cleaned_data["last_date"],
+                    self.cleaned_data["end_date"],
                     "%Y-%m",
                 )
 
@@ -421,9 +421,9 @@ class AdvancedEventSearch(forms.Form):
                 }
 
             # specific date
-            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["last_date"]):
+            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["end_date"]):
                 date = datetime.datetime.strptime(
-                    self.cleaned_data["last_date"],
+                    self.cleaned_data["end_date"],
                     "%Y-%m-%d",
                 ).date()
 
@@ -456,11 +456,11 @@ class AdvancedEventSearch(forms.Form):
     def clean_type(self):
         if self.cleaned_data["type"]:
             if isinstance(self.cleaned_data["type"], list):
-                return models.EventTypes.objects.filter(
+                return models.Types.objects.filter(
                     id__in=self.cleaned_data["type"],
                 )
 
-            return models.EventTypes.objects.get(id=self.cleaned_data["type"])
+            return models.Types.objects.get(id=self.cleaned_data["type"])
 
         return None
 

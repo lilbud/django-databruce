@@ -360,3 +360,8 @@ First public release of the site. Site was locked behind a login and accounts on
   - Removed list of updates
   - Moved to 2 column layout
   - Added full new logo
+
+# v1.19.6 (August 17, 2026)
+
+- Changed column names for tours/runs/tour legs, update pages to match
+- Changed setlist card header functionality

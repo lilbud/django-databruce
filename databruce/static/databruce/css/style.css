@@ -40,9 +40,7 @@
   box-sizing: border-box !important;
 }
 
-input:disabled,
-select:disabled,
-textarea:disabled {
+:disabled {
   cursor: not-allowed !important;
 }
 
@@ -162,12 +160,6 @@ body {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004) !important;
 }
 
-#capture-area {
-  -webkit-text-stroke-width: 0.2px;
-  -webkit-text-stroke-color: transparent;
-  /* Smooths out the jagged sub-pixel text steps */
-}
-
 /* Force the main content area to grow and fill available space */
 .padded-body {
   flex: 1 0 auto;
@@ -181,7 +173,6 @@ body {
 /* Optional: Improve the footer card appearance */
 .footer .card {
   border-radius: 0;
-  /* Often looks better flush with the bottom */
   border: none;
 }
 
@@ -195,41 +186,32 @@ ul:last-child {
   margin-bottom: 0 !important;
 }
 
-/* Logo */
-.logo {
-  text-indent: -9999px;
-  overflow: hidden;
-  white-space: nowrap;
-  display: inline-block;
 
-  /* Existing mask logic */
-  -webkit-mask-image: var(--logo-mask);
-  mask-image: var(--logo-mask);
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  /* Vital Dimensions */
-  height: 25px;
-  aspect-ratio: 6 / 1;
-  background-color: var(--color-white);
-}
-
+.logo,
 .logo-icon {
   text-indent: -9999px;
   overflow: hidden;
   white-space: nowrap;
   display: inline-block;
-
-  /* Existing mask logic */
-  -webkit-mask-image: var(--db-icon-white);
-  mask-image: var(--db-icon-white);
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
-  /* Vital Dimensions */
+  background-color: var(--color-white);
+}
+
+/* Logo */
+.logo {
+  -webkit-mask-image: var(--logo-mask);
+  mask-image: var(--logo-mask);
+  height: 25px;
+  aspect-ratio: 6 / 1;
+}
+
+.logo-icon {
+  -webkit-mask-image: var(--db-icon-white);
+  mask-image: var(--db-icon-white);
   height: 40px;
   aspect-ratio: 1 / 1;
-  background-color: var(--color-white);
 }
 
 /* Navbar */
@@ -283,27 +265,64 @@ a:link,
 .card-footer {
   font-size: var(--text-sm) !important;
   font-weight: 500 !important;
-  line-height: 1.5rem;
   align-items: center !important;
   justify-content: space-between !important;
+  display: flex !important;
 }
 
-:not(#album)>.card-header {
-  display: flex !important;
+.card-header {
+  border-bottom: none !important;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  align-items: center;
+}
+
+.card-header>.d-flex {
+  align-items: center;
+}
+
+/* Ensure button icons remain centered without line-height quirks */
+.card-header .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  line-height: 1;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.collapse,
+.collapsing {
+  background-color: var(--background-color-highlight) !important;
+}
+
+.collapse-icon {
+  stroke: currentColor;
+  stroke-width: 0.8px;
+  /* Adjust weight: 0.5px (thinner) to 1.2px (bold) */
+  transition: transform 0.2s ease-in-out;
+}
+
+
+
+/* Rotates 180deg when the target is expanded */
+.collapse-toggle[aria-expanded="true"] .collapse-icon {
+  transform: rotate(180deg);
 }
 
 #album .progress {
   height: 6px !important;
 }
 
-.card-header,
+/* .card-header,
 .card-footer:not(#eventInfoFooter) {
   padding: 0.35rem 0.75rem !important;
-}
+} */
 
-.card-header:has(.nav-pills) {
+/* .card-header:has(.nav-pills) {
   padding: 0.1rem 0 !important;
-}
+} */
 
 .card-body:not(#setlistCard, [class*="p-"], [class*="px-"], [class*="py-"]),
 .card-body:has(.table):not(#setlistCard) {

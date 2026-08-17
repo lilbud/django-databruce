@@ -257,34 +257,36 @@
             {% if setlist_certainty %}
               <div class="col-12">
                 <div class="card">
-                  <div class="card-header d-flex flex-column">
+                  <div class="card-header">
                     <div class="d-flex justify-content-between w-100">
-                      Setlist
-                      <span class="text-sm my-auto"
-                            data-bs-toggle="tooltip"
+                      <span>Setlist</span>
+                      <span data-bs-toggle="tooltip"
                             data-bs-html="true"
                             data-bs-title="Setlist Options">
                         <a role="button"
-                           class="btn btn-sm btn-primary icon-button p-1"
+                           class="btn btn-sm btn-primary icon-button collapse-toggle"
                            data-bs-toggle="collapse"
-                           href="#options">
+                           href="#options"
+                           aria-expanded="false"
+                           aria-controls="options">
                           <svg xmlns="http://www.w3.org/2000/svg"
                                width="16"
                                height="16"
                                fill="currentColor"
-                               class="bi bi-three-dots"
+                               class="bi bi-chevron-down collapse-icon"
                                viewBox="0 0 16 16">
-                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
                           </svg>
                         </a>
                       </span>
                     </div>
-                    <div class="collapse row w-100" id="options">
-                      <div class="col-12 px-0 py-2">
-                        <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
-                        <button id="download-btn"
-                                class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
-                      </div>
+                  </div>
+                  <div class="collapse" id="options">
+                    <!-- Inner wrapper handles the padding and spacing cleanly -->
+                    <div class="px-3 py-2 d-flex gap-2">
+                      <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
+                      <button id="download-btn"
+                              class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
                     </div>
                   </div>
                   <div class="card-body p-0" id="setlistCard">
@@ -321,7 +323,7 @@
                 <div class="col-12 col-lg-12 order-2">
                   <div class="card h-100">
                     <div class="card-header">
-                      <span>Set Times
+                      <span class="d-flex gap-1">Set Times
                         <i class="bi bi-question-circle-fill"
                            data-bs-toggle="tooltip"
                            data-bs-title="Local Time Shown"></i>

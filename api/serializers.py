@@ -321,7 +321,7 @@ class EventRunSerializer(BaseSerializer):
             "city",
             "first_event",
             "last_event",
-            "num_shows",
+            "num_events",
             "num_songs",
             "uuid",
         ]
@@ -353,7 +353,7 @@ class ToursSerializer(BaseSerializer):
             "first_event",
             "last_event",
             "band",
-            "num_shows",
+            "num_events",
             "num_songs",
             "num_legs",
         ]
@@ -368,10 +368,18 @@ class OnstageSerializer(BaseSerializer):
         fields = ["relation", "band", "guest", "note"]
 
 
+class TypesSerializer(BaseSerializer):
+    class Meta:
+        model = models.Types
+        fields = ["id", "name", "slug"]
+
+
 class EventTypeSerializer(BaseSerializer):
+    type = TypesSerializer()
+
     class Meta:
         model = models.EventTypes
-        fields = ["id", "name", "slug"]
+        fields = ["type"]
 
 
 class TagsSerializer(BaseSerializer):
@@ -458,12 +466,6 @@ class IndexEventsSerializer(BaseSerializer):
     class Meta:
         model = models.Events
         fields = ["event_id", "date", "venue"]
-
-
-class TypesSerializer(BaseSerializer):
-    class Meta:
-        model = models.Types
-        fields = ["id", "name", "slug"]
 
 
 class EventTypesSerializer(BaseSerializer):
@@ -1000,7 +1002,7 @@ class TourLegsSerializer(BaseSerializer):
             "tour",
             "first_event",
             "last_event",
-            "num_shows",
+            "num_events",
             "num_songs",
             "note",
         ]

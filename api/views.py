@@ -918,6 +918,12 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
         )
 
 
+class TypesViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Types.objects.all()
+    serializer_class = api_serializers.TypesSerializer
+    filterset_class = filters.TypeFilter
+
+
 class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.EventTypes.objects.all()
     serializer_class = api_serializers.EventTypeSerializer

@@ -1307,9 +1307,15 @@ class UserAttendedShowsFilter(filters.FilterSet):
     )
 
 
-class EventTypeFilter(filters.FilterSet):
+class TypeFilter(filters.FilterSet):
     id = filters.NumberFilter(lookup_expr="exact")
+    name = filters.CharFilter(lookup_expr="icontains")
+
+
+class EventTypeFilter(filters.FilterSet):
+    id = filters.NumberFilter(field_name="type_id", lookup_expr="exact")
     name = filters.CharFilter(
+        field_name="type__name",
         lookup_expr="icontains",
     )
 
