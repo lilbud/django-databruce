@@ -35,34 +35,34 @@ INSTALLED_APPS += [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("DATABASE_NAME"),
-    #     "USER": os.getenv("DATABASE_USER"),
-    #     "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-    #     "HOST": "localhost",
-    #     "PORT": "5432",
-    #     "CONN_MAX_AGE": 0,
-    #     "CONN_HEALTH_CHECKS": True,
-    #     "OPTIONS": {
-    #         "pool": True,
-    #         "options": "-c search_path=public,extensions",
-    #     },
-    # },
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("SUPABASE_DATABASE"),
-        "USER": os.getenv("SUPABASE_USER"),
-        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-        "HOST": os.getenv("SUPABASE_HOST"),
-        "PORT": os.getenv("SUPABASE_PORT"),
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "HOST": "localhost",
+        "PORT": "5432",
         "CONN_MAX_AGE": 0,
         "CONN_HEALTH_CHECKS": True,
         "OPTIONS": {
+            "pool": True,
             "options": "-c search_path=public,extensions",
-            "connect_timeout": 5,
         },
     },
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": os.getenv("SUPABASE_DATABASE"),
+    #     "USER": os.getenv("SUPABASE_USER"),
+    #     "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+    #     "HOST": os.getenv("SUPABASE_HOST"),
+    #     "PORT": os.getenv("SUPABASE_PORT"),
+    #     "CONN_MAX_AGE": 0,
+    #     "CONN_HEALTH_CHECKS": True,
+    #     "OPTIONS": {
+    #         "options": "-c search_path=public,extensions",
+    #         "connect_timeout": 5,
+    #     },
+    # },
     # "digital_ocean": {
     #     "ENGINE": "django.db.backends.postgresql",
     #     "NAME": os.getenv("DO_DATABASE_NAME"),

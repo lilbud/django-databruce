@@ -166,7 +166,7 @@ function initializeShareCardGenerator(config) {
           logoBrandLink.style.display = 'block';
           logoBrandLink.style.width = '100%';
           logoBrandLink.style.textAlign = 'center';
-          logoBrandLink.style.height = '32px';
+          logoBrandLink.style.paddingTop = '5px';
         }
 
         const targetCard = sandbox.querySelector('#capture-area') || sandbox.firstElementChild;
