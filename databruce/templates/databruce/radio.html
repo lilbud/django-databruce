@@ -1,0 +1,124 @@
+{% extends "databruce/wide_layout.html" %}
+{% load static %}
+{% block extrajs %}
+  <script src="{% static "databruce/js/gapless5.js" %}"></script>
+{% endblock extrajs %}
+{% block content %}
+  <div class="col-12">
+    <h3>Radio</h3>
+    <div class="row my-3 justify-content-center">
+      <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-primary" id="play">Play</button>
+        <button class="btn btn-primary" id="pause">Pause</button>
+        <button class="btn btn-primary" id="end">Stop</button>
+      </div>
+    </div>
+    <div class="row">
+      <pre id="ready">Both tracks are not loaded</pre>
+      <div id="tracks"></div>
+      <pre id="status"></pre>
+    </div>
+  </div>
+  <script>
+
+  $(document).ready(function () {
+    const identifier = 'bs2009-07-28.aud.unknown.flac16'; // Example item
+    const desiredFormat = 'VBR MP3'; // e.g., 'Text', 'JPEG', 'VBR MP3', 'MPEG4'
+  
+    let files = [];
+    let queue = [];
+    let container = $('#tracks')
+
+    fetch(`https://archive.org/metadata/${identifier}`)
+      .then(res => res.json())
+      .then(data => {
+        files = data.files.filter(file => file.format === desiredFormat);
+
+        files.forEach((item, index) => {
+          let audioUrl = `https://archive.org/download/${identifier}/${item.name}`;
+          
+          let row = $('<a />')
+            .attr('id', index)
+            .addClass('song')
+            .attr('href', audioUrl)
+            .text(item.name);
+          
+          container.append(row);
+          container.append('<br>');
+        })
+      });
+
+      container.on("click", ".song", function(event) {
+        event.preventDefault();
+        
+        // 4. FIX: Use $(this) to wrap the element correctly, and parse the ID as a number
+        let currentIndex = parseInt($(this).attr('id'), 10);
+        let currentTrackUrl = $(this).attr("href");
+        
+        // 5. Add the clicked track to your queue
+        addToQueue(currentTrackUrl);
+        console.log("Added to queue:", currentTrackUrl);
+
+        // 6. Look ahead to find the next track in our saved array
+        let nextIndex = currentIndex + 1;
+        if (nextIndex < files.length) {
+          let nextItem = files[nextIndex];
+          let nextTrackUrl = `https://archive.org/${identifier}/${nextItem.name}`;
+          
+          // Add the next track to your queue
+          addToQueue(nextTrackUrl);
+          console.log("Added next track to queue:", nextTrackUrl);
+        } else {
+          console.log("This was the last track. No subsequent track to queue.");
+        }
+      });
+
+      const player = new Gapless5({
+          onProgress: function (track) {
+              // Track completed state can be checked safely
+              const currentCompleteState = track ? track.completeState : {};
+              
+              // Gapless5 provides direct nextTrack properties on the main engine instance
+              const nextTrackState = player.nextTrack ? player.nextTrack.completeState : {};
+
+              if (player.nextTrack && player.nextTrack.webAudioLoadingState === 'LOADED') {
+                  document.querySelector('#ready').classList.add('loaded');
+                  document.querySelector('#ready').innerHTML = 'Both tracks are LOADED';
+              }
+
+              document.querySelector('#status').innerHTML = JSON.stringify({
+                  currentTrack: currentCompleteState,
+                  nextTrack: nextTrackState
+              }, null, 2);
+          }
+      });
+
+      // 2. Adjust your previous addToQueue function to push tracks directly to Gapless5
+      function addToQueue(url) {
+          // .addTrack adds the URL to the existing Gapless engine seamlessly
+          player.addTrack(url);
+          
+          // Optional: If the player isn't actively playing anything, kick off playback
+          if (!player.isPlaying) {
+              player.play();
+          }
+      }
+
+      // 3. FIXED CONTROLS: Call the methods directly on the core "player" object
+      document.getElementById('play').addEventListener('click', () => {
+          // Gapless5 has a built-in togglePlayPause() method on the main player object
+          player.togglePlayPause();
+      });
+
+      document.getElementById('end').addEventListener('click', () => {
+          // Use the player's built-in track jumping method to skip or seek
+          // If you want to jump immediately to the next track, use .next()
+          player.next(); 
+          
+          // Alternatively, if you want a true physical jump to the end of the timeline:
+          // player.gotoPosition(player.getDuration());
+      });
+    })
+        
+  </script>
+{% endblock content %}

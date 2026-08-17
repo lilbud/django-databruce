@@ -179,6 +179,11 @@ urlpatterns = [
         views.TestEvent.as_view(),
         name="test_table",
     ),
+    # path(
+    #     "radio/",
+    #     views.Radio.as_view(),
+    #     name="radio",
+    # ),
     path(
         "search/advanced/results",
         views.AdvancedSearchResults.as_view(),

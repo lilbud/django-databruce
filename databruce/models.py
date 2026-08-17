@@ -761,7 +761,7 @@ class Relations(BaseModel, models.Model):
     mbid = models.UUIDField(default=None, editable=False, null=True)
     brucebase_url = models.TextField(default=None, blank=True, null=True)
     name = models.TextField(default=None, blank=True, null=True)
-    appearances = models.IntegerField(default=0)
+    num_events = models.IntegerField(default=0)
     first_event = models.ForeignKey(
         Events,
         models.DO_NOTHING,

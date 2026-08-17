@@ -465,7 +465,7 @@ class IndexEventsSerializer(BaseSerializer):
 
     class Meta:
         model = models.Events
-        fields = ["event_id", "date", "venue"]
+        fields = ["event_id", "date", "venue", "early_late"]
 
 
 class EventTypesSerializer(BaseSerializer):
@@ -732,7 +732,7 @@ class RelationsSerializer(BaseSerializer):
             "aliases",
             "nicknames",
             "uuid",
-            "appearances",
+            "num_events",
         ]
 
 

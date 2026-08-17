@@ -84,6 +84,14 @@ class Test(TemplateView):
         return context
 
 
+class Radio(TemplateView):
+    model = models.Events
+    template_name = "databruce/radio.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        return super().get_context_data(**kwargs)
+
+
 def event_search(request):
     query = request.GET.get("q", "")
 
@@ -162,6 +170,13 @@ class Index(PageTitleMixin, TemplateView):
         )
 
         context["latest_event"] = queryset
+
+        context["event_count"] = models.Events.objects.count()
+        context["song_count"] = models.Songs.objects.count()
+        context["tour_count"] = models.Tours.objects.count()
+        context["venue_count"] = models.Venues.objects.count()
+        context["relation_count"] = models.Relations.objects.count()
+        context["band_count"] = models.Bands.objects.count()
 
         return context
 

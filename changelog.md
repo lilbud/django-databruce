@@ -365,3 +365,5 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Changed column names for tours/runs/tour legs, update pages to match
 - Changed setlist card header functionality
+- Updated home page to add counts of items
+- Further updated columns, all event count columns are now "num_events"

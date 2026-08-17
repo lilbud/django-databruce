@@ -29,7 +29,75 @@
         </div>
       </div>
     {% endif %}
-    <div class="row row-cols-1 row-cols-lg-2 gx-3 row-gap-3">
+    <div class="row row-cols-3 row-cols-lg-6 my-3 g-3">
+      <div class="col">
+        <div class="card p-3">
+          <div class="text-xs text-muted">Events</div>
+          <a href="{% url "events" %}">
+            <div class="text-lg fw-semibold gap-1 d-flex">
+              {{ event_count }}
+              <i class="bi bi-box-arrow-up-right text-xs"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card p-3">
+          <div class="text-xs text-muted">Songs</div>
+          <a href="{% url "songs" %}">
+            <div class="text-lg fw-semibold gap-1 d-flex">
+              {{ song_count }}
+              <i class="bi bi-box-arrow-up-right text-xs"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card p-3">
+          <div class="text-xs text-muted">Tours</div>
+          <a href="{% url "tours" %}">
+            <div class="text-lg fw-semibold gap-1 d-flex">
+              {{ tour_count }}
+              <i class="bi bi-box-arrow-up-right text-xs"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card p-3">
+          <div class="text-xs text-muted">Venues</div>
+          <a href="{% url "venues" %}">
+            <div class="text-lg fw-semibold gap-1 d-flex">
+              {{ venue_count }}
+              <i class="bi bi-box-arrow-up-right text-xs"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card p-3">
+          <div class="text-xs text-muted">Relations</div>
+          <a href="{% url "relations" %}">
+            <div class="text-lg fw-semibold gap-1 d-flex">
+              {{ relation_count }}
+              <i class="bi bi-box-arrow-up-right text-xs"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card p-3">
+          <div class="text-xs text-muted">Bands</div>
+          <a href="{% url "bands" %}">
+            <div class="text-lg fw-semibold gap-1 d-flex">
+              {{ band_count }}
+              <i class="bi bi-box-arrow-up-right text-xs"></i>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row row-cols-1 row-cols-lg-2 g-3">
       <div class="col order-2">
         <div class="card">
           <div class="card-header">Featured Show</div>
@@ -63,19 +131,19 @@
         </div>
       </div>
       <div class="col order-3">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 gx-3 gy-3">
-          <div class="col">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-3">
+          {% comment %} <div class="col">
             <div class="card">
               <div class="card-header">Latest</div>
               <div class="card-body p-0 list-card" id="recent"></div>
             </div>
-          </div>
-          <div class="col">
+          </div> {% endcomment %}
+          {% comment %} <div class="col">
             <div class="card">
               <div class="card-header">Upcoming</div>
               <div class="card-body p-0 list-card" id="upcoming"></div>
             </div>
-          </div>
+          </div> {% endcomment %}
           <div class="col">
             <div class="card">
               <div class="card-header">
@@ -130,6 +198,10 @@
           var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`
           var item2 = `<div class="col-9 py-0 text-wrap">${item.venue}</div>`
 
+          if (item.early_late) {
+            item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`
+          }
+
           var listItem = createMultiListItem(item1, item2);
 
           $(list).append(listItem);
@@ -161,9 +233,9 @@
         container.append(loadingList);
       })
 
-      getEventData(`/api/v1/events_index/?month=${month}&day=${day}&limit=5&format=json`, '#otd')
-      getEventData('/api/v1/events_index/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
-      getEventData('/api/v1/events_index/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
+      getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
+      //getEventData('/api/v1/events_index/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
+      //getEventData('/api/v1/events_index/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
 
       var url = '/api/v1/setlists_index/?event={{ latest_event.event.id }}&format=json&show_only=true';
 
