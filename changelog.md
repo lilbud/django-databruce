@@ -367,3 +367,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - Changed setlist card header functionality
 - Updated home page to add counts of items
 - Further updated columns, all event count columns are now "num_events"
+- Update advanced search to still filter for both songs in a NOT followed_by query

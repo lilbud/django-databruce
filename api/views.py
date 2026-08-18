@@ -330,14 +330,18 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         return queryset.distinct()
 
     def _build_form_condition(self, query, position_filters) -> Q:
+        match_songs = [query["song_1"]]
+
+        condition = Q(setlist_event__set_name__in=VALID_SET_NAMES)
+
         if query["position"] == "followed_by" and query["song_2"]:
-            condition = Q(
-                setlist_event__songs_page__id__song_id=query["song_1"],
-            ) & Q(
+            condition &= Q(setlist_event__song_id=query["song_1"]) & Q(
                 setlist_event__songs_page__next__song_id=query["song_2"],
             )
+
         else:
-            condition = Q(setlist_event__song_id=query["song_1"])
+            condition &= Q(setlist_event__song_id=query["song_1"])
+
             if query["position"] and query["position"] not in [
                 "anywhere",
                 "followed_by",
@@ -347,6 +351,19 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         # Invert condition if choice is False (NOT evaluation)
         if query["choice"] is False:
             condition = ~condition
+
+            if query["position"] == "followed_by" and query["song_2"]:
+                match_songs.append(query["song_2"])
+                condition = (
+                    Q(setlist_event__set_name__in=VALID_SET_NAMES)
+                    & Q(
+                        Q(setlist_event__song_id=query["song_1"])
+                        & ~Q(
+                            setlist_event__songs_page__next__song_id=query["song_2"],
+                        ),
+                    )
+                    & Q(setlist_event__song_id__in=match_songs)
+                )
 
         return condition
 
