@@ -39,6 +39,34 @@ VALID_SET_NAMES = [
 date = datetime.datetime.now(tz=datetime.UTC).date()
 
 
+class NotEqualFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        # 1. Grab the FilterSet class assigned to this ViewSet
+        filterset_class = getattr(view, "filterset_class", None)
+
+        # 2. Extract out all declared filters to map names to actual database paths
+        # (e.g., matching 'city' to field_name='venue__city_id')
+        declared_filters = filterset_class.base_filters if filterset_class else {}
+
+        for param, value in request.query_params.items():
+            if param.endswith("__not"):
+                # Strip out the suffix to find the form field name (e.g., 'city')
+                filter_name = param.replace("__not", "")
+
+                # Check if this field exists in your EventsFilter configuration
+                if filter_name in declared_filters:
+                    # Resolve to the deep relationship path ('venue__city_id')
+                    orm_field_path = declared_filters[filter_name].field_name
+                else:
+                    # Fallback to the parameter name if it isn't explicitly configured
+                    orm_field_path = filter_name
+
+                # 3. Apply the database exclusion safely using the correct ORM pathway
+                queryset = queryset.exclude(**{orm_field_path: value})
+
+        return queryset
+
+
 class DataTablesFilterBackend(BaseFilterBackend):
     def get_sb_filter(
         self,

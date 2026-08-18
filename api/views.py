@@ -18,6 +18,7 @@ from django.db.models import (
     Value,
 )
 from django.db.models.functions import Cast, Coalesce, Lower
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import exceptions, viewsets
 
 from api import filters
@@ -210,6 +211,7 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
     serializer_class = api_serializers.AdvSearchSerializer
+    filter_backends = [DjangoFilterBackend, filters.NotEqualFilterBackend]
     filterset_class = filters.EventsFilter
 
     def get_queryset(self):
@@ -352,6 +354,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         if query["choice"] is False:
             condition = ~condition
 
+            # followed by special case
             if query["position"] == "followed_by" and query["song_2"]:
                 match_songs.append(query["song_2"])
                 condition = (
@@ -464,7 +467,8 @@ class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
     )
 
     serializer_class = api_serializers.AdvSearchSerializer
-    filterset_class = filters.EventsFilter
+    # filterset_class = filters.EventsFilter
+    filter_backends = [filters.EventsFilter, filters.NotEqualFilterBackend]
 
 
 class NugsViewSet(viewsets.ReadOnlyModelViewSet):

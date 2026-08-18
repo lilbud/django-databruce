@@ -216,7 +216,7 @@ class Calendar(PageTitleMixin, TemplateView):
         try:
             if re.search(
                 r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
-                self.request.GET["start"],
+                self.request.GET["start"],  # type: ignore
             ):  # type: ignore
                 context["start_date"] = self.request.GET["start"]
         except MultiValueDictKeyError:
@@ -1484,6 +1484,7 @@ class AdvSearch(PageTitleMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.GET:
+            raw_params = {}
             clean_params = {}
 
             for key, value in request.GET.items():
@@ -1498,7 +1499,19 @@ class AdvSearch(PageTitleMixin, TemplateView):
                     continue
 
                 # If it passes both checks, keep the parameter
-                clean_params[key] = value
+                raw_params[key] = value
+
+            for key, value in list(raw_params.items()):
+                if key.endswith("_exclude") and value.lower() == "true":
+                    field = key.replace("_exclude", "")
+
+                    if field in raw_params:
+                        clean_params[f"{field}__not"] = raw_params[field]
+                        raw_params.pop(field, None)
+
+                    continue
+                if key in raw_params and not key.endswith("_exclude"):
+                    clean_params[key] = value
 
             # If parameters were removed, redirect to the clean URL
             if len(clean_params) != len(request.GET):
@@ -1515,27 +1528,42 @@ class AdvSearch(PageTitleMixin, TemplateView):
         context["title"] = self.title
         context["display_fields"] = []
 
-        event_form = self.form_class(self.request.GET)
+        data = self.request.GET.copy()
+        for key in list(data.keys()):
+            if key.endswith("__not"):
+                field = key.removesuffix("__not")
+                data[field] = data[key]  # type: ignore
+                data[f"{field}_exclude"] = "True"
+
+        event_form = self.form_class(data)
         formset = self.formset_class(self.request.GET)
 
         if event_form.is_valid():
             for f in event_form.changed_data:
                 if "_exclude" not in f and f != "conjunction":
+                    raw_val = event_form.cleaned_data[f]
+
+                    # 1. Format the field data string
+                    if isinstance(raw_val, list):
+                        data_str = " OR ".join(raw_val)
+                    elif isinstance(raw_val, QuerySet):
+                        data_str = " OR ".join(raw_val.values_list("name", flat=True))
+                    elif isinstance(raw_val, dict):
+                        data_str = raw_val.get("value", "")
+                    else:
+                        data_str = str(raw_val)
+
+                    # 2. Check if this field was negated (either via '_exclude' or '__not' in request.GET)
+                    is_excluded = (
+                        event_form.cleaned_data.get(f"{f}_exclude") is True
+                        or f"{f}__not" in self.request.GET
+                    )
+
                     display = {
                         "label": event_form[f].label,
-                        "data": event_form.cleaned_data[f],
+                        "data": f"NOT {data_str}" if is_excluded else data_str,
+                        "is_excluded": is_excluded,
                     }
-
-                    if type(event_form.cleaned_data[f]) is list:
-                        display["data"] = " OR ".join(event_form.cleaned_data[f])
-                    elif type(event_form.cleaned_data[f]) is QuerySet:
-                        display["data"] = " OR ".join(
-                            event_form.cleaned_data[f].values_list("name", flat=True),
-                        )
-                    elif type(event_form.cleaned_data[f]) is dict:
-                        display["data"] = event_form.cleaned_data[f]["value"]
-                    else:
-                        display["data"] = event_form.cleaned_data[f].__str__()
 
                     context["display_fields"].append(display)
 

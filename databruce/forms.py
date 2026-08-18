@@ -222,7 +222,7 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm",
                 "id": "day_of_week",
-                "name": "event_day_of_week",
+                # "name": "event_day_of_week",
             },
         ),
     )
@@ -257,7 +257,7 @@ class AdvancedEventSearch(forms.Form):
 
     city = CustomCharField(
         label="City",
-        lookup_path="venue__city__id",
+        lookup_path="venue__city_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -270,7 +270,7 @@ class AdvancedEventSearch(forms.Form):
 
     state = CustomCharField(
         label="State",
-        lookup_path="venue__city__state__id",
+        lookup_path="venue__city__state_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -283,7 +283,7 @@ class AdvancedEventSearch(forms.Form):
 
     country = CustomCharField(
         label="Country",
-        lookup_path="venue__city__country__id",
+        lookup_path="venue__city__country_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -296,7 +296,7 @@ class AdvancedEventSearch(forms.Form):
 
     venue = CustomCharField(
         label="Venue",
-        lookup_path="venue__id",
+        lookup_path="venue_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -309,7 +309,7 @@ class AdvancedEventSearch(forms.Form):
 
     tour = CustomCharField(
         label="Tour",
-        lookup_path="tour__id",
+        lookup_path="tour_id",
         required=False,
         widget=forms.Select(
             attrs={
@@ -322,7 +322,7 @@ class AdvancedEventSearch(forms.Form):
 
     tour_leg = CustomCharField(
         label="Tour Leg",
-        lookup_path="leg__id",
+        lookup_path="leg_id",
         required=False,
         widget=forms.Select(
             attrs={

@@ -7,8 +7,14 @@
   <script src="{% static 'databruce/js/eventTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col">
+  <div class="col-12">
     <div class="text-2xl text-nowrap mb-2">Advanced Search Results</div>
+    <div class="text-base mb-2">Click link below to copy a short url to these results (the links are very long and look awful).</div>
+    <div id="short_url" class="mb-3">
+      <button id="short-url" class="btn btn-sm btn-primary">Get Short URL</button>
+      <span id="shortLink" class="px-2 d-none text-sm"></span>
+      <button class="btn btn-sm btn-primary d-none" id="copyButton">Copy</button>
+    </div>
     <div class="card mb-3">
       <div class="card-body text-sm">
         <div id="row">
@@ -85,6 +91,40 @@
             var selectedValue = this.value;
             table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
         });
+    });
+
+    $('button#short-url').click(function () {
+      var received_data = '{{ request.build_absolute_uri|safe }}'
+
+      $.ajax({
+        url: '/short_url/',
+        type: 'GET',
+        data: { url: received_data },
+        cache: false,
+        dataType: 'json',
+        success: function (resp) {
+          $('#shortLink').removeClass('d-none')
+          $('#shortLink').text(`${resp.short_url}`)
+          $('#copyButton').removeClass('d-none')
+        }
+      })
+
+      $('#short-url').prop('disabled', true)
+    });
+
+    $('#copyButton').click(function () {
+      var btn = this
+
+      var link = $('#shortLink').text()
+      navigator.clipboard.writeText(link)
+
+      $(btn).text('Copied')
+      $(btn).removeClass('btn-primary').addClass('btn-success')
+
+      setTimeout(function () {
+        $(btn).removeClass('btn-success').addClass('btn-primary')
+        $(btn).text('Copy')
+      }, 3000)
     });
   </script>
 {% endblock content %}

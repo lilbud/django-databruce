@@ -368,3 +368,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Updated home page to add counts of items
 - Further updated columns, all event count columns are now "num_events"
 - Update advanced search to still filter for both songs in a NOT followed_by query
+
+# v1.19.7 (August 18, 2026)
+
+- Updated advanced search to fix "NOT" fields still filtering on those fields. NOT fields also display properly again.
