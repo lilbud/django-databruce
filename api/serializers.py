@@ -2,7 +2,6 @@ import datetime
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, F
 from rest_framework import serializers
 
 from databruce import models
@@ -484,8 +483,9 @@ class EventsSerializer(BaseSerializer):
     tour = MinimalToursSerializer(required=False)
     venue = MinimalVenuesSerializer(
         required=False,
-        include=["uuid", "name", "formatted"],
+        include=["uuid", "name"],
     )
+
     city = serializers.SerializerMethodField(required=False)
 
     def get_city(self, obj):
@@ -497,34 +497,26 @@ class EventsSerializer(BaseSerializer):
     leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
 
-    type = TypesSerializer(many=True, required=False)
-    tags = TagsSerializer(many=True, required=False)
-
     rank = serializers.IntegerField(required=False)
     event_status = serializers.BooleanField(required=False)
     public = serializers.BooleanField(required=False)
 
-    bands = serializers.SerializerMethodField(required=False)
-    relations = serializers.SerializerMethodField(required=False)
-
-    setlist = IndexSetlistSerializer(
-        source="setlist_event",
+    type = serializers.SlugRelatedField(
         many=True,
-        required=False,
         read_only=True,
-        include=["song", "notes", "set_name", "debut", "premiere", "nobruce", "segue"],
+        slug_field="name",
+        required=False,
+    )
+
+    tags = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="name",
+        required=False,
     )
 
     def get_has_setlist(self, obj):
         return bool(obj.setlist_event.exists())
-
-    def get_bands(self, obj):
-        return list({item.band_id for item in obj.onstage if item.band_id})
-
-    def get_relations(self, obj):
-        return list(
-            {item.relation_id for item in obj.onstage if item.relation_id},
-        )
 
     def get_date(self, obj):
         return get_date_from_instance(obj)
@@ -539,7 +531,7 @@ class EventsSerializer(BaseSerializer):
             "city",
             "leg",
             "has_setlist",
-            "setlist",
+            # "setlist",
             "rank",
             "event_status",
             "event_id",
@@ -549,8 +541,8 @@ class EventsSerializer(BaseSerializer):
             "type",
             "tags",
             "note",
-            "bands",
-            "relations",
+            # "bands",
+            # "relations",
         ]
 
 
@@ -634,40 +626,10 @@ class ArchiveLinksSerializer(BaseSerializer):
 
     class Meta:
         model = models.ArchiveLinks
-        fields = "__all__"
-
-
-class EventRunDetailSerializer(BaseSerializer):
-    events = serializers.SerializerMethodField()
-    songs = serializers.SerializerMethodField()
-
-    def get_events(self, obj):
-        return models.Events.objects.filter(run__id=obj.id)
-
-    def get_songs(self, obj):
-        return (
-            models.Setlists.objects.filter(
-                event__run__id=obj.id,
-                set_name__in=VALID_SET_NAMES,
-            )
-            .values("song__id")
-            .annotate(
-                count=Count("event"),
-                name=F("song__name"),
-                category=F("song__category"),
-            )
-            .order_by("-count", "song__name")
-        )
-
-    class Meta:
-        model = models.Events
-        fields = "__all__"
+        fields = ["id", "event", "url"]
 
 
 class BootlegsSerializer(BaseSerializer):
-    event = MinimalEventSerializer()
-    archive = MinimalArchiveLinksSerializer(required=False)
-
     class Meta:
         model = models.Bootlegs
         fields = "__all__"

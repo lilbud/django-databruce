@@ -372,3 +372,10 @@ First public release of the site. Site was locked behind a login and accounts on
 # v1.19.7 (August 18, 2026)
 
 - Updated advanced search to fix "NOT" fields still filtering on those fields. NOT fields also display properly again.
+
+# v1.19.8 (August 19, 2026)
+
+- Change field type on some serializers
+- Remove unnecessary field types from serializers
+- Update short url creation
+- Change adv search path on home page "On This Day" card

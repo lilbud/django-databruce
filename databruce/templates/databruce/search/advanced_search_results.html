@@ -5,15 +5,26 @@
 {% endblock %}
 {% block extrajs %}
   <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+          integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+          crossorigin="anonymous"></script>
 {% endblock extrajs %}
 {% block content %}
 <div class="col-12">
   <div class="text-2xl text-nowrap">Advanced Search Results</div>
   <div class="text-base mb-2">Click link below to copy a short url to these results (the links are very long and look awful).</div>
   <div id="short_url" class="mb-3">
-    <button id="short-url" class="btn btn-sm btn-primary">Get Short URL</button>
-    <span id="shortLink" class="px-2 d-none text-sm"></span>
-    <button class="btn btn-sm btn-primary d-none" id="copyButton">Copy</button>
+    <!--<button id="short-url" class="btn btn-sm btn-primary">Get Short URL</button>-->
+    <button id="short-url"
+            hx-get="/short_url/"
+            hx-vals='{"url": "{{ request.build_absolute_uri|safe }}"}'
+            hx-target="#shortLink"
+            hx-swap="innerHTML"
+            hx-disabled-element="self">
+                Get Short URL
+    </button>
+    <span id="shortLink" class="px-2 text-sm"></span>
+    <button class="btn btn-sm btn-primary" id="copyButton">Copy</button>
   </div>
   <div class="card mb-3">
     <div class="card-body text-sm">
@@ -157,7 +168,7 @@
         { targets: [5], width: '15rem' }
       ],
       initComplete: function() {
-        searchBuilder(this.api(), sb_columns); 
+        searchBuilder(this.api(), sb_columns);
       }
     });
 
@@ -172,24 +183,23 @@
         .draw()
     })
 
-    $('button#short-url').click(function () {
-      var received_data = '{{ request.build_absolute_uri|safe }}'
+    // $('button#short-url').click(function () {
+    //   var received_data = '{{ request.build_absolute_uri|safe }}'
 
-      $.ajax({
-        url: '/short_url/',
-        type: 'GET',
-        data: { url: received_data },
-        cache: false,
-        dataType: 'json',
-        success: function (resp) {
-          $('#shortLink').removeClass('d-none')
-          $('#shortLink').text(`${resp.short_url}`)
-          $('#copyButton').removeClass('d-none')
-        }
-      })
+    //   $.ajax({
+    //     url: '/short_url/',
+    //     type: 'GET',
+    //     data: { url: received_data },
+    //     cache: false,
+    //     dataType: 'json',
+    //     success: function (resp) {
+    //       $('#shortLink').removeClass('d-none').text(`${resp.short_url}`)
+    //       $('#copyButton').removeClass('d-none')
+    //     }
+    //   })
 
-      $('#short-url').prop('disabled', true)
-    })
+    //   $('#short-url').prop('disabled', true)
+    // })
 
     $('#copyButton').click(function () {
       var btn = this

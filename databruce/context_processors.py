@@ -76,7 +76,7 @@ def get_navbar_links():
             "children": [
                 {"name": "Official Releases", "url": "releases"},
                 {"name": "Nugs Releases", "url": "nugs"},
-                {"name": "Bootlegs", "url": "bootlegs"},
+                # {"name": "Bootlegs", "url": "bootlegs"},
             ],
         },
         {

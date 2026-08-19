@@ -99,11 +99,7 @@ class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
 class BandViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-    queryset = (
-        models.Bands.objects.all()
-        .order_by("name")
-        .prefetch_related("first_event", "last_event")
-    )
+    queryset = models.Bands.objects.order_by("name")
 
     serializer_class = api_serializers.BandsSerializer
     filterset_class = filters.BandsFilter
@@ -410,29 +406,16 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
             type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
         )
 
-        onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
-            "band",
-        )
-
         return (
             models.Events.objects.select_related(
                 "artist",
                 "tour",
                 "venue__city__country",
-                "venue__venues_text",
-                "venue__parent",
             )
             .prefetch_related(
-                "run",
                 "venue__city__state",
                 "leg",
-                Prefetch("onstage_event", queryset=onstage_qs, to_attr="onstage"),
-                Prefetch(
-                    "setlist_event",
-                    queryset=models.Setlists.objects.select_related(
-                        "song",
-                    ).prefetch_related("setlist_notes"),
-                ),
+                "setlist_event",
                 "type",
                 "tags",
             )

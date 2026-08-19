@@ -11,6 +11,7 @@ from uuid import uuid4
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import F, Func, Value
+from django.db.models.fetch_modes import FETCH_PEERS
 from django.db.models.functions import Lower, Trim
 from django.urls import reverse
 from django.utils import timezone
@@ -52,9 +53,16 @@ class RegexpReplace(Func):
     arg_joiner = ", "
 
 
+class BaseManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().fetch_mode(FETCH_PEERS)  # type: ignore
+
+
 class BaseModel(models.Model):
     created_at = models.DateTimeField(db_index=True, default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = BaseManager()
 
     class Meta:
         abstract = True

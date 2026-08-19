@@ -1,4 +1,7 @@
+from typing import Any
+
 import msgspec
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.renderers import BaseRenderer
 from rest_framework.request import Request
@@ -78,10 +81,19 @@ class DatatablesRenderer(BaseRenderer):
         return msgspec.json.encode(data)
 
 
+def msgspec_enc_hook(obj: Any) -> Any:
+    """Converts DRF ErrorDetail objects to standard strings for msgspec."""
+    if isinstance(obj, ErrorDetail):
+        return str(obj)
+    raise TypeError(f"Type {type(obj)} not serializable by msgspec")
+
+
 class JSONRenderer(BaseRenderer):
     media_type = "application/json"
     format = "json"  # Triggered by ?format=custom
     charset = "utf-8"
+
+    _encoder = msgspec.json.Encoder(enc_hook=msgspec_enc_hook)
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if data is None:

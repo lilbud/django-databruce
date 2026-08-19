@@ -150,7 +150,7 @@
                 On This Day
                 <a role="button"
                    class="btn btn-sm btn-primary text-xs py-0.5 px-1"
-                   href="{% url 'adv_search_test' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
+                   href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
               </div>
               <div class="card-body p-0 list-card" id="otd"></div>
             </div>
@@ -254,7 +254,7 @@
             if (data) {
               return data
             }
-            
+
             return ''
           },
           'createdCell': function (td, cellData, rowData, row, col) {
@@ -319,6 +319,6 @@
 
       createTable(url, setlistColumns, '#setlistTable', setlistOptions);
     })
-  
+
   </script>
 {% endblock content %}

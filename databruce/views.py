@@ -1431,8 +1431,24 @@ class ShortenURL(PageTitleMixin, TemplateView):
         user = UserModel.objects.first()
         short_url = shortener.create(user, request.GET["url"])
 
+        protocol = 'https'
+
+        if request.get_host() == "127.0.0.1:8000":
+            protocol = 'http'
+
+        full_short_url = f"{protocol}://{request.get_host()}/s/{short_url}"
+
+        if "HX-Request" in request.headers:
+            # Return raw HTML directly instead of creating a whole new template file
+            html_snippet = f"""
+            <span id="shortLink" class="px-2 text-sm">{full_short_url}</span>
+            <button id="copyButton"
+            class="btn btn-sm btn-primary ms-2">Copy Link</button>
+            """
+            return HttpResponse(html_snippet)
+
         return HttpResponse(
-            json.dumps({"short_url": f"https://{request.get_host()}/s/{short_url}"}),
+            json.dumps({"short_url": full_short_url}),
             content_type="application/json",
         )
 
