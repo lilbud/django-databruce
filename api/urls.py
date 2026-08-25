@@ -114,6 +114,21 @@ router.register(
     views.TagsViewSet,
     basename="tags",
 )
+router.register(
+    r"logs",
+    views.ItemInsertLogViewSet,
+    basename="logs",
+)
+router.register(
+    r"articles",
+    views.ArticlesViewSet,
+    basename="articles",
+)
+router.register(
+    r"articles_search",
+    views.ArticlesSearchViewSet,
+    basename="articles_search",
+)
 
 
 # The API URLs are now determined automatically by the router.

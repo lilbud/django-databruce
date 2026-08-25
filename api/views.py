@@ -20,6 +20,7 @@ from django.db.models import (
 from django.db.models.functions import Cast, Coalesce, Lower
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import exceptions, viewsets
+from rest_framework.pagination import PageNumberPagination
 
 from api import filters
 from api import serializers as api_serializers
@@ -37,6 +38,12 @@ VALID_SET_NAMES = [
     "Recording",
 ]
 date = datetime.datetime.now(tz=datetime.UTC).date()
+
+
+class StandardSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "per_page"  # Allows client to pass ?page_size=20
+    max_page_size = 100  # Sets an upper limit for client requests
 
 
 class SubqueryCount(Subquery):
@@ -207,14 +214,14 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
     serializer_class = api_serializers.AdvSearchSerializer
-    filter_backends = [DjangoFilterBackend, filters.NotEqualFilterBackend]
-    filterset_class = filters.EventsFilter
+    filter_backends = [
+        filters.DataTablesFilterBackend,
+        DjangoFilterBackend,
+        filters.NotEqualFilterBackend,
+    ]
+    filterset_class = filters.AdvSearchFilter
 
     def get_queryset(self):
-        onstage_qs = models.Onstage.objects.select_related("relation").prefetch_related(
-            "band",
-        )
-
         status_check = models.EventTypes.objects.filter(
             event_id=OuterRef("pk"),
             type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
@@ -226,7 +233,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 "artist",
                 "tour",
                 "venue__city__country",
-                "venue__venues_text",
+                "venue",
             )
             .prefetch_related(
                 "run",
@@ -234,13 +241,6 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
                 "leg",
                 "tags",
                 "type",
-                Prefetch("onstage_event", queryset=onstage_qs, to_attr="onstage"),
-                Prefetch(
-                    "setlist_event",
-                    queryset=models.Setlists.objects.select_related(
-                        "song",
-                    ).prefetch_related("setlist_notes"),
-                ),
             )
             .annotate(event_status=Exists(status_check))
         ).order_by("event_id")
@@ -252,19 +252,19 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         # Base structure mapping positions to Q objects
         position_filters = {
             "show_opener": Q(setlist_event__is_opener=True),
-            "in_show": Q(setlist_event__set_name="show"),
-            "in_set_one": Q(setlist_event__set_name="set 1"),
-            "set_one_opener": Q(setlist_event__set_name="set 1", is_set_opener=True),
-            "set_one_closer": Q(setlist_event__set_name="set 1", is_set_closer=True),
-            "in_set_two": Q(setlist_event__set_name="set 2"),
-            "set_two_opener": Q(setlist_event__set_name="set 2", is_set_opener=True),
-            "set_two_closer": Q(setlist_event__set_name="set 2", is_set_closer=True),
+            "in_show": Q(setlist_event__set_name="Show"),
+            "in_set_one": Q(setlist_event__set_name="Set 1"),
+            "set_one_opener": Q(setlist_event__set_name="Set 1", is_set_opener=True),
+            "set_one_closer": Q(setlist_event__set_name="Set 1", is_set_closer=True),
+            "in_set_two": Q(setlist_event__set_name="Set 2"),
+            "set_two_opener": Q(setlist_event__set_name="Set 2", is_set_opener=True),
+            "set_two_closer": Q(setlist_event__set_name="Set 2", is_set_closer=True),
             "main_set_closer": Q(setlist_event__is_main_set_closer=True),
-            "encore_opener": Q(setlist_event__set_name="encore", is_set_opener=True),
-            "in_encore": Q(setlist_event__set_name="encore"),
-            "in_preshow": Q(setlist_event__set_name="pre-show"),
-            "in_recording": Q(setlist_event__set_name="recording"),
-            "in_soundcheck": Q(setlist_event__set_name="soundcheck"),
+            "encore_opener": Q(setlist_event__set_name="Encore", is_set_opener=True),
+            "in_encore": Q(setlist_event__set_name="Encore"),
+            "in_preshow": Q(setlist_event__set_name="Pre-Show"),
+            "in_recording": Q(setlist_event__set_name="Recording"),
+            "in_soundcheck": Q(setlist_event__set_name="Soundcheck"),
             "show_closer": Q(setlist_event__is_closer=True),
             "anywhere": Q(),
             "premiere": Q(setlist_event__premiere=True),
@@ -276,35 +276,24 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         # 2. Extract query parameters for the dynamic formset
         query_params = self.request.query_params  # type: ignore
         conjunction = query_params.get("conjunction", "and").lower()
+        setlist_queries = []
+        index = 0
 
-        try:
-            total_forms = int(query_params.get("form-TOTAL_FORMS", 0))
-        except ValueError:
-            total_forms = 0
+        while f"songs[{index}][song_1]" in query_params:
+            # Safely convert choice string back to a Python boolean
+            choice_str = query_params.get(f"songs[{index}][choice]", "false").lower()
 
-        if total_forms == 0:
-            return queryset
+            song_dict = {
+                "song_1": query_params.get(f"songs[{index}][song_1]"),
+                "song_2": query_params.get(
+                    f"songs[{index}][song_2]",
+                ),  # Will be None if missing
+                "choice": choice_str == "true",
+                "position": query_params.get(f"songs[{index}][position]"),
+            }
 
-        # 3. Parse and collect all valid formset queries
-        formset_queries = []
-        for i in range(total_forms):
-            song_1 = query_params.get(f"form-{i}-song1")
-            song_2 = query_params.get(f"form-{i}-song2")
-            choice = query_params.get(f"form-{i}-choice")
-            position = query_params.get(f"form-{i}-position")
-
-            if song_1:
-                formset_queries.append(
-                    {
-                        "song_1": song_1,
-                        "choice": choice.lower() == "true",
-                        "position": position,
-                        "song_2": song_2,
-                    },
-                )
-
-        if not formset_queries:
-            return queryset
+            setlist_queries.append(song_dict)
+            index += 1
 
         # =========================================================================
         # 4. CHOP UP FILTERS ACCORDING TO LOGICAL OPERATOR (THE FIX)
@@ -312,7 +301,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         if conjunction == "or":
             # For OR operations, a single combined filter is required.
             or_filter = Q()
-            for query in formset_queries:
+            for query in setlist_queries:
                 condition = self._build_form_condition(query, position_filters)
                 or_filter |= condition
 
@@ -320,7 +309,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
         else:
             # For AND operations, loop and CHAIN discrete .filter() statements.
             # This isolates the SQL multi-joins per row instead of cross-contaminating them.
-            for query in formset_queries:
+            for query in setlist_queries:
                 condition = self._build_form_condition(query, position_filters)
                 queryset = queryset.filter(condition)
 
@@ -799,18 +788,9 @@ class LyricsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SetlistNotesViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = (
-        models.SetlistNotes.objects.all()
-        .select_related(
-            "setlist__song",
-            "event",
-            "event__venue__city",
-            "event__venue__venues_text",
-        )
-        .prefetch_related(
-            "event__venue__city__state",
-            "event__venue__city__country",
-        )
+    queryset = models.SetlistNotes.objects.all().select_related(
+        "setlist__song",
+        "event__venue",
     )
 
     serializer_class = api_serializers.SetlistNotesSerializer
@@ -1113,3 +1093,31 @@ class YearSongBreakdown(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = api_serializers.YearSongBreakdownSerializer
     filterset_class = filters.YearSongBreakdownFilter
+
+
+class ItemInsertLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.ItemInsertLog.objects.all()
+    serializer_class = api_serializers.ItemInsertLogSerializer
+
+
+class ArticlesViewSet(viewsets.ModelViewSet):
+    queryset = models.Articles.objects.all()
+    serializer_class = api_serializers.ArticlesSerializer
+    lookup_field = (
+        "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)
+    )
+
+    filterset_class = filters.ArticleFilter
+    ordering = ["-published_at"]  # Default ordering
+
+
+class ArticlesSearchViewSet(viewsets.ModelViewSet):
+    queryset = models.Articles.objects.all()
+    serializer_class = api_serializers.ArticlesSerializer
+    lookup_field = (
+        "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)
+    )
+
+    filterset_class = filters.ArticleFilter
+    ordering = ["-published_at"]  # Default ordering
+    pagination_class = StandardSetPagination

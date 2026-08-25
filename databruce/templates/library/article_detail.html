@@ -1,0 +1,42 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load i18n static %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block extrastyle %}
+{% endblock extrastyle %}
+{% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_edit_btn.html" with view="articles" item=article.id %}
+  {% endif %}
+  <div class="col-12 col-lg-8">
+    <div class="text-base">
+      <a href="{% url 'library:articles' %}">Back to Databruce Article Library</a>
+    </div>
+    <div class="page-title my-3">{{ article.title }}</div>
+    <div class="text-sm">
+      Author: <span class="fw-semibold">{{ article.author }}</span>
+    </div>
+    <div class="text-sm">
+      Source: <span class="fw-semibold">{{ article.source }}</span>
+    </div>
+    <div class="text-sm">
+      Published Date: <span class="fw-semibold">{{ article.published_at|date:"F j, Y" }}</span>
+    </div>
+    <hr>
+    <div class="text-base">{{ body }}</div>
+    <hr>
+    <div class="prefix-container text-sm">
+      <span class="prefix">Sourced From</span>
+      <span class="value">{{ article.collection_name }}</span>
+    </div>
+    <div class="prefix-container text-sm mb-1">
+      <span class="prefix">Category</span>
+      <span class="value text-wrap">
+        <a href="{% url "library:article_category" slug=article.category %}">
+          <span class="badge badge-primary text-2xs">{{ category }}</span>
+        </a>
+      </span>
+    </div>
+  </div>
+{% endblock content %}

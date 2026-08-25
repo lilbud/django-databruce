@@ -20,6 +20,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django_filters import ModelMultipleChoiceFilter
 from django_filters import rest_framework as filters
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.request import Request
@@ -37,6 +38,10 @@ VALID_SET_NAMES = [
 ]
 
 date = datetime.datetime.now(tz=datetime.UTC).date()
+
+
+class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
+    pass
 
 
 class NotEqualFilterBackend(BaseFilterBackend):
@@ -693,48 +698,25 @@ class AdvSearchFilter(filters.FilterSet):
         label="year",
     )
 
-    type = filters.BaseInFilter(
+    type = ModelMultipleChoiceFilter(
         field_name="event_type__type_id",
-        lookup_expr="exact",
-        method="filter_by_event_type",
+        to_field_name="id",
+        queryset=models.Types.objects.all(),
     )
 
-    def filter_by_event_type(self, queryset, name, value):
-        if type(value) == str:
-            value = int(value)
-
-            return queryset.filter(event_type__type_id=value)
-
-        if type(value) == list:
-            return queryset.filter(event_type__type_id__in=[int(x) for x in value])
-
-        return queryset
-
-    tag = filters.BaseInFilter(
+    tag = ModelMultipleChoiceFilter(
         field_name="event_tags__tag_id",
-        lookup_expr="exact",
-        label="event tag id",
-        method="filter_by_tag",
+        to_field_name="id",
+        queryset=models.Tags.objects.all(),
     )
 
-    def filter_by_tag(self, queryset, name, value):
-        if type(value) == str:
-            value = int(value)
-
-            return queryset.filter(event_tags__tag_id=value)
-
-        if type(value) == list:
-            return queryset.filter(event_tags__tag_id__in=[int(x) for x in value])
-
-        return queryset
-
-    start_date = filters.DateTimeFilter(
+    start_date = filters.DateFilter(
         field_name="date",
         lookup_expr="gte",
         label="start date",
     )
 
-    end_date = filters.DateTimeFilter(
+    end_date = filters.DateFilter(
         field_name="date",
         lookup_expr="lte",
         label="end date",
@@ -1371,3 +1353,44 @@ class TagFilter(filters.FilterSet):
 class EventTagFilter(filters.FilterSet):
     event = filters.NumberFilter(field_name="event_id", lookup_expr="exact")
     tag = filters.NumberFilter(field_name="tag_id", lookup_expr="exact")
+
+
+class ArticleFilter(filters.FilterSet):
+    # Full-Text Search filter using the generated fts_vector column
+    q = filters.CharFilter(method="filter_by_fts", label="Search (FTS)")
+
+    # Exact and multiple choice filters
+    category = filters.ChoiceFilter(choices=models.ArticleCategory.choices)
+    author = filters.CharFilter(lookup_expr="icontains")
+
+    date_after = filters.NumberFilter(
+        field_name="published_at__year",
+        lookup_expr="gte",
+    )
+
+    date_before = filters.NumberFilter(
+        field_name="published_at__year",
+        lookup_expr="lte",
+    )
+
+    class Meta:
+        model = models.Articles
+        fields = [
+            "q",
+            "category",
+            "author",
+            "date_after",
+            "date_before",
+        ]
+
+    def filter_by_fts(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        # Query using the pre-calculated English tsvector
+        query = SearchQuery(value, config="english")
+        return (
+            queryset.filter(fts_vector=query)
+            .annotate(rank=SearchRank("fts_vector", query))
+            .order_by("-rank", "-published_at", "-created_at")
+        )

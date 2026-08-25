@@ -1,0 +1,8 @@
+<div class="row mb-2">
+  <span class="text-2xl">
+    <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
+  </span>
+  <span class="text-sm">Author <span class="fw-semibold">{{ article.author }}</span> on {{ article.published_at|date:"F j, Y" }}</span>
+  <span class="text-sm my-3">{{ article.content|truncatewords:50 }}</span>
+  <span class="text-sm fw-semibold"><a href="{% url "library:article_detail" slug=article.slug %}">Read More</a></span>
+</div>

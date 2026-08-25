@@ -750,27 +750,40 @@ button#usercount {
   }
 }
 
-
 .modal-title {
   color: var(--text-color-default) !important;
 }
 
 .card.message.info {
-  background-color: var(--color-info-light) !important;
-  border-color: var(--color-info) !important;
+  --color: var(--color-info) !important;
 }
 
 .card.message.error {
-  background-color: var(--color-danger-light) !important;
-  border-color: var(--color-danger) !important;
+  --color: var(--color-danger) !important;
 }
 
 .card.message.warning {
-  background-color: var(--color-warning-light) !important;
-  border-color: var(--color-warning) !important;
+  --color: var(--color-warning) !important;
 }
 
 .card.message.success {
-  background-color: var(--color-success-light) !important;
-  border-color: var(--color-success) !important;
+  --color: var(--color-success) !important;
+}
+
+/* .card.message {
+  background-color: color-mix(in oklab, var(--bg-color) 30%, transparent) !important;
+  border-color: var(--color) !important;
+  color: color-mix(in oklab, var(--color) 70%, black) !important;
+} */
+
+[data-bs-theme="dark"] .card.message {
+  background-color: color-mix(in oklab, var(--color) 30%, transparent) !important;
+  border-color: color-mix(in oklab, var(--color) 70%, transparent) !important;
+  color: color-mix(in oklab, var(--color) 60%, white) !important;
+}
+
+[data-bs-theme="light"] .card.message {
+  background-color: color-mix(in oklab, var(--color) 20%, transparent) !important;
+  border-color: color-mix(in oklab, var(--color) 70%, transparent) !important;
+  color: color-mix(in oklab, var(--color) 70%, black) !important;
 }

@@ -13,16 +13,6 @@
       {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
     <hr>
-    <div class="pagination">
-      {% if page.has_previous %}
-        <a href="?page=1">&lt; First</a>
-        <a href="?page={{ page.previous_page_number }}">Previous</a>
-      {% endif %}
-      <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
-      {% if page.has_next %}
-        <a href="?page={{ page.next_page_number }}">Next</a>
-        <a href="?page={{ page.paginator.num_pages }}">Last &gt;</a>
-      {% endif %}
-    </div>
+    {% include 'databruce/partials/_pagination.html' %}
   </div>
 {% endblock content %}

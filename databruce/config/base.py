@@ -167,7 +167,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
-        "databruce.pagination.JSONRenderer",
+        "rest_framework.renderers.JSONRenderer",
         "databruce.pagination.DatatablesRenderer",
     ),
     "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",

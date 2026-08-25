@@ -1,0 +1,238 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load i18n %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block content %}
+  <div class="col-12">
+    <div class="row mb-3">
+      <form action="{% url "library:article_search" %}"
+            method="get"
+            id="article_search">
+        <div class="row g-2 align-items-lg-end">
+          <!-- Query Input -->
+          <div class="col-12 col-lg">
+            <label class="form-label mb-1">{{ form.query.label }}</label>
+            <div>{{ form.query }}</div>
+          </div>
+          <!-- Year After -->
+          <div class="col-6 col-lg-1">
+            <label class="form-label mb-1">{{ form.date_after.label }}</label>
+            <div>{{ form.date_after }}</div>
+          </div>
+          <!-- Year Before -->
+          <div class="col-6 col-lg-1">
+            <label class="form-label mb-1">{{ form.date_before.label }}</label>
+            <div>{{ form.date_before }}</div>
+          </div>
+          <!-- Submit Button -->
+          <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+            <button class="btn btn-sm btn-primary w-100" type="submit">Search</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- Results Container -->
+    <div id="search-results" class="mt-4"></div>
+    <!-- Pagination Controls -->
+    <div id="pagination-controls" class="mt-3"></div>
+  </div>
+  <script>
+    {% comment %} $(document).ready(function () {
+
+      $('#article_search').on('submit', async function(e) {
+        //e.preventDefault();
+
+        var form = this;
+        const container = $('#results');
+
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+
+        const paramMapping = {
+          query: 'q',
+          date_before: 'date_before',
+          date_after: 'date_after',
+        };
+
+        for (const [key, value] of formData.entries()) {
+          const trimmedValue = value.trim();
+          if (trimmedValue) {
+            // Use mapped API query param name if defined, otherwise default to the input name
+            const apiParam = paramMapping[key] || key;
+            params.append(apiParam, trimmedValue);
+          }
+        }
+
+        const apiUrl = `/api/v1/articles/?${params.toString()}`;
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          
+          data.results.forEach(item => {
+            const html = `<div>
+            <div class="text-xl" id="title"><a href="/library/article/${item.slug}">${item.title}</a></div>
+            <div class="text-sm" id="author"><span class="fw-semibold">Author:</span> ${item.author}</div>
+            <div class="text-sm" id="author"><span class="fw-semibold">Date:</span> ${item.published_at}</div>
+            <div class="text-sm fw-semibold my-2" id="link"><a href="/library/article/${item.slug}">Read More</a></div></div>
+            `;
+
+            container.append(html);
+            container.append('<hr>');
+          })
+
+        } catch (error) {
+          console.error('Search failed:', error);
+        }
+
+      })
+}) {% endcomment %}
+     document.addEventListener('DOMContentLoaded', () => {
+      const searchForm = document.querySelector('#article_search');
+      const resultsContainer = document.getElementById('search-results');
+      const paginationContainer = document.getElementById('pagination-controls');
+
+      // Track the current search params globally across pagination requests
+      let currentSearchParams = new URLSearchParams();
+
+      // Field mapping between Form names and DRF FilterSet query params
+      const paramMapping = {
+        query: 'q',
+        category: 'category',
+        date_before: 'date_before',
+        date_after: 'date_after',
+      };
+
+      // Form submit handler
+      searchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(searchForm);
+        currentSearchParams = new URLSearchParams();
+
+        // Collect active search parameters
+        for (const [key, value] of formData.entries()) {
+          const trimmedValue = value.trim();
+          if (trimmedValue) {
+            const apiParam = paramMapping[key] || key;
+            currentSearchParams.append(apiParam, trimmedValue);
+          }
+        }
+
+        // Always reset to page 1 on a fresh search submit
+        fetchArticles(1);
+      });
+
+      // Fetch articles from DRF API
+      async function fetchArticles(page = 1) {
+        // Clone params and append current page
+        const params = new URLSearchParams(currentSearchParams);
+        params.set('page', page);
+
+        const apiUrl = `/api/v1/articles_search/?${params.toString()}`;
+
+        try {
+          const response = await fetch(apiUrl, {
+            headers: {
+              'Accept': 'application/json',
+            },
+          });
+
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+          const data = await response.json(); // DRF response format: { count, next, previous, results }
+
+          renderResults(data.results);
+          renderPagination(data, page);
+
+        } catch (error) {
+          console.error('Fetch error:', error);
+          if (resultsContainer) {
+            resultsContainer.innerHTML = `<p class="text-danger">Failed to load results.</p>`;
+          }
+        }
+      }
+
+      // Render article items
+      function renderResults(articles) {
+        if (!resultsContainer) return;
+
+        if (!articles || articles.length === 0) {
+          resultsContainer.innerHTML = '<p class="text-muted">No articles found.</p>';
+          return;
+        }
+
+        resultsContainer.innerHTML = articles.map(article => `
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="card-title text-sm">
+              <a href="/library/article/${article.slug}/">${article.title}</a>
+              </div>
+              <div class="card-subtitle my-2 text-xs">
+                By ${article.author} | <span class="badge badge-primary">${article.category}</span>
+              </div>
+              <p class="card-text">${article.excerpt}...</p>
+              <a href="/library/article/${article.slug}/" class="btn btn-sm btn-primary">Read Article</a>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Render pagination navigation
+      function renderPagination(data, currentPage) {
+        if (!paginationContainer) return;
+
+        // Calculate total pages from DRF's total `count` and page size (e.g., 10)
+        const pageSize = 10;
+        const totalPages = Math.ceil(data.count / pageSize);
+
+        if (totalPages <= 1) {
+          paginationContainer.innerHTML = '';
+          return;
+        }
+
+        paginationContainer.innerHTML = `
+          <nav aria-label="Article search pagination">
+            <ul class="pagination justify-content-center">
+              <li class="page-item ${!data.previous ? 'disabled' : ''}">
+                <button class="page-link" data-page="${currentPage - 1}">Previous</button>
+              </li>
+              
+              <li class="page-item disabled">
+                <span class="page-link">Page ${currentPage} of ${totalPages}</span>
+              </li>
+              
+              <li class="page-item ${!data.next ? 'disabled' : ''}">
+                <button class="page-link" data-page="${currentPage + 1}">Next</button>
+              </li>
+            </ul>
+          </nav>
+        `;
+      }
+
+      // Event delegation for pagination clicks
+      if (paginationContainer) {
+        paginationContainer.addEventListener('click', (event) => {
+          const button = event.target.closest('button[data-page]');
+          if (button && !button.parentElement.classList.contains('disabled')) {
+            const targetPage = parseInt(button.dataset.page, 10);
+            fetchArticles(targetPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      }
+    });
+  </script>
+{% endblock content %}

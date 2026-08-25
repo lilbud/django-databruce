@@ -6,8 +6,8 @@
   {% if user.is_superuser %}
     {% include "databruce/partials/admin_edit_btn.html" with view="releases" item=info.id %}
   {% endif %}
-  <div class="col">
-    <div class="text-2xl text-nowrap mb-2">{{ info.name }}</div>
+  <div class="col-12">
+    <div class="page-title">{{ info.name }}</div>
     <div class="d-grid gap-0 row-gap-2 mb-2">
       {% if info.note %}
         <div class="row">
@@ -23,7 +23,12 @@
           </div>
         </div>
       {% endif %}
-      <div class="info-card-row row row-cols-2 g-2 {% if info.event %} row-cols-lg-4 {% else %} row-cols-lg-3 {% endif %}">
+      <div class="info-card-row row row-cols-2 g-2
+                  {% if info.event %}
+                    row-cols-lg-4
+                  {% else %}
+                    row-cols-lg-3
+                  {% endif %}">
         <div class="col">
           <div class="card">
             <div class="card-body">

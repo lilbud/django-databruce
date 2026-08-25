@@ -33,6 +33,8 @@ urlpatterns = [
     path("s/", include("shortener.urls")),
     path("", include("api.urls", namespace="api")),
     path("", include("blog.urls", namespace="blog")),
+    path("", include("select2.urls", namespace="select2")),
+    path("library/", include("library.urls", namespace="library")),
     path("benner/", admin.site.urls),
     path("test/", views.Test.as_view(), name="test"),
     path("calendar/", views.Calendar.as_view(), name="calendar"),

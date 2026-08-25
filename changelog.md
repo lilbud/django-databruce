@@ -379,3 +379,12 @@ First public release of the site. Site was locked behind a login and accounts on
 - Remove unnecessary field types from serializers
 - Update short url creation
 - Change adv search path on home page "On This Day" card
+
+# v1.20 (September XX, 2026)
+
+- Added the Databruce Library, a collection of Bruce-related articles sourced from various places. The initial batch of about 1,000 are taken from my archive of the BTX Article Thread. Eventually I'll get to adding articles from Ken Rosen's site and some other places. Also added corresponding table/listing pages.
+- Added "Article Search", which allows for full text searching of the above article library. Consider this a work in progress, as I haven't fully settled on the design and general functionality yet.
+- Fixed some pages looking off on mobile due to missing bootstrap column div.
+- Setlist Note Search is now a table rather than a form leading to a new page.
+- Added better pagination controls to blog and library pages
+- Added new endpoints for Advanced Search, these should be much more responsive due to limiting the fields gotten through select2.

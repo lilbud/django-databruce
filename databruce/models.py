@@ -9,16 +9,21 @@ import re
 from uuid import uuid4
 
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.db import models
 from django.db.models import F, Func, Value
 from django.db.models.fetch_modes import FETCH_PEERS
-from django.db.models.functions import Lower, Trim
+from django.db.models.functions import Coalesce, Lower, Trim
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from timezone_field import TimeZoneField
 
 from .templatetags.filters import format_fuzzy
+
+# class ImmutableUnaccent(Func):
+#     function = "immutable_unaccent"
+#     output_field = models.TextField()
 
 
 class CustomUser(AbstractUser):
@@ -1136,6 +1141,13 @@ class Songs(BaseModel, models.Model):
         db_persist=True,
     )
 
+    search_vector = models.GeneratedField(
+        expression=SearchVector("name", config="unaccent"),
+        output_field=SearchVectorField(),
+        db_persist=True,
+        db_column="fts_name_vector",
+    )
+
     class Meta:
         db_table = "songs"
         ordering = ["name"]
@@ -1206,7 +1218,7 @@ class Setlists(BaseModel, models.Model):
         ("Show Opener", "Show Opener"),
     ]
 
-    note = models.TextField(default=None, db_column="song_note", blank=True)
+    note = models.TextField(default=None, db_column="song_note", blank=True, null=True)
     segue = models.BooleanField(default=False)
     premiere = models.BooleanField(default=False)
     debut = models.BooleanField(default=False)
@@ -1994,7 +2006,7 @@ class EventTypes(models.Model):
     type = models.ForeignKey("Types", on_delete=models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "event_types"
         unique_together = ("event", "type")
         verbose_name_plural = "Event Types"
@@ -2184,3 +2196,103 @@ class EventTags(models.Model):
 
     def __str__(self) -> str:
         return f"{self.event} - {self.tag}"
+
+
+class ItemInsertLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    source_id = models.CharField(max_length=255)
+    item_name = models.CharField(max_length=255)
+    django_view = models.CharField(max_length=255, blank=True, null=True)
+    source_created_at = models.DateTimeField()
+    logged_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True, null=True)  # New message column
+
+    class Meta:
+        managed = True
+        db_table = "item_insert_log"
+        ordering = ["-source_created_at"]
+
+    def __str__(self):
+        return f"{self.message} (ID: {self.source_id})"
+
+
+class ArticleCategory(models.TextChoices):
+    ALBUM_REVIEW = "album-review", "Album Review"
+    BOOK_EXCERPT = "book-excerpt", "Book Excerpt"
+    BOOK_REVIEW = "book-review", "Book Review"
+    COMMENTARY = "commentary", "Commentary"
+    CONCERT_REVIEW = "concert-review", "Concert Review"
+    COURT_CASE = "court-case", "Court Case"
+    ESSAY = "essay", "Essay"
+    EULOGY = "eulogy", "Eulogy"
+    FILM_REVIEW = "film-review", "Film Review"
+    INTERVIEW = "interview", "Interview"
+    NEWS = "news", "News"
+    OPINION = "opinion", "Opinion"
+    OTHER = "other", "Other"
+    SPEECH = "speech", "Speech"
+    THESIS = "thesis", "Thesis"
+    VIDEO_REVIEW = "video-review", "Video Review"
+
+
+class Articles(BaseModel, models.Model):
+    id = models.AutoField(primary_key=True)
+    author = models.TextField()
+    title = models.TextField()
+    slug = models.SlugField(unique=True, blank=True)
+    content = models.TextField()
+
+    category = models.TextField(choices=ArticleCategory.choices)
+
+    published_at = models.DateField(
+        blank=True,
+        null=True,
+        default=None,
+        db_column="publish_date",
+    )
+    source = models.TextField()
+    source_url = models.TextField(blank=True, default=None)
+    collection_name = models.TextField(blank=True, default=None)
+
+    event = models.ForeignKey(
+        "Events",
+        on_delete=models.DO_NOTHING,
+        blank=True,
+        null=True,
+    )
+
+    uuid = models.UUIDField(editable=False, default=uuid4)
+
+    fts_vector = models.GeneratedField(
+        expression=(
+            SearchVector(Coalesce("title", Value("")), weight="A", config="english")
+            + SearchVector(Coalesce("author", Value("")), weight="B", config="english")
+            + SearchVector(Coalesce("type", Value("")), weight="C", config="english")
+            + SearchVector(Coalesce("content", Value("")), weight="D", config="english")
+        ),
+        output_field=SearchVectorField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        managed = False
+        db_table = "articles"
+
+    def __str__(self) -> str:
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            # Check if the slug already exists in the DB
+            while Articles.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
+        if not self.published_at:
+            self.published_at = self.created_at
+
+        super().save(*args, **kwargs)

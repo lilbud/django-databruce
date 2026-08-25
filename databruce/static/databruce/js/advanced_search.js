@@ -12,8 +12,8 @@ function get_options({ ajax_url = false }) {
     maximumSelectionLength: 3,
     width: '100%', // need to override the changed default
     ajax: {
-      delay: 500,
-      url: '/api/v1/',
+      delay: 250,
+      url: '/api/select2/',
       dataType: 'json',
       data: function (params) {
         return {
@@ -23,23 +23,9 @@ function get_options({ ajax_url = false }) {
       processResults: function (data) {
         return {
           results: $.map(data.results, function (item) {
-            var text = item.name;
-
-            if (item.original_artist) {
-              text = `${item.name} (${item.original_artist})`;
-            }
-
-            if (item.text) {
-              text = item.text;
-            }
-
-            if (ajax_url.includes('tags')) {
-              text = item.slug;
-            }
-
             return {
               id: item.id,
-              text: text
+              text: item.text
             };
           })
         };
@@ -49,7 +35,13 @@ function get_options({ ajax_url = false }) {
 
   if (ajax_url) {
     options.ajax.url += ajax_url;
+
+    if (options.ajax.url.includes("state")) {
+      options.minimumInputLength = 2;
+    }
   };
+
+
 
   return options;
 }
@@ -147,7 +139,10 @@ function addForm() {
   totalForms.value++;
 };
 
-
+function resetForm() {
+  var url = '/search/advanced';
+  window.location = url;
+}
 
 $(document).ready(function () {
   var row = $('#setlist-search').find('.song-row').last();
@@ -163,7 +158,7 @@ $(document).ready(function () {
   $('#relation').select2(get_options({ ajax_url: 'relations/' }));
   $('#band').select2(get_options({ ajax_url: 'bands/' }));
   $('#venue').select2(get_options({ ajax_url: 'venues/' }));
-  $('#type').select2(get_options({ ajax_url: 'event_types/' }));
+  $('#type').select2(get_options({ ajax_url: 'types/' }));
   $('#tag').select2(get_options({ ajax_url: 'tags/' }));
 
   row.find('.song2').parent().hide();

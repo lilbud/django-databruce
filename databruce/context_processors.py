@@ -81,11 +81,20 @@ def get_navbar_links():
         },
         {
             "name": "Search",
-            "match_keyword": "search",
+            "match_keywords": ["search/notes", "search/advanced"],
             "icon": "bi-binoculars-fill",
             "children": [
                 {"name": "Advanced Search", "url": "adv_search"},
                 {"name": "Setlist Note Search", "url": "note_search"},
+            ],
+        },
+        {
+            "name": "Library",
+            "match_keyword": "library",
+            "icon": "bi-book-half",
+            "children": [
+                {"name": "Articles", "url": "library:articles"},
+                {"name": "Article Search", "url": "library:article_search"},
             ],
         },
         {

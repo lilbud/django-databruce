@@ -12,7 +12,7 @@ class PostgresViewTestRunner(DiscoverRunner):
         print("\n🔨 Creating test database materialized views...")
         with connection.cursor() as cursor:
             cursor.execute("""
-                CREATE MATERIALIZED VIEW "public".venues_text AS
+                CREATE MATERIALIZED VIEW IF NOT EXISTS "public".venues_text AS
                 WITH
                 aliases AS (
                     SELECT
@@ -101,5 +101,32 @@ class PostgresViewTestRunner(DiscoverRunner):
                 FROM
                 base_data;
             """)
+
+            cursor.execute(
+                """
+                CREATE MATERIALIZED VIEW "public".songs_page AS
+                SELECT
+                  s.id,
+                  lag(s.id) OVER (
+                    PARTITION BY
+                      e.event_id,
+                      s.set_name
+                    ORDER BY
+                      e.event_id,
+                      s.song_num
+                  ) AS prev,
+                  lead(s.id) OVER (
+                    PARTITION BY
+                      e.event_id,
+                      s.set_name
+                    ORDER BY
+                      e.event_id,
+                      s.song_num
+                  ) AS next
+                FROM
+                  setlists s
+                  LEFT JOIN events e ON e.id = s.event_id;
+                """,
+            )
 
         return config

@@ -53,7 +53,6 @@ from databruce.forms import (
     ContactForm,
     CustomPasswordChangeForm,
     LoginForm,
-    SetlistNoteSearch,
     SetlistSearch,
     UpdateUserForm,
     UserForm,
@@ -161,13 +160,24 @@ class Index(PageTitleMixin, TemplateView):
                 "event__venue",
                 "event__tour",
             )
-            .filter(
-                event_filter,
-            )
+            .filter(event_filter)
             .distinct("event_id")
             .order_by("-event_id")
             .first()
         )
+
+        if not queryset:
+            queryset = (
+                models.Setlists.objects.select_related(
+                    "event__artist",
+                    "event__venue",
+                    "event__tour",
+                )
+                .filter(event__event_id="19780919-01")
+                .distinct("event_id")
+                .order_by("-event_id")
+                .first()
+            )
 
         context["latest_event"] = queryset
 
@@ -1130,41 +1140,354 @@ class Contact(PageTitleMixin, TemplateView):
 
 
 class SetlistNotesSearch(PageTitleMixin, TemplateView):
-    form_class = SetlistNoteSearch
     title = "Setlist Notes Search"
     description = "Search for setlist notes"
     template_name = "databruce/search/notes_search.html"
 
     def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        context["form"] = self.form_class(self.request.GET)
+        return super().get_context_data(**kwargs)
 
-        if context["form"].is_valid():
-            self.template_name = "databruce/search/notes_search_results.html"
-            context["query"] = context["form"].cleaned_data["query"]
 
-        context["form"] = self.form_class()
+# def build_search_form_url(request_get_params):
+#     """Translates remapped API query parameters back into Django form/formset GET parameters."""
+#     form_params = {}
 
-        return context
+#     # Track how many song rows exist to build form-TOTAL_FORMS correctly
+#     song_indices = set()
+
+#     for key, val in request_get_params.items():
+#         # 1. Reverse-map nested API song parameters: songs[0][song_1] -> form-0-song1
+#         match = re.match(r"^songs\[(\d+)\]\[(\w+)\]$", key)
+#         if match:
+#             idx, field = match.groups()
+#             song_indices.add(int(idx))
+
+#             # Map field names back to form names (e.g., song_1 -> song1)
+#             form_field_name = "song1" if field == "song_1" else field
+#             form_params[f"form-{idx}-{form_field_name}"] = val
+#             continue
+
+#         # 2. Reverse-map exclusion fields: field__not -> field & field_exclude=True
+#         if key.endswith("__not"):
+#             base_field = key.replace("__not", "")
+#             form_params[base_field] = val
+#             form_params[f"{base_field}_exclude"] = "true"
+#             continue
+
+#         # 3. Copy standard top-level fields directly (start_date, end_date, conjunction, etc.)
+#         form_params[key] = val
+
+#     # 4. Inject required Formset Management Parameters
+#     total_forms = len(song_indices) if song_indices else 1
+#     form_params["form-TOTAL_FORMS"] = str(total_forms)
+#     form_params["form-INITIAL_FORMS"] = "0"
+#     form_params["form-MIN_NUM_FORMS"] = "0"
+#     form_params["form-MAX_NUM_FORMS"] = "1000"
+
+#     return form_params
 
 
 class AdvancedSearch(PageTitleMixin, TemplateView):
     form_class = AdvancedEventSearch
-    formset_class = formset_factory(SetlistSearch)
+    formset_class = formset_factory(SetlistSearch, extra=0)
     template_name = "databruce/search/advanced_search.html"
     title = "Advanced Search"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["form"] = self.form_class()
-        context["formset"] = self.formset_class(
-            {
-                "form-TOTAL_FORMS": "1",
-                "form-INITIAL_FORMS": "0",
-                "form-0-choice": "is",
-                "form-0-position": "anywhere",
-            },
+
+        if self.request.GET:
+            get_data = self.request.GET.copy()
+
+            # Ensure management keys exist
+            if "form-TOTAL_FORMS" not in get_data:
+                get_data["form-TOTAL_FORMS"] = "1"
+            if "form-INITIAL_FORMS" not in get_data:
+                get_data["form-INITIAL_FORMS"] = "0"
+
+            formset = self.formset_class(get_data)
+            form = self.form_class(self.request.GET)
+
+            form.is_valid()
+            formset.is_valid()
+        else:
+            form = self.form_class()
+            # Django sets TOTAL_FORMS=1 and INITIAL_FORMS=0 automatically
+            formset = self.formset_class(
+                initial=[
+                    {
+                        "form-TOTAL_FORMS": "1",
+                        "form-INITIAL_FORMS": "0",
+                        "form-0-choice": "is",
+                        "form-0-position": "anywhere",
+                    },
+                ],
+            )
+
+        context["form"] = form
+        context["formset"] = formset
+        return context
+
+
+class AdvSearch(PageTitleMixin, TemplateView):
+    template_name = "databruce/search/test_advsearch.html"
+    title = "Advanced Search"
+    form_class = AdvancedEventSearch
+    formset = SetlistSearch
+    formset_class = formset_factory(formset)
+
+    positions = {
+        "anywhere": "Anywhere",
+        "followed_by": "Followed By",
+        "show_opener": "Show Opener",
+        "in_show": "in Main Set",
+        "in_set_one": "in Set 1",
+        "set_one_opener": "Set 1 Opener",
+        "set_one_closer": "Set 1 Closer",
+        "in_set_two": "in Set 2",
+        "set_two_opener": "Set 2 Opener",
+        "set_two_closer": "Set 2 Closer",
+        "main_set_closer": "Main Set Closer",
+        "encore_opener": "Encore Opener",
+        "in_encore": "Encore",
+        "in_preshow": "Pre-Show",
+        "in_recording": "Recording",
+        "in_soundcheck": "Soundcheck",
+        "show_closer": "Show Closer",
+        "premiere": "Premiere",
+        "debut": "Tour Debut",
+        "nobruce": "No Bruce",
+        "request": "Sign Request",
+    }
+
+    def get(self, request, *args, **kwargs):
+        if request.GET:
+            # 1. Unpack request.GET.lists() cleanly
+            is_initial_submission = "form-TOTAL_FORMS" in request.GET
+
+            if is_initial_submission:
+                raw_params = {}
+                clean_params = {}
+
+                event_form = self.form_class(request.GET)
+                formset = self.formset_class(request.GET)
+
+                if not event_form.has_changed() and not formset.has_changed():
+                    messages.warning(request, "Please fill out at least one field")
+                    return redirect(reverse("adv_search"))
+
+                if not event_form.is_valid() or not formset.is_valid():
+                    messages.error(
+                        self.request,
+                        "Your search parameters contain invalid data. Please review the highlighted fields.",
+                    )
+                    return redirect(
+                        f"{reverse('adv_search')}?{request.GET.urlencode()}",
+                    )
+
+                # 1. Pull the normalized date values from cleaned_data
+                start_date_data = event_form.cleaned_data.get("start_date")
+                if start_date_data:
+                    clean_params["start_date"] = start_date_data["value"]
+
+                end_date_data = event_form.cleaned_data.get("end_date")
+                if end_date_data:
+                    clean_params["end_date"] = end_date_data["value"]
+
+                for key, values in request.GET.lists():
+                    # Filter out empty strings
+                    non_empty_values = [v.strip() for v in values if v.strip()]
+
+                    if not non_empty_values:
+                        continue
+
+                    # Skip 'False' exclude fields
+                    if (
+                        (
+                            key.endswith("_exclude")
+                            and non_empty_values[0].lower() == "false"
+                        )
+                        or key in ["start_date", "end_date"]
+                        or key.startswith("form-")
+                    ):
+                        continue
+
+                    # Keep multi-select fields as lists, flatten single fields to strings
+                    if len(non_empty_values) > 1:
+                        raw_params[key] = non_empty_values
+                    else:
+                        raw_params[key] = non_empty_values[0]
+
+                # 2. Process '_exclude' transformations
+                for key, value in list(raw_params.items()):
+                    if key.endswith("_exclude") and value == "true":
+                        field = key.replace("_exclude", "")
+                        if field in raw_params:
+                            clean_params[f"{field}__not"] = raw_params[field]
+                            raw_params.pop(field, None)
+                        continue
+
+                    if not key.endswith("_exclude"):
+                        clean_params[key] = value
+
+                # Clean formset items from formset.cleaned_data safely
+                for i, form_data in enumerate(formset.cleaned_data):
+                    if not form_data:
+                        continue
+
+                    song1 = form_data.get("song1")
+                    if song1:
+                        clean_params[f"songs[{i}][song_1]"] = song1
+                        if form_data.get("song2"):
+                            clean_params[f"songs[{i}][song_2]"] = form_data["song2"]
+                        clean_params[f"songs[{i}][choice]"] = str(
+                            form_data.get("choice", False),
+                        ).lower()
+                        if form_data.get("position"):
+                            clean_params[f"songs[{i}][position]"] = form_data[
+                                "position"
+                            ]
+
+                # 4. Check if redirect is necessary
+                # Compare count of raw request.GET keys vs cleaned parameters
+                if len(clean_params) != len(request.GET):
+                    redirect_url = reverse("adv_search_results")
+                    if clean_params:
+                        # CRITICAL: doseq=True ensures lists like {'type': ['4', '1']}
+                        # encode as 'type=4&type=1' instead of crashing/mangling
+                        redirect_url += "?" + urlencode(clean_params, doseq=True)
+
+                    return redirect(redirect_url)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["title"] = self.title
+        context["display_fields"] = []
+        event_search_queries = []
+
+        # 1. Access the request query parameters from the request object
+        query_params = self.request.GET
+
+        data = self.request.GET.copy()
+
+        for key in list(data.keys()):
+            if key.endswith("__not"):
+                field = key.removesuffix("__not")
+                data[field] = data[key]  # type: ignore
+                data[f"{field}_exclude"] = "True"
+
+        event_form = self.form_class(data)
+
+        if event_form.is_valid():
+            for f in event_form.changed_data:
+                if "_exclude" not in f and f != "conjunction":
+                    raw_val = event_form.cleaned_data[f]
+
+                    # 1. Format the field data string
+                    if isinstance(raw_val, list):
+                        data_str = " **OR** ".join(raw_val)
+                    elif isinstance(raw_val, QuerySet):
+                        data_str = " **OR** ".join(
+                            raw_val.values_list("name", flat=True),
+                        )
+                    elif isinstance(raw_val, dict):
+                        data_str = raw_val.get("value", "")
+                    else:
+                        data_str = str(raw_val)
+
+                    # 2. Check if this field was negated (either via '_exclude' or '__not' in request.GET)
+                    is_excluded = (
+                        event_form.cleaned_data.get(f"{f}_exclude") is True
+                        or f"{f}__not" in self.request.GET
+                    )
+
+                    display = {
+                        "label": event_form[f].label,
+                        "data": f"NOT {data_str}" if is_excluded else data_str,
+                        "is_excluded": is_excluded,
+                    }
+
+                    if is_excluded:
+                        event_search_queries.append(
+                            f"{event_form[f].name}__not={query_params.get(f)}",
+                        )
+                    else:
+                        event_search_queries.append(
+                            f"{event_form[f].name}={query_params.get(f)}",
+                        )
+
+                    context["display_fields"].append(display)
+
+        # 2. Extract global non-formset elements
+        conjunction = query_params.get("conjunction", "and")
+        context["conjunction"] = conjunction
+        index = 0
+
+        setlist_queries = []
+        setlist_search_display_queries = []
+
+        song_map = {str(s.id): s.name for s in models.Songs.objects.only("id", "name")}
+
+        while f"songs[{index}][song_1]" in query_params:
+            # Safely convert choice string back to a Python boolean
+            choice_str = query_params.get(
+                f"songs[{index}][choice]",
+                "false",
+            ).lower()
+
+            song_dict = {
+                "song_1": query_params.get(f"songs[{index}][song_1]"),
+                "song_2": query_params.get(
+                    f"songs[{index}][song_2]",
+                ),  # Will be None if missing
+                "choice": choice_str == "true",
+                "position": query_params.get(f"songs[{index}][position]"),
+            }
+
+            setlist_queries.append(song_dict)
+            index += 1
+
+        for query in setlist_queries:
+            if not query.get("song_1"):
+                continue
+
+            choice = query.get("choice", True)
+            pos = query.get("position")
+            s1_name = song_map.get(str(query["song_1"]).replace("'", ""))
+
+            choice_str = "is" if choice else "not"
+
+            summary = f"{s1_name} ({choice_str} anywhere)"
+
+            if pos == "followed_by" and query.get("song_2"):
+                s2_name = song_map.get(str(query["song_2"]).replace("'", ""))
+                summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
+
+            else:
+                pos_display = self.positions.get(pos)
+
+                summary = f"{s1_name} ({choice_str} {pos_display})"
+
+            setlist_search_display_queries.append(summary)
+
+        context["search_summary"] = setlist_search_display_queries
+
+        query_display = f" {context['conjunction']} ".join(
+            setlist_search_display_queries,
         )
+
+        field_display = ", ".join(
+            [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
+        )
+
+        if query_display == "":
+            context["description"] = f"{field_display}"
+        elif query_display and field_display == "":
+            context["description"] = f"Songs: {query_display}"
+        else:
+            context["description"] = f"Songs: {query_display}, {field_display}"
 
         return context
 
@@ -1431,10 +1754,10 @@ class ShortenURL(PageTitleMixin, TemplateView):
         user = UserModel.objects.first()
         short_url = shortener.create(user, request.GET["url"])
 
-        protocol = 'https'
+        protocol = "https"
 
         if request.get_host() == "127.0.0.1:8000":
-            protocol = 'http'
+            protocol = "http"
 
         full_short_url = f"{protocol}://{request.get_host()}/s/{short_url}"
 
@@ -1466,222 +1789,6 @@ class TestTable(PageTitleMixin, TemplateView):
 class TestEvent(PageTitleMixin, TemplateView):
     template_name = "databruce/test_event_table.html"
     title = "Table"
-
-
-class AdvSearch(PageTitleMixin, TemplateView):
-    template_name = "databruce/test_advsearch.html"
-    title = "Advanced Search"
-    form_class = AdvancedEventSearch
-    formset = SetlistSearch
-    formset_class = formset_factory(formset)
-
-    position_filters = {
-        "show_opener": Q(is_opener=True),
-        "in_show": Q(set_name="show"),
-        "in_set_one": Q(set_name="set 1"),
-        "set_one_opener": Q(set_name="set 1", is_set_opener=True),
-        "set_one_closer": Q(set_name="set 1", is_set_closer=True),
-        "in_set_two": Q(set_name="set 2"),
-        "set_two_opener": Q(set_name="set 2", is_set_opener=True),
-        "set_two_closer": Q(set_name="set 2", is_set_closer=True),
-        "main_set_closer": Q(is_main_set_closer=True),
-        "encore_opener": Q(set_name="encore", is_set_opener=True),
-        "in_encore": Q(set_name="encore"),
-        "in_preshow": Q(set_name="pre-show"),
-        "in_recording": Q(set_name="recording"),
-        "in_soundcheck": Q(set_name="soundcheck"),
-        "show_closer": Q(is_closer=True),
-        "anywhere": Q(),  # No additional filters
-        "premiere": Q(premiere=True),
-        "debut": Q(debut=True),
-        "nobruce": Q(nobruce=True),
-        "request": Q(sign_request=True),
-    }
-
-    def get(self, request, *args, **kwargs):
-        if request.GET:
-            raw_params = {}
-            clean_params = {}
-
-            for key, value in request.GET.items():
-                stripped_val = value.strip()  # type: ignore
-
-                # 1. Skip if the field value is entirely empty
-                if not stripped_val:
-                    continue
-
-                # 2. Skip if it is an '_exclude' field set to 'False'
-                if key.endswith("_exclude") and stripped_val.lower() == "false":
-                    continue
-
-                # If it passes both checks, keep the parameter
-                raw_params[key] = value
-
-            for key, value in list(raw_params.items()):
-                if key.endswith("_exclude") and value.lower() == "true":
-                    field = key.replace("_exclude", "")
-
-                    if field in raw_params:
-                        clean_params[f"{field}__not"] = raw_params[field]
-                        raw_params.pop(field, None)
-
-                    continue
-                if key in raw_params and not key.endswith("_exclude"):
-                    clean_params[key] = value
-
-            # If parameters were removed, redirect to the clean URL
-            if len(clean_params) != len(request.GET):
-                redirect_url = request.path
-                if clean_params:
-                    redirect_url += "?" + urlencode(clean_params)
-
-                return redirect(redirect_url)
-
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["title"] = self.title
-        context["display_fields"] = []
-
-        data = self.request.GET.copy()
-        for key in list(data.keys()):
-            if key.endswith("__not"):
-                field = key.removesuffix("__not")
-                data[field] = data[key]  # type: ignore
-                data[f"{field}_exclude"] = "True"
-
-        event_form = self.form_class(data)
-        formset = self.formset_class(self.request.GET)
-
-        if event_form.is_valid():
-            for f in event_form.changed_data:
-                if "_exclude" not in f and f != "conjunction":
-                    raw_val = event_form.cleaned_data[f]
-
-                    # 1. Format the field data string
-                    if isinstance(raw_val, list):
-                        data_str = " OR ".join(raw_val)
-                    elif isinstance(raw_val, QuerySet):
-                        data_str = " OR ".join(raw_val.values_list("name", flat=True))
-                    elif isinstance(raw_val, dict):
-                        data_str = raw_val.get("value", "")
-                    else:
-                        data_str = str(raw_val)
-
-                    # 2. Check if this field was negated (either via '_exclude' or '__not' in request.GET)
-                    is_excluded = (
-                        event_form.cleaned_data.get(f"{f}_exclude") is True
-                        or f"{f}__not" in self.request.GET
-                    )
-
-                    display = {
-                        "label": event_form[f].label,
-                        "data": f"NOT {data_str}" if is_excluded else data_str,
-                        "is_excluded": is_excluded,
-                    }
-
-                    context["display_fields"].append(display)
-
-        pos_choices = dict(formset.form.base_fields["position"].choices)  # type: ignore
-
-        # 1. Access the request query parameters from the request object
-        query_params = self.request.GET
-
-        # 2. Extract global non-formset elements
-        conjunction = query_params.get("conjunction", "and")
-
-        try:
-            total_forms = int(query_params.get("form-TOTAL_FORMS", 0))
-        except ValueError:
-            total_forms = 0
-
-        # 3. Restructure the flat query strings into a clean list of search dicts
-        search_queries = []
-
-        event_search_queries = []
-        setlist_search_display_queries = []
-
-        if formset.is_valid():
-            for i in range(total_forms):
-                song_id = query_params.get(f"form-{i}-song1")
-                choice = query_params.get(f"form-{i}-choice")
-                position = query_params.get(f"form-{i}-position")
-
-                if song_id:
-                    search_queries.append(
-                        {
-                            "song_id": song_id,
-                            "choice": f"{choice == 'True'}",
-                            "position": position,
-                        },
-                    )
-
-            # 5. Inject the structured query properties back into the template context
-            context["logical_operator"] = conjunction
-            context["parsed_queries"] = search_queries
-
-            song_ids = [
-                str(f["song1"]).replace("'", "")
-                for f in formset.cleaned_data
-                if f.get("song1")
-            ]
-
-            song_ids.extend(
-                [
-                    str(f["song2"]).replace("'", "")
-                    for f in formset.cleaned_data
-                    if f.get("song2")
-                ],
-            )
-
-            song_map = {
-                str(s.id): s.name for s in models.Songs.objects.filter(id__in=song_ids)
-            }
-
-            for form in formset.cleaned_data:
-                if not form.get("song1"):
-                    continue
-
-                choice = form.get("choice", True)
-                pos = form.get("position")
-                s1_name = song_map.get(str(form["song1"]).replace("'", ""))
-
-                choice_str = "is" if choice else "not"
-
-                summary = f"{s1_name} ({choice_str} anywhere)"
-
-                if pos == "followed_by" and form.get("song2"):
-                    s2_name = song_map.get(str(form["song2"]).replace("'", ""))
-                    summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
-
-                else:
-                    pos_display = pos_choices.get(pos)
-
-                    summary = f"{s1_name} ({choice_str} {pos_display})"
-
-                setlist_search_display_queries.append(summary)
-
-            context["search_summary"] = setlist_search_display_queries
-
-        context["conjunction"] = conjunction
-
-        query_display = f" {context['conjunction']} ".join(
-            setlist_search_display_queries,
-        )
-
-        field_display = ", ".join(
-            [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
-        )
-
-        if query_display == "":
-            context["description"] = f"{field_display}"
-        elif query_display and field_display == "":
-            context["description"] = f"Songs: {query_display}"
-        else:
-            context["description"] = f"Songs: {query_display}, {field_display}"
-
-        return context
 
 
 class RelationDetail(PageTitleMixin, TemplateView):

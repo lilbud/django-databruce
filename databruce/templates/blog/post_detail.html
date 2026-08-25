@@ -12,7 +12,7 @@
     {% include "databruce/partials/admin_edit_btn.html" with view="blogposts" item=post.id %}
   {% endif %}
   <div class="col-12 col-lg-8">
-    <div class="text-2xl text-nowrap mb-2">
+    <div class="page-title">
       <a href="{% url 'blog:blog' %}">Blog</a> &gt; {{ post.title }}
     </div>
     <div class="text-sm mb-4">

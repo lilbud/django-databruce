@@ -300,7 +300,7 @@
                             <th class="gap">Gap</th>
                             <th class="tour_num">Tour</th>
                             <th class="last_event">Last</th>
-                            <th class="notes min-tablet-l">Note</th>
+                            <th class="notes">Note</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -798,7 +798,7 @@
       },
       {
         'data': 'song',
-        'className': 'text-wrap',
+        'className': 'text-nowrap',
         'width': '',
         'render': function (data, type, row, meta) {
           var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
@@ -827,10 +827,10 @@
             $(badges).append($(badge).prop('outerHTML'));
           }
 
-          if (row.notes.length > 0) {
-            var notes = `<br><span class="text-wrap d-inline-block d-xl-none fw-light setlist-note">${row.notes}</span>`;
-            return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;
-          }
+          //if (row.notes.length > 0) {
+          //  var notes = `<br><span class="text-wrap d-inline-block d-xl-none fw-light setlist-note">${row.notes}</span>`;
+          //  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;
+          //}
 
           return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
         }

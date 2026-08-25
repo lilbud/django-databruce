@@ -1,26 +1,17 @@
 {% extends "databruce/narrow_layout.html" %}
+{% load i18n %}
 {% block title %}
-  Lyrics
+  {{ title }}
 {% endblock title %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_new_btn.html" with view="articles" %}
+  {% endif %}
   <div class="col-12">
     <div class="row mb-3">
       <div class="col">
-        <div class="text-2xl mb-3">Lyrics</div>
-        <div class="card">
-          <div class="card-body text-sm">
-            <div class="text-wrap">
-              <span class="fw-medium">Note:</span>
-              <div>
-                English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct German Bruce fan site. Italian lyrics source from loose-ends.it, an Italian Bruce fan site.
-                <br>
-                <br>
-                Lyrics were contributed by multiple people, and credit has been listed when known.
-                I only speak English, and cannot vouch for the quality of the translations, so they're provided "as-is".
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="text-2xl">Databruce Article Library</div>
+        <div class="text-base">Bruce related articles sourced from various corners of the internet.</div>
       </div>
     </div>
     <div class="row">
@@ -57,15 +48,15 @@
             </div>
             <div class="row">
               <div class="table-responsive">
-                <table class="table table-hover display" id="lyricTable">
+                <table class="table table-hover display" id="articleTable">
                   <thead>
                     <tr>
-                      <th class="all">Song</th>
-                      <th class="all">Version</th>
+                      <th class="all">Title</th>
+                      <th class="all">Author</th>
+                      <th class="all">Type</th>
                       <th class="all">Source</th>
-                      <th class="all">Language</th>
-                      <th class="all">Translator</th>
-                      <th class="all">Note</th>
+                      <th class="all">Collection</th>
+                      <th class="all">Publish Date</th>
                     </tr>
                   </thead>
                 </table>
@@ -80,29 +71,53 @@
     $(document).ready(function () {
       let sb_columns = [0,1,2,3,4];
 
-      var table = new DataTable('#lyricTable', {
-          ajax: {
-            'url': '/api/v1/lyrics/?format=custom',
-          },
-          columns: [
-            {
-              'data': 'song',
-              'name': 'song__sort_song_name',
-              'render': function (data, type, row, meta) {
-                if (data) {
-                  return `<a href="/lyrics/${row.uuid}">${data}</a>`
-                }
-              },
+      var table = new DataTable('#articleTable', {
+        ajax: {
+          'url': '/api/v1/articles/?format=custom',
+        },
+        columns: [
+          {
+            'data': 'title',
+            'name': 'title',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return `<a href="/library/article/${row.slug}">${data}</a>`
+              }
             },
-            {'data': 'version', 'name': 'version'},
-            {'data': 'source', 'name': 'source'},
-            {'data': 'language', 'name': 'language'},
-            {'data': 'translator', 'name': 'translator'},
-            {'data': 'note', 'name': 'note'},
-          ],
+          },
+          {
+            'data': 'author',
+            'name': 'author',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return data
+              }
+            },
+          },
+          {
+            'data': 'category',
+            'name': 'category',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return data
+              }
+            },
+          },
+          {'data': 'source', 'name': 'source'},
+          {'data': 'collection_name', 'name': 'collection_name'},
+          {
+            'data': 'published_at',
+            'name': 'published_at',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return data
+              }
+            },
+          },
+        ],
         initComplete: function(settings, json) {
           var table = this.api();
-          var values = table.column(3).data().unique().toArray();
+          var values = table.column(2).data().unique().toArray();
           var container = $('#PublicityFilter');
           
           values.forEach(element => {
@@ -114,12 +129,11 @@
 
       $('#PublicityFilter').on('change', function () {
         var selectedValue = this.value;
-        table.order([[0, 'asc']]).column(3).search(selectedValue ? selectedValue : '', true, false).draw();
+        table.order([[0, 'asc']]).column(2).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       tableSearch(table, 'search');
       searchBuilder(table, sb_columns);
-
     });
   </script>
 {% endblock content %}

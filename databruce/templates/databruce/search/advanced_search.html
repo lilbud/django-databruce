@@ -35,102 +35,94 @@
         <div class="col">
           {% for field in form %}
             {% for error in field.errors %}
-              {% comment %} <li>{{ field.label }}: {{ error }}</li> {% endcomment %}
               <div class="card">
-                <div class="card-body message failure">{{ error }}</div>
+                <div class="card message error">{{ error }}</div>
               </div>
             {% endfor %}
           {% endfor %}
         </div>
       </div>
     {% endif %}
+    <!-- Render Form Non-Field Errors -->
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <!-- Render Formset Non-Form Errors (e.g. Management Form Errors) -->
+    {% if formset.non_form_errors %}
+      <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+    {% endif %}
     <form action="{% url 'adv_search_results' %}" method="get" id="search-form">
       {% comment %} {% csrf_token %} {% endcomment %}
       <div class="row d-grid gap-0 row-gap-3">
         <div class="row row-cols-2 px-auto">
           <div class="col-6 col-lg-2 pe-2">
-            {{ form.start_date.errors }}
             <label class="form-label text-sm">{{ form.start_date.label }}</label>
             <div class="pe-lg-0 mb-1">{{ form.start_date }}</div>
           </div>
           <div class="col-6 col-lg-2 px-0">
-            {{ form.end_date.errors }}
             <label class="form-label text-sm">{{ form.end_date.label }}</label>
             <div class="pe-lg-0">{{ form.end_date }}</div>
           </div>
         </div>
         <div class="row row-cols-2">
           <div class="col-6 col-lg-2 pe-2">
-            {{ form.month.errors }}
             <label class="form-label text-sm">{{ form.month.label }}</label>
             {{ form.month }}
           </div>
           <div class="col-3 col-lg-1 px-0">
-            {{ form.day.errors }}
             <label class="form-label text-sm">{{ form.day.label }}</label>
             {{ form.day }}
           </div>
         </div>
         <div class="row">
-          {{ form.day_of_week.errors }}
           <div class="form-label text-sm text-nowrap">{{ form.day_of_week.label }}</div>
           <div class="col-2 col-md-1 pe-1">{{ form.day_of_week_exclude }}</div>
           <div class="col-9 col-md-4 px-0">{{ form.day_of_week }}</div>
         </div>
         <div class="row">
-          {{ form.type.errors }}
           <div class="form-label text-sm text-nowrap">{{ form.type.label }}</div>
           <div class="col-9 col-md-4">{{ form.type }}</div>
         </div>
         <div class="row">
-          {{ form.tag.errors }}
           <div class="form-label text-sm text-nowrap">{{ form.tag.label }}</div>
           <div class="col-9 col-md-4">{{ form.tag }}</div>
         </div>
         <div class="row">
-          {{ form.city.errors }}
           <label class="form-label text-sm">{{ form.city.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.city_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.city }}</div>
         </div>
         <div class="row">
-          {{ form.state.errors }}
           <label class="form-label text-sm">{{ form.state.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.state_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.state }}</div>
         </div>
         <div class="row">
-          {{ form.country.errors }}
           <label class="form-label text-sm">{{ form.country.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.country_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.country }}</div>
         </div>
         <div class="row">
-          {{ form.venue.errors }}
           <label class="form-label text-sm">{{ form.venue.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.venue_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.venue }}</div>
         </div>
         <div class="row">
-          {{ form.tour.errors }}
           <label class="form-label text-sm">{{ form.tour.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.tour_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.tour }}</div>
         </div>
         <div class="row">
-          {{ form.tour_leg.errors }}
           <label class="form-label text-sm">{{ form.tour_leg.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.tour_leg_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.tour_leg }}</div>
         </div>
         <div class="row">
-          {{ form.relation.errors }}
           <label class="form-label text-sm">{{ form.relation.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.relation_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.relation }}</div>
         </div>
         <div class="row">
-          {{ form.band.errors }}
           <label class="form-label text-sm">{{ form.band.label }}</label>
           <div class="col-2 col-md-1 pe-1">{{ form.band_exclude }}</div>
           <div class="col-9 col-lg-4 px-0">{{ form.band }}</div>
@@ -150,7 +142,7 @@
                       class="btn btn-success">Go</button>
               <button id="form-reset-btn"
                       type="reset"
-                      onclick="location.reload()"
+                      onclick="resetForm()"
                       name="reset"
                       class="btn btn-danger">Reset</button>
               <button id="form-add-btn"

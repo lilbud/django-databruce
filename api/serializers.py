@@ -1,6 +1,7 @@
 import datetime
 from zoneinfo import ZoneInfo
 
+import strip_markdown
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -16,6 +17,24 @@ VALID_SET_NAMES = [
     "Pre-Show",
     "Post-Show",
 ]
+
+
+class BaseSelect2Serializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="pk")
+    text = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = ["id", "text"]
+
+    def __init__(self, *args, **kwargs):
+        # Dynamically accept a text_field argument to specify the display field
+        self.text_field = kwargs.pop("text_field", "name")
+        super().__init__(*args, **kwargs)
+
+    def get_text(self, obj):
+        # Safely extract the string representation or attribute
+        attr = getattr(obj, self.text_field, None)
+        return str(attr) if attr is not None else str(obj)
 
 
 def get_date_from_instance(obj):
@@ -459,7 +478,13 @@ class IndexSetlistSerializer(BaseSerializer):
 
 
 class IndexEventsSerializer(BaseSerializer):
-    venue = serializers.CharField(source="venue.name", max_length=255)
+    # 1. Change venue to a SerializerMethodField
+    venue = serializers.SlugRelatedField(
+        source="venue.venues_text",
+        slug_field="formatted",
+        read_only=True,
+        required=False,
+    )
     date = serializers.CharField(max_length=255)
 
     class Meta:
@@ -553,7 +578,7 @@ class AdvSearchSerializer(BaseSerializer):
     tour = MinimalToursSerializer(required=False)
     venue = MinimalVenuesSerializer(
         required=False,
-        include=["uuid", "name", "formatted"],
+        include=["uuid", "name"],
     )
     city = serializers.SerializerMethodField(required=False)
 
@@ -563,34 +588,26 @@ class AdvSearchSerializer(BaseSerializer):
     leg = serializers.CharField(required=False, source="leg.name", max_length=255)
     has_setlist = serializers.SerializerMethodField()
 
-    type = TypesSerializer(many=True, required=False)
-    tags = TagsSerializer(many=True, required=False)
+    type = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="name",
+        required=False,
+    )
+
+    tags = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="name",
+        required=False,
+    )
 
     rank = serializers.IntegerField(required=False)
     event_status = serializers.BooleanField(required=False)
     public = serializers.BooleanField(required=False)
 
-    bands = serializers.SerializerMethodField(required=False)
-    relations = serializers.SerializerMethodField(required=False)
-
-    def get_bands(self, obj):
-        return list({item.band_id for item in obj.onstage if item.band_id})
-
-    def get_relations(self, obj):
-        return list(
-            {item.relation_id for item in obj.onstage if item.relation_id},
-        )
-
-    setlist = IndexSetlistSerializer(
-        source="setlist_event",
-        many=True,
-        required=False,
-        read_only=True,
-        include=["song", "notes", "set_name", "debut", "premiere", "nobruce", "segue"],
-    )
-
     def get_has_setlist(self, obj):
-        return bool(obj.setlist_event.exists())
+        return obj.setlist_certainty != "Unknown"
 
     def get_date(self, obj):
         return get_date_from_instance(obj)
@@ -604,8 +621,6 @@ class AdvSearchSerializer(BaseSerializer):
             "venue",
             "city",
             "leg",
-            "bands",
-            "relations",
             "has_setlist",
             "rank",
             "event_status",
@@ -616,8 +631,6 @@ class AdvSearchSerializer(BaseSerializer):
             "type",
             "tags",
             "note",
-            # "onstage",
-            "setlist",
         ]
 
 
@@ -778,12 +791,9 @@ class SetlistMobileSerializer(BaseSerializer):
 
 
 class SetlistNotesSerializer(BaseSerializer):
-    event = EventsSerializer(include=["event_id", "venue", "date"], required=False)
-    song = MinimalSongsSerializer(
-        source="setlist.song",
-        include=["name", "slug"],
-        required=False,
-    )
+    event = EventsSerializer(include=["event_id", "date"], required=False)
+    song = serializers.CharField(source="setlist.song.name", max_length=255)
+
     set_name = serializers.CharField(
         source="setlist.set_name",
         max_length=255,
@@ -1186,7 +1196,7 @@ class UpdatesSerializer(BaseSerializer):
     created_at = serializers.SerializerMethodField(method_name="get_created")
 
     def get_created(self, obj):
-        return obj.created_at.strftime("%m/%d")
+        return obj.created_at.strftime("%Y-%m-%d")
 
     class Meta:
         model = models.Updates
@@ -1380,3 +1390,54 @@ class YearSongBreakdownSerializer(BaseSerializer):
     class Meta:
         model = models.Setlists
         fields = ["year", "count"]
+
+
+class ItemInsertLogSerializer(serializers.ModelSerializer):
+    # Generates a fully-resolved target URL by replacing {id} with source_id
+    target_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.ItemInsertLog
+        fields = [
+            "id",
+            "source_id",
+            "item_name",
+            "django_view",
+            "target_url",
+            "message",
+            "source_created_at",
+            "logged_at",
+        ]
+
+    def get_target_url(self, obj):
+        if not obj.django_view:
+            return None
+
+        return f"{obj.django_view}{obj.source_id}"
+
+
+class ArticlesSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(
+        source="get_category_display",
+        read_only=True,
+    )
+
+    excerpt = serializers.SerializerMethodField()
+
+    def get_excerpt(self, obj):
+        return strip_markdown.strip_markdown(obj.content[:250])
+
+    class Meta:
+        model = models.Articles
+        fields = [
+            "title",
+            "author",
+            "content",
+            "slug",
+            "uuid",
+            "published_at",
+            "category",
+            "source",
+            "collection_name",
+            "excerpt",
+        ]

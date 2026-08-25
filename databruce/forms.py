@@ -12,6 +12,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
     UserCreationForm,
 )
+from django.core.exceptions import ValidationError
 from django.db.models import Q, QuerySet
 
 from . import models
@@ -27,6 +28,40 @@ class CustomCharField(forms.CharField):
     def __init__(self, *args, lookup_path=None, **kwargs) -> None:
         self.lookup_path = lookup_path
         super().__init__(*args, **kwargs)
+
+
+class CustomDateField(forms.DateField):
+    def __init__(self, *args, lookup_path=None, **kwargs) -> None:
+        self.lookup_path = lookup_path
+        super().__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value:
+            return None
+
+        # Accept existing datetime/date objects
+        if isinstance(value, (datetime.date, datetime.datetime)):
+            return value
+
+        # Try parsing full date (%Y-%m-%d)
+        try:
+            return datetime.datetime.strptime(value.strip(), "%Y-%m-%d").date()
+        except ValueError:
+            pass
+
+        # Try parsing year-month (%Y-%m) and default to 1st of the month
+        try:
+            return (
+                datetime.datetime.strptime(value.strip(), "%Y-%m").date().replace(day=1)
+            )
+        except ValueError:
+            pass
+
+        # Raising ValidationError allows form.is_valid() to catch it cleanly
+        raise ValidationError(
+            self.error_messages["invalid"],
+            code="invalid",
+        )
 
 
 class CustomChoiceField(forms.ChoiceField):
@@ -57,7 +92,20 @@ class AdvancedEventSearch(forms.Form):
             "conjunction",
             "event_type",
             "event_tag",
+            "type",
+            "tag",
         ]
+
+        if self.is_bound and not self.is_valid():
+            for field_name in self.errors:
+                if field_name in self.fields:
+                    current_classes = self.fields[field_name].widget.attrs.get(
+                        "class",
+                        "",
+                    )
+                    self.fields[field_name].widget.attrs["class"] = (
+                        f"{current_classes} is-invalid"
+                    )
 
         for field_name in list(self.fields.keys()):
             if field_name.endswith("_exclude") or field_name in ignore:
@@ -151,15 +199,15 @@ class AdvancedEventSearch(forms.Form):
         ("7", "Saturday"),
     ]
 
-    start_date = CustomCharField(
+    start_date = CustomDateField(
         label="Start Date",
         lookup_path="date__gte",
         required=False,
+        input_formats=["%Y-%m-%d", "%Y-%m"],
+        error_messages={"invalid": "Enter a valid date in YYYY-MM-DD format."},
         widget=forms.TextInput(
             attrs={
                 "id": "start_date",
-                "type": "search",
-                "name": "event_start_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
                 "class": "form-control form-control-sm date-form col-6",
@@ -168,15 +216,15 @@ class AdvancedEventSearch(forms.Form):
         ),
     )
 
-    end_date = CustomCharField(
+    end_date = CustomDateField(
         label="Last Date",
         lookup_path="date__lte",
         required=False,
+        input_formats=["%Y-%m-%d", "%Y-%m"],
+        error_messages={"invalid": "Enter a valid date in YYYY-MM-DD format."},
         widget=forms.TextInput(
             attrs={
                 "id": "end_date",
-                "type": "search",
-                "name": "event_end_date",
                 "placeholder": "YYYY-MM-DD",
                 "maxlength": 10,
                 "class": "form-control form-control-sm date-form col-6",
@@ -222,7 +270,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm",
                 "id": "day_of_week",
-                # "name": "event_day_of_week",
             },
         ),
     )
@@ -235,7 +282,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2-multi",
                 "id": "type",
-                "name": "event_type",
                 "placeholder": "Choose multiple",
             },
         ),
@@ -249,7 +295,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2-multi",
                 "id": "tag",
-                "name": "event_tag",
                 "placeholder": "Choose multiple",
             },
         ),
@@ -263,7 +308,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "city",
-                "name": "event_city",
             },
         ),
     )
@@ -276,7 +320,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "state",
-                "name": "event_state",
             },
         ),
     )
@@ -289,7 +332,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "country",
-                "name": "event_country",
             },
         ),
     )
@@ -302,7 +344,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "venue",
-                "name": "event_venue",
             },
         ),
     )
@@ -315,7 +356,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "tour",
-                "name": "event_tour",
             },
         ),
     )
@@ -328,7 +368,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "tour-leg",
-                "name": "event_tour_leg",
             },
         ),
     )
@@ -341,7 +380,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "relation",
-                "name": "event_relation",
             },
         ),
     )
@@ -354,7 +392,6 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm select2",
                 "id": "band",
-                "name": "event_band",
             },
         ),
     )
@@ -368,69 +405,27 @@ class AdvancedEventSearch(forms.Form):
             attrs={
                 "class": "form-select form-select-sm",
                 "id": "conjunctionSelect",
-                "name": "setlist_conjunction",
             },
         ),
     )
 
     def clean_start_date(self):
-        # the first year tracked in the database is 1965, so that is the start date
-        if self.cleaned_data["start_date"]:
-            # partial date, get first of month
-            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["start_date"]):
-                date = (
-                    datetime.datetime.strptime(self.cleaned_data["start_date"], "%Y-%m")
-                    .replace(day=1)
-                    .date()
-                )
+        date = self.cleaned_data.get("start_date")
 
-                return {
-                    "id": date,
-                    "value": date.strftime("%Y-%m-%d"),
-                }
+        if date:
+            # Enforce minimum database year threshold (e.g., 1965)
+            if date.year < 1965:
+                raise ValidationError("Date cannot be earlier than 1965.")
 
-            # specific date
-            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["start_date"]):
-                date = datetime.datetime.strptime(
-                    self.cleaned_data["start_date"],
-                    "%Y-%m-%d",
-                ).date()
-
-                return {
-                    "id": date,
-                    "value": date.strftime("%Y-%m-%d"),
-                }
+            return date.strftime("%Y-%m-%d")
 
         return None
 
     def clean_end_date(self):
-        # default end date is last day of current year
-        if self.cleaned_data["end_date"]:
-            # partial date
-            if re.search(r"^\d{4}-\d{2}$", self.cleaned_data["end_date"]):
-                dt = datetime.datetime.strptime(
-                    self.cleaned_data["end_date"],
-                    "%Y-%m",
-                )
+        date = self.cleaned_data.get("end_date")
 
-                last = calendar.monthrange(dt.year, dt.month)[1]
-
-                return {
-                    "id": dt.replace(day=last).date(),
-                    "value": dt.replace(day=last).date().strftime("%Y-%m-%d"),
-                }
-
-            # specific date
-            if re.search(r"^\d{4}-\d{2}-\d{2}$", self.cleaned_data["end_date"]):
-                date = datetime.datetime.strptime(
-                    self.cleaned_data["end_date"],
-                    "%Y-%m-%d",
-                ).date()
-
-                return {
-                    "id": date,
-                    "value": date.strftime("%Y-%m-%d"),
-                }
+        if date:
+            return date.strftime("%Y-%m-%d")
 
         return None
 
@@ -454,26 +449,22 @@ class AdvancedEventSearch(forms.Form):
         return None
 
     def clean_type(self):
-        if self.cleaned_data["type"]:
-            if isinstance(self.cleaned_data["type"], list):
-                return models.Types.objects.filter(
-                    id__in=self.cleaned_data["type"],
-                )
+        types = self.cleaned_data.get("type")
 
-            return models.Types.objects.get(id=self.cleaned_data["type"])
+        if types:
+            # types is always a list of string IDs, e.g. ['4'] or ['4', '1']
+            return models.Types.objects.filter(id__in=types)
 
-        return None
+        return models.Types.objects.none()  # Return an empty QuerySet if empty
 
     def clean_tag(self):
-        if self.cleaned_data["tag"]:
-            if isinstance(self.cleaned_data["tag"], list):
-                return models.Tags.objects.filter(
-                    id__in=self.cleaned_data["tag"],
-                )
+        tags = self.cleaned_data.get("tag")
 
-            return models.Tags.objects.get(id=self.cleaned_data["tag"])
+        if tags:
+            # types is always a list of string IDs, e.g. ['4'] or ['4', '1']
+            return models.Tags.objects.filter(id__in=tags)
 
-        return None
+        return models.Tags.objects.none()  # Return an empty QuerySet if empty
 
     def clean_state(self):
         data = re.sub(r"\D", "", self.cleaned_data["state"])
@@ -695,6 +686,54 @@ class SetlistNoteSearch(forms.Form):
                 "name": "note",
                 "placeholder": "Enter query",
                 "class": "form-control",
+            },
+        ),
+    )
+
+
+class ArticleSearch(forms.Form):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize form."""
+        super().__init__(*args, **kwargs)
+
+    query = CustomCharField(
+        label="Query:",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "id": "articleSearch",
+                "type": "search",
+                "name": "article",
+                "placeholder": "Enter query",
+                "class": "form-control form-control-sm",
+            },
+        ),
+    )
+
+    date_before = CustomCharField(
+        label="To",
+        lookup_path="published_at__year",
+        required=False,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control form-control-sm",
+                "type": "search",
+                "placeholder": "YYYY",
+                "maxlength": 4,
+            },
+        ),
+    )
+
+    date_after = CustomCharField(
+        label="From",
+        required=False,
+        lookup_path="published_at__year",
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control form-control-sm",
+                "type": "search",
+                "placeholder": "YYYY",
+                "maxlength": 4,
             },
         ),
     )

@@ -4,8 +4,9 @@ import re
 
 from django.contrib.auth.models import Group
 from django.core import mail
-from django.db import transaction
-from django.test import TransactionTestCase, override_settings
+from django.db import connection, transaction
+from django.http import HttpResponse
+from django.test import Client, TransactionTestCase, override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -162,6 +163,9 @@ class BaseDataTest(TransactionTestCase):
         # Flush base tables to disk
         transaction.commit()
 
+        with connection.cursor() as cursor:
+            cursor.execute("REFRESH MATERIALIZED VIEW songs_page;")
+
 
 class ContactTests(BaseDataTest):
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -222,7 +226,7 @@ class UserTests(BaseDataTest):
         email_body = mail.outbox[0].body
 
         # 3. Extract the activation link from the email body
-        link_match = re.search(r"https://example.com.*", email_body) # type: ignore
+        link_match = re.search(r"https://example.com.*", email_body)  # type: ignore
         assert link_match, "Activation link not found in email"
         activation_url = link_match.group(0)  # type: ignore
 
@@ -238,29 +242,29 @@ class UserTests(BaseDataTest):
 class AdvSearchTest(BaseDataTest):
     def get_search_results(
         self,
-        client,
-        song1_id,
+        client: Client,
+        song1_id: int,
         song2_id: int | None = None,
         position: str = "anywhere",
         choice: str = "True",
-    ):
+    ) -> HttpResponse:
         """Simulate the Advanced Search GET request and return the dict object."""
-        url = reverse("adv_search_results")
+        url = reverse("api:adv_search-list")
 
         data = {
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "0",
-            "form-0-song1": song1_id,
-            "form-0-position": position,
-            "form-0-choice": choice,
+            "songs[0][song_1]": song1_id,
+            "songs[0][position]": position,
+            "songs[0][choice]": choice,
             "conjunction": "and",
         }
 
         # Add song2 if it's a 'followed_by' query
         if song2_id:
-            data["form-0-song2"] = song2_id
+            data["songs[0][song_2]"] = song2_id
 
-        return client.get(url, data)
+        response = client.get(url, data)
+
+        return response
 
     def test_show_opener_filter(self):
         response = self.get_search_results(
@@ -270,16 +274,11 @@ class AdvSearchTest(BaseDataTest):
             choice="True",
         )
 
-        events = response.context["events"]
-
-        # Event 1 should be included because Song A IS show opener
-        assert self.event1 in events
-
-        # Verify the summary string reflects the result above
-        assert "Song A (is Show Opener)" in response.context["search_summary"]
+        events = [item["event_id"] for item in response.json()]
+        assert self.event1.event_id in events
 
         # Should be only one event
-        assert events.count() == 1
+        assert len(events) == 1
 
     def test_followed_by(self):
         response = self.get_search_results(
@@ -290,16 +289,13 @@ class AdvSearchTest(BaseDataTest):
             choice="True",
         )
 
-        events = response.context["events"]
+        events = [item["event_id"] for item in response.json()]
 
         # Event 2 should be included because Song A IS followed by Song B
-        assert self.event2 in events
-
-        # Verify the summary string reflects the result above
-        assert "Song A (is followed by) Song B" in response.context["search_summary"]
+        assert self.event2.event_id in events
 
         # Should be only one event
-        assert events.count() == 1
+        assert len(events) == 1
 
     def test_not_followed_by(self):
         response = self.get_search_results(
@@ -310,15 +306,13 @@ class AdvSearchTest(BaseDataTest):
             choice="False",
         )
 
-        events = response.context["events"]
+        events = [item["event_id"] for item in response.json()]
 
         # Event 1 should be present because Song A is NOT followed by Song B
-        assert self.event1 in events
+        assert self.event1.event_id in events
 
-        # Verify the summary string reflects the result above
-        assert "Song A (not followed by) Song B" in response.context["search_summary"]
-
-        assert events.count() == 1
+        # Should be only one event
+        assert len(events) == 1
 
     def test_not_anywhere(self):
         response = self.get_search_results(
@@ -328,12 +322,10 @@ class AdvSearchTest(BaseDataTest):
             choice="False",
         )
 
-        events = response.context["events"]
+        events = [item["event_id"] for item in response.json()]
 
         # Event 1 should be present because song B is not present for event1
-        assert self.event1 in events
-
-        assert "Song B (not anywhere)" in response.context["search_summary"]
+        assert self.event1.event_id in events
 
     def test_is_anywhere(self):
         response = self.get_search_results(
@@ -343,12 +335,10 @@ class AdvSearchTest(BaseDataTest):
             choice="True",
         )
 
-        events = response.context["events"]
+        events = [item["event_id"] for item in response.json()]
 
         # Event 1 should be present because song A is present for event1
-        assert self.event1 in events
-
-        assert "Song A (is anywhere)" in response.context["search_summary"]
+        assert self.event1.event_id in events
 
 
 class EventSearch(BaseDataTest):
@@ -389,7 +379,7 @@ class TestViews(BaseDataTest):
 
     def test_event_mobile(self):
         response = self.client.get(
-            reverse("event_details_mobile", args=[self.event.event_id]),
+            reverse("event_details_mobile", args=[self.event]),
         )
         assert response.status_code == 200
 
@@ -433,7 +423,7 @@ class TestViews(BaseDataTest):
 class ModelStringTests(BaseDataTest):
     def test_model_string_representations(self):
         assert str(self.artist) == "The E Street Band"
-        assert str(self.venue) == "Bottom Line (New York City)"
+        assert str(self.venue) == "Bottom Line"
         assert str(self.tour) == "Born In The U.S.A."
         assert str(self.event) == "1975-08-15 [Fri]"
         assert str(self.song_a) == "Song A (Bruce Springsteen)"

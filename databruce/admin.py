@@ -821,3 +821,10 @@ class PostAdmin(ModelAdmin):
         ):
             return False
         return super().has_delete_permission(request, obj)
+
+
+@admin.register(models.Articles)
+class ArticleAdmin(ModelAdmin):
+    list_display = ("title", "author", "created_at")
+    search_fields = ["title", "author", "content"]
+    prepopulated_fields = {"slug": ("title",)}
