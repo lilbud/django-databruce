@@ -11,7 +11,7 @@ from django.contrib.auth import authenticate, get_user_model, update_session_aut
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.tokens import (
-    default_token_generator,
+  default_token_generator,
 )
 from django.contrib.auth.views import LoginView
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -21,14 +21,14 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import send_mail
 from django.db.models import (
-    Count,
-    Exists,
-    F,
-    Min,
-    OuterRef,
-    Q,
-    QuerySet,
-    Subquery,
+  Count,
+  Exists,
+  F,
+  Min,
+  OuterRef,
+  Q,
+  QuerySet,
+  Subquery,
 )
 from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -49,1103 +49,1081 @@ from shortener import shortener
 from databruce import models
 from databruce.config import base
 from databruce.forms import (
-    AdvancedEventSearch,
-    ContactForm,
-    CustomPasswordChangeForm,
-    LoginForm,
-    SetlistSearch,
-    UpdateUserForm,
-    UserForm,
+  AdvancedEventSearch,
+  ContactForm,
+  CustomPasswordChangeForm,
+  LoginForm,
+  SetlistSearch,
+  UpdateUserForm,
+  UserForm,
 )
 from databruce.templatetags.filters import currency
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
 
-VALID_SET_NAMES = [
-    "Show",
-    "Set 1",
-    "Set 2",
-    "Encore",
-    "Pre-Show",
-    "Post-Show",
-]
-
 
 class Test(TemplateView):
-    model = models.Events
-    template_name = "databruce/test.html"
+  model = models.Events
+  template_name = "databruce/test.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["year"] = "2023"
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["year"] = "2023"
 
-        return context
+    return context
 
 
 class Radio(TemplateView):
-    model = models.Events
-    template_name = "databruce/radio.html"
+  model = models.Events
+  template_name = "databruce/radio.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        return super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    return super().get_context_data(**kwargs)
 
 
 def event_search(request):
-    query = request.GET.get("q", "")
+  query = request.GET.get("q", "")
 
-    results = (
-        models.Events.objects.select_related("artist", "venue")
-        .annotate(
-            search=SearchVector("event_id", weight="A")
-            + SearchVector("date", weight="B")
-            + SearchVector("early_late", weight="B")
-            + SearchVector("artist__name", weight="C")
-            + SearchVector("venue__name", weight="D"),
-        )
-        .filter(search=query)
-        .annotate(rank=SearchRank(F("search"), query))
-        .values()
+  results = (
+    models.Events.objects.select_related("artist", "venue")
+    .annotate(
+      search=SearchVector("event_id", weight="A")
+      + SearchVector("date", weight="B")
+      + SearchVector("early_late", weight="B")
+      + SearchVector("artist__name", weight="C")
+      + SearchVector("venue__name", weight="D"),
     )
+    .filter(search=query)
+    .annotate(rank=SearchRank(F("search"), query))
+    .values()
+  )
 
-    return JsonResponse(
-        {
-            "results": list(results)[:10],
-            "query": query,
-        },
-        safe=False,
-    )
+  return JsonResponse(
+    {
+      "results": list(results)[:10],
+      "query": query,
+    },
+    safe=False,
+  )
 
 
 class PageTitleMixin(ContextMixin):
-    def get_page_title(self, _context):
-        return getattr(self, "title", None)
+  def get_page_title(self, _context):
+    return getattr(self, "title", None)
 
-    def get_page_description(self, _context):
-        return getattr(self, "description", None)
+  def get_page_description(self, _context):
+    return getattr(self, "description", None)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = self.get_page_title(context)
-        context["description"] = self.get_page_description(context)
-        context["date"] = datetime.datetime.today()
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context["title"] = self.get_page_title(context)
+    context["description"] = self.get_page_description(context)
+    context["date"] = datetime.datetime.today()
 
-        return context
+    return context
 
 
 class Index(PageTitleMixin, TemplateView):
-    template_name = "databruce/index.html"
-    title = "Home"
+  template_name = "databruce/index.html"
+  title = "Home"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        date = datetime.datetime.today()
-        month = date.month
-        day = date.day
+    date = datetime.datetime.today()
+    month = date.month
+    day = date.day
 
-        event_filter = Q(
-            Q(event__date__month=month)
-            & Q(event__date__day=day)
-            & Q(event__artist__springsteen_band=True)
-            & Q(set_name__in=VALID_SET_NAMES)
-            & Q(event__setlist_certainty="Confirmed")
-            & ~Q(event__tour__name__icontains="misc.")
-            & ~Q(event__tour_id__in=[25, 48]),
+    event_filter = Q(
+      Q(event__date__month=month)
+      & Q(event__date__day=day)
+      & Q(event__artist__springsteen_band=True)
+      & Q(set_name__in=models.SetTypes.valid_sets())
+      & Q(event__setlist_certainty="Confirmed")
+      & ~Q(event__tour__name__icontains="misc.")
+      & ~Q(event__tour_id__in=[25, 48]),
+    )
+
+    queryset = (
+      models.Setlists.objects.select_related(
+        "event__artist",
+        "event__venue",
+        "event__tour",
+      )
+      .filter(event_filter)
+      .distinct("event_id")
+      .order_by("-event_id")
+      .first()
+    )
+
+    if not queryset:
+      queryset = (
+        models.Setlists.objects.select_related(
+          "event__artist",
+          "event__venue",
+          "event__tour",
         )
+        .filter(event__event_id="19780919-01")
+        .distinct("event_id")
+        .order_by("-event_id")
+        .first()
+      )
 
-        queryset = (
-            models.Setlists.objects.select_related(
-                "event__artist",
-                "event__venue",
-                "event__tour",
-            )
-            .filter(event_filter)
-            .distinct("event_id")
-            .order_by("-event_id")
-            .first()
-        )
+    context["latest_event"] = queryset
 
-        if not queryset:
-            queryset = (
-                models.Setlists.objects.select_related(
-                    "event__artist",
-                    "event__venue",
-                    "event__tour",
-                )
-                .filter(event__event_id="19780919-01")
-                .distinct("event_id")
-                .order_by("-event_id")
-                .first()
-            )
+    context["event_count"] = models.Events.objects.count()
+    context["song_count"] = models.Songs.objects.count()
+    context["tour_count"] = models.Tours.objects.count()
+    context["venue_count"] = models.Venues.objects.count()
+    context["relation_count"] = models.Relations.objects.count()
+    context["band_count"] = models.Bands.objects.count()
 
-        context["latest_event"] = queryset
-
-        context["event_count"] = models.Events.objects.count()
-        context["song_count"] = models.Songs.objects.count()
-        context["tour_count"] = models.Tours.objects.count()
-        context["venue_count"] = models.Venues.objects.count()
-        context["relation_count"] = models.Relations.objects.count()
-        context["band_count"] = models.Bands.objects.count()
-
-        return context
+    return context
 
 
 class Song(PageTitleMixin, TemplateView):
-    template_name = "databruce/songs/songs.html"
-    title = "Songs"
+  template_name = "databruce/songs/songs.html"
+  title = "Songs"
 
 
 class About(PageTitleMixin, TemplateView):
-    template_name = "databruce/about.html"
-    title = "About"
+  template_name = "databruce/about.html"
+  title = "About"
 
 
 class Roadmap(PageTitleMixin, TemplateView):
-    template_name = "databruce/roadmap.html"
-    title = "Roadmap"
+  template_name = "databruce/roadmap.html"
+  title = "Roadmap"
 
 
 class Links(PageTitleMixin, TemplateView):
-    template_name = "databruce/links.html"
-    title = "Links"
+  template_name = "databruce/links.html"
+  title = "Links"
 
 
 class Calendar(PageTitleMixin, TemplateView):
-    template_name = "databruce/calendar.html"
+  template_name = "databruce/calendar.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["years"] = list(range(context["date"].year, 1964, -1))
-        context["title"] = f"Event Calendar - {context['date'].strftime('%B %Y')}"
-        context["description"] = f"Events in {context['date'].strftime('%B %Y')}"
+    context["years"] = list(range(context["date"].year, 1964, -1))
+    context["title"] = f"Event Calendar - {context['date'].strftime('%B %Y')}"
+    context["description"] = f"Events in {context['date'].strftime('%B %Y')}"
 
-        context["end_date"] = f"{context['date'].year}-12-31"
+    context["end_date"] = f"{context['date'].year}-12-31"
 
-        try:
-            if re.search(
-                r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
-                self.request.GET["start"],  # type: ignore
-            ):  # type: ignore
-                context["start_date"] = self.request.GET["start"]
-        except MultiValueDictKeyError:
-            context["start_date"] = context["date"].strftime("%Y-%m-%d")
+    try:
+      if re.search(
+        r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
+        self.request.GET["start"],  # type: ignore
+      ):  # type: ignore
+        context["start_date"] = self.request.GET["start"]
+    except MultiValueDictKeyError:
+      context["start_date"] = context["date"].strftime("%Y-%m-%d")
 
-        return context
+    return context
 
 
 class Users(PageTitleMixin, TemplateView):
-    template_name = "users/users.html"
-    title = "Users"
-    description = "List of Users"
+  template_name = "users/users.html"
+  title = "Users"
+  description = "List of Users"
 
 
 class UserProfile(PageTitleMixin, TemplateView):
-    template_name = "users/profile.html"
-    title = "User Profile"
+  template_name = "users/profile.html"
+  title = "User Profile"
 
-    def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(UserModel, uuid=self.kwargs["id"])
-        context["title"] = f'User "{context["info"]}"'
-        context["description"] = f"{context['info']} Profile"
+  def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(UserModel, uuid=self.kwargs["id"])
+    context["title"] = f'User "{context["info"]}"'
+    context["description"] = f"{context['info']} Profile"
 
-        user_events = models.Events.objects.filter(
-            user_event__user_id=context["info"].pk,
-        )
+    user_events = models.Events.objects.filter(
+      user_event__user_id=context["info"].pk,
+    )
 
-        context["user_event_count"] = user_events.count()
+    context["user_event_count"] = user_events.count()
 
-        context["user_songs_count"] = (
-            models.Setlists.objects.filter(
-                event__event_id__in=user_events.values("event_id"),
-                set_name__in=VALID_SET_NAMES,
-            )
-            .distinct("song_id")
-            .order_by("song_id")
-        ).count()
+    context["user_songs_count"] = (
+      models.Setlists.objects.filter(
+        event__event_id__in=user_events.values("event_id"),
+        set_name__in=models.SetTypes.valid_sets(),
+      )
+      .distinct("song_id")
+      .order_by("song_id")
+    ).count()
 
-        context["first_event"] = user_events.order_by("event_id").first()
-        context["last_event"] = user_events.order_by("-event_id").first()
+    context["first_event"] = user_events.order_by("event_id").first()
+    context["last_event"] = user_events.order_by("-event_id").first()
 
-        return context
+    return context
 
 
 class ResendActivation(PageTitleMixin, TemplateView):
-    template_name = "users/resend_activation.html"
-    title = "Resend Activation"
+  template_name = "users/resend_activation.html"
+  title = "Resend Activation"
 
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        email = request.POST.get("email")
-        user = User.objects.filter(email=email, is_active=False).first()
-        if user:
-            # RE-RUN YOUR ACTIVATION EMAIL LOGIC HERE
-            messages.success(request, "Activation email resent!")
-        else:
-            messages.error(request, "No inactive account found with that email.")
+  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    email = request.POST.get("email")
+    user = User.objects.filter(email=email, is_active=False).first()
+    if user:
+      # RE-RUN YOUR ACTIVATION EMAIL LOGIC HERE
+      messages.success(request, "Activation email resent!")
+    else:
+      messages.error(request, "No inactive account found with that email.")
 
-        return render(request, template_name=self.template_name)  # type: ignore
+    return render(request, template_name=self.template_name)  # type: ignore
 
 
 class Login(PageTitleMixin, LoginView):
-    form_class = LoginForm
-    template_name = "users/login.html"
-    title = "Login"
-    success_url = reverse_lazy("home")
+  form_class = LoginForm
+  template_name = "users/login.html"
+  title = "Login"
+  success_url = reverse_lazy("home")
 
-    def form_invalid(self, form):
-        username = self.request.POST.get("username")
-        password = self.request.POST.get("password")
-        user = authenticate(self.request, username=username, password=password)
+  def form_invalid(self, form):
+    username = self.request.POST.get("username")
+    password = self.request.POST.get("password")
+    user = authenticate(self.request, username=username, password=password)
 
-        if user is None:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    if field.title() == "__All__":
-                        messages.error(self.request, f"{error}")
-                    else:
-                        messages.error(self.request, f"{field.title()}: {error}")
+    if user is None:
+      for field, errors in form.errors.items():
+        for error in errors:
+          if field.title() == "__All__":
+            messages.error(self.request, f"{error}")
+          else:
+            messages.error(self.request, f"{field.title()}: {error}")
 
-        return super().form_invalid(form)
+    return super().form_invalid(form)
 
-    def form_valid(self, form):
-        remember_me = form.cleaned_data.get("remember_me")
+  def form_valid(self, form):
+    remember_me = form.cleaned_data.get("remember_me")
 
-        if not remember_me:
-            self.request.session.set_expiry(0)
-        else:
-            self.request.session.set_expiry(1209600)  # 2 weeks
+    if not remember_me:
+      self.request.session.set_expiry(0)
+    else:
+      self.request.session.set_expiry(1209600)  # 2 weeks
 
-        return super().form_valid(form)
+    return super().form_valid(form)
 
 
 class SignUp(PageTitleMixin, TemplateView):
-    template_name = "users/signup.html"
-    email_template_name = "users/signup_email.html"
-    subject_template_name = "users/signup_confirm_subject.txt"
-    title = "Signup"
-    token_generator = default_token_generator
-    form_class = UserForm
+  template_name = "users/signup.html"
+  email_template_name = "users/signup_email.html"
+  subject_template_name = "users/signup_confirm_subject.txt"
+  title = "Signup"
+  token_generator = default_token_generator
+  form_class = UserForm
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        context["form"] = self.form_class
-        return context
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
+    context["form"] = self.form_class
+    return context
 
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        form = self.form_class(request.POST)
+  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    form = self.form_class(request.POST)
 
-        if form.is_valid():
-            if form.cleaned_data["verification"] == os.getenv(
-                "VERIFICATION_ANSWER",
-            ):
-                user = form.save(commit=False)
-                user.is_active = False
-                user.save()
+    if form.is_valid():
+      if form.cleaned_data["verification"] == os.getenv(
+        "VERIFICATION_ANSWER",
+      ):
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
 
-                current_site = get_current_site(request)
-                use_https = True
+        current_site = get_current_site(request)
+        use_https = True
 
-                context = {
-                    "email": user.email,
-                    "domain": current_site.domain,
-                    "site_name": current_site.name,
-                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                    "user": user,
-                    "token": self.token_generator.make_token(user),
-                    "protocol": "https" if use_https else "http",
-                }
+        context = {
+          "email": user.email,
+          "domain": current_site.domain,
+          "site_name": current_site.name,
+          "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+          "user": user,
+          "token": self.token_generator.make_token(user),
+          "protocol": "https" if use_https else "http",
+        }
 
-                self.send_mail(
-                    context=context,
-                    from_email=os.getenv("MAILGUN_EMAIL"),
-                    to_email=user.email,
-                )
-
-                return redirect(reverse("signup_done"))
-
-            messages.error(request, "Incorrect verification answer")
-            return render(
-                request,
-                template_name=self.template_name,  # type: ignore
-                context={"form": form},
-            )
-
-        messages.error(request, "Signup Failed, see errors below")
-        return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
-
-    def send_mail(self, context, from_email, to_email):
-        subject = loader.render_to_string(self.subject_template_name, context).strip()
-        body = loader.render_to_string(self.email_template_name, context)
-
-        # This will now be intercepted by the test runner
-        return send_mail(
-            subject,
-            body,
-            from_email,
-            [to_email],
-            fail_silently=False,
+        self.send_mail(
+          context=context,
+          from_email=os.getenv("MAILGUN_EMAIL"),
+          to_email=user.email,
         )
+
+        return redirect(reverse("signup_done"))
+
+      messages.error(request, "Incorrect verification answer")
+      return render(
+        request,
+        template_name=self.template_name,  # type: ignore
+        context={"form": form},
+      )
+
+    messages.error(request, "Signup Failed, see errors below")
+    return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
+
+  def send_mail(self, context, from_email, to_email):
+    subject = loader.render_to_string(self.subject_template_name, context).strip()
+    body = loader.render_to_string(self.email_template_name, context)
+
+    # This will now be intercepted by the test runner
+    return send_mail(
+      subject,
+      body,
+      from_email,
+      [to_email],
+      fail_silently=False,
+    )
 
 
 class SignUpConfirm(PageTitleMixin, TemplateView):
-    template_name = "users/signup_done.html"
-    reset_url_token = "activate"  # noqa: S105
-    token_generator = default_token_generator
-    title = "Sign Up Complete"
+  template_name = "users/signup_done.html"
+  reset_url_token = "activate"  # noqa: S105
+  token_generator = default_token_generator
+  title = "Sign Up Complete"
 
-    def get_user(self, uidb64):
-        try:
-            # urlsafe_base64_decode() decodes to bytestring
-            uid = urlsafe_base64_decode(uidb64).decode()
-            user = UserModel._default_manager.get(pk=uid)  # noqa: SLF001
-        except (
-            TypeError,
-            ValueError,
-            OverflowError,
-            UserModel.DoesNotExist,
-            ValidationError,
+  def get_user(self, uidb64):
+    try:
+      # urlsafe_base64_decode() decodes to bytestring
+      uid = urlsafe_base64_decode(uidb64).decode()
+      user = UserModel._default_manager.get(pk=uid)  # noqa: SLF001
+    except (
+      TypeError,
+      ValueError,
+      OverflowError,
+      UserModel.DoesNotExist,
+      ValidationError,
+    ):
+      user = None
+    return user
+
+  @method_decorator(sensitive_post_parameters())
+  @method_decorator(never_cache)
+  def dispatch(self, *args, **kwargs):
+    if "uidb64" not in kwargs or "token" not in kwargs:
+      msg = "The URL path must contain 'uidb64' and 'token' parameters."
+      raise ImproperlyConfigured(msg)
+
+    # 1. Fetch and validate the env key early so the type checker knows it's a strict 'str'
+    token_key = os.getenv("INTERNAL_RESET_SESSION_TOKEN")
+    if not token_key:
+      msg = "The 'INTERNAL_RESET_SESSION_TOKEN' environment variable is not configured."
+      raise ImproperlyConfigured(msg)
+
+    self.validlink = False
+    self.user = self.get_user(kwargs["uidb64"])
+
+    if self.user is not None:
+      token = kwargs["token"]
+      if token == self.reset_url_token:
+        # 2. Used safely here as a guaranteed string
+        session_token = self.request.session.get(token_key)
+
+        if self.token_generator.check_token(
+          user=self.user,
+          token=session_token,
         ):
-            user = None
-        return user
+          self.validlink = True
+          return super().dispatch(*args, **kwargs)
+      else:
+        if self.token_generator.check_token(
+          user=self.user,
+          token=token,
+        ):
+          # 3. Used safely here as a guaranteed string
+          self.request.session[token_key] = token
 
-    @method_decorator(sensitive_post_parameters())
-    @method_decorator(never_cache)
-    def dispatch(self, *args, **kwargs):
-        if "uidb64" not in kwargs or "token" not in kwargs:
-            msg = "The URL path must contain 'uidb64' and 'token' parameters."
-            raise ImproperlyConfigured(msg)
+          group = Group.objects.get(name="Users")
+          self.user.groups.add(group)  # type: ignore
+          self.user.is_active = True
+          self.user.save()
 
-        # 1. Fetch and validate the env key early so the type checker knows it's a strict 'str'
-        token_key = os.getenv("INTERNAL_RESET_SESSION_TOKEN")
-        if not token_key:
-            msg = "The 'INTERNAL_RESET_SESSION_TOKEN' environment variable is not configured."
-            raise ImproperlyConfigured(msg)
+        return redirect("login")
 
-        self.validlink = False
-        self.user = self.get_user(kwargs["uidb64"])
-
-        if self.user is not None:
-            token = kwargs["token"]
-            if token == self.reset_url_token:
-                # 2. Used safely here as a guaranteed string
-                session_token = self.request.session.get(token_key)
-
-                if self.token_generator.check_token(
-                    user=self.user,
-                    token=session_token,
-                ):
-                    self.validlink = True
-                    return super().dispatch(*args, **kwargs)
-            else:
-                if self.token_generator.check_token(
-                    user=self.user,
-                    token=token,
-                ):
-                    # 3. Used safely here as a guaranteed string
-                    self.request.session[token_key] = token
-
-                    group = Group.objects.get(name="Users")
-                    self.user.groups.add(group)  # type: ignore
-                    self.user.is_active = True
-                    self.user.save()
-
-                return redirect("login")
-
-        return None
+    return None
 
 
 class UserChangePassword(View):
-    template_name = "users/password_change.html"
-    form_class = CustomPasswordChangeForm
-    title = "Change Password"
+  template_name = "users/password_change.html"
+  form_class = CustomPasswordChangeForm
+  title = "Change Password"
 
-    def post(self, request: HttpRequest):
-        password_form = self.form_class(request.user, request.POST)
+  def post(self, request: HttpRequest):
+    password_form = self.form_class(request.user, request.POST)
 
-        if password_form.is_valid():
-            user = password_form.save()
-            update_session_auth_hash(request, user)  # Prevents logging out
+    if password_form.is_valid():
+      user = password_form.save()
+      update_session_auth_hash(request, user)  # Prevents logging out
 
-            messages.success(request, "Your password is updated successfully")
+      messages.success(request, "Your password is updated successfully")
 
-            storage = messages.get_messages(request)
+      storage = messages.get_messages(request)
 
-            msg_list = next(
-                {"message": msg.message, "tags": msg.tags} for msg in storage
-            )
+      msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
 
-            return JsonResponse(
-                {
-                    "success": True,
-                    "messages": msg_list,
-                },
-            )
+      return JsonResponse(
+        {
+          "success": True,
+          "messages": msg_list,
+        },
+      )
 
-        err_msg = []
+    err_msg = []
 
-        for msg in password_form.errors.values():
-            err_msg.append(str(msg[0]))
+    for msg in password_form.errors.values():
+      err_msg.append(str(msg[0]))
 
-        msg_list = []
+    msg_list = []
 
-        return JsonResponse(
-            {
-                "success": False,
-                "messages": {"message": "\n".join(err_msg), "tags": "error"},
-            },
-            status=400,
-        )
+    return JsonResponse(
+      {
+        "success": False,
+        "messages": {"message": "\n".join(err_msg), "tags": "error"},
+      },
+      status=400,
+    )
 
 
 class UserSettings(LoginRequiredMixin, PageTitleMixin, TemplateView):
-    template_name = "users/settings.html"
-    form_class = UpdateUserForm
-    password_form_class = CustomPasswordChangeForm
+  template_name = "users/settings.html"
+  form_class = UpdateUserForm
+  password_form_class = CustomPasswordChangeForm
 
-    title = "User Settings"
+  title = "User Settings"
 
-    def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["form"] = self.form_class(instance=self.request.user)
-        context["password_form"] = self.password_form_class(self.request.user)
+  def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["form"] = self.form_class(instance=self.request.user)
+    context["password_form"] = self.password_form_class(self.request.user)
 
-        return context
+    return context
 
-    def post(self, request: HttpRequest):
-        user_form = self.form_class(request.POST, instance=request.user)
+  def post(self, request: HttpRequest):
+    user_form = self.form_class(request.POST, instance=request.user)
 
-        if user_form.is_valid():
-            user_form.save()
-            messages.success(request, "Your profile is updated successfully")
+    if user_form.is_valid():
+      user_form.save()
+      messages.success(request, "Your profile is updated successfully")
 
-            storage = messages.get_messages(request)
-            msg_list = next(
-                {"message": msg.message, "tags": msg.tags} for msg in storage
-            )
+      storage = messages.get_messages(request)
+      msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
 
-            return JsonResponse(
-                {
-                    "success": True,
-                    "messages": msg_list,
-                },
-            )
+      return JsonResponse(
+        {
+          "success": True,
+          "messages": msg_list,
+        },
+      )
 
-        return JsonResponse({"success": False, "errors": user_form.errors}, status=400)
+    return JsonResponse({"success": False, "errors": user_form.errors}, status=400)
 
 
 class SignUpDone(PageTitleMixin, TemplateView):
-    template_name = "users/signup_done.html"
-    title = "Sign Up Complete"
+  template_name = "users/signup_done.html"
+  title = "Sign Up Complete"
 
 
 class UserRemoveShow(View):
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        models.UserAttendedShows.objects.filter(
-            user_id=request.user.pk,
-            event_id=request.POST["event"],
-        ).delete()
+  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    models.UserAttendedShows.objects.filter(
+      user_id=request.user.pk,
+      event_id=request.POST["event"],
+    ).delete()
 
-        return redirect(
-            request.headers.get("referer", "redirect_if_referer_not_found"),
-        )
+    return redirect(
+      request.headers.get("referer", "redirect_if_referer_not_found"),
+    )
 
 
 class UserAddRemoveShow(View):
-    def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        item = models.UserAttendedShows.objects.filter(
-            user_id=request.POST["user"],
-            event_id=request.POST["event"],
-        )
+  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    item = models.UserAttendedShows.objects.filter(
+      user_id=request.POST["user"],
+      event_id=request.POST["event"],
+    )
 
-        result = {}
+    result = {}
 
-        if item:
-            models.UserAttendedShows.objects.filter(
-                user_id=request.POST["user"],
-                event_id=request.POST["event"],
-            ).delete()
+    if item:
+      models.UserAttendedShows.objects.filter(
+        user_id=request.POST["user"],
+        event_id=request.POST["event"],
+      ).delete()
 
-            result["action"] = "removed"
-        else:
-            models.UserAttendedShows.objects.create(
-                user_id=request.user.pk,
-                event_id=request.POST["event"],
-            )
+      result["action"] = "removed"
+    else:
+      models.UserAttendedShows.objects.create(
+        user_id=request.user.pk,
+        event_id=request.POST["event"],
+      )
 
-            result["action"] = "added"
+      result["action"] = "added"
 
-        count = models.UserAttendedShows.objects.filter(
-            event_id=request.POST["event"],
-        ).count()
+    count = models.UserAttendedShows.objects.filter(
+      event_id=request.POST["event"],
+    ).count()
 
-        result["count"] = count
+    result["count"] = count
 
-        return JsonResponse(result)
+    return JsonResponse(result)
 
 
 class EventDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/events/detail.html"
-    description = "Event Detail"
+  template_name = "databruce/events/detail.html"
+  description = "Event Detail"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["event"] = get_object_or_404(
-            models.Events.objects.select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__city",
-            ).prefetch_related(
-                "leg",
-                "run",
-                "archive_links",
-                "nugs_event",
-                "release_event",
-                "event_type",
-            ),
-            event_id=self.kwargs["id"],
-        )
+    context["event"] = get_object_or_404(
+      models.Events.objects.select_related(
+        "venue",
+        "artist",
+        "tour",
+        "venue__city",
+      ).prefetch_related(
+        "leg",
+        "run",
+        "archive_links",
+        "nugs_event",
+        "release_event",
+        "event_type",
+        "event_tag",
+      ),
+      event_id=self.kwargs["id"],
+    )
 
-        event = context["event"]
-        event_date = event.get_date()
+    event = context["event"]
+    event_date = event.get_date()
 
-        venue = event.venue
-        venue_name = getattr(venue, "name", "Unknown Venue")
+    venue = event.venue
+    venue_name = getattr(venue, "name", "Unknown Venue")
 
-        context["title"] = f"{event_date} - {venue_name}"
+    context["title"] = f"{event_date} - {venue_name}"
 
-        context["description"] = f"{event.summary}"
+    context["description"] = f"{event.summary}"
 
-        context["setlist_certainty"] = bool(
-            context["event"].setlist_certainty not in (None, "", "Unknown"),
-        )
+    context["setlist_certainty"] = bool(
+      context["event"].setlist_certainty not in (None, "", "Unknown"),
+    )
 
-        if venue and venue.city and venue.city.timezone:
-            tz_target = venue.city.timezone
-        else:
-            tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
+    if venue and venue.city and venue.city.timezone:
+      tz_target = venue.city.timezone
+    else:
+      tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
 
-        context["scheduled_time"] = None
-        context["start_time"] = None
-        context["end_time"] = None
-        context["duration"] = None
+    context["scheduled_time"] = None
+    context["start_time"] = None
+    context["end_time"] = None
+    context["duration"] = None
 
-        if event.scheduled_time:
-            context["scheduled_time"] = (
-                event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
+    if event.scheduled_time:
+      context["scheduled_time"] = (
+        event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+      )
 
-        if event.start_time:
-            context["start_time"] = (
-                event.start_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
+    if event.start_time:
+      context["start_time"] = (
+        event.start_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+      )
 
-        if event.end_time:
-            context["end_time"] = (
-                event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
+    if event.end_time:
+      context["end_time"] = (
+        event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+      )
 
-        neighbor_qs = models.Events.objects.select_related("venue", "artist", "tour")
+    neighbor_qs = models.Events.objects.select_related("venue", "artist", "tour")
 
-        context["prev_event"] = (
-            neighbor_qs.filter(event_id__lt=event.event_id)
-            .order_by("-event_id")
-            .first()
-        )
+    context["prev_event"] = (
+      neighbor_qs.filter(event_id__lt=event.event_id).order_by("-event_id").first()
+    )
 
-        context["next_event"] = (
-            neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
-        )
+    context["next_event"] = (
+      neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
+    )
 
-        if not context["event"].date:
-            messages.info(
-                self.request,
-                "This is a placeholder date, actual date unknown.",
-            )
+    if not context["event"].date:
+      messages.info(
+        self.request,
+        "This is a placeholder date, actual date unknown.",
+      )
 
-        user = self.request.user
+    user = self.request.user
 
-        if user.is_authenticated:
-            context["user_attended"] = models.UserAttendedShows.objects.filter(
-                user_id=user.pk,
-                event_id=event.pk,
-            ).first()
+    if user.is_authenticated:
+      context["user_attended"] = models.UserAttendedShows.objects.filter(
+        user_id=user.pk,
+        event_id=event.pk,
+      ).first()
 
-        if context["event"].run:
-            if context["event"].run.ticket_range:
-                context["ticket_range"] = [
-                    currency(float(x))
-                    for x in context["event"].run.ticket_range.split("/")  # type: ignore
-                ]
-            else:
-                context["ticket_range"] = [
-                    currency(context["event"].run.ticket_min),
-                    currency(context["event"].run.ticket_max),
-                ]
-        elif context["event"].ticket_range:
-            context["ticket_range"] = [
-                currency(float(x)) for x in context["event"].ticket_range.split("/")
-            ]
-        else:
-            context["ticket_range"] = [
-                currency(context["event"].ticket_min),
-                currency(context["event"].ticket_max),
-            ]
+    if context["event"].run:
+      if context["event"].run.ticket_range:
+        context["ticket_range"] = [
+          currency(float(x))
+          for x in context["event"].run.ticket_range.split("/")  # type: ignore
+        ]
+      else:
+        context["ticket_range"] = [
+          currency(context["event"].run.ticket_min),
+          currency(context["event"].run.ticket_max),
+        ]
+    elif context["event"].ticket_range:
+      context["ticket_range"] = [
+        currency(float(x)) for x in context["event"].ticket_range.split("/")
+      ]
+    else:
+      context["ticket_range"] = [
+        currency(context["event"].ticket_min),
+        currency(context["event"].ticket_max),
+      ]
 
-        try:
-            context["ticket_range"] = " / ".join(context["ticket_range"])
-        except TypeError:
-            context["ticket_range"] = "- / -"
+    try:
+      context["ticket_range"] = " / ".join(context["ticket_range"])
+    except TypeError:
+      context["ticket_range"] = "- / -"
 
-        return context
+    return context
 
-    def get_template_names(self):
-        """Dynamically route requests to the simplified share layout."""
-        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return ["databruce/event_mobile.html"]
+  def get_template_names(self):
+    """Dynamically route requests to the simplified share layout."""
+    if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+      return ["databruce/event_mobile.html"]
 
-        return [self.template_name]
+    return [self.template_name]
 
 
 class EventDetailMobile(PageTitleMixin, TemplateView):
-    template_name = "databruce/event_mobile.html"
-    description = "Event Detail"
+  template_name = "databruce/event_mobile.html"
+  description = "Event Detail"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["event"] = get_object_or_404(
-            models.Events.objects.select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__city",
-            ).prefetch_related("leg", "run"),
-            event_id=self.kwargs["id"],
-        )
+    context["event"] = get_object_or_404(
+      models.Events.objects.select_related(
+        "venue",
+        "artist",
+        "tour",
+        "venue__city",
+      ).prefetch_related("leg", "run"),
+      event_id=self.kwargs["id"],
+    )
 
-        event = context["event"]
-        event_date = event.get_date()
+    event = context["event"]
+    event_date = event.get_date()
 
-        venue = event.venue
-        venue_name = getattr(venue, "name", "Unknown Venue")
+    venue = event.venue
+    venue_name = getattr(venue, "name", "Unknown Venue")
 
-        context["title"] = f"{event_date} - {venue_name}"
+    context["title"] = f"{event_date} - {venue_name}"
 
-        context["description"] = (
-            f"{event_date}<br>{context['event'].artist}<br>{venue_name}"
-        )
+    context["description"] = (
+      f"{event_date}<br>{context['event'].artist}<br>{venue_name}"
+    )
 
-        if not context["event"].date:
-            messages.info(
-                self.request,
-                "This is a placeholder date, actual date unknown.",
-            )
+    if not context["event"].date:
+      messages.info(
+        self.request,
+        "This is a placeholder date, actual date unknown.",
+      )
 
-        return context
+    return context
 
 
 class EventDetailTest(PageTitleMixin, TemplateView):
-    template_name = "databruce/event_test.html"
-    description = "Event Detail"
+  template_name = "databruce/event_test.html"
+  description = "Event Detail"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["event"] = get_object_or_404(
-            models.Events.objects.select_related(
-                "venue",
-                "artist",
-                "tour",
-                "venue__city",
-            )
-            .prefetch_related("leg", "run", "archive_links", "nugs_event")
-            .annotate(),
-            event_id=self.kwargs["id"],
-        )
-        event = context["event"]
-        event_date = event.get_date()
+    context["event"] = get_object_or_404(
+      models.Events.objects.select_related(
+        "venue",
+        "artist",
+        "tour",
+        "venue__city",
+      )
+      .prefetch_related("leg", "run", "archive_links", "nugs_event")
+      .annotate(),
+      event_id=self.kwargs["id"],
+    )
+    event = context["event"]
+    event_date = event.get_date()
 
-        venue = event.venue
-        venue_name = getattr(venue, "name", "Unknown Venue")
+    venue = event.venue
+    venue_name = getattr(venue, "name", "Unknown Venue")
 
-        context["title"] = f"{event_date} - {venue_name}"
-        context["description"] = f"{event_date}<br>{event.artist}<br>{venue_name}"
+    context["title"] = f"{event_date} - {venue_name}"
+    context["description"] = f"{event_date}<br>{event.artist}<br>{venue_name}"
 
-        if context["event"].setlist_certainty in (None, "", "Unknown"):
-            context["setlist_certainty"] = False
-        else:
-            context["setlist_certainty"] = True
+    if context["event"].setlist_certainty in (None, "", "Unknown"):
+      context["setlist_certainty"] = False
+    else:
+      context["setlist_certainty"] = True
 
-        if venue and venue.city and venue.city.timezone:
-            tz_target = venue.city.timezone
-        else:
-            tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
+    if venue and venue.city and venue.city.timezone:
+      tz_target = venue.city.timezone
+    else:
+      tz_target = zoneinfo.ZoneInfo(base.TIME_ZONE)
 
-        if event.scheduled_time:
-            context["scheduled_time"] = (
-                event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
+    if event.scheduled_time:
+      context["scheduled_time"] = (
+        event.scheduled_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+      )
 
-        if event.start_time:
-            context["start_time"] = (
-                event.start_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
+    if event.start_time:
+      context["start_time"] = (
+        event.start_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+      )
 
-        if event.end_time:
-            context["end_time"] = (
-                event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
-            )
+    if event.end_time:
+      context["end_time"] = (
+        event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
+      )
 
-        if event.start_time and event.end_time and not event.length:
-            context["duration"] = event.end_time.astimezone(
-                tz_target,
-            ) - event.start_time.astimezone(tz_target)
-        elif event.length:
-            context["duration"] = event.length
+    if event.start_time and event.end_time and not event.length:
+      context["duration"] = event.end_time.astimezone(
+        tz_target,
+      ) - event.start_time.astimezone(tz_target)
+    elif event.length:
+      context["duration"] = event.length
 
-        neighbor_qs = models.Events.objects.select_related("venue", "artist", "tour")
+    neighbor_qs = models.Events.objects.select_related("venue", "artist", "tour")
 
-        context["prev_event"] = (
-            neighbor_qs.filter(event_id__lt=event.event_id)
-            .order_by("-event_id")
-            .first()
-        )
+    context["prev_event"] = (
+      neighbor_qs.filter(event_id__lt=event.event_id).order_by("-event_id").first()
+    )
 
-        context["next_event"] = (
-            neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
-        )
+    context["next_event"] = (
+      neighbor_qs.filter(event_id__gt=event.event_id).order_by("event_id").first()
+    )
 
-        if not context["event"].date:
-            messages.info(
-                self.request,
-                "This is a placeholder date, actual date unknown.",
-            )
+    if not context["event"].date:
+      messages.info(
+        self.request,
+        "This is a placeholder date, actual date unknown.",
+      )
 
-        context["official"] = (
-            models.Releases.objects.filter(
-                event__id=event.pk,
-            )
-            .prefetch_related("event")
-            .order_by("date")
-        )
+    context["official"] = (
+      models.Releases.objects.filter(
+        event__id=event.pk,
+      )
+      .prefetch_related("event")
+      .order_by("date")
+    )
 
-        context["official_tracks"] = (
-            models.ReleaseTracks.objects.filter(event__id=event.pk)
-            .select_related("release")
-            .prefetch_related("event")
-            .distinct("release_id", "release__date")
-            .order_by("release__date")
-        )
+    context["official_tracks"] = (
+      models.ReleaseTracks.objects.filter(event__id=event.pk)
+      .select_related("release")
+      .prefetch_related("event")
+      .distinct("release_id", "release__date")
+      .order_by("release__date")
+    )
 
-        user = self.request.user
+    user = self.request.user
 
-        if user.is_authenticated:
-            context["user_attended"] = models.UserAttendedShows.objects.filter(
-                user=user.pk,
-                event__id=event.pk,
-            )
+    if user.is_authenticated:
+      context["user_attended"] = models.UserAttendedShows.objects.filter(
+        user=user.pk,
+        event__id=event.pk,
+      )
 
-        context["users"] = models.UserAttendedShows.objects.filter(
-            event__id=event.pk,
-        )
+    context["users"] = models.UserAttendedShows.objects.filter(
+      event__id=event.pk,
+    )
 
-        return context
+    return context
 
 
 class Event(PageTitleMixin, TemplateView):
-    template_name = "databruce/events/events.html"
-    title = "Events"
+  template_name = "databruce/events/events.html"
+  title = "Events"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["years"] = (
-            models.Events.objects.values_list("date__year", flat=True)
-            .exclude(date__isnull=True)
-            .distinct()
-            .order_by("-date__year")
-        )
+    context["years"] = (
+      models.Events.objects.values_list("date__year", flat=True)
+      .exclude(date__isnull=True)
+      .distinct()
+      .order_by("-date__year")
+    )
 
-        try:
-            if self.kwargs["year"] in context["years"]:
-                context["year"] = int(self.kwargs["year"])
-        except KeyError:
-            context["year"] = int(context["date"].year)  # current year
+    try:
+      if self.kwargs["year"] in context["years"]:
+        context["year"] = int(self.kwargs["year"])
+    except KeyError:
+      context["year"] = int(context["date"].year)  # current year
 
-        context["title"] = f"{context['year']} Events"
-        context["description"] = f"{context['year']} Events"
+    context["title"] = f"{context['year']} Events"
+    context["description"] = f"{context['year']} Events"
 
-        return context
+    return context
 
 
 class Venue(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/venues/venues.html"
-    title = "Venues"
-    description = "List of Venues"
+  template_name = "databruce/locations/venues/venues.html"
+  title = "Venues"
+  description = "List of Venues"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        return super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    return super().get_context_data(**kwargs)
 
 
 class VenueDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/venues/detail.html"
+  template_name = "databruce/locations/venues/detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["info"] = (
-            models.Venues.objects.filter(
-                uuid=self.kwargs["id"],
-            )
-            .annotate(
-                aliases=ArraySubquery(
-                    models.VenueAliases.objects.filter(
-                        venue=OuterRef("id"),
-                    ).values_list("name", flat=True),
-                ),
-            )
-            .first()
-        )
+    context["info"] = (
+      models.Venues.objects.filter(
+        uuid=self.kwargs["id"],
+      )
+      .annotate(
+        aliases=ArraySubquery(
+          models.VenueAliases.objects.filter(
+            venue=OuterRef("id"),
+          ).values_list("name", flat=True),
+        ),
+      )
+      .first()
+    )
 
-        venue = context["info"]
-        venue_name = getattr(venue, "name", None)
-        venue_address = getattr(venue, "address", None)
+    venue = context["info"]
+    venue_name = getattr(venue, "name", None)
+    venue_address = getattr(venue, "address", None)
 
-        if venue_address:
-            context["shared_loc"] = models.Venues.objects.exclude(id=venue.pk).filter(  # type: ignore
-                address=venue_address,
-            )[:5]
+    if venue_address:
+      context["shared_loc"] = models.Venues.objects.exclude(id=venue.pk).filter(  # type: ignore
+        address=venue_address,
+      )[:5]
 
-        context["child_venues"] = models.Venues.objects.filter(parent=venue)
+    context["child_venues"] = models.Venues.objects.filter(parent=venue)
 
-        context["title"] = f"{venue_name}"
-        context["description"] = f"{venue_name}"
+    context["title"] = f"{venue_name}"
+    context["description"] = f"{venue_name}"
 
-        return context
+    return context
 
 
 class SongLyrics(PageTitleMixin, TemplateView):
-    template_name = "databruce/songs/lyrics.html"
-    title = "Lyrics"
-    description = "List of Song Lyrics"
+  template_name = "databruce/songs/lyrics.html"
+  title = "Lyrics"
+  description = "List of Song Lyrics"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        return super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    return super().get_context_data(**kwargs)
 
 
 class SongLyricDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/songs/lyric_detail.html"
+  template_name = "databruce/songs/lyric_detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
 
-        context["lyrics"] = get_object_or_404(
-            models.Lyrics.objects.filter().select_related("song"),
-            uuid=self.kwargs["id"],
-        )
+    context["lyrics"] = get_object_or_404(
+      models.Lyrics.objects.filter().select_related("song"),
+      uuid=self.kwargs["id"],
+    )
 
-        song = context["lyrics"].song
-        song_name = getattr(song, "name", "Unknown Song")
+    song = context["lyrics"].song
+    song_name = getattr(song, "name", "Unknown Song")
 
-        context["title"] = f"Lyrics for {song_name}"
-        context["description"] = (
-            f"Source: {context['lyrics'].source}<br>Language: {context['lyrics'].language}"
-        )
+    context["title"] = f"Lyrics for {song_name}"
+    context["description"] = (
+      f"Source: {context['lyrics'].source}<br>Language: {context['lyrics'].language}"
+    )
 
-        return context
+    return context
 
 
 class SongDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/songs/detail.html"
+  template_name = "databruce/songs/detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        try:
-            context["info"] = get_object_or_404(
-                models.Songs.objects.prefetch_related(
-                    "album",
-                    "last_event",
-                ),
-                uuid=self.kwargs["id"],
-            )
-        except KeyError:
-            context["info"] = get_object_or_404(
-                models.Songs.objects.prefetch_related(
-                    "album",
-                    "last_event",
-                ),
-                slug=self.kwargs["slug"],
-            )
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
+    try:
+      context["info"] = get_object_or_404(
+        models.Songs.objects.prefetch_related(
+          "album",
+          "last_event",
+        ),
+        uuid=self.kwargs["id"],
+      )
+    except KeyError:
+      context["info"] = get_object_or_404(
+        models.Songs.objects.prefetch_related(
+          "album",
+          "last_event",
+        ),
+        slug=self.kwargs["slug"],
+      )
 
-        song = context["info"]
-        song_name = getattr(song, "name", "Unknown Song")
+    song = context["info"]
+    song_name = getattr(song, "name", "Unknown Song")
 
-        context["title"] = f"{song_name}"
+    context["title"] = f"{song_name}"
 
-        context["setlists"] = (
-            models.Setlists.objects.filter(
-                song_id=song.pk,
-            )
-            .select_related("event", "song")
-            .prefetch_related("setlist_position")
-        )
+    context["setlists"] = (
+      models.Setlists.objects.filter(
+        song_id=song.pk,
+      )
+      .select_related("event", "song")
+      .prefetch_related("setlist_position")
+    )
 
-        context["positions"] = (
-            context["setlists"]
-            .filter(position__isnull=False)
-            .values("position")
-            .annotate(
-                count=Count("position"),
-                num=Min("song_num"),
-            )
-        ).order_by("num")
+    context["positions"] = (
+      context["setlists"]
+      .filter(position__isnull=False)
+      .values("position")
+      .annotate(
+        count=Count("position"),
+        num=Min("song_num"),
+      )
+    ).order_by("num")
 
-        first_event = getattr(context["info"], "first_event", None)
-        first_event_id = first_event.event_id if first_event else None
+    first_event = getattr(context["info"], "first_event", None)
+    first_event_id = first_event.event_id if first_event else None
 
-        last_event = getattr(context["info"], "last_event", None)
-        last_event_id = last_event.event_id if last_event else None
+    last_event = getattr(context["info"], "last_event", None)
+    last_event_id = last_event.event_id if last_event else None
 
-        latest_event = (
-            models.Events.objects.filter(
-                is_stats_eligible=True,
-                setlist_event__isnull=False,
-            )
-            .order_by("-event_id")
-            .first()
-        )
+    latest_event = (
+      models.Events.objects.filter(
+        is_stats_eligible=True,
+        setlist_event__isnull=False,
+      )
+      .order_by("-event_id")
+      .first()
+    )
 
-        if last_event_id and latest_event:
-            context["show_gap"] = models.Events.objects.filter(
-                event_id__gt=last_event_id,
-                event_id__lte=latest_event.event_id,
-                is_stats_eligible=True,
-            ).count()
-        else:
-            context["show_gap"] = 0
+    if last_event_id and latest_event:
+      context["show_gap"] = models.Events.objects.filter(
+        event_id__gt=last_event_id,
+        event_id__lte=latest_event.event_id,
+        is_stats_eligible=True,
+      ).count()
+    else:
+      context["show_gap"] = 0
 
-        context["lyrics"] = models.Lyrics.objects.filter(
-            song_id=song.pk,
-        ).order_by("id")
+    context["lyrics"] = models.Lyrics.objects.filter(
+      song_id=song.pk,
+    ).order_by("id")
 
-        if first_event:
-            context["events_since_premiere"] = models.Events.objects.filter(
-                event_id__gt=first_event_id,
-            ).count()
-        else:
-            context["events_since_premiere"] = 0
+    if first_event:
+      context["events_since_premiere"] = models.Events.objects.filter(
+        event_id__gt=first_event_id,
+      ).count()
+    else:
+      context["events_since_premiere"] = 0
 
-        if context["events_since_premiere"] > 0:
-            context["frequency"] = round(
-                (
-                    (
-                        context["info"].num_plays_public
-                        / context["events_since_premiere"]
-                    )
-                    * 100
-                ),
-                2,
-            )
-        else:
-            context["frequency"] = None
+    if context["events_since_premiere"] > 0:
+      context["frequency"] = round(
+        ((context["info"].num_plays_public / context["events_since_premiere"]) * 100),
+        2,
+      )
+    else:
+      context["frequency"] = None
 
-        return context
+    return context
 
 
 class EventSearch(PageTitleMixin, TemplateView):
-    template_name = "databruce/search/search.html"
-    title = "Event Search"
+  template_name = "databruce/search/search.html"
+  title = "Event Search"
 
 
 class Tour(PageTitleMixin, TemplateView):
-    template_name = "databruce/tours/tours.html"
-    title = "Tours"
+  template_name = "databruce/tours/tours.html"
+  title = "Tours"
 
 
 class TourDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/tours/detail.html"
+  template_name = "databruce/tours/detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(models.Tours, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(models.Tours, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
 
-        return context
+    return context
 
 
 class Contact(PageTitleMixin, TemplateView):
-    form_class = ContactForm
-    template_name = "databruce/contact.html"
-    title = "Contact"
+  form_class = ContactForm
+  template_name = "databruce/contact.html"
+  title = "Contact"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        context["form"] = self.form_class()
-        return context
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
+    context["form"] = self.form_class()
+    return context
 
-    def post(self, request: HttpRequest):
-        form = self.form_class(request.POST)
+  def post(self, request: HttpRequest):
+    form = self.form_class(request.POST)
 
-        if form.is_valid():
-            if form.cleaned_data["verification"] == os.environ.get(
-                "VERIFICATION_ANSWER",
-            ):
-                use_https = False
-                del form.cleaned_data["verification"]
+    if form.is_valid():
+      if form.cleaned_data["verification"] == os.environ.get(
+        "VERIFICATION_ANSWER",
+      ):
+        use_https = False
+        del form.cleaned_data["verification"]
 
-                form.cleaned_data["is_user"] = UserModel.objects.filter(
-                    email__iexact=form.cleaned_data["email"],
-                ).exists()
+        form.cleaned_data["is_user"] = UserModel.objects.filter(
+          email__iexact=form.cleaned_data["email"],
+        ).exists()
 
-                models.Contact.objects.create(**form.cleaned_data)
+        models.Contact.objects.create(**form.cleaned_data)
 
-                context = {
-                    "email": form.cleaned_data["email"],
-                    "subject": form.cleaned_data["subject"],
-                    "message": form.cleaned_data["message"],
-                    "protocol": "https" if use_https else "http",
-                }
+        context = {
+          "email": form.cleaned_data["email"],
+          "subject": form.cleaned_data["subject"],
+          "message": form.cleaned_data["message"],
+          "protocol": "https" if use_https else "http",
+        }
 
-                body = loader.render_to_string(
-                    "databruce/email/contact_email.html",
-                    context,
-                )
+        body = loader.render_to_string(
+          "databruce/email/contact_email.html",
+          context,
+        )
 
-                send_mail(
-                    subject=form.cleaned_data["subject"],
-                    message=body,
-                    from_email=base.DEFAULT_FROM_EMAIL,
-                    recipient_list=[base.NOTIFY_EMAIL] if base.NOTIFY_EMAIL else [],
-                    fail_silently=False,
-                )
+        send_mail(
+          subject=form.cleaned_data["subject"],
+          message=body,
+          from_email=base.DEFAULT_FROM_EMAIL,
+          recipient_list=[base.NOTIFY_EMAIL] if base.NOTIFY_EMAIL else [],
+          fail_silently=False,
+        )
 
-                messages.success(request, "Message Sent")
+        messages.success(request, "Message Sent")
 
-                return redirect(reverse("contact"))
+        return redirect(reverse("contact"))
 
-            messages.error(request, "Incorrect verification answer")
-            return render(
-                request,
-                template_name=self.template_name,  # type: ignore
-                context={"form": form, "verification_err": True},
-            )
+      messages.error(request, "Incorrect verification answer")
+      return render(
+        request,
+        template_name=self.template_name,  # type: ignore
+        context={"form": form, "verification_err": True},
+      )
 
-        messages.error(request, "Message not sent, see errors below")
+    messages.error(request, "Message not sent, see errors below")
 
-        return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
+    return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
 
 
 class SetlistNotesSearch(PageTitleMixin, TemplateView):
-    title = "Setlist Notes Search"
-    description = "Search for setlist notes"
-    template_name = "databruce/search/notes_search.html"
+  title = "Setlist Notes Search"
+  description = "Search for setlist notes"
+  template_name = "databruce/search/notes_search.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        return super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    return super().get_context_data(**kwargs)
 
 
 # def build_search_form_url(request_get_params):
@@ -1188,840 +1166,848 @@ class SetlistNotesSearch(PageTitleMixin, TemplateView):
 
 
 class AdvancedSearch(PageTitleMixin, TemplateView):
-    form_class = AdvancedEventSearch
-    formset_class = formset_factory(SetlistSearch, extra=0)
-    template_name = "databruce/search/advanced_search.html"
-    title = "Advanced Search"
+  form_class = AdvancedEventSearch
+  formset_class = formset_factory(SetlistSearch, extra=0)
+  template_name = "databruce/search/advanced_search.html"
+  title = "Advanced Search"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
 
-        if self.request.GET:
-            get_data = self.request.GET.copy()
+    if self.request.GET:
+      get_data = self.request.GET.copy()
 
-            # Ensure management keys exist
-            if "form-TOTAL_FORMS" not in get_data:
-                get_data["form-TOTAL_FORMS"] = "1"
-            if "form-INITIAL_FORMS" not in get_data:
-                get_data["form-INITIAL_FORMS"] = "0"
+      # Ensure management keys exist
+      if "form-TOTAL_FORMS" not in get_data:
+        get_data["form-TOTAL_FORMS"] = "1"
+      if "form-INITIAL_FORMS" not in get_data:
+        get_data["form-INITIAL_FORMS"] = "0"
 
-            formset = self.formset_class(get_data)
-            form = self.form_class(self.request.GET)
+      formset = self.formset_class(get_data)
+      form = self.form_class(self.request.GET)
 
-            form.is_valid()
-            formset.is_valid()
-        else:
-            form = self.form_class()
-            # Django sets TOTAL_FORMS=1 and INITIAL_FORMS=0 automatically
-            formset = self.formset_class(
-                initial=[
-                    {
-                        "form-TOTAL_FORMS": "1",
-                        "form-INITIAL_FORMS": "0",
-                        "form-0-choice": "is",
-                        "form-0-position": "anywhere",
-                    },
-                ],
-            )
+      form.is_valid()
+      formset.is_valid()
+    else:
+      form = self.form_class()
+      # Django sets TOTAL_FORMS=1 and INITIAL_FORMS=0 automatically
+      formset = self.formset_class(
+        initial=[
+          {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-0-choice": "is",
+            "form-0-position": "anywhere",
+          },
+        ],
+      )
 
-        context["form"] = form
-        context["formset"] = formset
-        return context
+    context["form"] = form
+    context["formset"] = formset
+    return context
 
 
 class AdvSearch(PageTitleMixin, TemplateView):
-    template_name = "databruce/search/test_advsearch.html"
-    title = "Advanced Search"
-    form_class = AdvancedEventSearch
-    formset = SetlistSearch
-    formset_class = formset_factory(formset)
+  template_name = "databruce/search/test_advsearch.html"
+  title = "Advanced Search"
+  form_class = AdvancedEventSearch
+  formset = SetlistSearch
+  formset_class = formset_factory(formset)
 
-    positions = {
-        "anywhere": "Anywhere",
-        "followed_by": "Followed By",
-        "show_opener": "Show Opener",
-        "in_show": "in Main Set",
-        "in_set_one": "in Set 1",
-        "set_one_opener": "Set 1 Opener",
-        "set_one_closer": "Set 1 Closer",
-        "in_set_two": "in Set 2",
-        "set_two_opener": "Set 2 Opener",
-        "set_two_closer": "Set 2 Closer",
-        "main_set_closer": "Main Set Closer",
-        "encore_opener": "Encore Opener",
-        "in_encore": "Encore",
-        "in_preshow": "Pre-Show",
-        "in_recording": "Recording",
-        "in_soundcheck": "Soundcheck",
-        "show_closer": "Show Closer",
-        "premiere": "Premiere",
-        "debut": "Tour Debut",
-        "nobruce": "No Bruce",
-        "request": "Sign Request",
-    }
+  positions = {
+    "anywhere": "Anywhere",
+    "followed_by": "Followed By",
+    "show_opener": "Show Opener",
+    "in_show": "in Main Set",
+    "in_set_one": "in Set 1",
+    "set_one_opener": "Set 1 Opener",
+    "set_one_closer": "Set 1 Closer",
+    "in_set_two": "in Set 2",
+    "set_two_opener": "Set 2 Opener",
+    "set_two_closer": "Set 2 Closer",
+    "main_set_closer": "Main Set Closer",
+    "encore_opener": "Encore Opener",
+    "in_encore": "Encore",
+    "in_preshow": "Pre-Show",
+    "in_recording": "Recording",
+    "in_soundcheck": "Soundcheck",
+    "show_closer": "Show Closer",
+    "premiere": "Premiere",
+    "debut": "Tour Debut",
+    "nobruce": "No Bruce",
+    "request": "Sign Request",
+  }
 
-    def get(self, request, *args, **kwargs):
-        if request.GET:
-            # 1. Unpack request.GET.lists() cleanly
-            is_initial_submission = "form-TOTAL_FORMS" in request.GET
+  def get(self, request, *args, **kwargs):
+    if request.GET:
+      # 1. Unpack request.GET.lists() cleanly
+      is_initial_submission = "form-TOTAL_FORMS" in request.GET
 
-            if is_initial_submission:
-                raw_params = {}
-                clean_params = {}
+      if is_initial_submission:
+        raw_params = {}
+        clean_params = {}
 
-                event_form = self.form_class(request.GET)
-                formset = self.formset_class(request.GET)
+        event_form = self.form_class(request.GET)
+        formset = self.formset_class(request.GET)
 
-                if not event_form.has_changed() and not formset.has_changed():
-                    messages.warning(request, "Please fill out at least one field")
-                    return redirect(reverse("adv_search"))
+        if not event_form.has_changed() and not formset.has_changed():
+          messages.warning(request, "Please fill out at least one field")
+          return redirect(reverse("adv_search"))
 
-                if not event_form.is_valid() or not formset.is_valid():
-                    messages.error(
-                        self.request,
-                        "Your search parameters contain invalid data. Please review the highlighted fields.",
-                    )
-                    return redirect(
-                        f"{reverse('adv_search')}?{request.GET.urlencode()}",
-                    )
+        if not event_form.is_valid() or not formset.is_valid():
+          messages.error(
+            self.request,
+            "Your search parameters contain invalid data. Please review the highlighted fields.",
+          )
+          return redirect(
+            f"{reverse('adv_search')}?{request.GET.urlencode()}",
+          )
 
-                # 1. Pull the normalized date values from cleaned_data
-                start_date_data = event_form.cleaned_data.get("start_date")
-                if start_date_data:
-                    clean_params["start_date"] = start_date_data["value"]
+        # 1. Pull the normalized date values from cleaned_data
+        start_date_data = event_form.cleaned_data.get("start_date")
+        if start_date_data:
+          clean_params["start_date"] = start_date_data["value"]
 
-                end_date_data = event_form.cleaned_data.get("end_date")
-                if end_date_data:
-                    clean_params["end_date"] = end_date_data["value"]
+        end_date_data = event_form.cleaned_data.get("end_date")
+        if end_date_data:
+          clean_params["end_date"] = end_date_data["value"]
 
-                for key, values in request.GET.lists():
-                    # Filter out empty strings
-                    non_empty_values = [v.strip() for v in values if v.strip()]
+        for key, values in request.GET.lists():
+          # Filter out empty strings
+          non_empty_values = [v.strip() for v in values if v.strip()]
 
-                    if not non_empty_values:
-                        continue
+          if not non_empty_values:
+            continue
 
-                    # Skip 'False' exclude fields
-                    if (
-                        (
-                            key.endswith("_exclude")
-                            and non_empty_values[0].lower() == "false"
-                        )
-                        or key in ["start_date", "end_date"]
-                        or key.startswith("form-")
-                    ):
-                        continue
+          # Skip 'False' exclude fields
+          if (
+            (key.endswith("_exclude") and non_empty_values[0].lower() == "false")
+            or key in ["start_date", "end_date"]
+            or key.startswith("form-")
+          ):
+            continue
 
-                    # Keep multi-select fields as lists, flatten single fields to strings
-                    if len(non_empty_values) > 1:
-                        raw_params[key] = non_empty_values
-                    else:
-                        raw_params[key] = non_empty_values[0]
+          # Keep multi-select fields as lists, flatten single fields to strings
+          if len(non_empty_values) > 1:
+            raw_params[key] = non_empty_values
+          else:
+            raw_params[key] = non_empty_values[0]
 
-                # 2. Process '_exclude' transformations
-                for key, value in list(raw_params.items()):
-                    if key.endswith("_exclude") and value == "true":
-                        field = key.replace("_exclude", "")
-                        if field in raw_params:
-                            clean_params[f"{field}__not"] = raw_params[field]
-                            raw_params.pop(field, None)
-                        continue
+        # 2. Process '_exclude' transformations
+        for key, value in list(raw_params.items()):
+          if key.endswith("_exclude") and value == "true":
+            field = key.replace("_exclude", "")
+            if field in raw_params:
+              clean_params[f"{field}__not"] = raw_params[field]
+              raw_params.pop(field, None)
+            continue
 
-                    if not key.endswith("_exclude"):
-                        clean_params[key] = value
+          if not key.endswith("_exclude"):
+            clean_params[key] = value
 
-                # Clean formset items from formset.cleaned_data safely
-                for i, form_data in enumerate(formset.cleaned_data):
-                    if not form_data:
-                        continue
+        # Clean formset items from formset.cleaned_data safely
+        for i, form_data in enumerate(formset.cleaned_data):
+          if not form_data:
+            continue
 
-                    song1 = form_data.get("song1")
-                    if song1:
-                        clean_params[f"songs[{i}][song_1]"] = song1
-                        if form_data.get("song2"):
-                            clean_params[f"songs[{i}][song_2]"] = form_data["song2"]
-                        clean_params[f"songs[{i}][choice]"] = str(
-                            form_data.get("choice", False),
-                        ).lower()
-                        if form_data.get("position"):
-                            clean_params[f"songs[{i}][position]"] = form_data[
-                                "position"
-                            ]
-
-                # 4. Check if redirect is necessary
-                # Compare count of raw request.GET keys vs cleaned parameters
-                if len(clean_params) != len(request.GET):
-                    redirect_url = reverse("adv_search_results")
-                    if clean_params:
-                        # CRITICAL: doseq=True ensures lists like {'type': ['4', '1']}
-                        # encode as 'type=4&type=1' instead of crashing/mangling
-                        redirect_url += "?" + urlencode(clean_params, doseq=True)
-
-                    return redirect(redirect_url)
-
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["title"] = self.title
-        context["display_fields"] = []
-        event_search_queries = []
-
-        # 1. Access the request query parameters from the request object
-        query_params = self.request.GET
-
-        data = self.request.GET.copy()
-
-        for key in list(data.keys()):
-            if key.endswith("__not"):
-                field = key.removesuffix("__not")
-                data[field] = data[key]  # type: ignore
-                data[f"{field}_exclude"] = "True"
-
-        event_form = self.form_class(data)
-
-        if event_form.is_valid():
-            for f in event_form.changed_data:
-                if "_exclude" not in f and f != "conjunction":
-                    raw_val = event_form.cleaned_data[f]
-
-                    # 1. Format the field data string
-                    if isinstance(raw_val, list):
-                        data_str = " **OR** ".join(raw_val)
-                    elif isinstance(raw_val, QuerySet):
-                        data_str = " **OR** ".join(
-                            raw_val.values_list("name", flat=True),
-                        )
-                    elif isinstance(raw_val, dict):
-                        data_str = raw_val.get("value", "")
-                    else:
-                        data_str = str(raw_val)
-
-                    # 2. Check if this field was negated (either via '_exclude' or '__not' in request.GET)
-                    is_excluded = (
-                        event_form.cleaned_data.get(f"{f}_exclude") is True
-                        or f"{f}__not" in self.request.GET
-                    )
-
-                    display = {
-                        "label": event_form[f].label,
-                        "data": f"NOT {data_str}" if is_excluded else data_str,
-                        "is_excluded": is_excluded,
-                    }
-
-                    if is_excluded:
-                        event_search_queries.append(
-                            f"{event_form[f].name}__not={query_params.get(f)}",
-                        )
-                    else:
-                        event_search_queries.append(
-                            f"{event_form[f].name}={query_params.get(f)}",
-                        )
-
-                    context["display_fields"].append(display)
-
-        # 2. Extract global non-formset elements
-        conjunction = query_params.get("conjunction", "and")
-        context["conjunction"] = conjunction
-        index = 0
-
-        setlist_queries = []
-        setlist_search_display_queries = []
-
-        song_map = {str(s.id): s.name for s in models.Songs.objects.only("id", "name")}
-
-        while f"songs[{index}][song_1]" in query_params:
-            # Safely convert choice string back to a Python boolean
-            choice_str = query_params.get(
-                f"songs[{index}][choice]",
-                "false",
+          song1 = form_data.get("song1")
+          if song1:
+            clean_params[f"songs[{i}][song_1]"] = song1
+            if form_data.get("song2"):
+              clean_params[f"songs[{i}][song_2]"] = form_data["song2"]
+            clean_params[f"songs[{i}][choice]"] = str(
+              form_data.get("choice", False),
             ).lower()
+            if form_data.get("position"):
+              clean_params[f"songs[{i}][position]"] = form_data["position"]
 
-            song_dict = {
-                "song_1": query_params.get(f"songs[{index}][song_1]"),
-                "song_2": query_params.get(
-                    f"songs[{index}][song_2]",
-                ),  # Will be None if missing
-                "choice": choice_str == "true",
-                "position": query_params.get(f"songs[{index}][position]"),
-            }
+        # 4. Check if redirect is necessary
+        # Compare count of raw request.GET keys vs cleaned parameters
+        if len(clean_params) != len(request.GET):
+          redirect_url = reverse("adv_search_results")
+          if clean_params:
+            # CRITICAL: doseq=True ensures lists like {'type': ['4', '1']}
+            # encode as 'type=4&type=1' instead of crashing/mangling
+            redirect_url += "?" + urlencode(clean_params, doseq=True)
 
-            setlist_queries.append(song_dict)
-            index += 1
+          return redirect(redirect_url)
 
-        for query in setlist_queries:
-            if not query.get("song_1"):
-                continue
+    return super().get(request, *args, **kwargs)
 
-            choice = query.get("choice", True)
-            pos = query.get("position")
-            s1_name = song_map.get(str(query["song_1"]).replace("'", ""))
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["title"] = self.title
+    context["display_fields"] = []
+    event_search_queries = []
 
-            choice_str = "is" if choice else "not"
+    # 1. Access the request query parameters from the request object
+    query_params = self.request.GET
 
-            summary = f"{s1_name} ({choice_str} anywhere)"
+    data = self.request.GET.copy()
 
-            if pos == "followed_by" and query.get("song_2"):
-                s2_name = song_map.get(str(query["song_2"]).replace("'", ""))
-                summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
+    for key in list(data.keys()):
+      if key.endswith("__not"):
+        field = key.removesuffix("__not")
+        data[field] = data[key]  # type: ignore
+        data[f"{field}_exclude"] = "True"
 
-            else:
-                pos_display = self.positions.get(pos)
+    event_form = self.form_class(data)
 
-                summary = f"{s1_name} ({choice_str} {pos_display})"
+    if event_form.is_valid():
+      for f in event_form.changed_data:
+        if "_exclude" not in f and f != "conjunction":
+          raw_val = event_form.cleaned_data[f]
 
-            setlist_search_display_queries.append(summary)
+          # 1. Format the field data string
+          if isinstance(raw_val, list):
+            data_str = " **OR** ".join(raw_val)
+          elif isinstance(raw_val, QuerySet):
+            data_str = " **OR** ".join(
+              raw_val.values_list("name", flat=True),
+            )
+          elif isinstance(raw_val, dict):
+            data_str = raw_val.get("value", "")
+          else:
+            data_str = str(raw_val)
 
-        context["search_summary"] = setlist_search_display_queries
+          # 2. Check if this field was negated (either via '_exclude' or '__not' in request.GET)
+          is_excluded = (
+            event_form.cleaned_data.get(f"{f}_exclude") is True
+            or f"{f}__not" in self.request.GET
+          )
 
-        query_display = f" {context['conjunction']} ".join(
-            setlist_search_display_queries,
-        )
+          display = {
+            "label": event_form[f].label,
+            "data": f"NOT {data_str}" if is_excluded else data_str,
+            "is_excluded": is_excluded,
+          }
 
-        field_display = ", ".join(
-            [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
-        )
+          if is_excluded:
+            event_search_queries.append(
+              f"{event_form[f].name}__not={query_params.get(f)}",
+            )
+          else:
+            event_search_queries.append(
+              f"{event_form[f].name}={query_params.get(f)}",
+            )
 
-        if query_display == "":
-            context["description"] = f"{field_display}"
-        elif query_display and field_display == "":
-            context["description"] = f"Songs: {query_display}"
-        else:
-            context["description"] = f"Songs: {query_display}, {field_display}"
+          context["display_fields"].append(display)
 
-        return context
+    # 2. Extract global non-formset elements
+    conjunction = query_params.get("conjunction", "and")
+    context["conjunction"] = conjunction
+    index = 0
+
+    setlist_queries = []
+    setlist_search_display_queries = []
+
+    song_map = {str(s.id): s.name for s in models.Songs.objects.only("id", "name")}
+
+    while f"songs[{index}][song_1]" in query_params:
+      # Safely convert choice string back to a Python boolean
+      choice_str = query_params.get(
+        f"songs[{index}][choice]",
+        "false",
+      ).lower()
+
+      song_dict = {
+        "song_1": query_params.get(f"songs[{index}][song_1]"),
+        "song_2": query_params.get(
+          f"songs[{index}][song_2]",
+        ),  # Will be None if missing
+        "choice": choice_str == "true",
+        "position": query_params.get(f"songs[{index}][position]"),
+      }
+
+      setlist_queries.append(song_dict)
+      index += 1
+
+    for query in setlist_queries:
+      if not query.get("song_1"):
+        continue
+
+      choice = query.get("choice", True)
+      pos = query.get("position")
+      s1_name = song_map.get(str(query["song_1"]).replace("'", ""))
+
+      choice_str = "is" if choice else "not"
+
+      summary = f"{s1_name} ({choice_str} anywhere)"
+
+      if pos == "followed_by" and query.get("song_2"):
+        s2_name = song_map.get(str(query["song_2"]).replace("'", ""))
+        summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
+
+      else:
+        pos_display = self.positions.get(pos)
+
+        summary = f"{s1_name} ({choice_str} {pos_display})"
+
+      setlist_search_display_queries.append(summary)
+
+    context["search_summary"] = setlist_search_display_queries
+
+    query_display = f" {context['conjunction']} ".join(
+      setlist_search_display_queries,
+    )
+
+    field_display = ", ".join(
+      [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
+    )
+
+    if query_display == "":
+      context["description"] = f"{field_display}"
+    elif query_display and field_display == "":
+      context["description"] = f"Songs: {query_display}"
+    else:
+      context["description"] = f"Songs: {query_display}, {field_display}"
+
+    return context
 
 
 class AdvancedSearchResults(PageTitleMixin, TemplateView):
-    template_name = "databruce/search/advanced_search_results.html"
-    form_class = AdvancedEventSearch
-    formset = SetlistSearch
-    formset_class = formset_factory(formset)
-    title = "Advanced Search Results"
+  template_name = "databruce/search/advanced_search_results.html"
+  form_class = AdvancedEventSearch
+  formset = SetlistSearch
+  formset_class = formset_factory(formset)
+  title = "Advanced Search Results"
 
-    position_filters = {
-        "show_opener": Q(is_opener=True),
-        "in_show": Q(set_name="show"),
-        "in_set_one": Q(set_name="set 1"),
-        "set_one_opener": Q(set_name="set 1", is_set_opener=True),
-        "set_one_closer": Q(set_name="set 1", is_set_closer=True),
-        "in_set_two": Q(set_name="set 2"),
-        "set_two_opener": Q(set_name="set 2", is_set_opener=True),
-        "set_two_closer": Q(set_name="set 2", is_set_closer=True),
-        "main_set_closer": Q(is_main_set_closer=True),
-        "encore_opener": Q(set_name="encore", is_set_opener=True),
-        "in_encore": Q(set_name="encore"),
-        "in_preshow": Q(set_name="pre-show"),
-        "in_recording": Q(set_name="recording"),
-        "in_soundcheck": Q(set_name="soundcheck"),
-        "show_closer": Q(is_closer=True),
-        "anywhere": Q(),  # No additional filters
-        "premiere": Q(premiere=True),
-        "debut": Q(debut=True),
-        "nobruce": Q(nobruce=True),
-        "request": Q(sign_request=True),
-    }
+  position_filters = {
+    "show_opener": Q(is_opener=True),
+    "in_show": Q(set_name=models.SetTypes.SHOW),
+    "in_set_one": Q(set_name=models.SetTypes.SET_1),
+    "set_one_opener": Q(
+      set_name=models.SetTypes.SET_1,
+      is_set_opener=True,
+    ),
+    "set_one_closer": Q(
+      set_name=models.SetTypes.SET_1,
+      is_set_closer=True,
+    ),
+    "in_set_two": Q(set_name=models.SetTypes.SET_2),
+    "set_two_opener": Q(
+      set_name=models.SetTypes.SET_2,
+      is_set_opener=True,
+    ),
+    "set_two_closer": Q(
+      set_name=models.SetTypes.SET_2,
+      is_set_closer=True,
+    ),
+    "main_set_closer": Q(is_main_set_closer=True),
+    "encore_opener": Q(
+      set_name=models.SetTypes.ENCORE,
+      is_set_opener=True,
+    ),
+    "in_encore": Q(set_name=models.SetTypes.ENCORE),
+    "in_preshow": Q(set_name=models.SetTypes.PRE_SHOW),
+    "in_recording": Q(set_name=models.SetTypes.RECORDING),
+    "in_soundcheck": Q(set_name=models.SetTypes.SOUNDCHECK),
+    "show_closer": Q(is_closer=True),
+    "anywhere": Q(),  # No additional filters
+    "premiere": Q(premiere=True),
+    "debut": Q(debut=True),
+    "nobruce": Q(nobruce=True),
+    "request": Q(sign_request=True),
+  }
 
-    def get(self, request, *args, **kwargs):
-        event_form = self.form_class(self.request.GET)
-        formset = self.formset_class(self.request.GET)
+  def get(self, request, *args, **kwargs):
+    event_form = self.form_class(self.request.GET)
+    formset = self.formset_class(self.request.GET)
 
-        if not event_form.has_changed() and not formset.has_changed():
-            messages.warning(self.request, "Please fill out at least one field")
-            return redirect(reverse("adv_search"))
+    if not event_form.has_changed() and not formset.has_changed():
+      messages.warning(self.request, "Please fill out at least one field")
+      return redirect(reverse("adv_search"))
 
-        return super().get(request, *args, **kwargs)
+    return super().get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["danger_event_types"] = ["Cancelled", "Rescheduled", "Relocated"]
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["danger_event_types"] = ["Cancelled", "Rescheduled", "Relocated"]
 
-        event_form = self.form_class(self.request.GET)
-        formset = self.formset_class(self.request.GET)
+    event_form = self.form_class(self.request.GET)
+    formset = self.formset_class(self.request.GET)
 
-        pos_choices = dict(formset.form.base_fields["position"].choices)  # type: ignore
+    pos_choices = dict(formset.form.base_fields["position"].choices)  # type: ignore
 
-        next_song = (
-            models.Setlists.objects.select_related("song")
-            .filter(
-                set_name=OuterRef("set_name"),
-                event_id=OuterRef("event_id"),
-                song_num__gt=OuterRef("song_num"),
+    next_song = (
+      models.Setlists.objects.select_related("song")
+      .filter(
+        set_name=OuterRef("set_name"),
+        event_id=OuterRef("event_id"),
+        song_num__gt=OuterRef("song_num"),
+      )
+      .order_by("event", "song_num")
+      .values("song_id")[:1]
+    )
+
+    setlist_qs = (
+      models.Setlists.objects.all()
+      .select_related("event", "song")
+      .values("event_id")
+      .annotate(
+        next_song=Subquery(next_song),
+      )
+    )
+
+    setlist_anywhere_qs = (
+      models.Setlists.objects.all()
+      .select_related("event", "song")
+      .values("event_id")
+      .annotate(
+        songs_list=ArrayAgg(
+          "song_id",
+          filter=Q(set_name__in=models.SetTypes.valid_sets()),
+          distinct=True,
+        ),
+      )
+    )
+
+    event_filter = event_form.get_filters()
+    sl_filter = Q()
+    event_search_queries = []
+    setlist_search_display_queries = []
+
+    for f in event_filter.children:
+      if type(f) == Q:
+        sl_filter &= f
+      else:
+        sl_filter &= Q(**{f"event__{f[0]}": f[1]})  # type: ignore
+
+    if formset.is_valid() and formset.has_changed():
+      song_ids = [
+        str(f["song1"]).replace("'", "") for f in formset.cleaned_data if f.get("song1")
+      ]
+
+      song_ids.extend(
+        [
+          str(f["song2"]).replace("'", "")
+          for f in formset.cleaned_data
+          if f.get("song2")
+        ],
+      )
+
+      song_map = {
+        str(s.id): s.name for s in models.Songs.objects.filter(id__in=song_ids)
+      }
+
+      for form in formset.cleaned_data:
+        if not form.get("song1"):
+          continue
+
+        choice = form.get("choice", True)
+        pos = form.get("position")
+        s1_name = song_map.get(str(form["song1"]).replace("'", ""))
+
+        choice_str = "is" if choice else "not"
+
+        condition = Q(song=form["song1"])
+
+        summary = f"{s1_name} ({choice_str} anywhere)"
+
+        if pos == "followed_by" and form.get("song2"):
+          s2_name = song_map.get(str(form["song2"]).replace("'", ""))
+
+          song2_condition = Q(
+            next_song=form["song2"],
+          )
+
+          if not choice:
+            song2_condition = ~song2_condition
+
+          condition &= song2_condition
+
+          summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
+
+        elif pos == "anywhere":
+          condition = Q(
+            songs_list__contains=[int(form["song1"].replace("'", ""))],
+          )
+
+          if not choice or choice is None:
+            condition = ~Q(
+              songs_list__contains=[int(form["song1"].replace("'", ""))],
             )
-            .order_by("event", "song_num")
-            .values("song_id")[:1]
-        )
 
-        setlist_qs = (
-            models.Setlists.objects.all()
-            .select_related("event", "song")
-            .values("event_id")
-            .annotate(
-                next_song=Subquery(next_song),
-            )
-        )
-
-        setlist_anywhere_qs = (
-            models.Setlists.objects.all()
-            .select_related("event", "song")
-            .values("event_id")
-            .annotate(
-                songs_list=ArrayAgg(
-                    "song_id",
-                    filter=Q(set_name__in=VALID_SET_NAMES),
-                    distinct=True,
-                ),
-            )
-        )
-
-        event_filter = event_form.get_filters()
-        sl_filter = Q()
-        event_search_queries = []
-        setlist_search_display_queries = []
-
-        for f in event_filter.children:
-            if type(f) == Q:
-                sl_filter &= f
-            else:
-                sl_filter &= Q(**{f"event__{f[0]}": f[1]})  # type: ignore
-
-        if formset.is_valid() and formset.has_changed():
-            song_ids = [
-                str(f["song1"]).replace("'", "")
-                for f in formset.cleaned_data
-                if f.get("song1")
-            ]
-
-            song_ids.extend(
-                [
-                    str(f["song2"]).replace("'", "")
-                    for f in formset.cleaned_data
-                    if f.get("song2")
-                ],
-            )
-
-            song_map = {
-                str(s.id): s.name for s in models.Songs.objects.filter(id__in=song_ids)
-            }
-
-            for form in formset.cleaned_data:
-                if not form.get("song1"):
-                    continue
-
-                choice = form.get("choice", True)
-                pos = form.get("position")
-                s1_name = song_map.get(str(form["song1"]).replace("'", ""))
-
-                choice_str = "is" if choice else "not"
-
-                condition = Q(song=form["song1"])
-
-                summary = f"{s1_name} ({choice_str} anywhere)"
-
-                if pos == "followed_by" and form.get("song2"):
-                    s2_name = song_map.get(str(form["song2"]).replace("'", ""))
-
-                    song2_condition = Q(
-                        next_song=form["song2"],
-                    )
-
-                    if not choice:
-                        song2_condition = ~song2_condition
-
-                    condition &= song2_condition
-
-                    summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
-
-                elif pos == "anywhere":
-                    condition = Q(
-                        songs_list__contains=[int(form["song1"].replace("'", ""))],
-                    )
-
-                    if not choice or choice is None:
-                        condition = ~Q(
-                            songs_list__contains=[int(form["song1"].replace("'", ""))],
-                        )
-
-                else:
-                    pos_filter = self.position_filters.get(pos)  # type: ignore
-                    pos_display = pos_choices.get(pos)
-
-                    if not choice:
-                        condition &= ~pos_filter  # type: ignore
-                    else:
-                        condition &= pos_filter  # type: ignore
-
-                    summary = f"{s1_name} ({choice_str} {pos_display})"
-
-                # use different queryset for the anywhere position
-                if pos == "anywhere":
-                    matched_events = set(
-                        setlist_anywhere_qs.filter(condition).values_list(
-                            "event_id",
-                            flat=True,
-                        ),
-                    )
-
-                else:
-                    matched_events = set(
-                        setlist_qs.filter(condition).values_list("event_id", flat=True),
-                    )
-
-                event_search_queries.append(matched_events)
-                setlist_search_display_queries.append(summary)
-
-        final_events = set()
-
-        if event_search_queries:
-            conjunction = event_form.cleaned_data["conjunction"]
-            if conjunction == "or":
-                final_events = set.union(*event_search_queries)
-            else:
-                final_events = set.intersection(*event_search_queries)
-
-            event_filter &= Q(id__in=final_events)
-
-        context["events"] = (
-            models.Events.objects.filter(event_filter)
-            .select_related(
-                "venue__city__country",
-                "artist",
-                "tour",
-                "type",
-            )
-            .prefetch_related(
-                "venue__city__state",
-                "onstage_event",
-            )
-            .annotate(
-                has_setlist=Exists(
-                    Subquery(
-                        models.Setlists.objects.filter(event_id=OuterRef("id")),
-                    ),
-                ),
-            )
-        ).order_by("event_id")
-
-        context["display_fields"] = []
-
-        for f in event_form.changed_data:
-            if "_exclude" not in f and f != "conjunction":
-                display = {
-                    "label": event_form[f].label,
-                    "data": event_form.cleaned_data[f],
-                }
-
-                if type(event_form.cleaned_data[f]) is list:
-                    display["data"] = " OR ".join(event_form.cleaned_data[f])
-                elif type(event_form.cleaned_data[f]) is QuerySet:
-                    display["data"] = " OR ".join(
-                        event_form.cleaned_data[f].values_list("name", flat=True),
-                    )
-                elif type(event_form.cleaned_data[f]) is dict:
-                    display["data"] = event_form.cleaned_data[f]["value"]
-                else:
-                    display["data"] = event_form.cleaned_data[f].__str__()
-
-                context["display_fields"].append(display)
-
-        context["search_summary"] = setlist_search_display_queries
-
-        context["conjunction"] = event_form.cleaned_data.get(
-            "conjunction",
-            "and",
-        )
-
-        query_display = f" {context['conjunction']} ".join(
-            setlist_search_display_queries,
-        )
-
-        field_display = ", ".join(
-            [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
-        )
-
-        if query_display == "":
-            context["description"] = f"{field_display}"
-        elif query_display and field_display == "":
-            context["description"] = f"Songs: {query_display}"
         else:
-            context["description"] = f"Songs: {query_display}, {field_display}"
+          pos_filter = self.position_filters.get(pos)  # type: ignore
+          pos_display = pos_choices.get(pos)
 
-        return context
+          if not choice:
+            condition &= ~pos_filter  # type: ignore
+          else:
+            condition &= pos_filter  # type: ignore
+
+          summary = f"{s1_name} ({choice_str} {pos_display})"
+
+        # use different queryset for the anywhere position
+        if pos == "anywhere":
+          matched_events = set(
+            setlist_anywhere_qs.filter(condition).values_list(
+              "event_id",
+              flat=True,
+            ),
+          )
+
+        else:
+          matched_events = set(
+            setlist_qs.filter(condition).values_list("event_id", flat=True),
+          )
+
+        event_search_queries.append(matched_events)
+        setlist_search_display_queries.append(summary)
+
+    final_events = set()
+
+    if event_search_queries:
+      conjunction = event_form.cleaned_data["conjunction"]
+      if conjunction == "or":
+        final_events = set.union(*event_search_queries)
+      else:
+        final_events = set.intersection(*event_search_queries)
+
+      event_filter &= Q(id__in=final_events)
+
+    context["events"] = (
+      models.Events.objects.filter(event_filter)
+      .select_related(
+        "venue__city__country",
+        "artist",
+        "tour",
+        "type",
+      )
+      .prefetch_related(
+        "venue__city__state",
+        "onstage_event",
+      )
+      .annotate(
+        has_setlist=Exists(
+          Subquery(
+            models.Setlists.objects.filter(event_id=OuterRef("id")),
+          ),
+        ),
+      )
+    ).order_by("event_id")
+
+    context["display_fields"] = []
+
+    for f in event_form.changed_data:
+      if "_exclude" not in f and f != "conjunction":
+        display = {
+          "label": event_form[f].label,
+          "data": event_form.cleaned_data[f],
+        }
+
+        if type(event_form.cleaned_data[f]) is list:
+          display["data"] = " OR ".join(event_form.cleaned_data[f])
+        elif type(event_form.cleaned_data[f]) is QuerySet:
+          display["data"] = " OR ".join(
+            event_form.cleaned_data[f].values_list("name", flat=True),
+          )
+        elif type(event_form.cleaned_data[f]) is dict:
+          display["data"] = event_form.cleaned_data[f]["value"]
+        else:
+          display["data"] = event_form.cleaned_data[f].__str__()
+
+        context["display_fields"].append(display)
+
+    context["search_summary"] = setlist_search_display_queries
+
+    context["conjunction"] = event_form.cleaned_data.get(
+      "conjunction",
+      "and",
+    )
+
+    query_display = f" {context['conjunction']} ".join(
+      setlist_search_display_queries,
+    )
+
+    field_display = ", ".join(
+      [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
+    )
+
+    if query_display == "":
+      context["description"] = f"{field_display}"
+    elif query_display and field_display == "":
+      context["description"] = f"Songs: {query_display}"
+    else:
+      context["description"] = f"Songs: {query_display}, {field_display}"
+
+    return context
 
 
 class ShortenURL(PageTitleMixin, TemplateView):
-    def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-        user = UserModel.objects.first()
-        short_url = shortener.create(user, request.GET["url"])
+  def get(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    user = UserModel.objects.first()
+    short_url = shortener.create(user, request.GET["url"])
 
-        protocol = "https"
+    protocol = "https"
 
-        if request.get_host() == "127.0.0.1:8000":
-            protocol = "http"
+    if request.get_host() == "127.0.0.1:8000":
+      protocol = "http"
 
-        full_short_url = f"{protocol}://{request.get_host()}/s/{short_url}"
+    full_short_url = f"{protocol}://{request.get_host()}/s/{short_url}"
 
-        if "HX-Request" in request.headers:
-            # Return raw HTML directly instead of creating a whole new template file
-            html_snippet = f"""
+    if "HX-Request" in request.headers:
+      # Return raw HTML directly instead of creating a whole new template file
+      html_snippet = f"""
             <span id="shortLink" class="px-2 text-sm">{full_short_url}</span>
             <button id="copyButton"
             class="btn btn-sm btn-primary ms-2">Copy Link</button>
             """
-            return HttpResponse(html_snippet)
+      return HttpResponse(html_snippet)
 
-        return HttpResponse(
-            json.dumps({"short_url": full_short_url}),
-            content_type="application/json",
-        )
+    return HttpResponse(
+      json.dumps({"short_url": full_short_url}),
+      content_type="application/json",
+    )
 
 
 class Relation(PageTitleMixin, TemplateView):
-    template_name = "databruce/relations/relations.html"
-    title = "Relations"
+  template_name = "databruce/relations/relations.html"
+  title = "Relations"
 
 
 class TestTable(PageTitleMixin, TemplateView):
-    template_name = "databruce/test_table.html"
-    title = "Table"
+  template_name = "databruce/test_table.html"
+  title = "Table"
 
 
 class TestEvent(PageTitleMixin, TemplateView):
-    template_name = "databruce/test_event_table.html"
-    title = "Table"
+  template_name = "databruce/test_event_table.html"
+  title = "Table"
 
 
 class RelationDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/relations/detail.html"
+  template_name = "databruce/relations/detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
 
-        context["info"] = get_object_or_404(models.Relations, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
-        context["bands"] = (
-            models.Onstage.objects.filter(relation=context["info"].id)
-            .select_related("band")
-            .distinct("band")
-        )
+    context["info"] = get_object_or_404(models.Relations, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
+    context["bands"] = (
+      models.Onstage.objects.filter(relation=context["info"].id)
+      .select_related("band")
+      .distinct("band")
+    )
 
-        return context
+    return context
 
 
 class Band(PageTitleMixin, TemplateView):
-    template_name = "databruce/bands/bands.html"
-    title = "Bands"
+  template_name = "databruce/bands/bands.html"
+  title = "Bands"
 
 
 class BandDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/bands/detail.html"
+  template_name = "databruce/bands/detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]):
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(models.Bands, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(models.Bands, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
 
-        return context
+    return context
 
 
 class Release(PageTitleMixin, TemplateView):
-    template_name = "databruce/releases/releases.html"
-    title = "Releases"
+  template_name = "databruce/releases/releases.html"
+  title = "Releases"
 
 
 class ReleaseDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/releases/detail.html"
+  template_name = "databruce/releases/detail.html"
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
 
-        queryset = models.Releases.objects.all()
-        context["info"] = get_object_or_404(queryset, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info'].name}"
+    queryset = models.Releases.objects.all()
+    context["info"] = get_object_or_404(queryset, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info'].name}"
 
-        return context
+    return context
 
 
 class City(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/cities/cities.html"
-    title = "Cities"
+  template_name = "databruce/locations/cities/cities.html"
+  title = "Cities"
 
 
 class CityDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/cities/detail.html"
-    queryset = models.Cities.objects.all().select_related("country")
+  template_name = "databruce/locations/cities/detail.html"
+  queryset = models.Cities.objects.all().select_related("country")
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
 
-        return context
+    return context
 
 
 class State(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/states/states.html"
-    title = "States"
+  template_name = "databruce/locations/states/states.html"
+  title = "States"
 
 
 class StateDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/states/detail.html"
-    queryset = models.States.objects.select_related("country")
+  template_name = "databruce/locations/states/detail.html"
+  queryset = models.States.objects.select_related("country")
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
 
-        return context
+    return context
 
 
 class Country(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/countries/countries.html"
-    title = "Countries"
+  template_name = "databruce/locations/countries/countries.html"
+  title = "Countries"
 
 
 class CountryDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/locations/countries/detail.html"
-    queryset = models.Countries.objects.select_related(
-        "first_event",
-        "last_event",
-    )
+  template_name = "databruce/locations/countries/detail.html"
+  queryset = models.Countries.objects.select_related(
+    "first_event",
+    "last_event",
+  )
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
 
-        return context
+    return context
 
 
 class EventRun(PageTitleMixin, TemplateView):
-    template_name = "databruce/events/runs.html"
-    title = "Event Runs"
+  template_name = "databruce/events/runs.html"
+  title = "Event Runs"
 
 
 class EventType(PageTitleMixin, TemplateView):
-    template_name = "databruce/events/type.html"
-    title = "Events by Type"
+  template_name = "databruce/events/type.html"
+  title = "Events by Type"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
 
-        try:
-            context["type"] = get_object_or_404(
-                models.Types,
-                slug=self.kwargs["slug"],
-            )
-        except KeyError:
-            context["type"] = get_object_or_404(
-                models.Types,
-                slug="concert",
-            )
+    try:
+      context["type"] = get_object_or_404(
+        models.Types,
+        slug=self.kwargs["slug"],
+      )
+    except KeyError:
+      context["type"] = get_object_or_404(
+        models.Types,
+        slug="concert",
+      )
 
-        context["title"] = f"Event Type '{context['type']}'"
+    context["title"] = f"Event Type '{context['type']}'"
 
-        context["types"] = models.Types.objects.values(
-            "id",
-            "name",
-            "slug",
-        )
+    context["types"] = models.Types.objects.values(
+      "id",
+      "name",
+      "slug",
+    )
 
-        return context
+    return context
 
 
 class EventTag(PageTitleMixin, TemplateView):
-    template_name = "databruce/events/tag.html"
-    title = "Events by Tag"
+  template_name = "databruce/events/tag.html"
+  title = "Events by Tag"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
 
-        if "slug" not in self.kwargs:
-            context["tag"] = models.Tags.objects.first()
-        else:
-            context["tag"] = get_object_or_404(
-                models.Tags,
-                slug=self.kwargs["slug"],
-            )
+    if "slug" not in self.kwargs:
+      context["tag"] = models.Tags.objects.first()
+    else:
+      context["tag"] = get_object_or_404(
+        models.Tags,
+        slug=self.kwargs["slug"],
+      )
 
-        context["title"] = f"Event Tag '{context['tag']}'"
+    context["title"] = f"Event Tag '{context['tag']}'"
 
-        context["tags"] = models.Tags.objects.values(
-            "id",
-            "name",
-            "slug",
-        )
+    context["tags"] = models.Tags.objects.values(
+      "id",
+      "name",
+      "slug",
+    )
 
-        return context
+    return context
 
 
 class RunDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/events/run_detail.html"
-    queryset = (
-        models.Runs.objects.all()
-        .select_related(
-            "first_event",
-            "last_event",
-            "band",
-            "venue",
-        )
-        .order_by("first_event__event_id")
+  template_name = "databruce/events/run_detail.html"
+  queryset = (
+    models.Runs.objects.all()
+    .select_related(
+      "first_event",
+      "last_event",
+      "band",
+      "venue",
     )
+    .order_by("first_event__event_id")
+  )
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    context["title"] = f"{context['info']}"
 
-        if context["info"].ticket_range:
-            context["ticket_range"] = " / ".join(
-                [
-                    currency(float(x))
-                    for x in context["info"].ticket_range.split("/")  # type: ignore
-                ],
-            )
-        elif context["info"].ticket_min and context["info"].ticket_max:
-            context["ticket_range"] = " / ".join(
-                [
-                    currency(context["info"].ticket_min),
-                    currency(context["info"].ticket_max),
-                ],
-            )
-        else:
-            context["ticket_range"] = None
+    if context["info"].ticket_range:
+      context["ticket_range"] = " / ".join(
+        [
+          currency(float(x))
+          for x in context["info"].ticket_range.split("/")  # type: ignore
+        ],
+      )
+    elif context["info"].ticket_min and context["info"].ticket_max:
+      context["ticket_range"] = " / ".join(
+        [
+          currency(context["info"].ticket_min),
+          currency(context["info"].ticket_max),
+        ],
+      )
+    else:
+      context["ticket_range"] = None
 
-        return context
+    return context
 
 
 class TourLeg(PageTitleMixin, TemplateView):
-    template_name = "databruce/tours/legs.html"
-    title = "Tour Legs"
+  template_name = "databruce/tours/legs.html"
+  title = "Tour Legs"
 
 
 class TourLegDetail(PageTitleMixin, TemplateView):
-    template_name = "databruce/tours/leg_detail.html"
-    queryset = models.TourLegs.objects.all()
+  template_name = "databruce/tours/leg_detail.html"
+  queryset = models.TourLegs.objects.all()
 
-    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        self.leg = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
-        context["info"] = self.leg
-        context["title"] = f"{context['info']}"
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    self.leg = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    context["info"] = self.leg
+    context["title"] = f"{context['info']}"
 
-        return context
+    return context
 
 
 class NugsRelease(PageTitleMixin, TemplateView):
-    template_name = "databruce/releases/nugs.html"
-    title = "Nugs Releases"
+  template_name = "databruce/releases/nugs.html"
+  title = "Nugs Releases"
 
 
 class Bootleg(PageTitleMixin, TemplateView):
-    template_name = "databruce/releases/bootlegs.html"
-    title = "Bootlegs"
+  template_name = "databruce/releases/bootlegs.html"
+  title = "Bootlegs"
 
 
 class Updates(PageTitleMixin, TemplateView):
-    template_name = "databruce/updates.html"
-    title = "Updates"
+  template_name = "databruce/updates.html"
+  title = "Updates"

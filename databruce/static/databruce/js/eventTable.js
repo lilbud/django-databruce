@@ -75,9 +75,9 @@ event_table_columns = [
     'render': function (data, type, row, meta) {
       if (row.event_status) {
         if (data) {
-          return `<span class="text-danger fw-semibold">[${row.type[0]['name']}] ${data}</span>`
+          return `<span class="text-danger fw-semibold">[${row.type[0]}] ${data}</span>`
         }
-        return `<span class="text-danger fw-semibold">[${row.type[0]['name']}]</span>`
+        return `<span class="text-danger fw-semibold">[${row.type[0]}]</span>`
       }
 
       return data;

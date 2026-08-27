@@ -84,7 +84,7 @@ async function albumBreakdown(url) {
                 <div class="col-auto percent text-center pe-0 text-xs text-nowrap">${item.song_count}</div>
             </div>
             <div class="collapse" id="${album}-collapse">
-                <ul class="list-group py-1">${songs}</ul>
+                <ul class="list-group pt-2 pb-1">${songs}</ul>
             </div>
         </div>`;
 
@@ -130,12 +130,12 @@ async function albumBreakdown(url) {
     });
 
     // Cleanup tooltips
-    return {
-      destroy() {
-        tooltips.forEach(t => t.dispose());
-        $albums.off('mouseenter mouseleave').empty();
-      }
-    };
+    // return {
+    //   destroy() {
+    //     tooltips.forEach(t => t.dispose());
+    //     $albums.off('mouseenter mouseleave').empty();
+    //   }
+    // };
   } catch (error) {
     console.error('Error fetching album breakdown:', error);
   }

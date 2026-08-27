@@ -388,3 +388,8 @@ First public release of the site. Site was locked behind a login and accounts on
 - Setlist Note Search is now a table rather than a form leading to a new page.
 - Added better pagination controls to blog and library pages
 - Added new endpoints for Advanced Search, these should be much more responsive due to limiting the fields gotten through select2.
+- Setlist Breakdown now shows for all events, whether public or not
+- Removed duplicate songs from SetlistBreakdown
+- Added Continent search field to Advanced Search
+- Added Continent search filter to event and adv search API
+- Changed some model choices over to TextChoices, cleaner that way

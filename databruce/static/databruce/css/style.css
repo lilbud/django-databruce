@@ -303,8 +303,8 @@ a:link,
   width: 1.5rem;
 }
 
-.collapse,
-.collapsing {
+#options.collapse,
+#options.collapsing {
   background-color: var(--background-color-highlight) !important;
 }
 
@@ -314,8 +314,6 @@ a:link,
   /* Adjust weight: 0.5px (thinner) to 1.2px (bold) */
   transition: transform 0.2s ease-in-out;
 }
-
-
 
 /* Rotates 180deg when the target is expanded */
 .collapse-toggle[aria-expanded="true"] .collapse-icon {
@@ -1872,7 +1870,7 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 .badge.tag-badge {
   background-color: var(--color-primary) !important;
   color: var(--color-contrast) !important;
-  font-weight: 300 !important;
-  font-size: var(--text-2xs) !important;
+  font-weight: 500 !important;
+  font-size: var(--text-3xs) !important;
   border-radius: 0.2rem !important;
 }

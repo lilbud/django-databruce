@@ -1,171 +1,176 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n static %}
 {% block title %}
-  {{ title }}
+    {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 {% endblock extrajs %}
 {% block content %}
-  <div class="col">
-    <div class="text-2xl text-nowrap">Advanced Event Search</div>
-    <div class="text-base mb-2">
-      Search for events based on a number of parameters like month/day, who was onstage, and even what songs were played.
-    </div>
-    <div class="text-sm">
-      Start/Last Date accepts full dates as well as partial dates. So, entering '1975-02' for start will find events after February 1st, 1975.
-      Likewise, entering '1975-02' for last will find events from before February 28th, 1975.
-    </div>
-    <hr>
-    {% if messages %}
-      <div class="row mb-3">
-        <div class="col">
-          {% for message in messages %}
-            <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
-          {% endfor %}
+    <div class="col">
+        <div class="text-2xl text-nowrap">Advanced Event Search</div>
+        <div class="text-base mb-2">
+            Search for events based on a number of parameters like month/day, who was onstage, and even what songs were played.
         </div>
-      </div>
-    {% endif %}
-    {% if form.errors %}
-      <div class="row mb-3">
-        <div class="col">
-          {% for field in form %}
-            {% for error in field.errors %}
-              <div class="card">
-                <div class="card message error">{{ error }}</div>
-              </div>
-            {% endfor %}
-          {% endfor %}
+        <div class="text-sm">
+            Start/Last Date accepts full dates as well as partial dates. So, entering '1975-02' for start will find events after February 1st, 1975.
+            Likewise, entering '1975-02' for last will find events from before February 28th, 1975.
         </div>
-      </div>
-    {% endif %}
-    <!-- Render Form Non-Field Errors -->
-    {% if form.non_field_errors %}
-      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-    {% endif %}
-    <!-- Render Formset Non-Form Errors (e.g. Management Form Errors) -->
-    {% if formset.non_form_errors %}
-      <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
-    {% endif %}
-    <form action="{% url 'adv_search_results' %}" method="get" id="search-form">
-      {% comment %} {% csrf_token %} {% endcomment %}
-      <div class="row d-grid gap-0 row-gap-3">
-        <div class="row row-cols-2 px-auto">
-          <div class="col-6 col-lg-2 pe-2">
-            <label class="form-label text-sm">{{ form.start_date.label }}</label>
-            <div class="pe-lg-0 mb-1">{{ form.start_date }}</div>
-          </div>
-          <div class="col-6 col-lg-2 px-0">
-            <label class="form-label text-sm">{{ form.end_date.label }}</label>
-            <div class="pe-lg-0">{{ form.end_date }}</div>
-          </div>
-        </div>
-        <div class="row row-cols-2">
-          <div class="col-6 col-lg-2 pe-2">
-            <label class="form-label text-sm">{{ form.month.label }}</label>
-            {{ form.month }}
-          </div>
-          <div class="col-3 col-lg-1 px-0">
-            <label class="form-label text-sm">{{ form.day.label }}</label>
-            {{ form.day }}
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-label text-sm text-nowrap">{{ form.day_of_week.label }}</div>
-          <div class="col-2 col-md-1 pe-1">{{ form.day_of_week_exclude }}</div>
-          <div class="col-9 col-md-4 px-0">{{ form.day_of_week }}</div>
-        </div>
-        <div class="row">
-          <div class="form-label text-sm text-nowrap">{{ form.type.label }}</div>
-          <div class="col-9 col-md-4">{{ form.type }}</div>
-        </div>
-        <div class="row">
-          <div class="form-label text-sm text-nowrap">{{ form.tag.label }}</div>
-          <div class="col-9 col-md-4">{{ form.tag }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.city.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.city_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.city }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.state.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.state_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.state }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.country.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.country_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.country }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.venue.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.venue_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.venue }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.tour.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.tour_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.tour }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.tour_leg.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.tour_leg_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.tour_leg }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.relation.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.relation_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.relation }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.band.label }}</label>
-          <div class="col-2 col-md-1 pe-1">{{ form.band_exclude }}</div>
-          <div class="col-9 col-lg-4 px-0">{{ form.band }}</div>
-        </div>
-        <div class="row">
-          <label class="form-label text-sm">{{ form.conjunction.label }}</label>
-          <div class="col-4 col-lg-1">{{ form.conjunction }}</div>
-        </div>
-        {{ formset.management_form }}
-        <div id="setlist-search" class="mb-4 col">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
-        <div class="row" id="form-buttons">
-          <div class="mx-auto">
-            <div class="btn-group mx-auto" role="group" aria-label="Basic example">
-              <button id="form-submit-btn"
-                      type="submit"
-                      name="submit"
-                      class="btn btn-success">Go</button>
-              <button id="form-reset-btn"
-                      type="reset"
-                      onclick="resetForm()"
-                      name="reset"
-                      class="btn btn-danger">Reset</button>
-              <button id="form-add-btn"
-                      type="button"
-                      name="add"
-                      onclick="addForm()"
-                      class="btn btn-primary">
-                <i class="bi bi-plus-lg fw-bold text-lg"></i>
-                Add Row
-              </button>
+        <hr>
+        {% if messages %}
+            <div class="row mb-3">
+                <div class="col">
+                    {% for message in messages %}
+                        <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
+                    {% endfor %}
+                </div>
             </div>
-          </div>
+        {% endif %}
+        {% if form.errors %}
+            <div class="row mb-3">
+                <div class="col">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="card">
+                                <div class="card message error">{{ error }}</div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <!-- Render Form Non-Field Errors -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <!-- Render Formset Non-Form Errors (e.g. Management Form Errors) -->
+        {% if formset.non_form_errors %}
+            <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+        {% endif %}
+        <form action="{% url 'adv_search_results' %}" method="get" id="search-form">
+            {% comment %} {% csrf_token %} {% endcomment %}
+            <div class="row d-grid gap-0 row-gap-3">
+                <div class="row row-cols-2 px-auto">
+                    <div class="col-6 col-lg-2 pe-2">
+                        <label class="form-label text-sm">{{ form.start_date.label }}</label>
+                        <div class="pe-lg-0 mb-1">{{ form.start_date }}</div>
+                    </div>
+                    <div class="col-6 col-lg-2 px-0">
+                        <label class="form-label text-sm">{{ form.end_date.label }}</label>
+                        <div class="pe-lg-0">{{ form.end_date }}</div>
+                    </div>
+                </div>
+                <div class="row row-cols-2">
+                    <div class="col-6 col-lg-2 pe-2">
+                        <label class="form-label text-sm">{{ form.month.label }}</label>
+                        {{ form.month }}
+                    </div>
+                    <div class="col-3 col-lg-1 px-0">
+                        <label class="form-label text-sm">{{ form.day.label }}</label>
+                        {{ form.day }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-label text-sm text-nowrap">{{ form.day_of_week.label }}</div>
+                    <div class="col-2 col-md-1 pe-1">{{ form.day_of_week_exclude }}</div>
+                    <div class="col-9 col-md-4 px-0">{{ form.day_of_week }}</div>
+                </div>
+                <div class="row">
+                    <div class="form-label text-sm text-nowrap">{{ form.type.label }}</div>
+                    <div class="col-9 col-md-4">{{ form.type }}</div>
+                </div>
+                <div class="row">
+                    <div class="form-label text-sm text-nowrap">{{ form.tag.label }}</div>
+                    <div class="col-9 col-md-4">{{ form.tag }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.venue.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.venue_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.venue }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.city.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.city_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.city }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.state.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.state_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.state }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.country.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.country_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.country }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.continent.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.continent_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.continent }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.tour.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.tour_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.tour }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.tour_leg.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.tour_leg_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.tour_leg }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.relation.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.relation_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.relation }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.band.label }}</label>
+                    <div class="col-2 col-md-1 pe-1">{{ form.band_exclude }}</div>
+                    <div class="col-9 col-lg-4 px-0">{{ form.band }}</div>
+                </div>
+                <div class="row">
+                    <label class="form-label text-sm">{{ form.conjunction.label }}</label>
+                    <div class="col-4 col-lg-1">{{ form.conjunction }}</div>
+                </div>
+                {{ formset.management_form }}
+                <div id="setlist-search" class="mb-4 col">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
+                <div class="row" id="form-buttons">
+                    <div class="mx-auto">
+                        <div class="btn-group mx-auto" role="group" aria-label="Basic example">
+                            <button id="form-submit-btn"
+                                    type="submit"
+                                    name="submit"
+                                    class="btn btn-success">Go</button>
+                            <button id="form-reset-btn"
+                                    type="reset"
+                                    onclick="resetForm()"
+                                    name="reset"
+                                    class="btn btn-danger">Reset</button>
+                            <button id="form-add-btn"
+                                    type="button"
+                                    name="add"
+                                    onclick="addForm()"
+                                    class="btn btn-primary">
+                                <i class="bi bi-plus-lg fw-bold text-lg"></i>
+                                Add Row
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div id="new_row" class="row d-none mb-2">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
+        <div id="conjunction" class="d-none">
+            <div class="row conjunction-row mb-0 py-1">
+                <label class="offset-0 offset-lg-1" for="conjunction">
+                    <span class="conjunction text-base text-uppercase">And</span>
+                </label>
+            </div>
         </div>
-      </div>
-    </form>
-    <div id="new_row" class="row d-none mb-2">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
-    <div id="conjunction" class="d-none">
-      <div class="row conjunction-row mb-0 py-1">
-        <label class="offset-0 offset-lg-1" for="conjunction">
-          <span class="conjunction text-base text-uppercase">And</span>
-        </label>
-      </div>
     </div>
-  </div>
-  <script src="{% static 'databruce/js/advanced_search.js' %}"></script>
+    <script src="{% static 'databruce/js/advanced_search.js' %}"></script>
 {% endblock content %}
