@@ -20,6 +20,7 @@ dependencies = [
     "django-watchfiles>=1.4.0",
     "djangorestframework>=3.17.2",
     "djlint>=1.36.4",
+    "drf-spectacular>=0.30.0",
     "gevent>=25.9.1",
     "gunicorn>=25.0.0",
     "lazy-ninja>=0.7.0",

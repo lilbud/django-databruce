@@ -54,7 +54,7 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
 
 
-class TypeInline(StackedInline):
+class EventTypeInline(StackedInline):
     model = models.EventTypes
     autocomplete_fields = ["type"]
     search_fields = ["type__name"]
@@ -74,6 +74,29 @@ class TypeInline(StackedInline):
     fields = ["event", "type"]
     fk_name = "event"
     ordering = ("type__name",)
+    extra = 0
+
+
+class EventTagInline(StackedInline):
+    model = models.EventTags
+    autocomplete_fields = ["tag"]
+    search_fields = ["tag__name"]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "event",
+                "tag",
+            )
+        )
+
+    collapsible = True
+
+    fields = ["event", "tag"]
+    fk_name = "event"
+    ordering = ("tag__name",)
     extra = 0
 
 
@@ -412,7 +435,7 @@ class EventAdmin(ModelAdmin):
 
     list_display = ["id", "date", "event_id"]
     list_display_links = ["id"]
-    inlines = [TypeInline, SetlistInline, OnstageInline]
+    inlines = [EventTypeInline, EventTagInline, SetlistInline, OnstageInline]
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -450,6 +473,21 @@ class EventTypeAdmin(ModelAdmin):
     search_fields = ["type__name", "type__slug"]
     list_display = ["id", "event", "type"]
     list_select_related = ["event", "type"]
+    list_display_links = ["id"]
+
+
+@admin.register(models.Tags)
+class TagAdmin(ModelAdmin):
+    search_fields = ["name", "slug"]
+    list_display = ["id", "name"]
+    list_display_links = ["id"]
+
+
+@admin.register(models.EventTags)
+class EventTagAdmin(ModelAdmin):
+    search_fields = ["tag__name", "tag__slug"]
+    list_display = ["id", "event", "tag"]
+    list_select_related = ["event", "tag"]
     list_display_links = ["id"]
 
 

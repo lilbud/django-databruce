@@ -393,3 +393,4 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added Continent search field to Advanced Search
 - Added Continent search filter to event and adv search API
 - Changed some model choices over to TextChoices, cleaner that way
+- Added "Full Album Performance" tag to mark all shows with a full album performance in running order.
