@@ -1120,7 +1120,7 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
 class ArticlesSearchViewSet(viewsets.ModelViewSet):
   queryset = models.Articles.objects.all()
-  serializer_class = api_serializers.ArticlesSerializer
+  serializer_class = api_serializers.ArticlesSearchSerializer
   lookup_field = (
     "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)
   )

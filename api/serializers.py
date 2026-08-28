@@ -1490,3 +1490,26 @@ class ArticlesSerializer(serializers.ModelSerializer):
       "source",
       "collection",
     ]
+
+
+class ArticlesSearchSerializer(serializers.ModelSerializer):
+  category = serializers.CharField(
+    source="get_category_display",
+    read_only=True,
+  )
+
+  collection = serializers.CharField(
+    source="collection.name",
+    read_only=True,
+  )
+
+  class Meta:
+    model = models.Articles
+    fields = [
+      "title",
+      "author",
+      "slug",
+      "category",
+      "collection",
+      "content",
+    ]
