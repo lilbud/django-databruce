@@ -394,3 +394,5 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added Continent search filter to event and adv search API
 - Changed some model choices over to TextChoices, cleaner that way
 - Added "Full Album Performance" tag to mark all shows with a full album performance in running order.
+- Added articles from GreasyLake Article Vault to the article library. Some of these are in Spanish/Norwegian, and contain encoding errors I am unable to fix.
+- Added all press releases from ShoreFire Media to article library.

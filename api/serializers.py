@@ -275,7 +275,7 @@ class BandsSerializer(BaseSerializer):
       "first_event",
       "last_event",
       "num_events",
-      "springsteen_band",
+      "bruce_band",
     ]
 
 

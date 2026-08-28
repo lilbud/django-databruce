@@ -37,9 +37,12 @@ class ArticleDetail(TemplateView):
     context["description"] = (
       f"{strip_markdown.strip_markdown(context['article'].content)[:100]}"
     )
-    context["category"] = models.Articles.ArticleCategory(
-      context["article"].category
-    ).label
+    try:
+      context["category"] = models.Articles.ArticleCategory(
+        context["article"].category,
+      ).label
+    except ValueError:
+      context["category"] = None
 
     # Step 1: Convert raw Markdown into raw HTML first
     # Includes common extensions for blockquotes, code, and lists

@@ -481,6 +481,10 @@ span #usercount {
   line-height: 1rem;
 }
 
+.card.message a {
+  font-weight: 600 !important;
+}
+
 .card-header,
 .card-footer,
 .card,

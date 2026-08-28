@@ -138,7 +138,7 @@ class Index(PageTitleMixin, TemplateView):
     event_filter = Q(
       Q(event__date__month=month)
       & Q(event__date__day=day)
-      & Q(event__artist__springsteen_band=True)
+      & Q(event__artist__bruce_band=True)
       & Q(set_name__in=models.SetTypes.valid_sets())
       & Q(event__setlist_certainty="Confirmed")
       & ~Q(event__tour__name__icontains="misc.")

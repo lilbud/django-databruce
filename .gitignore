@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/*
 __pycache__/
+**/__pycache__/
 *.__pycache__/
 *.py[cod]
 *$py.class
@@ -176,3 +177,4 @@ api_v2/
 /static/*
 
 **/local.py
+api/migrations/__pycache__/__init__.cpython-312.pyc
