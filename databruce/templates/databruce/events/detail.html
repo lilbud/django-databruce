@@ -68,6 +68,7 @@
                                                 <a class="text-reset"
                                                    href="{% url 'band_details' id=event.artist.uuid %}"
                                                    id="artist">{{ event.artist }}</a>
+                                                [{{ event.id }}]
                                                 {% for t in event.type.all %}
                                                     {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
                                                         <span class="text-lg text-danger">[{{ t.name }}]</span>

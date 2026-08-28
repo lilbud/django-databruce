@@ -23,6 +23,9 @@
                                 <label for="PublicityFilter" class="pb-1">Category</label>
                                 <select id="PublicityFilter" class="form-select form-select-sm">
                                     <option value="">All</option>
+                                    {% for choice in categories|dictsort:1 %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <!-- Search -->
@@ -108,7 +111,7 @@
             },
           },
           {'data': 'source', 'name': 'source'},
-          {'data': 'collection_name', 'name': 'collection_name'},
+          {'data': 'collection', 'name': 'collection__name'},
           {
             'data': 'published_at',
             'name': 'published_at',
@@ -119,16 +122,6 @@
             },
           },
         ],
-        initComplete: function(settings, json) {
-          var table = this.api();
-          var values = table.column(2).data().unique().toArray();
-          var container = $('#PublicityFilter');
-          
-          values.forEach(element => {
-            var option = `<option value="${element}">${element}</option>`;
-            container.append(option);
-          })
-        }
       });
 
       $('#PublicityFilter').on('change', function () {

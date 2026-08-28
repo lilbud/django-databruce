@@ -24,57 +24,57 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = [
-    "127.0.0.1",
+  "127.0.0.1",
 ]
 
 INSTALLED_APPS += [
-    "django_erd_generator",
+  "django_erd_generator",
 ]
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #   "ENGINE": "django.db.backends.postgresql",
-    #   "NAME": os.getenv("DATABASE_NAME"),
-    #   "USER": os.getenv("DATABASE_USER"),
-    #   "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-    #   "HOST": "localhost",
-    #   "PORT": "5432",
-    #   "CONN_MAX_AGE": 0,
-    #   "CONN_HEALTH_CHECKS": True,
-    #   "OPTIONS": {
-    #     "options": "-c search_path=public,extensions",
-    #   },
-    # },
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("SUPABASE_DATABASE"),
-        "USER": os.getenv("SUPABASE_USER"),
-        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-        "HOST": os.getenv("SUPABASE_HOST"),
-        "PORT": os.getenv("SUPABASE_PORT"),
-        "CONN_MAX_AGE": 0,
-        "CONN_HEALTH_CHECKS": True,
-        "OPTIONS": {
-            "options": "-c search_path=public,extensions",
-            "connect_timeout": 5,
-        },
+  "default": {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": os.getenv("DATABASE_NAME"),
+    "USER": os.getenv("DATABASE_USER"),
+    "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+    "HOST": "localhost",
+    "PORT": "5432",
+    "CONN_MAX_AGE": 0,
+    "CONN_HEALTH_CHECKS": True,
+    "OPTIONS": {
+      "options": "-c search_path=public,extensions",
     },
-    # "digital_ocean": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("DO_DATABASE_NAME"),
-    #     "USER": os.getenv("DO_DATABASE_USER"),
-    #     "PASSWORD": os.getenv("DO_DATABASE_PASSWORD"),
-    #     "HOST": os.getenv("DO_DATABASE_HOST"),
-    #     "PORT": "5432",
-    #     "CONN_MAX_AGE": 10,
-    #     "CONN_HEALTH_CHECKS": True,
-    #     "OPTIONS": {
-    #         "options": "-c search_path=public,extensions",
-    #     },
-    # },
+  },
+  # "default": {
+  #   "ENGINE": "django.db.backends.postgresql",
+  #   "NAME": os.getenv("SUPABASE_DATABASE"),
+  #   "USER": os.getenv("SUPABASE_USER"),
+  #   "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+  #   "HOST": os.getenv("SUPABASE_HOST"),
+  #   "PORT": os.getenv("SUPABASE_PORT"),
+  #   "CONN_MAX_AGE": 0,
+  #   "CONN_HEALTH_CHECKS": True,
+  #   "OPTIONS": {
+  #     "options": "-c search_path=public,extensions",
+  #     "connect_timeout": 5,
+  #   },
+  # },
+  # "digital_ocean": {
+  #     "ENGINE": "django.db.backends.postgresql",
+  #     "NAME": os.getenv("DO_DATABASE_NAME"),
+  #     "USER": os.getenv("DO_DATABASE_USER"),
+  #     "PASSWORD": os.getenv("DO_DATABASE_PASSWORD"),
+  #     "HOST": os.getenv("DO_DATABASE_HOST"),
+  #     "PORT": "5432",
+  #     "CONN_MAX_AGE": 10,
+  #     "CONN_HEALTH_CHECKS": True,
+  #     "OPTIONS": {
+  #         "options": "-c search_path=public,extensions",
+  #     },
+  # },
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -86,31 +86,31 @@ DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
 PASSWORD_RESET_TIMEOUT = 259200
 
 CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-        "LOCATION": "my_cache_table",
-    },
+  "default": {
+    "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+    "LOCATION": "my_cache_table",
+  },
 }
 
 TESTING = "test" in sys.argv
 
 if DEBUG:
-    REST_FRAMEWORK = {
-        "DEFAULT_RENDERER_CLASSES": (
-            "rest_framework.renderers.JSONRenderer",
-            "rest_framework.renderers.BrowsableAPIRenderer",
-            "databruce.pagination.DatatablesRenderer",
-        ),
-        "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",
-        "DEFAULT_PERMISSION_CLASSES": [
-            "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-        ],
-        "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-        "DEFAULT_FILTER_BACKENDS": [
-            "django_filters.rest_framework.DjangoFilterBackend",
-            "rest_framework.filters.SearchFilter",
-            "api.filters.DataTablesFilterBackend",
-            "rest_framework.filters.OrderingFilter",
-        ],
-        "PAGE_SIZE": 50,
-    }
+  REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": (
+      "rest_framework.renderers.JSONRenderer",
+      "rest_framework.renderers.BrowsableAPIRenderer",
+      "databruce.pagination.DatatablesRenderer",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",
+    "DEFAULT_PERMISSION_CLASSES": [
+      "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": [
+      "django_filters.rest_framework.DjangoFilterBackend",
+      "rest_framework.filters.SearchFilter",
+      "api.filters.DataTablesFilterBackend",
+      "rest_framework.filters.OrderingFilter",
+    ],
+    "PAGE_SIZE": 50,
+  }

@@ -1878,3 +1878,7 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
   font-size: var(--text-3xs) !important;
   border-radius: 0.2rem !important;
 }
+
+#article-content img {
+  max-width: 100% !important;
+}

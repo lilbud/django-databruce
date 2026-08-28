@@ -32,11 +32,11 @@
             Published Date: <span class="fw-semibold">{{ article.published_at|date:"F j, Y" }}</span>
         </div>
         <hr>
-        <div class="text-base">{{ body }}</div>
+        <div class="text-base" id='article-content'>{{ body }}</div>
         <hr>
         <div class="prefix-container text-sm">
             <span class="prefix">Sourced From</span>
-            <span class="value">{{ article.collection_name }}</span>
+            <span class="value">{{ article.collection.name }}</span>
         </div>
         <div class="prefix-container text-sm mb-1">
             <span class="prefix">Category</span>

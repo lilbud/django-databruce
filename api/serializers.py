@@ -1,7 +1,6 @@
 import datetime
 from zoneinfo import ZoneInfo
 
-import strip_markdown
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -1463,28 +1462,31 @@ class ItemInsertLogSerializer(serializers.ModelSerializer):
     return f"{obj.django_view}{obj.source_id}"
 
 
+class LibraryCollectionSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = models.LibraryCollection
+    fields = ["id", "name", "slug"]
+
+
 class ArticlesSerializer(serializers.ModelSerializer):
   category = serializers.CharField(
     source="get_category_display",
     read_only=True,
   )
 
-  excerpt = serializers.SerializerMethodField()
-
-  def get_excerpt(self, obj):
-    return strip_markdown.strip_markdown(obj.content[:250])
+  collection = serializers.CharField(
+    source="collection.name",
+    read_only=True,
+  )
 
   class Meta:
     model = models.Articles
     fields = [
       "title",
       "author",
-      "content",
       "slug",
-      "uuid",
       "published_at",
       "category",
       "source",
-      "collection_name",
-      "excerpt",
+      "collection",
     ]

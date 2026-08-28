@@ -1115,7 +1115,7 @@ class ArticlesViewSet(viewsets.ModelViewSet):
   )
 
   filterset_class = filters.ArticleFilter
-  ordering = ["-published_at"]  # Default ordering
+  # ordering = ["-published_at"]  # Default ordering
 
 
 class ArticlesSearchViewSet(viewsets.ModelViewSet):

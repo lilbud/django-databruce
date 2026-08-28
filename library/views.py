@@ -18,6 +18,8 @@ class Articles(TemplateView):
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     context["title"] = self.title
+    context["categories"] = models.Articles.ArticleCategory.choices
+
     return context
 
 
@@ -109,7 +111,7 @@ class ArticlesByCategory(TemplateView):
     context["page"] = paginator.get_page(page_number)
 
     context["title"] = "Articles By Category"
-    context["category"] = models.ArticleCategory(category).label
+    context["category"] = models.Articles.ArticleCategory(category).label
 
     return context
 
