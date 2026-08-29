@@ -226,7 +226,7 @@ class Calendar(PageTitleMixin, TemplateView):
     return context
 
 
-class Users(PageTitleMixin, TemplateView):
+class Users(LoginRequiredMixin, PageTitleMixin, TemplateView):
   template_name = "users/users.html"
   title = "Users"
   description = "List of Users"

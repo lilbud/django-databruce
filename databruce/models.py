@@ -9,6 +9,7 @@ import re
 from uuid import uuid4
 
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.db import models
 from django.db.models import F, Func, Value
@@ -2322,6 +2323,10 @@ class Articles(BaseModel):
   class Meta:
     managed = False
     db_table = "articles"
+    indexes = [
+      # GIN index on the generated vector for fast search execution
+      GinIndex(fields=["fts_vector"], name="idx_articles_fts_vector"),
+    ]
 
   def __str__(self) -> str:
     return self.title

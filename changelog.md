@@ -382,17 +382,31 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.20 (September XX, 2026)
 
+## Added
+
 - Added the Databruce Library, a collection of Bruce-related articles sourced from various places. The initial batch of about 1,000 are taken from my archive of the BTX Article Thread. Eventually I'll get to adding articles from Ken Rosen's site and some other places. Also added corresponding table/listing pages.
 - Added "Article Search", which allows for full text searching of the above article library. Consider this a work in progress, as I haven't fully settled on the design and general functionality yet.
-- Fixed some pages looking off on mobile due to missing bootstrap column div.
-- Setlist Note Search is now a table rather than a form leading to a new page.
 - Added better pagination controls to blog and library pages
 - Added new endpoints for Advanced Search, these should be much more responsive due to limiting the fields gotten through select2.
-- Setlist Breakdown now shows for all events, whether public or not
-- Removed duplicate songs from SetlistBreakdown
 - Added Continent search field to Advanced Search
 - Added Continent search filter to event and adv search API
-- Changed some model choices over to TextChoices, cleaner that way
 - Added "Full Album Performance" tag to mark all shows with a full album performance in running order.
 - Added articles from GreasyLake Article Vault to the article library. Some of these are in Spanish/Norwegian, and contain encoding errors I am unable to fix.
 - Added all press releases from ShoreFire Media to article library.
+
+## Changed
+
+- Setlist Note Search is now a table rather than a form leading to a new page.
+- Setlist Breakdown now shows for all events, whether public or not
+- Changed some model choices over to TextChoices, cleaner that way
+- Updated Article Search so titles are weighted more favorably in results
+- Restrict "Users" page to logged in users only. User Profiles can still be viewed
+
+## Removed
+
+- Removed duplicate songs from SetlistBreakdown
+
+## Fixed
+
+- Fixed some pages looking off on mobile due to missing bootstrap column div.
+- Fixed issue where hitting enter on Event Search modal would direct to API response page

@@ -1406,12 +1406,17 @@ class ArticleFilter(dj_filters.FilterSet):
     if not value:
       return queryset
 
-    # Query using the pre-calculated English tsvector
     query = SearchQuery(value, config="english")
+
     return (
       queryset.filter(fts_vector=query)
-      .annotate(rank=SearchRank("fts_vector", query))
-      .order_by("-rank", "-published_at", "-created_at")
+      .annotate(
+        # Checks if title contains the raw search term (icontains)
+        # or matches via search query
+        in_title=Q(title__icontains=value),
+        rank=SearchRank("fts_vector", query, weights=[0.1, 0.2, 0.5, 1.0]),
+      )
+      .order_by("-in_title", "-rank")
     )
 
 

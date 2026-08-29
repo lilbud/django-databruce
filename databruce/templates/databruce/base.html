@@ -1,152 +1,158 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
-  <head>
-    {% load i18n static %}
-    {% if not debug %}
-      <script defer
-              src="https://cloud.umami.is/script.js"
-              data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
-    {% endif %}
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description"
-          content="{{ description|safe|default_if_none:" A Springsteen Setlist Database" }}">
-    <meta name="keywords" content="Databruce, Setlists, Springsteen">
-    <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:title" content="{{ title|default_if_none:"databruce" }}">
-    <meta property="og:site_name" content="Databruce">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:description"
-          content="{{ description|safe|default_if_none:" A Springsteen Setlist Database" }}">
-    <link rel="icon"
-          type="image/png"
-          href="{% static "databruce/img/favicon-96x96.png" %}"
-          sizes="96x96" />
-    <link rel="icon"
-          type="image/svg+xml"
-          href="{% static "databruce/img/favicon.svg" %}" />
-    <link rel="shortcut icon" href="{% static "databruce/img/favicon.ico" %}" />
-    <link rel="apple-touch-icon"
-          sizes="180x180"
-          href="{% static "databruce/img/apple-touch-icon.png" %}" />
-    <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
-    <title>
-      {% block title %}
-        Home
-      {% endblock title %}
-      | Databruce
-    </title>
-    <!-- leaflet.js-->
-    <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
-    <script src="{% static 'databruce/js/leaflet/leaflet.js' %}"></script>
-    <!--JQuery-->
-    <link rel="stylesheet"
-          href="{% static 'databruce/css/jquery-ui.min.css' %}">
-    <script src="{% static 'databruce/js/jquery/jquery-4.0.0.min.js' %}"></script>
-    <script src="{% static 'databruce/js/jquery/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'databruce/js/jquery/jquery.mask.min.js' %}"></script>
-    <!--Bootstrap-->
-    <link rel="stylesheet"
-          href="{% static 'databruce/css/bootstrap.min.css' %}">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="{% static 'databruce/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
-    <!--Datatables-->
-    {% comment %}
+    <head>
+        {% load i18n static %}
+        {% if not debug %}
+            <script defer
+                    src="https://cloud.umami.is/script.js"
+                    data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
+        {% endif %}
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description"
+              content="{{ description|safe|default_if_none:" A Springsteen Setlist Database" }}">
+        <meta name="keywords" content="Databruce, Setlists, Springsteen">
+        <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:title" content="{{ title|default_if_none:"databruce" }}">
+        <meta property="og:site_name" content="Databruce">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ request.build_absolute_uri }}">
+        <meta property="og:description"
+              content="{{ description|safe|default_if_none:" A Springsteen Setlist Database" }}">
+        <link rel="icon"
+              type="image/png"
+              href="{% static "databruce/img/favicon-96x96.png" %}"
+              sizes="96x96" />
+        <link rel="icon"
+              type="image/svg+xml"
+              href="{% static "databruce/img/favicon.svg" %}" />
+        <link rel="shortcut icon" href="{% static "databruce/img/favicon.ico" %}" />
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{% static "databruce/img/apple-touch-icon.png" %}" />
+        <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
+        <title>
+            {% block title %}
+                Home
+            {% endblock title %}
+            | Databruce
+        </title>
+        <!-- leaflet.js-->
+        <link rel="stylesheet" href="{% static 'databruce/css/leaflet.css' %}" />
+        <script src="{% static 'databruce/js/leaflet/leaflet.js' %}"></script>
+        <!--JQuery-->
+        <link rel="stylesheet"
+              href="{% static 'databruce/css/jquery-ui.min.css' %}">
+        <script src="{% static 'databruce/js/jquery/jquery-4.0.0.min.js' %}"></script>
+        <script src="{% static 'databruce/js/jquery/jquery-ui.min.js' %}"></script>
+        <script src="{% static 'databruce/js/jquery/jquery.mask.min.js' %}"></script>
+        <!--Bootstrap-->
+        <link rel="stylesheet"
+              href="{% static 'databruce/css/bootstrap.min.css' %}">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <script src="{% static 'databruce/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+        <!--Datatables-->
+        {% comment %}
     <link href="{% static 'databruce/css/datatables-3.1.min.css' %}"
-          rel="stylesheet"> {% endcomment %}
-    <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-3.0.1/b-4.0.1/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.1/rg-2.0.0/sb-2.0.0/datatables.min.css"
-          rel="stylesheet"
-          integrity="sha384-XtmjPZI0Hksef8p1R4c4asVVjgEUK/ELDbONiHOWM2Tl48+UdkHdlI8s9l2wHnyH"
-          crossorigin="anonymous">
-    <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-3.0.1/b-4.0.1/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.1/rg-2.0.0/sb-2.0.0/datatables.min.js"
-            integrity="sha384-MzpligBHTFM0HdFifmid2MvwUUYD+se8z2K/gv0SmoNJKq/TpEKcNP0SwkqboH3R"
-            crossorigin="anonymous"></script>
-    <script src="https://nightly.datatables.net/cardview/js/dataTables.cardView.js?2026-08-04a"></script>
-    {% comment %}
-    <script src="{% static 'databruce/js/datatables/datatables-3.1.min.js' %}"></script> {% endcomment %}
-    {% comment %}
-    <script src="{% static 'databruce/js/datatables/dt_plus_remove.js' %}"></script> {% endcomment %}
-    <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
-    <!-- Other -->
-    <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
-    <script src="{% static 'databruce/js/eventSearch.js' %}"></script>
-    <!-- Datatables Scripts -->
-    <script src="{% static 'databruce/js/datatables.js' %}"></script>
-    <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
-    <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
-    {% block extrastyle %}
-    {% endblock extrastyle %}
-    {% block extrajs %}
-    {% endblock extrajs %}
-  </head>
-  <body>
-    {% include "./partials/navbar.html" %}
-    <div class="padded-body">
-      {% block container %}
-      {% endblock container %}
-      {% include "./partials/searchbuilder.html" %}
-    </div>
-    <div class="modal fade"
-         id="searchModal"
-         tabindex="-1"
-         aria-labelledby="searchModalLabel"
-         aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-body">
-            <div class="row mb-2">
-              <span class="text-muted">Note: Search is very much in beta. Best results will be when either using a date or part of a date + other field. Ex. Boston 1975</span>
-            </div>
-            <div class="row mb-3">
-              <form role="search"
-                    method="get"
-                    action="{% url 'event_search' %}"
-                    class="d-flex my-xl-auto">
-                <input type="search"
-                       id="eventSearch"
-                       name="q"
-                       class="form-control"
-                       placeholder="Search by date (yyyy-mm-dd), venue, city, etc."
-                       aria-label="Search">
-              </form>
-            </div>
-            <div class="row justify-content-center" id="loadingContainer">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-            <div class="row justify-content-center">
-              <div class="col">
-                <ul id="results" class="list-group">
-                </ul>
-              </div>
-            </div>
-          </div>
+        rel="stylesheet"> {% endcomment %}
+        <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-3.0.1/b-4.0.1/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.1/rg-2.0.0/sb-2.0.0/datatables.min.css"
+              rel="stylesheet"
+              integrity="sha384-XtmjPZI0Hksef8p1R4c4asVVjgEUK/ELDbONiHOWM2Tl48+UdkHdlI8s9l2wHnyH"
+              crossorigin="anonymous">
+        <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/dt-3.0.1/b-4.0.1/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.1/rg-2.0.0/sb-2.0.0/datatables.min.js"
+                integrity="sha384-MzpligBHTFM0HdFifmid2MvwUUYD+se8z2K/gv0SmoNJKq/TpEKcNP0SwkqboH3R"
+                crossorigin="anonymous"></script>
+        <script src="https://nightly.datatables.net/cardview/js/dataTables.cardView.js?2026-08-04a"></script>
+        {% comment %}
+        <script src="{% static 'databruce/js/datatables/datatables-3.1.min.js' %}"></script> {% endcomment %}
+        {% comment %}
+        <script src="{% static 'databruce/js/datatables/dt_plus_remove.js' %}"></script> {% endcomment %}
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
+        <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
+        <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
+        <!-- Other -->
+        <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
+        <script src="{% static 'databruce/js/eventSearch.js' %}"></script>
+        <!-- Datatables Scripts -->
+        <script src="{% static 'databruce/js/datatables.js' %}"></script>
+        <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
+        <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
+        {% block extrastyle %}
+        {% endblock extrastyle %}
+        {% block extrajs %}
+        {% endblock extrajs %}
+    </head>
+    <body>
+        {% include "./partials/navbar.html" %}
+        <div class="padded-body">
+            {% block container %}
+            {% endblock container %}
+            {% include "./partials/searchbuilder.html" %}
         </div>
-      </div>
-    </div>
-    <div class="footer mt-3">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body text-center py-2">
-            Copyright ©{% now "Y" %}, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
-          </div>
+        <div class="modal fade"
+             id="searchModal"
+             tabindex="-1"
+             aria-labelledby="searchModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="row mb-2">
+                            <span class="text-muted">Note: Search is very much in beta. Best results will be when either using a date or part of a date + other field. Ex. Boston 1975</span>
+                        </div>
+                        <div class="row mb-3">
+                            <form role="search"
+                                  method="get"
+                                  action="{% url 'event_search' %}"
+                                  class="d-flex my-xl-auto">
+                                <input type="search"
+                                       id="eventSearch"
+                                       name="q"
+                                       class="form-control"
+                                       placeholder="Search by date (yyyy-mm-dd), venue, city, etc."
+                                       aria-label="Search">
+                            </form>
+                        </div>
+                        <div class="row justify-content-center" id="loadingContainer">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col">
+                                <ul id="results" class="list-group">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <script>
+        <div class="footer mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-2">
+                        Copyright ©{% now "Y" %}, Databruce.com. Song lyrics and titles are the copyright of Sony Music Entertainment/Bruce Springsteen. All other copyrights are held by their respective owners.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
     $(document).ready(function () {
       $("#loadingContainer").hide();
       let searchTimer;
+
+      $("form").on("keydown", "input:not(textarea)", function(event) {
+          if (event.key === "Enter") {
+              event.preventDefault();
+          }
+      });
 
       $('#eventSearch').on('input', function () {
         const query = $(this).val();
@@ -217,6 +223,6 @@
           .responsive.recalc();
       });
     });
-    </script>
-  </body>
+        </script>
+    </body>
 </html>

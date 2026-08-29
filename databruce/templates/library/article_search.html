@@ -126,10 +126,8 @@
               <a href="/library/article/${article.slug}/">${article.title}</a>
               </div>
               <div class="card-subtitle my-2 text-xs">
-                By ${article.author} | <span class="badge badge-primary">${article.category}</span>
+                <span class="fw-medium">${article.author}</span><br><span class="fw-medium">${article.published_at}</span>
               </div>
-              <p class="card-text">${truncateText(article.content)}}...</p>
-              <a href="/library/article/${article.slug}/" class="btn btn-sm btn-primary">Read Article</a>
             </div>
           </div>
         `).join('');

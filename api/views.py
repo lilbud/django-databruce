@@ -1126,5 +1126,4 @@ class ArticlesSearchViewSet(viewsets.ModelViewSet):
   )
 
   filterset_class = filters.ArticleFilter
-  ordering = ["-published_at"]  # Default ordering
   pagination_class = StandardSetPagination

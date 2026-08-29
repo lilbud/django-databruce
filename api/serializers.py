@@ -1503,6 +1503,8 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
     read_only=True,
   )
 
+  rank = serializers.FloatField(required=False)
+
   class Meta:
     model = models.Articles
     fields = [
@@ -1512,4 +1514,6 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
       "category",
       "collection",
       "content",
+      "published_at",
+      "rank",
     ]
