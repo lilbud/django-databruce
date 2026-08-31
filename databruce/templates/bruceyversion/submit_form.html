@@ -41,50 +41,16 @@
                 <div class="col">{{ form.non_field_errors }}</div>
                 {% for field in form %}
                     <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="mb-1">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}" class="fw-medium">{{ field.label }}</label>
+                        {% if field.help_text %}
+                            <div class="form-text text-muted text-xs mb-2">{{ field.help_text|safe }}</div>
+                        {% endif %}
                         {{ field }}
                         {% if field.errors %}
                             <div class="error-message">{{ field.errors }}</div>
                         {% endif %}
-                        {# Help text #}
-                        {% if field.help_text %}
-                            <small class="help-text">{{ field.help_text|safe }}</small>
-                        {% endif %}
                     </div>
                 {% endfor %}
-                {% comment %} <div class="mb-3">
-                    {{ form.event.label_tag }}
-                    <select name="event"
-                            class="form-select form-select-sm event select2"
-                            id="event">
-                        {% if form.event.value %}
-                            <!-- Force the selected ID into the DOM on page reload -->
-                            <option value="{{ form.event.value }}" selected="selected">{{ form.event.value }}</option>
-                        {% endif %}
-                    </select>
-                    {{ form.event.errors }}
-                </div>
-                <div class="mb-3">
-                    {{ form.song.label_tag }}
-                    <select name="song"
-                            class="form-select form-select-sm"
-                            id="song"
-                            {% if not form.song.value %}disabled="disabled"{% endif %}>
-                        {% if form.song.value %}
-                            <!-- Force the selected ID into the DOM on page reload -->
-                            <option value="{{ form.song.value }}" selected="selected">{{ form.song.value }}</option>
-                        {% endif %}
-                    </select>
-                    {{ form.song.errors }}
-                </div>
-                <div class="mb-3">
-                    {{ form.comment.label_tag }}
-                    <textarea name="comment"
-                              class="form-control form-control-sm"
-                              id="comment"
-                              {% if not form.song.value %}disabled="disabled"{% endif %}>{{ form.comment.value|default_if_none:"" }}</textarea>
-                    {{ form.comment.errors }}
-                </div> {% endcomment %}
                 <div class="col-12 mx-auto">
                     <button class="btn btn-sm btn-primary" type="submit">Submit</button>
                 </div>

@@ -71,7 +71,7 @@
         </div>
         <div class="card mb-3">
             <div class="card-header">Entry</div>
-            <div class="card-body">{{ entry.comment }}</div>
+            <div class="card-body text-sm">{{ entry.comment }}</div>
         </div>
         <div class="card mb-2" id="commentCard">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -108,7 +108,9 @@
                                     <span class="text-primary">{{ comment.user.username }}</span>
                                     <span class="mb-2">
                                         <span class="fw-medium">{{ comment.created_at }}</span>
-                                        <span class="text-muted">(Edited: {{ comment.updated_at }})</span>
+                                        {% if comment.updated_at != comment.created_at %}
+                                            <span class="text-muted">(Edited: {{ comment.updated_at }})</span>
+                                        {% endif %}
                                     </span>
                                     <span>{{ comment.comment|linebreaks }}</span>
                                 </div>
@@ -140,8 +142,11 @@
                     <form method="post" id="comment-form">
                         {% csrf_token %}
                         <input type="hidden" name="entry" value="{{ entry.id }}">
-                        <label for="{{ form.comment.id_for_label }}" class="mb-1">{{ form.comment.label }}</label>
+                        <label for="{{ form.comment.id_for_label }}" class="fw-medium">{{ form.comment.label }}</label>
                         {{ form.comment }}
+                        {% if form.comment.help_text %}
+                            <div class="form-text text-muted text-xs mb-2">{{ form.comment.help_text }}</div>
+                        {% endif %}
                         <span class="button-container">
                             <button id="submit-comment"
                                     class="btn btn-primary text-xs mt-2"
@@ -170,7 +175,10 @@
                     <form method="post" id="update-comment-form">
                         {% csrf_token %}
                         <input type="hidden" name="commentID" value="{{ user_comment.id }}">
-                        <label for="{{ form.comment.id_for_label }}" class="mb-1">{{ form.comment.label }}</label>
+                        <label for="{{ form.comment.id_for_label }}" class="fw-medium">{{ form.comment.label }}</label>
+                        {% if form.comment.help_text %}
+                            <div class="form-text text-muted text-xs mb-2">{{ form.comment.help_text }}</div>
+                        {% endif %}
                         {{ form.comment }}
                         <span class="button-container">
                             <button id="update-comment"
