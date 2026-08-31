@@ -130,7 +130,7 @@ class AdvancedEventSearch(forms.Form):
     lookup_path: str,
   ) -> Q:
     # If it's a string, dictionary, or single model instance
-    if isinstance(value, dict):
+    if isinstance(value, dict):  # noqa: SIM108
       val_id = value.get("id")
     else:
       # Safely get .id from a model instance, fallback to the raw value (str/int)

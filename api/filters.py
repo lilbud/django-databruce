@@ -26,6 +26,7 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from bruceyversion import models as bv_models
 from databruce import models
 
 date = datetime.datetime.now(tz=datetime.UTC).date()
@@ -636,6 +637,14 @@ class EventsFilter(dj_filters.FilterSet):
       )
       ranking_cases.append(When(exact_date_match, then=Value(1.0)))
 
+    event_exclude_filter = Q(
+      Q(tour__num_songs=0)
+      | Q(
+        setlist_certainty__in=["Unknown", "Probable"],
+      )
+      | Q(public=False),
+    )
+
     return (
       queryset.annotate(
         search=vector,
@@ -644,6 +653,7 @@ class EventsFilter(dj_filters.FilterSet):
           default=SearchRank(vector, query, weights=[0.1, 0.3, 0.6, 1.0]),
         ),
       )
+      .exclude(event_exclude_filter)
       .filter(
         Q(event_id__startswith=str(value)) | date_conditions | Q(search=query),
         rank__gt=0.1,
@@ -1072,15 +1082,41 @@ class SetlistFilter(dj_filters.FilterSet):
 
     return queryset.filter(lookup)
 
+  def filter_song_list(self, queryset, name, value):
+    return queryset.exclude(song_id__in=[689, 1021, 514])
+
+  def filter_bv(self, queryset, name, value):
+    assert self.data is not None
+    event = self.data.get("event")
+
+    check = bv_models.Entries.objects.filter(event=event)
+
+    if check.exists():
+      return queryset.exclude(event=event, song_id__in=check.values_list("song"))
+
+    return queryset
+
   song_num = dj_filters.BooleanFilter(
     method="filter_song_num",
     label="has song num",
+  )
+
+  bv = dj_filters.BooleanFilter(
+    method="filter_bv",
+    label="no entry song",
   )
 
   show_only = dj_filters.BooleanFilter(
     method="filter_show_only",
     label="show only",
   )
+
+  hide_non_songs = dj_filters.BooleanFilter(
+    method="filter_song_list",
+    label="hide non songs",
+  )
+
+  song = dj_filters.CharFilter(field_name="song__name", lookup_expr="icontains")
 
   class Meta:
     model = models.Setlists

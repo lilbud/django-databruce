@@ -41,8 +41,6 @@ function get_options({ ajax_url = false }) {
     }
   };
 
-
-
   return options;
 }
 

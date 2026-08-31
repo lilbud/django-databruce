@@ -109,6 +109,10 @@
   font-size: clamp(var(--text-xl), 3.8vw, var(--text-2xl)) !important;
 }
 
+.entry-row {
+  font-size: clamp(var(--text-xs), 3.8vw, var(--text-sm)) !important;
+}
+
 h1,
 h2,
 h3,

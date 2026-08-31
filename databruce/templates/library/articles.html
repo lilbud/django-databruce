@@ -56,10 +56,10 @@
                                         <tr>
                                             <th class="all">Title</th>
                                             <th class="all">Author</th>
-                                            <th class="all">Type</th>
+                                            <th class="min-desktop">Type</th>
                                             <th class="all">Source</th>
-                                            <th class="all">Collection</th>
-                                            <th class="all">Publish Date</th>
+                                            <th class="min-desktop">Collection</th>
+                                            <th class="min-desktop">Publish Date</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -82,10 +82,15 @@
         ajax: {
           'url': '/api/v1/articles/?format=custom',
         },
+        responsive: {
+          details: false,
+        },
         columns: [
           {
             'data': 'title',
             'name': 'title',
+            'width': '20rem',
+            'class': 'text-wrap',
             'render': function (data, type, row, meta) {
               if (data) {
                 return `<a href="/library/article/${row.slug}">${truncateText(data)}</a>`

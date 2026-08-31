@@ -1,0 +1,19 @@
+<div class="row entry-row">
+    <div class="col-3">
+        <a class="text-reset text-primary"
+           href="{% url "profile" id=entry.user.uuid %}">{{ entry.user }}<br>
+            <span class="text-default">Votes: {{ entry.user_vote_count }}</span>
+        </a>
+    </div>
+    <div class="col">
+        <a class="text-reset"
+           href="{% url "bruceyversion:entry_details" id=entry.uuid %}">{{ entry.comment }}</a>
+    </div>
+    <div class="col-3">
+        <a href="{% url "bruceyversion:entry_details" id=entry.uuid %}">
+            {{ entry.song.name }}
+            <br>
+            {{ entry.event.get_date }}
+        </a>
+    </div>
+</div>

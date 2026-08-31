@@ -11,7 +11,7 @@
     {% endif %}
     <div class="col-12 col-lg-8">
         <div class="text-base">
-            <a href="{% url 'library:articles' %}">Back to Databruce Article Library</a>
+            <a href="{% url "library:articles" %}">Back to Databruce Article Library</a>
         </div>
         {% if article.note %}
             <!-- message cards -->
@@ -32,7 +32,7 @@
             Published Date: <span class="fw-semibold">{{ article.published_at|date:"F j, Y" }}</span>
         </div>
         <hr>
-        <div class="text-base" id='article-content'>{{ body }}</div>
+        <div class="text-base" id="article-content">{{ body }}</div>
         <hr>
         <div class="prefix-container text-sm">
             <span class="prefix">Sourced From</span>

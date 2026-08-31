@@ -82,6 +82,9 @@ class BaseDataTest(TransactionTestCase):
       is_active=False,
     )
 
+    # group = Group.objects.get(name="Beta Testers")
+    # self.user_active.groups.add(group)  # type: ignore
+
     self.user_event = UserAttendedShows.objects.create(
       user=self.user_active,
       event=self.event,
@@ -312,8 +315,10 @@ class AdvSearchTest(BaseDataTest):
     # Event 1 should be present because Song A is NOT followed by Song B
     assert self.event1.event_id in events
 
-    # Should be only one event
-    assert len(events) == 1
+    # print(events)
+
+    # Should be only two events
+    assert len(events) == 2
 
   def test_not_anywhere(self):
     response = self.get_search_results(

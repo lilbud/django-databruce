@@ -1,0 +1,290 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-6">
+        <span class="text-sm">
+            <a href="{% url "bruceyversion:entries" %}">Back to Entries</a>
+        </span>
+        <div class="page-title mb-3">{{ title }}</div>
+        <div class="row d-flex-inline gx-2 gy-2 mb-2">
+            <div class="col-9">
+                <div class="card h-100">
+                    <div class="card-header">Entry Info</div>
+                    <div class="card-body">
+                        <div class="prefix-container text-sm">
+                            <span class="prefix">Event</span>
+                            <span class="value">
+                                <a href="{% url "event_details" id=entry.event.event_id %}">{{ entry.event.get_date }} - {{ entry.event.venue }}</a>
+                            </span>
+                        </div>
+                        <div class="prefix-container text-sm">
+                            <span class="prefix">Song</span>
+                            <span class="value"><a href="{% url "song_details" id=entry.song.uuid %}">{{ entry.song.name }}</a></span>
+                        </div>
+                        <div class="prefix-container text-sm">
+                            <span class="prefix">User</span>
+                            <span class="value"><a href="{% url "profile" id=entry.user.uuid %}">{{ entry.user.username }}</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card h-100">
+                    <div class="card-header">Votes</div>
+                    <div class="card-body d-flex align-items-center gap-2 flex-wrap">
+                        <div class="col-12 col-lg-6">
+                            <span class="d-flex text-xl" id="vote-count">{{ entry.votes }}</span>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                            {% if user.is_authenticated %}
+                                {% if not user_voted %}
+                                    <form method="post" id="voteForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user" value="{{ user.id }}">
+                                        <input type="hidden" name="entry" value="{{ entry.id }}">
+                                        <button class="btn btn-sm btn-primary"
+                                                id="vote-btn"
+                                                type="submit"
+                                                name="submit">Vote</button>
+                                    </form>
+                                {% else %}
+                                    <span data-bs-toggle="tooltip"
+                                          data-bs-title="You have either already voted for this entry or this is your entry">
+                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span data-bs-toggle="tooltip"
+                                      data-bs-title="You must be logged in to vote">
+                                    <a role="button"
+                                       href="{% url "login" %}?next={{ request.path }}"
+                                       class="btn btn-sm btn-primary"
+                                       id="vote-btn">Login</a>
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-header">Entry</div>
+            <div class="card-body">{{ entry.comment }}</div>
+        </div>
+        <div class="card mb-2" id="commentCard">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Comments
+                {% if user.is_authenticated %}
+                    {% if not user_comment %}
+                        <button class="btn btn-secondary-subtle text-xs py-1 px-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#commentModal">Submit Comment</button>
+                    {% else %}
+                        <span data-bs-toggle="tooltip"
+                              data-bs-title="You already commented, click to update">
+                            <button class="btn btn-secondary-subtle text-xs py-1 px-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#updateCommentModal">Update Comment</button>
+                        </span>
+                    {% endif %}
+                {% else %}
+                    <span data-bs-toggle="tooltip"
+                          data-bs-title="You must be logged in to vote">
+                        <a role="button"
+                           href="{% url "login" %}?next={{ request.path }}"
+                           class="btn btn-sm btn-primary"
+                           id="vote-btn">Login</a>
+                    </span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if comments|length > 0 %}
+                    {% for comment in comments %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="card info-card">
+                                    <span class="text-primary">{{ comment.user.username }}</span>
+                                    <span class="mb-2">
+                                        <span class="fw-medium">{{ comment.created_at }}</span>
+                                        <span class="text-muted">(Edited: {{ comment.updated_at }})</span>
+                                    </span>
+                                    <span>{{ comment.comment|linebreaks }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="card message info">No comments for this entry, submit one above</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="modal fade"
+         id="commentModal"
+         tabindex="-1"
+         aria-labelledby="commentModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="commentModalLabel">Submit Comment</h1>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="comment-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="entry" value="{{ entry.id }}">
+                        <label for="{{ form.comment.id_for_label }}" class="mb-1">{{ form.comment.label }}</label>
+                        {{ form.comment }}
+                        <span class="button-container">
+                            <button id="submit-comment"
+                                    class="btn btn-primary text-xs mt-2"
+                                    type="submit">Submit</button>
+                        </span>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade"
+         id="updateCommentModal"
+         tabindex="-1"
+         aria-labelledby="updateCommentModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="updateCommentModalLabel">Update Comment</h1>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="update-comment-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="commentID" value="{{ user_comment.id }}">
+                        <label for="{{ form.comment.id_for_label }}" class="mb-1">{{ form.comment.label }}</label>
+                        {{ form.comment }}
+                        <span class="button-container">
+                            <button id="update-comment"
+                                    class="btn btn-primary text-xs mt-2"
+                                    type="submit">Submit</button>
+                        </span>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      $(document).ready(function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        $('#voteForm').submit(async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch("{% url 'bruceyversion:entry_vote' %}", {
+              method: 'POST',
+              body: formData
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json(); // Parses the JSON response body
+
+            if (!data['success']) {
+              alert(data['message'])
+              $('#vote-btn').prop('disabled', true);
+            } else {
+              $('#vote-count').text(data['votes']);
+              $('#vote-btn').hide();
+            }
+
+          } catch (error) {
+            console.error('Error during POST request:', error);
+          }
+        });
+
+        $('#comment-form').submit(async function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch("{% url 'bruceyversion:entry_comment_submit' %}", {
+              method: 'POST',
+              body: formData
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json(); // Parses the JSON response body
+            const modalElement = document.getElementById('commentModal');
+
+            // Get the active instance and trigger hide
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modalInstance.hide();
+
+            // disable comment button
+            $('#submit-comment').prop('disabled', true);
+            $('#submit-comment').closest('span').attr('data-bs-toggle', 'tooltip').attr('data-bs-title', 'You have already commented on this entry')
+
+            var url = '{{ request.path }}'
+            
+            console.log(url);
+            if (url) { // require a URL
+              window.location = url; // redirect
+            }
+
+          } catch (error) {
+            console.error('Error during POST request:', error);
+          }
+        });
+
+        $('#update-comment-form').submit(async function(e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch("{% url 'bruceyversion:entry_comment_update' %}", {
+              method: 'POST',
+              body: formData
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json(); // Parses the JSON response body
+            const modalElement = document.getElementById('updateCommentModal');
+
+            // Get the active instance and trigger hide
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modalInstance.hide();
+
+            var url = '{{ request.path }}'
+            
+            console.log(url);
+            if (url) { // require a URL
+              window.location = url; // redirect
+            }
+
+          } catch (error) {
+            console.error('Error during POST request:', error);
+          }
+        })
+      })
+    </script>
+{% endblock content %}

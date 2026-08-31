@@ -35,24 +35,25 @@ TEST_RUNNER = "test_runner.PostgresViewTestRunner"
 
 # Application definition
 INSTALLED_APPS = [
-    "django.contrib.admin",  # required
-    "django.contrib.auth",
-    "django.contrib.postgres",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.sitemaps",
-    "django.contrib.sites",
-    "databruce.apps.DatabruceConfig",
-    "shortener",
-    "anymail",
-    "django.contrib.humanize",
-    "api",
-    "blog",
-    "rest_framework",
-    "django_filters",
-    "timezone_field",
+  "django.contrib.admin",  # required
+  "django.contrib.auth",
+  "django.contrib.postgres",
+  "django.contrib.contenttypes",
+  "django.contrib.sessions",
+  "django.contrib.messages",
+  "django.contrib.staticfiles",
+  "django.contrib.sitemaps",
+  "django.contrib.sites",
+  "databruce.apps.DatabruceConfig",
+  "shortener",
+  "anymail",
+  "django.contrib.humanize",
+  "api",
+  "blog",
+  "bruceyversion",
+  "rest_framework",
+  "django_filters",
+  "timezone_field",
 ]
 
 SITE_ID = 1
@@ -64,17 +65,17 @@ SHORTENER_LIFESPAN = -1
 SHORTENER_MAX_USES = -1
 
 MIDDLEWARE = [
-    # These three are optional, but highly recommended!
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.http.ConditionalGetMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
+  # These three are optional, but highly recommended!
+  "django.middleware.security.SecurityMiddleware",
+  "django.contrib.sessions.middleware.SessionMiddleware",
+  "django.middleware.common.CommonMiddleware",
+  "django.middleware.csrf.CsrfViewMiddleware",
+  "django.middleware.locale.LocaleMiddleware",
+  "django.contrib.auth.middleware.AuthenticationMiddleware",
+  "django.contrib.messages.middleware.MessageMiddleware",
+  "django.middleware.clickjacking.XFrameOptionsMiddleware",
+  "django.middleware.http.ConditionalGetMiddleware",
+  "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 TESTING = "test" in sys.argv
@@ -82,42 +83,42 @@ TESTING = "test" in sys.argv
 ROOT_URLCONF = "databruce.urls"
 
 TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "builtins": [
-                "django.template.defaulttags",
-                "databruce.templatetags.filters",
-            ],
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "databruce.context_processors.base_data",
-            ],
-        },
+  {
+    "BACKEND": "django.template.backends.django.DjangoTemplates",
+    "DIRS": [],
+    "APP_DIRS": True,
+    "OPTIONS": {
+      "builtins": [
+        "django.template.defaulttags",
+        "databruce.templatetags.filters",
+      ],
+      "context_processors": [
+        "django.template.context_processors.debug",
+        "django.template.context_processors.request",
+        "django.contrib.auth.context_processors.auth",
+        "django.contrib.messages.context_processors.messages",
+        "databruce.context_processors.base_data",
+      ],
     },
+  },
 ]
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": "localhost",
-        "PORT": "5432",
-        "CONN_MAX_AGE": 0,
-        "CONN_HEALTH_CHECKS": False,
-        "TEST": {
-            "NAME": "databruce_test",
-            "USER": os.getenv("DATABASE_USER"),
-            "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        },
+  "default": {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": os.getenv("DATABASE_NAME"),
+    "USER": os.getenv("DATABASE_USER"),
+    "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+    "HOST": "localhost",
+    "PORT": "5432",
+    "CONN_MAX_AGE": 0,
+    "CONN_HEALTH_CHECKS": False,
+    "TEST": {
+      "NAME": "databruce_test",
+      "USER": os.getenv("DATABASE_USER"),
+      "PASSWORD": os.getenv("DATABASE_PASSWORD"),
     },
+  },
 }
 
 WSGI_APPLICATION = "databruce.wsgi.application"
@@ -127,26 +128,26 @@ FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+  {
+    "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+  },
+  {
+    "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+  },
+  {
+    "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+  },
+  {
+    "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+  },
 ]
 
 PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
-    "django.contrib.auth.hashers.ScryptPasswordHasher",
+  "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+  "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+  "django.contrib.auth.hashers.Argon2PasswordHasher",
+  "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+  "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
 # Internationalization
@@ -172,8 +173,8 @@ AUTH_USER_MODEL = "databruce.CustomUser"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ANYMAIL = {
-    "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
-    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),  # e.g., '://yourdomain.com'
+  "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
+  "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),  # e.g., '://yourdomain.com'
 }
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"

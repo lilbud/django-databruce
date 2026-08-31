@@ -25,16 +25,16 @@ router.register(r"relations", views.RelationsViewSet, basename="relation")
 router.register(r"onstage", views.OnstageViewSet, basename="onstage")
 router.register(r"onstageband", views.OnstageBandViewSet, basename="onstageband")
 router.register(
-    r"release_tracks",
-    views.ReleaseTracksViewSet,
-    basename="release_tracks",
+  r"release_tracks",
+  views.ReleaseTracksViewSet,
+  basename="release_tracks",
 )
 router.register(r"releases", views.ReleasesViewSet, basename="release")
 router.register(r"setlists", views.SetlistViewSet, basename="setlist")
 router.register(
-    r"setlists_mobile",
-    views.SetlistMobileViewSet,
-    basename="setlists_mobile",
+  r"setlists_mobile",
+  views.SetlistMobileViewSet,
+  basename="setlists_mobile",
 )
 router.register(r"snippets", views.SnippetViewSet, basename="snippet")
 router.register(r"included", views.IncludedSongViewSet, basename="included")
@@ -45,93 +45,103 @@ router.register(r"tour_legs", views.TourLegsViewSet, basename="tour_leg")
 router.register(r"songspage", views.SongsPageViewSet, basename="songs_page")
 router.register(r"lyrics", views.LyricsViewSet, basename="lyrics")
 router.register(
-    r"setlist_entries",
-    views.SetlistEntriesViewSet,
-    basename="setlist_entries",
+  r"setlist_entries",
+  views.SetlistEntriesViewSet,
+  basename="setlist_entries",
 )
 router.register(
-    r"setlist_stats",
-    views.SetlistStatsViewSet,
-    basename="setlist_stats",
+  r"setlist_stats",
+  views.SetlistStatsViewSet,
+  basename="setlist_stats",
 )
 router.register(
-    r"advanced_search",
-    views.AdvancedSearch,
-    basename="advanced_search",
+  r"advanced_search",
+  views.AdvancedSearch,
+  basename="advanced_search",
 )
 router.register(
-    r"setlist_notes",
-    views.SetlistNotesViewSet,
-    basename="setlist_notes",
+  r"setlist_notes",
+  views.SetlistNotesViewSet,
+  basename="setlist_notes",
 )
 router.register(
-    r"updates",
-    views.UpdatesViewSet,
-    basename="updates",
+  r"updates",
+  views.UpdatesViewSet,
+  basename="updates",
 )
 router.register(
-    r"users",
-    views.UsersViewSet,
-    basename="users",
+  r"users",
+  views.UsersViewSet,
+  basename="users",
 )
 router.register(
-    r"user_attended_shows",
-    views.UsersAttendedShowsViewSet,
-    basename="user_attended_shows",
+  r"user_attended_shows",
+  views.UsersAttendedShowsViewSet,
+  basename="user_attended_shows",
 )
 router.register(
-    r"adv_search",
-    views.AdvancedEventSearch,
-    basename="adv_search",
+  r"adv_search",
+  views.AdvancedEventSearch,
+  basename="adv_search",
 )
 router.register(
-    r"setlist_songs",
-    views.SetlistSongsViewSet,
-    basename="setlist_songs",
+  r"setlist_songs",
+  views.SetlistSongsViewSet,
+  basename="setlist_songs",
 )
 router.register(
-    r"setlist_breakdown",
-    views.SetlistBreakdown,
-    basename="setlist_breakdown",
+  r"setlist_breakdown",
+  views.SetlistBreakdown,
+  basename="setlist_breakdown",
 )
 router.register(
-    r"user_album_breakdown",
-    views.UserAlbumBreakdown,
-    basename="user_album_breakdown",
+  r"user_album_breakdown",
+  views.UserAlbumBreakdown,
+  basename="user_album_breakdown",
 )
 router.register(
-    r"year_song_breakdown",
-    views.YearSongBreakdown,
-    basename="year_song_breakdown",
+  r"year_song_breakdown",
+  views.YearSongBreakdown,
+  basename="year_song_breakdown",
 )
 router.register(
-    r"event_tags",
-    views.EventTagsViewSet,
-    basename="event_tags",
+  r"event_tags",
+  views.EventTagsViewSet,
+  basename="event_tags",
 )
 router.register(
-    r"tags",
-    views.TagsViewSet,
-    basename="tags",
+  r"tags",
+  views.TagsViewSet,
+  basename="tags",
 )
 router.register(
-    r"logs",
-    views.ItemInsertLogViewSet,
-    basename="logs",
+  r"logs",
+  views.ItemInsertLogViewSet,
+  basename="logs",
 )
 router.register(
-    r"articles",
-    views.ArticlesViewSet,
-    basename="articles",
+  r"articles",
+  views.ArticlesViewSet,
+  basename="articles",
 )
 router.register(
-    r"articles_search",
-    views.ArticlesSearchViewSet,
-    basename="articles_search",
+  r"articles_search",
+  views.ArticlesSearchViewSet,
+  basename="articles_search",
+)
+router.register(
+  r"bv_entries",
+  views.BVEntriesViewSet,
+  basename="bv_entries",
+)
+router.register(
+  r"bv_entry_comments",
+  views.BVEntryCommentsViewSet,
+  basename="bv_entry_comments",
 )
 
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path("api/v1/", include(router.urls)),
+  path("api/v1/", include(router.urls)),
 ]

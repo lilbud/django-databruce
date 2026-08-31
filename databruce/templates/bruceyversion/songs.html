@@ -1,0 +1,24 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-8">
+        <div class="page-title mb-1">Bruceyversion Song List</div>
+        <div class="text-sm mb-4 d-flex align-items-center gap-2 text-nowrap">
+            Have a favorite song not listed below? Submit your pick here:
+            <a role="button"
+               href="{% url "bruceyversion:submit" %}"
+               class="btn btn-sm btn-primary-subtle text-xs">Submit Song</a>
+        </div>
+        <div class="row mb-3">
+            {% for item in songs %}
+                <span class="text-lg">
+                    <a class="text-primary"
+                       href="{% url "bruceyversion:entry_by_song" id=item.song.uuid %}">{{ item.song.name }}</a>
+                    - {{ item.song_votes }}
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

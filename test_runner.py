@@ -4,14 +4,14 @@ from django.test.runner import DiscoverRunner
 
 
 class PostgresViewTestRunner(DiscoverRunner):
-    def setup_databases(self, **kwargs):
-        # 1. Let Django build the standard tables first
-        config = super().setup_databases(**kwargs)
+  def setup_databases(self, **kwargs):
+    # 1. Let Django build the standard tables first
+    config = super().setup_databases(**kwargs)
 
-        # 2. Inject the Materialized View schema right into the test database
-        print("\n🔨 Creating test database materialized views...")
-        with connection.cursor() as cursor:
-            cursor.execute("""
+    # 2. Inject the Materialized View schema right into the test database
+    print("\n🔨 Creating test database materialized views...")
+    with connection.cursor() as cursor:
+      cursor.execute("""
                 CREATE MATERIALIZED VIEW IF NOT EXISTS "public".venues_text AS
                 WITH
                 aliases AS (
@@ -102,9 +102,9 @@ class PostgresViewTestRunner(DiscoverRunner):
                 base_data;
             """)
 
-            cursor.execute(
-                """
-                CREATE MATERIALIZED VIEW "public".songs_page AS
+      cursor.execute(
+        """
+                CREATE MATERIALIZED VIEW IF NOT EXISTS "public".songs_page AS
                 SELECT
                   s.id,
                   lag(s.id) OVER (
@@ -127,6 +127,6 @@ class PostgresViewTestRunner(DiscoverRunner):
                   setlists s
                   LEFT JOIN events e ON e.id = s.event_id;
                 """,
-            )
+      )
 
-        return config
+    return config

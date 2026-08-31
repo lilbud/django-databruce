@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from django.templatetags.static import static
+from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,34 +28,36 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Application definition
 INSTALLED_APPS = [
-    "unfold",  # before django.contrib.admin
-    "unfold_markdown",
-    "unfold.contrib.filters",  # optional, if special filters are needed
-    "unfold.contrib.forms",  # optional, if special form elements are needed
-    "unfold.contrib.inlines",  # optional, if special inlines are needed
-    "django.contrib.admin",  # required
-    "django.contrib.auth",
-    "django.contrib.postgres",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "databruce.apps.DatabruceConfig",
-    "django.contrib.sitemaps",
-    "django.contrib.sites",
-    "django_browser_reload",
-    "django.contrib.humanize",
-    "api",
-    "blog",
-    "rest_framework",
-    "django_filters",
-    "shortener",
-    "anymail",
-    "timezone_field",
-    "django_watchfiles",
-    "sentry_sdk",
-    "drf_spectacular",
-    "django_msgspec",
+  "unfold",  # before django.contrib.admin
+  "unfold_markdown",
+  "unfold.contrib.filters",  # optional, if special filters are needed
+  "unfold.contrib.forms",  # optional, if special form elements are needed
+  "unfold.contrib.inlines",  # optional, if special inlines are needed
+  "django.contrib.admin",  # required
+  "django.contrib.auth",
+  "django.contrib.postgres",
+  "django.contrib.contenttypes",
+  "django.contrib.sessions",
+  "django.contrib.messages",
+  "django.contrib.staticfiles",
+  "databruce.apps.DatabruceConfig",
+  "django.contrib.sitemaps",
+  "django.contrib.sites",
+  "django_browser_reload",
+  "django.contrib.humanize",
+  "api",
+  "blog",
+  "library",
+  "bruceyversion",
+  "rest_framework",
+  "django_filters",
+  "shortener",
+  "anymail",
+  "timezone_field",
+  "django_watchfiles",
+  "sentry_sdk",
+  "drf_spectacular",
+  "django_msgspec",
 ]
 
 SITE_ID = 1
@@ -66,53 +69,53 @@ SHORTENER_LIFESPAN = -1
 SHORTENER_MAX_USES = -1
 
 MIDDLEWARE = [
-    # These three are optional, but highly recommended!
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.http.ConditionalGetMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
-    "databruce.middleware.CleanQueryStringMiddleware",
+  # These three are optional, but highly recommended!
+  "django.middleware.security.SecurityMiddleware",
+  "django.contrib.sessions.middleware.SessionMiddleware",
+  "django.middleware.common.CommonMiddleware",
+  "django.middleware.csrf.CsrfViewMiddleware",
+  "django.middleware.locale.LocaleMiddleware",
+  "django.contrib.auth.middleware.AuthenticationMiddleware",
+  "django.contrib.messages.middleware.MessageMiddleware",
+  "django.middleware.clickjacking.XFrameOptionsMiddleware",
+  "django.middleware.http.ConditionalGetMiddleware",
+  "django_browser_reload.middleware.BrowserReloadMiddleware",
+  "databruce.middleware.CleanQueryStringMiddleware",
 ]
 
 TESTING = "test" in sys.argv
 
 if not TESTING:
-    INSTALLED_APPS = [
-        *INSTALLED_APPS,
-        "debug_toolbar",
-    ]
-    MIDDLEWARE = [
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-        *MIDDLEWARE,
-    ]
+  INSTALLED_APPS = [
+    *INSTALLED_APPS,
+    "debug_toolbar",
+  ]
+  MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    *MIDDLEWARE,
+  ]
 
 
 ROOT_URLCONF = "databruce.urls"
 AUTH_USER_MODEL = "databruce.CustomUser"
 
 TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "databruce.context_processors.base_data",
-                "databruce.context_processors.navbar_context",
-            ],
-            "builtins": ["databruce.templatetags.filters"],
-        },
+  {
+    "BACKEND": "django.template.backends.django.DjangoTemplates",
+    "DIRS": [],
+    "APP_DIRS": True,
+    "OPTIONS": {
+      "context_processors": [
+        "django.template.context_processors.debug",
+        "django.template.context_processors.request",
+        "django.contrib.auth.context_processors.auth",
+        "django.contrib.messages.context_processors.messages",
+        "databruce.context_processors.base_data",
+        "databruce.context_processors.navbar_context",
+      ],
+      "builtins": ["databruce.templatetags.filters"],
     },
+  },
 ]
 
 WSGI_APPLICATION = "databruce.wsgi.application"
@@ -122,26 +125,26 @@ FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+  {
+    "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+  },
+  {
+    "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+  },
+  {
+    "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+  },
+  {
+    "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+  },
 ]
 
 PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
-    "django.contrib.auth.hashers.ScryptPasswordHasher",
+  "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+  "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+  "django.contrib.auth.hashers.Argon2PasswordHasher",
+  "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+  "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
 # Internationalization
@@ -166,35 +169,35 @@ LOGIN_REDIRECT_URL = "/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": (
-        "rest_framework.renderers.JSONRenderer",
-        "databruce.pagination.DatatablesRenderer",
-    ),
-    "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-    ],
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_FILTER_BACKENDS": [
-        "django_filters.rest_framework.DjangoFilterBackend",
-        "rest_framework.filters.SearchFilter",
-        "api.filters.DataTablesFilterBackend",
-        "rest_framework.filters.OrderingFilter",
-    ],
-    "PAGE_SIZE": 50,
+  "DEFAULT_RENDERER_CLASSES": (
+    "rest_framework.renderers.JSONRenderer",
+    "databruce.pagination.DatatablesRenderer",
+  ),
+  "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",
+  "DEFAULT_PERMISSION_CLASSES": [
+    "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+  ],
+  "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+  "DEFAULT_FILTER_BACKENDS": [
+    "django_filters.rest_framework.DjangoFilterBackend",
+    "rest_framework.filters.SearchFilter",
+    "api.filters.DataTablesFilterBackend",
+    "rest_framework.filters.OrderingFilter",
+  ],
+  "PAGE_SIZE": 50,
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Databruce",
-    "DESCRIPTION": "An API to interact with the Databruce database",
-    "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    # OTHER SETTINGS
+  "TITLE": "Databruce",
+  "DESCRIPTION": "An API to interact with the Databruce database",
+  "VERSION": "1.0.0",
+  "SERVE_INCLUDE_SCHEMA": False,
+  # OTHER SETTINGS
 }
 
 ANYMAIL = {
-    "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
-    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),  # e.g., '://yourdomain.com'
+  "MAILGUN_API_KEY": os.getenv("MAILGUN_API"),
+  "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_DOMAIN"),  # e.g., '://yourdomain.com'
 }
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
@@ -202,25 +205,47 @@ DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
 NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL")
 
 STATICFILES_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+  "django.contrib.staticfiles.finders.FileSystemFinder",
+  "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
 SESSION_EXEXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 
 UNFOLD = {
-    "STYLES": [
-        lambda request: static("admin/css/custom_unfold.css"),
+  "STYLES": [
+    lambda request: static("admin/css/custom_unfold.css"),
+  ],
+  "SCRIPTS": [
+    lambda request: static("admin/js/jquery-4.0.0.min.js"),
+    lambda request: static("admin/js/custom_unfold.js"),
+  ],
+  "SIDEBAR": {
+    "show_all_applications": True,  # Ensures non-configured models still show up
+    "navigation": [
+      {
+        "title": "Authentication & Authorization",
+        "separator": True,
+        "items": [
+          {
+            "title": "Users",
+            # CHANGE 'auth' to your actual app label where CustomUser lives!
+            "link": reverse_lazy("admin:databruce_customuser_changelist"),
+            "icon": "person",
+          },
+          {
+            "title": "Groups",
+            "link": reverse_lazy("admin:auth_group_changelist"),
+            "icon": "group",
+          },
+        ],
+      },
     ],
-    "SCRIPTS": [
-        lambda request: static("admin/js/jquery-4.0.0.min.js"),
-        lambda request: static("admin/js/custom_unfold.js"),
-    ],
+  },
 }
 
 
 try:
-    from .local import *  # noqa: F403
+  from .local import *  # noqa: F403
 except (ImportError, ModuleNotFoundError):
-    from .prod import *  # noqa: F403
+  from .prod import *  # noqa: F403

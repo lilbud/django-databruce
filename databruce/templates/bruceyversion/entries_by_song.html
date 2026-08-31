@@ -1,0 +1,53 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-8">
+        <div class="page-title mb-1">
+            Bruceyversion Entries For:
+            <a href="{% url "song_details" id=song.uuid %}">{{ song.name }}</a>
+        </div>
+        {% if page %}
+            <div class="text-sm mb-4 d-flex align-items-center gap-2 text-nowrap">
+                Have a favorite performance not listed below? Submit your pick here:
+                <a role="button"
+                   href="{% url "bruceyversion:submit" %}"
+                   class="btn btn-sm btn-primary-subtle text-xs">Submit Performance</a>
+            </div>
+        {% else %}
+            <div class="text-sm mb-4 d-flex align-items-center gap-2 text-nowrap">
+                There are no entries for this song, be the first here:
+                <a role="button"
+                   href="{% url "bruceyversion:submit" %}"
+                   class="btn btn-sm btn-primary-subtle text-xs">Submit Performance</a>
+            </div>
+        {% endif %}
+        {% if page %}
+            {% for entry in page %}
+                <div class="row entry-row">
+                    <div class="col-3">
+                        <a class="text-reset text-primary"
+                           href="{% url "profile" id=entry.user.uuid %}">{{ entry.user }}<br>
+                            <span class="text-default">Votes: {{ entry.user_vote_count }}</span>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a class="text-reset"
+                           href="{% url "bruceyversion:entry_details" id=entry.uuid %}">{{ entry.comment }}</a>
+                    </div>
+                    <div class="col-3">
+                        <a href="{% url "bruceyversion:entry_details" id=entry.uuid %}">
+                            {{ entry.event.get_date }}
+                            <br>
+                            {{ entry.event.venue }}
+                        </a>
+                    </div>
+                </div>
+                {% if not forloop.last %}<hr>{% endif %}
+            {% endfor %}
+            <hr>
+            {% include 'databruce/partials/_pagination.html' %}
+        {% endif %}
+    </div>
+{% endblock content %}

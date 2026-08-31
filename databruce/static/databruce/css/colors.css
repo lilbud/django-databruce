@@ -585,7 +585,7 @@
 .btn-secondary-outline,
 .badge-secondary-subtle,
 .badge-secondary-outline {
-  --color: var(--color-secondary);
+  --color: var(--color-secondary-dark);
 }
 
 /* success badge */
@@ -649,15 +649,15 @@
   --color: var(--color-danger);
 }
 
-.badge-neutral {
-  background-color: var(--color-active) !important;
-  color: var(--color-white) !important;
-  border-radius: 100px !important;
-}
-
+.badge-neutral,
 .badge-neutral-subtle,
 .badge-neutral-outline {
   border-radius: 100px !important;
+}
+
+.badge-neutral {
+  background-color: var(--color-active) !important;
+  color: var(--color-white) !important;
 }
 
 .badge:not([class*="badge-neutral"]) {
@@ -688,13 +688,8 @@ button#usercount {
   border-radius: 0 0.25rem 0.25rem 0 !important;
 }
 
-.badge[class*="subtle"],
-.badge[class*="outline"] {
-  border: 0.06rem solid color-mix(in oklab, var(--color) 70%, transparent) !important;
-}
-
-.btn[class*="subtle"],
-.btn[class*="outline"] {
+[class*="subtle"],
+[class*="outline"] {
   border: 0.06rem solid color-mix(in oklab, var(--color) 70%, transparent) !important;
 }
 
@@ -703,50 +698,46 @@ button#usercount {
 }
 
 [data-bs-theme="light"] {
-  [class*="outline"]:not([class*="badge-neutral"]) {
-    color: color-mix(in oklab, var(--color) 90%, black) !important;
+
+  [class*="outline"]:not([class*="badge-neutral"]),
+  [class*="subtle"]:not([class*="badge-neutral"]) {
+    color: var(--color) !important;
   }
 
   [class*="subtle"]:not([class*="badge-neutral"]) {
-    color: color-mix(in oklab, var(--color) 70%, black) !important;
-    background-color: color-mix(in oklab, var(--color) 20%, transparent) !important;
+    background-color: color-mix(in oklab, var(--color) 12%, transparent) !important;
+  }
+
+  .badge-neutral-subtle,
+  .badge-neutral-outline {
+    color: var(--color-active) !important;
+    border: 0.06rem solid color-mix(in oklab, var(--color-gray-600) 70%, transparent) !important;
   }
 
   .badge-neutral-subtle {
     background-color: color-mix(in oklab, var(--color-gray-300) 50%, transparent) !important;
-    color: var(--color-active) !important;
-    border: 0.06rem solid color-mix(in oklab, var(--color-gray-600) 70%, transparent) !important;
-  }
-
-  .badge-neutral-outline {
-    background-color: transparent !important;
-    color: var(--color-active) !important;
-    border: 0.06rem solid color-mix(in oklab, var(--color-gray-600) 70%, transparent) !important;
   }
 }
 
 [data-bs-theme="dark"] {
-  [class*="outline"]:not([class*="badge-neutral"]) {
-    color: color-mix(in oklab, var(--color) 70%, white) !important;
+
+  [class*="outline"]:not([class*="badge-neutral"]),
+  [class*="subtle"]:not([class*="badge-neutral"]) {
+    color: var(--color) !important;
   }
 
   [class*="subtle"]:not([class*="badge-neutral"]) {
-    color: color-mix(in oklab, var(--color) 60%, white) !important;
-    background-color: color-mix(in oklab, var(--color) 30%, transparent) !important;
+    background-color: color-mix(in oklab, var(--color) 15%, transparent) !important;
   }
 
   .badge-neutral-outline,
   .badge-neutral-subtle {
     border: 0.06rem solid var(--color-gray-400) !important;
-    color: var(--color-active) !important;
+    color: var(--color-gray-400) !important;
   }
 
   .badge-neutral-subtle {
-    background-color: color-mix(in oklab, var(--color-gray-200) 20%, transparent) !important;
-  }
-
-  .badge-neutral-outline {
-    background-color: transparent !important;
+    background-color: color-mix(in oklab, var(--color-gray-200) 12%, transparent) !important;
   }
 }
 
@@ -755,35 +746,30 @@ button#usercount {
 }
 
 .card.message.info {
-  --color: var(--color-info) !important;
+  --color: var(--color-cyan-500) !important;
 }
 
 .card.message.error {
-  --color: var(--color-danger) !important;
+  --color: var(--color-red-500) !important;
 }
 
 .card.message.warning {
-  --color: var(--color-warning) !important;
+  --color: var(--color-orange-500) !important;
 }
 
 .card.message.success {
-  --color: var(--color-success) !important;
+  --color: var(--color-green-500) !important;
 }
 
-/* .card.message {
-  background-color: color-mix(in oklab, var(--bg-color) 30%, transparent) !important;
-  border-color: var(--color) !important;
-  color: color-mix(in oklab, var(--color) 70%, black) !important;
-} */
+.card.message {
+  border-color: color-mix(in oklab, var(--color) 70%, transparent) !important;
+  background-color: color-mix(in oklab, var(--color) 15%, transparent) !important;
+}
 
 [data-bs-theme="dark"] .card.message {
-  background-color: color-mix(in oklab, var(--color) 30%, transparent) !important;
-  border-color: color-mix(in oklab, var(--color) 70%, transparent) !important;
-  color: color-mix(in oklab, var(--color) 60%, white) !important;
+  color: var(--color) !important;
 }
 
 [data-bs-theme="light"] .card.message {
-  background-color: color-mix(in oklab, var(--color) 20%, transparent) !important;
-  border-color: color-mix(in oklab, var(--color) 70%, transparent) !important;
   color: color-mix(in oklab, var(--color) 70%, black) !important;
 }

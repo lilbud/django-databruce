@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from bruceyversion import models as bv_models
 from databruce import models
 from databruce.templatetags.filters import format_fuzzy
 
@@ -540,6 +541,7 @@ class EventsSerializer(BaseSerializer):
   class Meta:
     model = models.Events
     fields = [
+      "id",
       "date",
       "artist",
       "tour",
@@ -797,7 +799,7 @@ class SetlistNotesSerializer(BaseSerializer):
 
 
 class SetlistSerializer(BaseSerializer):
-  song = MinimalSongsSerializer(include=["name", "uuid", "category_slug", "slug"])
+  song = MinimalSongsSerializer(include=["name", "uuid", "category_slug", "slug", "id"])
   last_event = MinimalEventSerializer(
     source="ltp",
     required=False,
@@ -1254,7 +1256,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
     album_songs = obj.get("album_songs", [])
     setlist_songs = obj.get("songs", [])
 
-    print(len(album_songs), len(setlist_songs))
+    # print(len(album_songs), len(setlist_songs))
 
     # Edge case: empty album is trivially complete
     if not album_songs:
@@ -1517,3 +1519,22 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
       "published_at",
       "rank",
     ]
+
+
+class BVEntriesSerializer(serializers.ModelSerializer):
+  song = serializers.CharField(source="song.name", max_length=255)
+  event = MinimalEventSerializer()
+  user = MinimalUserSerializer()
+
+  class Meta:
+    model = bv_models.Entries
+    fields = ["id", "song", "event", "user", "comment"]
+
+
+class BVEntryCommentsSerializer(serializers.ModelSerializer):
+  entry = BVEntriesSerializer()
+  user = MinimalUserSerializer()
+
+  class Meta:
+    model = bv_models.EntryComments
+    fields = ["id", "entry", "user", "comment"]

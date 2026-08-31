@@ -1,0 +1,22 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-8">
+        <div class="page-title">{{ title }}</div>
+        <div class="text-sm mb-3">List of all submitted song entries</div>
+        <div class="text-sm mb-3 d-flex align-items-center gap-2">
+            Have a favorite performance not listed below? Submit your pick here:
+            <a role="button"
+               href="{% url "bruceyversion:submit" %}"
+               class="btn btn-sm btn-primary-subtle text-xs">Submit Performance</a>
+        </div>
+        {% for entry in page %}
+            {% include "./entry_partial.html" with entry=entry %}
+            {% if not forloop.last %}<hr>{% endif %}
+        {% endfor %}
+        <hr>
+        {% include 'databruce/partials/_pagination.html' %}
+    </div>
+{% endblock content %}
