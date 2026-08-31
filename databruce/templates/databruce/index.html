@@ -1,165 +1,172 @@
 {% extends "databruce/wide_layout.html" %}
 {% load i18n static tz %}
 {% block title %}
-  {{ title }}
+    {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/table.js' %}"></script>
+    <script src="{% static 'databruce/js/table.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col-12 col-lg-8 col-xxl-6">
-    <div class="row mb-3 justify-content-center logo-row">
-      {% comment %} <div class="text-3xl">Welcome to Databruce!</div>
-      <div class="text-base">A Bruce Springsteen concert database</div> {% endcomment %}
-      <div class="main-logo" role="img" aria-label="Databruce">
-        <span class="sr-only">Databruce</span>
-      </div>
-    </div>
-    {% if not user.is_authenticated %}
-      <div class="row my-3 justify-content-center">
-        <div class="d-flex justify-content-center gap-2">
-          <a href="{% url "login" %}"
-             type="button"
-             role="button"
-             class="btn btn-sm btn-primary">Login</a>
-          <a href="{% url "signup" %}"
-             type="button"
-             role="button"
-             class="btn btn-sm btn-primary">Create Account</a>
-        </div>
-      </div>
-    {% endif %}
-    <div class="row row-cols-3 row-cols-lg-6 my-3 g-3">
-      <div class="col">
-        <div class="card p-3">
-          <div class="text-xs text-muted">Events</div>
-          <a href="{% url "events" %}">
-            <div class="text-lg fw-semibold gap-1 d-flex">
-              {{ event_count }}
-              <i class="bi bi-box-arrow-up-right text-xs"></i>
+    <div class="col-12 col-lg-8 col-xxl-6">
+        <div class="row mb-3 justify-content-center logo-row">
+            {% comment %} <div class="text-3xl">Welcome to Databruce!</div>
+            <div class="text-base">A Bruce Springsteen concert database</div> {% endcomment %}
+            <div class="main-logo" role="img" aria-label="Databruce">
+                <span class="sr-only">Databruce</span>
             </div>
-          </a>
         </div>
-      </div>
-      <div class="col">
-        <div class="card p-3">
-          <div class="text-xs text-muted">Songs</div>
-          <a href="{% url "songs" %}">
-            <div class="text-lg fw-semibold gap-1 d-flex">
-              {{ song_count }}
-              <i class="bi bi-box-arrow-up-right text-xs"></i>
-            </div>
-          </a>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card p-3">
-          <div class="text-xs text-muted">Tours</div>
-          <a href="{% url "tours" %}">
-            <div class="text-lg fw-semibold gap-1 d-flex">
-              {{ tour_count }}
-              <i class="bi bi-box-arrow-up-right text-xs"></i>
-            </div>
-          </a>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card p-3">
-          <div class="text-xs text-muted">Venues</div>
-          <a href="{% url "venues" %}">
-            <div class="text-lg fw-semibold gap-1 d-flex">
-              {{ venue_count }}
-              <i class="bi bi-box-arrow-up-right text-xs"></i>
-            </div>
-          </a>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card p-3">
-          <div class="text-xs text-muted">Relations</div>
-          <a href="{% url "relations" %}">
-            <div class="text-lg fw-semibold gap-1 d-flex">
-              {{ relation_count }}
-              <i class="bi bi-box-arrow-up-right text-xs"></i>
-            </div>
-          </a>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card p-3">
-          <div class="text-xs text-muted">Bands</div>
-          <a href="{% url "bands" %}">
-            <div class="text-lg fw-semibold gap-1 d-flex">
-              {{ band_count }}
-              <i class="bi bi-box-arrow-up-right text-xs"></i>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="row row-cols-1 row-cols-lg-2 g-3">
-      <div class="col order-2">
-        <div class="card">
-          <div class="card-header">Featured Show</div>
-          <div class="card-body p-0" id="setlistCard">
-            <div class="col-12">
-              {% with latest=latest_event.event %}
-                <div class="col-12 px-2 pt-2 text-sm">
-                  <div class="row">
-                    <a class="fw-medium" href="{% url "event_details" id=latest.event_id %}">{{ latest.get_date }} - {{ latest.venue.venues_text.formatted }}</a>
-                  </div>
-                  <div class="row">
-                    <a class="text-reset"
-                       href="{% url 'band_details' id=latest.artist.uuid %}">{{ latest.artist.name }}</a>
-                  </div>
+        {% if not user.is_authenticated %}
+            <div class="row my-3 justify-content-center">
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{% url "login" %}"
+                       type="button"
+                       role="button"
+                       class="btn btn-sm btn-primary">Login</a>
+                    <a href="{% url "signup" %}"
+                       type="button"
+                       role="button"
+                       class="btn btn-sm btn-primary">Create Account</a>
                 </div>
-              {% endwith %}
-              <div class="table-responsive index">
-                <table class="table table-hover display" id="setlistTable">
-                  <thead>
-                    <tr>
-                      <th class="song_num">#</th>
-                      <th class="song">Song</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
             </div>
-          </div>
+        {% endif %}
+        <div class="row row-cols-3 row-cols-lg-6 my-3 g-3">
+            <div class="col">
+                <div class="card p-3">
+                    <div class="text-xs text-muted">Events</div>
+                    <a href="{% url "events" %}">
+                        <div class="text-lg fw-semibold gap-1 d-flex">
+                            {{ event_count }}
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card p-3">
+                    <div class="text-xs text-muted">Songs</div>
+                    <a href="{% url "songs" %}">
+                        <div class="text-lg fw-semibold gap-1 d-flex">
+                            {{ song_count }}
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card p-3">
+                    <div class="text-xs text-muted">Tours</div>
+                    <a href="{% url "tours" %}">
+                        <div class="text-lg fw-semibold gap-1 d-flex">
+                            {{ tour_count }}
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card p-3">
+                    <div class="text-xs text-muted">Venues</div>
+                    <a href="{% url "venues" %}">
+                        <div class="text-lg fw-semibold gap-1 d-flex">
+                            {{ venue_count }}
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card p-3">
+                    <div class="text-xs text-muted">Relations</div>
+                    <a href="{% url "relations" %}">
+                        <div class="text-lg fw-semibold gap-1 d-flex">
+                            {{ relation_count }}
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card p-3">
+                    <div class="text-xs text-muted">Bands</div>
+                    <a href="{% url "bands" %}">
+                        <div class="text-lg fw-semibold gap-1 d-flex">
+                            {{ band_count }}
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col order-3">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-3">
-          {% comment %} <div class="col">
-            <div class="card">
-              <div class="card-header">Latest</div>
-              <div class="card-body p-0 list-card" id="recent"></div>
+        <div class="row row-cols-1 row-cols-lg-2 g-3">
+            <div class="col order-2">
+                <div class="card">
+                    <div class="card-header">Featured Show</div>
+                    <div class="card-body p-0" id="setlistCard">
+                        <div class="col-12">
+                            {% with featured=featured_event.event %}
+                                <div class="col-12 px-2 pt-2 text-sm">
+                                    <div class="row">
+                                        <a class="fw-medium"
+                                           href="{% url "event_details" id=featured.event_id %}">{{ featured.get_date }} - {{ featured.venue.venues_text.formatted }}</a>
+                                    </div>
+                                    <div class="row">
+                                        <a class="text-reset"
+                                           href="{% url 'band_details' id=featured.artist.uuid %}">{{ featured.artist.name }}</a>
+                                    </div>
+                                </div>
+                            {% endwith %}
+                            <div class="table-responsive index">
+                                <table class="table table-hover display" id="setlistTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="song_num">#</th>
+                                            <th class="song">Song</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div> {% endcomment %}
-          {% comment %} <div class="col">
-            <div class="card">
-              <div class="card-header">Upcoming</div>
-              <div class="card-body p-0 list-card" id="upcoming"></div>
+            <div class="col order-3">
+                {% if latest_event %}
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header">Latest Event</div>
+                                <div class="card-body p-0 px-3 pb-2">
+                                    <a href="{% url "event_details" id=latest_event.event_id %}">
+                                        <div class="text-lg fw-semibold gap-1 d-flex">
+                                            {{ latest_event }}
+                                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                                        </div>
+                                    </a>
+                                    <span class="text-sm text-muted">{{ latest_event.venue.venues_text.formatted }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-3">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                On This Day
+                                <a role="button"
+                                   class="btn btn-sm btn-primary text-xs py-0.5 px-1"
+                                   href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
+                            </div>
+                            <div class="card-body p-0 list-card" id="otd"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div> {% endcomment %}
-          <div class="col">
-            <div class="card">
-              <div class="card-header">
-                On This Day
-                <a role="button"
-                   class="btn btn-sm btn-primary text-xs py-0.5 px-1"
-                   href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
-              </div>
-              <div class="card-body p-0 list-card" id="otd"></div>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <script>
+    <script>
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     function createPlaceholderItem() {
@@ -237,7 +244,7 @@
       //getEventData('/api/v1/events_index/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
       //getEventData('/api/v1/events_index/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
 
-      var url = '/api/v1/setlists_index/?event={{ latest_event.event.id }}&format=json&show_only=true';
+      var url = '/api/v1/setlists_index/?event={{ featured_event.event.id }}&format=json&show_only=true';
 
       let setlistOptions = {
         rowGroup: {
@@ -303,7 +310,7 @@
                   $(badges).append($(badge).prop('outerHTML'));
                 } else if (row.last >= 50 && !row.debut) {
                   var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-warning').text('Bust');
+                  $(badge).addClass('badge-warning').text('Bustout');
                   $(badges).append($(badge).prop('outerHTML'));
                 }
 
@@ -320,5 +327,5 @@
       createTable(url, setlistColumns, '#setlistTable', setlistOptions);
     })
 
-  </script>
+    </script>
 {% endblock content %}

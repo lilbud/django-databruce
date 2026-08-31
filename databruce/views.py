@@ -127,6 +127,7 @@ class PageTitleMixin(ContextMixin):
 class Index(PageTitleMixin, TemplateView):
   template_name = "databruce/index.html"
   title = "Home"
+  description = "Databruce: A Bruce Springsteen Database"
 
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
@@ -170,7 +171,14 @@ class Index(PageTitleMixin, TemplateView):
         .first()
       )
 
-    context["latest_event"] = queryset
+    context["featured_event"] = queryset
+
+    context["latest_event"] = (
+      models.Events.objects.select_related("artist", "venue")
+      .filter(date__lte=date)
+      .order_by("-event_id")
+      .first()
+    )
 
     context["event_count"] = models.Events.objects.count()
     context["song_count"] = models.Songs.objects.count()

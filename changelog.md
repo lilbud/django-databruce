@@ -394,6 +394,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added articles from GreasyLake Article Vault to the article library. Some of these are in Spanish/Norwegian, and contain encoding errors I am unable to fix.
 - Added all press releases from ShoreFire Media to article library.
 - Added "Bruceyversion", basically a ripoff of Headyversion. It allows users to submit their picks for best performance of a given song. Since each song/event can only be inserted once, users after the fact can vote for that entry, and add a comment with their thoughts. This feature is added to the site as of 8/31, but will not be made publicly available to all users yet. I will first run a small beta test with volunteer users to ensure everything works.
+- Added "Latest Show" card to home page
 
 ## Changed
 
@@ -402,6 +403,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Changed some model choices over to TextChoices, cleaner that way
 - Updated Article Search so titles are weighted more favorably in results
 - Restrict "Users" page to logged in users only. User Profiles can still be viewed
+- Home Page setlist changed "Bust" to "Bustout"
 
 ## Removed
 
