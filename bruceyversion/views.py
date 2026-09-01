@@ -134,12 +134,19 @@ class EntryDetail(PageTitleMixin, TemplateView):
         entry=context["entry"].id,
       ).exists()
 
-      context["user_comment"] = bv_models.EntryComments.objects.get(
-        user=self.request.user,
-        entry=context["entry"].id,
-      )
+      try:
+        context["user_comment"] = bv_models.EntryComments.objects.get(
+          user=self.request.user,
+          entry=context["entry"].id,
+        )
 
-      context["form"] = self.form(initial={"comment": context["user_comment"].comment})
+        context["form"] = self.form(
+          initial={"comment": context["user_comment"].comment},
+        )
+      except bv_models.EntryComments.DoesNotExist:
+        context["user_comment"] = None
+        context["form"] = self.form()
+
     else:
       context["user_voted"] = False
 
