@@ -59,7 +59,25 @@
     </div>
     <script>
       $(document).ready(function () {
-        $('#event').select2({
+
+        var eventID = '{{ request.POST.event }}';
+        var songID = '{{ request.POST.song }}';
+
+        if (eventID && songID) {
+          fetch(`/api/v1/setlists/?event=${eventID}&format=json&show_only=true&hide_non_songs=true&bv=true`)
+          .then(response => response.json())
+          .then(data => {
+            data.results.forEach(function (item) {
+              // Keep selected state if it matches a returned validation value
+              let isSelected = item.song.id == songID ? 'selected="selected"' : '';
+              console.log(item.song.id)
+              $('#song').append(`<option value="${item.song.id}" ${isSelected}>${item.set_name} - ${item.song.name}</option>`);
+            });
+          });
+        }
+        
+
+        var eventSelect = $('#event').select2({
           theme: "bootstrap-5",
           selectionCssClass: "form-select-sm",
           dropdownCssClass: "form-select-sm",
@@ -103,9 +121,13 @@
             return data.customHtml || data.text;
           },
           templateSelection: function (data) {
-            return data.customHtml;
+            return data.customHtml || data.text;
           }
         });
+
+        if (eventSelect.val()) {
+          eventSelect.trigger('change');
+        }
       });
 
       if ($('#event').val()) {
@@ -114,7 +136,7 @@
       fetch(`/api/v1/events/${existingEventId}/`)
         .then(response => response.json())
         .then(item => {
-            var option = new Option(`${item.date} - ${item.artist.name} - ${item.venue.name}`, item.id, true, true);
+            var option = new Option(`${item.date} - ${item.venue.name}`, item.id, true, true);
             $('#event').append(option).trigger('change');
         });
       }
@@ -128,8 +150,6 @@
         const val = $(this).val();
         var isPopulated = val.length > 0;
 
-        //$('#song').prop('disabled', !isPopulated);
-
         $('#song').empty().append(`<option value=""></option>`);
 
         if (isPopulated) {
@@ -140,7 +160,7 @@
           .then(data => {
             data.results.forEach(function (item) {
               // Keep selected state if it matches a returned validation value
-              let isSelected = item.song_id == currentSongValue ? 'selected="selected"' : '';
+              let isSelected = item.song.id == currentSongValue ? 'selected="selected"' : '';
               $('#song').append(`<option value="${item.song.id}" ${isSelected}>${item.set_name} - ${item.song.name}</option>`);
             });
             // Trigger change to unlock comment field if song was pre-selected from validation error
@@ -148,16 +168,5 @@
           });
         }
       });
-
-      //$('#song').on('change', function() {
-      //  const val = $(this).val();
-      //  
-      //  var isPopulated = val.length > 0;
-      //  
-      //  if (isPopulated) {
-      //    //console.log('removed disabled')
-      //    //$('#comment').removeAttr('disabled');
-      //  }
-      //});
     </script>
 {% endblock content %}

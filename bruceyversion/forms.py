@@ -11,16 +11,37 @@ class SubmitForm(forms.Form):
     super().__init__(*args, **kwargs)
 
     # Check if form has POST data (args[0] is typically request.POST)
-    if args and isinstance(args[0], dict):
-      data = args[0]
+    if self.is_bound:
+      # Extract the event ID submitted by the user
+      song_id = self.data.get("song")
+      if song_id:
+        # Query the actual songs matching that event
+        # Example assuming a Song model:
+        songs = models.Songs.objects.filter(id=song_id)
+        self.fields["song"].choices = [(s.id, str(s.name)) for s in songs]
 
-      # If an event ID was submitted, dynamically validate it
-      if data.get("event"):
-        self.fields["event"].choices = [(data["event"], data["event"])]
+    if self.is_bound:
+      event_id = self.data.get("event")
+    else:
+      event_id = self.initial.get("event")
 
-      # If a song ID was submitted, dynamically validate it
-      if data.get("song"):
-        self.fields["song"].choices = [(data["song"], data["song"])]
+    # 2. If a value exists, inject it as a valid choice so validation passes
+    if event_id:
+      try:
+        event_obj = models.Events.objects.get(pk=event_id)
+        # CRITICAL FIX: Clear choices completely to prevent duplication
+        self.fields["event"].choices = []
+
+        # If you use a Select2 placeholder, prepend an empty choice:
+        # self.fields["event"].choices = [("", "")]
+
+        # Append the singular, valid choice item
+        self.fields["event"].choices += [
+          (event_obj.pk, f"{event_obj.date} - {event_obj.venue}"),
+        ]
+
+      except (models.Events.DoesNotExist, ValueError):
+        self.fields["event"].choices = [(event_id, event_id)]
 
   event = forms.ChoiceField(
     label="Event",
