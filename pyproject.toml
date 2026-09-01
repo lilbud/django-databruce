@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "bleach>=6.4.0",
     "django==6.1",
     "django-anymail[mailgun]>=14.0",
     "django-browser-reload>=1.20.0",

@@ -2279,6 +2279,7 @@ class Articles(BaseModel):
   title = models.TextField()
   slug = models.SlugField(unique=True, blank=True)
   content = models.TextField()
+  excerpt = models.TextField()
 
   category = models.TextField(choices=ArticleCategory.choices, default=None, blank=True)
 

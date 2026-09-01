@@ -1,5 +1,6 @@
 import string
 
+import bleach
 import markdown
 from django import template
 from django.utils.safestring import mark_safe
@@ -66,3 +67,48 @@ def currency(value):
     return f"${value:,.2f}"
   except (ValueError, TypeError):
     return value
+
+
+@register.filter(name="markdown_safe")
+def markdown_safe(value):
+  """Converts markdown to HTML and thoroughly sanitizes it against XSS.
+  Automatically marks the output as safe for Django templates.
+  """
+  if not value:
+    return ""
+
+  # 1. Convert Markdown text to raw HTML
+  raw_html = markdown.markdown(value)
+
+  # 2. Define safe elements
+  allowed_tags = [
+    "p",
+    "strong",
+    "em",
+    "a",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "ul",
+    "ol",
+    "li",
+    "br",
+    "code",
+    "pre",
+    "blockquote",
+  ]
+  allowed_attributes = {
+    "a": ["href", "title", "target", "rel"],
+  }
+
+  # 3. Clean the HTML (strips script tags, onerror events, etc.)
+  cleaned_html = bleach.clean(
+    raw_html,
+    tags=allowed_tags,
+    attributes=allowed_attributes,
+    strip=True,
+  )
+
+  # 4. Mark as safe so you don't need to append |safe in the template
+  return mark_safe(cleaned_html)

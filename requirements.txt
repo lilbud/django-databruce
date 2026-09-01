@@ -26,3 +26,4 @@ django-watchfiles
 drf-spectacular
 django-msgspec
 strip-markdown
+bleach

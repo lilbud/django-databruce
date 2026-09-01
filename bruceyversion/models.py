@@ -6,6 +6,11 @@ from databruce.models import BaseModel, CustomUser, Events, Songs
 
 
 class Entries(BaseModel):
+  class ModerationStatus(dj_models.TextChoices):
+    PENDING = "PENDING", "Pending Review"
+    APPROVED = "APPROVED", "Approved"
+    REJECTED = "REJECTED", "Rejected"
+
   id = dj_models.AutoField(primary_key=True)
   user = dj_models.ForeignKey(
     CustomUser,
@@ -26,6 +31,12 @@ class Entries(BaseModel):
   comment = dj_models.TextField(default="", blank=False)
   uuid = dj_models.UUIDField(editable=False, default=uuid4)
   hidden = dj_models.BooleanField(default=False)
+  status = dj_models.CharField(
+    max_length=10,
+    choices=ModerationStatus.choices,
+    default=ModerationStatus.PENDING,
+    db_index=True,
+  )
 
   class Meta:
     managed = True
