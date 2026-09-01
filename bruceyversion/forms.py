@@ -110,8 +110,8 @@ class CommentForm(forms.Form):
   comment = forms.CharField(
     label="Comment",
     required=True,
-    max_length=255,
-    help_text="255 character limit",
+    max_length=5000,
+    help_text="5000 character limit",
     widget=forms.Textarea(
       attrs={
         "class": "form-control form-control-sm",

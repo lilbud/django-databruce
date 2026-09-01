@@ -137,6 +137,9 @@ class EntryDetail(PageTitleMixin, TemplateView):
         entry=context["entry"].id,
       ).exists()
 
+      context["is_users_entry"] = self.request.user == context["entry"].user
+      print(context["is_users_entry"])
+
       try:
         context["user_comment"] = bv_models.EntryComments.objects.get(
           user=self.request.user,
@@ -161,14 +164,13 @@ class EntryVote(View):
     entry_id = request.POST.get("entry")
     entry = get_object_or_404(bv_models.Entries, id=entry_id)
 
-    if entry and entry.user == request.user:
-      return JsonResponse(
-        {
-          "message": "You cannot vote for your own entry",
-          "success": False,
-        },
-      )
-
+    # if entry and entry.user == request.user:
+    #   return JsonResponse(
+    #     {
+    #       "message": "You cannot vote for your own entry",
+    #       "success": False,
+    #     },
+    #   )
     created = bv_models.EntryVotes.objects.get_or_create(
       entry=entry,
       user=request.user,
