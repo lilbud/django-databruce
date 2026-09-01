@@ -152,8 +152,14 @@
 
       $('#song').on('change', function() {
         const val = $(this).val();
+        
         var isPopulated = val.length > 0;
-        $('#comment').prop('disabled', !isPopulated);
+        
+        if (isPopulated) {
+          console.log('removed disabled')
+          $('#comment').removeAttr('disabled');
+        }
+        //$('#comment').prop('disabled', isPopulated);
       });
     </script>
 {% endblock content %}

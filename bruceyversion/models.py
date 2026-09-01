@@ -25,6 +25,7 @@ class Entries(BaseModel):
   votes = dj_models.IntegerField(default=0)
   comment = dj_models.TextField(default="", blank=False)
   uuid = dj_models.UUIDField(editable=False, default=uuid4)
+  hidden = dj_models.BooleanField(default=False)
 
   class Meta:
     managed = True
@@ -45,6 +46,7 @@ class EntryComments(BaseModel):
   )
   comment = dj_models.CharField(default="", blank=False, max_length=255)
   uuid = dj_models.UUIDField(editable=False, default=uuid4)
+  hidden = dj_models.BooleanField(default=False)
 
   class Meta:
     managed = True
@@ -67,6 +69,7 @@ class EntryVotes(BaseModel):
     related_name="user_entry_votes",
   )
   uuid = dj_models.UUIDField(editable=False, default=uuid4)
+  hidden = dj_models.BooleanField(default=False)
 
   class Meta:
     managed = True

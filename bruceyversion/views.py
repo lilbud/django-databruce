@@ -92,7 +92,7 @@ class EntriesList(PageTitleMixin, TemplateView):
         "event",
         "song",
       )
-      .all()
+      .exclude(hidden=True)
       .order_by("-created_at")
       .annotate(user_vote_count=SubqueryCount(users))
     )
@@ -120,9 +120,13 @@ class EntryDetail(PageTitleMixin, TemplateView):
 
     context["form"] = self.form
 
-    context["comments"] = bv_models.EntryComments.objects.filter(
-      entry=context["entry"].pk,
-    ).order_by("-created_at")
+    context["comments"] = (
+      bv_models.EntryComments.objects.filter(
+        entry=context["entry"].pk,
+      )
+      .exclude(hidden=True)
+      .order_by("-created_at")
+    )
 
     if self.request.user.is_authenticated:
       context["user_voted"] = bv_models.EntryVotes.objects.filter(
@@ -235,6 +239,7 @@ class EntriesBySong(TemplateView):
       .filter(
         song__uuid=self.kwargs["id"],
       )
+      .exclude(hidden=True)
       .annotate(user_vote_count=SubqueryCount(users))
       .order_by("-votes")
     )
@@ -299,6 +304,7 @@ class SongList(TemplateView):
           bv_models.EntryVotes.objects.filter(entry=OuterRef("id")),
         ),
       )
+      .exclude(hidden=True)
       .order_by("-song_votes")
     )
 

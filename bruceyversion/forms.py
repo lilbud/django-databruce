@@ -53,7 +53,7 @@ class SubmitForm(forms.Form):
     widget=forms.Textarea(
       attrs={
         "class": "form-control form-control-sm",
-        "id": "text",
+        "id": "comment",
         "name": "text",
         "disabled": "disabled",
       },

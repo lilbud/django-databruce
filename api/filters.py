@@ -1089,10 +1089,13 @@ class SetlistFilter(dj_filters.FilterSet):
     assert self.data is not None
     event = self.data.get("event")
 
-    check = bv_models.Entries.objects.filter(event=event)
+    check = bv_models.Entries.objects.filter(event=event).filter(hidden=False)
 
     if check.exists():
-      return queryset.exclude(event=event, song_id__in=check.values_list("song"))
+      return queryset.exclude(
+        event=event,
+        song_id__in=check.values_list("song"),
+      )
 
     return queryset
 
