@@ -384,8 +384,8 @@ First public release of the site. Site was locked behind a login and accounts on
 
 ## Added
 
-- Added the Databruce Library, a collection of Bruce-related articles sourced from various places. The initial batch of about 1,000 are taken from my archive of the BTX Article Thread. Eventually I'll get to adding articles from Ken Rosen's site and some other places. Also added corresponding table/listing pages.
-- Added "Article Search", which allows for full text searching of the above article library. Consider this a work in progress, as I haven't fully settled on the design and general functionality yet.
+- Added the Databruce Library, a collection of Bruce-related articles sourced from various places.
+- Added "Article Search", which allows for full text searching of the above article library.
 - Added better pagination controls to blog and library pages
 - Added new endpoints for Advanced Search, these should be much more responsive due to limiting the fields gotten through select2.
 - Added Continent search field to Advanced Search
@@ -393,7 +393,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added "Full Album Performance" tag to mark all shows with a full album performance in running order.
 - Added articles from GreasyLake Article Vault to the article library. Some of these are in Spanish/Norwegian, and contain encoding errors I am unable to fix.
 - Added all press releases from ShoreFire Media to article library.
-- Added "Bruceyversion", basically a ripoff of Headyversion. It allows users to submit their picks for best performance of a given song. Since each song/event can only be inserted once, users after the fact can vote for that entry, and add a comment with their thoughts. This feature is added to the site as of 8/31, but will not be made publicly available to all users yet. I will first run a small beta test with volunteer users to ensure everything works.
+- Added "Bruceyversion" song version submission and voting
 - Added "Latest Show" card to home page
 
 ## Changed
@@ -404,6 +404,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Updated Article Search so titles are weighted more favorably in results
 - Restrict "Users" page to logged in users only. User Profiles can still be viewed
 - Home Page setlist changed "Bust" to "Bustout"
+- All buttons and badges switch to the "subtle" style in dark mode
 
 ## Removed
 
@@ -413,3 +414,9 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Fixed some pages looking off on mobile due to missing bootstrap column div.
 - Fixed issue where hitting enter on Event Search modal would direct to API response page
+- Fixed numerous issues with Bruceyversion
+  - Entry submission fixed
+  - Entries list wraps text properly
+  - Entry submission and comments now capped at 5000 chars
+  - Page/Open Graph description now shows a truncated entry instead of none
+  - Entry list votes counter updated to show entry votes instead of user votes

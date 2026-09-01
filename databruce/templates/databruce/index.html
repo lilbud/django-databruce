@@ -8,9 +8,7 @@
 {% endblock extrajs %}
 {% block content %}
     <div class="col-12 col-lg-8 col-xxl-6">
-        <div class="row mb-3 justify-content-center logo-row">
-            {% comment %} <div class="text-3xl">Welcome to Databruce!</div>
-            <div class="text-base">A Bruce Springsteen concert database</div> {% endcomment %}
+        <div class="row justify-content-center logo-row">
             <div class="main-logo" role="img" aria-label="Databruce">
                 <span class="sr-only">Databruce</span>
             </div>
@@ -30,7 +28,7 @@
             </div>
         {% endif %}
         <div class="row row-cols-3 row-cols-lg-6 my-3 g-3">
-            <div class="col">
+            <div class="col mt-lg-0">
                 <div class="card p-3">
                     <div class="text-xs text-muted">Events</div>
                     <a href="{% url "events" %}">
@@ -41,7 +39,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col">
+            <div class="col mt-lg-0">
                 <div class="card p-3">
                     <div class="text-xs text-muted">Songs</div>
                     <a href="{% url "songs" %}">
@@ -52,7 +50,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col">
+            <div class="col mt-lg-0">
                 <div class="card p-3">
                     <div class="text-xs text-muted">Tours</div>
                     <a href="{% url "tours" %}">
@@ -63,7 +61,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col">
+            <div class="col mt-lg-0">
                 <div class="card p-3">
                     <div class="text-xs text-muted">Venues</div>
                     <a href="{% url "venues" %}">
@@ -74,7 +72,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col">
+            <div class="col mt-lg-0">
                 <div class="card p-3">
                     <div class="text-xs text-muted">Relations</div>
                     <a href="{% url "relations" %}">
@@ -85,7 +83,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col">
+            <div class="col mt-lg-0">
                 <div class="card p-3">
                     <div class="text-xs text-muted">Bands</div>
                     <a href="{% url "bands" %}">
@@ -156,7 +154,7 @@
                             <div class="card-header">
                                 On This Day
                                 <a role="button"
-                                   class="btn btn-sm btn-primary text-xs py-0.5 px-1"
+                                   class="btn btn-sm btn-primary-subtle text-xs py-0.5 px-1"
                                    href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
                             </div>
                             <div class="card-body p-0 list-card" id="otd"></div>

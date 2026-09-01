@@ -83,13 +83,6 @@
   line-height: 2rem;
 }
 
-/* @media (min-width: 768px) {
-  .text-lg-2xl {
-    font-size: var(--text-2xl);
-    line-height: 2rem;
-  }
-} */
-
 .text-3xl {
   font-size: var(--text-3xl);
   line-height: 2.25rem;
@@ -328,15 +321,6 @@ a:link,
   height: 6px !important;
 }
 
-/* .card-header,
-.card-footer:not(#eventInfoFooter) {
-  padding: 0.35rem 0.75rem !important;
-} */
-
-/* .card-header:has(.nav-pills) {
-  padding: 0.1rem 0 !important;
-} */
-
 .card-body:not(#setlistCard, [class*="p-"], [class*="px-"], [class*="py-"]),
 .card-body:has(.table):not(#setlistCard) {
   padding: 1rem !important;
@@ -348,7 +332,7 @@ a:link,
 }
 
 #tableControls {
-  padding: 0 1rem 1rem 1rem !important;
+  padding: 0 1rem 0.5rem 1rem !important;
   row-gap: .5rem !important;
   align-items: flex-end !important;
   display: flex !important;
@@ -445,27 +429,6 @@ thead tr:first-child th {
   font-weight: 500;
 }
 
-[data-bs-theme="light"] {
-  .info-card-row .card {
-    background-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
-    border-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
-  }
-
-  .info-card {
-    border-color: var(--border-color-base) !important;
-  }
-}
-
-[data-bs-theme="dark"] {
-  .info-card-row .card {
-    background-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
-    border-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
-  }
-
-  .info-card {
-    border-color: var(--border-color-base) !important;
-  }
-}
 
 span #usercount {
   cursor: pointer !important;
@@ -495,7 +458,7 @@ span #usercount {
 .list-group-item,
 .accordion-item {
   background-color: var(--background-color-subtle);
-  border-color: var(--border-color-base);
+  border-color: var(--border-color-light);
   color: var(--text-color-default);
 }
 
@@ -549,23 +512,6 @@ table th:not(.fc-day) {
   font-size: var(--text-xs) !important;
   font-weight: 500 !important;
 }
-
-[data-bs-theme="light"] {
-
-  th.dt-ordering-asc,
-  th.dt-ordering-desc {
-    background-color: var(--color-gray-200) !important;
-  }
-}
-
-[data-bs-theme="dark"] {
-
-  th.dt-ordering-asc,
-  th.dt-ordering-desc {
-    background-color: var(--color-gray-700) !important;
-  }
-}
-
 
 table th:not(.fc-day, [class*="opener"], [class*="closer"], [class*="dt-ordering"]) {
   background-color: var(--background-color-subtle) !important;
@@ -924,34 +870,6 @@ button:not(.active)>.badge {
   color: var(--color-blue-50) !important;
 }
 
-[data-bs-theme="dark"] {
-
-  button.active:hover>.badge,
-  button:not(.active):hover>.badge,
-  button.active>.badge {
-    background-color: var(--color-gray-500) !important;
-    color: var(--color-white) !important;
-  }
-
-  .nav-pills button:not(.active):hover {
-    color: var(--color-white) !important;
-  }
-}
-
-[data-bs-theme="light"] {
-
-  button.active:hover>.badge,
-  button:not(.active):hover>.badge,
-  button.active>.badge {
-    background-color: var(--color-gray-500) !important;
-    color: var(--color-white) !important;
-  }
-
-  .nav-pills button:not(.active):hover {
-    color: var(--color-black) !important;
-  }
-}
-
 .dt-paging-button.page-item.active>button.page-link {
   color: var(--color-white) !important;
   background-color: var(--color-primary) !important;
@@ -992,16 +910,6 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   display: block;
 }
 
-[data-bs-theme="dark"] {
-  .main-logo {
-    background-image: var(--main-logo-white);
-  }
-}
-
-/* a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover {
-  color: var(--color-blue-500) !important;
-} */
-
 /* links should be primary site color except buttons and certain classes */
 a:not(.text-reset, .dropdown-item, .btn, .bd-links-link) {
   color: var(--color-primary-dark) !important;
@@ -1011,8 +919,6 @@ a:not(.text-reset, .dropdown-item, .btn, .bd-links-link) {
 #djDebugPanelList a {
   color: white !important;
 }
-
-
 
 /* hides doubled column control buttons */
 .dt-column-header>.dtcc:nth-child(3) {
@@ -1142,7 +1048,7 @@ div.dt-scroll-body {
 .card-body:not(:has(#headimg)) {
   border-bottom-left-radius: var(--bs-border-radius) !important;
   border-bottom-right-radius: var(--bs-border-radius) !important;
-  border-color: var(--emphasis) !important;
+  border-color: transparent !important;
 }
 
 .btn,
@@ -1713,11 +1619,6 @@ pre {
 .btn-prev:hover,
 .btn-next:hover {
   color: var(--color-primary) !important;
-}
-
-.badge:hover,
-.btn:hover {
-  box-shadow: inset 0 0 0 100px rgba(255, 255, 255, 0.2) !important;
 }
 
 .bi-chevron-right::before,

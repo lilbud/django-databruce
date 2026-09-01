@@ -102,12 +102,61 @@ function eventTable(url) {
       'url': url,
     },
     columns: event_table_columns,
+    columnDefs: [
+      { 'target': '_all', columnControl: [], ordering: { indicators: false } },
+    ],
     serverSide: true,
     processing: true,
     initComplete: function (settings, json) {
-      var info = this.api().page.info();
+      var api = this.api();
+      var info = api.page.info();
       $('#event-count-badge').text(info.recordsTotal);
     }
+  });
+
+  let dropdown = $('#columnOrder');
+
+  // table.columns().every(function () {
+  //   let column = this;
+
+  //   if (column.orderable()) {
+  //     let columnIndex = column.index();
+  //     let columnTitle = $(column.header()).find('.dt-column-title').text();
+
+  //     // Append only if the column can be sorted
+  //     dropdown.append(
+  //       $('<option></option>')
+  //         .val(`${columnIndex}-asc`)
+  //         .text(`${columnTitle} (asc.)`)
+  //     );
+
+  //     // Append Descending Option
+  //     dropdown.append(
+  //       $('<option></option>')
+  //         .val(`${columnIndex}-desc`)
+  //         .text(`${columnTitle} (desc.)`)
+  //     );
+  //   }
+  // });
+
+  // 3. Listen for dropdown changes to reorder the table
+  dropdown.on('change', function () {
+    let rawValue = $(this).val();
+
+    // Don't trigger sorting if the default placeholder option is selected
+    if (!rawValue) return;
+
+    // Split the combined string value (e.g., "2-desc" becomes index 2, direction "desc")
+    let parts = rawValue.split('-');
+    let selectedColumnIndex = parseInt(parts[0], 10);
+    let direction = parts[1];
+
+    // Apply ordering rule and refresh interface layout
+    table.order([selectedColumnIndex, direction]).draw();
+  });
+
+  $(window).on('resize', function () {
+    table.columns.adjust();
   });
 
   tableSearch(table, 'search');

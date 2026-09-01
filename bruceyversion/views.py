@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import F, OuterRef
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -164,34 +165,39 @@ class EntryVote(View):
     entry_id = request.POST.get("entry")
     entry = get_object_or_404(bv_models.Entries, id=entry_id)
 
-    # if entry and entry.user == request.user:
-    #   return JsonResponse(
-    #     {
-    #       "message": "You cannot vote for your own entry",
-    #       "success": False,
-    #     },
-    #   )
-    created = bv_models.EntryVotes.objects.get_or_create(
-      entry=entry,
-      user=request.user,
-    )
-
-    if created:
-      entry.votes += 1
-      entry.save(update_fields=["votes"])
-
+    # Prevent users from voting on their own entry on the backend
+    if entry.user == request.user:
       return JsonResponse(
         {
-          "message": "You have successfully voted for this entry",
-          "votes": entry.votes,
-          "success": True,
+          "message": "You cannot vote on your own entry",
+          "success": False,
         },
+        status=400,
       )
+
+    with transaction.atomic():
+      vote, created = bv_models.EntryVotes.objects.get_or_create(
+        entry=entry,
+        user=request.user,
+      )
+
+      if created:
+        entry.votes += 1
+        entry.save(update_fields=["votes"])
+        voted = True
+        message = "You have successfully voted for this entry."
+      else:
+        vote.delete()
+        entry.votes = max(0, entry.votes - 1)
+        entry.save(update_fields=["votes"])
+        voted = False
+        message = "Your vote has been removed."
 
     return JsonResponse(
       {
-        "message": "You have already voted for this entry",
+        "message": message,
         "votes": entry.votes,
+        "voted": voted,
         "success": True,
       },
     )

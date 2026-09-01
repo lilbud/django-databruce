@@ -5,6 +5,7 @@ DateTime.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
 DataTable.defaults.column.columnControl = ['orderStatus', ['orderAsc', 'orderDesc', 'orderRemove', 'orderAddAsc', 'orderAddDesc']];
+DataTable.defaults.column.orderSequence = ['asc', 'desc'];
 
 set_names = [
   "Show",
@@ -62,7 +63,7 @@ DataTable.feature.register('customInputPaging', function (settings) {
   return container;
 });
 
-$.fn.dataTable === DataTable
+
 
 $.extend(true, DataTable.defaults, {
   searching: true,
@@ -98,13 +99,6 @@ $.extend(true, DataTable.defaults, {
     top: ['customInputPaging', 'info'],
     bottom: ['customInputPaging', 'info'],
   },
-});
-
-// needed to fix pages with multiple tables behind tabs
-$(document).ready(function () {
-  $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
-    $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
-  });
 });
 
 function slugify(str) {

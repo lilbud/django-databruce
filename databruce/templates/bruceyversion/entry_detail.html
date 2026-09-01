@@ -39,25 +39,23 @@
                         </div>
                         <div class="col-12 col-lg-6">
                             {% if user.is_authenticated %}
-                                {% if not user_voted and not is_users_entry %}
+                                {% if not is_users_entry %}
                                     <form method="post" id="voteForm">
                                         {% csrf_token %}
                                         <input type="hidden" name="user" value="{{ user.id }}">
                                         <input type="hidden" name="entry" value="{{ entry.id }}">
-                                        <button class="btn btn-sm btn-primary"
+                                        <button class="btn btn-sm
+                                                       {% if user_voted %}btn-danger{% else %}btn-primary{% endif %}"
                                                 id="vote-btn"
                                                 type="submit"
-                                                name="submit">Vote</button>
+                                                data-voted="{{ user_voted|yesno:'true,false' }}"
+                                                name="submit">
+                                            {% if user_voted %}Remove{% else %}Vote{% endif %}
+                                        </button>
                                     </form>
-                                {% endif %}
-                                {% if is_users_entry %}
+                                {% else %}
                                     <span data-bs-toggle="tooltip"
                                           data-bs-title="You cannot vote on your own entry">
-                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
-                                    </span>
-                                {% elif user_voted %}
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="You have already voted for this entry">
                                         <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
                                     </span>
                                 {% endif %}
@@ -65,7 +63,7 @@
                                 <span data-bs-toggle="tooltip"
                                       data-bs-title="You must be logged in to vote">
                                     <a role="button"
-                                       href="{% url "login" %}?next={{ request.path }}"
+                                       href="{% url 'login' %}?next={{ request.path }}"
                                        class="btn btn-sm btn-primary"
                                        id="vote-btn">Login</a>
                                 </span>
@@ -84,13 +82,13 @@
                 Comments
                 {% if user.is_authenticated %}
                     {% if not user_comment %}
-                        <button class="btn btn-secondary-subtle text-xs py-1 px-2"
+                        <button class="btn btn-secondary text-xs py-1 px-2"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addCommentModal">Submit Comment</button>
                     {% else %}
                         <span data-bs-toggle="tooltip"
                               data-bs-title="You already commented, click to update">
-                            <button class="btn btn-secondary-subtle text-xs py-1 px-2"
+                            <button class="btn btn-secondary text-xs py-1 px-2"
                                     data-bs-toggle="modal"
                                     data-bs-target="#updateCommentModal">Update Comment</button>
                         </span>
@@ -223,14 +221,28 @@
               throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            const data = await response.json(); // Parses the JSON response body
+            const data = await response.json();
 
             if (!data['success']) {
-              alert(data['message'])
+              alert(data['message']);
               $('#vote-btn').prop('disabled', true);
             } else {
+              // Update vote count display
               $('#vote-count').text(data['votes']);
-              //$('#vote-btn').hide();
+
+              // Toggle button UI based on returned vote state
+              const $btn = $('#vote-btn');
+              if (data['voted']) {
+                $btn.text('Remove')
+                    .removeClass('btn-primary')
+                    .addClass('btn-danger')
+                    .data('voted', true);
+              } else {
+                $btn.text('Vote')
+                    .removeClass('btn-danger')
+                    .addClass('btn-primary')
+                    .data('voted', false);
+              }
             }
 
           } catch (error) {

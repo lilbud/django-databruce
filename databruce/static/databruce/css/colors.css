@@ -17,20 +17,6 @@
   --color-gray-950: #09090b;
 
   /* blue */
-  /* old brand color 0483c8, -500 */
-  /* --color-blue-50: #e1f4fe;
-  --color-blue-100: #c3e9fe;
-  --color-blue-200: #87d3fd;
-  --color-blue-300: #4bbdfb;
-  --color-blue-400: #0fa7fa;
-  --color-blue-500: #0483c8;
-  --color-blue-600: #0369a0;
-  --color-blue-700: #024f78;
-  --color-blue-800: #023450;
-  --color-blue-900: #011a28;
-  --color-blue-950: #000d14; */
-
-
   --color-blue-50: #e1f4fe;
   --color-blue-100: #c8ecfe;
   --color-blue-200: #8cd6fd;
@@ -42,8 +28,6 @@
   --color-blue-800: #023955;
   --color-blue-900: #011e2d;
   --color-blue-950: #000d14;
-
-
 
   /* teal */
   --color-teal-50: #f0fdfa;
@@ -84,18 +68,18 @@
   --color-orange-900: #7e2a0c;
   --color-orange-950: #441306;
 
-  /* emerald */
-  --color-green-50: #ecfdf5;
-  --color-green-100: #d0fae5;
-  --color-green-200: #a4f4cf;
-  --color-green-300: #5ee9b5;
-  --color-green-400: #00d492;
-  --color-green-500: #00bc7d;
-  --color-green-600: #009966;
-  --color-green-700: #007a55;
-  --color-green-800: #006045;
-  --color-green-900: #004f3b;
-  --color-green-950: #002c22;
+  /* green */
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #b9f8cf;
+  --color-green-300: #7bf1a8;
+  --color-green-400: #05df72;
+  --color-green-500: #00c950;
+  --color-green-600: #00a63e;
+  --color-green-700: #008236;
+  --color-green-800: #016630;
+  --color-green-900: #0d542b;
+  --color-green-950: #032e15;
 
   /* cyan */
   --color-cyan-50: #ecfeff;
@@ -109,7 +93,6 @@
   --color-cyan-800: #005f78;
   --color-cyan-900: #104e64;
   --color-cyan-950: #053345;
-
 }
 
 [data-bs-theme="light"] {
@@ -162,7 +145,7 @@
   /* success */
   --color-success-lighter: var(--color-green-50) !important;
   --color-success-light: var(--color-green-400) !important;
-  --color-success: var(--color-green-500) !important;
+  --color-success: var(--color-green-600) !important;
   --color-success-dark: var(--color-green-700) !important;
   --color-success-darker: var(--color-green-900) !important;
 
@@ -237,7 +220,7 @@
   /* success */
   --color-success-lighter: var(--color-green-950) !important;
   --color-success-light: var(--color-green-700) !important;
-  --color-success: var(--color-green-400) !important;
+  --color-success: var(--color-green-600) !important;
   --color-success-dark: var(--color-green-300) !important;
   --color-success-darker: var(--color-green-200) !important;
 
@@ -297,14 +280,6 @@
 
 .text-subtle {
   color: var(--text-color-subtle) !important;
-}
-
-[data-bs-theme="light"] .text-primary {
-  color: var(--color-primary) !important;
-}
-
-[data-bs-theme="dark"] .text-primary {
-  color: var(--color-primary-dark) !important;
 }
 
 .text-muted {
@@ -482,7 +457,7 @@
 
 .nav-item>button {
   --color: var(--color-white);
-  --bg: transparent;
+  --bg-color: transparent;
   --border-color: transparent;
   --hover-bg: #0268a0;
   --hover-color: var(--color-white);
@@ -490,7 +465,7 @@
 
 .nav-btn {
   --color: var(--color-white);
-  --bg: transparent;
+  --bg-color: transparent;
   --border-color: transparent;
   --hover-bg: transparent;
   --hover-color: var(--color-black);
@@ -498,50 +473,38 @@
 
 /* primary btn */
 .btn-primary {
-  --bg: var(--color-primary);
-  --color: var(--color-white);
+  --bg-color: var(--color-primary);
+  --color: var(--color-contrast);
   --border-color: transparent;
-  --hover-bg: color-mix(in oklab, var(--color-primary) 70%, transparent);
-  --hover-color: var(--color-white);
 }
 
 /* secondary btn */
 .btn-secondary {
   --color: var(--color-contrast);
-  --bg: var(--color-secondary);
-  --hover-bg: var(--color-secondary-dark);
-  --hover-color: var(--color-contrast);
+  --bg-color: var(--color-secondary);
 }
 
 /* success btn */
 .btn-success {
   --color: var(--color-contrast);
-  --bg: var(--color-success);
-  --hover-bg: var(--color-success-dark);
-  --hover-color: var(--color-contrast);
+  --bg-color: var(--color-success);
 }
 
 /* warning btn */
 .btn-warning {
   --color: var(--color-contrast);
-  --bg: var(--color-warning);
-  --hover-bg: var(--color-warning-dark);
-  --hover-color: var(--color-contrast);
+  --bg-color: var(--color-warning);
 }
 
 /* danger btn */
 .btn-danger {
   --color: var(--color-contrast);
-  --bg: var(--color-danger);
-  --hover-bg: var(--color-danger-dark);
-  --hover-color: var(--color-contrast);
+  --bg-color: var(--color-danger);
 }
 
 .btn-neutral {
   --color: var(--color-white);
-  --bg: var(--color-active);
-  --hover-bg: color-mix(in oklab, var(--color-active) 80%, transparent);
-  --hover-color: var(--color-white);
+  --bg-color: var(--color-active);
 }
 
 .btn-neutral-subtle,
@@ -551,19 +514,15 @@
 
 .btn-info {
   --color: var(--color-contrast);
-  --bg: var(--color-info);
+  --bg-color: var(--color-info);
   --border-color: transparent;
-  --hover-bg: var(--color-info-dark);
-  --hover-color: var(--color-contrast);
 }
 
 /* primary badge */
 .badge-primary {
-  --bg: var(--color-primary);
+  --bg-color: var(--color-primary);
   --color: var(--color-white);
   --border-color: transparent;
-  --hover-bg: color-mix(in oklab, var(--color-primary) 70%, transparent);
-  --hover-color: var(--color-white);
 }
 
 .btn-primary-subtle,
@@ -575,10 +534,8 @@
 
 /* secondary badge */
 .badge-secondary {
-  --bg: var(--color-secondary);
+  --bg-color: var(--color-secondary);
   --color: var(--color-contrast);
-  --hover-bg: var(--color-secondary-dark);
-  --hover-color: var(--color-contrast);
 }
 
 .btn-secondary-subtle,
@@ -590,10 +547,8 @@
 
 /* success badge */
 .badge-success {
-  --bg: var(--color-success);
+  --bg-color: var(--color-success);
   --color: var(--color-contrast);
-  --hover-bg: var(--color-success-dark);
-  --hover-color: var(--color-contrast);
 }
 
 .btn-success-subtle,
@@ -605,10 +560,8 @@
 
 /* warning badge */
 .badge-warning {
-  --bg: var(--color-warning);
+  --bg-color: var(--color-warning);
   --color: var(--color-contrast);
-  --hover-bg: var(--color-warning-dark);
-  --hover-color: var(--color-contrast);
 }
 
 .btn-warning-subtle,
@@ -620,11 +573,9 @@
 
 /* info badge */
 .badge-info {
-  --bg: var(--color-info);
+  --bg-color: var(--color-info);
   --color: var(--color-contrast);
   --border-color: transparent;
-  --hover-bg: color-mix(in oklab, var(--color-info) 80%, transparent);
-  --hover-color: var(--color-contrast);
 }
 
 .btn-info-subtle,
@@ -636,10 +587,8 @@
 
 /* danger badge */
 .badge-danger {
-  --bg: var(--color-danger);
+  --bg-color: var(--color-danger);
   --color: var(--color-contrast);
-  --hover-bg: var(--color-danger-dark);
-  --hover-color: var(--color-contrast);
 }
 
 .btn-danger-subtle,
@@ -649,9 +598,7 @@
   --color: var(--color-danger);
 }
 
-.badge-neutral,
-.badge-neutral-subtle,
-.badge-neutral-outline {
+.badge {
   border-radius: 100px !important;
 }
 
@@ -660,12 +607,11 @@
   color: var(--color-white) !important;
 }
 
-.badge:not([class*="badge-neutral"]) {
+.badge {
   border: none !important;
-  border-radius: 100px !important;
   box-shadow: none !important;
   color: var(--color) !important;
-  background-color: var(--bg) !important;
+  background-color: var(--bg-color) !important;
 }
 
 #attendedBtnGroup button {
@@ -673,10 +619,10 @@
 }
 
 .btn {
-  border: 0.06rem solid transparent !important;
+  border: none !important;
   box-shadow: none !important;
   color: var(--color) !important;
-  background-color: var(--bg) !important;
+  background-color: var(--bg-color) !important;
   border-radius: 0.25rem !important;
 }
 
@@ -688,88 +634,37 @@ button#usercount {
   border-radius: 0 0.25rem 0.25rem 0 !important;
 }
 
-[class*="subtle"],
-[class*="outline"] {
-  border: 0.06rem solid color-mix(in oklab, var(--color) 70%, transparent) !important;
-}
-
-[class*="outline"] {
-  background-color: transparent !important;
-}
-
-[data-bs-theme="light"] {
-
-  [class*="outline"]:not([class*="badge-neutral"]),
-  [class*="subtle"]:not([class*="badge-neutral"]) {
-    color: var(--color) !important;
-  }
-
-  [class*="subtle"]:not([class*="badge-neutral"]) {
-    background-color: color-mix(in oklab, var(--color) 12%, transparent) !important;
-  }
-
-  .badge-neutral-subtle,
-  .badge-neutral-outline {
-    color: var(--color-active) !important;
-    border: 0.06rem solid color-mix(in oklab, var(--color-gray-600) 70%, transparent) !important;
-  }
-
-  .badge-neutral-subtle {
-    background-color: color-mix(in oklab, var(--color-gray-300) 50%, transparent) !important;
-  }
-}
-
-[data-bs-theme="dark"] {
-
-  [class*="outline"]:not([class*="badge-neutral"]),
-  [class*="subtle"]:not([class*="badge-neutral"]) {
-    color: var(--color) !important;
-  }
-
-  [class*="subtle"]:not([class*="badge-neutral"]) {
-    background-color: color-mix(in oklab, var(--color) 15%, transparent) !important;
-  }
-
-  .badge-neutral-outline,
-  .badge-neutral-subtle {
-    border: 0.06rem solid var(--color-gray-400) !important;
-    color: var(--color-gray-400) !important;
-  }
-
-  .badge-neutral-subtle {
-    background-color: color-mix(in oklab, var(--color-gray-200) 12%, transparent) !important;
-  }
-}
-
 .modal-title {
   color: var(--text-color-default) !important;
 }
 
-.card.message.info {
-  --color: var(--color-cyan-500) !important;
-}
-
-.card.message.error {
-  --color: var(--color-red-500) !important;
-}
-
-.card.message.warning {
-  --color: var(--color-orange-500) !important;
-}
-
-.card.message.success {
-  --color: var(--color-green-500) !important;
-}
-
 .card.message {
-  border-color: color-mix(in oklab, var(--color) 70%, transparent) !important;
-  background-color: color-mix(in oklab, var(--color) 15%, transparent) !important;
-}
-
-[data-bs-theme="dark"] .card.message {
+  background-color: var(--bg-color) !important;
+  border-color: var(--border-color) !important;
   color: var(--color) !important;
 }
 
-[data-bs-theme="light"] .card.message {
-  color: color-mix(in oklab, var(--color) 70%, black) !important;
+.badge:not([class*="subtle"]),
+.btn {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: transparent !important;
+}
+
+.badge[class*="subtle"],
+.btn[class*="subtle"] {
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--bg-color) !important;
+  color: var(--color) !important;
+}
+
+.badge[class*="outline"],
+.btn[class*="outline"] {
+  background-color: transparent !important;
+  color: var(--color) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.btn[class*="outline"]:hover {
+  background-color: var(--bg-color) !important;
 }
