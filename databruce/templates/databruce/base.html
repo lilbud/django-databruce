@@ -10,7 +10,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description"
-              content="{{ description|safe|default_if_none:" A Springsteen Setlist Database" }}">
+              content="{{ description|safe|truncatechars:200|default_if_none:"A Springsteen Setlist Database" }}">
         <meta name="keywords" content="Databruce, Setlists, Springsteen">
         <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
         <meta property="og:image:width" content="1200" />
@@ -22,7 +22,7 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ request.build_absolute_uri }}">
         <meta property="og:description"
-              content="{{ description|safe|default_if_none:" A Springsteen Setlist Database" }}">
+              content="{{ description|safe|truncatechars:200|default_if_none:"A Springsteen Setlist Database" }}">
         <link rel="icon"
               type="image/png"
               href="{% static "databruce/img/favicon-96x96.png" %}"

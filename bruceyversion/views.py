@@ -107,16 +107,20 @@ class EntriesList(PageTitleMixin, TemplateView):
 class EntryDetail(PageTitleMixin, TemplateView):
   template_name = "bruceyversion/entry_detail.html"
   title = "Bruceyversion Entry Detail"
+  description = "Bruceyversion Entry Detail"
   form = forms.CommentForm
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     context["title"] = self.title
+
     context["entry"] = bv_models.Entries.objects.select_related(
       "user",
       "event",
       "song",
     ).get(uuid=self.kwargs["id"])
+
+    context["description"] = context["entry"].comment
 
     context["form"] = self.form
 

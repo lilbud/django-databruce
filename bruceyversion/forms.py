@@ -40,7 +40,6 @@ class SubmitForm(forms.Form):
         "class": "form-select form-select-sm",
         "id": "song",
         "placeholder": "Select an event first",
-        "disabled": "disabled",
       },
     ),
   )
@@ -48,14 +47,13 @@ class SubmitForm(forms.Form):
   comment = forms.CharField(
     label="Comment",
     required=True,
-    max_length=2000,
-    help_text="2000 character limit",
+    max_length=5000,
+    help_text="5000 character limit",
     widget=forms.Textarea(
       attrs={
         "class": "form-control form-control-sm",
         "id": "comment",
         "name": "text",
-        "disabled": "disabled",
       },
     ),
   )
