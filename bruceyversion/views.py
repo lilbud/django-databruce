@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import F, OuterRef
-from django.db.models.aggregates import Count
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -17,11 +16,7 @@ from databruce.views import PageTitleMixin
 from . import forms
 from . import models as bv_models
 
-users = (
-  bv_models.EntryVotes.objects.filter(user_id=OuterRef("user"))
-  .values("user")
-  .annotate(count=Count("user"))
-)
+users = bv_models.EntryVotes.objects.filter(entry__user_id=OuterRef("user"))
 
 
 class GroupRequiredMixin(AccessMixin):
@@ -94,7 +89,11 @@ class EntriesList(PageTitleMixin, TemplateView):
       )
       .exclude(hidden=True)
       .order_by("-created_at")
-      .annotate(user_vote_count=SubqueryCount(users))
+      .annotate(
+        user_vote_count=SubqueryCount(
+          users,
+        ),
+      )
     )
 
     paginator = Paginator(queryset, 10)
