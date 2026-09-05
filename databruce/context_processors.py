@@ -1,16 +1,15 @@
+from typing import Any
+
 from .forms import EventSearch
 
 
-def base_data(request):  # noqa: ARG001
+def base_data(request) -> dict[Any, Any]:
   data = {}
   data["searchForm"] = EventSearch()
   return data
 
 
-# views.py or context_processors.py
-
-
-def get_navbar_links():
+def get_navbar_links() -> list[dict[str, Any]]:
   return [
     {
       "name": "Events",
@@ -131,5 +130,5 @@ def get_navbar_links():
   ]
 
 
-def navbar_context(request):
+def navbar_context(request) -> dict[str, list[dict[str, Any]]]:
   return {"nav_links": get_navbar_links()}

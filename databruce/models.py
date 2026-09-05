@@ -727,6 +727,11 @@ class Event(BaseModel):
 
 
 class NugsRelease(BaseModel):
+  class Category(models.TextChoices):
+    TOUR_ARCHIVE = "tour-archive", _("Tour Archive")
+    CHRISTMAS = "christmas", _("Christmas")
+    FIRST_FRIDAY = "first-friday", _("First Friday")
+
   id = models.AutoField(primary_key=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
   nugs_id = models.IntegerField(default=0)
@@ -753,7 +758,12 @@ class NugsRelease(BaseModel):
 
   name = models.CharField(default=None, blank=True, max_length=255)
 
-  first_friday = models.BooleanField(default=False, db_column="first_friday")
+  category = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    choices=Category.choices,
+  )
 
   class Meta:
     db_table = "nugs_releases"
@@ -1732,6 +1742,11 @@ class Guest(BaseModel):
 
 
 class Lyric(BaseModel):
+  class Langauge(models.TextChoices):
+    GERMAN = "german", _("German")
+    ITALIAN = "italian", _("Italian")
+    ENGLISH = "english", _("English")
+
   id = models.AutoField(primary_key=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
 
@@ -1766,7 +1781,9 @@ class Lyric(BaseModel):
 
   text = models.CharField(db_column="lyrics", blank=True, default=None, max_length=255)
 
-  language = models.CharField(blank=True, default=None, max_length=255)
+  language = models.CharField(
+    blank=True, default=None, max_length=255, choices=Langauge.choices
+  )
   note = models.CharField(blank=True, default=None, max_length=255)
   translator = models.CharField(blank=True, default=None, max_length=255)
 
@@ -1933,7 +1950,7 @@ class SetlistEntries(models.Model):
 
 
 class Contact(BaseModel):
-  class Subjects(models.TextChoices):
+  class Subject(models.TextChoices):
     PROBLEM = "problem", _("Bug/Problem")
     SUGGESTION = "suggestion", _("Suggestion")
     COMMENT = "comment", _("Comment")
@@ -1942,7 +1959,7 @@ class Contact(BaseModel):
   id = models.AutoField(primary_key=True)
   email = models.EmailField()
   is_user = models.BooleanField(default=False)
-  subject = models.CharField(choices=Subjects.choices, max_length=50)
+  subject = models.CharField(choices=Subject.choices, max_length=50)
   message = models.CharField(max_length=255)
 
   class Meta:

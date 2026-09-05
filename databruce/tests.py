@@ -17,7 +17,7 @@ from databruce.models import (
   CustomUser,
   Event,
   Setlist,
-  SetTypes,
+  SetType,
   Song,
   State,
   Tour,
@@ -32,7 +32,7 @@ class BaseDataTest(TransactionTestCase):
   Inheriting from this automatically seeds your database records per class block.
   """
 
-  def setUp(self):
+  def setUp(self) -> None:
     # 1. Core Global Records Seeding
     self.country = Country.objects.create(name="United States", alpha_2="US")
     self.state = State.objects.create(
@@ -81,9 +81,6 @@ class BaseDataTest(TransactionTestCase):
       password="faiasd87gf9s",  # noqa: S106
       is_active=False,
     )
-
-    # group = Group.objects.get(name="Beta Testers")
-    # self.user_active.groups.add(group)  # type: ignore
 
     self.user_event = UserAttendedShow.objects.create(
       user=self.user_active,
@@ -138,7 +135,7 @@ class BaseDataTest(TransactionTestCase):
       event=self.event1,
       song=self.song_a,
       song_num=1,
-      set_name=SetTypes.SET_1,
+      set_name=SetType.SET_1,
       is_opener=True,
     )
 
@@ -146,7 +143,7 @@ class BaseDataTest(TransactionTestCase):
       event=self.event1,
       song=self.song_c,
       song_num=2,
-      set_name=SetTypes.SET_1,
+      set_name=SetType.SET_1,
     )
 
     # 3. Setup Event 2: A is followed by B (Fails "A NOT followed by B")
@@ -154,14 +151,14 @@ class BaseDataTest(TransactionTestCase):
       event=self.event2,
       song=self.song_a,
       song_num=1,
-      set_name=SetTypes.SET_1,
+      set_name=SetType.SET_1,
     )
 
     self.setlist4 = Setlist.objects.create(
       event=self.event2,
       song=self.song_b,
       song_num=2,
-      set_name=SetTypes.SET_1,
+      set_name=SetType.SET_1,
     )
 
     # Flush base tables to disk
@@ -173,7 +170,7 @@ class BaseDataTest(TransactionTestCase):
 
 class ContactTests(BaseDataTest):
   @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
-  def test_contact(self):
+  def test_contact(self) -> None:
     contact_url = reverse("contact")
     data = {
       "email": "test@example.com",
@@ -190,7 +187,7 @@ class ContactTests(BaseDataTest):
 
 
 class UserTests(BaseDataTest):
-  def test_user_login(self):
+  def test_user_login(self) -> None:
     # The login method requires credentials
     self.client.login(username="testuser", password="faiasd87gf9s")  # noqa: S106
 

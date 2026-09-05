@@ -1,237 +1,275 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n static %}
 {% block title %}
-  {{ title }}
+    {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/songTable.js' %}"></script>
-  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
-  <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
+    <script src="{% static 'databruce/js/songTable.js' %}"></script>
+    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+    <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col-12">
-    <div class="row mb-3">
-      <div class="col">
-        {% if info.id == user.id %}
-          <div class="text-2xl">{% translate "Your Profile" %}</div>
-        {% else %}
-          <div class="text-2xl">{{ info.username }}'s Profile</div>
-        {% endif %}
-      </div>
-    </div>
-    <div class="info-card-row mb-3 row row-cols-2 g-2 row-cols-lg-4">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div class="text-sm text-nowrap fw-medium">Shows Seen</div>
-            <div class="text-base" id="user-event-count">{{ user_event_count }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div class="text-sm text-nowrap fw-medium">Songs Seen</div>
-            <div class="text-base" id="user-song-count">{{ user_songs_count }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div class="text-sm text-nowrap fw-medium">First Show</div>
-            <div class="text-base" id="user-first-show">
-              {% if first_event %}
-                <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
-              {% else %}
-                N/A
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div class="text-sm text-nowrap fw-medium">Latest Show</div>
-            <div class="text-base" id="user-last-show">
-              {% if last_event %}
-                <a href="{% url 'event_details' id=last_event.event_id %}">{{ last_event }}</a>
-              {% else %}
-                N/A
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col">
-        <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active button"
-                    id="pills-events-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#events"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-events"
-                    aria-selected="true">Shows</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link button"
-                    id="pills-songs-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#songs"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-songs"
-                    aria-selected="false">Songs</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link button"
-                    id="pills-albums-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#albums"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-album"
-                    aria-selected="false">{% translate "Albums" %}</button>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="row">
-      <div class="tab-content">
-        <div id="events" class="tab-pane fade show active">
-          <div class="card">
-            <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
-          </div>
-        </div>
-        <div id="songs" class="tab-pane fade">
-          <div class="row mb-3">
+    <div class="col-12">
+        <div class="row mb-3">
             <div class="col">
-              <div class="card">
-                <div class="card-header">Songs Seen</div>
-                <div class="card-body">{% include "databruce/partials/song_table.html" %}</div>
-              </div>
+                {% if info.id == user.id %}
+                    <div class="text-2xl">{% translate "Your Profile" %}</div>
+                {% else %}
+                    <div class="text-2xl">{{ info.username }}'s Profile</div>
+                {% endif %}
             </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-              <div class="card">
-                <div class="card-header">Most Played Not Seen (100+ plays)</div>
-                <div class="card-body">
-                  <div id="tableControls">
-                    <div class="col-12 col-md-1">
-                      <label for="categoryFilter" class="pb-1">Category</label>
-                      <select id="categoryFilter" class="form-select form-select-sm">
-                        <option value="">All</option>
-                        <option value="true">Original</option>
-                        <option value="false">Covers</option>
-                      </select>
-                    </div>
-                    <!-- Search -->
-                    <div class="col">
-                      <label for="unseen-song-search" class="pb-1">Search</label>
-                      <div class="input-group input-group-sm">
-                        <input type="text"
-                               id="unseen-song-search"
-                               class="form-control form-control-sm"
-                               placeholder="Type to search table...">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="table-responsive">
-                      <table class="table table-hover display" id="notSeenTable">
-                        <thead>
-                          <tr>
-                            <th class="all">Count</th>
-                            <th class="all">Name</th>
-                            <th class="all">Category</th>
-                            <th class="all">First</th>
-                            <th class="all">Last</th>
-                            <th class="all">Original</th>
-                          </tr>
-                        </thead>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <div class="card">
-                <div class="card-header">
-                  Rare Songs (<100 Plays)
-                </div>
-                <div class="card-body">
-                  <div id="tableControls">
-                    <div class="col-12 col-md-1">
-                      <label for="categoryFilter" class="pb-1">Category</label>
-                      <select id="categoryFilter" class="form-select form-select-sm">
-                        <option value="">All</option>
-                        <option value="true">Original</option>
-                        <option value="false">Covers</option>
-                      </select>
-                    </div>
-                    <!-- Search -->
-                    <div class="col">
-                      <label for="song-search" class="pb-1">Search</label>
-                      <div class="input-group input-group-sm">
-                        <span class="input-group-text">
-                          <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text"
-                               id="rare-song-search"
-                               class="form-control form-control-sm"
-                               placeholder="Type to search table...">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="table-responsive">
-                      <table class="table table-hover display" id="rareTable">
-                        <thead>
-                          <tr>
-                            <th class="all">Count</th>
-                            <th class="all">Name</th>
-                            <th class="all">Category</th>
-                            <th class="all">First</th>
-                            <th class="all">Last</th>
-                            <th class="all">Original</th>
-                          </tr>
-                        </thead>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-        <div id="albums" class="tab-pane fade">
-          <div class="col-12">
-            <div class="row g-3"
-                 id="cardContainer">
-              <div class="col-12 col-md-6 col-lg-4 d-none" id="example">
-                <div class="card" id="album">
-                  <div class="card-header d-block py-0.5"></div>
-                  <div class="card-body p-0"></div>
+        <div class="info-card-row mb-3 row row-cols-2 g-2 row-cols-lg-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-sm text-nowrap fw-medium">Shows Seen</div>
+                        <div class="text-base" id="user-event-count">{{ user_event_count }}</div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-sm text-nowrap fw-medium">Songs Seen</div>
+                        <div class="text-base" id="user-song-count">{{ user_songs_count }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-sm text-nowrap fw-medium">First Show</div>
+                        <div class="text-base" id="user-first-show">
+                            {% if first_event %}
+                                <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-sm text-nowrap fw-medium">Latest Show</div>
+                        <div class="text-base" id="user-last-show">
+                            {% if last_event %}
+                                <a href="{% url 'event_details' id=last_event.event_id %}">{{ last_event }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="row mb-3">
+            <div class="col">
+                <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active button"
+                                id="pills-events-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#events"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-events"
+                                aria-selected="true">Shows</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link button"
+                                id="pills-songs-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#songs"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-songs"
+                                aria-selected="false">Songs</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link button"
+                                id="pills-albums-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#albums"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-album"
+                                aria-selected="false">{% translate "Albums" %}</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="tab-content">
+                <div id="events" class="tab-pane fade show active">
+                    <div class="card">
+                        <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
+                    </div>
+                </div>
+                <div id="songs" class="tab-pane fade">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header">Songs Seen</div>
+                                <div class="card-body">
+                                    <div id="tableControls">
+                                        <div class="col-12 col-md-1">
+                                            <label for="categoryFilter" class="pb-1">Category</label>
+                                            <select id="categoryFilter" class="form-select form-select-sm">
+                                                <option value="">All</option>
+                                                <option value="true">Original</option>
+                                                <option value="false">Covers</option>
+                                            </select>
+                                        </div>
+                                        <!-- Search -->
+                                        <div class="col">
+                                            <label for="song-search" class="pb-1">Search</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text"
+                                                       id="song-search"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="Type to search table...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover display" id="songTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="all">Times Seen</th>
+                                                        <th class="all">Song</th>
+                                                        <th class="all">Category</th>
+                                                        <th class="all">First</th>
+                                                        <th class="all">Last</th>
+                                                        <th class="all">Original</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header">Most Played Not Seen (100+ plays)</div>
+                                <div class="card-body">
+                                    <div id="tableControls">
+                                        <div class="col-12 col-md-1">
+                                            <label for="categoryFilter" class="pb-1">Category</label>
+                                            <select id="categoryFilter" class="form-select form-select-sm">
+                                                <option value="">All</option>
+                                                <option value="true">Original</option>
+                                                <option value="false">Covers</option>
+                                            </select>
+                                        </div>
+                                        <!-- Search -->
+                                        <div class="col">
+                                            <label for="unseen-song-search" class="pb-1">Search</label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text"
+                                                       id="unseen-song-search"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="Type to search table...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover display" id="notSeenTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="all">Total Plays</th>
+                                                        <th class="all">Name</th>
+                                                        <th class="all">Category</th>
+                                                        <th class="all">First</th>
+                                                        <th class="all">Last</th>
+                                                        <th class="all">Original</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header">
+                                    Rare Songs (<100 Plays)
+                                </div>
+                                <div class="card-body">
+                                    <div id="tableControls">
+                                        <div class="col-12 col-md-1">
+                                            <label for="categoryRareFilter" class="pb-1">Category</label>
+                                            <select id="categoryRareFilter" class="form-select form-select-sm">
+                                                <option value="">All</option>
+                                                <option value="true">Original</option>
+                                                <option value="false">Covers</option>
+                                            </select>
+                                        </div>
+                                        <!-- Search -->
+                                        <div class="col">
+                                            <label for="rare-song-search" class="pb-1">Search</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">
+                                                    <i class="bi bi-search"></i>
+                                                </span>
+                                                <input type="text"
+                                                       id="rare-song-search"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="Type to search table...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover display" id="rareTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="all">Times Seen</th>
+                                                        <th class="all">Total</th>
+                                                        <th class="all">Name</th>
+                                                        <th class="all">Category</th>
+                                                        <th class="all">First</th>
+                                                        <th class="all">Last</th>
+                                                        <th class="all">Original</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="albums" class="tab-pane fade">
+                    <div class="col-12">
+                        <div class="row g-3" id="cardContainer">
+                            <div class="col-12 col-md-6 col-lg-4 d-none" id="example">
+                                <div class="card" id="album">
+                                    <div class="card-header d-block py-0.5"></div>
+                                    <div class="card-body p-0"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       /* album breakdown */
+      let searchTimeout;
 
       fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
       .then(response => response.json()) // Parse JSON response
@@ -303,8 +341,90 @@
       eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?user={{ info.id }}&format=custom', '30vh');
       songTable('/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom', '30vh', '#notSeenTable');
-      songTable('/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom', '30vh', '#rareTable');
+      //songTable('/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom', '30vh', '#rareTable');
 
+      /* RARE TABLE */
+
+      song_table_defs = [
+        { targets: '_all', className: 'text-wrap text-xs' },
+      ]
+
+      song_table_columns = [
+        {
+          'data': 'count',
+          'name': 'count',
+          'width': '1rem',
+          'className': 'all text-center',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return data
+            }
+          },
+        },
+        {
+          'data': 'song.num_plays_public',
+          'name': 'song__num_plays_public',
+          'width': '1rem',
+          'className': 'all text-center',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return data
+            }
+          },
+        },
+        {
+          'data': 'song',
+          'name': 'song__sort_song_name',
+          'width': '15rem',
+          'className': 'all',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return `<a href="/songs/${data.uuid}">${data.name}</a>`
+            }
+          },
+        },
+        { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': '' },
+        {
+          'data': 'first_event',
+          'name': 'first_event',
+          'width': '10rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`
+            }
+          },
+        },
+        {
+          'data': 'last_event',
+          'name': 'last_event',
+          'width': '10rem',
+          'render': function (data, type, row, meta) {
+            if (type === 'display' && data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`
+            }
+          },
+        },
+        { 'data': 'song__original', 'name': 'song__original', 'visible': false, 'orderable': false },
+      ]
+
+      var table = new DataTable('#rareTable', {
+        ajax: {
+          'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom',
+        },
+        scrollY: '30vh',
+        columns: song_table_columns,
+        initComplete: function (settings, json) {
+          var info = this.api().page.info();
+          $('#song-count-badge').text(info.recordsTotal);
+        }
+      });
+
+      tableSearch(table, 'rare-song-search');
+
+      $('#categoryRareFilter').on('change', function () {
+        var selectedValue = this.value;
+        table.order([[0, 'desc'], [1, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
+      });
     })
-  </script>
+    </script>
 {% endblock content %}

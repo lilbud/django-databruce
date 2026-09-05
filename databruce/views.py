@@ -65,6 +65,7 @@ from .models import (
   Country,
   Event,
   Lyric,
+  NugsRelease,
   Onstage,
   Relation,
   Release,
@@ -331,6 +332,7 @@ class SignUpView(PageTitleMixin, TemplateView):
   email_template_name = "users/signup_email.html"
   subject_template_name = "users/signup_confirm_subject.txt"
   title = "Signup"
+  description = "Sign Up"
   token_generator = default_token_generator
   form_class = UserForm
 
@@ -1978,6 +1980,12 @@ class TourLegDetailView(PageTitleMixin, TemplateView):
 class NugsReleaseView(PageTitleMixin, TemplateView):
   template_name = "databruce/releases/nugs.html"
   title = "Nugs Releases"
+
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["categories"] = NugsRelease.Category.choices
+
+    return context
 
 
 class BootlegView(PageTitleMixin, TemplateView):

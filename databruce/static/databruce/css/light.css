@@ -99,6 +99,15 @@
     --bg-color: var(--color-gray-200) !important;
   }
 
+  .btn-purple-subtle,
+  .badge-purple-subtle,
+  .btn-purple-outline,
+  .badge-purple-outline {
+    --color: var(--color-purple-950) !important;
+    --border-color: var(--color-purple-400) !important;
+    --bg-color: var(--color-purple-200) !important;
+  }
+
   .card.message.info {
     --color: var(--color-cyan-800) !important;
     --border-color: var(--color-cyan-400) !important;

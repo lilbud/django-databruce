@@ -838,35 +838,24 @@ button:disabled {
   gap: 0.25rem !important;
 }
 
-button.nav-link:not(.button).active {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  /* border-bottom: 3px solid var(--color-primary) !important; */
-  box-shadow: 0 3px 0 0 var(--color-primary) !important;
-  border-radius: 0px !important;
-  color: var(--text-color-default) !important;
+.nav-link {
   font-weight: 500 !important;
 }
 
-.nav-link.button.active {
-  background-color: var(--color-primary) !important;
-  border-color: transparent !important;
-  color: var(--color-white) !important;
-  font-weight: 500 !important;
-}
-
-.nav-link.button:not(.active) {
-  background-color: var(--background-color-emphasis) !important;
-  border-color: var(--color-primary) !important;
-  color: var(--text-color-default) !important;
-  font-weight: 300 !important;
-}
-
-button.nav-link:not(.active) {
+.nav-link.active {
   background-color: transparent !important;
-  border-color: transparent !important;
+  border-radius: 0 !important;
+  border-bottom: 3px solid var(--color-primary) !important;
   color: var(--color-primary-dark) !important;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
+}
+
+.nav-link:not(.active) {
+  color: var(--color-primary-dark) !important;
+}
+
+.card-header:has(.nav-pills) {
+  padding: 0rem 0.25rem !important;
 }
 
 button>.badge {
@@ -1123,27 +1112,17 @@ button {
   margin: 0 0.75rem !important;
 }
 
-button.nav-link {
+.nav-link {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   text-wrap: nowrap !important;
-}
-
-button.nav-link .badge {
-  font-weight: 500 !important;
-  font-size: 0.75rem !important;
-  display: inline-flex;
-  vertical-align: middle;
+  gap: 0.35rem !important;
 }
 
 #albumTable_wrapper>.dt-layout-table {
   margin-top: 0 !important;
 }
-
-/* .list-group-item * {
-  font-size: clamp(var(--text-2xs), 0.625rem + 0.139vw, var(--text-xs)) !important;
-} */
 
 .album-breakdown .list-group-item {
   font-size: var(--text-3xs) !important;
@@ -1807,4 +1786,22 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 
 #article-content img {
   max-width: 100% !important;
+}
+
+.count-badge {
+  font-weight: 450 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  border-radius: 100px !important;
+  padding: .1rem .15rem !important;
+}
+
+.nav-link.active .count-badge {
+  background-color: var(--color-blue-500) !important;
+  color: var(--color-white) !important;
+}
+
+.nav-link:not(.active) .count-badge {
+  background-color: var(--text-color-default) !important;
+  color: var(--color-contrast) !important;
 }

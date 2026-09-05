@@ -34,7 +34,7 @@ class ArticleDetailView(TemplateView):
     context = super().get_context_data(**kwargs)
 
     context["article"] = get_object_or_404(
-      Article,
+      Article.objects.select_related("collection").prefetch_related("event"),
       slug=self.kwargs["slug"],
     )
 

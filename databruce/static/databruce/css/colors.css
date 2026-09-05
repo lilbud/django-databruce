@@ -482,6 +482,16 @@
   color: var(--color-white) !important;
 }
 
+.badge.nugs-badge {
+  background-color: var(--color-purple-500) !important;
+  color: var(--color-white) !important;
+}
+
+.badge.lp-badge {
+  background-color: var(--color-secondary) !important;
+  color: var(--color-white) !important;
+}
+
 .nav-item>button {
   --color: var(--color-white);
   --bg-color: transparent;
@@ -629,6 +639,11 @@
   border-radius: 100px !important;
 }
 
+.badge-purple {
+  --bg-color: var(--color-purple-500) !important;
+  --color: var(--color-white) !important;
+}
+
 .badge-neutral {
   background-color: var(--color-active) !important;
   color: var(--color-white) !important;
@@ -639,7 +654,7 @@
   box-shadow: none !important;
 }
 
-.badge:not(.badge-neutral) {
+.badge:not(.badge-neutral, .count-badge) {
   color: var(--color) !important;
   background-color: var(--bg-color) !important;
 }

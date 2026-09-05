@@ -3,17 +3,14 @@
     {{ title }}
 {% endblock title %}
 {% block content %}
+    {% if user.is_superuser %}
+        {% include "databruce/partials/admin_new_btn.html" with view="nugsrelease" %}
+    {% endif %}
     <div class="col-12">
         <div class="row mb-3">
             <div class="col">
                 <div class="text-2xl">Nugs Releases</div>
                 <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
-                <div class="text-sm">
-                    Hovering over Release Date will show time of release in UTC/GMT. Not all releases have times, only the bulk of the First Friday releases.
-                </div>
-                <div class="text-xs">
-                    Times are approximate, and will show 12am ET/4am UTC as default. Thanks to <a href="https://cantfindtickets.wordpress.com/">Kieran</a> for many of the release times, with some filled in by me.
-                </div>
             </div>
         </div>
         <div class="row">
@@ -21,12 +18,13 @@
                 <div class="card">
                     <div class="card-body">
                         <div id="tableControls">
-                            <div class="col-12 col-md-1">
-                                <label for="PublicityFilter" class="pb-1">First Friday</label>
+                            <div class="col-12 col-md-2">
+                                <label for="PublicityFilter" class="pb-1">Category</label>
                                 <select id="PublicityFilter" class="form-select form-select-sm">
                                     <option value="">All</option>
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
+                                    {% for choice in categories %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <!-- Search -->
@@ -42,13 +40,6 @@
                                            placeholder="Type to search table...">
                                 </div>
                             </div>
-                            <div class="col-12 col-md-auto mt-2 mt-md-0">
-                                <button type="button"
-                                        id="sbButton"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#sbModal"
-                                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-                            </div>
                         </div>
                         <div class="row">
                             <div class="table-responsive">
@@ -58,9 +49,8 @@
                                             <th class="all">Release Date</th>
                                             <th class="all">Event</th>
                                             <th class="all">Venue</th>
-                                            <th class="all">Location</th>
+                                            <th class="all">Category</th>
                                             <th class="all">Link</th>
-                                            <th class="all">First Friday?</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -79,24 +69,23 @@
         ajax: {
           'url': '/api/v1/nugs_releases/?format=custom',
         },
-        columnDefs: [
-          { targets: [-1], visible: false },
-        ],
         columns: [
           {
             'data': 'date',
             'name': 'date',
+            'width': '12rem',
             'className': 'text-nowrap',
             'type': 'text',
             'render': function (data, type, row, meta) {
               if (data) {
-                return `<span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${data.time}">${data.date}</span>`
+                return `<span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${data.time}">${data.date} ${data.time}</span>`
               }
             },
           },
           {
             'data': 'event',
             'name': 'event__event_id',
+            'width': '12rem',
             'render': function (data, type, row, meta) {
               if (data) {
                 return `<a href="/events/${data.event_id}">${data.date}</a>`
@@ -105,38 +94,47 @@
           },
           {
             'data': 'event.venue',
-            'name': 'event__venue__name',
+            'width': '15rem',
+            'name': 'event__venue__name, event__venue__city__name',
             'render': function (data, type, row, meta) {
               if (data) {
-                return `<a href="/venues/${data.uuid}">${data.name}</a>`;
+                if (row.city) {
+                  return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
+                }
+
+                return `<a href="/venues/${data.uuid}">${data.name}</a>`
               }
             },
           },
           {
-            'data': 'event.venue',
-            'name': 'event__venue__city__name, event__venue__city__state__abbrev',
+            'data': 'category',
+            'name': 'category',
+            'orderable': false,
+            'columnControl': [],
+            'width': '6rem',
             'render': function (data, type, row, meta) {
               if (data) {
-                return `<a href="/cities/${row.city.uuid}">${row.city.formatted}</a>`
+                return data;
               }
             },
           },
           {
             'data': 'url',
             'name': 'name',
+            'className': 'text-center',
             'searchable': false,
+            'orderable': false,
+            'width': '6rem',
+            'columnControl': [],
             'render': function (data, type, row, meta) {
               if (data) {
-                return `<a target="_blank" rel="noopener noreferrer" href="${data}">${row.name}</a>`
-              }
-            },
-          },
-          {
-            'data': 'first_friday',
-            'name': 'first_friday',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data;
+
+                if (data.includes('nugs')) {
+                  return `<a target="_blank" rel="noopener noreferrer" href="${data}"><span class="badge badge-purple">${row.name}</span></a>`
+                } else {
+                  return `<a target="_blank" rel="noopener noreferrer" href="${data}"><span class="badge badge-secondary">${row.name}</span></a>`
+                }
+
               }
             },
           },
@@ -145,7 +143,7 @@
 
       $('#PublicityFilter').on('change', function () {
         var selectedValue = this.value;
-        table.order([[0, 'desc']]).column(5).search(selectedValue ? selectedValue : '', true, false).draw();
+        table.order([[0, 'desc']]).column(3).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       tableSearch(table, 'search');

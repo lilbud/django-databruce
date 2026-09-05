@@ -34,6 +34,13 @@
         <div class="text-sm">
             Language: <span class="fw-semibold">{{ article.language|title }}</span>
         </div>
+        {% if article.event %}
+            <div class="text-sm">
+                Event: <span class="fw-semibold">
+                <a href="{% url "event_details" id=article.event.event_id %}">{{ article.event }}</a>
+                </span>
+            </div>
+        {% endif %}
         <hr>
         <div class="text-base" id="article-content">{{ body }}</div>
         <hr>

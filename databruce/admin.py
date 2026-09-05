@@ -1,4 +1,5 @@
 from datetime import time
+from typing import Any
 
 from django import forms
 from django.contrib import admin, messages
@@ -7,6 +8,7 @@ from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import Group
 from django.db import models as dj_models
+from django.db.models import QuerySet
 from django.db.models.functions import Cast
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -45,7 +47,12 @@ class UserAdmin(DefaultUserAdmin, ModelAdmin):
     "uuid",
   ]
 
-  def get_search_results(self, request, queryset, search_term):
+  def get_search_results(
+    self,
+    request,
+    queryset,
+    search_term,
+  ) -> QuerySet[Any, Any] | tuple[QuerySet[Any, Any], bool]:
     # Apply filter during autocomplete requests
     if "autocomplete" in request.path:
       queryset = queryset.filter(groups=3)
@@ -67,7 +74,7 @@ class EventTypeInline(StackedInline):
   autocomplete_fields = ["type"]
   search_fields = ["type__name"]
 
-  def get_queryset(self, request):
+  def get_queryset(self, request) -> QuerySet[Any, Any]:
     return (
       super()
       .get_queryset(request)
@@ -226,7 +233,7 @@ class BandsForm(NoteForm):
 
   class Meta:
     model = db_models.Band
-    fields = "__all__"
+    fields = ["note"]
 
 
 class RunForm(NoteForm):
@@ -236,7 +243,7 @@ class RunForm(NoteForm):
 
   class Meta:
     model = db_models.Run
-    fields = "__all__"
+    fields = ["note"]
 
 
 @admin.register(db_models.Band)
@@ -458,7 +465,7 @@ class EventAdmin(ModelAdmin):
       # IT IS AN UPDATE
       # Grab every field name except 'summary' and 'id'
       fields_to_update = [
-        f.name for f in obj._meta.fields if f.name != "summary" and f.name != "id"
+        f.name for f in obj._meta.fields if f.name not in {"summary", "id"}
       ]
       obj.save(update_fields=fields_to_update)
 
@@ -510,7 +517,7 @@ class LyricForm(forms.ModelForm):
 
   class Meta:
     model = db_models.Lyric
-    fields = "__all__"
+    fields = ["note"]
 
 
 @admin.register(db_models.Lyric)
@@ -592,7 +599,7 @@ class ReleaseForm(forms.ModelForm):
 
   class Meta:
     model = db_models.Release
-    fields = "__all__"
+    fields = ["note"]
 
 
 @admin.register(db_models.Release)

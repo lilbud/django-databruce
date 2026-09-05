@@ -94,6 +94,15 @@
     --bg-color: var(--color-red-800) !important;
   }
 
+  .btn-purple-subtle,
+  .badge-purple-subtle,
+  .btn-purple-outline,
+  .badge-purple-outline {
+    --color: var(--color-purple-100) !important;
+    --border-color: var(--color-purple-600) !important;
+    --bg-color: var(--color-purple-800) !important;
+  }
+
   .btn-neutral-subtle,
   .badge-neutral-subtle {
     --color: var(--color-gray-100) !important;
@@ -172,6 +181,13 @@
     border: 1px solid var(--color-red-600) !important;
     background-color: var(--color-red-800) !important;
     color: var(--color-red-100) !important;
+  }
+
+  .badge-purple,
+  .btn-purple {
+    border: 1px solid var(--color-purple-600) !important;
+    background-color: var(--color-purple-800) !important;
+    color: var(--color-purple-100) !important;
   }
 
   .text-primary {

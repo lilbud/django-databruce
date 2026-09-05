@@ -59,6 +59,7 @@ class Article(BaseModel):
     GERMAN = "german", _("German")
     NORWEGIAN = "norwegian", _("Norwegian")
     SWEDISH = "swedish", _("Swedish")
+    DUTCH = "dutch", _("Dutch")
 
   id = models.AutoField(primary_key=True)
   author = models.CharField(max_length=255)
@@ -89,7 +90,7 @@ class Article(BaseModel):
   )
 
   source = models.CharField(max_length=255)
-  source_url = models.TextField(blank=True, default=None)
+  source_url = models.CharField(blank=True, default=None, max_length=255)
 
   collection = models.ForeignKey(
     to=Collection,
@@ -122,7 +123,7 @@ class Article(BaseModel):
   )
 
   class Meta:
-    managed = False
+    managed = True
     db_table = "articles"
     verbose_name = "Article"
     verbose_name_plural = "Articles"

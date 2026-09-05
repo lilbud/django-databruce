@@ -27,7 +27,7 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
 
       if self.default_limit_param in request.query_params:
         try:
-          return int(request.query_params[self.default_limit_param])
+          return int(request.query_params[self.default_limit_param])  # type: ignore
         except (ValueError, TypeError):
           pass
     else:
@@ -62,7 +62,7 @@ class DatatablesRenderer(JSONRenderer):
 
   def render(self, data, accepted_media_type=None, renderer_context=None):
     # Only apply the "data" wrapper if this specific format was selected
-    if renderer_context and renderer_context.get("format") == "custom":
+    if renderer_context and renderer_context.get("format") == "custom":  # noqa: SIM102
       if data is not None and "data" not in data:
         data = {"data": data}
 

@@ -70,63 +70,61 @@
             <div class="card-header">
                 <ul class="nav nav-pills" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active"
-                                id="pills-events-tab"
-                                data-bs-toggle="pill"
-                                data-bs-target="#events"
-                                type="button"
-                                role="tab"
-                                aria-controls="pills-home"
-                                aria-selected="true">
-                            Events<span class="badge badge-light rounded-pill text-bg-light"
-      id="event-count-badge">0</span>
-                        </button>
+                        <a class="nav-link active"
+                           id="pills-events-tab"
+                           data-bs-toggle="pill"
+                           data-bs-target="#events"
+                           type="button"
+                           role="tab"
+                           aria-controls="pills-home"
+                           aria-selected="true">
+                            Events<span class="badge count-badge" id="event-count-badge">0</span>
+                        </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link"
-                                id="pills-songs-tab"
-                                data-bs-toggle="pill"
-                                data-bs-target="#songs"
-                                type="button"
-                                role="tab"
-                                aria-controls="pills-profile"
-                                aria-selected="false">
-                            Songs<span class="badge badge-light rounded-pill text-bg-light"
-      id="song-count-badge">0</span>
-                        </button>
+                        <a class="nav-link"
+                           id="pills-songs-tab"
+                           data-bs-toggle="pill"
+                           data-bs-target="#songs"
+                           type="button"
+                           role="tab"
+                           aria-controls="pills-profile"
+                           aria-selected="false">
+                            Songs<span class="badge count-badge" id="song-count-badge">0</span>
+                        </a>
                     </li>
                     {% if child_venues %}
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link text-nowrap"
-                                    id="pills-children-tab"
-                                    data-bs-toggle="pill"
-                                    data-bs-target="#children"
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="pills-children"
-                                    aria-selected="false">Child Venues</button>
+                            <a class="nav-link text-nowrap"
+                               id="pills-children-tab"
+                               data-bs-toggle="pill"
+                               data-bs-target="#children"
+                               type="button"
+                               role="tab"
+                               aria-controls="pills-children"
+                               aria-selected="false">Child Venues</a>
                         </li>
                     {% endif %}
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link"
-                                id="pills-links-tab"
-                                data-bs-toggle="pill"
-                                data-bs-target="#links"
-                                type="button"
-                                role="tab"
-                                aria-controls="pills-links"
-                                aria-selected="false">Links</button>
+                        <a class="nav-link"
+                           id="pills-links-tab"
+                           data-bs-toggle="pill"
+                           data-bs-target="#links"
+                           type="button"
+                           role="tab"
+                           aria-controls="pills-links"
+                           aria-selected="false">Links</a>
                     </li>
                     {% if info.latitude %}
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link"
-                                    id="pills-map-tab"
-                                    data-bs-toggle="pill"
-                                    data-bs-target="#map"
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="pills-map"
-                                    aria-selected="false">Map</button>
+                            <a class="nav-link"
+                               id="pills-map-tab"
+                               data-bs-toggle="pill"
+                               data-bs-target="#map"
+                               type="button"
+                               role="tab"
+                               aria-controls="pills-map"
+                               aria-selected="false">Map</a>
                         </li>
                     {% endif %}
                 </ul>

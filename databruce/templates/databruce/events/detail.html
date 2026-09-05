@@ -191,14 +191,6 @@
                                role="tab"
                                aria-controls="onstage"
                                aria-selected="false">Onstage</a>
-                            {% comment %} <a class="nav-link text-sm"
-                               id="notes-tab"
-                               data-bs-toggle="pill"
-                               data-bs-target="#notes"
-                               type="button"
-                               role="tab"
-                               aria-controls="notes"
-                            aria-selected="false">Notes</a> {% endcomment %}
                             <a class="nav-link text-sm"
                                id="links-tab"
                                data-bs-toggle="pill"
@@ -215,14 +207,17 @@
                                role="tab"
                                aria-controls="stats"
                                aria-selected="false">Stats</a>
-                            <a class="nav-link text-sm"
-                               id="article-tab"
-                               data-bs-toggle="pill"
-                               data-bs-target="#articles"
-                               type="button"
-                               role="tab"
-                               aria-controls="article"
-                               aria-selected="false">Articles</a>
+                            {% if articles|length > 0 %}
+                                <a class="nav-link text-sm"
+                                   id="article-tab"
+                                   data-bs-toggle="pill"
+                                   data-bs-target="#articles"
+                                   type="button"
+                                   role="tab"
+                                   aria-controls="article"
+                                   aria-selected="false">Articles
+                                    <span class="badge count-badge" id="count-badge">{{ articles|length }}</span>{% endif %}
+                            </a>
                         </nav>
                     </div>
                 </div>
@@ -506,7 +501,7 @@
                                     </ul>
                                 {% endfor %}
                             {% endif %}
-                            {% if event.brucebase_url or event.nugs %}
+                            {% if event.brucebase_url or event.nugs_event %}
                                 <ul class="ps-3">
                                     {% if event.brucebase_url %}
                                         <li class="ps-0">
@@ -515,7 +510,7 @@
                                     {% endif %}
                                     {% if event.nugs_event %}
                                         <li class="ps-0">
-                                            <a href="{{ event.nugs_event.url }}">Nugs Release</a>
+                                            <a href="{{ event.nugs_event.all.0.url }}">Nugs Release</a>
                                         </li>
                                     {% endif %}
                                 </ul>
@@ -714,7 +709,7 @@
                         <div class="card-body">
                             <ul>
                                 {% for article in articles %}
-                                    <li>
+                                    <li class="text-sm">
                                         <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
                                         ({{ article.source }})
                                         <span class="fw-semibold">[{{ article.get_category_display }}]</span>

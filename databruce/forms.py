@@ -878,12 +878,7 @@ class ContactForm(forms.Form):
 
   subject = forms.ChoiceField(
     label="Subject",
-    choices=[
-      ("problem", "Bug/Problem"),
-      ("suggestion", "Suggestion"),
-      ("comment", "Comment"),
-      ("comment", "Question"),
-    ],
+    choices=models.Contact.Subject.choices,
     required=True,
     widget=forms.Select(
       attrs={"class": "form-select form-select-sm subject"},

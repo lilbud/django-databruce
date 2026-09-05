@@ -659,13 +659,17 @@ class NugsSerializer(BaseSerializer):
   date = serializers.SerializerMethodField()
   event = EventsSerializer(include=["id", "event_id", "venue", "date"])
   city = MinimalCitiesSerializer(required=False, source="event.venue.city")
+  category = serializers.SerializerMethodField()
+
+  def get_category(self, obj):
+    return obj.get_category_display()
 
   def get_date(self, obj):
     try:
       return {
-        "date": obj.date.strftime("%Y-%m-%d [%a]"),
+        "date": obj.date.strftime("%Y-%m-%d"),
         "time": obj.date.astimezone(ZoneInfo("UTC")).strftime(
-          "%I:%M:%S %p",
+          "%I:%M %Z",
         ),
       }
     except AttributeError:
@@ -673,7 +677,7 @@ class NugsSerializer(BaseSerializer):
 
   class Meta:
     model = models.NugsRelease
-    fields = ["id", "event", "date", "city", "url", "name"]
+    fields = ["id", "event", "date", "city", "url", "name", "category"]
 
 
 class RelationsSerializer(BaseSerializer):
@@ -1029,6 +1033,10 @@ class SongsPageSerializer(BaseSerializer):
 
 class LyricsSerializer(BaseSerializer):
   song = serializers.CharField(source="song.name", max_length=255)
+  language = serializers.SerializerMethodField()
+
+  def get_language(self, obj):
+    return obj.get_language_display()
 
   class Meta:
     model = models.Lyric
@@ -1092,6 +1100,7 @@ class SetlistSongsSerializer(BaseSerializer):
             "name",
             "category",
             "original",
+            "num_plays_public",
           ],
         ).data
         for s in songs
