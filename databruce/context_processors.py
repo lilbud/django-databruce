@@ -12,15 +12,6 @@ def base_data(request):  # noqa: ARG001
 
 def get_navbar_links():
   return [
-    # {
-    #   "name": "Beta",
-    #   "match_keyword": "beta",
-    #   "limit_group": True,
-    #   "icon": "bi-bus-front-fill",
-    #   "children": [
-    #     {"name": "Bruceyversion", "url": "bruceyversion:entries"},
-    #   ],
-    # },
     {
       "name": "Events",
       "match_keyword": "events",

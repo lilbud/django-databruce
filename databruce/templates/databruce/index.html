@@ -294,12 +294,12 @@
           'className': 'text-wrap',
           'width': '',
           'render': function (data, type, row, meta) {
-                var song = `<a class="text-reset pe-2" href="/songs/${data.uuid}">${data.name}</a>`;
+                var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
                 var segue = row.segue ? `<span class="segue"></span>` : '';
 
                 song = `${song} ${segue}`;
 
-                var badges = $('<span />');
+                var badges = $('<span />').addClass("ms-2");
                 var baseBadge = `<span class="badge"></span>`;
 
                 if (row.instrumental) {

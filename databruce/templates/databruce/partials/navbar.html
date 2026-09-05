@@ -30,21 +30,6 @@
                    type="button"
                    href="{% url 'blog:blog' %}">News</a>
             </li>
-            {% comment %} {% if request.user|has_group:"Beta Testers" or request.user.is_superuser %}
-                <li class="nav-item dropdown">
-                    <button class="btn btn-sm dropdown-toggle"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            id="nav-dropdown-99">Beta</button>
-                    <ul class="dropdown-menu" aria-labelledby="nav-dropdown-99">
-                        <li>
-                            <a class="dropdown-item" href="{% url "bruceyversion:entries" %}">Bruceyversion</a>
-                        </li>
-                    </ul>
-                </li>
-            {% endif %} {% endcomment %}
             {% for item in nav_links %}
                 {% if item.children %}
                     <!-- Dropdown Nav Item -->
@@ -269,19 +254,6 @@
             <div class="offcanvas-body">
                 <nav class="w-100" id="offcanvasNav" aria-label="Mobile main navigation">
                     <ul class="bd-links-nav list-unstyled mb-0 pb-3">
-                        {% comment %} {% if request.user|has_group:"Beta Testers" or request.user.is_superuser %}
-                            <li class="bd-links-group py-2">
-                                <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm">
-                                    <i class="bi bi-bus-front-fill" aria-hidden="true"></i>
-                                    Beta
-                                </span>
-                                <ul class="list-unstyled pb-2">
-                                    <li>
-                                        <a class="bd-links-link" href="{% url "bruceyversion:entries" %}">Bruceyversion</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% endif %} {% endcomment %}
                         {% for item in nav_links %}
                             {% if item.children %}
                                 <li class="bd-links-group py-2">

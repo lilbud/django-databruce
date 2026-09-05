@@ -585,9 +585,7 @@ tr.album-header>td {
 
 /* align all calendar day cell content to middle vertically */
 td:not(.fc-day) {
-  align-items: center;
   vertical-align: middle !important;
-  /* display: inline-flex !important; */
 }
 
 tbody tr:not(.set-header) {
@@ -597,11 +595,6 @@ tbody tr:not(.set-header) {
 
 :not(.fc-scrollgrid-section, .set-header)>td {
   padding: 0.15rem 0.5rem !important;
-}
-
-td:not(.fc-day) {
-  align-items: center !important;
-  vertical-align: middle !important;
 }
 
 .badge {
@@ -624,6 +617,7 @@ td .badge {
   font-size: 11px !important;
   font-weight: 600 !important;
   border-radius: 5px !important;
+  margin-top: -2px;
   font-family: 'JetBrains Mono Variable', monospace !important;
   padding: .05rem .4rem !important;
 }
