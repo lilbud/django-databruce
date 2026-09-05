@@ -7,7 +7,7 @@
 {% endblock extrastyle %}
 {% block content %}
     {% if user.is_superuser %}
-        {% include "databruce/partials/admin_edit_btn.html" with view="articles" item=article.id %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="article" item=article.id app="library" %}
     {% endif %}
     <div class="col-12 col-lg-8">
         <div class="text-base">
@@ -30,6 +30,9 @@
         </div>
         <div class="text-sm">
             Published Date: <span class="fw-semibold">{{ article.published_at|date:"F j, Y" }}</span>
+        </div>
+        <div class="text-sm">
+            Language: <span class="fw-semibold">{{ article.language|title }}</span>
         </div>
         <hr>
         <div class="text-base" id="article-content">{{ body }}</div>

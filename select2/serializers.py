@@ -20,7 +20,7 @@ class CitySelect2Serializer(serializers.ModelSerializer):
       return f"{obj.name}, {obj.country.name}"
 
   class Meta:
-    model = models.Cities
+    model = models.City
     fields = ["id", "text"]
 
 
@@ -31,7 +31,7 @@ class StateSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.States
+    model = models.State
     fields = ["id", "text"]
 
 
@@ -42,7 +42,7 @@ class CountrySelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Countries
+    model = models.Country
     fields = ["id", "text"]
 
 
@@ -53,7 +53,7 @@ class ContinentSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Continents
+    model = models.Continent
     fields = ["id", "text"]
 
 
@@ -70,7 +70,7 @@ class VenueSelect2Serializer(serializers.ModelSerializer):
       return None
 
   class Meta:
-    model = models.Venues
+    model = models.Venue
     fields = ["id", "text"]
 
 
@@ -81,7 +81,7 @@ class TourSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Tours
+    model = models.Tour
     fields = ["id", "text"]
 
 
@@ -92,7 +92,7 @@ class RelationSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Relations
+    model = models.Relation
     fields = ["id", "text"]
 
 
@@ -103,7 +103,7 @@ class BandSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Bands
+    model = models.Band
     fields = ["id", "text"]
 
 
@@ -117,7 +117,7 @@ class SongSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Songs
+    model = models.Song
     fields = ["id", "text"]
 
 
@@ -128,7 +128,7 @@ class TagSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Tags
+    model = models.Tag
     fields = ["id", "text"]
 
 
@@ -139,5 +139,5 @@ class TypeSelect2Serializer(serializers.ModelSerializer):
     return obj.name
 
   class Meta:
-    model = models.Types
+    model = models.Type
     fields = ["id", "text"]

@@ -1,174 +1,174 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load humanize static %}
 {% block title %}
-  Event Run "{{ title }}"
+    Event Run "{{ title }}"
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/slotTable.js' %}"></script>
-  <script src="{% static 'databruce/js/songTable.js' %}"></script>
-  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+    <script src="{% static 'databruce/js/slotTable.js' %}"></script>
+    <script src="{% static 'databruce/js/songTable.js' %}"></script>
+    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  {% if user.is_superuser %}
-    {% include "databruce/partials/admin_edit_btn.html" with view="runs" item=info.id %}
-  {% endif %}
-  <div class="col-12">
-    <div class="text-2xl text-wrap mb-3">
-      <a href="{% url "runs" %}">Runs</a>
-      &gt; {{ info }}
-    </div>
-    <div class="row">
-      <div class="col-12">
-        {% if info.note %}
-          <div class="card mb-3">
-            <div class="card-body text-sm">
-              <div class="text-wrap">
-                <span class="fw-medium">Notes:</span>
-                <div>{{ info.note|markdown|safe }}</div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <ul class="nav nav-pills" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active"
-                    id="pills-events-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#events"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-home"
-                    aria-selected="true">
-              Events<span class="badge badge-light rounded-pill text-bg-light"
-      id="event-count-badge">0</span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link"
-                    id="pills-songs-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#songs"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-profile"
-                    aria-selected="false">
-              Songs<span class="badge badge-light rounded-pill text-bg-light"
-      id="song-count-badge">0</span>
-            </button>
-          </li>
-          {% if info.num_songs > 0 %}
-            <li class="nav-item" role="presentation">
-              <button class="nav-link"
-                      id="pills-slots-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#slots"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-profile"
-                      aria-selected="false">Slots</button>
-            </li>
-          {% endif %}
-          <li class="nav-item" role="presentation">
-            <button class="nav-link"
-                    id="pills-stats-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#stats"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-stats"
-                    aria-selected="false">Stats</button>
-          </li>
-        </ul>
-      </div>
-      <div class="card-body">
-        <div class="tab-content">
-          <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
-          <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
-          <div id="slots" class="tab-pane fade">{% include "databruce/partials/slot_table.html" %}</div>
-          <div id="stats" class="tab-pane fade">
-            <div class="col">
-              <div class="row mb-2">
-                <div class="col">
-                  <div class="card divider">
-                    <div class="card-body text-center fw-semibold text-base p-1">Box Office Stats</div>
-                  </div>
-                </div>
-              </div>
-              <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Tickets Sold / Total</div>
-                    <div class="value">
-                      {% if info.total_sales %}
-                        {{ info.total_sales|intcomma }}
-                      {% else %}
-                        -
-                      {% endif %}
-                      /
-                      {% if info.total_capacity %}
-                        {{ info.total_capacity|intcomma }}
-                      {% elif info.sellout %}
-                        {{ info.total_sales|intcomma }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                    <small>Across All Shows on Run</small>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Gross</div>
-                    <div class="value">
-                      {% if info.total_gross %}
-                        {{ info.total_gross|currency }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                    <small>Across All Shows on Run</small>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Ticket Price Range</div>
-                    <div class="value">{{ ticket_range|default_if_none:"-" }}</div>
-                    <small>Across All Shows on Run</small>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Promoter</div>
-                    <div class="value">{{ info.promo_company|default_if_none:"-" }}</div>
-                    <small>Across All Shows on Run</small>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Shows/Sellouts</div>
-                    <div class="value">{{ info.num_sellout|default_if_none:"-" }} / {{ info.num_events|default_if_none:"-" }}</div>
-                    <small>Across All Shows on Run</small>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Source</div>
-                    <div class="value">{{ info.box_office_source|default_if_none:"-" }}</div>
-                    <small>Across All Shows on Run</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    {% if user.is_superuser %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="run" item=info.id %}
+    {% endif %}
+    <div class="col-12">
+        <div class="text-2xl text-wrap mb-3">
+            <a href="{% url "runs" %}">Runs</a>
+            &gt; {{ info }}
         </div>
-      </div>
+        <div class="row">
+            <div class="col-12">
+                {% if info.note %}
+                    <div class="card mb-3">
+                        <div class="card-body text-sm">
+                            <div class="text-wrap">
+                                <span class="fw-medium">Notes:</span>
+                                <div>{{ info.note|markdown|safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="pills-events-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#events"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-home"
+                                aria-selected="true">
+                            Events<span class="badge badge-light rounded-pill text-bg-light"
+      id="event-count-badge">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="pills-songs-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#songs"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-profile"
+                                aria-selected="false">
+                            Songs<span class="badge badge-light rounded-pill text-bg-light"
+      id="song-count-badge">0</span>
+                        </button>
+                    </li>
+                    {% if info.num_songs > 0 %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link"
+                                    id="pills-slots-tab"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#slots"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="pills-profile"
+                                    aria-selected="false">Slots</button>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="pills-stats-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#stats"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-stats"
+                                aria-selected="false">Stats</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+                    <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
+                    <div id="slots" class="tab-pane fade">{% include "databruce/partials/slot_table.html" %}</div>
+                    <div id="stats" class="tab-pane fade">
+                        <div class="col">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <div class="card divider">
+                                        <div class="card-body text-center fw-semibold text-base p-1">Box Office Stats</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                                <div class="col">
+                                    <div class="card info-card">
+                                        <div class="title">Tickets Sold / Total</div>
+                                        <div class="value">
+                                            {% if info.total_sales %}
+                                                {{ info.total_sales|intcomma }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                            /
+                                            {% if info.total_capacity %}
+                                                {{ info.total_capacity|intcomma }}
+                                            {% elif info.sellout %}
+                                                {{ info.total_sales|intcomma }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </div>
+                                        <small>Across All Shows on Run</small>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card info-card">
+                                        <div class="title">Gross</div>
+                                        <div class="value">
+                                            {% if info.total_gross %}
+                                                {{ info.total_gross|currency }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </div>
+                                        <small>Across All Shows on Run</small>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card info-card">
+                                        <div class="title">Ticket Price Range</div>
+                                        <div class="value">{{ ticket_range|default_if_none:"-" }}</div>
+                                        <small>Across All Shows on Run</small>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card info-card">
+                                        <div class="title">Promoter</div>
+                                        <div class="value">{{ info.promo_company|default_if_none:"-" }}</div>
+                                        <small>Across All Shows on Run</small>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card info-card">
+                                        <div class="title">Shows/Sellouts</div>
+                                        <div class="value">{{ info.num_sellout|default_if_none:"-" }} / {{ info.num_events|default_if_none:"-" }}</div>
+                                        <small>Across All Shows on Run</small>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card info-card">
+                                        <div class="title">Source</div>
+                                        <div class="value">{{ info.box_office_source|default_if_none:"-" }}</div>
+                                        <small>Across All Shows on Run</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       eventTable('/api/v1/events/?run={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?run={{ info.id }}&format=custom');
@@ -176,5 +176,5 @@
       $('.dtsb-searchBuilder').remove();
       slotTable('/api/v1/setlist_entries/?run={{ info.id }}&format=custom');
     })
-  </script>
+    </script>
 {% endblock content %}

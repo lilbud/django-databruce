@@ -34,10 +34,10 @@
                     </div>
                     <div class="col">
                         <a class="text-reset"
-                           href="{% url "bruceyversion:entry_details" id=entry.uuid %}">{{ entry.comment }}</a>
+                           href="{% url "bruceyversion:entry_detail" id=entry.uuid %}">{{ entry.comment }}</a>
                     </div>
                     <div class="col-3">
-                        <a href="{% url "bruceyversion:entry_details" id=entry.uuid %}">
+                        <a href="{% url "bruceyversion:entry_detail" id=entry.uuid %}">
                             {{ entry.event.get_date }}
                             <br>
                             {{ entry.event.venue }}

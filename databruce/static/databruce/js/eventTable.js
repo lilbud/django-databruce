@@ -116,29 +116,6 @@ function eventTable(url) {
 
   let dropdown = $('#columnOrder');
 
-  // table.columns().every(function () {
-  //   let column = this;
-
-  //   if (column.orderable()) {
-  //     let columnIndex = column.index();
-  //     let columnTitle = $(column.header()).find('.dt-column-title').text();
-
-  //     // Append only if the column can be sorted
-  //     dropdown.append(
-  //       $('<option></option>')
-  //         .val(`${columnIndex}-asc`)
-  //         .text(`${columnTitle} (asc.)`)
-  //     );
-
-  //     // Append Descending Option
-  //     dropdown.append(
-  //       $('<option></option>')
-  //         .val(`${columnIndex}-desc`)
-  //         .text(`${columnTitle} (desc.)`)
-  //     );
-  //   }
-  // });
-
   // 3. Listen for dropdown changes to reorder the table
   dropdown.on('change', function () {
     let rawValue = $(this).val();
@@ -150,6 +127,8 @@ function eventTable(url) {
     let parts = rawValue.split('-');
     let selectedColumnIndex = parseInt(parts[0], 10);
     let direction = parts[1];
+
+    console.log(selectedColumnIndex, direction)
 
     // Apply ordering rule and refresh interface layout
     table.order([selectedColumnIndex, direction]).draw();

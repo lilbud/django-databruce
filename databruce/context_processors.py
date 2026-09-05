@@ -106,7 +106,7 @@ def get_navbar_links():
       ],
     },
     {
-      "name": "About Databruce",
+      "name": "About",
       "icon": "bi-question-circle-fill",
       "children": [
         {
@@ -127,6 +127,14 @@ def get_navbar_links():
           "kwargs": {"slug": "roadmap"},
         },
         {"name": "Contact Us", "url": "contact"},
+      ],
+    },
+    {
+      "name": "Other",
+      "match_keyword": ["bruceyversion"],
+      "icon": "bi-book-half",
+      "children": [
+        {"name": "Bruceyversion", "url": "bruceyversion:entries"},
       ],
     },
   ]

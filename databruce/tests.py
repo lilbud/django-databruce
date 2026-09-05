@@ -11,18 +11,18 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from databruce.models import (
-  Bands,
-  Cities,
-  Countries,
+  Band,
+  City,
+  Country,
   CustomUser,
-  Events,
-  Setlists,
+  Event,
+  Setlist,
   SetTypes,
-  Songs,
-  States,
-  Tours,
-  UserAttendedShows,
-  Venues,
+  Song,
+  State,
+  Tour,
+  UserAttendedShow,
+  Venue,
 )
 
 
@@ -34,26 +34,26 @@ class BaseDataTest(TransactionTestCase):
 
   def setUp(self):
     # 1. Core Global Records Seeding
-    self.country = Countries.objects.create(name="United States", alpha_2="US")
-    self.state = States.objects.create(
+    self.country = Country.objects.create(name="United States", alpha_2="US")
+    self.state = State.objects.create(
       name="New York",
       abbrev="NY",
       country=self.country,
     )
-    self.city = Cities.objects.create(name="New York City", state=self.state)
+    self.city = City.objects.create(name="New York City", state=self.state)
 
     # 2. Build your core models, linking the venue to your new city path
-    self.artist = Bands.objects.create(name="The E Street Band")
+    self.artist = Band.objects.create(name="The E Street Band")
 
-    self.venue = Venues.objects.create(
+    self.venue = Venue.objects.create(
       name="Bottom Line",
       detail="",
       city=self.city,
     )
 
-    self.tour = Tours.objects.create(name="Born In The U.S.A.")
+    self.tour = Tour.objects.create(name="Born In The U.S.A.")
 
-    self.event = Events.objects.create(
+    self.event = Event.objects.create(
       event_id="19750815-01",
       date=datetime.datetime(
         year=1975,
@@ -85,27 +85,27 @@ class BaseDataTest(TransactionTestCase):
     # group = Group.objects.get(name="Beta Testers")
     # self.user_active.groups.add(group)  # type: ignore
 
-    self.user_event = UserAttendedShows.objects.create(
+    self.user_event = UserAttendedShow.objects.create(
       user=self.user_active,
       event=self.event,
     )
 
-    self.song_a = Songs.objects.create(
+    self.song_a = Song.objects.create(
       name="Song A",
       original_artist="Bruce Springsteen",
     )
 
-    self.song_b = Songs.objects.create(
+    self.song_b = Song.objects.create(
       name="Song B",
       original_artist="Goose",
     )
 
-    self.song_c = Songs.objects.create(
+    self.song_c = Song.objects.create(
       name="Song C",
       original_artist="The Grateful Dead",
     )
 
-    self.event1 = Events.objects.create(
+    self.event1 = Event.objects.create(
       event_id="19780919-01",
       date=datetime.datetime(
         year=1978,
@@ -119,7 +119,7 @@ class BaseDataTest(TransactionTestCase):
       public=True,
     )
 
-    self.event2 = Events.objects.create(
+    self.event2 = Event.objects.create(
       event_id="19780919-02",
       date=datetime.datetime(
         year=1978,
@@ -134,7 +134,7 @@ class BaseDataTest(TransactionTestCase):
     )
 
     # 2. Setup Event 1: A is followed by C (Matches "A NOT followed by B")
-    self.setlist1 = Setlists.objects.create(
+    self.setlist1 = Setlist.objects.create(
       event=self.event1,
       song=self.song_a,
       song_num=1,
@@ -142,7 +142,7 @@ class BaseDataTest(TransactionTestCase):
       is_opener=True,
     )
 
-    self.setlist2 = Setlists.objects.create(
+    self.setlist2 = Setlist.objects.create(
       event=self.event1,
       song=self.song_c,
       song_num=2,
@@ -150,14 +150,14 @@ class BaseDataTest(TransactionTestCase):
     )
 
     # 3. Setup Event 2: A is followed by B (Fails "A NOT followed by B")
-    self.setlist3 = Setlists.objects.create(
+    self.setlist3 = Setlist.objects.create(
       event=self.event2,
       song=self.song_a,
       song_num=1,
       set_name=SetTypes.SET_1,
     )
 
-    self.setlist4 = Setlists.objects.create(
+    self.setlist4 = Setlist.objects.create(
       event=self.event2,
       song=self.song_b,
       song_num=2,
@@ -195,10 +195,10 @@ class UserTests(BaseDataTest):
     self.client.login(username="testuser", password="faiasd87gf9s")  # noqa: S106
 
   def test_user_add_show(self):
-    UserAttendedShows.objects.create(user=self.user_active, event=self.event1)
+    UserAttendedShow.objects.create(user=self.user_active, event=self.event1)
 
   def test_user_remove_show(self):
-    UserAttendedShows.objects.filter(
+    UserAttendedShow.objects.filter(
       user=self.user_active,
       event=self.event1,
     ).delete()
@@ -441,7 +441,7 @@ class DataTablesTest(BaseDataTest):
   def test_datatable_search_response(self):
     """Your actual test wrapper execution logic calling get_search_results."""
     response = self.get_search_results(self.client)
-    self.assertEqual(response.status_code, 200)
+    assert response.status_code == 200  # type: ignore
 
   def get_search_results(
     self,

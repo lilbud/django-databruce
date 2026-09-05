@@ -10,7 +10,7 @@
 {% endblock extrajs %}
 {% block content %}
     {% if user.is_superuser %}
-        {% include "databruce/partials/admin_edit_btn.html" with view="events" item=event.id %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="event" item=event.id %}
     {% endif %}
     <div class="col d-grid gap-0 gx-0">
         <!-- next and last buttons-->
@@ -191,14 +191,14 @@
                                role="tab"
                                aria-controls="onstage"
                                aria-selected="false">Onstage</a>
-                            <a class="nav-link text-sm"
+                            {% comment %} <a class="nav-link text-sm"
                                id="notes-tab"
                                data-bs-toggle="pill"
                                data-bs-target="#notes"
                                type="button"
                                role="tab"
                                aria-controls="notes"
-                               aria-selected="false">Notes</a>
+                            aria-selected="false">Notes</a> {% endcomment %}
                             <a class="nav-link text-sm"
                                id="links-tab"
                                data-bs-toggle="pill"
@@ -215,6 +215,14 @@
                                role="tab"
                                aria-controls="stats"
                                aria-selected="false">Stats</a>
+                            <a class="nav-link text-sm"
+                               id="article-tab"
+                               data-bs-toggle="pill"
+                               data-bs-target="#articles"
+                               type="button"
+                               role="tab"
+                               aria-controls="article"
+                               aria-selected="false">Articles</a>
                         </nav>
                     </div>
                 </div>
@@ -304,8 +312,6 @@
                                                         <th class="notes">Note</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -415,7 +421,7 @@
                                         <div class="card-body p-2" id="tags">
                                             {% for tag in event.event_tag.all %}
                                                 <a href="{% url "events_by_tag" slug=tag.tag.slug %}">
-                                                    <span class='badge tag-badge'>{{ tag.tag.slug }} </span></a>
+                                                    <span class="badge tag-badge">{{ tag.tag.slug }}</span></a>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -440,8 +446,6 @@
                                         <th class="all">Guest</th>
                                         <th class="all">Person</th>
                                     </thead>
-                                    <tbody>
-                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -509,7 +513,7 @@
                                             <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
                                         </li>
                                     {% endif %}
-                                    {% if event.nugs %}
+                                    {% if event.nugs_event %}
                                         <li class="ps-0">
                                             <a href="{{ event.nugs_event.url }}">Nugs Release</a>
                                         </li>
@@ -700,6 +704,27 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade"
+                 id="articles"
+                 role="tabpanel"
+                 aria-labelledby="article-tab"
+                 tabindex="5">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <ul>
+                                {% for article in articles %}
+                                    <li>
+                                        <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
+                                        ({{ article.source }})
+                                        <span class="fw-semibold">[{{ article.get_category_display }}]</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="{% static 'databruce/js/share-card.js' %}"></script>
@@ -828,11 +853,6 @@
             $(badges).append($(badge).prop('outerHTML'));
           }
 
-          //if (row.notes.length > 0) {
-          //  var notes = `<br><span class="text-wrap d-inline-block d-xl-none fw-light setlist-note">${row.notes}</span>`;
-          //  return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;
-          //}
-
           return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
         }
       },
@@ -910,7 +930,7 @@
         'className': '',
         'render': function (data, type, row, meta) {
           if (row.notes) {
-            return `<span class="setlist-note">${row.notes.join(';').replaceAll("''", "'")}</span>`
+            return `<span class="setlist-note">${row.notes.join('; ').replaceAll("''", "'")}</span>`
           }
 
           return ''

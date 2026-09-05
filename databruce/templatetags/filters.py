@@ -72,6 +72,7 @@ def currency(value):
 @register.filter(name="markdown_safe")
 def markdown_safe(value):
   """Converts markdown to HTML and thoroughly sanitizes it against XSS.
+
   Automatically marks the output as safe for Django templates.
   """
   if not value:

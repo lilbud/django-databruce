@@ -36,6 +36,22 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  src: url('../fonts/JetBrainsMono.ttf') format('truetype');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box !important;
 }
@@ -336,7 +352,7 @@ a:link,
   row-gap: .5rem !important;
   align-items: flex-end !important;
   display: flex !important;
-  gap: 0.5rem;
+  gap: 0.25rem;
   flex-wrap: wrap;
   margin-top: calc(-1 * var(--bs-gutter-y));
   margin-right: calc(-.5 * var(--bs-gutter-x));
@@ -571,6 +587,7 @@ tr.album-header>td {
 td:not(.fc-day) {
   align-items: center;
   vertical-align: middle !important;
+  /* display: inline-flex !important; */
 }
 
 tbody tr:not(.set-header) {
@@ -582,23 +599,33 @@ tbody tr:not(.set-header) {
   padding: 0.15rem 0.5rem !important;
 }
 
-td {
+td:not(.fc-day) {
   align-items: center !important;
   vertical-align: middle !important;
 }
 
-td .badge {
-  display: inline-flex !important;
+.badge {
+  font-size: var(--text-xs) !important;
+  vertical-align: middle !important;
+  font-weight: 500 !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 18px !important;
-  /* margin: 2px !important; */
+  border-radius: 100px !important;
   white-space: nowrap !important;
   width: max-content !important;
+  display: inline-flex !important;
+  cursor: pointer !important;
+
+}
+
+td .badge {
+  height: 18px !important;
   vertical-align: middle !important;
-  font-size: var(--text-2xs) !important;
-  font-weight: 500 !important;
-  line-height: 1 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  border-radius: 5px !important;
+  font-family: 'JetBrains Mono Variable', monospace !important;
+  padding: .05rem .4rem !important;
 }
 
 .bi.bi-check-lg {
@@ -610,15 +637,6 @@ td .badge {
 /* font size clamp for event header. Inspired by WTED Archives */
 .event-header-date {
   font-size: clamp(var(--text-xl), 3.8vw, var(--text-2xl)) !important;
-}
-
-/* custom badges for the badge row on event detail */
-.badge-row span.badge {
-  font-weight: 500 !important;
-  font-size: var(--text-xs) !important;
-  line-height: 1rem !important;
-  padding: 0.15rem 0.45rem !important;
-  /* display: inline-flex; */
 }
 
 .segue,
@@ -664,10 +682,6 @@ blockquote {
   background-color: var(--background-color-muted);
 }
 
-/* smaller font size for setlist notes */
-.setlist-note {
-  font-size: 0.7rem !important;
-}
 
 .info-card small {
   margin-top: 0.1rem !important;
@@ -1679,8 +1693,6 @@ a[href="https://datatables.net/tn/25"] {
 .notes {
   width: 18rem;
   min-width: 18rem;
-  font-size: 0.7rem;
-  font-weight: 300;
 }
 
 /* Song fills remaining space and pushes others right */
@@ -1689,10 +1701,23 @@ a[href="https://datatables.net/tn/25"] {
   min-width: 0;
 }
 
+.song * {
+  align-items: center !important;
+}
+
 td.notes {
   text-wrap: wrap !important;
   word-wrap: break-word !important;
+  /* font-family: 'JetBrains Mono', monospace !important; */
+  font-weight: 300 !important;
+  line-height: 1.2 !important;
 }
+
+/* smaller font size for setlist notes */
+.setlist-note {
+  font-size: 0.7rem !important;
+}
+
 
 @media (max-width: 767px) {
   .min-tablet-l {
@@ -1778,10 +1803,12 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 
 .badge.tag-badge {
   background-color: var(--color-primary) !important;
+  font-family: 'JetBrains Mono', monospace !important;
   color: var(--color-contrast) !important;
   font-weight: 500 !important;
   font-size: var(--text-3xs) !important;
   border-radius: 0.2rem !important;
+  padding: .2rem .4rem !important;
 }
 
 #article-content img {

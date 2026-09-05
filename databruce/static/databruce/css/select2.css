@@ -34,12 +34,12 @@
 
 /* Combined borders and border colors */
 .select2-dropdown,
-.select2-search__field,
+/* .select2-search__field, */
 .select2-selection,
 .select2-selection--multiple,
 .select2-selection--single,
 .select2-selection__choice,
-.select2-results__options,
+/* .select2-results__options, */
 .select2-container--bootstrap-5 .select2-selection {
   border: 1px solid var(--border-color-base) !important;
 }
@@ -70,14 +70,14 @@
 .select2-results__option--highlighted,
 .select2-results__option--highlighted.select2-results__option--selectable {
   background-color: var(--color-primary) !important;
-  color: rgb(var(--primary-content)) !important;
+  color: var(--color-white) !important;
   border-radius: var(--bs-border-radius-sm) !important;
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
   background-color: var(--background-color-emphasis) !important;
   border: 1px solid var(--border-color-base) !important;
-  color: var(--text-color-default) !important;
+  color: #fff !important;
 }
 
 /* Container & Focus states */

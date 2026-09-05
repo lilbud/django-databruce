@@ -1,7 +1,7 @@
 {% extends "databruce/wide_layout.html" %}
 {% block extrajs %}
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
-  <script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
+    <script>
       document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -80,11 +80,12 @@
               .then((resp) => resp.json())
               .then(function(data){
                 var eventsList = [];
-
+                
                 $(data.results).each(function (i, val){
+                  let releaseDate = new Date(val.date);
                   eventsList.push(
                     {
-                      title: val.name,
+                      title: `${val.name} (${releaseDate.getFullYear()})`,
                       start: val.date,
                       url: `/releases/${val.uuid}`,
                       className: 'px-1 calendar event release-event',
@@ -96,7 +97,14 @@
               })
             },
             function (info, successCallback, failureCallback) {
-              fetch(`/api/v1/releases/?format=json&month=${info.start.getMonth() + 1}&current_year=false`)
+              
+              const midTime = info.start.getTime() + (info.end.getTime() - info.start.getTime()) / 2;
+              const midDate = new Date(midTime);
+
+              const targetMonth = midDate.getMonth() + 1;
+              const currentViewYear = midDate.getFullYear();
+
+              fetch(`/api/v1/releases/?format=json&month=${targetMonth}&current_year=false`)
               .then((resp) => resp.json())
               .then(function(data){
                 var eventsList = [];
@@ -105,11 +113,12 @@
                 $(data.results).each(function (i, val){
 
                   let historicalDate = new Date(val.date);
+                  let releaseDate = new Date(val.date);
                   historicalDate.setFullYear(currentViewYear);
 
                   eventsList.push(
                     {
-                      title: val.name,
+                      title: `${val.name} (${releaseDate.getFullYear()})`,
                       start: historicalDate.toISOString().split('T')[0],
                       url: `/releases/${val.uuid}`,
                       className: 'px-1 calendar event release-event-past',
@@ -164,40 +173,40 @@
 
         $('#year-select > button').text(calendar.getDate().getFullYear())
       });
-  </script>
+    </script>
 {% endblock extrajs %}
 {% load static %}
 {% block title %}
-  {{ title }}
+    {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12 col-xl-10">
-    <div class="row">
-      <div class="col">
-        <div class="d-flex justify-content-start mb-3">
-          <div class="text-2xl mb-3 pe-2">Event Calendar</div>
-          <div id="year-select">
-            <button class="btn btn-sm btn-primary dropdown-toggle"
-                    type="button"
-                    id="my-button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">{{ start_date|date:'Y' }}</button>
-            <ul class="dropdown-menu">
-              {% for i in years %}
-                <li>
-                  <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
+    <div class="col-12 col-xl-10">
+        <div class="row">
+            <div class="col">
+                <div class="d-flex justify-content-start mb-3">
+                    <div class="text-2xl mb-3 pe-2">Event Calendar</div>
+                    <div id="year-select">
+                        <button class="btn btn-sm btn-primary dropdown-toggle"
+                                type="button"
+                                id="my-button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">{{ start_date|date:'Y' }}</button>
+                        <ul class="dropdown-menu">
+                            {% for i in years %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="row">
+            <div id="calendar"></div>
+        </div>
     </div>
-    <div class="row">
-      <div id="calendar"></div>
-    </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       var date = new Date();
 
@@ -207,5 +216,5 @@
       $(`td[data-date$='${currentMonth}-${currentDay}']`).addClass('today');
     });
 
-  </script>
+    </script>
 {% endblock content %}

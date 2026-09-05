@@ -17,7 +17,7 @@ class SubmitForm(forms.Form):
       if song_id:
         # Query the actual songs matching that event
         # Example assuming a Song model:
-        songs = models.Songs.objects.filter(id=song_id)
+        songs = models.Song.objects.filter(id=song_id)
         self.fields["song"].choices = [(s.id, str(s.name)) for s in songs]
 
     if self.is_bound:
@@ -28,7 +28,7 @@ class SubmitForm(forms.Form):
     # 2. If a value exists, inject it as a valid choice so validation passes
     if event_id:
       try:
-        event_obj = models.Events.objects.get(pk=event_id)
+        event_obj = models.Event.objects.get(pk=event_id)
         # CRITICAL FIX: Clear choices completely to prevent duplication
         self.fields["event"].choices = []
 
@@ -40,7 +40,7 @@ class SubmitForm(forms.Form):
           (event_obj.pk, f"{event_obj.date} - {event_obj.venue}"),
         ]
 
-      except (models.Events.DoesNotExist, ValueError):
+      except (models.Event.DoesNotExist, ValueError):
         self.fields["event"].choices = [(event_id, event_id)]
 
   event = forms.ChoiceField(
@@ -83,8 +83,8 @@ class SubmitForm(forms.Form):
     data = self.cleaned_data.get("event")
     if data:
       try:
-        return models.Events.objects.get(id=data)
-      except models.Events.DoesNotExist:
+        return models.Event.objects.get(id=data)
+      except models.Event.DoesNotExist:
         raise forms.ValidationError("Select a valid event.")
     return None
 
@@ -92,8 +92,8 @@ class SubmitForm(forms.Form):
     data = self.cleaned_data.get("song")
     if data:
       try:
-        return models.Songs.objects.get(id=data)
-      except models.Songs.DoesNotExist:
+        return models.Song.objects.get(id=data)
+      except models.Song.DoesNotExist:
         raise forms.ValidationError("Select a valid song.")
     return None
 

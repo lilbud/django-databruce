@@ -10,7 +10,7 @@ class CitySelect2Filter(filters.FilterSet):
   country = filters.CharFilter(field_name="country__name", lookup_expr="istartswith")
 
   class Meta:
-    model = models.Cities
+    model = models.City
     fields = ["name", "state", "country"]
 
 
@@ -32,23 +32,23 @@ class StateSelect2Filter(filters.FilterSet):
     return queryset.filter(filter)
 
   class Meta:
-    model = models.States
+    model = models.State
     fields = ["name", "country"]
 
 
 class CountrySelect2Filter(filters.FilterSet):
-  name = filters.CharFilter(lookup_expr="istartswith", label="Name")
+  name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Countries
+    model = models.Country
     fields = ["name"]
 
 
 class ContinentSelect2Filter(filters.FilterSet):
-  name = filters.CharFilter(lookup_expr="istartswith", label="Name")
+  name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Continents
+    model = models.Continent
     fields = ["name"]
 
 
@@ -60,31 +60,31 @@ class VenueSelect2Filter(filters.FilterSet):
     return queryset.filter(filter)
 
   class Meta:
-    model = models.Venues
+    model = models.Venue
     fields = ["name"]
 
 
 class TourSelect2Filter(filters.FilterSet):
-  name = filters.CharFilter(lookup_expr="istartswith", label="Name")
+  name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Tours
+    model = models.Tour
     fields = ["name"]
 
 
 class RelationSelect2Filter(filters.FilterSet):
-  name = filters.CharFilter(lookup_expr="istartswith", label="Name")
+  name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Relations
+    model = models.Relation
     fields = ["name"]
 
 
 class BandSelect2Filter(filters.FilterSet):
-  name = filters.CharFilter(lookup_expr="istartswith", label="Name")
+  name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Bands
+    model = models.Band
     fields = ["name"]
 
 
@@ -96,7 +96,7 @@ class SongSelect2Filter(filters.FilterSet):
   )
 
   class Meta:
-    model = models.Songs
+    model = models.Song
     fields = ["name"]
 
   def filter_name(self, queryset, name, value):
@@ -114,7 +114,7 @@ class TagSelect2Filter(filters.FilterSet):
   name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Tags
+    model = models.Tag
     fields = ["name"]
 
 
@@ -122,5 +122,5 @@ class TypeSelect2Filter(filters.FilterSet):
   name = filters.CharFilter(lookup_expr="icontains", label="Name")
 
   class Meta:
-    model = models.Types
+    model = models.Type
     fields = ["name"]

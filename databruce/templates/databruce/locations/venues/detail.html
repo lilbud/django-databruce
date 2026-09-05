@@ -1,183 +1,183 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load static %}
 {% block title %}
-  Venue "{{ info.get_name }}"
+    Venue "{{ info.get_name }}"
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/songTable.js' %}"></script>
-  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+    <script src="{% static 'databruce/js/songTable.js' %}"></script>
+    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  {% if user.is_superuser %}
-    {% include "databruce/partials/admin_edit_btn.html" with view="venues" item=info.id %}
-  {% endif %}
-  <div class="col-12">
-    <div class="text-2xl text-nowrap mb-3">
-      <a href="{% url "venues" %}">Venues</a> &gt;
-      {{ info.name }}
-    </div>
-    <div class="row">
-      <div class="col-12">
-        {% if info.aliases or shared_loc %}
-          <div class="card mb-3">
-            <div class="card-body text-sm">
-              <div class="row d-flex gy-2 gy-md-1">
-                <div class="prefix-container">
-                  <span class="prefix">Nicknames/AKA</span>
-                  <span class="value">{{ info.aliases|join:'; ' }}</span>
-                </div>
-                {% if info.address %}
-                  <div class="prefix-container">
-                    <div class="col">
-                      <span class="prefix">Address</span>
-                      <span class="value">{{ info.address }}</span>
-                    </div>
-                  </div>
-                {% endif %}
-                <div>
-                  <div class="fw-medium">Same Address As:</div>
-                  <div>
-                    <ul>
-                      {% for venue in shared_loc %}
-                        <li>
-                          <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-    {% if info.note %}
-      <div class="row">
-        <div class="col">
-          <div class="card mb-3">
-            <div class="card-body text-sm">
-              <div class="text-wrap">
-                <span class="fw-medium">Notes:</span>
-                <div>{{ info.note|markdown|safe }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    {% if user.is_superuser %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="venue" item=info.id %}
     {% endif %}
-    <div class="card">
-      <div class="card-header">
-        <ul class="nav nav-pills" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active"
-                    id="pills-events-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#events"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-home"
-                    aria-selected="true">
-              Events<span class="badge badge-light rounded-pill text-bg-light"
-      id="event-count-badge">0</span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link"
-                    id="pills-songs-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#songs"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-profile"
-                    aria-selected="false">
-              Songs<span class="badge badge-light rounded-pill text-bg-light"
-      id="song-count-badge">0</span>
-            </button>
-          </li>
-          {% if child_venues %}
-            <li class="nav-item" role="presentation">
-              <button class="nav-link text-nowrap"
-                      id="pills-children-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#children"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-children"
-                      aria-selected="false">Child Venues</button>
-            </li>
-          {% endif %}
-          <li class="nav-item" role="presentation">
-            <button class="nav-link"
-                    id="pills-links-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#links"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-links"
-                    aria-selected="false">Links</button>
-          </li>
-          {% if info.latitude %}
-            <li class="nav-item" role="presentation">
-              <button class="nav-link"
-                      id="pills-map-tab"
-                      data-bs-toggle="pill"
-                      data-bs-target="#map"
-                      type="button"
-                      role="tab"
-                      aria-controls="pills-map"
-                      aria-selected="false">Map</button>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
-      <div class="card-body">
-        <div class="tab-content">
-          <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
-          <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
-          <div id="links" class="tab-pane fade">
-            <ul>
-              {% if info.brucebase_url %}
-                <li>
-                  <a target="_blank"
-                     href="https://brucebase.wikidot.com/venue:{{ info.brucebase_url }}">Brucebase</a>
-                </li>
-              {% endif %}
-              {% if info.mbid %}
-                <li>
-                  <a target="_blank" href="https://musicbrainz.org/place/{{ info.mbid }}">Musicbrainz</a>
-                </li>
-              {% endif %}
-            </ul>
-          </div>
-          <div id="map" class="tab-pane fade">
-            <div class="map-container row">
-              <div class="col">
-                <div id="map-object"></div>
-              </div>
-            </div>
-          </div>
-          <div id="children" class="tab-pane fade text-sm">
-            <div class="row mb-3">
-              <div>The following venues are/were located here:</div>
-            </div>
-            <div class="row text-sm">
-              <div class="col">
-                <ul>
-                  {% for venue in child_venues %}
-                    <li>
-                      <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
-          </div>
+    <div class="col-12">
+        <div class="text-2xl text-nowrap mb-3">
+            <a href="{% url "venues" %}">Venues</a> &gt;
+            {{ info.name }}
         </div>
-      </div>
+        <div class="row">
+            <div class="col-12">
+                {% if info.aliases or shared_loc %}
+                    <div class="card mb-3">
+                        <div class="card-body text-sm">
+                            <div class="row d-flex gy-2 gy-md-1">
+                                <div class="prefix-container">
+                                    <span class="prefix">Nicknames/AKA</span>
+                                    <span class="value">{{ info.aliases|join:'; ' }}</span>
+                                </div>
+                                {% if info.address %}
+                                    <div class="prefix-container">
+                                        <div class="col">
+                                            <span class="prefix">Address</span>
+                                            <span class="value">{{ info.address }}</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-medium">Same Address As:</div>
+                                    <div>
+                                        <ul>
+                                            {% for venue in shared_loc %}
+                                                <li>
+                                                    <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if info.note %}
+            <div class="row">
+                <div class="col">
+                    <div class="card mb-3">
+                        <div class="card-body text-sm">
+                            <div class="text-wrap">
+                                <span class="fw-medium">Notes:</span>
+                                <div>{{ info.note|markdown|safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="pills-events-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#events"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-home"
+                                aria-selected="true">
+                            Events<span class="badge badge-light rounded-pill text-bg-light"
+      id="event-count-badge">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="pills-songs-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#songs"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-profile"
+                                aria-selected="false">
+                            Songs<span class="badge badge-light rounded-pill text-bg-light"
+      id="song-count-badge">0</span>
+                        </button>
+                    </li>
+                    {% if child_venues %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-nowrap"
+                                    id="pills-children-tab"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#children"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="pills-children"
+                                    aria-selected="false">Child Venues</button>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="pills-links-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#links"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-links"
+                                aria-selected="false">Links</button>
+                    </li>
+                    {% if info.latitude %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link"
+                                    id="pills-map-tab"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#map"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="pills-map"
+                                    aria-selected="false">Map</button>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+                    <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
+                    <div id="links" class="tab-pane fade">
+                        <ul>
+                            {% if info.brucebase_url %}
+                                <li>
+                                    <a target="_blank"
+                                       href="https://brucebase.wikidot.com/venue:{{ info.brucebase_url }}">Brucebase</a>
+                                </li>
+                            {% endif %}
+                            {% if info.mbid %}
+                                <li>
+                                    <a target="_blank" href="https://musicbrainz.org/place/{{ info.mbid }}">Musicbrainz</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div id="map" class="tab-pane fade">
+                        <div class="map-container row">
+                            <div class="col">
+                                <div id="map-object"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="children" class="tab-pane fade text-sm">
+                        <div class="row mb-3">
+                            <div>The following venues are/were located here:</div>
+                        </div>
+                        <div class="row text-sm">
+                            <div class="col">
+                                <ul>
+                                    {% for venue in child_venues %}
+                                        <li>
+                                            <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       eventTable('/api/v1/events/?venue={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?venue={{ info.id }}&format=custom');
@@ -201,5 +201,5 @@
           map.invalidateSize();
       });
     })
-  </script>
+    </script>
 {% endblock content %}

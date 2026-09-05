@@ -1,271 +1,271 @@
 {% extends "databruce/wide_layout.html" %}
 {% block title %}
-  Song "{{ title }}"
+    Song "{{ title }}"
 {% endblock title %}
 {% block content %}
-  {% if user.is_superuser %}
-    {% include "databruce/partials/admin_edit_btn.html" with view="songs" item=info.id %}
-  {% endif %}
-  <div class="col-12">
-    <div class="row mb-3">
-      <div class="col">
-        <div class="row d-grid gap-0 row-gap-1 text-base text-center text-lg-start">
-          <div class="text-2xl text-wrap mb-2">{{ info.name }}</div>
-          <div class="col-12">
-            <!-- start of original row -->
-            <div class="row">
-              <div class="col-12">
-                {% if info.album %}
-                  <div class="row mb-2">
-                    <div class="fw-semibold">Album</div>
-                    <div>
-                      <a href="{% url "release_details" id=info.album.uuid %}">{{ info.category }}</a>
-                    </div>
-                  </div>
-                {% endif %}
-                {% if info.original == False %}
-                  <div class="row mb-2">
-                    <div class="fw-semibold">Original Artist</div>
-                    <div>{{ info.original_artist }}</div>
-                  </div>
-                {% endif %}
-                <div class="row mb-2 d-flex-inline col-gap-2 justify-content-center justify-content-lg-start">
-                  <div class="col-auto">
-                    <div class="fw-semibold">Public</div>
-                    <div>{{ info.num_plays_public }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <div class="fw-semibold">Private</div>
-                    <div>{{ info.num_plays_private }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <div class="fw-semibold">Snippet</div>
-                    <div>{{ info.num_plays_snippet }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <div class="fw-semibold">Opener</div>
-                    <div>{{ info.opener }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <div class="fw-semibold">Closer</div>
-                    <div>{{ info.closer }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <div class="fw-semibold">Frequency</div>
-                    <div>{{ frequency|default_if_none:"0" }}%</div>
-                  </div>
-                </div>
-                <div class="row">
-                  {% if info.last_event %}
-                    <div class="fw-semibold">Last Played</div>
-                    <div>
-                      <a href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
-                      {% if show_gap == 0 %}
-                        <span>(latest event)</span>
-                      {% else %}
-                        <span>({{ show_gap }} show{{ show_gap|pluralize }} ago)</span>
-                      {% endif %}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            <!-- end of original row -->
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-            <ul class="nav nav-pills" role="tablist">
-              <button class="nav-link active"
-                      data-bs-toggle="pill"
-                      data-bs-target="#events"
-                      aria-controls="pills-events">
-                Performances
-                <span class="badge" id="event-count-badge">0</span>
-              </button>
-              <button class="nav-link"
-                      data-bs-toggle="pill"
-                      data-bs-target="#snippets"
-                      aria-controls="pills-snippets">
-                Snippets
-                <span class="badge" id="snippet-count-badge">0</span>
-              </button>
-              <button class="nav-link"
-                      data-bs-toggle="pill"
-                      data-bs-target="#included"
-                      aria-controls="pills-included">
-                Included Songs
-                <span class="badge" id="included-count-badge">0</span>
-              </button>
-              <button class="nav-link"
-                      data-bs-toggle="pill"
-                      data-bs-target="#stats"
-                      aria-controls="pills-stats">Stats</button>
-              <button class="nav-link"
-                      data-bs-toggle="pill"
-                      data-bs-target="#lyrics"
-                      aria-controls="pills-stats">Lyrics</button>
-              <button class="nav-link"
-                      data-bs-toggle="pill"
-                      data-bs-target="#links"
-                      aria-controls="pills-links">Links</button>
-            </ul>
-          </div>
-          <div class="card-body">
-            <div class="tab-content">
-              <div id="events" class="tab-pane fade show active">
-                <div id="tableControls">
-                  <div class="col-12 col-md-1">
-                    <label for="PublicityFilter" class="pb-1">Publicity</label>
-                    <select id="PublicityFilter" class="form-select form-select-sm">
-                      <option value="">All</option>
-                      <option value="true">Public</option>
-                      <option value="false">Private</option>
-                    </select>
-                  </div>
-                  <!-- Search -->
-                  <div class="col">
-                    <label for="song-search" class="pb-1">Search</label>
-                    <div class="input-group input-group-sm">
-                      <input type="text"
-                             id="song-search"
-                             class="form-control form-control-sm"
-                             placeholder="Type to search table...">
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-auto mt-2 mt-md-0">
-                    <button type="button"
-                            id="sbButton"
-                            data-bs-toggle="modal"
-                            data-bs-target="#sbModal"
-                            class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="table-responsive">
-                    <table class="table table-hover display" id="songTable">
-                      <thead>
-                        <tr>
-                          <th class="all">Date</th>
-                          <th class="all">Act</th>
-                          <th class="all">Venue</th>
-                          <th class="all">Tour</th>
-                          <th class="all">Position</th>
-                          <th class="all">Gap</th>
-                          <th class="all">Set</th>
-                          <th class="all">Prev</th>
-                          <th class="all">Next</th>
-                          <th class="all">Note</th>
-                          <th class="all">Public</th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <div id="snippets" class="tab-pane fade p-2">
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="snippetTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Date</th>
-                        <th class="all">Act</th>
-                        <th class="all">Venue</th>
-                        <th class="all">During Song</th>
-                        <th class="all">Note</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-              <div id="included" class="tab-pane fade p-2">
-                <div class="table-responsive">
-                  <table class="table table-hover display" id="includedTable">
-                    <thead>
-                      <tr>
-                        <th class="all">Count</th>
-                        <th class="all">Name</th>
-                        <th class="all">First</th>
-                        <th class="all">Last</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-              <div id="stats" class="tab-pane fade">
-                <div class="row row-cols-1 row-cols-lg-2">
-                  <div class="col-12 col-lg-6 mb-3 mb-md-0">
-                    <div class="chart-container">
-                      <canvas id="chart"></canvas>
-                    </div>
-                  </div>
-                  <div class="col-12 col-lg-6">
-                    <div class="row row-cols-2 row-cols-lg-3 g-2">
-                      {% for item in positions %}
-                        <div class="col">
-                          <div class="card p-0">
-                            <div class="card-body">
-                              <div class="text-sm text-wrap">{{ item.position }}</div>
-                              <div class="text-xl">{{ item.count }}</div>
+    {% if user.is_superuser %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="song" item=info.id %}
+    {% endif %}
+    <div class="col-12">
+        <div class="row mb-3">
+            <div class="col">
+                <div class="row d-grid gap-0 row-gap-1 text-base text-center text-lg-start">
+                    <div class="text-2xl text-wrap mb-2">{{ info.name }}</div>
+                    <div class="col-12">
+                        <!-- start of original row -->
+                        <div class="row">
+                            <div class="col-12">
+                                {% if info.album %}
+                                    <div class="row mb-2">
+                                        <div class="fw-semibold">Album</div>
+                                        <div>
+                                            <a href="{% url "release_details" id=info.album.uuid %}">{{ info.category }}</a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if info.original == False %}
+                                    <div class="row mb-2">
+                                        <div class="fw-semibold">Original Artist</div>
+                                        <div>{{ info.original_artist }}</div>
+                                    </div>
+                                {% endif %}
+                                <div class="row mb-2 d-flex-inline col-gap-2 justify-content-center justify-content-lg-start">
+                                    <div class="col-auto">
+                                        <div class="fw-semibold">Public</div>
+                                        <div>{{ info.num_plays_public }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="fw-semibold">Private</div>
+                                        <div>{{ info.num_plays_private }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="fw-semibold">Snippet</div>
+                                        <div>{{ info.num_plays_snippet }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="fw-semibold">Opener</div>
+                                        <div>{{ info.opener }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="fw-semibold">Closer</div>
+                                        <div>{{ info.closer }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="fw-semibold">Frequency</div>
+                                        <div>{{ frequency|default_if_none:"0" }}%</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    {% if info.last_event %}
+                                        <div class="fw-semibold">Last Played</div>
+                                        <div>
+                                            <a href="{% url "event_details" id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
+                                            {% if show_gap == 0 %}
+                                                <span>(latest event)</span>
+                                            {% else %}
+                                                <span>({{ show_gap }} show{{ show_gap|pluralize }} ago)</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                          </div>
                         </div>
-                      {% endfor %}
+                        <!-- end of original row -->
                     </div>
-                  </div>
                 </div>
-              </div>
-              <div id="lyrics" class="tab-pane fade">
-                {% for lyric in lyrics %}
-                  {% if lyric.language == 'English' %}{{ lyric.text|linebreaksbr }}{% endif %}
-                {% endfor %}
-                {% if lyrics.count > 1 %}
-                  <div class="fw-semibold mt-2">All Versions</div>
-                  <ul>
-                    {% for lyric in lyrics %}
-                      <li>
-                        <a href="{% url "lyric_detail" id=lyric.uuid %}">
-                          {{ lyric.language }}
-                          {% if lyric.note %}[{{ lyric.note }}]{% endif %}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </div>
-              <div id="links" class="tab-pane fade">
-                <ul>
-                  {% if info.brucebase_url %}
-                    <li>
-                      <a target="_blank"
-                         href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
-                    </li>
-                  {% endif %}
-                  {% if info.spotify_id %}
-                    <li>
-                      <a target="_blank"
-                         href="https://open.spotify.com/track/{{ info.spotify_id }}">Spotify</a>
-                    </li>
-                  {% endif %}
-                  {% if info.mbid %}
-                    <li>
-                      <a target="_blank" href="https://musicbrainz.org/work/{{ info.mbid }}">Musicbrainz</a>
-                    </li>
-                  {% endif %}
-                </ul>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-pills" role="tablist">
+                            <button class="nav-link active"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#events"
+                                    aria-controls="pills-events">
+                                Performances
+                                <span class="badge" id="event-count-badge">0</span>
+                            </button>
+                            <button class="nav-link"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#snippets"
+                                    aria-controls="pills-snippets">
+                                Snippets
+                                <span class="badge" id="snippet-count-badge">0</span>
+                            </button>
+                            <button class="nav-link"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#included"
+                                    aria-controls="pills-included">
+                                Included Songs
+                                <span class="badge" id="included-count-badge">0</span>
+                            </button>
+                            <button class="nav-link"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#stats"
+                                    aria-controls="pills-stats">Stats</button>
+                            <button class="nav-link"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#lyrics"
+                                    aria-controls="pills-stats">Lyrics</button>
+                            <button class="nav-link"
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#links"
+                                    aria-controls="pills-links">Links</button>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div id="events" class="tab-pane fade show active">
+                                <div id="tableControls">
+                                    <div class="col-12 col-md-1">
+                                        <label for="PublicityFilter" class="pb-1">Publicity</label>
+                                        <select id="PublicityFilter" class="form-select form-select-sm">
+                                            <option value="">All</option>
+                                            <option value="true">Public</option>
+                                            <option value="false">Private</option>
+                                        </select>
+                                    </div>
+                                    <!-- Search -->
+                                    <div class="col">
+                                        <label for="song-search" class="pb-1">Search</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text"
+                                                   id="song-search"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="Type to search table...">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-auto mt-2 mt-md-0">
+                                        <button type="button"
+                                                id="sbButton"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#sbModal"
+                                                class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover display" id="songTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="all">Date</th>
+                                                    <th class="all">Act</th>
+                                                    <th class="all">Venue</th>
+                                                    <th class="all">Tour</th>
+                                                    <th class="all">Position</th>
+                                                    <th class="all">Gap</th>
+                                                    <th class="all">Set</th>
+                                                    <th class="all">Prev</th>
+                                                    <th class="all">Next</th>
+                                                    <th class="all">Note</th>
+                                                    <th class="all">Public</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="snippets" class="tab-pane fade p-2">
+                                <div class="table-responsive">
+                                    <table class="table table-hover display" id="snippetTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">Date</th>
+                                                <th class="all">Act</th>
+                                                <th class="all">Venue</th>
+                                                <th class="all">During Song</th>
+                                                <th class="all">Note</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="included" class="tab-pane fade p-2">
+                                <div class="table-responsive">
+                                    <table class="table table-hover display" id="includedTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="all">Count</th>
+                                                <th class="all">Name</th>
+                                                <th class="all">First</th>
+                                                <th class="all">Last</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="stats" class="tab-pane fade">
+                                <div class="row row-cols-1 row-cols-lg-2">
+                                    <div class="col-12 col-lg-6 mb-3 mb-md-0">
+                                        <div class="chart-container">
+                                            <canvas id="chart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <div class="row row-cols-2 row-cols-lg-3 g-2">
+                                            {% for item in positions %}
+                                                <div class="col">
+                                                    <div class="card p-0">
+                                                        <div class="card-body">
+                                                            <div class="text-sm text-wrap">{{ item.position }}</div>
+                                                            <div class="text-xl">{{ item.count }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="lyrics" class="tab-pane fade">
+                                {% for lyric in lyrics %}
+                                    {% if lyric.language == 'English' %}{{ lyric.text|linebreaksbr }}{% endif %}
+                                {% endfor %}
+                                {% if lyrics.count > 1 %}
+                                    <div class="fw-semibold mt-2">All Versions</div>
+                                    <ul>
+                                        {% for lyric in lyrics %}
+                                            <li>
+                                                <a href="{% url "lyric_detail" id=lyric.uuid %}">
+                                                    {{ lyric.language }}
+                                                    {% if lyric.note %}[{{ lyric.note }}]{% endif %}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            <div id="links" class="tab-pane fade">
+                                <ul>
+                                    {% if info.brucebase_url %}
+                                        <li>
+                                            <a target="_blank"
+                                               href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if info.spotify_id %}
+                                        <li>
+                                            <a target="_blank"
+                                               href="https://open.spotify.com/track/{{ info.spotify_id }}">Spotify</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if info.mbid %}
+                                        <li>
+                                            <a target="_blank" href="https://musicbrainz.org/work/{{ info.mbid }}">Musicbrainz</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-  <script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script>
     $(document).ready(function () {
         let ctx = document.getElementById("chart").getContext("2d");
         Chart.defaults.color = '#999';
@@ -598,5 +598,5 @@
         }
       });
     })
-  </script>
+    </script>
 {% endblock content %}

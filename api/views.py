@@ -23,10 +23,11 @@ from rest_framework import exceptions, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 
-from api import filters
+from api import filters as api_filters
 from api import serializers as api_serializers
-from bruceyversion import models as bv_models
+from bruceyversion.models import Entry, EntryComment
 from databruce import models as db_models
+from library.models import Article
 
 UserModel = get_user_model()
 
@@ -35,8 +36,8 @@ date = datetime.datetime.now(tz=datetime.UTC).date()
 
 class StandardSetPagination(PageNumberPagination):
   page_size = 10
-  page_size_query_param = "per_page"  # Allows client to pass ?page_size=20
-  max_page_size = 100  # Sets an upper limit for client requests
+  page_size_query_param = "per_page"
+  max_page_size = 100
 
 
 class SubqueryCount(Subquery):
@@ -48,25 +49,23 @@ class SubqueryCount(Subquery):
   template = "(SELECT COUNT(*) FROM (%(subquery)s) _count)"
 
   def __init__(self, queryset: Any, **kwargs: Any) -> None:
-    # Move the instantiation here to resolve the type-checker error
     kwargs.setdefault("output_field", IntegerField())
     super().__init__(queryset, **kwargs)
 
 
-class EventSearch(viewsets.ReadOnlyModelViewSet):
+class EventSearchViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Events.objects.select_related(
+    db_models.Event.objects.select_related(
       "artist",
       "tour",
-      "venue__city",
       "venue__venues_text",
     ).prefetch_related("run", "leg", "event_type")
   ).order_by("event_id")
 
   serializer_class = api_serializers.EventSearchSerializer
-  filterset_class = filters.EventsFilter
+  filterset_class = api_filters.EventsFilter
 
 
 class ArchiveViewSet(viewsets.ReadOnlyModelViewSet):
@@ -74,7 +73,7 @@ class ArchiveViewSet(viewsets.ReadOnlyModelViewSet):
 
   queryset = db_models.ArchiveLinks.objects.all().select_related("event")
   serializer_class = api_serializers.ArchiveLinksSerializer
-  filterset_class = filters.ArchiveFilter
+  filterset_class = api_filters.ArchiveFilter
 
 
 class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
@@ -82,7 +81,7 @@ class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
 
   def get_queryset(self):
     return (
-      db_models.OnstageBandMembers.objects.all()
+      db_models.OnstageBandMember.objects.all()
       .select_related(
         "relation",
         "band",
@@ -93,23 +92,23 @@ class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
   serializer_class = api_serializers.OnstageBandSerializer
-  filterset_class = filters.OnstageBandFilter
+  filterset_class = api_filters.OnstageBandFilter
 
 
 class BandViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  queryset = db_models.Bands.objects.order_by("name")
+  queryset = db_models.Band.objects.order_by("name")
 
   serializer_class = api_serializers.BandsSerializer
-  filterset_class = filters.BandsFilter
+  filterset_class = api_filters.BandsFilter
 
 
 class BootlegViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Bootlegs.objects.select_related(
+    db_models.Bootleg.objects.select_related(
       "event",
     )
     .prefetch_related("archive")
@@ -117,28 +116,28 @@ class BootlegViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.BootlegsSerializer
-  filterset_class = filters.BootlegFilter
+  filterset_class = api_filters.BootlegFilter
 
 
 class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Cities.objects.all()
+    db_models.City.objects.all()
     .order_by("name")
     .select_related("first_event", "last_event", "country")
     .prefetch_related("state")
   )
 
   serializer_class = api_serializers.CitiesSerializer
-  filterset_class = filters.CitiesFilter
+  filterset_class = api_filters.CitiesFilter
 
 
 class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.SongsPage.objects.all()
+    db_models.SongPage.objects.all()
     .prefetch_related(
       "prev__song",
       "next__song",
@@ -154,13 +153,13 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
   ).order_by("id__event__event_id", F("id__song_num").asc(nulls_first=True))
 
   serializer_class = api_serializers.SongsPageSerializer
-  filterset_class = filters.SongsPageFilter
+  filterset_class = api_filters.SongsPageFilter
 
 
 class ContinentsViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  queryset = db_models.Continents.objects.all()
+  queryset = db_models.Continent.objects.all()
   serializer_class = api_serializers.ContinentsSerializer
   filterset_fields = ["name"]
   ordering = ["name", "num_events"]
@@ -170,21 +169,21 @@ class CountriesViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Countries.objects.all()
+    db_models.Country.objects.all()
     .order_by("name")
     .select_related("first_event", "last_event")
   )
 
   serializer_class = api_serializers.CountriesSerializer
-  filterset_class = filters.CountryFilter
+  filterset_class = api_filters.CountryFilter
 
 
 class CoversViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  queryset = db_models.Covers.objects.all().select_related("event")
+  queryset = db_models.Cover.objects.all().select_related("event")
   serializer_class = api_serializers.CoversSerializer
-  filterset_class = filters.CoversFilter
+  filterset_class = api_filters.CoversFilter
   ordering = ["event"]
 
 
@@ -192,7 +191,7 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Venues.objects.all()
+    db_models.Venue.objects.all()
     .select_related(
       "city__country",
       "venues_text",
@@ -202,26 +201,26 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.VenuesSerializer
-  filterset_class = filters.VenuesFilter
+  filterset_class = api_filters.VenuesFilter
 
 
-class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
+class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
   serializer_class = api_serializers.AdvSearchSerializer
   filter_backends = [
-    filters.DataTablesFilterBackend,
+    api_filters.DataTablesFilterBackend,
     DjangoFilterBackend,
-    filters.NotEqualFilterBackend,
+    api_filters.NotEqualFilterBackend,
   ]
-  filterset_class = filters.AdvSearchFilter
+  filterset_class = api_filters.AdvSearchFilter
 
   def get_queryset(self):
-    status_check = db_models.EventTypes.objects.filter(
+    status_check = db_models.EventType.objects.filter(
       event_id=OuterRef("pk"),
       type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
     )
 
     return (
-      db_models.Events.objects.all()
+      db_models.Event.objects.all()
       .select_related(
         "artist",
         "tour",
@@ -245,38 +244,38 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
     # Base structure mapping positions to Q objects
     position_filters = {
       "show_opener": Q(setlist_event__is_opener=True),
-      "in_show": Q(setlist_event__set_name=db_models.SetTypes.SHOW),
-      "in_set_one": Q(setlist_event__set_name=db_models.SetTypes.SET_1),
+      "in_show": Q(setlist_event__set_name=db_models.SetType.SHOW),
+      "in_set_one": Q(setlist_event__set_name=db_models.SetType.SET_1),
       "is_set_opener": Q(setlist_event__is_set_opener=True),
       "set_one_opener": Q(
-        setlist_event__set_name=db_models.SetTypes.SET_1,
+        setlist_event__set_name=db_models.SetType.SET_1,
         setlist_event__is_set_opener=True,
       ),
       "set_one_closer": Q(
-        setlist_event__set_name=db_models.SetTypes.SET_1,
+        setlist_event__set_name=db_models.SetType.SET_1,
         setlist_event__is_set_closer=True,
       ),
-      "in_set_two": Q(setlist_event__set_name=db_models.SetTypes.SET_2),
+      "in_set_two": Q(setlist_event__set_name=db_models.SetType.SET_2),
       "set_two_opener": Q(
-        setlist_event__set_name=db_models.SetTypes.SET_2,
+        setlist_event__set_name=db_models.SetType.SET_2,
         setlist_event__is_set_opener=True,
       ),
       "set_two_closer": Q(
-        setlist_event__set_name=db_models.SetTypes.SET_2,
+        setlist_event__set_name=db_models.SetType.SET_2,
         setlist_event__is_set_closer=True,
       ),
       "main_set_closer": Q(setlist_event__is_main_set_closer=True),
       "encore_opener": Q(
-        setlist_event__set_name=db_models.SetTypes.ENCORE,
+        setlist_event__set_name=db_models.SetType.ENCORE,
         setlist_event__is_set_opener=True,
       ),
-      "in_encore": Q(setlist_event__set_name=db_models.SetTypes.ENCORE),
-      "in_preshow": Q(setlist_event__set_name=db_models.SetTypes.PRE_SHOW),
+      "in_encore": Q(setlist_event__set_name=db_models.SetType.ENCORE),
+      "in_preshow": Q(setlist_event__set_name=db_models.SetType.PRE_SHOW),
       "in_recording": Q(
-        setlist_event__set_name=db_models.SetTypes.RECORDING,
+        setlist_event__set_name=db_models.SetType.RECORDING,
       ),
       "in_soundcheck": Q(
-        setlist_event__set_name=db_models.SetTypes.SOUNDCHECK,
+        setlist_event__set_name=db_models.SetType.SOUNDCHECK,
       ),
       "show_closer": Q(setlist_event__is_closer=True),
       "anywhere": Q(),
@@ -311,6 +310,8 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
     # =========================================================================
     # 4. CHOP UP FILTERS ACCORDING TO LOGICAL OPERATOR (THE FIX)
     # =========================================================================
+    songs = []
+
     if conjunction == "or":
       # For OR operations, a single combined filter is required.
       or_filter = Q()
@@ -324,10 +325,20 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
       # For AND operations, loop and CHAIN discrete .filter() statements.
       # This isolates the SQL multi-joins per row instead of cross-contaminating them.
       for query in setlist_queries:
+        # songs.append(query["song_1"])
+
+        if query["song_2"]:
+          songs.append(query["song_2"])
+
         condition = self._build_form_condition(query, position_filters)
         and_filter &= condition
 
       queryset = queryset.filter(and_filter)
+
+    songs = list(set(songs))
+
+    if songs:
+      queryset = queryset.filter(setlist_event__song_id__in=songs)
 
     # 5. Prevent duplicate entries from Many-To-Many relational joins
     return queryset.distinct()
@@ -335,7 +346,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
   def _build_form_condition(self, query, position_filters) -> Q:
     match_songs = [int(query["song_1"])]
 
-    condition = Q(setlist_event__set_name__in=db_models.SetTypes.valid_sets())
+    condition = Q(setlist_event__set_name__in=db_models.SetType.valid_sets())
 
     if query["position"] == "followed_by" and query["song_2"]:
       condition &= Q(setlist_event__song_id=query["song_1"]) & Q(
@@ -359,15 +370,11 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
       if query["position"] == "followed_by" and query["song_2"]:
         match_songs.append(int(query["song_2"]))
 
-        condition = (
-          Q(setlist_event__set_name__in=db_models.SetTypes.valid_sets())
-          # & Q(setlist_event__song_id__in=match_songs)
-          & Q(
-            Q(setlist_event__song_id=query["song_1"])
-            & ~Q(
-              setlist_event__songs_page__next__song_id=query["song_2"],
-            ),
-          )
+        condition = Q(setlist_event__set_name__in=db_models.SetType.valid_sets()) & Q(
+          Q(setlist_event__song_id=query["song_1"])
+          & ~Q(
+            setlist_event__songs_page__next__song_id=query["song_2"],
+          ),
         )
 
     print(condition)
@@ -377,7 +384,7 @@ class AdvancedEventSearch(viewsets.ReadOnlyModelViewSet):
 
 class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
-    db_models.Setlists.objects.all()
+    db_models.Setlist.objects.all()
     .select_related(
       "event",
       "song",
@@ -389,19 +396,19 @@ class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.IndexSetlistSerializer
-  filterset_class = filters.SetlistFilter
+  filterset_class = api_filters.SetlistFilter
   ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
 
 
 class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
-    db_models.Events.objects.all().select_related(
+    db_models.Event.objects.all().select_related(
       "venue__venues_text",
     )
   ).order_by("event_id")
 
   serializer_class = api_serializers.IndexEventsSerializer
-  filterset_class = filters.EventsFilter
+  filterset_class = api_filters.EventsFilter
   ordering_fields = ["event_id"]
 
 
@@ -409,13 +416,13 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   def get_queryset(self):
-    status_check = db_models.EventTypes.objects.filter(
+    status_check = db_models.EventType.objects.filter(
       event_id=OuterRef("pk"),
       type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
     )
 
     return (
-      db_models.Events.objects.select_related(
+      db_models.Event.objects.select_related(
         "artist",
         "tour",
         "venue__city__country",
@@ -431,13 +438,13 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     ).order_by("event_id")
 
   serializer_class = api_serializers.EventsSerializer
-  filterset_class = filters.EventsFilter
+  filterset_class = api_filters.EventsFilter
   ordering_fields = ["event_id"]
 
 
-class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
+class AdvancedSearchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
-    db_models.Events.objects.all()
+    db_models.Event.objects.all()
     .select_related(
       "venue",
       "artist",
@@ -458,15 +465,14 @@ class AdvancedSearch(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.AdvSearchSerializer
-  # filterset_class = filters.EventsFilter
-  filter_backends = [filters.EventsFilter, filters.NotEqualFilterBackend]
+  filter_backends = [api_filters.EventsFilter, api_filters.NotEqualFilterBackend]
 
 
 class NugsViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.NugsReleases.objects.all()
+    db_models.NugsRelease.objects.all()
     .filter(date__isnull=False)
     .select_related(
       "event__venue__venues_text",
@@ -480,37 +486,25 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
   ).order_by("-date")
 
   serializer_class = api_serializers.NugsSerializer
-  filter_backends = [filters.DataTablesFilterBackend]
+  filter_backends = [api_filters.DataTablesFilterBackend]
 
 
 class RelationsViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  rel_aliases = db_models.RelationAliases.objects.filter(relation=OuterRef("id"))
+  # rel_aliases = db_models.RelationAlias.objects.filter(relation=OuterRef("id"))
   onstage = db_models.Onstage.objects.select_related("relation").filter(
     relation=OuterRef("id"),
   )
 
   queryset = (
-    db_models.Relations.objects.all()
+    db_models.Relation.objects.all()
     .order_by("name")
     .select_related("first_event", "last_event")
-    .annotate(
-      aliases=ArraySubquery(
-        rel_aliases.filter(
-          type="alias",
-        ).values("name"),
-      ),
-      nicknames=ArraySubquery(
-        rel_aliases.filter(
-          type="nickname",
-        ).values("name"),
-      ),
-    )
   )
 
   serializer_class = api_serializers.RelationsSerializer
-  filterset_class = filters.RelationFilter
+  filterset_class = api_filters.RelationFilter
 
 
 class OnstageViewSet(viewsets.ReadOnlyModelViewSet):
@@ -528,28 +522,28 @@ class OnstageViewSet(viewsets.ReadOnlyModelViewSet):
   ).order_by("event", F("band").asc(nulls_first=True), "relation__name")
 
   serializer_class = api_serializers.OnstageSerializer
-  filterset_class = filters.OnstageFilter
+  filterset_class = api_filters.OnstageFilter
 
 
 class ReleaseTracksViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.ReleaseTracks.objects.all()
+    db_models.ReleaseTrack.objects.all()
     .order_by("discnum", "position")
     .select_related("song", "release")
     .prefetch_related("event", "disc")
   )
 
   serializer_class = api_serializers.ReleaseTracksSerializer
-  filterset_class = filters.ReleaseTracksFilter
+  filterset_class = api_filters.ReleaseTracksFilter
 
 
 class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Releases.objects.all()
+    db_models.Release.objects.all()
     .prefetch_related("event")
     .annotate(
       date_str=Cast("date", output_field=CharField(max_length=10)),
@@ -558,7 +552,7 @@ class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
     .order_by("-date")
   )
   serializer_class = api_serializers.ReleasesSerializer
-  filterset_class = filters.ReleaseFilter
+  filterset_class = api_filters.ReleaseFilter
 
 
 class SetlistStatsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -570,14 +564,14 @@ class SetlistStatsViewSet(viewsets.ReadOnlyModelViewSet):
     .prefetch_related("ltp")
   )
   serializer_class = api_serializers.SetlistStatsSerializer
-  filterset_class = filters.SetlistStatsFilter
+  filterset_class = api_filters.SetlistStatsFilter
 
 
 class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Setlists.objects.all()
+    db_models.Setlist.objects.all()
     .select_related(
       "event",
       "song",
@@ -590,13 +584,13 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.SetlistSerializer
-  filterset_class = filters.SetlistFilter
+  filterset_class = api_filters.SetlistFilter
   ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
 
 
 class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
-    db_models.Setlists.objects.all()
+    db_models.Setlist.objects.all()
     .select_related(
       "event",
       "song",
@@ -608,7 +602,7 @@ class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.SetlistMobileSerializer
-  filterset_class = filters.SetlistFilter
+  filterset_class = api_filters.SetlistFilter
   ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
 
 
@@ -631,13 +625,13 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.SetlistEntrySerializer
-  filterset_class = filters.SetlistEntryFilter
+  filterset_class = api_filters.SetlistEntryFilter
 
 
 class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
   def get_queryset(self):
     filter = Q(
-      set_name__in=db_models.SetTypes.valid_sets(),
+      set_name__in=db_models.SetType.valid_sets(),
       event__public=True,
       nobruce=False,
     ) | Q(
@@ -646,7 +640,7 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
     queryset = (
-      db_models.Setlists.objects.filter(filter)
+      db_models.Setlist.objects.filter(filter)
       .select_related("song", "event")
       .prefetch_related("song__first_event", "song__last_event")
       .all()
@@ -665,7 +659,7 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     return self.filter_queryset(queryset)  # type: ignore
 
   serializer_class = api_serializers.SetlistSongsSerializer
-  filterset_class = filters.SetlistSongsFilter
+  filterset_class = api_filters.SetlistSongsFilter
   ordering_fields = ["count"]
 
 
@@ -674,7 +668,7 @@ class SnippetViewSet(viewsets.ReadOnlyModelViewSet):
 
   def get_queryset(self):
     queryset = (
-      db_models.Snippets.objects.all().select_related(
+      db_models.Snippet.objects.all().select_related(
         "setlist__song",
         "setlist__event__artist",
         "setlist__event__venue",
@@ -684,14 +678,14 @@ class SnippetViewSet(viewsets.ReadOnlyModelViewSet):
     return self.filter_queryset(queryset)
 
   serializer_class = api_serializers.SnippetSerializer
-  filterset_class = filters.SnippetFilter
+  filterset_class = api_filters.SnippetFilter
 
 
 class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   def get_queryset(self):
-    queryset = db_models.Snippets.objects.all().select_related(
+    queryset = db_models.Snippet.objects.all().select_related(
       "setlist__song",
       "setlist__event__artist",
       "setlist__event__venue",
@@ -711,28 +705,28 @@ class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
     return self.filter_queryset(queryset)
 
   serializer_class = api_serializers.IncludedSerializer
-  filterset_class = filters.IncludedFilter
+  filterset_class = api_filters.IncludedFilter
 
 
 class StatesViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.States.objects.all()
+    db_models.State.objects.all()
     .select_related("country")
     .prefetch_related("first_event", "last_event")
     .order_by("name")
   )
 
   serializer_class = api_serializers.StatesSerializer
-  filterset_class = filters.StateFilter
+  filterset_class = api_filters.StateFilter
 
 
 class SongsViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Songs.objects.all().prefetch_related(
+    db_models.Song.objects.all().prefetch_related(
       "first_event",
       "last_event",
       "lyrics_song",
@@ -740,14 +734,14 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
   ).order_by("sort_song_name")
 
   serializer_class = api_serializers.SongsSerializer
-  filterset_class = filters.SongsFilter
+  filterset_class = api_filters.SongsFilter
 
 
 class ToursViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.Tours.objects.all()
+    db_models.Tour.objects.all()
     .select_related(
       "first_event",
       "last_event",
@@ -761,14 +755,14 @@ class ToursViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.ToursSerializer
-  filterset_class = filters.TourFilter
+  filterset_class = api_filters.TourFilter
 
 
 class TourLegsViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = (
-    db_models.TourLegs.objects.all()
+    db_models.TourLeg.objects.all()
     .select_related(
       "tour",
       "first_event__artist",
@@ -780,12 +774,12 @@ class TourLegsViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.TourLegsSerializer
-  filterset_class = filters.TourLegFilter
+  filterset_class = api_filters.TourLegFilter
 
 
 class EventRunViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
-    db_models.Runs.objects.all()
+    db_models.Run.objects.all()
     .select_related(
       "venue",
       "band",
@@ -802,28 +796,26 @@ class EventRunViewSet(viewsets.ReadOnlyModelViewSet):
   )
 
   serializer_class = api_serializers.EventRunSerializer
-  filterset_class = filters.EventRunFilter
+  filterset_class = api_filters.EventRunFilter
 
 
 class LyricsViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = (
-    db_models.Lyrics.objects.all().select_related("song").order_by("song__name")
-  )
+  queryset = db_models.Lyric.objects.all().select_related("song").order_by("song__name")
   serializer_class = api_serializers.LyricsSerializer
 
 
 class SetlistNotesViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.SetlistNotes.objects.all().select_related(
+  queryset = db_models.SetlistNote.objects.all().select_related(
     "setlist__song",
     "event__venue",
   )
 
   serializer_class = api_serializers.SetlistNotesSerializer
-  filterset_class = filters.SetlistNoteFilter
+  filterset_class = api_filters.SetlistNoteFilter
 
 
 class UpdatesViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.Updates.objects.all().order_by("-created_at", "-id")
+  queryset = db_models.Update.objects.all().order_by("-created_at", "-id")
   serializer_class = api_serializers.UpdatesSerializer
 
 
@@ -847,14 +839,14 @@ class UsersViewSet(viewsets.ReadOnlyModelViewSet):
 class UsersAttendedShowsViewSet(viewsets.ReadOnlyModelViewSet):
   def get_queryset(self):
     return (
-      db_models.UserAttendedShows.objects.all().select_related(
+      db_models.UserAttendedShow.objects.all().select_related(
         "user",
         "event",
       )
     ).order_by("-event__event_id")
 
   serializer_class = api_serializers.UserAttendedShowsSerializer
-  filterset_class = filters.UserAttendedShowsFilter
+  filterset_class = api_filters.UserAttendedShowsFilter
 
 
 class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
@@ -865,17 +857,17 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
 
   def get_queryset(self):
     event_id = self.request.query_params.get("event")  # type: ignore
-    event_filter = Q(set_name__in=db_models.SetTypes.valid_sets())
+    event_filter = Q(set_name__in=db_models.SetType.valid_sets())
 
     if not event_id:
       raise ValidationError({"event": "This parameter is required."})
 
     event_filter = Q(
-      Q(event_id=event_id) & Q(set_name__in=db_models.SetTypes.valid_sets()),
+      Q(event_id=event_id) & Q(set_name__in=db_models.SetType.valid_sets()),
     )
 
     # Base setlist for this event (reused for total count and filtering)
-    event_setlist = db_models.Setlists.objects.filter(
+    event_setlist = db_models.Setlist.objects.filter(
       event_filter,
     )
 
@@ -886,12 +878,11 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
 
     # Album songs subquery: songs from releases matching this category
     album_songs_subquery = (
-      db_models.ReleaseTracks.objects.filter(
-        release__songs__category=OuterRef("song__category"),
+      db_models.ReleaseTrack.objects.filter(
+        release__name=OuterRef("song__category"),
       )
-      .distinct("position", "song_id")
-      .order_by("position")
       .values("song_id")
+      .order_by("position")
     )
 
     # Setlist songs subquery: songs from this event matching this category
@@ -899,8 +890,8 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
       event_setlist.filter(
         song__category=OuterRef("song__category"),
       )
-      .distinct("song_id")
       .values("song_id")
+      .order_by("song_num")
     )
 
     # Aggregate by category
@@ -920,127 +911,27 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
 
 
 class TypesViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.Types.objects.all()
+  queryset = db_models.Type.objects.all()
   serializer_class = api_serializers.TypesSerializer
-  filterset_class = filters.TypeFilter
+  filterset_class = api_filters.TypeFilter
 
 
 class EventTypesViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.EventTypes.objects.all()
+  queryset = db_models.EventType.objects.all()
   serializer_class = api_serializers.EventTypeSerializer
-  filterset_class = filters.EventTypeFilter
+  filterset_class = api_filters.EventTypeFilter
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.Tags.objects.all()
+  queryset = db_models.Tag.objects.all()
   serializer_class = api_serializers.TagsSerializer
-  filterset_class = filters.TagFilter
+  filterset_class = api_filters.TagFilter
 
 
 class EventTagsViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.EventTags.objects.all()
+  queryset = db_models.EventTag.objects.all()
   serializer_class = api_serializers.EventTagSerializer
-  filterset_class = filters.EventTagFilter
-
-
-# class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
-#     def get_queryset(self):
-#         user = self.request.query_params.get("user")  # type: ignore
-
-#         filter = Q(
-#             Q(release_tracks__song__setlists__event__user_event__user_id=user)
-#             & Q(release_tracks__song__setlists__set_name__in=db_models.SetTypes.valid_sets()),
-#         )
-
-#         return (
-#             db_models.Releases.objects.filter(type="Studio")
-#             .prefetch_related("release_tracks")
-#             .annotate(
-#                 user_album_count=Count(
-#                     "release_tracks",
-#                     filter=filter,
-#                     distinct=True,
-#                 ),
-#                 album_song_count=Count("release_tracks", distinct=True),
-#             )
-#             .order_by("date")
-#         )
-
-#     def list(self, request, *args, **kwargs) -> response.Response:
-#         queryset = self.get_queryset()  # Assuming the annotations from previous steps
-#         user = self.request.query_params.get("user")  # type: ignore
-#         valid_sets = ["Show", "Encore", "Set 1", "Set 2", "Pre-Show", "Post-Show"]
-
-#         # 1. Get all ReleaseTracks for these albums to maintain Disc/Track order
-#         # We order by discnum and track here so the list is ready
-#         release_tracks = (
-#             db_models.ReleaseTracks.objects.filter(
-#                 release_id__in=queryset.values("id"),
-#             )
-#             .select_related("song")
-#             .order_by("discnum", "position")
-#         )
-
-#         # 2. Map song IDs to their respective Releases
-#         tracks_by_release = {}
-
-#         for rt in release_tracks:
-#             if rt.release_id not in tracks_by_release:  # type: ignore
-#                 tracks_by_release[rt.release_id] = []  # type: ignore
-
-#             tracks_by_release[rt.release_id].append(rt.song_id)  # type: ignore
-
-#         # 3. Get "times seen" counts for this user
-#         user_song_counts = (
-#             db_models.Setlists.objects.filter(
-#                 event__user_event__user_id=user,
-#                 set_name__in=valid_sets,
-#                 song_id__in=release_tracks.values_list("song_id", flat=True),
-#             )
-#             .select_related("song", "event__user_event")
-#             .annotate(times_seen=Count("id"))
-#         )
-
-#         count_map = {
-#             item["song_id"]: item["times_seen"]
-#             for item in user_song_counts.values("song_id", "times_seen")
-#         }
-
-#         # 4. Bulk fetch and serialize the song objects
-#         relevant_songs = db_models.Songs.objects.filter(
-#             id__in=release_tracks.values_list("song_id", flat=True),
-#         )
-
-#         serialized_songs = api_serializers.MinimalSongsSerializer(
-#             relevant_songs,
-#             many=True,
-#             include=["slug", "name", "id"],
-#         ).data
-
-#         # 5. Enrich the map with "times_seen" and "user_seen"
-#         songs_map = {}
-
-#         for song_data in serialized_songs:
-#             s_id = song_data["id"]
-#             count = count_map.get(s_id, 0)
-
-#             song_data["times_seen"] = count
-
-#             songs_map[s_id] = song_data
-
-#         # 6. Pass enriched data to context
-#         serializer = self.get_serializer(
-#             queryset,
-#             many=True,
-#             context={
-#                 "songs_map": songs_map,
-#                 "tracks_by_release": tracks_by_release,
-#             },
-#         )
-#         return response.Response(serializer.data)
-
-#     serializer_class = api_serializers.UserAlbumBreakdownSerializer
-#     filterset_class = filters.UserAlbumBreakdownFilter
+  filterset_class = api_filters.EventTagFilter
 
 
 class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
@@ -1049,15 +940,15 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
   def get_queryset(self):
     user_id = self.request.query_params.get("user")  # type: ignore
     if not user_id:
-      return db_models.Releases.objects.none()
+      return db_models.Release.objects.none()
 
     # 1. Corrected Subquery: Group by song_id using values() BEFORE annotate()
     # DO NOT slice with [:1] here as it corrupts the Prefetch query grouping.
     times_seen_subquery = (
-      db_models.Setlists.objects.filter(
+      db_models.Setlist.objects.filter(
         song_id=OuterRef("song_id"),
         event__user_event__user_id=user_id,
-        set_name__in=db_models.SetTypes.valid_sets(),
+        set_name__in=db_models.SetType.valid_sets(),
       )
       .values("song_id")
       .annotate(cnt=Count("id"))
@@ -1067,7 +958,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
     # 2. Prefetch release tracks with annotated play count
     tracks_prefetch = Prefetch(
       "release_tracks",
-      queryset=db_models.ReleaseTracks.objects.select_related("song")
+      queryset=db_models.ReleaseTrack.objects.select_related("song")
       .annotate(
         times_seen=Coalesce(
           Subquery(times_seen_subquery),
@@ -1079,7 +970,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
 
     # 3. Fetch all Studio releases and prefetch their full track lists
     return (
-      db_models.Releases.objects.filter(type="Studio")
+      db_models.Release.objects.filter(type="Studio")
       .prefetch_related(tracks_prefetch)
       .order_by("date")
     )
@@ -1095,21 +986,21 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
 class YearSongBreakdown(viewsets.ReadOnlyModelViewSet):
   def get_queryset(self):
     return (
-      db_models.Setlists.objects.filter(
-        Q(set_name__in=db_models.SetTypes.valid_sets()) & Q(event__date__isnull=False),
+      db_models.Setlist.objects.filter(
+        Q(set_name__in=db_models.SetType.valid_sets()) & Q(event__date__isnull=False),
       )
       .values(year=F("event__date__year"))
       .annotate(
         count=Count(
           "event__event_id",
           distinct=True,
-          filter=Q(set_name__in=db_models.SetTypes.valid_sets()),
+          filter=Q(set_name__in=db_models.SetType.valid_sets()),
         ),
       )
     )
 
   serializer_class = api_serializers.YearSongBreakdownSerializer
-  filterset_class = filters.YearSongBreakdownFilter
+  filterset_class = api_filters.YearSongBreakdownFilter
 
 
 class ItemInsertLogViewSet(viewsets.ReadOnlyModelViewSet):
@@ -1118,34 +1009,33 @@ class ItemInsertLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ArticlesViewSet(viewsets.ModelViewSet):
-  queryset = db_models.Articles.objects.all()
+  queryset = Article.objects.all()
   serializer_class = api_serializers.ArticlesSerializer
   lookup_field = (
     "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)
   )
 
-  filterset_class = filters.ArticleFilter
-  # ordering = ["-published_at"]  # Default ordering
+  filterset_class = api_filters.ArticleFilter
 
 
 class ArticlesSearchViewSet(viewsets.ModelViewSet):
-  queryset = db_models.Articles.objects.all()
+  queryset = Article.objects.all()
   serializer_class = api_serializers.ArticlesSearchSerializer
   lookup_field = (
     "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)
   )
 
-  filterset_class = filters.ArticleFilter
+  filterset_class = api_filters.ArticleFilter
   pagination_class = StandardSetPagination
 
 
 class BVEntriesViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = bv_models.Entries.objects.all().select_related("song", "event", "user")
+  queryset = Entry.objects.all().select_related("song", "event", "user")
   serializer_class = api_serializers.BVEntriesSerializer
 
 
 class BVEntryCommentsViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = bv_models.EntryComments.objects.all().select_related(
+  queryset = EntryComment.objects.all().select_related(
     "entry",
     "user",
     "entry__song",

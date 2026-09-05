@@ -30,7 +30,7 @@
                    type="button"
                    href="{% url 'blog:blog' %}">News</a>
             </li>
-            {% if request.user|has_group:"Beta Testers" or request.user.is_superuser %}
+            {% comment %} {% if request.user|has_group:"Beta Testers" or request.user.is_superuser %}
                 <li class="nav-item dropdown">
                     <button class="btn btn-sm dropdown-toggle"
                             type="button"
@@ -44,7 +44,7 @@
                         </li>
                     </ul>
                 </li>
-            {% endif %}
+            {% endif %} {% endcomment %}
             {% for item in nav_links %}
                 {% if item.children %}
                     <!-- Dropdown Nav Item -->
@@ -269,7 +269,7 @@
             <div class="offcanvas-body">
                 <nav class="w-100" id="offcanvasNav" aria-label="Mobile main navigation">
                     <ul class="bd-links-nav list-unstyled mb-0 pb-3">
-                        {% if request.user|has_group:"Beta Testers" or request.user.is_superuser %}
+                        {% comment %} {% if request.user|has_group:"Beta Testers" or request.user.is_superuser %}
                             <li class="bd-links-group py-2">
                                 <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm">
                                     <i class="bi bi-bus-front-fill" aria-hidden="true"></i>
@@ -281,7 +281,7 @@
                                     </li>
                                 </ul>
                             </li>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
                         {% for item in nav_links %}
                             {% if item.children %}
                                 <li class="bd-links-group py-2">

@@ -65,6 +65,8 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
     // Create a DocumentFragment to minimize reflows
     const fragment = $(document.createDocumentFragment());
 
+    console.log(options && options.rowGroup);
+
     if (options && options.rowGroup) {
       Object.entries(data).forEach(([key, value]) => {
         const columnsCount = tbody.closest('table').find('thead th').length || 2;

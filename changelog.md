@@ -395,9 +395,12 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added all press releases from ShoreFire Media to article library.
 - Added "Bruceyversion" song version submission and voting
 - Added "Latest Show" card to home page
+- Added language and excerpt to articles
 
 ## Changed
 
+- Refactored app. Models and Views are now grouped by subapp
+- Numerous style tweaks. Moved the theme colors to their own files to make per-theme changes easier
 - Setlist Note Search is now a table rather than a form leading to a new page.
 - Setlist Breakdown now shows for all events, whether public or not
 - Changed some model choices over to TextChoices, cleaner that way
@@ -405,10 +408,16 @@ First public release of the site. Site was locked behind a login and accounts on
 - Restrict "Users" page to logged in users only. User Profiles can still be viewed
 - Home Page setlist changed "Bust" to "Bustout"
 - All buttons and badges switch to the "subtle" style in dark mode
+- Bruceyversion entry form now redirects to entry detail on successful submission
+- Bruceyversion entries are now entered into a moderation queue before being visible on the list page
+- Articles now have a "language" column
+- All articles in library now have Category set
+- Added library collection page
 
 ## Removed
 
 - Removed duplicate songs from SetlistBreakdown
+- Removed `official` and `nugs` columns from Events table. Many events belong to more than one official and/or nugs release
 
 ## Fixed
 

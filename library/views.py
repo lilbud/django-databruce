@@ -8,22 +8,25 @@ from django.shortcuts import get_object_or_404
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
-from databruce import forms, models
+from databruce import forms
+
+from .models import Article, Collection
 
 
-class Articles(TemplateView):
+class ArticleListView(TemplateView):
   template_name = "library/articles.html"
   title = "Articles"
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     context["title"] = self.title
-    context["categories"] = models.Articles.ArticleCategory.choices
+    context["categories"] = Article.ArticleCategory.choices
+    context["languages"] = Article.ArticleLanguage.choices
 
     return context
 
 
-class ArticleDetail(TemplateView):
+class ArticleDetailView(TemplateView):
   template_name = "library/article_detail.html"
   title = "Article"
 
@@ -31,7 +34,7 @@ class ArticleDetail(TemplateView):
     context = super().get_context_data(**kwargs)
 
     context["article"] = get_object_or_404(
-      models.Articles,
+      Article,
       slug=self.kwargs["slug"],
     )
 
@@ -40,7 +43,7 @@ class ArticleDetail(TemplateView):
       f"{strip_markdown.strip_markdown(context['article'].content)[:100]}"
     )
     try:
-      context["category"] = models.Articles.ArticleCategory(
+      context["category"] = Article.ArticleCategory(
         context["article"].category,
       ).label
     except ValueError:
@@ -95,14 +98,14 @@ class ArticleDetail(TemplateView):
     return context
 
 
-class ArticlesByCategory(TemplateView):
+class ArticleCategoryView(TemplateView):
   template_name = "library/articles_by_category.html"
 
   def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
     context = super().get_context_data(**kwargs)
     category = self.kwargs["slug"]
 
-    queryset = models.Articles.objects.filter(
+    queryset = Article.objects.filter(
       category=category,
     ).order_by("-published_at", "-created_at")
 
@@ -111,12 +114,36 @@ class ArticlesByCategory(TemplateView):
     context["page"] = paginator.get_page(page_number)
 
     context["title"] = "Articles By Category"
-    context["category"] = models.Articles.ArticleCategory(category).label
+    context["category"] = Article.ArticleCategory(category).label
 
     return context
 
 
-class ArticleSearch(TemplateView):
+class ArticleCollectionView(TemplateView):
+  template_name = "library/articles_by_collection.html"
+
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    slug = self.kwargs["slug"]
+
+    collection = get_object_or_404(Collection, slug=slug)
+
+    context["collection"] = collection
+
+    queryset = Article.objects.filter(
+      collection__slug=slug,
+    ).order_by("-published_at", "-created_at")
+
+    paginator = Paginator(queryset, 10)
+    page_number = self.request.GET.get("page", 1)
+    context["page"] = paginator.get_page(page_number)
+
+    context["title"] = "Articles By Collection"
+
+    return context
+
+
+class ArticleSearchView(TemplateView):
   template_name = "library/article_search.html"
   form_class = forms.ArticleSearch
   title = "Article Search"

@@ -8,7 +8,7 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import Group
 from django.db import models as dj_models
 from django.db.models.functions import Cast
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from unfold.admin import ModelAdmin, StackedInline
@@ -20,7 +20,9 @@ from unfold.forms import (
 )
 from unfold_markdown.widgets import MarkdownWidget
 
-from bruceyversion import models as bv_models
+from blog.models import BlogCategory, BlogPost, BlogPostCategory, BlogPostTag, BlogTag
+from bruceyversion.models import Entry
+from library.models import Article, Collection
 
 from . import models as db_models
 
@@ -61,7 +63,7 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 
 
 class EventTypeInline(StackedInline):
-  model = db_models.EventTypes
+  model = db_models.EventType
   autocomplete_fields = ["type"]
   search_fields = ["type__name"]
 
@@ -84,7 +86,7 @@ class EventTypeInline(StackedInline):
 
 
 class EventTagInline(StackedInline):
-  model = db_models.EventTags
+  model = db_models.EventTag
   autocomplete_fields = ["tag"]
   search_fields = ["tag__name"]
 
@@ -122,14 +124,14 @@ class OnstageInline(StackedInline):
 
   autocomplete_fields = ["relation", "band"]
 
-  fields = ["relation", "band", "note", "guest"]
+  fields = ["relation", "band", "note", "guest", "event"]
   fk_name = "event"
   ordering = ("relation__name",)
   extra = 0
 
 
 class SetlistInline(StackedInline):
-  model = db_models.Setlists
+  model = db_models.Setlist
   collapsible = True
   ordering_field = "position"
 
@@ -160,7 +162,7 @@ class SetlistInline(StackedInline):
 
 
 class ReleaseTrackInline(StackedInline):
-  model = db_models.ReleaseTracks
+  model = db_models.ReleaseTrack
   collapsible = True
 
   def get_queryset(self, request):
@@ -196,7 +198,7 @@ class ArchiveAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.UserAttendedShows)
+@admin.register(db_models.UserAttendedShow)
 class UserAttendedShowsAdmin(ModelAdmin):
   search_fields = ["user__username", "event", "event__date"]
   list_select_related = [
@@ -223,7 +225,7 @@ class BandsForm(NoteForm):
   )
 
   class Meta:
-    model = db_models.Bands
+    model = db_models.Band
     fields = "__all__"
 
 
@@ -233,11 +235,11 @@ class RunForm(NoteForm):
   )
 
   class Meta:
-    model = db_models.Runs
+    model = db_models.Run
     fields = "__all__"
 
 
-@admin.register(db_models.Bands)
+@admin.register(db_models.Band)
 class BandAdmin(ModelAdmin):
   form = BandsForm
   search_fields = ["name"]
@@ -254,11 +256,11 @@ class BandAdmin(ModelAdmin):
   ]
 
 
-@admin.register(db_models.Guests)
+@admin.register(db_models.Guest)
 class GuestAdmin(ModelAdmin):
-  autocomplete_fields = ["setlist", "guest"]
+  autocomplete_fields = ["setlist", "relation"]
   search_fields = [
-    "guest__name",
+    "relation__name",
     "setlist__id",
     "setlist__event__event_id",
     "setlist__song__name",
@@ -267,12 +269,12 @@ class GuestAdmin(ModelAdmin):
     "setlist__id",
     "setlist__event__event_id",
     "setlist__song",
-    "guest__name",
+    "relation__name",
   ]
-  list_select_related = ["setlist", "guest", "setlist__song"]
+  list_select_related = ["setlist", "relation", "setlist__song"]
 
 
-@admin.register(db_models.Bootlegs)
+@admin.register(db_models.Bootleg)
 class BootlegAdmin(ModelAdmin):
   search_fields = [
     "event__event_id",
@@ -288,7 +290,7 @@ class BootlegAdmin(ModelAdmin):
   list_display_links = ["id", "event"]
 
 
-@admin.register(db_models.Cities)
+@admin.register(db_models.City)
 class CityAdmin(ModelAdmin):
   search_fields = ["name"]
   list_select_related = [
@@ -302,14 +304,14 @@ class CityAdmin(ModelAdmin):
   list_display_links = ["id", "state", "country"]
 
 
-@admin.register(db_models.Continents)
+@admin.register(db_models.Continent)
 class ContinentAdmin(ModelAdmin):
   search_fields = ["name"]
   list_display = ["id", "name"]
   list_display_links = ["id"]
 
 
-@admin.register(db_models.Countries)
+@admin.register(db_models.Country)
 class CountryAdmin(ModelAdmin):
   search_fields = ["name"]
   list_display = ["id", "name"]
@@ -323,7 +325,7 @@ class CountryAdmin(ModelAdmin):
   autocomplete_fields = ["first_event", "last_event", "continent"]
 
 
-@admin.register(db_models.Covers)
+@admin.register(db_models.Cover)
 class CoverAdmin(ModelAdmin):
   search_fields = ["event"]
   list_select_related = ["event", "event__venue", "event__venue__city"]
@@ -333,7 +335,7 @@ class CoverAdmin(ModelAdmin):
   list_display_links = ["id", "event"]
 
 
-@admin.register(db_models.NugsReleases)
+@admin.register(db_models.NugsRelease)
 class NugsAdmin(ModelAdmin):
   search_fields = ["event"]
   autocomplete_fields = ["event"]
@@ -355,7 +357,7 @@ class EventForm(forms.ModelForm):
   title = dj_models.CharField(max_length=255)
 
   class Meta:
-    model = db_models.Events
+    model = db_models.Event
     fields = "__all__"
 
   def clean(self):
@@ -423,7 +425,7 @@ class EventForm(forms.ModelForm):
     return cleaned_data
 
 
-@admin.register(db_models.Events)
+@admin.register(db_models.Event)
 class EventAdmin(ModelAdmin):
   form = EventForm
   search_fields = ["id", "event_id", "date"]
@@ -433,8 +435,6 @@ class EventAdmin(ModelAdmin):
     "tour",
     "run",
     "leg",
-    "nugs_id",
-    "official_id",
   ]
 
   exclude = ("summary", "type")
@@ -463,14 +463,14 @@ class EventAdmin(ModelAdmin):
       obj.save(update_fields=fields_to_update)
 
 
-@admin.register(db_models.Types)
+@admin.register(db_models.Type)
 class TypeAdmin(ModelAdmin):
   search_fields = ["name", "slug"]
   list_display = ["id", "name"]
   list_display_links = ["id"]
 
 
-@admin.register(db_models.EventTypes)
+@admin.register(db_models.EventType)
 class EventTypeAdmin(ModelAdmin):
   search_fields = ["type__name", "type__slug"]
   list_display = ["id", "event", "type"]
@@ -478,14 +478,14 @@ class EventTypeAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.Tags)
+@admin.register(db_models.Tag)
 class TagAdmin(ModelAdmin):
   search_fields = ["name", "slug"]
   list_display = ["id", "name"]
   list_display_links = ["id"]
 
 
-@admin.register(db_models.EventTags)
+@admin.register(db_models.EventTag)
 class EventTagAdmin(ModelAdmin):
   search_fields = ["tag__name", "tag__slug"]
   list_display = ["id", "event", "tag"]
@@ -493,7 +493,7 @@ class EventTagAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.Songs)
+@admin.register(db_models.Song)
 class SongAdmin(ModelAdmin):
   search_fields = ["name", "original_artist"]
   list_select_related = ["first_event", "last_event", "album"]
@@ -509,11 +509,11 @@ class LyricForm(forms.ModelForm):
   )
 
   class Meta:
-    model = db_models.Lyrics
+    model = db_models.Lyric
     fields = "__all__"
 
 
-@admin.register(db_models.Lyrics)
+@admin.register(db_models.Lyric)
 class LyricsAdmin(ModelAdmin):
   search_fields = ["song__name", "text"]
   autocomplete_fields = ["song"]
@@ -525,7 +525,7 @@ class LyricsAdmin(ModelAdmin):
   form = LyricForm
 
 
-@admin.register(db_models.Setlists)
+@admin.register(db_models.Setlist)
 class SetlistAdmin(ModelAdmin):
   autocomplete_fields = ["event", "song", "ltp"]
   search_fields = ["song__name", "set_name", "event__event_id"]
@@ -556,7 +556,7 @@ class OnstageAdmin(ModelAdmin):
   ordering = ("relation__name",)
 
 
-@admin.register(db_models.Relations)
+@admin.register(db_models.Relation)
 class RelationAdmin(ModelAdmin):
   search_fields = ["name"]
   list_display = ["id", "name"]
@@ -566,7 +566,7 @@ class RelationAdmin(ModelAdmin):
   ordering = ("name",)
 
 
-@admin.register(db_models.ReleaseDiscs)
+@admin.register(db_models.ReleaseDisc)
 class ReleaseDiscAdmin(ModelAdmin):
   search_fields = ["release__name"]
   list_display = ["id", "name", "release__name"]
@@ -575,7 +575,7 @@ class ReleaseDiscAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.ReleaseTracks)
+@admin.register(db_models.ReleaseTrack)
 class ReleaseTrackAdmin(ModelAdmin):
   search_fields = ["release__name", "song__name"]
   list_select_related = ["release", "song", "event", "disc", "setlist"]
@@ -591,11 +591,11 @@ class ReleaseForm(forms.ModelForm):
   )
 
   class Meta:
-    model = db_models.Releases
+    model = db_models.Release
     fields = "__all__"
 
 
-@admin.register(db_models.Releases)
+@admin.register(db_models.Release)
 class ReleaseAdmin(ModelAdmin):
   def get_queryset(self, request):
     base_qs = super().get_queryset(request)
@@ -609,7 +609,7 @@ class ReleaseAdmin(ModelAdmin):
   inlines = [ReleaseTrackInline]
 
 
-@admin.register(db_models.Snippets)
+@admin.register(db_models.Snippet)
 class SnippetAdmin(ModelAdmin):
   search_fields = [
     "snippet__name",
@@ -641,7 +641,7 @@ class SnippetAdmin(ModelAdmin):
   ]
 
 
-@admin.register(db_models.States)
+@admin.register(db_models.State)
 class StateAdmin(ModelAdmin):
   search_fields = ["name", "abbrev", "country__name"]
   list_select_related = [
@@ -661,7 +661,7 @@ class StateAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.Tours)
+@admin.register(db_models.Tour)
 class TourAdmin(ModelAdmin):
   def get_queryset(self, request):
     base_qs = super().get_queryset(request)
@@ -681,7 +681,7 @@ class TourAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.TourLegs)
+@admin.register(db_models.TourLeg)
 class TourLegAdmin(ModelAdmin):
   search_fields = ["name"]
   list_select_related = [
@@ -698,7 +698,7 @@ class TourLegAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.Venues)
+@admin.register(db_models.Venue)
 class VenueAdmin(ModelAdmin):
   search_fields = ["name"]
   list_select_related = ["first_event", "last_event", "city"]
@@ -736,7 +736,7 @@ class VenueAdmin(ModelAdmin):
   ordering = ("name",)
 
 
-@admin.register(db_models.Runs)
+@admin.register(db_models.Run)
 class RunAdmin(ModelAdmin):
   form = RunForm
   search_fields = ["name", "band__name"]
@@ -769,28 +769,28 @@ class ContactAdmin(ModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.BlogCategory)
+@admin.register(BlogCategory)
 class CategoryAdmin(ModelAdmin):
   list_display = ("name", "slug", "created_at")
   search_fields = ["name", "slug"]
   prepopulated_fields = {"slug": ("name",)}
 
 
-@admin.register(db_models.BlogTags)
+@admin.register(BlogTag)
 class BlogTagAdmin(ModelAdmin):
   list_display = ("name", "slug", "created_at")
   search_fields = ["name", "slug"]
   prepopulated_fields = {"slug": ("name",)}
 
 
-class TagInline(StackedInline):
-  model = db_models.BlogPostTags
+class TagInline(admin.StackedInline):
+  model = BlogPostTag
   autocomplete_fields = ["tag"]
   extra = 0
 
 
-class CategoryInline(StackedInline):
-  model = db_models.BlogPostCategories
+class CategoryInline(admin.StackedInline):
+  model = BlogPostCategory
   autocomplete_fields = ["category"]
   extra = 0
 
@@ -801,7 +801,7 @@ class PostForm(forms.ModelForm):
   )
 
   class Meta:
-    model = db_models.BlogPosts
+    model = BlogPost
     fields = [
       "title",
       "slug",
@@ -813,7 +813,7 @@ class PostForm(forms.ModelForm):
     ]
 
 
-@admin.register(db_models.BlogPosts)
+@admin.register(BlogPost)
 class PostAdmin(ModelAdmin):
   form = PostForm
   list_filter = (
@@ -855,14 +855,14 @@ class PostAdmin(ModelAdmin):
     return super().has_delete_permission(request, obj)
 
 
-@admin.register(db_models.LibraryCollection)
+@admin.register(Collection)
 class CollectionAdmin(ModelAdmin):
   list_display = ("name", "slug", "created_at")
   search_fields = ["name", "slug"]
   prepopulated_fields = {"slug": ("name",)}
 
 
-@admin.register(db_models.Articles)
+@admin.register(Article)
 class ArticleAdmin(ModelAdmin):
   def get_queryset(self, request: HttpRequest) -> dj_models.QuerySet:
     return (
@@ -879,7 +879,7 @@ class ArticleAdmin(ModelAdmin):
   prepopulated_fields = {"slug": ("title",)}
 
 
-@admin.register(bv_models.Entries)
+@admin.register(Entry)
 class EntryAdmin(ModelAdmin):
   # This places action buttons directly inside each row of the table list
   list_display = ["id", "status_badge"]
@@ -889,38 +889,46 @@ class EntryAdmin(ModelAdmin):
     description="Moderation Status",
     ordering="status",  # Enables column header sorting
     label={
-      bv_models.Entries.ModerationStatus.APPROVED: "success",  # Green badge
-      bv_models.Entries.ModerationStatus.REJECTED: "danger",  # Red badge
-      bv_models.Entries.ModerationStatus.PENDING: "warning",  # Orange/Yellow badge
+      Entry.ModerationStatus.APPROVED: "success",  # Green badge
+      Entry.ModerationStatus.REJECTED: "danger",  # Red badge
+      Entry.ModerationStatus.PENDING: "warning",  # Orange/Yellow badge
     },
   )
-  def status_badge(self, obj: bv_models.Entries):
+  def status_badge(self, obj: Entry):
     # Return the human-readable text label choice
     return obj.status
 
   @action(description="Approve", icon="check_circle", url_path="approve-row")  # type: ignore
-  def mark_row_approved(self, request: HttpRequest, object_id: int):
-    bv_models.Entries.objects.filter(pk=object_id).update(
-      status=bv_models.Entries.ModerationStatus.APPROVED,
+  def mark_row_approved(
+    self,
+    request: HttpRequest,
+    object_id: int,
+  ) -> HttpResponseRedirect:
+    Entry.objects.filter(pk=object_id).update(
+      status=Entry.ModerationStatus.APPROVED,
     )
     self.message_user(request, "Entry approved.", messages.SUCCESS)
 
     # 3. Redirect back to the entry list page to refresh the view
     return redirect(
       reverse_lazy("admin:bruceyversion_entries_changelist"),
-    )  # Swap "app" with your app name
+    )
 
   @action(description="Reject", icon="cancel", url_path="reject-row")  # type: ignore
-  def mark_row_rejected(self, request: HttpRequest, object_id: int):
-    bv_models.Entries.objects.filter(pk=object_id).update(
-      status=bv_models.Entries.ModerationStatus.REJECTED,
+  def mark_row_rejected(
+    self,
+    request: HttpRequest,
+    object_id: int,
+  ) -> HttpResponseRedirect:
+    Entry.objects.filter(pk=object_id).update(
+      status=Entry.ModerationStatus.REJECTED,
     )
     self.message_user(request, "Entry rejected.", messages.WARNING)
 
     # 3. Redirect back to the entry list page to refresh the view
     return redirect(
       reverse_lazy("admin:bruceyversion_entries_changelist"),
-    )  # Swap "app" with your app name
+    )
 
   def get_queryset(self, request: HttpRequest) -> dj_models.QuerySet:
     return super().get_queryset(request).select_related("user", "event", "song")

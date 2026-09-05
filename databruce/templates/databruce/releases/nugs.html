@@ -1,76 +1,77 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
+    {{ title }}
 {% endblock title %}
 {% block content %}
-  <div class="col-12">
-    <div class="row mb-3">
-      <div class="col">
-        <div class="text-2xl">Nugs Releases</div>
-        <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
-        <div class="text-sm">
-          Hovering over Release Date will show time of release in UTC/GMT. Not all releases have times, only the bulk of the First Friday releases.
-        </div>
-        <div class="text-xs">
-          Times are approximate, and will show 12am ET/4am UTC as default. Thanks to <a href="https://cantfindtickets.wordpress.com/">Kieran</a> for many of the release times, with some filled in by me.
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div id="tableControls">
-              <div class="col-12 col-md-1">
-                <label for="PublicityFilter" class="pb-1">First Friday</label>
-                <select id="PublicityFilter" class="form-select form-select-sm">
-                  <option value="">All</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <!-- Search -->
-              <div class="col">
-                <label for="search" class="pb-1">Search</label>
-                <div class="input-group input-group-sm">
-                  <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                  </span>
-                  <input type="text"
-                         id="search"
-                         class="form-control form-control-sm"
-                         placeholder="Type to search table...">
+    <div class="col-12">
+        <div class="row mb-3">
+            <div class="col">
+                <div class="text-2xl">Nugs Releases</div>
+                <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
+                <div class="text-sm">
+                    Hovering over Release Date will show time of release in UTC/GMT. Not all releases have times, only the bulk of the First Friday releases.
                 </div>
-              </div>
-              <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <button type="button"
-                        id="sbButton"
-                        data-bs-toggle="modal"
-                        data-bs-target="#sbModal"
-                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-              </div>
+                <div class="text-xs">
+                    Times are approximate, and will show 12am ET/4am UTC as default. Thanks to <a href="https://cantfindtickets.wordpress.com/">Kieran</a> for many of the release times, with some filled in by me.
+                </div>
             </div>
-            <div class="row">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="releasesTable">
-                  <thead>
-                    <tr class="header">
-                      <th class="all">Release Date</th>
-                      <th class="all">Event</th>
-                      <th class="all">Venue</th>
-                      <th class="all">Location</th>
-                      <th class="all">Link</th>
-                      <th class="all">First Friday?</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="tableControls">
+                            <div class="col-12 col-md-1">
+                                <label for="PublicityFilter" class="pb-1">First Friday</label>
+                                <select id="PublicityFilter" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                            <!-- Search -->
+                            <div class="col">
+                                <label for="search" class="pb-1">Search</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text"
+                                           id="search"
+                                           class="form-control form-control-sm"
+                                           placeholder="Type to search table...">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-auto mt-2 mt-md-0">
+                                <button type="button"
+                                        id="sbButton"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#sbModal"
+                                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-hover display" id="releasesTable">
+                                    <thead>
+                                        <tr class="header">
+                                            <th class="all">Release Date</th>
+                                            <th class="all">Event</th>
+                                            <th class="all">Venue</th>
+                                            <th class="all">Location</th>
+                                            <th class="all">Link</th>
+                                            <th class="all">First Friday?</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       let sb_columns = [0,1,2,3,4,5];
 
@@ -122,7 +123,8 @@
           },
           {
             'data': 'url',
-            'name': 'url',
+            'name': 'name',
+            'searchable': false,
             'render': function (data, type, row, meta) {
               if (data) {
                 return `<a target="_blank" rel="noopener noreferrer" href="${data}">${row.name}</a>`
@@ -149,5 +151,5 @@
       tableSearch(table, 'search');
       searchBuilder(table, sb_columns);
     });
-  </script>
+    </script>
 {% endblock content %}

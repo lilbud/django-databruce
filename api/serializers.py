@@ -4,9 +4,10 @@ from zoneinfo import ZoneInfo
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from bruceyversion import models as bv_models
+from bruceyversion.models import Entry, EntryComment
 from databruce import models
 from databruce.templatetags.filters import format_fuzzy
+from library.models import Article, Collection
 
 UserModel = get_user_model()
 
@@ -18,7 +19,7 @@ class BaseSelect2Serializer(serializers.ModelSerializer):
   class Meta:
     fields = ["id", "text"]
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, *args, **kwargs) -> None:
     # Dynamically accept a text_field argument to specify the display field
     self.text_field = kwargs.pop("text_field", "name")
     super().__init__(*args, **kwargs)
@@ -51,9 +52,10 @@ def get_formatted_city(obj):
 
       return f"{obj.name}, {obj.state.abbrev}, {obj.country.name}"
 
-    return f"{obj.name}, {obj.country.name}"
   except AttributeError:
     return None
+  else:
+    return f"{obj.name}, {obj.country.name}"
 
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -78,19 +80,19 @@ class BaseSerializer(serializers.ModelSerializer):
 
 class MinimalStatesSerializer(BaseSerializer):
   class Meta:
-    model = models.States
+    model = models.State
     fields = ["name", "abbrev", "uuid"]
 
 
 class MinimalCountriesSerializer(BaseSerializer):
   class Meta:
-    model = models.Countries
+    model = models.Country
     fields = ["name", "uuid"]
 
 
 class MinimalBandsSerializer(BaseSerializer):
   class Meta:
-    model = models.Bands
+    model = models.Band
     fields = ["name", "uuid"]
 
 
@@ -101,19 +103,19 @@ class MinimalCitiesSerializer(BaseSerializer):
     return get_formatted_city(obj)
 
   class Meta:
-    model = models.Cities
+    model = models.City
     fields = ["name", "formatted", "uuid"]
 
 
 class MinimalVenuesTextSerializer(BaseSerializer):
   class Meta:
-    model = models.VenuesText
+    model = models.VenueText
     fields = ["formatted", "location"]
 
 
 class MinimalVenuesSerializer(BaseSerializer):
   class Meta:
-    model = models.Venues
+    model = models.Venue
     fields = [
       "name",
       "detail",
@@ -123,7 +125,7 @@ class MinimalVenuesSerializer(BaseSerializer):
 
 class MinimalToursSerializer(BaseSerializer):
   class Meta:
-    model = models.Tours
+    model = models.Tour
     fields = ["name", "uuid"]
 
 
@@ -140,25 +142,25 @@ class MinimalEventSerializer(BaseSerializer):
     return get_date_from_instance(obj)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = ["date", "event_id"]
 
 
 class MinimalTourLegsSerializer(BaseSerializer):
   class Meta:
-    model = models.TourLegs
+    model = models.TourLeg
     fields = ["name", "uuid"]
 
 
 class MinimalEventRunSerializer(BaseSerializer):
   class Meta:
-    model = models.Runs
+    model = models.Run
     fields = ["name", "uuid"]
 
 
 class MinimalRelationsSerializer(BaseSerializer):
   class Meta:
-    model = models.Relations
+    model = models.Relation
     fields = ["name", "instruments", "uuid"]
 
 
@@ -167,7 +169,7 @@ class MinimalSongsSerializer(BaseSerializer):
   last_event = MinimalEventSerializer(required=False)
 
   class Meta:
-    model = models.Songs
+    model = models.Song
     fields = [
       "id",
       "name",
@@ -188,7 +190,7 @@ class MinimalSetlistSerializer(BaseSerializer):
   song = MinimalSongsSerializer()
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = ["id", "event_id", "song", "set_name", "uuid"]
 
 
@@ -206,7 +208,7 @@ class MinimalArchiveLinksSerializer(BaseSerializer):
 
 class MinimalEventTypeSerializer(BaseSerializer):
   class Meta:
-    model = models.EventTypes
+    model = models.EventType
     fields = ["id", "name"]
 
 
@@ -216,7 +218,7 @@ class StatesSerializer(BaseSerializer):
   country = MinimalCountriesSerializer()
 
   class Meta:
-    model = models.States
+    model = models.State
     fields = [
       "id",
       "uuid",
@@ -233,7 +235,7 @@ class CountriesSerializer(BaseSerializer):
   last_event = MinimalEventSerializer(required=False)
 
   class Meta:
-    model = models.Countries
+    model = models.Country
     fields = ["id", "uuid", "name", "first_event", "last_event", "num_events"]
 
 
@@ -248,7 +250,7 @@ class CitiesSerializer(BaseSerializer):
     return get_formatted_city(obj)
 
   class Meta:
-    model = models.Cities
+    model = models.City
     fields = [
       "id",
       "name",
@@ -267,7 +269,7 @@ class BandsSerializer(BaseSerializer):
   last_event = MinimalEventSerializer(required=False)
 
   class Meta:
-    model = models.Bands
+    model = models.Band
     fields = [
       "id",
       "uuid",
@@ -299,7 +301,7 @@ class VenuesSerializer(BaseSerializer):
     return obj.name
 
   class Meta:
-    model = models.Venues
+    model = models.Venue
     fields = [
       "id",
       "uuid",
@@ -322,7 +324,7 @@ class EventRunSerializer(BaseSerializer):
   last_event = MinimalEventSerializer(required=False, include=["event_id", "date"])
 
   class Meta:
-    model = models.Runs
+    model = models.Run
     fields = [
       "id",
       "name",
@@ -345,7 +347,7 @@ class IndexSerializer(BaseSerializer):
     return get_date_from_instance(obj)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = ["id", "event_id", "date", "venue"]
 
 
@@ -355,7 +357,7 @@ class ToursSerializer(BaseSerializer):
   band = MinimalBandsSerializer(required=False)
 
   class Meta:
-    model = models.Tours
+    model = models.Tour
     fields = [
       "id",
       "uuid",
@@ -380,7 +382,7 @@ class OnstageSerializer(BaseSerializer):
 
 class TypesSerializer(BaseSerializer):
   class Meta:
-    model = models.Types
+    model = models.Type
     fields = ["id", "name", "slug"]
 
 
@@ -388,13 +390,13 @@ class EventTypeSerializer(BaseSerializer):
   type = TypesSerializer()
 
   class Meta:
-    model = models.EventTypes
+    model = models.EventType
     fields = ["type"]
 
 
 class TagsSerializer(BaseSerializer):
   class Meta:
-    model = models.Tags
+    model = models.Tag
     fields = ["id", "name", "slug", "description"]
 
 
@@ -403,7 +405,7 @@ class EventTagSerializer(BaseSerializer):
   tag = TagsSerializer()
 
   class Meta:
-    model = models.EventTags
+    model = models.EventTag
     fields = ["id", "event", "tag"]
 
 
@@ -428,7 +430,7 @@ class EventSearchSerializer(BaseSerializer):
     return get_date_from_instance(obj)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = [
       "id",
       "event_id",
@@ -452,7 +454,7 @@ class IndexSetlistSerializer(BaseSerializer):
   )
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = [
       "song",
       "song_num",
@@ -480,7 +482,7 @@ class IndexEventsSerializer(BaseSerializer):
   date = serializers.CharField(max_length=255)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = ["event_id", "date", "venue", "early_late"]
 
 
@@ -489,7 +491,7 @@ class EventTypesSerializer(BaseSerializer):
   type = TypesSerializer()
 
   class Meta:
-    model = models.EventTypes
+    model = models.EventType
     fields = ["id", "name", "slug"]
 
 
@@ -539,7 +541,7 @@ class EventsSerializer(BaseSerializer):
     return get_date_from_instance(obj)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = [
       "id",
       "date",
@@ -606,7 +608,7 @@ class AdvSearchSerializer(BaseSerializer):
     return get_date_from_instance(obj)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = [
       "date",
       "artist",
@@ -637,19 +639,19 @@ class ArchiveLinksSerializer(BaseSerializer):
 
 class BootlegsSerializer(BaseSerializer):
   class Meta:
-    model = models.Bootlegs
-    fields = "__all__"
+    model = models.Bootleg
+    fields = ["id", "event", "url"]
 
 
 class ContinentsSerializer(BaseSerializer):
   class Meta:
-    model = models.Continents
-    fields = "__all__"
+    model = models.Continent
+    fields = ["id", "name", "num_events"]
 
 
 class CoversSerializer(BaseSerializer):
   class Meta:
-    model = models.Covers
+    model = models.Cover
     fields = ["id", "url"]
 
 
@@ -670,8 +672,8 @@ class NugsSerializer(BaseSerializer):
       return None
 
   class Meta:
-    model = models.NugsReleases
-    fields = "__all__"
+    model = models.NugsRelease
+    fields = ["id", "event", "date", "city", "url", "name"]
 
 
 class RelationsSerializer(BaseSerializer):
@@ -688,7 +690,7 @@ class RelationsSerializer(BaseSerializer):
       return None
 
   class Meta:
-    model = models.Relations
+    model = models.Relation
     fields = [
       "id",
       "first_event",
@@ -710,8 +712,8 @@ class OnstageBandSerializer(BaseSerializer):
   relation = RelationsSerializer(include=["id", "name", "instruments", "uuid"])
 
   class Meta:
-    model = models.OnstageBandMembers
-    fields = "__all__"
+    model = models.OnstageBandMember
+    fields = ["id", "first", "last", "relation"]
 
 
 class ReleasesSerializer(BaseSerializer):
@@ -723,7 +725,7 @@ class ReleasesSerializer(BaseSerializer):
     return obj.date.strftime("%m-%d")
 
   class Meta:
-    model = models.Releases
+    model = models.Release
     fields = ["uuid", "name", "date", "length", "event", "month_day", "type"]
 
 
@@ -736,7 +738,7 @@ class SongsSerializer(BaseSerializer):
     return obj.lyrics_song.exists()
 
   class Meta:
-    model = models.Songs
+    model = models.Song
     fields = [
       "id",
       "name",
@@ -761,25 +763,14 @@ class SetlistStatsSerializer(BaseSerializer):
 
   class Meta:
     model = models.SetlistStats
-    fields = "__all__"
+    fields = ["ltp"]
 
 
 class SetlistMobileSerializer(BaseSerializer):
   song = MinimalSongsSerializer(include=["name", "uuid", "slug"])
-  # notes = serializers.SerializerMethodField()
-
-  # def get_notes(self, obj):
-  #     if not obj.setlist_notes.exists():
-  #         return None
-
-  #     return "; ".join(
-  #         list(
-  #             filter(None, [item.note for item in obj.setlist_notes.all()]),
-  #         ),
-  #     )
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = "__all__"
 
 
@@ -794,7 +785,7 @@ class SetlistNotesSerializer(BaseSerializer):
   )
 
   class Meta:
-    model = models.SetlistNotes
+    model = models.SetlistNote
     fields = ["event", "song", "set_name", "note"]
 
 
@@ -823,7 +814,7 @@ class SetlistSerializer(BaseSerializer):
     return obj.last
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = [
       "song",
       "ltp",
@@ -848,7 +839,7 @@ class SetlistSerializer(BaseSerializer):
 
 class ReleaseDiscSerializer(BaseSerializer):
   class Meta:
-    model = models.ReleaseDiscs
+    model = models.ReleaseDisc
     fields = ["id", "name", "uuid"]
 
 
@@ -865,7 +856,7 @@ class ReleaseTracksSerializer(BaseSerializer):
   length = serializers.TimeField(format="%M:%S", required=False)  # type: ignore
 
   class Meta:
-    model = models.ReleaseTracks
+    model = models.ReleaseTrack
     fields = [
       "event",
       "disc",
@@ -883,8 +874,8 @@ class SetlistFilterSerializer(BaseSerializer):
   song = MinimalSongsSerializer()
 
   class Meta:
-    model = models.Setlists
-    fields = "__all__"
+    model = models.Setlist
+    fields = ["count", "song"]
 
 
 class SnippetSerializer(BaseSerializer):
@@ -911,7 +902,7 @@ class SnippetSerializer(BaseSerializer):
     )
 
   class Meta:
-    model = models.Snippets
+    model = models.Snippet
     fields = ["event", "song", "venue", "notes"]
 
 
@@ -919,7 +910,7 @@ class IncludedSerializer(BaseSerializer):
   count = serializers.IntegerField(required=False)
 
   event_map = {
-    s.event_id: MinimalEventSerializer(s).data for s in models.Events.objects.all()
+    s.event_id: MinimalEventSerializer(s).data for s in models.Event.objects.all()
   }
 
   song_map = {
@@ -927,7 +918,7 @@ class IncludedSerializer(BaseSerializer):
       s,
       include=["uuid", "name", "category", "original"],
     ).data
-    for s in models.Songs.objects.all()
+    for s in models.Song.objects.all()
   }
 
   first_event = serializers.SerializerMethodField()
@@ -944,7 +935,7 @@ class IncludedSerializer(BaseSerializer):
     return self.event_map[obj["last_event"]]
 
   class Meta:
-    model = models.Snippets
+    model = models.Snippet
     fields = [
       "count",
       "snippet",
@@ -959,7 +950,7 @@ class TourLegsSerializer(BaseSerializer):
   tour = MinimalToursSerializer()
 
   class Meta:
-    model = models.TourLegs
+    model = models.TourLeg
     fields = [
       "id",
       "uuid",
@@ -974,7 +965,6 @@ class TourLegsSerializer(BaseSerializer):
 
 
 class SongsPageSerializer(BaseSerializer):
-  # id = serializers.IntegerField(source="id_id")
   id = SetlistSerializer(
     include=["set_name", "position", "gap", "debut", "premiere"],
   )
@@ -1024,7 +1014,7 @@ class SongsPageSerializer(BaseSerializer):
     )
 
   class Meta:
-    model = models.SongsPage
+    model = models.SongPage
     fields = [
       "id",
       "stats",
@@ -1041,7 +1031,7 @@ class LyricsSerializer(BaseSerializer):
   song = serializers.CharField(source="song.name", max_length=255)
 
   class Meta:
-    model = models.Lyrics
+    model = models.Lyric
     fields = ["song", "version", "source", "language", "note", "uuid", "translator"]
 
 
@@ -1069,59 +1059,6 @@ class SetlistEntrySerializer(BaseSerializer):
     ]
 
 
-# class SetlistSongsSerializer(BaseSerializer):
-#     count = serializers.IntegerField(required=False)
-#     song = serializers.SerializerMethodField(required=False)
-#     first_event = serializers.SerializerMethodField(required=False)
-#     last_event = serializers.SerializerMethodField(required=False)
-
-#     @cached_property
-#     def event_map(self):
-#         return {
-#             s.event_id: MinimalEventSerializer(s).data
-#             for s in models.Events.objects.all()
-#         }
-
-#     @cached_property
-#     def song_map(self):
-#         """Will ONLY run the first time a song lookup is requested.
-
-#         completely bypassing Django system checks and startup freezes.
-#         """
-#         return {
-#             s.id: MinimalSongsSerializer(
-#                 s,
-#                 include=[
-#                     "uuid",
-#                     "name",
-#                     "category",
-#                     "original",
-#                     "num_plays_public",
-#                 ],
-#             ).data
-#             for s in models.Songs.objects.all()
-#         }
-
-#     def get_song(self, obj):
-#         # Access via self.song_map (cached_property attaches to the instance)
-#         return self.song_map[obj["song_id"]]
-
-#     def get_first_event(self, obj):
-#         return self.event_map[obj["first_event"]]
-
-#     def get_last_event(self, obj):
-#         return self.event_map[obj["last_event"]]
-
-#     class Meta:
-#         model = models.Setlists
-#         fields = [
-#             "song",
-#             "count",
-#             "first_event",
-#             "last_event",
-#         ]
-
-
 class SetlistSongsSerializer(BaseSerializer):
   count = serializers.IntegerField(required=False)
   song = serializers.SerializerMethodField(required=False)
@@ -1144,8 +1081,8 @@ class SetlistSongsSerializer(BaseSerializer):
         if e_id
       }
 
-      songs = models.Songs.objects.filter(id__in=song_ids)
-      events = models.Events.objects.filter(event_id__in=event_ids)
+      songs = models.Song.objects.filter(id__in=song_ids)
+      events = models.Event.objects.filter(event_id__in=event_ids)
 
       self._song_map = {
         s.id: MinimalSongsSerializer(
@@ -1174,7 +1111,7 @@ class SetlistSongsSerializer(BaseSerializer):
     return self._event_map.get(obj["last_event"])
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = [
       "song",
       "count",
@@ -1190,7 +1127,7 @@ class UpdatesSerializer(BaseSerializer):
     return obj.created_at.strftime("%Y-%m-%d")
 
   class Meta:
-    model = models.Updates
+    model = models.Update
     fields = ["created_at", "item_id", "item", "value", "view", "msg"]
 
 
@@ -1224,7 +1161,7 @@ class UserAttendedShowsSerializer(BaseSerializer):
   user = MinimalUserSerializer()
 
   class Meta:
-    model = models.UserAttendedShows
+    model = models.UserAttendedShow
     fields = ["event", "user"]
 
 
@@ -1239,7 +1176,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
       s,
       include=["id", "name", "original_artist", "original"],
     ).data
-    for s in models.Songs.objects.all()
+    for s in models.Song.objects.all()
   }
 
   album_complete = serializers.SerializerMethodField(required=False)
@@ -1255,8 +1192,6 @@ class SetlistBreakdownSerializer(BaseSerializer):
 
     album_songs = obj.get("album_songs", [])
     setlist_songs = obj.get("songs", [])
-
-    # print(len(album_songs), len(setlist_songs))
 
     # Edge case: empty album is trivially complete
     if not album_songs:
@@ -1295,7 +1230,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
       return []
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = [
       "total_setlist_songs",
       "song_count",
@@ -1304,61 +1239,6 @@ class SetlistBreakdownSerializer(BaseSerializer):
       "album_complete",
       "category_slug",
     ]
-
-
-# class SetlistBreakdownSerializer(BaseSerializer):
-#   total_setlist_songs = serializers.IntegerField(required=False)
-#   song_count = serializers.IntegerField(required=False)
-#   category = serializers.CharField(required=False, max_length=255)
-#   category_slug = serializers.CharField(required=False, max_length=255)
-#   album_complete = serializers.SerializerMethodField(required=False)
-#   songs = serializers.SerializerMethodField(required=False)
-
-#   def get_songs(self, obj):
-#     song_ids = obj.get("songs") or []
-#     if not song_ids:
-#       return []
-
-#     # Fetch only the relevant song records for this aggregated group
-#     songs_qs = models.Songs.objects.filter(id__in=song_ids)
-#     return MinimalSongsSerializer(
-#       songs_qs,
-#       many=True,
-#       include=["id", "name", "original_artist", "original"],
-#     ).data
-
-#   def get_album_complete(self, obj):
-#     remove = {689, 1021, 514}
-
-#     if obj.get("category") in ("Covers", "Originals"):
-#       return False
-
-#     album_songs = obj.get("album_songs") or []
-#     setlist_songs = obj.get("songs") or []
-
-#     if not album_songs:
-#       return True
-#     if not setlist_songs:
-#       return False
-
-#     filtered_setlist = [s for s in setlist_songs if s not in remove]
-#     if not filtered_setlist:
-#       return False
-
-#     return set(setlist_songs).issubset(set(album_songs)) and len(
-#       setlist_songs,
-#     ) == len(album_songs)
-
-#   class Meta:
-#     model = models.Setlists
-#     fields = [
-#       "total_setlist_songs",
-#       "song_count",
-#       "songs",
-#       "category",
-#       "album_complete",
-#       "category_slug",
-#     ]
 
 
 class ReleaseTrackSongSerializer(serializers.ModelSerializer):
@@ -1370,7 +1250,7 @@ class ReleaseTrackSongSerializer(serializers.ModelSerializer):
   times_seen = serializers.IntegerField(default=0)
 
   class Meta:
-    model = models.ReleaseTracks
+    model = models.ReleaseTrack
     fields = ["id", "name", "slug", "times_seen"]
 
 
@@ -1381,7 +1261,7 @@ class UserAlbumBreakdownSerializer(serializers.ModelSerializer):
   album_percent = serializers.SerializerMethodField()
 
   class Meta:
-    model = models.Releases
+    model = models.Release
     fields = [
       "id",
       "name",
@@ -1436,7 +1316,7 @@ class YearSongBreakdownSerializer(BaseSerializer):
   count = serializers.IntegerField()
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = ["year", "count"]
 
 
@@ -1466,7 +1346,7 @@ class ItemInsertLogSerializer(serializers.ModelSerializer):
 
 class LibraryCollectionSerializer(serializers.ModelSerializer):
   class Meta:
-    model = models.LibraryCollection
+    model = Collection
     fields = ["id", "name", "slug"]
 
 
@@ -1482,11 +1362,12 @@ class ArticlesSerializer(serializers.ModelSerializer):
   )
 
   class Meta:
-    model = models.Articles
+    model = Article
     fields = [
       "title",
       "author",
       "slug",
+      "language",
       "published_at",
       "category",
       "source",
@@ -1508,7 +1389,7 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
   rank = serializers.FloatField(required=False)
 
   class Meta:
-    model = models.Articles
+    model = Article
     fields = [
       "title",
       "author",
@@ -1527,7 +1408,7 @@ class BVEntriesSerializer(serializers.ModelSerializer):
   user = MinimalUserSerializer()
 
   class Meta:
-    model = bv_models.Entries
+    model = Entry
     fields = ["id", "song", "event", "user", "comment"]
 
 
@@ -1536,5 +1417,5 @@ class BVEntryCommentsSerializer(serializers.ModelSerializer):
   user = MinimalUserSerializer()
 
   class Meta:
-    model = bv_models.EntryComments
+    model = EntryComment
     fields = ["id", "entry", "user", "comment"]

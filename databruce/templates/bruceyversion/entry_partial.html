@@ -1,19 +1,14 @@
-<div class="row entry-row">
+<a class="row entry-row"
+   href="{% url "bruceyversion:entry_detail" id=entry.uuid %}">
     <div class="col-3">
-        <a class="text-reset text-primary"
-           href="{% url "profile" id=entry.user.uuid %}">{{ entry.user }}<br>
-            <span class="text-default">Votes: {{ entry.votes }}</span>
-        </a>
+        {{ entry.user }}
+        <br>
+        <span class="text-default">Votes: {{ entry.votes }}</span>
     </div>
-    <div class="col-6 text-wrap text-break">
-        <a class="text-reset"
-           href="{% url "bruceyversion:entry_details" id=entry.uuid %}">{{ entry.comment|truncatechars:200 }}</a>
-    </div>
+    <div class="col-6 text-wrap text-break text-reset text-default">{{ entry.comment|truncatechars:200 }}</div>
     <div class="col-3">
-        <a href="{% url "bruceyversion:entry_details" id=entry.uuid %}">
-            {{ entry.song.name }}
-            <br>
-            {{ entry.event.get_date }}
-        </a>
+        {{ entry.song.name }}
+        <br>
+        {{ entry.event.get_date }}
     </div>
-</div>
+</a>

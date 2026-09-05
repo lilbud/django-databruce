@@ -1,7 +1,7 @@
 //DataTable.type('num', 'className', 'dt-center');
 //DataTable.type('string', 'className', 'dt-left');
-DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
-DateTime.defaults.maxDate = new Date();
+DataTable.defaults.minDate = new Date('1965-01-01 00:00:00');
+DataTable.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
 DataTable.defaults.column.columnControl = ['orderStatus', ['orderAsc', 'orderDesc', 'orderRemove', 'orderAddAsc', 'orderAddDesc']];

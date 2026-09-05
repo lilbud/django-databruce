@@ -1,33 +1,26 @@
 {% extends "databruce/narrow_layout.html" %}
+{% load static %}
 {% block title %}
     {{ title }}
 {% endblock title %}
 {% block extrajs %}
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{% static "databruce/js/select2/select2.min.js" %}"></script>
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+          href="{% static "databruce/css/select2/select2.min.css" %}" />
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+          href="{% static "databruce/css/select2/select2-bootstrap-5-theme.min.css" %}" />
 {% endblock extrajs %}
 {% block content %}
     <div class="col-12">
         <div class="page-title">Bruceyversion Submission Form</div>
         <div class="text-sm mb-2">Have a particular favorite live performance of a song? Submit it below!</div>
-        <div class="row my-3 gx-0">
-            <div class="col">
-                <div class="card message info">
-                    <span>
-                        Note: Only one entry can be submitted for a given song and show. If your entry is already taken, check the <a href="{% url "bruceyversion:entries" %}">entries page</a> and vote on it instead.
-                    </span>
-                </div>
-            </div>
-        </div>
-        {% comment %} <div class="text-xs mb-3"></div> {% endcomment %}
         {% if messages %}
             <div class="row mb-3">
                 <div class="col">
                     {% for message in messages %}
-                        <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
+                        <div class="card message {{ message.tags }} fst-italic p-2">
+                            <span>{{ message|safe }}</span>
+                        </div>
                     {% endfor %}
                 </div>
             </div>
@@ -41,9 +34,9 @@
                 <div class="col">{{ form.non_field_errors }}</div>
                 {% for field in form %}
                     <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="fw-medium">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}" class="form-label fw-medium mb-1">{{ field.label }}</label>
                         {% if field.help_text %}
-                            <div class="form-text text-muted text-xs mb-2">{{ field.help_text|safe }}</div>
+                            <div class="form-text text-muted text-xs mb-2 mt-0">{{ field.help_text|safe }}</div>
                         {% endif %}
                         {{ field }}
                         {% if field.errors %}
@@ -84,8 +77,8 @@
           minimumInputLength: 3,
           dropdownAutoWidth: true,
           dropdownPosition: 'below',
-          placeholder: $(this).data('placeholder'),
           allowClear: true,
+          placeholder: '',
           maximumSelectionLength: 4,
           width: '100%',
           ajax: {
@@ -147,7 +140,7 @@
     
 
       $('#event').on('change', function() {
-        const val = $(this).val();
+        const val = $(this).val() || '';
         var isPopulated = val.length > 0;
 
         $('#song').empty().append(`<option value=""></option>`);

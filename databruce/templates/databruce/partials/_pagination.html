@@ -19,7 +19,7 @@
         {% for num in page.paginator.page_range %}
             {% if page.number == num %}
                 <li class="page-item active" aria-current="page">
-                    <span class="page-link">{{ num }}</span>
+                    <span class="page-link bg-primary">{{ num }}</span>
                 </li>
             {% elif num > page.number|add:'-3' and num < page.number|add:'3' %}
                 <li class="page-item">

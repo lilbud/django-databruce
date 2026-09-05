@@ -26,8 +26,9 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from bruceyversion import models as bv_models
+from bruceyversion.models import Entry
 from databruce import models
+from library.models import Article
 
 date = datetime.datetime.now(tz=datetime.UTC).date()
 
@@ -297,10 +298,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
       criteria = self.get_param(request, "searchBuilder[logic]")
 
-      if not criteria:
-        break
-
-      if col_idx_param is None:
+      if criteria is None or col_idx_param in ["undefined", None]:
         break
 
       name = next(c for c in fields if c["data"] == col_idx_param)
@@ -386,7 +384,7 @@ class EventRunFilter(dj_filters.FilterSet):
   )
 
   class Meta:
-    model = models.Runs
+    model = models.Run
     fields = ["start_date", "end_date", "id"]
 
 
@@ -609,14 +607,30 @@ class EventsFilter(dj_filters.FilterSet):
 
     query = SearchQuery(value, search_type="websearch")
 
+    weekday_text_expr = Case(
+      When(date__isnull=True, then=Value("")),
+      When(date__iso_week_day=1, then=Value("Monday")),
+      When(date__iso_week_day=2, then=Value("Tuesday")),
+      When(date__iso_week_day=3, then=Value("Wednesday")),
+      When(date__iso_week_day=4, then=Value("Thursday")),
+      When(date__iso_week_day=5, then=Value("Friday")),
+      When(date__iso_week_day=6, then=Value("Saturday")),
+      When(date__iso_week_day=7, then=Value("Sunday")),
+      output_field=CharField(max_length=255),
+    )
+
     vector = (
       SearchVector("event_id", weight="B")
       + SearchVector("date", weight="A")
+      + SearchVector("date__day", weight="A")
+      + SearchVector(weekday_text_expr, weight="B")
       + SearchVector("date__day", weight="B")
       + SearchVector("early_late", weight="B")
       + SearchVector("artist__name", weight="C")
       + SearchVector("venue__name", weight="B")
       + SearchVector("venue__city__name", weight="B")
+      + SearchVector("venue__city__aliases", weight="B")
+      + SearchVector("title", weight="C")
       + SearchVector("run__name", weight="D")
     )
 
@@ -640,7 +654,7 @@ class EventsFilter(dj_filters.FilterSet):
     event_exclude_filter = Q(
       Q(tour__num_songs=0)
       | Q(
-        setlist_certainty__in=["Unknown", "Probable"],
+        setlist_certainty__in=["Unknown"],
       )
       | Q(public=False),
     )
@@ -680,7 +694,7 @@ class EventsFilter(dj_filters.FilterSet):
       return queryset.filter(
         Q(venue_id=value) | Q(venue__parent=value),
       )
-    except models.Venues.DoesNotExist:
+    except models.Venue.DoesNotExist:
       # Fallback if the venue ID provided doesn't exist
       pass
 
@@ -688,7 +702,7 @@ class EventsFilter(dj_filters.FilterSet):
     return queryset.filter(venue_id=value)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = [
       "year",
       "date",
@@ -718,13 +732,13 @@ class AdvSearchFilter(dj_filters.FilterSet):
   type = ModelMultipleChoiceFilter(
     field_name="event_type__type_id",
     to_field_name="id",
-    queryset=models.Types.objects.all(),
+    queryset=models.Type.objects.all(),
   )
 
   tag = ModelMultipleChoiceFilter(
     field_name="event_tag__tag_id",
     to_field_name="id",
-    queryset=models.Tags.objects.all(),
+    queryset=models.Tag.objects.all(),
   )
 
   start_date = dj_filters.DateFilter(
@@ -841,7 +855,7 @@ class AdvSearchFilter(dj_filters.FilterSet):
       return queryset.filter(
         Q(venue_id=value) | Q(venue__parent=value),
       )
-    except models.Venues.DoesNotExist:
+    except models.Venue.DoesNotExist:
       # Fallback if the venue ID provided doesn't exist
       pass
 
@@ -849,7 +863,7 @@ class AdvSearchFilter(dj_filters.FilterSet):
     return queryset.filter(venue_id=value)
 
   class Meta:
-    model = models.Events
+    model = models.Event
     fields = [
       "year",
       "date",
@@ -1076,7 +1090,7 @@ class SetlistFilter(dj_filters.FilterSet):
   def filter_show_only(self, queryset, name, value):
     lookup = "set_name__in"
 
-    lookup = Q(set_name__in=models.SetTypes.valid_sets()) & Q(
+    lookup = Q(set_name__in=models.SetType.valid_sets()) & Q(
       event__public=True,
     )
 
@@ -1089,7 +1103,7 @@ class SetlistFilter(dj_filters.FilterSet):
     assert self.data is not None
     event = self.data.get("event")
 
-    check = bv_models.Entries.objects.filter(event=event).filter(hidden=False)
+    check = Entry.objects.filter(event=event).filter(hidden=False)
 
     if check.exists():
       return queryset.exclude(
@@ -1122,7 +1136,7 @@ class SetlistFilter(dj_filters.FilterSet):
   song = dj_filters.CharFilter(field_name="song__name", lookup_expr="icontains")
 
   class Meta:
-    model = models.Setlists
+    model = models.Setlist
     fields = "__all__"
 
 
@@ -1253,7 +1267,7 @@ class SetlistSongsFilter(dj_filters.FilterSet):
     return queryset.filter(**{lookup: 100})
 
   def filter_unseen(self, queryset, name, value):
-    events = models.UserAttendedShows.objects.filter(user_id=value).values_list(
+    events = models.UserAttendedShow.objects.filter(user_id=value).values_list(
       "event_id",
     )
 
@@ -1287,7 +1301,7 @@ class IncludedFilter(dj_filters.FilterSet):
     if value:
       # Get the IDs of only the first instance of each snippet
       unique_ids = (
-        models.Snippets.objects.order_by("snippet_id", "id")
+        models.Snippet.objects.order_by("snippet_id", "id")
         .distinct("snippet_id")
         .values_list("snippet_id")
       )
@@ -1316,7 +1330,7 @@ class SnippetFilter(dj_filters.FilterSet):
     if value:
       # Get the IDs of only the first instance of each snippet
       unique_ids = (
-        models.Snippets.objects.order_by("snippet_id", "id")
+        models.Snippet.objects.order_by("snippet_id", "id")
         .distinct("snippet_id")
         .values_list("id", flat=True)
       )
@@ -1418,7 +1432,7 @@ class ArticleFilter(dj_filters.FilterSet):
   q = dj_filters.CharFilter(method="filter_by_fts", label="Search (FTS)")
 
   # Exact and multiple choice filters
-  category = dj_filters.ChoiceFilter(choices=models.Articles.ArticleCategory.choices)
+  category = dj_filters.ChoiceFilter(choices=Article.ArticleCategory.choices)
   author = dj_filters.CharFilter(lookup_expr="icontains")
 
   date_after = dj_filters.NumberFilter(
@@ -1432,7 +1446,7 @@ class ArticleFilter(dj_filters.FilterSet):
   )
 
   class Meta:
-    model = models.Articles
+    model = Article
     fields = [
       "q",
       "category",

@@ -1,19 +1,30 @@
 from django.urls import path
 
-from . import views
+from .views import (
+  ArticleCategoryView,
+  ArticleCollectionView,
+  ArticleDetailView,
+  ArticleListView,
+  ArticleSearchView,
+)
 
 app_name = "library"
 urlpatterns = [
-    path("articles/", views.Articles.as_view(), name="articles"),
-    path("article/<str:slug>/", views.ArticleDetail.as_view(), name="article_detail"),
-    path(
-        "categories/<slug:slug>",
-        views.ArticlesByCategory.as_view(),
-        name="article_category",
-    ),
-    path(
-        "search/",
-        views.ArticleSearch.as_view(),
-        name="article_search",
-    ),
+  path("articles/", ArticleListView.as_view(), name="articles"),
+  path("article/<str:slug>/", ArticleDetailView.as_view(), name="article_detail"),
+  path(
+    "category/<slug:slug>",
+    ArticleCategoryView.as_view(),
+    name="article_category",
+  ),
+  path(
+    "collection/<slug:slug>",
+    ArticleCollectionView.as_view(),
+    name="article_collection",
+  ),
+  path(
+    "search/",
+    ArticleSearchView.as_view(),
+    name="article_search",
+  ),
 ]

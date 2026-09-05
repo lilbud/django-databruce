@@ -1,82 +1,82 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
-  Lyrics
+    Lyrics
 {% endblock title %}
 {% block content %}
-  <div class="col-12">
-    <div class="row mb-3">
-      <div class="col">
-        <div class="text-2xl mb-3">Lyrics</div>
-        <div class="card">
-          <div class="card-body text-sm">
-            <div class="text-wrap">
-              <span class="fw-medium">Note:</span>
-              <div>
-                English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct German Bruce fan site. Italian lyrics source from loose-ends.it, an Italian Bruce fan site.
-                <br>
-                <br>
-                Lyrics were contributed by multiple people, and credit has been listed when known.
-                I only speak English, and cannot vouch for the quality of the translations, so they're provided "as-is".
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div id="tableControls">
-              <div class="col-12 col-md-1">
-                <label for="PublicityFilter" class="pb-1">Category</label>
-                <select id="PublicityFilter" class="form-select form-select-sm">
-                  <option value="">All</option>
-                </select>
-              </div>
-              <!-- Search -->
-              <div class="col">
-                <label for="search" class="pb-1">Search</label>
-                <div class="input-group input-group-sm">
-                  <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                  </span>
-                  <input type="text"
-                         id="search"
-                         class="form-control form-control-sm"
-                         placeholder="Type to search table...">
+    <div class="col-12">
+        <div class="row mb-3">
+            <div class="col">
+                <div class="text-2xl mb-3">Lyrics</div>
+                <div class="card">
+                    <div class="card-body text-sm">
+                        <div class="text-wrap">
+                            <span class="fw-medium">Note:</span>
+                            <div>
+                                English lyrics sourced from a dataset on HuggingFace. German lyrics sourced from Stonepony.de, a now defunct German Bruce fan site. Italian lyrics source from loose-ends.it, an Italian Bruce fan site.
+                                <br>
+                                <br>
+                                Lyrics were contributed by multiple people, and credit has been listed when known.
+                                I only speak English, and cannot vouch for the quality of the translations, so they're provided "as-is".
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <button type="button"
-                        id="sbButton"
-                        data-bs-toggle="modal"
-                        data-bs-target="#sbModal"
-                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-              </div>
             </div>
-            <div class="row">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="lyricTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Song</th>
-                      <th class="all">Version</th>
-                      <th class="all">Source</th>
-                      <th class="all">Language</th>
-                      <th class="all">Translator</th>
-                      <th class="all">Note</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="tableControls">
+                            <div class="col-12 col-md-1">
+                                <label for="PublicityFilter" class="pb-1">Language</label>
+                                <select id="PublicityFilter" class="form-select form-select-sm">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                            <!-- Search -->
+                            <div class="col">
+                                <label for="search" class="pb-1">Search</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text"
+                                           id="search"
+                                           class="form-control form-control-sm"
+                                           placeholder="Type to search table...">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-auto mt-2 mt-md-0">
+                                <button type="button"
+                                        id="sbButton"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#sbModal"
+                                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-hover display" id="lyricTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="all">Song</th>
+                                            <th class="all">Version</th>
+                                            <th class="all">Source</th>
+                                            <th class="all">Language</th>
+                                            <th class="all">Translator</th>
+                                            <th class="all">Note</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       let sb_columns = [0,1,2,3,4];
 
@@ -121,5 +121,5 @@
       searchBuilder(table, sb_columns);
 
     });
-  </script>
+    </script>
 {% endblock content %}

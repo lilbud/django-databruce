@@ -37,7 +37,7 @@ function initializeShareCardGenerator(config) {
           createdRow: function (row, data) {
             row.addClass(slugify(data.set_name));
 
-            var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+            var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal', 'Soundcheck']
 
             if (allowedSets.includes(data.set_name)) {
               var album = data.song.category_slug;
@@ -141,10 +141,7 @@ function initializeShareCardGenerator(config) {
         return createTable(url, setlistColumns, $sandboxTable, setlistOptions)
           .then(() => {
             return new Promise((resolveRendering) => {
-              // A tiny 50ms pause lets the browser render the newly appended table rows and tooltips completely
-
               resolveRendering(sandbox);
-
             });
           });
       })

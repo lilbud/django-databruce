@@ -8,6 +8,15 @@
             <a href="{% url "bruceyversion:entries" %}">Back to Entries</a>
         </span>
         <div class="page-title mb-3">{{ title }}</div>
+        {% if messages %}
+            <div class="row mb-3">
+                <div class="col">
+                    {% for message in messages %}
+                        <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
         <div class="row d-flex-inline gx-2 gy-2 mb-2">
             <div class="col-9">
                 <div class="card h-100">
@@ -39,7 +48,17 @@
                         </div>
                         <div class="col-12 col-lg-6">
                             {% if user.is_authenticated %}
-                                {% if not is_users_entry %}
+                                {% if entry.user.id == user.id %}
+                                    <span data-bs-toggle="tooltip"
+                                          data-bs-title="You cannot vote on your own entry">
+                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
+                                    </span>
+                                {% elif entry.status == 'PENDING' or entry.status == 'REJECTED' %}
+                                    <span data-bs-toggle="tooltip"
+                                          data-bs-title="You cannot vote on pending entries">
+                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
+                                    </span>
+                                {% else %}
                                     <form method="post" id="voteForm">
                                         {% csrf_token %}
                                         <input type="hidden" name="user" value="{{ user.id }}">
@@ -53,11 +72,6 @@
                                             {% if user_voted %}Remove{% else %}Vote{% endif %}
                                         </button>
                                     </form>
-                                {% else %}
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="You cannot vote on your own entry">
-                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
-                                    </span>
                                 {% endif %}
                             {% else %}
                                 <span data-bs-toggle="tooltip"
@@ -81,17 +95,27 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 Comments
                 {% if user.is_authenticated %}
-                    {% if not user_comment %}
-                        <button class="btn btn-secondary text-xs py-1 px-2"
-                                data-bs-toggle="modal"
-                                data-bs-target="#addCommentModal">Submit Comment</button>
-                    {% else %}
+                    {% if entry.status == "PENDING" %}
                         <span data-bs-toggle="tooltip"
-                              data-bs-title="You already commented, click to update">
+                              data-bs-title="You cannot comment on pending entries">
                             <button class="btn btn-secondary text-xs py-1 px-2"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#updateCommentModal">Update Comment</button>
+                                    data-bs-target="#updateCommentModal"
+                                    disabled>Update Comment</button>
                         </span>
+                    {% else %}
+                        {% if not user_comment %}
+                            <button class="btn btn-secondary text-xs py-1 px-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#addCommentModal">Submit Comment</button>
+                        {% else %}
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="You already commented, click to update">
+                                <button class="btn btn-secondary text-xs py-1 px-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#updateCommentModal">Update Comment</button>
+                            </span>
+                        {% endif %}
                     {% endif %}
                 {% else %}
                     <span data-bs-toggle="tooltip"
@@ -104,8 +128,8 @@
                 {% endif %}
             </div>
             <div class="card-body">
-                {% if comments|length > 0 %}
-                    {% for comment in comments %}
+                {% if entry.entry_comment.all|length > 0 %}
+                    {% for comment in entry.entry_comment.all %}
                         <div class="row">
                             <div class="col">
                                 <div class="card info-card">
@@ -267,14 +291,6 @@
             const data = await response.json(); // Parses the JSON response body
             const modalElement = document.getElementById('commentModal');
 
-            // Get the active instance and trigger hide
-            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modalInstance.hide();
-
-            // disable comment button
-            $('#submit-comment').prop('disabled', true);
-            $('#submit-comment').closest('span').attr('data-bs-toggle', 'tooltip').attr('data-bs-title', 'You have already commented on this entry')
-
             var url = '{{ request.path }}'
             
             console.log(url);
@@ -303,10 +319,6 @@
 
             const data = await response.json(); // Parses the JSON response body
             const modalElement = document.getElementById('updateCommentModal');
-
-            // Get the active instance and trigger hide
-            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
-            modalInstance.hide();
 
             var url = '{{ request.path }}'
             

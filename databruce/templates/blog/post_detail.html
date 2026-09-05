@@ -1,44 +1,44 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n static %}
 {% block title %}
-  {{ title }}
+    {{ title }}
 {% endblock title %}
 {% block extrastyle %}
-  <link rel="stylesheet"
-        href="{% static "magnific-popup/magnific-popup.css" %}">
+    <link rel="stylesheet"
+          href="{% static "magnific-popup/magnific-popup.css" %}">
 {% endblock extrastyle %}
 {% block content %}
-  {% if user.is_superuser %}
-    {% include "databruce/partials/admin_edit_btn.html" with view="blogposts" item=post.id %}
-  {% endif %}
-  <div class="col-12 col-lg-8">
-    <div class="page-title">
-      <a href="{% url 'blog:blog' %}">Blog</a> &gt; {{ post.title }}
+    {% if user.is_superuser %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="blogpost" item=post.id %}
+    {% endif %}
+    <div class="col-12 col-lg-8">
+        <div class="page-title">
+            <a href="{% url 'blog:blog' %}">Blog</a> &gt; {{ post.title }}
+        </div>
+        <div class="text-sm mb-4">
+            Posted by <span class="fw-semibold">{{ post.author }}</span> on {{ post.published_at|date:"F j, Y" }}
+        </div>
+        <div id="toc" class="text-sm">{{ toc|safe }}</div>
+        <br>
+        <div class="text-base">{{ body }}</div>
+        <hr>
+        <div class="prefix-container text-sm mb-1">
+            <span class="prefix">Tags</span>
+            <span class="value text-wrap">
+                {% for tag in post.tags.all %}
+                    <a href="{% url "blog:blog_post_tag" slug=tag.slug %}">
+                        <span class="badge badge-primary text-2xs">{{ tag.slug }}</span>
+                    </a>
+                {% endfor %}
+            </span>
+        </div>
+        <div class="prefix-container text-sm">
+            <span class="prefix">Updated</span>
+            <span class="value">{{ post.updated_at|date:"F j, Y" }}</span>
+        </div>
     </div>
-    <div class="text-sm mb-4">
-      Posted by <span class="fw-semibold">{{ post.author }}</span> on {{ post.published_at|date:"F j, Y" }}
-    </div>
-    <div id="toc" class="text-sm">{{ toc|safe }}</div>
-    <br>
-    <div class="text-base">{{ body }}</div>
-    <hr>
-    <div class="prefix-container text-sm mb-1">
-      <span class="prefix">Tags</span>
-      <span class="value text-wrap">
-        {% for tag in post.tags.all %}
-          <a href="{% url "blog:blog_post_tag" slug=tag.slug %}">
-            <span class="badge badge-primary text-2xs">{{ tag.slug }}</span>
-          </a>
-        {% endfor %}
-      </span>
-    </div>
-    <div class="prefix-container text-sm">
-      <span class="prefix">Updated</span>
-      <span class="value">{{ post.updated_at|date:"F j, Y" }}</span>
-    </div>
-  </div>
-  <script src="{% static "magnific-popup/jquery.magnific-popup.min.js" %}"></script>
-  <script>
+    <script src="{% static "magnific-popup/jquery.magnific-popup.min.js" %}"></script>
+    <script>
         var options = {
             delegate: 'a',
             type: 'image',
@@ -50,5 +50,5 @@
         $('figure').each(function() {
             $(this).magnificPopup(options);
         })
-  </script>
+    </script>
 {% endblock content %}

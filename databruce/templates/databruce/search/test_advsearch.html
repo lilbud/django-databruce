@@ -1,120 +1,103 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load filters static %}
 {% block title %}
-  {{ title }}
+    {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
-          integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
-          crossorigin="anonymous"></script>
+    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+            integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+            crossorigin="anonymous"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col-12">
-    <div class="page-title">Advanced Search Results</div>
-    <div class="text-base mb-2">Click link below to copy a short url to these results (the links are very long and look awful).</div>
-    <div id="short_url" class="mb-3">
-      <button id="short-url"
-              hx-get="/short_url/"
-              hx-vals='{"url": "{{ request.build_absolute_uri|safe }}"}'
-              hx-target="#short-url-response"
-              hx-swap="innerHTML"
-              hx-on::before-request="this.setAttribute('disabled', 'true')"
-              class="btn btn-primary btn-sm">Generate Short URL</button>
-      <span id="short-url-response"></span>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body text-sm">
-        <div id="row">
-          <div class="d-flex flex-column">
-            {% if display_fields %}
-              {% for field in display_fields %}
-                <div>
-                  <span class="pe-2 fw-semibold">{{ field.label }}:</span>
-                  {% if field.choice %}({{ field.choice }}){% endif %}
-                  {{ field.data.value|default:field.data|markdown|safe }}
-                </div>
-              {% endfor %}
-            {% endif %}
-            {% if search_summary %}
-              <div class="pe-2 fw-semibold">Songs:</div>
-              {% for field in search_summary %}
-                {{ field }}
-                {% if not forloop.last %}<div class="col-1 fw-semibold">{{ conjunction|upper }}</div>{% endif %}
-              {% endfor %}
-            {% endif %}
-          </div>
+    <div class="col-12">
+        <div class="page-title">Advanced Search Results</div>
+        <div class="text-base mb-2">Click link below to copy a short url to these results (the links are very long and look awful).</div>
+        <div id="short_url" class="mb-3">
+            <button id="short-url"
+                    hx-get="/short_url/"
+                    hx-vals='{"url": "{{ request.build_absolute_uri|safe }}"}'
+                    hx-target="#short-url-response"
+                    hx-swap="innerHTML"
+                    hx-on::before-request="this.setAttribute('disabled', 'true')"
+                    class="btn btn-primary btn-sm">Generate Short URL</button>
+            <span id="short-url-response"></span>
         </div>
-      </div>
+        <div class="card mb-3">
+            <div class="card-body text-sm">
+                <div id="row">
+                    <div class="d-flex flex-column">
+                        {% if display_fields %}
+                            {% for field in display_fields %}
+                                <div>
+                                    <span class="pe-2 fw-semibold">{{ field.label }}:</span>
+                                    {% if field.choice %}({{ field.choice }}){% endif %}
+                                    {{ field.data.value|default:field.data|markdown|safe }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% if search_summary %}
+                            <div class="pe-2 fw-semibold">Songs:</div>
+                            {% for field in search_summary %}
+                                {{ field }}
+                                {% if not forloop.last %}<div class="col-1 fw-semibold">{{ conjunction|upper }}</div>{% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
+        </div>
     </div>
-    <div class="card">
-      <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
-    </div>
-  </div>
-  <script>
+    <script>
     document.addEventListener('DOMContentLoaded', async () => {
         // 1. Extract the GET parameters from the current URL
         const urlParams = new URLSearchParams(window.location.search);
         let searchTimeout;
 
-        // If there are no search parameters, stop here
-        if (urlParams.size === 0) return;
+        eventTable(`/api/v1/adv_search/?${urlParams.toString()}&format=custom`);
 
-        try {
-            var url = `/api/v1/adv_search/?${urlParams.toString()}&format=custom`
-
-            var table = new DataTable('#eventTable', {
-                layout: {
-                    topStart: null,
-                    bottomStart: null,
-                    topEnd: null,
-                    bottomEnd: null,
-                    top: ['customInputPaging', 'info'],
-                    bottom: ['customInputPaging', 'info'],
-                },
-                ajax: {
-                  'url': url,
-                },
-                columns: event_table_columns,
-            });
-
-        } catch (error) {
-            console.error('Failed to fetch results:', error);
-        }
-
-        $('#search').on('keyup change clear', function () {
-            const value = $(this).val();
-            clearTimeout(searchTimeout);
-
-            searchTimeout = setTimeout(function () {
-                table.search(value).draw();
-            }, 500);
-        });
-
-        $('#PublicityFilter').on('change', function () {
-            var selectedValue = this.value;
-            table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
-        });
+        //// If there are no search parameters, stop here
+        //if (urlParams.size === 0) return;
+//
+        //try {
+        //    var url = `/api/v1/adv_search/?${urlParams.toString()}&format=custom`
+//
+        //    var table = new DataTable('#eventTable', {
+        //        layout: {
+        //            topStart: null,
+        //            bottomStart: null,
+        //            topEnd: null,
+        //            bottomEnd: null,
+        //            top: ['customInputPaging', 'info'],
+        //            bottom: ['customInputPaging', 'info'],
+        //        },
+        //        ajax: {
+        //          'url': url,
+        //        },
+        //        columns: event_table_columns,
+        //    });
+//
+        //} catch (error) {
+        //    console.error('Failed to fetch results:', error);
+        //}
+//
+        //$('#search').on('keyup change clear', function () {
+        //    const value = $(this).val();
+        //    clearTimeout(searchTimeout);
+//
+        //    searchTimeout = setTimeout(function () {
+        //        table.search(value).draw();
+        //    }, 500);
+        //});
+//
+        //$('#PublicityFilter').on('change', function () {
+        //    var selectedValue = this.value;
+        //    table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
+        //});
     });
-
-    // $('button#short-url').click(function () {
-    //   var received_data = '{{ request.build_absolute_uri|safe }}'
-
-    //   $.ajax({
-    //     url: '/short_url/',
-    //     type: 'GET',
-    //     data: { url: received_data },
-    //     cache: false,
-    //     dataType: 'json',
-    //     success: function (resp) {
-    //       $('#shortLink').removeClass('d-none')
-    //       $('#shortLink').text(`${resp.short_url}`)
-    //       $('#copyButton').removeClass('d-none')
-    //     }
-    //   })
-
-    //   $('#short-url').prop('disabled', true)
-    // });
 
     $('#short-url-response').on('click', '#copyButton', function () {
       var btn = this
@@ -130,5 +113,5 @@
         $(btn).text('Copy')
       }, 3000)
     });
-  </script>
+    </script>
 {% endblock content %}

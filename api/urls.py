@@ -17,7 +17,7 @@ router.register(r"venues", views.VenuesViewSet, basename="venue")
 router.register(r"events", views.EventViewSet, basename="event")
 router.register(r"events_index", views.IndexEventViewSet, basename="event_index")
 router.register(r"setlists_index", views.IndexSetlistViewSet, basename="setlist_index")
-router.register(r"event_search", views.EventSearch, basename="event_search")
+router.register(r"event_search", views.EventSearchViewSet, basename="event_search")
 router.register(r"event_types", views.TypesViewSet, basename="event_types")
 router.register(r"runs", views.EventRunViewSet, basename="runs")
 router.register(r"nugs_releases", views.NugsViewSet, basename="nugs_release")
@@ -56,7 +56,7 @@ router.register(
 )
 router.register(
   r"advanced_search",
-  views.AdvancedSearch,
+  views.AdvancedSearchViewSet,
   basename="advanced_search",
 )
 router.register(
@@ -81,7 +81,7 @@ router.register(
 )
 router.register(
   r"adv_search",
-  views.AdvancedEventSearch,
+  views.AdvancedEventSearchViewSet,
   basename="adv_search",
 )
 router.register(

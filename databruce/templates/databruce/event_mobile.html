@@ -1,214 +1,216 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
-  <head>
-    {% load i18n static %}
-    {% if not debug %}
-      <script defer
-              src="https://cloud.umami.is/script.js"
-              data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
-    {% endif %}
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description"
-          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
-    <meta name="keywords" content="Databruce, Setlists, Springsteen">
-    <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:title" content="{{ title|default_if_none:"Databruce" }}">
-    <meta property="og:site_name" content="Databruce">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:description"
-          content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
-    <link rel="icon"
-          type="image/png"
-          href="{% static "databruce/img/favicon-96x96.png" %}"
-          sizes="96x96" />
-    <link rel="icon"
-          type="image/svg+xml"
-          href="{% static "databruce/img/favicon.svg" %}" />
-    <link rel="shortcut icon" href="{% static "databruce/img/favicon.ico" %}" />
-    <link rel="apple-touch-icon"
-          sizes="180x180"
-          href="{% static "databruce/img/apple-touch-icon.png" %}" />
-    <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
-    <title>
-      {{ title }}
-      | Databruce
-    </title>
-    <!--JQuery-->
-    <script src="{% static 'databruce/js/jquery/jquery-4.0.0.min.js' %}"></script>
-    <!--Bootstrap-->
-    <link rel="stylesheet"
-          href="{% static 'databruce/css/bootstrap.min.css' %}">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="{% static 'databruce/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
-    <!--Datatables-->
-    <link href="{% static 'databruce/css/datatables.min.css' %}"
-          rel="stylesheet">
-    <script src="{% static 'databruce/js/datatables/datatables-3.1.min.js' %}"></script>
-    <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
-    <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
-    <!-- Other -->
-    <script src="{% static 'databruce/js/datatables.js' %}"></script>
-    <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
-    <script src="{% static 'databruce/js/html2canvas.min.js' %}"></script>
-    <script src="{% static 'databruce/js/table.js' %}"></script>
-  </head>
-  <body>
-    <div id="capture-area">
-      <nav class="navbar navbar-expand-xl p-0 border-bottom">
-        <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
-          <a class="navbar-brand p-xl-0 mx-auto mx-xl-2"
-             href="{% url 'index' %}"
-             aria-label="Databruce Home">
-            <div class="logo" role="img" aria-label="Databruce">
-              <span class="sr-only">Databruce</span>
-            </div>
-          </a>
-          <li class="nav-item d-none d-xl-block"
-              id="toggle-container"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              data-bs-title="Toggle Theme">
-            <button class="btn btn-sm nav-btn border-0 bd-theme-btn"
-                    id="bd-theme"
-                    type="button"
-                    aria-label="Toggle Theme">
-              <i class="bi bi-sun-fill theme-icon text-xl" aria-hidden="true"></i>
-              <i class="bi bi-moon-stars-fill theme-icon text-xl" aria-hidden="true"></i>
-              <span class="d-lg-none my-auto" id="bd-theme-text">Toggle Theme</span>
-            </button>
-          </li>
-        </div>
-      </nav>
-      {% comment %} <div id="download-btn" class="btn btn-primary mb-3 text-xs">Download</div> {% endcomment %}
-      <div class="padded-body">
-        <div class="container-lg">
-          <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
-            <div class="col d-grid gap-0 gx-0">
-              <!-- next and last buttons-->
-              {% if not event.date %}
-                <!-- message cards -->
-                <div class="row mb-2 gx-0">
-                  <div class="col">
-                    <div class="card message info">This is a placeholder date, actual date unknown.</div>
-                  </div>
-                </div>
-              {% endif %}
-              <!-- event info -->
-              <div class="row mb-3 gx-0">
-                <div class="col">
-                  <div class="card">
-                    <div class="card-body">
-                      <div class="d-flex flex-wrap">
-                        <div class="flex-grow-1 w-75 mb-0">
-                          {% if event.title %}
-                            <div class="row mb-2 text-center">
-                              <div class="col">
-                                <div id="title" class="text-wrap text-xs fw-light">
-                                  <span class="mb-0">{{ event.title }}</span>
-                                </div>
-                              </div>
-                            </div>
-                          {% endif %}
-                          <div class="row text-center">
-                            <div class="col">
-                              <div class="row">
-                                <div class="text-wrap fw-semibold text-xl">
-                                  <span class="text-primary" id="date">{{ event.get_date }}</span>
-                                  {% if type_note %}<span class="text-lg text-danger">[{{ event.type.name }}]</span>{% endif %}
-                                </div>
-                              </div>
-                              <div class="row text-wrap text-xl">
-                                <div class="fw-semibold text-reset" id="event-header-artist">{{ event.artist }}</div>
-                              </div>
-                              <div class="row text-sm text-reset">
-                                <div class="col event-header-venue">
-                                  <div class="text-reset fw-semibold">{{ event.venue.get_name }}</div>
-                                  {% if event.venue.city %}<div class="fw-light">{{ event.venue.city }}</div>{% endif %}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row text-center justify-content-center mt-2">
-                            <div class="col-md-12">
-                              <div class="badge-row text-center justify-content-center d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-                                   id="badge-row">
-                                {% if event.tour %}<span class="badge badge-primary">{{ event.tour }}</span>{% endif %}
-                                {% if event.leg %}<span class="badge badge-primary">{{ event.leg.name }}</span>{% endif %}
-                                {% if event.run %}<span class="badge badge-primary">{{ event.run.name }}</span>{% endif %}
-                              </div>
-                            </div>
-                          </div>
+    <head>
+        {% load i18n static %}
+        {% if not debug %}
+            <script defer
+                    src="https://cloud.umami.is/script.js"
+                    data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
+        {% endif %}
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description"
+              content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
+        <meta name="keywords" content="Databruce, Setlists, Springsteen">
+        <meta property="og:image" content="{% static "databruce/img/ogimg.jpg" %}">
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Blue rectangle that reads Databruce" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:title" content="{{ title|default_if_none:"Databruce" }}">
+        <meta property="og:site_name" content="Databruce">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ request.build_absolute_uri }}">
+        <meta property="og:description"
+              content="{{ description|safe|default_if_none:"A Springsteen Setlist Database" }}">
+        <link rel="icon"
+              type="image/png"
+              href="{% static "databruce/img/favicon-96x96.png" %}"
+              sizes="96x96" />
+        <link rel="icon"
+              type="image/svg+xml"
+              href="{% static "databruce/img/favicon.svg" %}" />
+        <link rel="shortcut icon" href="{% static "databruce/img/favicon.ico" %}" />
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{% static "databruce/img/apple-touch-icon.png" %}" />
+        <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
+        <title>
+            {{ title }}
+            | Databruce
+        </title>
+        <!--JQuery-->
+        <script src="{% static 'databruce/js/jquery/jquery-4.0.0.min.js' %}"></script>
+        <!--Bootstrap-->
+        <link rel="stylesheet"
+              href="{% static 'databruce/css/bootstrap.min.css' %}">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <script src="{% static 'databruce/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+        <!--Datatables-->
+        {% comment %} <link href="{% static 'databruce/css/datatables.min.css' %}"
+              rel="stylesheet">
+        <script src="{% static 'databruce/js/datatables/datatables.min.js' %}"></script> {% endcomment %}
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
+        <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
+        <link rel="stylesheet" href="{% static 'databruce/css/light.css' %}" />
+        <link rel="stylesheet" href="{% static 'databruce/css/dark.css' %}" />
+        <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
+        <!-- Other -->
+        {% comment %} <script src="{% static 'databruce/js/datatables.js' %}"></script> {% endcomment %}
+        <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
+        <script src="{% static 'databruce/js/snapdom.js' %}"></script>
+        <script src="{% static 'databruce/js/table.js' %}"></script>
+    </head>
+    <body>
+        <div id="capture-area">
+            <nav class="navbar navbar-expand-xl p-0 border-bottom">
+                <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
+                    <a class="navbar-brand p-xl-0 mx-auto mx-xl-2"
+                       href="{% url 'index' %}"
+                       aria-label="Databruce Home">
+                        <div class="logo" role="img" aria-label="Databruce">
+                            <span class="sr-only">Databruce</span>
                         </div>
-                      </div>
+                    </a>
+                    <li class="nav-item d-none d-xl-block"
+                        id="toggle-container"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="Toggle Theme">
+                        <button class="btn btn-sm nav-btn border-0 bd-theme-btn"
+                                id="bd-theme"
+                                type="button"
+                                aria-label="Toggle Theme">
+                            <i class="bi bi-sun-fill theme-icon text-xl" aria-hidden="true"></i>
+                            <i class="bi bi-moon-stars-fill theme-icon text-xl" aria-hidden="true"></i>
+                            <span class="d-lg-none my-auto" id="bd-theme-text">Toggle Theme</span>
+                        </button>
+                    </li>
+                </div>
+            </nav>
+            {% comment %} <div id="download-btn" class="btn btn-primary mb-3 text-xs">Download</div> {% endcomment %}
+            <div class="padded-body">
+                <div class="container-lg">
+                    <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
+                        <div class="col d-grid gap-0 gx-0">
+                            <!-- next and last buttons-->
+                            {% if not event.date %}
+                                <!-- message cards -->
+                                <div class="row mb-2 gx-0">
+                                    <div class="col">
+                                        <div class="card message info">This is a placeholder date, actual date unknown.</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- event info -->
+                            <div class="row mb-3 gx-0">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex flex-wrap">
+                                                <div class="flex-grow-1 w-75 mb-0">
+                                                    {% if event.title %}
+                                                        <div class="row mb-2 text-center">
+                                                            <div class="col">
+                                                                <div id="title" class="text-wrap text-xs fw-light">
+                                                                    <span class="mb-0">{{ event.title }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="row text-center">
+                                                        <div class="col">
+                                                            <div class="row">
+                                                                <div class="text-wrap fw-semibold text-xl">
+                                                                    <span class="text-primary" id="date">{{ event.get_date }}</span>
+                                                                    {% if type_note %}<span class="text-lg text-danger">[{{ event.type.name }}]</span>{% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="row text-wrap text-xl">
+                                                                <div class="fw-semibold text-reset" id="event-header-artist">{{ event.artist }}</div>
+                                                            </div>
+                                                            <div class="row text-sm text-reset">
+                                                                <div class="col event-header-venue">
+                                                                    <div class="text-reset fw-semibold">{{ event.venue.get_name }}</div>
+                                                                    {% if event.venue.city %}<div class="fw-light">{{ event.venue.city }}</div>{% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row text-center justify-content-center mt-2">
+                                                        <div class="col-md-12">
+                                                            <div class="badge-row text-center justify-content-center d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+                                                                 id="badge-row">
+                                                                {% if event.tour %}<span class="badge badge-primary">{{ event.tour }}</span>{% endif %}
+                                                                {% if event.leg %}<span class="badge badge-primary">{{ event.leg.name }}</span>{% endif %}
+                                                                {% if event.run %}<span class="badge badge-primary">{{ event.run.name }}</span>{% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- setlist and notes -->
+                            <div class="tab-content overflow-hidden" id="myTabContent">
+                                <div class="tab-pane fade show active"
+                                     id="overview"
+                                     role="tabpanel"
+                                     aria-labelledby="overview-tab"
+                                     tabindex="0">
+                                    <div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
+                                        <div class="col-12">
+                                            {% if event.note %}
+                                                <div class="row mb-3 gx-0">
+                                                    <div class="col">
+                                                        {% partialdef event-note inline %}
+                                                            <div class="card">
+                                                                <div class="card-header">
+                                                                    Notes
+                                                                    <i class="bi bi-pencil"></i>
+                                                                </div>
+                                                                <div class="card-body event-note text-wrap">{{ event.note|markdown|safe }}</div>
+                                                            </div>
+                                                        {% endpartialdef %}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-header d-flex flex-column">
+                                                        <div class="d-flex justify-content-between w-100">Setlist</div>
+                                                        <div class="collapse row w-100" id="options">
+                                                            <div class="col-12 px-0 pt-1">
+                                                                <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0" id="setlistCard">
+                                                        <div class="table-responsive" id="mobileTable">
+                                                            <table class="table table-hover display wrap" id="setlistTable">
+                                                                <thead>
+                                                                    <th class="all">#</th>
+                                                                    <th class="all">Song</th>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
-              <!-- setlist and notes -->
-              <div class="tab-content overflow-hidden" id="myTabContent">
-                <div class="tab-pane fade show active"
-                     id="overview"
-                     role="tabpanel"
-                     aria-labelledby="overview-tab"
-                     tabindex="0">
-                  <div class="row row-cols-1 {% if event.note %}gy-3 gx-0{% endif %}">
-                    <div class="col-12">
-                      {% if event.note %}
-                        <div class="row mb-3 gx-0">
-                          <div class="col">
-                            {% partialdef event-note inline %}
-                              <div class="card">
-                                <div class="card-header">
-                                  Notes
-                                  <i class="bi bi-pencil"></i>
-                                </div>
-                                <div class="card-body event-note text-wrap">{{ event.note|markdown|safe }}</div>
-                              </div>
-                            {% endpartialdef %}
-                          </div>
-                        </div>
-                      {% endif %}
-                      <div class="col-12">
-                        <div class="card">
-                          <div class="card-header d-flex flex-column">
-                            <div class="d-flex justify-content-between w-100">Setlist</div>
-                            <div class="collapse row w-100" id="options">
-                              <div class="col-12 px-0 pt-1">
-                                <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="card-body p-0" id="setlistCard">
-                            <div class="table-responsive" id="mobileTable">
-                              <table class="table table-hover display wrap" id="setlistTable">
-                                <thead>
-                                  <th class="all">#</th>
-                                  <th class="all">Song</th>
-                                </thead>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-    <script>
+        <script>
     $(document).ready(function() {
       var event = "{{ event.id }}";
       var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
@@ -424,6 +426,6 @@
 				],
 			});
 }); {% endcomment %}
-    </script>
-  </body>
+        </script>
+    </body>
 </html>

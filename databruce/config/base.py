@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 
 from django.templatetags.static import static
-from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -222,25 +221,7 @@ UNFOLD = {
   ],
   "SIDEBAR": {
     "show_all_applications": True,  # Ensures non-configured models still show up
-    "navigation": [
-      {
-        "title": "Authentication & Authorization",
-        "separator": True,
-        "items": [
-          {
-            "title": "Users",
-            # CHANGE 'auth' to your actual app label where CustomUser lives!
-            "link": reverse_lazy("admin:databruce_customuser_changelist"),
-            "icon": "person",
-          },
-          {
-            "title": "Groups",
-            "link": reverse_lazy("admin:auth_group_changelist"),
-            "icon": "group",
-          },
-        ],
-      },
-    ],
+    "show_search": True,
   },
 }
 

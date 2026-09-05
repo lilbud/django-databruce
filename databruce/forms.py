@@ -454,7 +454,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["city"])
 
     if data:
-      return models.Cities.objects.get(id=data)
+      return models.City.objects.get(id=data)
 
     return None
 
@@ -463,24 +463,24 @@ class AdvancedEventSearch(forms.Form):
 
     if types:
       # types is always a list of string IDs, e.g. ['4'] or ['4', '1']
-      return models.Types.objects.filter(id__in=types)
+      return models.Type.objects.filter(id__in=types)
 
-    return models.Types.objects.none()  # Return an empty QuerySet if empty
+    return models.Type.objects.none()  # Return an empty QuerySet if empty
 
   def clean_tag(self):
     tags = self.cleaned_data.get("tag")
 
     if tags:
       # types is always a list of string IDs, e.g. ['4'] or ['4', '1']
-      return models.Tags.objects.filter(id__in=tags)
+      return models.Tag.objects.filter(id__in=tags)
 
-    return models.Tags.objects.none()  # Return an empty QuerySet if empty
+    return models.Tag.objects.none()  # Return an empty QuerySet if empty
 
   def clean_state(self):
     data = re.sub(r"\D", "", self.cleaned_data["state"])
 
     if data:
-      return models.States.objects.get(id=self.cleaned_data["state"])
+      return models.State.objects.get(id=self.cleaned_data["state"])
 
     return None
 
@@ -488,7 +488,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["country"])
 
     if data:
-      return models.Countries.objects.get(id=data)
+      return models.Country.objects.get(id=data)
 
     return None
 
@@ -496,7 +496,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["continent"])
 
     if data:
-      return models.Continents.objects.get(id=data)
+      return models.Continent.objects.get(id=data)
 
     return None
 
@@ -504,7 +504,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["venue"])
 
     if data:
-      return models.Venues.objects.get(id=data)
+      return models.Venue.objects.get(id=data)
 
     return None
 
@@ -512,7 +512,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["tour"])
 
     if data:
-      return models.Tours.objects.get(id=data)
+      return models.Tour.objects.get(id=data)
 
     return None
 
@@ -520,7 +520,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["tour_leg"])
 
     if data:
-      return models.TourLegs.objects.get(id=data)
+      return models.TourLeg.objects.get(id=data)
 
     return None
 
@@ -528,7 +528,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["relation"])
 
     if data:
-      return models.Relations.objects.get(id=data)
+      return models.Relation.objects.get(id=data)
 
     return None
 
@@ -536,7 +536,7 @@ class AdvancedEventSearch(forms.Form):
     data = re.sub(r"\D", "", self.cleaned_data["band"])
 
     if data:
-      return models.Bands.objects.get(id=data)
+      return models.Band.objects.get(id=data)
 
     return None
 

@@ -1,0 +1,33 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load i18n %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    <div class="col-12 col-lg-8">
+        <div class="text-2xl text-nowrap mb-3">
+            <a href="{% url 'library:articles' %}">Databruce Article Library</a> &gt; Articles by Collection: {{ collection }}
+        </div>
+        {% if collection.description %}
+            <!-- message cards -->
+            <div class="row my-3 gx-0">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-wrap">
+                                <div class="text-sm text-nowrap fw-medium">Description</div>
+                                <div class="text-sm">{{ collection.description|markdown|safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% for article in page %}
+            {% include "./article_partial.html" with article=article %}
+            {% if not forloop.last %}<hr>{% endif %}
+        {% endfor %}
+        <hr>
+        {% include 'databruce/partials/_pagination.html' %}
+    </div>
+{% endblock content %}

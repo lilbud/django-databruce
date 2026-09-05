@@ -1,132 +1,132 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load static %}
 {% block title %}
-  Band "{{ info.name }}"
+    Band "{{ info.name }}"
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+    <script src="{% static 'databruce/js/eventTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  {% if user.is_superuser %}
-    {% include "databruce/partials/admin_edit_btn.html" with view="bands" item=info.id %}
-  {% endif %}
-  <div class="col-12">
-    <div class="text-2xl text-nowrap mb-3">
-      <a href="{% url 'bands' %}">Bands</a> &gt; {{ info.name }}
-    </div>
-    {% if info.note %}
-      <div class="card mb-3">
-        <div class="card-body text-sm">
-          <div class="text-wrap">
-            <span class="fw-medium">Notes:</span>
-            <div>{{ info.note|markdown|safe }}</div>
-          </div>
-        </div>
-      </div>
+    {% if user.is_superuser %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="band" item=info.id %}
     {% endif %}
-    <div class="card">
-      <div class="card-header">
-        <ul class="nav nav-pills" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active"
-                    id="pills-events-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#events"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-home"
-                    aria-selected="true">
-              Events<span class="badge badge-light rounded-pill text-bg-light"
-      id="event-count-badge">0</span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link"
-                    id="pills-members-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#members"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-profile"
-                    aria-selected="false">
-              Members<span class="badge badge-light rounded-pill text-bg-light"
-      id="member-count-badge">0</span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link"
-                    id="pills-links-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#links"
-                    type="button"
-                    role="tab"
-                    aria-controls="pills-links"
-                    aria-selected="false">Links</button>
-          </li>
-        </ul>
-      </div>
-      <div class="card-body">
-        <div class="tab-content">
-          <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
-          <div id="members" class="tab-pane fade">
-            <div id="tableControls">
-              <!-- Search -->
-              <div class="col">
-                <label for="search" class="pb-1">Search</label>
-                <div class="input-group input-group-sm">
-                  <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                  </span>
-                  <input type="text"
-                         id="search"
-                         class="form-control form-control-sm"
-                         placeholder="Type to search table...">
-                </div>
-              </div>
-              <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <button type="button"
-                        id="sbButton"
-                        data-bs-toggle="modal"
-                        data-bs-target="#sbModal"
-                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-              </div>
-            </div>
-            <div class="row">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="memberTable">
-                  <thead>
-                    <tr>
-                      <th class="all text-center">Events</th>
-                      <th class="all">Name</th>
-                      <th class="all">Instruments</th>
-                      <th class="all">First</th>
-                      <th class="all">Last</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div id="links" class="tab-pane fade">
-            <ul>
-              {% if info.brucebase_url %}
-                <li>
-                  <a target="_blank"
-                     href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
-                </li>
-              {% endif %}
-              {% if info.mbid %}
-                <li>
-                  <a target="_blank" href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
-                </li>
-              {% endif %}
-            </ul>
-          </div>
+    <div class="col-12">
+        <div class="text-2xl text-nowrap mb-3">
+            <a href="{% url 'bands' %}">Bands</a> &gt; {{ info.name }}
         </div>
-      </div>
+        {% if info.note %}
+            <div class="card mb-3">
+                <div class="card-body text-sm">
+                    <div class="text-wrap">
+                        <span class="fw-medium">Notes:</span>
+                        <div>{{ info.note|markdown|safe }}</div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="pills-events-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#events"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-home"
+                                aria-selected="true">
+                            Events<span class="badge badge-light rounded-pill text-bg-light"
+      id="event-count-badge">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="pills-members-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#members"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-profile"
+                                aria-selected="false">
+                            Members<span class="badge badge-light rounded-pill text-bg-light"
+      id="member-count-badge">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="pills-links-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#links"
+                                type="button"
+                                role="tab"
+                                aria-controls="pills-links"
+                                aria-selected="false">Links</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+                    <div id="members" class="tab-pane fade">
+                        <div id="tableControls">
+                            <!-- Search -->
+                            <div class="col">
+                                <label for="search" class="pb-1">Search</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text"
+                                           id="search"
+                                           class="form-control form-control-sm"
+                                           placeholder="Type to search table...">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-auto mt-2 mt-md-0">
+                                <button type="button"
+                                        id="sbButton"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#sbModal"
+                                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-hover display" id="memberTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="all text-center">Events</th>
+                                            <th class="all">Name</th>
+                                            <th class="all">Instruments</th>
+                                            <th class="all">First</th>
+                                            <th class="all">Last</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="links" class="tab-pane fade">
+                        <ul>
+                            {% if info.brucebase_url %}
+                                <li>
+                                    <a target="_blank"
+                                       href="https://brucebase.wikidot.com{{ info.brucebase_url }}">Brucebase</a>
+                                </li>
+                            {% endif %}
+                            {% if info.mbid %}
+                                <li>
+                                    <a target="_blank" href="https://musicbrainz.org/artist/{{ info.mbid }}">Musicbrainz</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script>
+    <script>
     $(document).ready(function () {
       eventTable('/api/v1/events/?artist={{ info.id }}&format=custom');
 
@@ -181,5 +181,5 @@
       tableSearch(table, 'search');
       searchBuilder(table, sb_columns);
     });
-  </script>
+    </script>
 {% endblock content %}
