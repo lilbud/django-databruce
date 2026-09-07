@@ -444,6 +444,10 @@ First public release of the site. Site was locked behind a login and accounts on
   - Most Played Not Seen "count" column is now "Total Plays"
   - Rare Songs "count" is now "Times Seen", and added "Total Plays" column.
 
+- Event Detail Changes:
+  - Setlist Table now hides columns on mobile. Only badges for important attributes are shown.
+  - Moved the add show button and user count to a card on the sidebar. Having it in the header was a PITA with spacing/layout. Used similar layout to WTED Archives.
+
 ## Removed
 
 ## Fixed

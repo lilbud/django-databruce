@@ -558,14 +558,14 @@ class UserRemoveShowView(View):
 
 class UserAddRemoveShowView(View):
   def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-    item = UserAttendedShow.objects.filter(
+    item, created = UserAttendedShow.objects.get_or_create(
       user_id=request.POST["user"],
       event_id=request.POST["event"],
     )
 
     result = {}
 
-    if item:
+    if not created:
       UserAttendedShow.objects.filter(
         user_id=request.POST["user"],
         event_id=request.POST["event"],
@@ -573,11 +573,6 @@ class UserAddRemoveShowView(View):
 
       result["action"] = "removed"
     else:
-      UserAttendedShow.objects.create(
-        user_id=request.user.pk,
-        event_id=request.POST["event"],
-      )
-
       result["action"] = "added"
 
     count = UserAttendedShow.objects.filter(

@@ -1681,7 +1681,6 @@ a[href="https://datatables.net/tn/25"] {
 td.notes {
   text-wrap: wrap !important;
   word-wrap: break-word !important;
-  /* font-family: 'JetBrains Mono', monospace !important; */
   font-weight: 300 !important;
   line-height: 1.2 !important;
 }

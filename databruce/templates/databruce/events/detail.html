@@ -114,63 +114,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex-shrink-1">
-                                {% if user.is_authenticated and event.public %}
-                                    <form method="post" id="userForm">
-                                        <input type="hidden" name="event" value="{{ event.id }}">
-                                        <input type="hidden" name="user" value="{{ user.id }}">
-                                        {% csrf_token %}
-                                        <div class="btn-group input-group input-group-sm attended-btn"
-                                             role="group"
-                                             id="attendedBtnGroup"
-                                             aria-label="Add show to user profile">
-                                            {% spaceless %}
-                                                <button id="addshow"
-                                                        type="submit"
-                                                        name="submit"
-                                                        class="btn btn-sm text-nowrap
-                                                               {% if user_attended %}
-                                                                   btn-primary
-                                                               {% else %}
-                                                                   btn-neutral
-                                                               {% endif %}
-                                                               icon-button">
-                                                    <i class="bi
-                                                              {% if user_attended %}
-                                                                  bi-star-fill
-                                                              {% else %}
-                                                                  bi-star
-                                                              {% endif %}"
-                                                       id="star"></i>
-                                                    <span id="attended">
-                                                        {% if user_attended %}
-                                                            Attended
-                                                        {% else %}
-                                                            Attended?
-                                                        {% endif %}
-                                                    </span>
-                                                </button>
-                                                <span class="d-inline-block"
-                                                      tabindex="0"
-                                                      id="user-list"
-                                                      data-bs-toggle="tooltip"
-                                                      data-bs-placement="top"
-                                                      data-bs-html="true">
-                                                    <button type="button"
-                                                            id="usercount"
-                                                            disabled
-                                                            class="btn rounded-start-0 btn-sm
-                                                                   {% if user_attended %}
-                                                                       btn-primary
-                                                                   {% else %}
-                                                                       btn-neutral
-                                                                   {% endif %}">0</button>
-                                                </span>
-                                            {% endspaceless %}
-                                        </div>
-                                    </form>
-                                {% endif %}
-                            </div>
                         </div>
                     </div>
                     <div class="card-footer py-0 px-1" id="eventInfoFooter">
@@ -301,10 +244,10 @@
                                                         <!-- Added missing tr tag for semantic validation -->
                                                         <th class="song_num">#</th>
                                                         <th class="song">Song</th>
-                                                        <th class="gap">Gap</th>
-                                                        <th class="tour_num">Tour</th>
-                                                        <th class="last_event">Last</th>
-                                                        <th class="notes">Note</th>
+                                                        <th class="gap min-tablet-l">Gap</th>
+                                                        <th class="tour_num min-tablet-l">Tour</th>
+                                                        <th class="last_event min-tablet-l">Last</th>
+                                                        <th class="notes min-desktop">Note</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -378,8 +321,59 @@
                                     </div>
                                 </div>
                             {% endif %}
+                            <div class="col-12 order-3">
+                                <div class="card">
+                                    <div class="card-body px-3 py-0">
+                                        <div class="row gx-2">
+                                            <div class="col py-3">
+                                                <div class="text-xs">Rating</div>
+                                                <div class="text-lg mb-2">0</div>
+                                            </div>
+                                            <span class="vr p-0"></span>
+                                            <div class="col py-3">
+                                                <a type="button"  data-bs-toggle="modal" data-bs-target="#userListModal">
+                                                    <div class="text-xs text-reset">Users Present</div>
+                                                    <div class="text-lg mb-2 fw-medium text-reset"id="userCount">0</div>
+                                                </a>
+                                                {% if user.is_authenticated and event.public %}
+                                                    <form method="post" id="userForm">
+                                                        <input type="hidden" name="event" value="{{ event.id }}">
+                                                        <input type="hidden" name="user" value="{{ user.id }}">
+                                                        {% csrf_token %}
+                                                        <button id="addshow"
+                                                                type="submit"
+                                                                name="submit"
+                                                                class="btn btn-sm text-xs w-100 text-nowrap
+                                                                       {% if user_attended %}
+                                                                           btn-primary
+                                                                       {% else %}
+                                                                           btn-neutral
+                                                                       {% endif %}
+                                                                       icon-button">
+                                                            <i class="bi
+                                                                      {% if user_attended %}
+                                                                          bi-star-fill
+                                                                      {% else %}
+                                                                          bi-star
+                                                                      {% endif %}"
+                                                               id="star"></i>
+                                                            <span id="attended">
+                                                                {% if user_attended %}
+                                                                    Attended
+                                                                {% else %}
+                                                                    Attended?
+                                                                {% endif %}
+                                                            </span>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             {% if setlist_certainty %}
-                                <div class="col-12 col-lg-12 order-3">
+                                <div class="col-12 col-lg-12 order-4">
                                     <div class="card h-100">
                                         <div class="card-header">
                                             Albums
@@ -407,7 +401,7 @@
                                 </div>
                             {% endif %}
                             {% if event.event_tag.all %}
-                                <div class="col-12 col-lg-12 order-4">
+                                <div class="col-12 col-lg-12 order-last">
                                     <div class="card h-100">
                                         <div class="card-header">
                                             <span>Tags</span>
@@ -722,292 +716,322 @@
             </div>
         </div>
     </div>
+    <div class="modal fade"
+         id="userListModal"
+         tabindex="-1"
+         aria-labelledby="userListModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="userListModalLabel">User Attended List</h1>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group" id="userListGroup">
+                        <li class="list-group-item">An item</li>
+                        <li class="list-group-item">A second item</li>
+                        <li class="list-group-item">A third item</li>
+                        <li class="list-group-item">A fourth item</li>
+                        <li class="list-group-item">And a fifth one</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="{% static 'databruce/js/share-card.js' %}"></script>
     <script>
-  var counts = [];
+      var counts = [];
 
-  $(document).ready(async function () {
-    var event = "{{ event.id }}";
-    var event_id = "{{ event.event_id }}";
+      $(document).ready(async function () {
+        var event = "{{ event.id }}";
+        var event_id = "{{ event.event_id }}";
 
-    fetch(`/api/v1/user_attended_shows/?user=&event=${event}&format=json`)
-      .then(response => response.json())
-      .then(data => {
-        const userCount = data.count;
-        const tooltipUsers = data.results.map(item => {
-          return `${item.user.username}`
-        }).join('<br>');
+        await albumBreakdown(`/api/v1/setlist_breakdown/?event={{ event.id }}&format=json&ordering=-song_count`);
 
-        var html = `<small>Users Present:<br><div>${tooltipUsers}</div></small>`;
-
-        $('#user-list').attr('data-bs-title', html);
-        $('#usercount').text(userCount);
-      }).catch(error => console.error('Error:', error));
-
-    await albumBreakdown(`/api/v1/setlist_breakdown/?event={{ event.id }}&format=json&ordering=-song_count`);
-
-    let onstageOptions = {
-      rowGroup: {
-        groupVal: 'band.name'
-      }
-    }
-
-    onstageColumns = [
-      {
-        'data': 'guest',
-        'className': 'text-center',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return $('<i />').addClass('bi bi-check-lg check').prop('outerHTML')
+        let onstageOptions = {
+          rowGroup: {
+            groupVal: 'band.name'
           }
-        },
-      },
-      {
-        'data': 'relation',
-        'className': 'text-nowrap',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return `<a class="text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
-          }
-        },
-      },
-    ]
-    
-    createTable('/api/v1/onstage/?event={{ event.id }}&format=json', onstageColumns, '#onstageTable', onstageOptions);
+        }
 
-    var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
-
-    let setlistOptions = {
-      createdRow: function (row, data) {
-        $(row).attr('data-set-name', slugify(data.set_name));
+        onstageColumns = [
+          {
+            'data': 'guest',
+            'className': 'text-center',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return $('<i />').addClass('bi bi-check-lg check').prop('outerHTML')
+              }
+            },
+          },
+          {
+            'data': 'relation',
+            'className': 'text-nowrap',
+            'render': function (data, type, row, meta) {
+              if (data) {
+                return `<a class="text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
+              }
+            },
+          },
+        ]
         
-        var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+        createTable('/api/v1/onstage/?event={{ event.id }}&format=json', onstageColumns, '#onstageTable', onstageOptions);
 
-        if (allowedSets.includes(data.set_name)) {
-          $(row).attr('data-album', data.song.category_slug);
+        var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
+
+        /* SETLIST TABLE */
+
+        const createBadge = (cls, text, title) =>
+          `<span class="badge ${cls} align-middle ms-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="${title}">${text}</span>`;
+        
+        // Data mapping for binary song flag badges
+        const SONG_BADGES = [
+          { key: 'instrumental', class: 'badge-info', label: 'Inst.', title: 'Instrumental' },
+          { key: 'sign_request', class: 'badge-info', label: 'Sign', title: 'Sign Request' },
+          { key: 'nobruce', class: 'badge-warning', label: 'No Boss', title: 'Song Played Without Bruce' },
+          { key: 'debut', class: 'badge-primary', label: 'Tour Debut', title: 'Tour Debut' },
+          { key: 'premiere', class: 'badge-secondary', label: 'First', title: 'First Time Played' },
+        ];
+
+        function getTourPositionBadge(row) {
+          const { tour_num: num, tour_total: total } = row;
+
+          if (num && total && num === total) {
+            return total === 1
+              ? createBadge('badge-secondary', 'Tour Only', 'Only Tour Performance')
+              : createBadge('badge-warning', `Tour Final`, `Final Tour Performance<br>(${num}/${total})`);
+          }
+          return null;
+        }
+        
+        let setlistOptions = {
+          createdRow: function (row, data) {
+            $(row).attr('data-set-name', slugify(data.set_name));
+            
+            var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+
+            if (allowedSets.includes(data.set_name)) {
+              $(row).attr('data-album', data.song.category_slug);
+            }
+
+            return row
+          },
+          rowGroup: {
+            groupVal: 'set_name'
+          }
         }
 
-        return row
-      },
-      rowGroup: {
-        groupVal: 'set_name'
-      }
-    }
+        let setlistColumns = [
+          {
+            'data': 'song_num',
+            'className': 'text-center',
+            'width': '',
+            'render': (data) => data ?? '',
+            'createdCell': (td, cellData, rowData) => {
+              $(td).addClass('songnum');
 
-    let setlistColumns = [
-      {
-        'data': 'song_num',
-        'className': 'text-center',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return data
-          }
-          
-          return ''
-        },
-        'createdCell': function (td, cellData, rowData, row, col) {
-          $(td).addClass('songnum');
+              if (rowData.position) {
+                var position = slugify(rowData.position);
+                $(td)
+                .addClass(`${position} position`)
+                .attr({
+                  'data-bs-toggle': 'tooltip',
+                  'data-bs-title': rowData.position,
+                  'data-bs-html': true
+                });
+              }
 
-          if (rowData.position) {
-            var position = slugify(rowData.position);
-            $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
-          }
+              return td;
+            },
+          },
+          {
+            'data': 'song',
+            'className': 'text-nowrap',
+            'width': '',
+            'render': function (data, type, row, meta) {
+              const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+              const segue = row.segue ? ' <span class="segue"></span>' : '';
 
-          return td;
-        },
-      },
-      {
-        'data': 'song',
-        'className': 'text-nowrap',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
-          var segue = row.segue ? `<span class="segue"></span>` : '';
+              const activeBadges = SONG_BADGES
+                .filter(b => row[b.key])
+                .map(b => createBadge(b.class, b.label, b.title))
 
-          song = `${song} ${segue}`;
+              const tourBadge = getTourPositionBadge(row);
+              let bustBadge = ''
 
-          var badges = $('<span />');
-          var baseBadge = `<span class="badge" data-bs-toggle="tooltip" data-bs-html="true"></span>`
+              if (row.gap >= 50 && !row.debut) {
+                const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
+              }
 
-          if (row.instrumental) {
-            var badge = $(baseBadge).clone();
-            $(badge).addClass('badge-info').text('Inst.').attr('data-bs-title', 'Instrumental');
-            badges.append($(badge).prop('outerHTML'));
-          }
+              // Combine all active badges into one list, filtering out nulls
+              const allBadges = [
+                ...activeBadges,
+                bustBadge,
+                tourBadge
+              ].filter(Boolean).join('');
 
-          if (row.sign_request) {
-            var badge = $(baseBadge).clone();
-            $(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
-            $(badges).append($(badge).prop('outerHTML'));
-          }
+              const badgeContainer = allBadges ? `<span class="ms-1 d-block d-md-none">${allBadges}</span>` : '';
 
-          if (row.nobruce) {
-            var badge = $(baseBadge).clone();
-            $(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
-            $(badges).append($(badge).prop('outerHTML'));
-          }
+              return `
+                <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">
+                  ${songLink}${segue}
+                  ${badgeContainer}
+                </div>
+              `;
+            }
+          },
+          {
+            'data': 'gap',
+            'className': 'text-center text-nowrap min-tablet-l',
+            'width': '',
+            'render': (data, type, row) => {
+              const { gap, debut, premiere } = row;
+              const validGap = gap === 0 ? null : gap;
 
-          return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
-        }
-      },
-      {
-        'data': 'gap',
-        'className': 'text-center text-nowrap',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', true);
-          var gap = ''
+              if (validGap >= 50 && !debut) {
+                return createBadge('badge-primary', `${validGap} Bustout`, '≥50 shows on current tour since last played');
+              }
+              if (premiere) {
+                return createBadge('badge-secondary', 'First', 'FTP');
+              }
+              if (debut) {
+                const label = validGap ? `${validGap} TD` : 'TD';
+                return createBadge('badge-primary', label, 'Tour Debut');
+              }
 
-          if (row.gap === 0) {
-            gap = null
-          } else {
-            gap = row.gap
-          }
+              return validGap ?? '';
+            }
+          },
+          {
+            'data': 'tour_num',
+            'className': 'text-center min-tablet-l',
+            'width': '',
+            'render': (data, type, row) => {
+              const { tour_num: num, tour_total: total } = row;
 
-          var debut = row.debut;
-          var premiere = row.premiere;
+              if (!num || !total) return '';
 
-          if (gap >= 50 && !debut) {
-            $(badge).addClass('badge-primary').text(`${gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
-            return $(badge).prop('outerHTML');
-          } else if (premiere) {
-            $(badge).addClass('badge-secondary').text(`First`).attr('data-bs-title', 'FTP');
-            return $(badge).prop('outerHTML');
-          } else if (debut && !premiere && gap) {
-            $(badge).addClass('badge-primary').text(`${gap}, TD`).attr('data-bs-title', 'Tour Debut');
-            return $(badge).prop('outerHTML');
-          } else if (debut && !premiere && !gap) {
-            $(badge).addClass('badge-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
-            return $(badge).prop('outerHTML');
-          } else {
-            return gap;
-          }
-        }
-      },
-      {
-        'data': 'tour_num',
-        'className': 'text-center',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          var num = row.tour_num;
-          var total = row.tour_total;
+              if (num === total) {
+                return total === 1
+                  ? createBadge('badge-secondary', 'Only', 'Only Tour Performance')
+                  : createBadge('badge-warning', `${num}/${total}`, `Final Tour Performance<br>(${num}/${total})`);
+              }
 
-          var badge = $('<span />').addClass('badge align-middle').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', true);
+              return `${num}/${total}`;
+            }
+          },
+          {
+            'data': 'last_event',
+            'className': 'text-center min-tablet-l',
+            'width': '',
+            'render': (data) => data ? `<a class="text-reset" href="/events/${data.event_id}">${data.date}</a>` : ''
+          },
+          {
+            'data': 'notes',
+            'className': 'min-desktop',
+            'render': (data, type, row) => {
+              if (row.notes?.length) {
+                const cleanedNotes = row.notes.join('; ').replace(/''/g, "'");
+                return `<span class="setlist-note">${cleanedNotes}</span>`;
+              }
+              return '';
+            }
+          },
+        ]
 
-          if (num == total && total == 1) {
-            $(badge).addClass('badge-secondary').text('Only').attr('data-bs-title', 'Only Tour Performance');
-            return $(badge).prop('outerHTML');
-          } else if (num == total && total > 1) {
-            $(badge).addClass('badge-warning').text(`${num}/${total}`).attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
-            return $(badge).prop('outerHTML');
-          } else if (num && total) {
-            return `${num}/${total}`
-          } else {
-            return null
-          }
-        }
-      },
-      {
-        'data': 'last_event',
-        'className': 'text-center',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return `<a class="text-reset" href="/events/${data.event_id}">${data.date}</a>`;
-          }
+        createTable(url, setlistColumns, '#setlistTable', setlistOptions);
 
-          return ''
-        }
-      },
-      {
-        'data': 'notes',
-        'className': '',
-        'render': function (data, type, row, meta) {
-          if (row.notes) {
-            return `<span class="setlist-note">${row.notes.join('; ').replaceAll("''", "'")}</span>`
-          }
+        $('#copySetlist').click(function () {
+          var btn = this;
+          var lines = [];
 
-          return ''
-        }
-      },
-    ]
+          // 1. Select all table rows where data-set-name is exactly "Show"
+          $('table td.song').each(function() {
+            var song = $(this).find('a').text().trim();
+            var segue = $(this).find('span.segue');
+            var line = segue.length > 0 ? `${song} >` : song;
 
-    createTable(url, setlistColumns, '#setlistTable', setlistOptions);
-
-    $('#copySetlist').click(function () {
-      var btn = this;
-      var lines = [];
-
-      // 1. Select all table rows where data-set-name is exactly "Show"
-      $('table td.song').each(function() {
-        var song = $(this).find('a').text().trim();
-        var segue = $(this).find('span.segue');
-        var line = segue.length > 0 ? `${song} >` : song;
-
-        lines.push(line);
-      });
-
-      var textToCopy = lines.join('\n');
-
-      if (textToCopy) {
-        navigator.clipboard.writeText(textToCopy)
-          .then(function() {
-            console.log('List copied to clipboard!'); // Optional success feedback
-          })
-          .catch(function(err) {
-            console.error('Failed to copy text: ', err);
+            lines.push(line);
           });
-      } else {
-        alert('No setlist found to copy.');
-      }
 
-      $(this).text('Setlist Copied').removeClass('btn-primary').addClass('btn-success');
+          var textToCopy = lines.join('\n');
 
-      setTimeout(function () {
-        $(btn).removeClass('btn-success').addClass('btn-primary');
-        $(btn).text('Copy Setlist');
-      }, 3000);
-    });
+          if (textToCopy) {
+            navigator.clipboard.writeText(textToCopy)
+              .then(function() {
+                console.log('List copied to clipboard!'); // Optional success feedback
+              })
+              .catch(function(err) {
+                console.error('Failed to copy text: ', err);
+              });
+          } else {
+            alert('No setlist found to copy.');
+          }
 
-    $('#userForm').submit(async function (e) {
-      e.preventDefault();
-      const formData = new FormData(this); 
+          $(this).text('Setlist Copied').removeClass('btn-primary').addClass('btn-success');
 
-      try {
-        const response = await fetch("{% url 'add_show' %}", {
-          method: 'POST',
-          body: FormData
+          setTimeout(function () {
+            $(btn).removeClass('btn-success').addClass('btn-primary');
+            $(btn).text('Copy Setlist');
+          }, 3000);
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        fetch(`/api/v1/user_attended_shows/?user=&event=${event}&format=json`)
+          .then(response => response.json())
+          .then(data => {
+            $('#userCount').text(data.count);
 
-        const data = await response.json(); // Parses the JSON response body
+            const userList = data.results.map(item => {
+              return `<li class="list-group-item">${item.user.username}</li>`
+            }).join('<br>');
 
-        $("#usercount").text(data['count']);
-        
-        const isAdded = data['action'] === 'added';
+            $('#userListGroup').html(userList)
 
-        $("#star").toggleClass('bi-star-fill', isAdded).toggleClass('bi-star', !isAdded);
-        $("#addshow, #usercount").toggleClass('btn-primary', isAdded).toggleClass('btn-neutral', !isAdded);
 
-        $("#attended").text(isAdded ? 'Attended' : 'Attended?');
+          }).catch(error => console.error('Error:', error));
 
-      } catch (error) {
-        console.error('Error during POST request:', error);
-      }
-    });
+        $('#userForm').submit(async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
 
-    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+          try {
+            const response = await fetch("{% url 'add_show' %}", {
+              method: 'POST',
+              body: formData,
+            });
 
-    initializeShareCardGenerator({
-        buttonId: 'download-btn',
-        ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
-        downloadFilename: `databruce_${event_id}`,
-        activeTheme: currentTheme,
-    });
-  });
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json(); // Parses the JSON response body
+
+            $("#userCount").text(data['count']);
+            
+            const isAdded = data['action'] === 'added';
+
+            $("#star").toggleClass('bi-star-fill', isAdded).toggleClass('bi-star', !isAdded);
+            $("#addshow").toggleClass('btn-primary', isAdded).toggleClass('btn-neutral', !isAdded);
+
+            $("#attended").text(isAdded ? 'Attended' : 'Attended?');
+
+          } catch (error) {
+            console.error('Error during POST request:', error);
+          }
+        });
+
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+
+        initializeShareCardGenerator({
+            buttonId: 'download-btn',
+            ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
+            downloadFilename: `databruce_${event_id}`,
+            activeTheme: currentTheme,
+        });
+      });
     </script>
 {% endblock content %}

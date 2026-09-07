@@ -671,13 +671,13 @@
   border-radius: 0.25rem !important;
 }
 
-button#addshow {
+/* button#addshow {
   border-radius: 0.25rem 0 0 0.25rem !important;
 }
 
 button#usercount {
   border-radius: 0 0.25rem 0.25rem 0 !important;
-}
+} */
 
 .modal-title {
   color: var(--text-color-default) !important;
