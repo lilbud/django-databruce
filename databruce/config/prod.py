@@ -24,15 +24,15 @@ load_dotenv()
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    "142.93.200.133",
-    "databruce.com",
-    "www.databruce.com",
-    "localhost",
-    "127.0.0.1",
+  "142.93.200.133",
+  "databruce.com",
+  "www.databruce.com",
+  "localhost",
+  "127.0.0.1",
 ]
 
 INTERNAL_IPS = [
-    "127.0.0.1",
+  "127.0.0.1",
 ]
 
 SECURE_SSL_REDIRECT = True
@@ -44,92 +44,107 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
+  "version": 1,
+  "disable_existing_loggers": False,
+  "formatters": {
+    "verbose": {
+      "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+      "style": "{",
     },
-    "root": {
-        "handlers": ["access", "error"],
-        "level": "INFO",
+  },
+  "filters": {
+    # Ensures you don't get spammed with emails during local development (DEBUG=True)
+    "require_debug_false": {
+      "()": "django.utils.log.RequireDebugFalse",
     },
-    "handlers": {
-        "access": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/var/log/django/access.log",
-            "maxBytes": 1024 * 1024 * 5,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-        "error": {
-            "level": "ERROR",
-            "class": "logging.handlers.RotatingFileHandler",
-            "maxBytes": 1024 * 1024 * 5,
-            "backupCount": 5,
-            "filename": "/var/log/django/error.log",
-            "formatter": "verbose",
-        },
+  },
+  "root": {
+    # Added mail_admins to catch all unexpected errors globally
+    "handlers": ["access", "error", "mail_admins"],
+    "level": "INFO",
+  },
+  "handlers": {
+    "access": {
+      "level": "INFO",
+      "class": "logging.handlers.RotatingFileHandler",
+      "filename": "/var/log/django/access.log",
+      "maxBytes": 1024 * 1024 * 5,
+      "backupCount": 5,
+      "formatter": "verbose",
     },
-    "loggers": {
-        "django": {
-            "handlers": ["access"],
-            "level": "INFO",
-            "propagate": True,
-        },
+    "error": {
+      "level": "ERROR",
+      "class": "logging.handlers.RotatingFileHandler",
+      "maxBytes": 1024 * 1024 * 5,
+      "backupCount": 5,
+      "filename": "/var/log/django/error.log",
+      "formatter": "verbose",
     },
+    # New Admin Email Handler
+    "mail_admins": {
+      "level": "ERROR",
+      "filters": ["require_debug_false"],
+      "class": "django.utils.log.AdminEmailHandler",
+      "include_html": True,  # Sends a rich, readable HTML traceback snippet
+    },
+  },
+  "loggers": {
+    "django": {
+      # Added mail_admins here to catch Django-specific core/request errors
+      "handlers": ["access", "mail_admins"],
+      "level": "INFO",
+      "propagate": True,
+    },
+  },
 }
 
 sentry_sdk.init(
-    dsn=os.getenv("SENTRY_DSN"),
-    send_default_pii=True,
-    traces_sample_rate=1.0,
+  dsn=os.getenv("SENTRY_DSN"),
+  send_default_pii=True,
+  traces_sample_rate=1.0,
 )
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": os.getenv("DATABASE_NAME"),
-    #     "USER": os.getenv("DATABASE_USER"),
-    #     "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-    #     "HOST": "localhost",
-    #     "PORT": "",
-    #     "CONN_MAX_AGE": 60,
-    #     "CONN_HEALTH_CHECKS": True,
-    #     "OPTIONS": {
-    #         "options": "-c search_path=public,extensions",
-    #     },
-    # },
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("SUPABASE_POOL_DATABASE"),
-        "USER": os.getenv("SUPABASE_POOL_USER"),
-        "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
-        "HOST": os.getenv("SUPABASE_POOL_HOST"),
-        "PORT": os.getenv("SUPABASE_POOL_PORT"),
-        "OPTIONS": {
-            "options": "-c search_path=public,extensions",
-            "pool": True,
-        },
+  # "default": {
+  #     "ENGINE": "django.db.backends.postgresql",
+  #     "NAME": os.getenv("DATABASE_NAME"),
+  #     "USER": os.getenv("DATABASE_USER"),
+  #     "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+  #     "HOST": "localhost",
+  #     "PORT": "",
+  #     "CONN_MAX_AGE": 60,
+  #     "CONN_HEALTH_CHECKS": True,
+  #     "OPTIONS": {
+  #         "options": "-c search_path=public,extensions",
+  #     },
+  # },
+  "default": {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": os.getenv("SUPABASE_POOL_DATABASE"),
+    "USER": os.getenv("SUPABASE_POOL_USER"),
+    "PASSWORD": os.getenv("SUPABASE_PASSWORD"),
+    "HOST": os.getenv("SUPABASE_POOL_HOST"),
+    "PORT": os.getenv("SUPABASE_POOL_PORT"),
+    "OPTIONS": {
+      "options": "-c search_path=public,extensions",
+      "pool": True,
     },
+  },
 }
 
 encoded_pass = os.getenv("REDIS_PW")
 
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{quote_plus(str(encoded_pass))}@127.0.0.1:6379/0",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+  "default": {
+    "BACKEND": "django_redis.cache.RedisCache",
+    "LOCATION": f"redis://:{quote_plus(str(encoded_pass))}@127.0.0.1:6379/0",
+    "OPTIONS": {
+      "CLIENT_CLASS": "django_redis.client.DefaultClient",
     },
+  },
 }
 
 # Session storage

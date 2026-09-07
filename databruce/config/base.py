@@ -201,7 +201,12 @@ ANYMAIL = {
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
+SERVER_EMAIL = os.getenv("MAILGUN_EMAIL")
 NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL")
+
+ADMINS = [
+  ("Brian", NOTIFY_EMAIL),
+]
 
 STATICFILES_FINDERS = [
   "django.contrib.staticfiles.finders.FileSystemFinder",
