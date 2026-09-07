@@ -49,69 +49,64 @@
             <div class="col">
                 <div class="card">
                     <div class="card-body" id="eventHeader">
-                        <div class="d-flex flex-wrap">
-                            <div class="flex-grow-1 w-80">
-                                {% if event.title %}
-                                    <div class="row mb-1">
-                                        <div class="col">
-                                            <div id="title" class="text-wrap text-xs fw-light">
-                                                <span class="mb-0">{{ event.title }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                <div class="row mb-3">
-                                    <div class="col">
-                                        <div class="row">
-                                            <div class="text-wrap fw-semibold event-header-date">
-                                                <span class="text-primary" id="date">{{ event.get_date }}</span>
-                                                <a class="text-reset"
-                                                   href="{% url 'band_details' id=event.artist.uuid %}"
-                                                   id="artist">{{ event.artist }}</a>
-                                                {% comment %} [{{ event.id }}] {% endcomment %}
-                                                {% for t in event.type.all %}
-                                                    {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
-                                                        <span class="text-lg text-danger">[{{ t.name }}]</span>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                        <div class="row text-sm text-reset">
-                                            <div class="col event-header-venue">
-                                                {% if event.venue %}
-                                                    <a class="text-reset fw-semibold"
-                                                       href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
-                                                    {% if event.venue.city %}
-                                                        <div class="fw-light">
-                                                            <a class="fw-light text-reset"
-                                                               href="{% url "city_details" id=event.venue.city.uuid %}">{{ event.venue.city }}</a>
-                                                        </div>
-                                                    {% endif %}
-                                                {% else %}
-                                                    <span class="fw-semibold">Unknown Venue</span>
-                                                {% endif %}
-                                            </div>
-                                        </div>
+                        {% if event.title %}
+                            <div class="row mb-1">
+                                <div class="col">
+                                    <div id="title" class="text-wrap text-xs fw-light">
+                                        <span class="mb-0">{{ event.title }}</span>
                                     </div>
                                 </div>
-                                <div class="row mb-0">
-                                    <div class="col-auto">
-                                        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
-                                             id="badge-row">
-                                            {% if event.event_type.length > 0 %}
-                                                <a href="{% url 'events_by_type' slug=event.event_type.type.slug %}"><span class="badge badge-primary">Type: {{ event.event_type.type.name }}</span></a>
+                            </div>
+                        {% endif %}
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="text-wrap fw-semibold event-header-date">
+                                        <span class="text-primary" id="date">{{ event.get_date }}</span>
+                                        <a class="text-reset"
+                                           href="{% url 'band_details' id=event.artist.uuid %}"
+                                           id="artist">{{ event.artist }}</a>
+                                        {% for t in event.type.all %}
+                                            {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
+                                                <span class="text-lg text-danger">[{{ t.name }}]</span>
                                             {% endif %}
-                                            {% if event.tour %}
-                                                <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>
-                                            {% endif %}
-                                            {% if event.leg %}
-                                                <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge badge-primary">Tour Leg: {{ event.leg.name }}</span></a>
-                                            {% endif %}
-                                            {% if event.run %}
-                                                <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge badge-primary">Run: {{ event.run.name }}</span></a>
-                                            {% endif %}
-                                        </div>
+                                        {% endfor %}
                                     </div>
+                                </div>
+                                <div class="row text-sm text-reset">
+                                    <div class="col event-header-venue">
+                                        {% if event.venue %}
+                                            <a class="text-reset fw-semibold"
+                                               href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
+                                            {% if event.venue.city %}
+                                                <div class="fw-light">
+                                                    <a class="fw-light text-reset"
+                                                       href="{% url "city_details" id=event.venue.city.uuid %}">{{ event.venue.city }}</a>
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="fw-semibold">Unknown Venue</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-0">
+                            <div class="col-auto">
+                                <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+                                     id="badge-row">
+                                    {% if event.event_type.length > 0 %}
+                                        <a href="{% url 'events_by_type' slug=event.event_type.type.slug %}"><span class="badge badge-primary">Type: {{ event.event_type.type.name }}</span></a>
+                                    {% endif %}
+                                    {% if event.tour %}
+                                        <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>
+                                    {% endif %}
+                                    {% if event.leg %}
+                                        <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge badge-primary">Tour Leg: {{ event.leg.name }}</span></a>
+                                    {% endif %}
+                                    {% if event.run %}
+                                        <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge badge-primary">Run: {{ event.run.name }}</span></a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

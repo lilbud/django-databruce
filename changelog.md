@@ -435,6 +435,7 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Added
 
 - Added article tab to event detail page, also displays count of articles. This tab is hidden if no articles available for event.
+- Event search can be opened by pressing CTRL/CMD + K, much like how search works on other sites like Bootstrap.
 
 ## Changed
 
@@ -447,6 +448,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Event Detail Changes:
   - Setlist Table now hides columns on mobile. Only badges for important attributes are shown.
   - Moved the add show button and user count to a card on the sidebar. Having it in the header was a PITA with spacing/layout. Used similar layout to WTED Archives.
+  - Header now no longer needs flex-grow/shrink, removed these wrapping divs
 
 ## Removed
 
