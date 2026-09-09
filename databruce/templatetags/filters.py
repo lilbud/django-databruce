@@ -63,10 +63,14 @@ def format_fuzzy(value):
 
 @register.filter
 def currency(value):
-  if value == int(value):
-    return f"${value:,.0f}"
+  try:
+    if value == int(value):
+      return f"${value:,.0f}"
 
-  return f"${value:,.2f}"
+  except (TypeError, ValueError):
+    return value
+  else:
+    return f"${value:,.2f}"
 
 
 @register.filter(name="markdown_safe")
