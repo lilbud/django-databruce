@@ -1782,7 +1782,10 @@ class Lyric(BaseModel):
   text = models.CharField(db_column="lyrics", blank=True, default=None, max_length=255)
 
   language = models.CharField(
-    blank=True, default=None, max_length=255, choices=Langauge.choices
+    blank=True,
+    default=None,
+    max_length=255,
+    choices=Langauge.choices,
   )
   note = models.CharField(blank=True, default=None, max_length=255)
   translator = models.CharField(blank=True, default=None, max_length=255)
@@ -2185,3 +2188,34 @@ class ItemInsertLog(models.Model):
 
   def __str__(self) -> str:
     return f"{self.message} (ID: {self.source_id})"
+
+
+class UserShowReview(BaseModel):
+  id = models.AutoField(primary_key=True)
+
+  user = models.ForeignKey(
+    to=CustomUser,
+    on_delete=models.CASCADE,
+    related_name="user_reviews",
+  )
+
+  content = models.TextField(blank=True, default=None)
+
+  event = models.ForeignKey(
+    to=Event,
+    on_delete=models.CASCADE,
+    related_name="event_reviews",
+  )
+
+  uuid = models.UUIDField(default=uuid4, editable=False)
+  rating = models.IntegerField(default=0, max_length=1)
+
+  class Meta:
+    managed = True
+    verbose_name = "User Show Review"
+    verbose_name_plural = "User Show Reviews"
+    db_table = "user_show_review"
+    unique_together = ("user", "event")
+
+  def __str__(self) -> str:
+    return f"{self.event} - {self.user}"

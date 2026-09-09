@@ -380,7 +380,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Update short url creation
 - Change adv search path on home page "On This Day" card
 
-# v1.20 (September 4, 2026)
+# v1.20 (September 8, 2026)
 
 ## Added
 
@@ -396,6 +396,9 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added "Bruceyversion" song version submission and voting
 - Added "Latest Show" card to home page
 - Added language and excerpt to articles
+- Added article tab to event detail page, also displays count of articles. This tab is hidden if no articles available for event.
+- Event search can be opened by pressing CTRL/CMD + K, much like how search works on other sites like Bootstrap.
+- Added Event reviews/ratings
 
 ## Changed
 
@@ -413,6 +416,16 @@ First public release of the site. Site was locked behind a login and accounts on
 - Articles now have a "language" column
 - All articles in library now have Category set
 - Added library collection page
+- Updated all nav-link sections to be consistent in style
+- Changed how forms handle user info
+- User Profile Table updates:
+  - Songs Seen "count" column is now "Times Seen"
+  - Most Played Not Seen "count" column is now "Total Plays"
+  - Rare Songs "count" is now "Times Seen", and added "Total Plays" column.
+- Event Detail Changes:
+  - Setlist Table now hides columns on mobile. Only badges for important attributes are shown.
+  - Moved the add show button and user count to a card on the sidebar. Having it in the header was a PITA with spacing/layout. Used similar layout to WTED Archives.
+  - Header now no longer needs flex-grow/shrink, removed these wrapping divs
 
 ## Removed
 
@@ -429,30 +442,6 @@ First public release of the site. Site was locked behind a login and accounts on
   - Entry submission and comments now capped at 5000 chars
   - Page/Open Graph description now shows a truncated entry instead of none
   - Entry list votes counter updated to show entry votes instead of user votes
-
-# v1.20.1 (September 5, 2026)
-
-## Added
-
-- Added article tab to event detail page, also displays count of articles. This tab is hidden if no articles available for event.
-- Event search can be opened by pressing CTRL/CMD + K, much like how search works on other sites like Bootstrap.
-
-## Changed
-
-- Updated all nav-link sections to be consistent in style
-- User Profile Table updates:
-  - Songs Seen "count" column is now "Times Seen"
-  - Most Played Not Seen "count" column is now "Total Plays"
-  - Rare Songs "count" is now "Times Seen", and added "Total Plays" column.
-
-- Event Detail Changes:
-  - Setlist Table now hides columns on mobile. Only badges for important attributes are shown.
-  - Moved the add show button and user count to a card on the sidebar. Having it in the header was a PITA with spacing/layout. Used similar layout to WTED Archives.
-  - Header now no longer needs flex-grow/shrink, removed these wrapping divs
-
-## Removed
-
-## Fixed
-
 - Fixed issue with Relation Detail not loading if relation has no bands
 - Signup page had no opengraph description
+- Fixed advanced_search issue where start_date would cause an error

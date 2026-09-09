@@ -79,59 +79,37 @@ function initializeShareCardGenerator(config) {
             'className': 'text-wrap',
             'width': '',
             'render': function (data, type, row, meta) {
-              var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
-              var segue = row.segue ? `<span class="segue-mobile"></span>` : '';
+              const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+              const segue = row.segue ? ' <span class="segue"></span>' : '';
 
-              song = `${song} ${segue}`;
+              const activeBadges = SONG_BADGES
+                .filter(b => row[b.key])
+                .map(b => createBadge(b.class, b.label, b.title))
 
-              var badges = $('<span />');
-              var baseBadge = `<span class="badge ms-1" data-bs-toggle="tooltip" data-bs-html="true"></span>`
+              const tourBadge = getTourPositionBadge(row);
+              let bustBadge = ''
 
-              if (row.instrumental) {
-                var badge = $(baseBadge).clone();
-                $(badge).addClass('badge-info').text('Instrumental');
-                badges.append($(badge).prop('outerHTML'));
+              if (row.gap >= 50 && !row.debut) {
+                const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
               }
 
-              if (row.sign_request) {
-                var badge = $(baseBadge).clone();
-                $(badge).addClass('badge-info').text('Sign Request');
-                $(badges).append($(badge).prop('outerHTML'));
-              }
+              // Combine all active badges into one list, filtering out nulls
+              const allBadges = [
+                ...activeBadges,
+                bustBadge,
+                tourBadge
+              ].filter(Boolean).join('');
 
-              if (row.nobruce) {
-                var badge = $(baseBadge).clone();
-                $(badge).addClass('badge-warning').text('No Boss');
-                $(badges).append($(badge).prop('outerHTML'));
-              }
+              const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
+              const notes = row.notes ? `<span class="text-wrap fw-light setlist-note">${row.notes}</span>` : '';
 
-              if (row.last == 0) {
-                gap = null;
-              } else {
-                gap = row.last;
-              }
-
-              var debut = row.debut;
-              var premiere = row.premiere;
-
-              if (premiere) {
-                var badge = $(baseBadge).clone();
-                $(badge).addClass('badge-secondary').text(`First`);
-                $(badges).append($(badge).prop('outerHTML'));
-              }
-
-              if (debut) {
-                var badge = $(baseBadge).clone();
-                $(badge).addClass('badge-primary').text(`Tour Debut`);
-                $(badges).append($(badge).prop('outerHTML'));
-              }
-
-              if (row.notes) {
-                var notes = `<span class="text-wrap d-inline-block fw-light setlist-note">${row.notes}</span>`;
-                return badges ? song + $(badges).prop('outerHTML') + '<br>' + notes : song;
-              }
-
-              return badges ? song + $(badges).prop('outerHTML') : song;
+              return `
+                <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">
+                  ${songLink}${segue}
+                  ${badgeContainer}
+                </div>
+                ${notes}
+              `;
             }
           },
         ]
@@ -157,7 +135,7 @@ function initializeShareCardGenerator(config) {
 
         if (logoBrandLink) {
           // Wipe out Bootstrap float, margins, padding, and flex properties
-          logoBrandLink.className = '';
+          // logoBrandLink.className = '';
 
           // Force an explicit, centered block layout framework
           logoBrandLink.style.display = 'block';

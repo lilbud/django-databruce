@@ -16,14 +16,13 @@ from django.contrib.auth.tokens import (
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.expressions import ArraySubquery
-from django.contrib.postgres.search import SearchRank, SearchVector
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import send_mail
 from django.db.models import (
+  Avg,
   Count,
   Exists,
-  F,
   Min,
   OuterRef,
   Q,
@@ -56,6 +55,7 @@ from .forms import (
   SetlistSearch,
   UpdateUserForm,
   UserForm,
+  UserReviewForm,
 )
 from .mixins import PageTitleMixin
 from .models import (
@@ -80,6 +80,7 @@ from .models import (
   TourLeg,
   Type,
   UserAttendedShow,
+  UserShowReview,
   Venue,
   VenueAlias,
 )
@@ -102,32 +103,6 @@ class RadioView(TemplateView):
 
   def get_context_data(self, **kwargs) -> dict[str, Any]:
     return super().get_context_data(**kwargs)
-
-
-def event_search(request):
-  query = request.GET.get("q", "")
-
-  results = (
-    Event.objects.select_related("artist", "venue")
-    .annotate(
-      search=SearchVector("event_id", weight="A")
-      + SearchVector("date", weight="B")
-      + SearchVector("early_late", weight="B")
-      + SearchVector("artist__name", weight="C")
-      + SearchVector("venue__name", weight="D"),
-    )
-    .filter(search=query)
-    .annotate(rank=SearchRank(F("search"), query))
-    .values()
-  )
-
-  return JsonResponse(
-    {
-      "results": list(results)[:10],
-      "query": query,
-    },
-    safe=False,
-  )
 
 
 class IndexView(PageTitleMixin, TemplateView):
@@ -544,52 +519,74 @@ class SignUpDoneView(PageTitleMixin, TemplateView):
   title = "Sign Up Complete"
 
 
-class UserRemoveShowView(View):
+class UserAddShowView(LoginRequiredMixin, View):
   def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    event_id = kwargs["event_id"]
+
+    # Securely fetch the user ID from the active authenticated session
+    UserAttendedShow.objects.get_or_create(
+      user_id=request.user.id,
+      event_id=event_id,
+    )
+
+    count = UserAttendedShow.objects.filter(event_id=event_id).count()
+
+    return JsonResponse({"action": "added", "count": count})
+
+
+class UserRemoveShowView(LoginRequiredMixin, View):
+  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
+    event_id = kwargs["event_id"]
+
+    # Securely filter by the authenticated user's ID
     UserAttendedShow.objects.filter(
-      user_id=request.user.pk,
-      event_id=request.POST["event"],
+      user_id=request.user.id,
+      event_id=event_id,
     ).delete()
 
-    return redirect(
-      request.headers.get("referer", "redirect_if_referer_not_found"),
-    )
+    count = UserAttendedShow.objects.filter(event_id=event_id).count()
+
+    return JsonResponse({"action": "removed", "count": count})
 
 
-class UserAddRemoveShowView(View):
-  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-    item, created = UserAttendedShow.objects.get_or_create(
-      user_id=request.POST["user"],
-      event_id=request.POST["event"],
-    )
-
+class UserAddReviewView(View):
+  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
+    form = UserReviewForm(request.POST)
     result = {}
 
-    if not created:
-      UserAttendedShow.objects.filter(
-        user_id=request.POST["user"],
-        event_id=request.POST["event"],
-      ).delete()
+    if form.is_valid():
+      review, created = UserShowReview.objects.update_or_create(
+        user_id=request.user.id,  # type: ignore
+        event_id=self.kwargs["event_id"],
+        defaults=form.cleaned_data,
+      )
 
-      result["action"] = "removed"
-    else:
-      result["action"] = "added"
+      count = UserShowReview.objects.filter(event_id=self.kwargs["event_id"]).count()
 
-    count = UserAttendedShow.objects.filter(
-      event_id=request.POST["event"],
-    ).count()
+      result["success"] = True
+      result["count"] = count
+      result["action"] = "created" if created else "updated"
 
-    result["count"] = count
+      return JsonResponse(result)
 
-    return JsonResponse(result)
+    return JsonResponse(
+      {
+        "action": "error",
+        "errors": form.errors,
+      },
+      status=400,
+    )
 
 
 class EventDetailView(PageTitleMixin, TemplateView):
   template_name = "databruce/events/detail.html"
   description = "Event Detail"
+  ReviewForm = UserReviewForm
 
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
+    context["review_form"] = self.ReviewForm()
+    user = self.request.user
 
     context["event"] = get_object_or_404(
       Event.objects.select_related(
@@ -606,6 +603,8 @@ class EventDetailView(PageTitleMixin, TemplateView):
         "event_type",
         "event_tag",
         "event_article",
+        "user_event",
+        "event_reviews",
       ),
       event_id=self.kwargs["id"],
     )
@@ -667,13 +666,37 @@ class EventDetailView(PageTitleMixin, TemplateView):
         "This is a placeholder date, actual date unknown.",
       )
 
-    user = self.request.user
+    context["user_list"] = (
+      context["event"].user_event.all().values_list("user__username", flat=True)  # type: ignore
+    )  # type: ignore
+
+    context["review_score"] = (
+      context["event"].event_reviews.aggregate(Avg("rating")).get("rating__avg")  # type: ignore
+    )
 
     if user.is_authenticated:
       context["user_attended"] = UserAttendedShow.objects.filter(
         user_id=user.pk,
         event_id=event.pk,
       ).first()
+
+      existing_review = UserShowReview.objects.filter(
+        user_id=user.pk,
+        event_id=event.pk,
+      )
+
+      context["user_review"] = existing_review.exists()
+
+      if context["user_review"]:
+        review = existing_review.first()
+        context["review_form"] = self.ReviewForm(
+          initial={
+            "content": review.content,
+            "rating": str(review.rating),
+          },
+        )
+
+        context["user_review"] = True
 
     if context["event"].run:
       if context["event"].run.ticket_range:
@@ -1242,11 +1265,11 @@ class AdvSearchView(PageTitleMixin, TemplateView):
         # 1. Pull the normalized date values from cleaned_data
         start_date_data = event_form.cleaned_data.get("start_date")
         if start_date_data:
-          clean_params["start_date"] = start_date_data["value"]
+          clean_params["start_date"] = start_date_data
 
         end_date_data = event_form.cleaned_data.get("end_date")
         if end_date_data:
-          clean_params["end_date"] = end_date_data["value"]
+          clean_params["end_date"] = end_date_data
 
         for key, values in request.GET.lists():
           # Filter out empty strings

@@ -123,11 +123,11 @@
 }
 
 [data-bs-theme="light"] {
-  --background-color-subtle: var(--color-gray-50) !important;
-  --background-color-muted: var(--color-gray-100) !important;
-  --background-color-default: var(--color-white) !important;
-  --background-color-highlight: var(--color-gray-200) !important;
-  --background-color-emphasis: var(--color-gray-300) !important;
+  --background-color-subtle: var(--color-gray-50);
+  --background-color-muted: var(--color-gray-100);
+  --background-color-default: var(--color-white);
+  --background-color-highlight: var(--color-gray-200);
+  --background-color-emphasis: var(--color-gray-300);
 
   /* Text colors */
   --text-color-subtle: var(--color-gray-400) !important;

@@ -1,345 +1,332 @@
 {% extends "databruce/wide_layout.html" %}
 {% load i18n static tz %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block extrajs %}
-    <script src="{% static 'databruce/js/table.js' %}"></script>
+  <script src="{% static 'databruce/js/table.js' %}"></script>
+  <script src="{% static 'databruce/js/setlistTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-    <div class="col-12 col-lg-8 col-xxl-6">
-        <div class="row justify-content-center logo-row">
-            <div class="main-logo" role="img" aria-label="Databruce">
-                <span class="sr-only">Databruce</span>
-            </div>
+  <div class="col-12 col-lg-8 col-xxl-6">
+    <div class="row justify-content-center logo-row">
+      <div class="main-logo" role="img" aria-label="Databruce">
+        <span class="sr-only">Databruce</span>
+      </div>
+    </div>
+    {% if not user.is_authenticated %}
+      <div class="row my-3 justify-content-center">
+        <div class="d-flex justify-content-center gap-2">
+          <a href="{% url "login" %}"
+             type="button"
+             role="button"
+             class="btn btn-sm btn-primary">Login</a>
+          <a href="{% url "signup" %}"
+             type="button"
+             role="button"
+             class="btn btn-sm btn-primary">Create Account</a>
         </div>
-        {% if not user.is_authenticated %}
-            <div class="row my-3 justify-content-center">
-                <div class="d-flex justify-content-center gap-2">
-                    <a href="{% url "login" %}"
-                       type="button"
-                       role="button"
-                       class="btn btn-sm btn-primary">Login</a>
-                    <a href="{% url "signup" %}"
-                       type="button"
-                       role="button"
-                       class="btn btn-sm btn-primary">Create Account</a>
-                </div>
+      </div>
+    {% endif %}
+    <div class="row my-3">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div class="prefix-container">
+              <span class="prefix">Latest Blog Post ({{ latest_blog_post.published_at|date:"Y-m-d" }})</span>
+              <span class="value">
+                <a href="{% url "blog:blog_post" slug=latest_blog_post.slug %}">
+                  <div class="text-sm fw-semibold gap-1 d-flex">
+                    {{ latest_blog_post }}
+                    <i class="bi bi-box-arrow-up-right text-xs"></i>
+                  </div>
+                </a></span>
+              </div>
             </div>
-        {% endif %}
-        <div class="row my-3">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="prefix-container">
-                            <span class="prefix">Latest Blog Post ({{ latest_blog_post.published_at|date:"Y-m-d" }})</span>
-                            <span class="value">
-                                <a href="{% url "blog:blog_post" slug=latest_blog_post.slug %}">
-                                    <div class="text-sm fw-semibold gap-1 d-flex">
-                                        {{ latest_blog_post }}
-                                        <i class="bi bi-box-arrow-up-right text-xs"></i>
-                                    </div>
-                                </a></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row row-cols-3 row-cols-lg-6 mb-3 g-2">
-                <div class="col">
-                    <div class="card p-3">
-                        <div class="text-xs text-muted">Events</div>
-                        <a href="{% url "events" %}">
-                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                {{ event_count }}
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card p-3">
-                        <div class="text-xs text-muted">Songs</div>
-                        <a href="{% url "songs" %}">
-                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                {{ song_count }}
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card p-3">
-                        <div class="text-xs text-muted">Tours</div>
-                        <a href="{% url "tours" %}">
-                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                {{ tour_count }}
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card p-3">
-                        <div class="text-xs text-muted">Venues</div>
-                        <a href="{% url "venues" %}">
-                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                {{ venue_count }}
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card p-3">
-                        <div class="text-xs text-muted">Relations</div>
-                        <a href="{% url "relations" %}">
-                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                {{ relation_count }}
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card p-3">
-                        <div class="text-xs text-muted">Bands</div>
-                        <a href="{% url "bands" %}">
-                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                {{ band_count }}
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-lg-2 g-3">
-                <div class="col order-2">
-                    <div class="card">
-                        <div class="card-header">Featured Show</div>
-                        <div class="card-body p-0" id="setlistCard">
-                            <div class="col-12">
-                                {% with featured=featured_event.event %}
-                                    <div class="col-12 px-2 pt-2 text-sm">
-                                        <div class="row">
-                                            <a class="fw-medium"
-                                               href="{% url "event_details" id=featured.event_id %}">{{ featured.get_date }} - {{ featured.venue.venues_text.formatted }}</a>
-                                        </div>
-                                        <div class="row">
-                                            <a class="text-reset"
-                                               href="{% url 'band_details' id=featured.artist.uuid %}">{{ featured.artist.name }}</a>
-                                        </div>
-                                    </div>
-                                {% endwith %}
-                                <div class="table-responsive index">
-                                    <table class="table table-hover display" id="setlistTable">
-                                        <thead>
-                                            <tr>
-                                                <th class="song_num">#</th>
-                                                <th class="song">Song</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col order-3 gy-3 row-gap-3">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-3">
-                        {% if latest_event %}
-                            <div class="col order-1">
-                                <div class="card">
-                                    <div class="card-header">Latest Event</div>
-                                    <div class="card-body p-0 px-3 pb-2">
-                                        <a href="{% url "event_details" id=latest_event.event_id %}">
-                                            <div class="text-lg fw-semibold gap-1 d-flex">
-                                                {{ latest_event }}
-                                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                                            </div>
-                                        </a>
-                                        <span class="text-sm text-muted">{{ latest_event.venue.venues_text.formatted }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <div class="col order-last">
-                            <div class="card">
-                                <div class="card-header">
-                                    On This Day
-                                    <a role="button"
-                                       class="btn btn-sm btn-primary text-xs py-0.5 px-1"
-                                       href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
-                                </div>
-                                <div class="card-body p-0 list-card" id="otd"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    function createPlaceholderItem() {
-      return `
-      <li class="list-group-item py-0.5 placeholder-glow">
-        <div class="row">
-          <div class="col-12 placeholder p-0 align-middle">
           </div>
         </div>
-      </li>`;
-    }
-
-    function createMultiListItem(item1, item2) {
-      return `
-      <li class="list-group-item py-0.5 px-3">
-        <div class="row row-cols-2 fw-medium">
-            ${item1}
-            ${item2}
+      </div>
+      <div class="row row-cols-3 row-cols-lg-6 mb-3 g-3">
+        <div class="col">
+          <div class="card p-3">
+            <div class="text-xs text-muted">Events</div>
+            <a href="{% url "events" %}">
+              <div class="text-lg fw-semibold gap-1 d-flex">
+                {{ event_count }}
+                <i class="bi bi-box-arrow-up-right text-xs"></i>
+              </div>
+            </a>
+          </div>
         </div>
-      </li>
-      `
-    }
+        <div class="col">
+          <div class="card p-3">
+            <div class="text-xs text-muted">Songs</div>
+            <a href="{% url "songs" %}">
+              <div class="text-lg fw-semibold gap-1 d-flex">
+                {{ song_count }}
+                <i class="bi bi-box-arrow-up-right text-xs"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card p-3">
+            <div class="text-xs text-muted">Tours</div>
+            <a href="{% url "tours" %}">
+              <div class="text-lg fw-semibold gap-1 d-flex">
+                {{ tour_count }}
+                <i class="bi bi-box-arrow-up-right text-xs"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card p-3">
+            <div class="text-xs text-muted">Venues</div>
+            <a href="{% url "venues" %}">
+              <div class="text-lg fw-semibold gap-1 d-flex">
+                {{ venue_count }}
+                <i class="bi bi-box-arrow-up-right text-xs"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card p-3">
+            <div class="text-xs text-muted">Relations</div>
+            <a href="{% url "relations" %}">
+              <div class="text-lg fw-semibold gap-1 d-flex">
+                {{ relation_count }}
+                <i class="bi bi-box-arrow-up-right text-xs"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card p-3">
+            <div class="text-xs text-muted">Bands</div>
+            <a href="{% url "bands" %}">
+              <div class="text-lg fw-semibold gap-1 d-flex">
+                {{ band_count }}
+                <i class="bi bi-box-arrow-up-right text-xs"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="row row-cols-1 row-cols-lg-2 g-3">
+        <div class="col order-2">
+          <div class="card">
+            <div class="card-header">Featured Show</div>
+            <div class="card-body p-0" id="setlistCard">
+              <div class="col-12">
+                {% with featured=featured_event.event %}
+                  <div class="col-12 px-2 pt-2 text-sm">
+                    <div class="row">
+                      <a class="fw-medium"
+                         href="{% url "event_details" id=featured.event_id %}">{{ featured.get_date }} - {{ featured.venue.venues_text.formatted }}</a>
+                    </div>
+                    <div class="row">
+                      <a class="text-reset"
+                         href="{% url 'band_details' id=featured.artist.uuid %}">{{ featured.artist.name }}</a>
+                    </div>
+                  </div>
+                {% endwith %}
+                <div class="table-responsive index">
+                  <table class="table table-hover display" id="setlistTable">
+                    <thead>
+                      <tr>
+                        <th class="song_num">#</th>
+                        <th class="song">Song</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col order-3 gy-3 row-gap-3">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-3">
+            {% if latest_event %}
+              <div class="col order-1">
+                <div class="card">
+                  <div class="card-header">Latest Event</div>
+                  <div class="card-body p-0 px-3 pb-2">
+                    <a href="{% url "event_details" id=latest_event.event_id %}">
+                      <div class="text-lg fw-semibold gap-1 d-flex">
+                        {{ latest_event }}
+                        <i class="bi bi-box-arrow-up-right text-xs"></i>
+                      </div>
+                    </a>
+                    <span class="text-sm text-muted">{{ latest_event.venue.venues_text.formatted }}</span>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+            <div class="col order-last">
+              <div class="card">
+                <div class="card-header">
+                  On This Day
+                  <a role="button"
+                     class="btn btn-sm btn-primary text-xs py-0.5 px-1"
+                     href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
+                </div>
+                <div class="card-body p-0 list-card" id="otd"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    function createListItem(item) {
-      return `<li class="list-group-item py-0.5 px-3">${item}</li>`
-    }
-
-    function getEventData(url, containerId) {
-      fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        var container = $(containerId);
-        var list = $('<ul />').addClass('list-group list-group-flush');
-
-        data.results.forEach((item, index) => {
-          var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`
-          var item2 = `<div class="col-9 py-0 text-wrap">${item.venue}</div>`
-
-          if (item.early_late) {
-            item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`
-          }
-
-          var listItem = createMultiListItem(item1, item2);
-
-          $(list).append(listItem);
-        });
-
-        $(container).html($(list).prop('outerHTML'));
-      }).catch(error => console.error('Error:', error));
-    }
-
-    $(document).ready(function () {
-      var date = new Date();
-
-      var month = date.getMonth() + 1;
-      var day = date.getDate();
-
-      $(".list-card").each(function() {
-        var container = $(this).empty();
-        var loadingList = $('<ul />').addClass('list-group list-group-flush');
-        var limit = 5;
-
-        if ($(this).attr('id') === "update") {
-          var limit = 10;
-        }
-
-        for (let i = 0; i < limit; i++) {
-          loadingList.append(createPlaceholderItem());
-        }
-
-        container.append(loadingList);
-      })
-
-      getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
-      //getEventData('/api/v1/events_index/?ordering=event_id&limit=5&time_frame=upcoming&format=json', '#upcoming')
-      //getEventData('/api/v1/events_index/?ordering=-event_id&limit=5&time_frame=latest&format=json', '#recent')
-
-      var url = '/api/v1/setlists_index/?event={{ featured_event.event.id }}&format=json&show_only=true';
-
-      let setlistOptions = {
-        rowGroup: {
-          groupVal: 'set_name'
-        }
+      function createPlaceholderItem() {
+        return `
+    <li class="list-group-item py-0.5 placeholder-glow">
+    <div class="row">
+      <div class="col-12 placeholder p-0 align-middle">
+      </div>
+    </div>
+    </li>`;
       }
 
-      let setlistColumns = [
-        {
+      function createMultiListItem(item1, item2) {
+        return `
+    <li class="list-group-item py-0.5 px-3">
+    <div class="row row-cols-2 fw-medium">
+      ${item1}
+      ${item2}
+    </div>
+    </li>
+    `
+      }
+
+      function createListItem(item) {
+        return `<li class="list-group-item py-0.5 px-3">${item}</li>`
+      }
+
+      function getEventData(url, containerId) {
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            var container = $(containerId);
+            var list = $('<ul />').addClass('list-group list-group-flush');
+
+            data.results.forEach((item, index) => {
+              var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`
+              var item2 = `<div class="col-9 py-0 text-wrap">${item.venue}</div>`
+
+              if (item.early_late) {
+                item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`
+              }
+
+              var listItem = createMultiListItem(item1, item2);
+
+              $(list).append(listItem);
+            });
+
+            $(container).html($(list).prop('outerHTML'));
+          }).catch(error => console.error('Error:', error));
+      }
+
+      $(document).ready(function() {
+        var date = new Date();
+
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+
+        $(".list-card").each(function() {
+          var container = $(this).empty();
+          var loadingList = $('<ul />').addClass('list-group list-group-flush');
+          var limit = 5;
+
+          if ($(this).attr('id') === "update") {
+            var limit = 10;
+          }
+
+          for (let i = 0; i < limit; i++) {
+            loadingList.append(createPlaceholderItem());
+          }
+
+          container.append(loadingList);
+        })
+
+        getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
+
+        /* SETLIST TABLE */
+
+        var url = '/api/v1/setlists/?event={{ featured_event.event.id }}&format=json&show_only=true';
+
+        let setlistOptions = {
+          rowGroup: {
+            groupVal: 'set_name'
+          }
+        }
+
+        let setlistColumns = [{
           'data': 'song_num',
-          'className': 'text-center',
+          'className': 'text-center songnum',
           'width': '',
-          'render': function (data, type, row, meta) {
+          'render': function(data, type, row, meta) {
             if (data) {
               return data
             }
 
             return ''
           },
-          'createdCell': function (td, cellData, rowData, row, col) {
-            $(td).addClass('songnum');
-
+          'createdCell': function(td, cellData, rowData) {
             if (rowData.position) {
               var position = slugify(rowData.position);
-              $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
+              $(td)
+                .addClass(`${position} position`)
+                .attr({
+                  'data-bs-toggle': 'tooltip',
+                  'data-bs-title': rowData.position,
+                  'data-bs-html': true
+                });
             }
 
             return td;
           },
-        },
-        {
+        }, {
           'data': 'song',
           'className': 'text-wrap',
           'width': '',
-          'render': function (data, type, row, meta) {
-                var song = `<a class="text-reset" href="/songs/${data.uuid}">${data.name}</a>`;
-                var segue = row.segue ? `<span class="segue"></span>` : '';
+          'render': function(data, type, row, meta) {
+            const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+            const segue = row.segue ? ' <span class="segue"></span>' : '';
+            let bustBadge = '';
 
-                song = `${song} ${segue}`;
+            const activeBadges = SONG_BADGES
+              .filter(b => row[b.key])
+              .map(b => createBadge(b.class, b.label, b.title))
 
-                var badges = $('<span />').addClass("ms-2");
-                var baseBadge = `<span class="badge"></span>`;
+            if (row.gap >= 50 && !row.debut) {
+              const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
+            }
 
-                if (row.instrumental) {
-                  var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-info').text('Instrumental');
-                  $(badges).append($(badge).prop('outerHTML'));
-                } else if (row.sign_request) {
-                  var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-info').text('Sign Request');
-                  $(badges).append($(badge).prop('outerHTML'));
-                } else if (row.nobruce) {
-                  var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-warning').text('No Bruce');
-                  $(badges).append($(badge).prop('outerHTML'));
-                } else if (row.premiere) {
-                  var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-warning').text('First');
-                  $(badges).append($(badge).prop('outerHTML'));
-                } else if (row.debut && !row.premiere) {
-                  var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-warning').text('TD');
-                  $(badges).append($(badge).prop('outerHTML'));
-                } else if (row.last >= 50 && !row.debut) {
-                  var badge = $(baseBadge).clone();
-                  $(badge).addClass('badge-warning').text('Bustout');
-                  $(badges).append($(badge).prop('outerHTML'));
-                }
+            const allBadges = [
+              ...activeBadges,
+              bustBadge
+            ].filter(Boolean).join('');
 
-                if (row.notes) {
-                  var notes = `<br><span class="text-wrap fw-light setlist-note">${row.notes}</span>`;
-                  return badges.children().length > 0 ? song + $(badges).prop('outerHTML') + notes : song;
-                }
+            const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
 
-                return badges.children().length > 0 ? song + $(badges).prop('outerHTML') : song;
+            const notes = row.notes ? `<span class="text-wrap fw-light d-block setlist-note">${row.notes}</span>` : '';
+
+            return `
+        <div class="d-flex d-md-inline-flex justify-content-between align-items-center w-100">
+        <span>${songLink}${segue}</span>
+        ${badgeContainer}
+        </div>
+        ${notes}
+      `;
           }
-        },
-      ]
+        }, ]
 
-      createTable(url, setlistColumns, '#setlistTable', setlistOptions);
-    })
-
-        </script>
+        createTable(url, setlistColumns, '#setlistTable', setlistOptions);
+      })
+    </script>
 {% endblock content %}

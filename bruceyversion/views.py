@@ -214,13 +214,10 @@ class SubmitEntryComment(View):
     form = forms.CommentForm(request.POST)
 
     if form.is_valid():
-      form.cleaned_data["user"] = db_models.CustomUser.objects.get(pk=request.user.id)  # type: ignore
-      form.cleaned_data["entry"] = bv_models.Entry.objects.get(
-        pk=request.POST["entry"],
-      )
-
-      bv_models.EntryComment.objects.create(
-        **form.cleaned_data,
+      item, created = bv_models.EntryComment.objects.update_or_create(
+        user_id=request.user.id,  # type: ignore
+        entry_id=request.POST["entry"],
+        defaults=form.cleaned_data,
       )
 
       return JsonResponse(

@@ -1,0 +1,10 @@
+<div class="star-rating d-inline-flex align-items-center gap-1 text-warning fs-6"
+     title="Rating: {{ rating }} out of 5">
+    {% for star in star_list %}
+        {% if star == 'fill' %}
+            <i class="bi bi-star-fill text-primary"></i>
+        {% else %}
+            <i class="bi bi-star text-secondary opacity-50"></i>
+        {% endif %}
+    {% endfor %}
+</div>

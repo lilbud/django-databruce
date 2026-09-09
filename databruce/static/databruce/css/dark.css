@@ -13,7 +13,7 @@
   }
 
   .info-card {
-    border-color: var(--border-color-base) !important;
+    border-color: transparent !important;
   }
 
   th.dt-ordering-asc,
@@ -92,6 +92,12 @@
     --color: var(--color-red-100) !important;
     --border-color: var(--color-red-600) !important;
     --bg-color: var(--color-red-800) !important;
+  }
+
+  #addshow[data-attended="true"]:hover {
+    background-color: var(--color-red-800) !important;
+    border-color: var(--color-red-600) !important;
+    color: var(--color-red-100) !important;
   }
 
   .btn-purple-subtle,
@@ -191,18 +197,6 @@
   }
 
   .text-primary {
-    color: var(--color-primary) !important;
+    color: var(--color-blue-300) !important;
   }
-
-  /* .badge-neutral-subtle {
-    color: var(--color-gray-950) !important;
-  }
-
-  .badge-neutral-outline {
-    color: var(--color-gray-50) !important;
-  }
-
-  .badge-neutral-subtle {
-    background-color: var(--color-gray-200) !important;
-  } */
 }

@@ -4,6 +4,7 @@ import re
 from collections.abc import Iterable
 from typing import Any
 
+import nh3
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import (
@@ -942,3 +943,40 @@ class CustomSetPasswordForm(SetPasswordForm):
     super().__init__(*args, **kwargs)
     for field in self.fields.values():
       field.widget.attrs.update({"class": "form-control form-control-sm"})
+
+
+class UserReviewForm(forms.Form):
+  def __init__(self, *args, **kwargs) -> None:
+    super().__init__(*args, **kwargs)
+
+  content = forms.CharField(
+    label="Content",
+    required=False,
+    help_text="Optional",
+    widget=forms.Textarea(
+      attrs={
+        "id": "content",
+        "name": "content",
+        "placeholder": "Enter Review Here",
+        "class": "form-control form-control-sm",
+      },
+    ),
+  )
+
+  rating = forms.ChoiceField(
+    choices=[(str(i), str(i)) for i in range(5, 0, -1)],
+    required=True,
+    widget=forms.RadioSelect(attrs={"class": "star-input"}),
+    label="Rate this show:",
+  )
+
+  def clean_content(self):
+    """Sanitize the content text field."""
+    # Note: Use your model's exact text field name here (e.g., 'content' or 'review')
+    data = self.cleaned_data["content"]
+    cleaned_data = nh3.clean(data, tags=set())
+
+    if any(link in cleaned_data for link in ["http://", "https://", "www."]):
+      raise forms.ValidationError("Links are not allowed in reviews.")
+
+    return cleaned_data

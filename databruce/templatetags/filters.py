@@ -63,10 +63,10 @@ def format_fuzzy(value):
 
 @register.filter
 def currency(value):
-  try:
-    return f"${value:,.2f}"
-  except (ValueError, TypeError):
-    return value
+  if value == int(value):
+    return f"${value:,.0f}"
+
+  return f"${value:,.2f}"
 
 
 @register.filter(name="markdown_safe")
@@ -113,3 +113,26 @@ def markdown_safe(value):
 
   # 4. Mark as safe so you don't need to append |safe in the template
   return mark_safe(cleaned_html)
+
+
+@register.inclusion_tag("databruce/partials/star_rating.html")
+def render_stars(rating):
+  """Safely converts a number (integer or float) into a 5-star array
+  and sends it to an isolated HTML partial template.
+  """
+  try:
+    rating = float(rating)
+  except (ValueError, TypeError):
+    rating = 0.0
+
+  star_list = []
+  for i in range(5, 0, -1):
+    if rating >= i:
+      star_list.append("fill")
+    else:
+      star_list.append("empty")
+
+  return {
+    "star_list": star_list,
+    "rating": rating,
+  }

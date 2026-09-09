@@ -26,7 +26,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
   "142.93.200.133",
   "databruce.com",
-  "www.databruce.com",
+  "://databruce.com",
   "localhost",
   "127.0.0.1",
 ]

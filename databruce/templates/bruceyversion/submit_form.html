@@ -11,7 +11,7 @@
           href="{% static "databruce/css/select2/select2-bootstrap-5-theme.min.css" %}" />
 {% endblock extrajs %}
 {% block content %}
-    <div class="col-12">
+    <div class="col-12 col-lg-9">
         <div class="page-title">Bruceyversion Submission Form</div>
         <div class="text-sm mb-2">Have a particular favorite live performance of a song? Submit it below!</div>
         {% if messages %}
@@ -30,7 +30,6 @@
                   id="submit-form"
                   action="{% url "bruceyversion:submit" %}">
                 {% csrf_token %}
-                <input type="hidden" name="user" value="{{ user.id }}">
                 <div class="col">{{ form.non_field_errors }}</div>
                 {% for field in form %}
                     <div class="mb-3">

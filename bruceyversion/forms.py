@@ -1,5 +1,6 @@
 from typing import Any
 
+import nh3
 from django import forms
 
 from databruce import models
@@ -99,7 +100,8 @@ class SubmitForm(forms.Form):
 
   def clean_comment(self):
     # .get() prevents KeyError if data is completely missing
-    return self.cleaned_data.get("comment")
+    data = self.cleaned_data["comment"]
+    return nh3.clean(data, tags=set())
 
 
 class CommentForm(forms.Form):

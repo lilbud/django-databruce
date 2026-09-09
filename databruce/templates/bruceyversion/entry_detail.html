@@ -61,7 +61,6 @@
                                 {% else %}
                                     <form method="post" id="voteForm">
                                         {% csrf_token %}
-                                        <input type="hidden" name="user" value="{{ user.id }}">
                                         <input type="hidden" name="entry" value="{{ entry.id }}">
                                         <button class="btn btn-sm
                                                        {% if user_voted %}btn-danger{% else %}btn-primary{% endif %}"
@@ -100,20 +99,20 @@
                               data-bs-title="You cannot comment on pending entries">
                             <button class="btn btn-secondary text-xs py-1 px-2"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#updateCommentModal"
+                                    data-bs-target="#commentModal"
                                     disabled>Update Comment</button>
                         </span>
                     {% else %}
                         {% if not user_comment %}
                             <button class="btn btn-secondary text-xs py-1 px-2"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#addCommentModal">Submit Comment</button>
+                                    data-bs-target="#commentModal">Submit Comment</button>
                         {% else %}
                             <span data-bs-toggle="tooltip"
                                   data-bs-title="You already commented, click to update">
                                 <button class="btn btn-secondary text-xs py-1 px-2"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#updateCommentModal">Update Comment</button>
+                                        data-bs-target="#commentModal">Update Comment</button>
                             </span>
                         {% endif %}
                     {% endif %}
@@ -142,7 +141,9 @@
                                     </span>
                                     {% if comment.comment|length > 200 %}
                                         <span data-bs-toggle="tooltip" data-bs-title="Click to view more">
-                                            <a role="button" data-bs-toggle="modal" data-bs-target="#commentModal">
+                                            <a role="button"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#viewCommentModal">
                                             {{ comment.comment|linebreaks|truncatechars:200 }}</a>
                                         </span>
                                     {% else %}
@@ -161,14 +162,18 @@
         </div>
     </div>
     <div class="modal fade"
-         id="addCommentModal"
+         id="commentModal"
          tabindex="-1"
          aria-labelledby="commentModalLabel"
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="commentModalLabel">Submit Comment</h1>
+                    {% if user_comment %}
+                        <h1 class="modal-title fs-5" id="commentModalLabel">Update Comment</h1>
+                    {% else %}
+                        <h1 class="modal-title fs-5" id="commentModalLabel">Add Comment</h1>
+                    {% endif %}
                     <button type="button"
                             class="btn-close"
                             data-bs-dismiss="modal"
@@ -185,39 +190,6 @@
                         {% endif %}
                         <span class="button-container">
                             <button id="submit-comment"
-                                    class="btn btn-primary text-xs mt-2"
-                                    type="submit">Submit</button>
-                        </span>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade"
-         id="updateCommentModal"
-         tabindex="-1"
-         aria-labelledby="updateCommentModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="updateCommentModalLabel">Update Comment</h1>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" id="update-comment-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="commentID" value="{{ user_comment.id }}">
-                        <label for="{{ form.comment.id_for_label }}" class="fw-medium">{{ form.comment.label }}</label>
-                        {% if form.comment.help_text %}
-                            <div class="form-text text-muted text-xs mb-2">{{ form.comment.help_text }}</div>
-                        {% endif %}
-                        {{ form.comment }}
-                        <span class="button-container">
-                            <button id="update-comment"
                                     class="btn btn-primary text-xs mt-2"
                                     type="submit">Submit</button>
                         </span>

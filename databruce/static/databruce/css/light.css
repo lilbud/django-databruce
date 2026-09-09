@@ -13,7 +13,7 @@
   }
 
   .info-card {
-    border-color: var(--border-color-base) !important;
+    border-color: var(--border-color-light) !important;
   }
 
   .text-primary {
@@ -61,6 +61,12 @@
     --color: var(--color-red-800) !important;
     --border-color: var(--color-red-400) !important;
     --bg-color: var(--color-red-100) !important;
+  }
+
+  #addshow[data-attended="true"]:hover {
+    background-color: var(--color-red-100) !important;
+    border-color: var(--color-red-400) !important;
+    color: var(--color-red-800) !important;
   }
 
   .btn-warning-subtle,

@@ -9,7 +9,7 @@
 {% endblock extrastyle %}
 {% block content %}
     {% if user.is_superuser %}
-        {% include "databruce/partials/admin_edit_btn.html" with view="blogpost" item=post.id %}
+        {% include "databruce/partials/admin_edit_btn.html" with view="blogpost" item=post.id app="blog" %}
     {% endif %}
     <div class="col-12 col-lg-8">
         <div class="page-title">

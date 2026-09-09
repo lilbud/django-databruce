@@ -281,6 +281,7 @@ nav ul {
 
 /* remove default link styles */
 a:link,
+a.text-reset,
 .btn-link {
   text-decoration: none !important;
 }
@@ -324,7 +325,6 @@ a:link,
 .collapse-icon {
   stroke: currentColor;
   stroke-width: 0.8px;
-  /* Adjust weight: 0.5px (thinner) to 1.2px (bold) */
   transition: transform 0.2s ease-in-out;
 }
 
@@ -380,13 +380,11 @@ a:link,
   font-weight: 600 !important;
 }
 
-.song-seen>.seenCount {
-  color: var(--text-color-default) !important;
-}
-
+.song-seen>.seenCount,
 .song-unseen>.song-name {
   color: var(--text-color-default) !important;
 }
+
 
 /* Remove the border from the last row of cells to prevent card overlap */
 .card .table tbody tr:last-child th,
@@ -426,12 +424,15 @@ thead tr:first-child th {
 
 .info-card {
   background-color: var(--background-color-muted) !important;
+  border: 1px solid transparent !important;
   padding: 0.5rem !important;
 }
 
 .info-card .title {
   font-size: var(--text-xs);
-  line-height: 1.1rem;
+  color: var(--text-color-muted) !important;
+  line-height: 1rem;
+  margin-bottom: 0.25rem !important;
   white-space: nowrap !important;
 }
 
@@ -441,14 +442,7 @@ thead tr:first-child th {
 
 .info-card .value {
   font-size: var(--text-sm);
-  line-height: 1.5rem;
   font-weight: 500;
-}
-
-
-span #usercount {
-  cursor: pointer !important;
-  pointer-events: none !important;
 }
 
 /* card */
@@ -457,7 +451,6 @@ span #usercount {
   border-width: 1px !important;
   border-style: solid !important;
   overflow: hidden !important;
-  /* color: var(--color-black) !important; */
   padding: 0.5rem !important;
   font-style: italic !important;
   font-size: var(--text-xs) !important;
@@ -472,16 +465,37 @@ span #usercount {
 .card-footer,
 .card,
 .list-group-item,
-.accordion-item {
+.accordion-item,
+.modal-dialog,
+.modal-body {
   background-color: var(--background-color-subtle);
-  border-color: var(--border-color-light);
   color: var(--text-color-default);
+}
+
+.modal-dialog {
+  border-radius: 0.5rem !important;
+}
+
+.modal-content {
+  height: calc(100% - var(--bs-modal-margin) * 2);
+}
+
+.card-header,
+.card-footer,
+.card,
+.accordion-item {
+  border-color: var(--border-color-light);
 }
 
 .card.divider,
 .card .form-control,
-.card .form-select {
+.card .form-select,
+.modal .form-control {
   background-color: var(--background-color-default) !important;
+}
+
+#comment {
+  height: 190px !important;
 }
 
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
@@ -1386,11 +1400,11 @@ pre {
   border-radius: var(--bs-border-radius-sm);
 }
 
-.bi.bi-star,
+/* .bi.bi-star,
 .bi.bi-star-fill {
   height: 16px;
   width: 16px;
-}
+} */
 
 /* Ensure the arrow smoothly transitions when rotating */
 .custom-accordion-toggle .toggle-arrow {
@@ -1559,9 +1573,9 @@ pre {
   margin-top: 1rem !important;
 }
 
-.modal-dialog {
+/* .modal-dialog {
   max-width: 700px !important;
-}
+} */
 
 @media (max-width: 550px) {
 
@@ -1803,4 +1817,77 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 .nav-link:not(.active) .count-badge {
   background-color: var(--text-color-default) !important;
   color: var(--color-contrast) !important;
+}
+
+/* Completely hide the radio inputs */
+.star-rating input[type="radio"] {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+/* Base layout: Row-reverse allows CSS sibling selectors (~) to work right-to-left */
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  font-size: 1.75rem;
+}
+
+.star-rating label {
+  cursor: pointer;
+  color: #ffc107;
+  position: relative;
+  display: inline-block;
+  margin: 0;
+
+  /* FIX: 8px padding on both sides creates a seamless 16px gap. 
+       Because padding keeps the hover state active, the flicker disappears. */
+  padding: 0 4px;
+}
+
+/* By default, hide the filled star and show the empty star */
+.star-rating .filled-star {
+  display: none;
+}
+
+.star-rating .empty-star {
+  display: inline-block;
+}
+
+/* State 1: When a radio is checked, turn its label (and preceding labels) into filled stars */
+.star-rating input[type="radio"]:checked~label .filled-star,
+/* State 2: When a user hovers over a star, turn it (and preceding stars) into filled stars */
+.star-rating label:hover .filled-star,
+.star-rating label:hover~label .filled-star {
+  display: inline-block;
+}
+
+/* Hide the empty stars whenever the filled stars are triggered */
+.star-rating input[type="radio"]:checked~label .empty-star,
+.star-rating label:hover .empty-star,
+.star-rating label:hover~label .empty-star {
+  display: none;
+}
+
+#addshow .hover-text {
+  display: none;
+}
+
+#addshow[data-attended="true"]:hover .default-text {
+  display: none;
+}
+
+#addshow[data-attended="true"]:hover .hover-text {
+  display: block;
+}
+
+/* Optional: Change the star icon to a trash can or X on hover */
+#addshow[data-attended="true"]:hover #star::before {
+  content: "\f5de";
 }

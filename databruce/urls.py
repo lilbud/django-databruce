@@ -65,7 +65,8 @@ from .views import (
   TourLegView,
   TourView,
   UpdateView,
-  UserAddRemoveShowView,
+  UserAddReviewView,
+  UserAddShowView,
   UserChangePasswordView,
   UserProfileView,
   UserRemoveShowView,
@@ -73,7 +74,6 @@ from .views import (
   UserView,
   VenueDetailView,
   VenueView,
-  event_search,
 )
 
 sitemaps = {
@@ -118,11 +118,6 @@ urlpatterns = [
     "settings/",
     UserSettingsView.as_view(),
     name="settings",
-  ),
-  path(
-    "event_search/",
-    event_search,
-    name="event_search",
   ),
   path(
     "change-password/",
@@ -282,15 +277,25 @@ urlpatterns = [
   path("tours/legs/<uuid:id>", TourLegDetailView.as_view(), name="leg_details"),
   path("releases/nugs", NugsReleaseView.as_view(), name="nugs"),
   path("releases/bootlegs", BootlegView.as_view(), name="bootlegs"),
+  # path(
+  #   "events/<int:event_id>/add_show/",
+  #   UserAddRemoveShowView.as_view(),
+  #   name="add_show",
+  # ),
   path(
-    "profile/add-show/",
-    UserAddRemoveShowView.as_view(),
+    "events/<int:event_id>/add/",
+    UserAddShowView.as_view(),
     name="add_show",
   ),
   path(
-    "profile/remove-show/",
+    "events/<int:event_id>/remove/",
     UserRemoveShowView.as_view(),
     name="remove_show",
+  ),
+  path(
+    "events/<int:event_id>/review/",
+    UserAddReviewView.as_view(),
+    name="add_show_review",
   ),
   path(
     "sitemap.xml",
