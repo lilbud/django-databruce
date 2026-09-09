@@ -790,13 +790,13 @@ class BlogTagAdmin(ModelAdmin):
   prepopulated_fields = {"slug": ("name",)}
 
 
-class TagInline(admin.StackedInline):
+class TagInline(StackedInline):
   model = BlogPostTag
   autocomplete_fields = ["tag"]
   extra = 0
 
 
-class CategoryInline(admin.StackedInline):
+class CategoryInline(StackedInline):
   model = BlogPostCategory
   autocomplete_fields = ["category"]
   extra = 0
