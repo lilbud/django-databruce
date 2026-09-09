@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
   "142.93.200.133",
   "databruce.com",
   "://databruce.com",
+  "www.databruce.com",
   "localhost",
   "127.0.0.1",
 ]
