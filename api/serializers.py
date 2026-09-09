@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
@@ -187,11 +188,20 @@ class MinimalSongsSerializer(BaseSerializer):
 
 
 class MinimalSetlistSerializer(BaseSerializer):
-  song = MinimalSongsSerializer()
+  song = MinimalSongsSerializer(include=["name", "uuid"])
 
   class Meta:
     model = models.Setlist
-    fields = ["id", "event_id", "song", "set_name", "uuid"]
+    fields = [
+      "id",
+      "event_id",
+      "song",
+      "set_name",
+      "uuid",
+      "debut",
+      "premiere",
+      "song_num",
+    ]
 
 
 class MinimalOnstageSerializer(BaseSerializer):
@@ -486,6 +496,14 @@ class IndexEventsSerializer(BaseSerializer):
     fields = ["event_id", "date", "venue", "early_late"]
 
 
+class EventSetlistSerializer(BaseSerializer):
+  song = serializers.CharField(source="song.name", max_length=255)
+
+  class Meta:
+    model = models.Setlist
+    fields = ["song", "song_num", "debut", "premiere", "set_name", "segue"]
+
+
 class EventTypesSerializer(BaseSerializer):
   event = MinimalEventSerializer()
   type = TypesSerializer()
@@ -534,10 +552,10 @@ class EventsSerializer(BaseSerializer):
     required=False,
   )
 
-  def get_has_setlist(self, obj):
+  def get_has_setlist(self, obj) -> bool:
     return bool(obj.setlist_event.exists())
 
-  def get_date(self, obj):
+  def get_date(self, obj) -> None | str | Any:
     return get_date_from_instance(obj)
 
   class Meta:
@@ -551,7 +569,6 @@ class EventsSerializer(BaseSerializer):
       "city",
       "leg",
       "has_setlist",
-      # "setlist",
       "rank",
       "event_status",
       "event_id",
@@ -561,9 +578,29 @@ class EventsSerializer(BaseSerializer):
       "type",
       "tags",
       "note",
-      # "bands",
-      # "relations",
     ]
+
+  def __init__(self, *args, **kwargs):
+    # Always run the super init first to populate self.fields
+    super().__init__(*args, **kwargs)
+
+    # Access the request object safely from context
+    request = self.context.get("request")
+
+    if request:
+      # Check for your specific parameter (e.g., ?include_extended=true)
+      include_setlist = (
+        request.query_params.get("include_setlist", "false").lower() == "true"
+      )
+
+      if include_setlist:
+        # Add the field dynamically to self.fields
+        self.fields["setlist"] = EventSetlistSerializer(
+          source="setlist_event",  # Points to a model method or property
+          read_only=True,
+          many=True,
+          required=False,
+        )
 
 
 class AdvSearchSerializer(BaseSerializer):

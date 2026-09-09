@@ -399,6 +399,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Added article tab to event detail page, also displays count of articles. This tab is hidden if no articles available for event.
 - Event search can be opened by pressing CTRL/CMD + K, much like how search works on other sites like Bootstrap.
 - Added Event reviews/ratings
+- Added alternate list view for Event Details
 
 ## Changed
 

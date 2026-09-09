@@ -1,7 +1,9 @@
+import re
 import string
 
 import bleach
 import markdown
+import nh3
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -23,11 +25,65 @@ class EMarkdown(markdown.Markdown):
 md = EMarkdown()
 
 
+@register.filter(name="format_event_id")
+def event_id_format(event_id: str) -> str:
+  event_num = event_id[-2:]
+  num = int(event_num)
+
+  cnt = string.ascii_lowercase[num - 1]
+
+  return f"{event_id[0:4]}{event_id[4:6]}{event_id[6:8]}{cnt}"
+
+
+@register.filter(name="format_event_note")
+def event_note_format(text: str) -> str:
+
+  text = text.replace("\r\n", "\n")
+
+  # Step 2: Use regex to replace single newlines with a space.
+  # This matches a newline only if it is NOT preceded or followed by another newline.
+  text = re.sub(r"\n{1,}", " ", text)
+
+  # Step 3: Clean up any accidental double spaces created by the merge
+  text = re.sub(r" +", " ", text)
+
+  raw_html = markdown.markdown(text)
+
+  return mark_safe(raw_html)
+
+
 @register.filter(name="markdown")
 def markdown_convert(note: str) -> str | None:
   if note:
-    # Wrap in mark_safe so Django renders the <a> tag as HTML
-    return mark_safe(md.convert(note))
+    raw_html = markdown.markdown(note)
+
+    # 2. Define safe elements
+    allowed_tags = [
+      "p",
+      "strong",
+      "em",
+      "a",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "ul",
+      "ol",
+      "li",
+      "br",
+      "code",
+      "pre",
+      "blockquote",
+    ]
+
+    # 3. Clean the HTML (strips script tags, onerror events, etc.)
+    cleaned_html = nh3.clean(
+      raw_html,
+      tags=set(allowed_tags),
+    )
+
+    return mark_safe(cleaned_html)
+
   return None
 
 
@@ -121,8 +177,9 @@ def markdown_safe(value):
 
 @register.inclusion_tag("databruce/partials/star_rating.html")
 def render_stars(rating):
-  """Safely converts a number (integer or float) into a 5-star array
-  and sends it to an isolated HTML partial template.
+  """Safely converts a number (integer or float) into a 5-star array.
+
+  Converts the number and sends it to an isolated HTML partial template.
   """
   try:
     rating = float(rating)

@@ -138,8 +138,7 @@ function addForm() {
 };
 
 function resetForm() {
-  var url = '/search/advanced';
-  window.location = url;
+  window.location.reload();
 }
 
 $(document).ready(function () {

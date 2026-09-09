@@ -7,6 +7,10 @@
     background-image: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)) !important;
   }
 
+  .text-secondary {
+    color: var(--color-secondary-dark) !important;
+  }
+
   .info-card-row .card {
     background-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
     border-color: color-mix(in oklab, var(--color-primary) 50%, black) !important;
@@ -125,25 +129,25 @@
 
   .card.message.info {
     --color: var(--color-cyan-100) !important;
-    --border-color: var(--color-cyan-800) !important;
-    --bg-color: var(--color-cyan-900) !important;
+    --border-color: var(--color-cyan-950) !important;
+    --bg-color: var(--color-cyan-950) !important;
   }
 
   .card.message.error {
     --color: var(--color-red-100) !important;
-    --border-color: var(--color-red-800) !important;
-    --bg-color: var(--color-red-900) !important;
+    --border-color: var(--color-red-950) !important;
+    --bg-color: var(--color-red-950) !important;
   }
 
   .card.message.warning {
     --color: var(--color-yellow-100) !important;
-    --border-color: var(--color-yellow-600) !important;
+    --border-color: var(--color-yellow-800) !important;
     --bg-color: var(--color-yellow-800) !important;
   }
 
   .card.message.success {
     --color: var(--color-green-100) !important;
-    --border-color: var(--color-green-800) !important;
+    --border-color: var(--color-green-900) !important;
     --bg-color: var(--color-green-900) !important;
   }
 

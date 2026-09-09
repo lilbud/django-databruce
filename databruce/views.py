@@ -23,8 +23,10 @@ from django.db.models import (
   Avg,
   Count,
   Exists,
+  F,
   Min,
   OuterRef,
+  Prefetch,
   Q,
   QuerySet,
   Subquery,
@@ -525,7 +527,7 @@ class UserAddShowView(LoginRequiredMixin, View):
 
     # Securely fetch the user ID from the active authenticated session
     UserAttendedShow.objects.get_or_create(
-      user_id=request.user.id,
+      user_id=request.user.id,  # type: ignore
       event_id=event_id,
     )
 
@@ -540,7 +542,7 @@ class UserRemoveShowView(LoginRequiredMixin, View):
 
     # Securely filter by the authenticated user's ID
     UserAttendedShow.objects.filter(
-      user_id=request.user.id,
+      user_id=request.user.id,  # type: ignore
       event_id=event_id,
     ).delete()
 
@@ -879,7 +881,7 @@ class EventDetailTestView(PageTitleMixin, TemplateView):
 
 
 class EventView(PageTitleMixin, TemplateView):
-  template_name = "databruce/events/events.html"
+  template_name = "databruce/events/events_table.html"
   title = "Events"
 
   def get_context_data(self, **kwargs: dict[str, Any]):
@@ -900,6 +902,36 @@ class EventView(PageTitleMixin, TemplateView):
 
     context["title"] = f"{context['year']} Events"
     context["description"] = f"{context['year']} Events"
+
+    display = self.request.GET.get("display", "table")
+    context["display"] = display
+
+    if display:
+      if display == "table":
+        self.template_name = "databruce/events/events_table.html"
+
+      elif display == "list":
+        context["events"] = (
+          Event.objects.filter(
+            Q(date__year=context["year"]) | Q(event_id__startswith=context["year"]),
+          )
+          .order_by("event_id")
+          .select_related("artist", "venue", "tour")
+          .prefetch_related(
+            "leg",
+            "run",
+            "venue__city",
+            "venue__city__state",
+            Prefetch(
+              "setlist_event",
+              queryset=Setlist.objects.select_related("song").order_by(
+                F("song_num").asc(nulls_first=True),
+              ),
+            ),
+          )
+        )
+
+        self.template_name = "databruce/events/events_list.html"
 
     return context
 

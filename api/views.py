@@ -311,50 +311,65 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
     # 4. CHOP UP FILTERS ACCORDING TO LOGICAL OPERATOR (THE FIX)
     # =========================================================================
     songs = []
+    filter = Q()
 
-    if conjunction == "or":
-      # For OR operations, a single combined filter is required.
-      or_filter = Q()
-      for query in setlist_queries:
-        condition = self._build_form_condition(query, position_filters)
-        or_filter |= condition
+    if len(setlist_queries) == 1:
+      query = setlist_queries[0]
 
-      queryset = queryset.filter(or_filter)
-    else:
-      and_filter = Q()
-      # For AND operations, loop and CHAIN discrete .filter() statements.
-      # This isolates the SQL multi-joins per row instead of cross-contaminating them.
-      for query in setlist_queries:
-        # songs.append(query["song_1"])
+      filter = Q(setlist_event__set_name__in=db_models.SetType.valid_sets())
 
-        if query["song_2"]:
-          songs.append(query["song_2"])
+      if query["position"] == "anywhere":
+        if query["choice"]:
+          filter &= Q(setlist_event__song_id=query["song_1"])
+        else:
+          filter &= ~Q(setlist_event__song_id=query["song_1"])
 
-        condition = self._build_form_condition(query, position_filters)
-        and_filter &= condition
+        return queryset.filter(filter).distinct()
 
-      queryset = queryset.filter(and_filter)
+    for query in setlist_queries:
+      # if query["choice"]:
+      songs.append(int(query["song_1"]))
 
-    songs = list(set(songs))
+      if query["song_2"]:
+        songs.append(int(query["song_2"]))
+
+      if query["position"] == "anywhere":
+        continue
+
+      condition = self._build_form_condition(query, position_filters)
+
+      if conjunction == "or":
+        filter |= condition
+      else:
+        filter &= condition
+
+    queryset = queryset.filter(
+      filter & Q(setlist_event__set_name__in=db_models.SetType.valid_sets()),
+    )
 
     if songs:
-      queryset = queryset.filter(setlist_event__song_id__in=songs)
+      if "followed_by" in [q["position"] for q in setlist_queries]:
+        queryset = queryset.filter(setlist_event__song_id__in=songs)
+      else:
+        for song in songs:
+          queryset = queryset.filter(
+            Q(setlist_event__song_id=song)
+            & Q(setlist_event__set_name__in=db_models.SetType.valid_sets()),
+          )
 
     # 5. Prevent duplicate entries from Many-To-Many relational joins
-    return queryset.distinct()
+    return queryset.filter(filter).distinct()
 
   def _build_form_condition(self, query, position_filters) -> Q:
-    match_songs = [int(query["song_1"])]
-
-    condition = Q(setlist_event__set_name__in=db_models.SetType.valid_sets())
+    condition = Q()
 
     if query["position"] == "followed_by" and query["song_2"]:
-      condition &= Q(setlist_event__song_id=query["song_1"]) & Q(
+      condition = Q(setlist_event__song_id=query["song_1"]) & Q(
         setlist_event__songs_page__next__song_id=query["song_2"],
       )
 
     else:
-      condition &= Q(setlist_event__song_id=query["song_1"])
+      condition = Q(setlist_event__song_id=query["song_1"])
 
       if query["position"] and query["position"] not in [
         "anywhere",
@@ -368,16 +383,12 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
 
       # followed by special case
       if query["position"] == "followed_by" and query["song_2"]:
-        match_songs.append(int(query["song_2"]))
-
         condition = Q(setlist_event__set_name__in=db_models.SetType.valid_sets()) & Q(
           Q(setlist_event__song_id=query["song_1"])
           & ~Q(
             setlist_event__songs_page__next__song_id=query["song_2"],
           ),
         )
-
-    print(condition)
 
     return condition
 
@@ -430,7 +441,14 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
       .prefetch_related(
         "venue__city__state",
         "leg",
-        "setlist_event",
+        Prefetch(
+          "setlist_event",
+          queryset=db_models.Setlist.objects.select_related("song")
+          .filter(
+            set_name__in=db_models.SetType.valid_sets(),
+          )
+          .order_by("song_num"),
+        ),
         "type",
         "tags",
       )

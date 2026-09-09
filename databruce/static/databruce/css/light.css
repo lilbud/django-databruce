@@ -12,6 +12,10 @@
     border-color: color-mix(in oklab, var(--color-primary) 20%, white) !important;
   }
 
+  .text-secondary {
+    color: var(--color-primary-dark) !important;
+  }
+
   .info-card {
     border-color: var(--border-color-light) !important;
   }

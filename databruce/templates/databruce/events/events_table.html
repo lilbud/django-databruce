@@ -10,21 +10,22 @@
   <div class="col-12">
     <div class="row">
       <div class="col">
-        <div class="d-flex justify-content-start mb-3">
+        <div class="d-flex justify-content-between mb-3">
           <div class="text-2xl pe-2">{{ year }} Events</div>
-          {% comment %} <div id="year-select" class="pe-2">
-            <button class="btn btn-sm btn-primary dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">{{ year }}</button>
-            <ul class="dropdown-menu">
-              {% for i in years %}
-                <li>
-                  <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div> {% endcomment %}
+          <div>
+            <div class="btn-group d-inline-flex gap-2 gx-2">
+              <a role="button"
+                 data-bs-toggle="tooltip"
+                 data-bs-title="View Events as Table"
+                 class="btn btn-sm btn-primary icon-button disabled"
+                 aria-disabled="true"><i class="bi bi-table"></i>Table</a>
+              <a role="button"
+                 data-bs-toggle="tooltip"
+                 data-bs-title="View Events as List"
+                 class="btn btn-sm btn-primary icon-button"
+                 href="{% url "events_year" year=year %}?display=list"><i class="bi bi-list"></i>List</a>
+            </div>
+          </div>
         </div>
         <div class="row my-3 d-flex-inline text-center text-sm">
           <p>
@@ -45,19 +46,19 @@
     </div>
   </div>
   <script>
-  $(document).ready(function () {
-    eventTable('/api/v1/events/?year={{ year }}&format=custom');
-  
-    $(function(){
-      // bind change event to select
-      $('#year_select').on('change', function () {
+    $(document).ready(function() {
+      eventTable('/api/v1/events/?year={{ year }}&format=custom');
+
+      $(function() {
+        // bind change event to select
+        $('#year_select').on('change', function() {
           var url = $(this).val() // get selected value
           if (url) { // require a URL
-              window.location = url; // redirect
+            window.location = url; // redirect
           }
           return false;
+        });
       });
     });
-  });
   </script>
 {% endblock content %}
