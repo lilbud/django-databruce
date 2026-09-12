@@ -1,3 +1,36 @@
+myModal.addEventListener('shown.bs.modal', function () {
+  const myInput = document.getElementById('eventSearch');
+  myInput.focus();
+});
+
+$("form").on("keydown", "input:not(textarea)", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+  }
+});
+
+$('#eventSearch').on('input', function () {
+  const query = $(this).val();
+
+  // If the query is a date, format to YYYY-MM-DD
+  if (/^\d/.test(query)) {
+    let numbersOnly = query.replace(/\D/g, '');
+    let formatted = '';
+
+    if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
+    if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
+    if (numbersOnly.length >= 6) formatted += '-' + numbersOnly.substring(6, 8);
+    $(this).val(formatted);
+  }
+
+  clearTimeout(searchTimer);
+
+  // Wait 500 milliseconds before calling the function
+  searchTimer = setTimeout(function () {
+    eventSearch(query);
+  }, 500);
+});
+
 function eventSearch(query) {
   // Clear the previous results
   results.innerHTML = '';

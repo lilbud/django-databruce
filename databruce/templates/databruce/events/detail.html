@@ -47,7 +47,7 @@
       </div>
     {% endif %}
     <!-- event info -->
-    <div class="row mb-2 mb-xl-3 gx-0">
+    <div class="row mb-3 gx-0">
       <div class="col">
         <div class="card">
           <div class="card-body" id="eventHeader">
@@ -60,8 +60,8 @@
                 </div>
               </div>
             {% endif %}
-            <div class="row mb-3">
-              <div class="col">
+            <div class="row row-gap-3">
+              <div class="col-12">
                 <div class="row">
                   <div class="text-wrap fw-semibold event-header-date">
                     <span class="text-primary" id="date">{{ event.get_date }}</span>
@@ -75,7 +75,7 @@
                     {% endfor %}
                   </div>
                 </div>
-                <div class="row text-sm text-reset">
+                <div class="row">
                   <div class="col event-header-venue">
                     {% if event.venue %}
                       <a class="text-reset fw-semibold"
@@ -92,9 +92,7 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="row mb-0">
-              <div class="col-auto">
+              <div class="col">
                 <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                      id="badge-row">
                   {% if event.event_type.length > 0 %}
@@ -164,16 +162,25 @@
       </div>
     </div>
     <!-- setlist and notes -->
+    {% if event.note %}
+      {% partialdef event-note %}
+        <div class="card">
+          <div class="card-header">
+            Notes
+            <i class="bi bi-pencil"></i>
+          </div>
+          <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
+        </div>
+      {% endpartialdef %}
+    {% endif %}
     <div class="tab-content overflow-hidden" id="myTabContent">
       <div class="tab-pane fade show active"
            id="overview"
            role="tabpanel"
            aria-labelledby="overview-tab"
            tabindex="0">
-        <div class="row row-cols-1
-                    {% if setlist_certainty %}row-cols-xl-2{% endif %}
-                    g-3">
-          {% if not setlist_certainty and not event.note %}
+        {% if not setlist_certainty and not event.note %}
+          <div class="row mb-3">
             <div class="col-12">
               <div class="card message info">
                 <span>
@@ -181,88 +188,74 @@
                 </span>
               </div>
             </div>
-          {% endif %}
-          <div class="col-12 {% if setlist_certainty %}col-xl-9{% endif %}">
-            {% if event.note %}
-              <div class="row d-xl-none mb-2 mt-0 gx-0">
-                <div class="col">
-                  {% partialdef event-note inline %}
-                    <div class="card">
-                      <div class="card-header">
-                        Notes
-                        <i class="bi bi-pencil"></i>
-                      </div>
-                      <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
-                    </div>
-                  {% endpartialdef %}
-                </div>
-              </div>
-            {% endif %}
-            {% if setlist_certainty %}
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-header">
-                    <div class="d-flex justify-content-between w-100">
-                      <span>Setlist</span>
-                      <span data-bs-toggle="tooltip"
-                            data-bs-html="true"
-                            data-bs-title="Setlist Options">
-                        <a role="button"
-                           class="btn btn-sm btn-primary icon-button collapse-toggle"
-                           data-bs-toggle="collapse"
-                           href="#options"
-                           aria-expanded="false"
-                           aria-controls="options">
-                          <svg xmlns="http://www.w3.org/2000/svg"
-                               width="16"
-                               height="16"
-                               fill="currentColor"
-                               class="bi bi-chevron-down collapse-icon"
-                               viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
-                          </svg>
-                        </a>
-                      </span>
-                    </div>
-                  </div>
-                  <div class="collapse" id="options">
-                    <!-- Inner wrapper handles the padding and spacing cleanly -->
-                    <div class="px-3 py-2 d-flex gap-2">
-                      <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
-                      <button id="download-btn"
-                              class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
-                    </div>
-                  </div>
-                  <div class="card-body p-0" id="setlistCard">
-                    <div class="table-responsive">
-                      <table class="table table-hover display nowrap" id="setlistTable">
-                        <thead>
-                          <tr>
-                            <!-- Added missing tr tag for semantic validation -->
-                            <th class="song_num">#</th>
-                            <th class="song">Song</th>
-                            <th class="gap min-tablet-l">Gap</th>
-                            <th class="tour_num min-tablet-l">Tour</th>
-                            <th class="last_event min-tablet-l">Last</th>
-                            <th class="notes min-desktop">Note</th>
-                          </tr>
-                        </thead>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
           </div>
-          <div class="col-12 {% if setlist_certainty %}col-xl-3{% endif %}">
-            <div class="row row-cols-2
-                        {% if setlist_certainty %}row-cols-xl-1{% endif %}
-                        g-3">
-              {% if event.note %}
-                <div class="col-12 col-md-6 col-xl-12 d-none d-xl-block order-1">{% partial event-note %}</div>
-              {% endif %}
+        {% elif event.note %}
+          <div class="row mb-3 d-block d-xl-none">
+            <div class="col-12">{% partial event-note %}</div>
+          </div>
+        {% endif %}
+        <div class="row
+                    {% if setlist_certainty %}row-cols-xl-2 row-gap-3 gx-3{% endif %}">
+          {% if setlist_certainty %}
+            <div class="col-12 col-xl-9 order-1">
+              <div class="card">
+                <div class="card-header">
+                  <div class="d-flex justify-content-between w-100">
+                    <span>Setlist</span>
+                    <span data-bs-toggle="tooltip"
+                          data-bs-html="true"
+                          data-bs-title="Setlist Options">
+                      <a role="button"
+                         class="btn btn-sm btn-primary icon-button collapse-toggle"
+                         data-bs-toggle="collapse"
+                         href="#options"
+                         aria-expanded="false"
+                         aria-controls="options">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             class="bi bi-chevron-down collapse-icon"
+                             viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                        </svg>
+                      </a>
+                    </span>
+                  </div>
+                </div>
+                <div class="collapse bg-highlight" id="options">
+                  <div class="px-3 py-2 d-flex gap-2">
+                    <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
+                    <button id="download-btn"
+                            class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
+                  </div>
+                </div>
+                <div class="card-body p-0" id="setlistCard">
+                  <div class="table-responsive">
+                    <table class="table table-hover display nowrap" id="setlistTable">
+                      <thead>
+                        <tr>
+                          <th class="song_num">#</th>
+                          <th class="song">Song</th>
+                          <th class="gap min-tablet-l">Gap</th>
+                          <th class="tour_num min-tablet-l">Tour</th>
+                          <th class="last_event min-tablet-l">Last</th>
+                          <th class="notes min-desktop">Note</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          <div class="col-12 d-flex flex-column gap-3
+                      {% if setlist_certainty %}col-xl-3 gap-3{% endif %}
+                      order-2">
+            <div class="d-none d-xl-block">{% partial event-note %}</div>
+            <div class="row g-3">
               {% if start_time or scheduled_time %}
-                <div class="col-12 col-lg-12 order-2">
+                <div class="col-12 col-md-6 col-xl-12">
                   <div class="card h-100">
                     <div class="card-header pb-0">
                       <span class="d-flex gap-2">Set Times</span>
@@ -310,147 +303,145 @@
                   </div>
                 </div>
               {% endif %}
-              <div class="col-12 order-3">
-                <div class="card">
-                  <div class="card-body px-3 py-0">
-                    <div class="row gx-2">
-                      <div class="col py-3">
-                        <a type="button"
-                           class="text-reset"
-                           data-bs-toggle="modal"
-                           data-bs-target="#userReviewModal">
-                          <div class="text-xs text-muted text-reset">Rating</div>
-                          <div class="text-lg fw-medium">{{ review_score|default_if_none:"0" }} / 5</div>
-                          <div class="text-muted text-3xs mb-2">{{ event.event_reviews.all|length }} Review{{ event.event_reviews.all|pluralize }}</div>
-                        </a>
-                        {% if user.is_authenticated and event.public %}
-                          {% if not user_review %}
-                            <button id="reviewshow"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#userAddReviewModal"
-                                    type="submit"
-                                    name="submit"
-                                    class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
+              {% if event.public %}
+                <div class="col-12 col-md-6 col-xl-12">
+                  <div class="card h-100">
+                    <div class="card-body px-3 py-0">
+                      <div class="row gx-2">
+                        <div class="col py-3">
+                          <a type="button"
+                             class="text-reset"
+                             data-bs-toggle="modal"
+                             data-bs-target="#userReviewModal">
+                            <div class="text-xs text-muted text-reset">Rating</div>
+                            <div class="text-lg fw-medium">{{ review_score|default_if_none:"0" }} / 5</div>
+                            <div class="text-muted text-3xs mb-2">{{ event.event_reviews.all|length }} Review{{ event.event_reviews.all|pluralize }}</div>
+                          </a>
+                          {% if user.is_authenticated %}
+                            {% if not user_review %}
+                              <button id="reviewshow"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#userAddReviewModal"
+                                      type="submit"
+                                      name="submit"
+                                      class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
+                            {% else %}
+                              <button id="reviewshow"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#userAddReviewModal"
+                                      type="submit"
+                                      name="submit"
+                                      class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
+                            {% endif %}
                           {% else %}
-                            <button id="reviewshow"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#userAddReviewModal"
-                                    type="submit"
-                                    name="submit"
-                                    class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="You must be logged in to review a show">
+                              <a role="button"
+                                 href="{% url 'login' %}?next={{ request.path }}"
+                                 class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</a>
+                            </span>
                           {% endif %}
-                        {% else %}
-                          <span data-bs-toggle="tooltip"
-                                data-bs-title="You must be logged in to review a show">
-                            <a role="button"
-                               href="{% url 'login' %}?next={{ request.path }}"
-                               class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</a>
-                          </span>
-                        {% endif %}
+                        </div>
+                        <span class="vr p-0"></span>
+                        <div class="col py-3">
+                          <a type="button"
+                             data-bs-toggle="modal"
+                             data-bs-target="#userListModal"
+                             class="text-reset">
+                            <div class="text-xs text-muted">Users Present</div>
+                            <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list|length }}</div>
+                          </a>
+                          {% if user.is_authenticated %}
+                            <form method="post" id="userForm">
+                              {% csrf_token %}
+                              <button id="addshow"
+                                      type="submit"
+                                      name="submit"
+                                      {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
+                                      class="btn btn-sm text-xs w-100 text-nowrap
+                                             {% if user_attended %}
+                                               btn-success
+                                             {% else %}
+                                               btn-neutral
+                                             {% endif %}
+                                             icon-button">
+                                <i class="bi
+                                          {% if user_attended %}
+                                            bi-star-fill
+                                          {% else %}
+                                            bi-star
+                                          {% endif %}"
+                                   id="star"></i>
+                                <span id="attended">
+                                  {% if user_attended %}
+                                    <span class="default-text">Attended</span>
+                                    <span class="hover-text">Remove?</span>
+                                  {% else %}
+                                    <span class="default-text">Attended?</span>
+                                    <span class="hover-text">Remove?</span>
+                                  {% endif %}
+                                </span>
+                              </button>
+                            </form>
+                          {% elif not user.is_authenticated %}
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="You must be logged in to add a show">
+                              <a role="button"
+                                 href="{% url 'login' %}?next={{ request.path }}"
+                                 class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Attended?</a>
+                            </span>
+                          {% endif %}
+                        </div>
                       </div>
-                      <span class="vr p-0"></span>
-                      <div class="col py-3">
-                        <a type="button"
-                           data-bs-toggle="modal"
-                           data-bs-target="#userListModal"
-                           class="text-reset">
-                          <div class="text-xs text-muted">Users Present</div>
-                          <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list|length }}</div>
-                        </a>
-                        {% if user.is_authenticated and event.public %}
-                          <form method="post" id="userForm">
-                            {% csrf_token %}
-                            <button id="addshow"
-                                    type="submit"
-                                    name="submit"
-                                    {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
-                                    class="btn btn-sm text-xs w-100 text-nowrap
-                                           {% if user_attended %}
-                                             btn-success
-                                           {% else %}
-                                             btn-neutral
-                                           {% endif %}
-                                           icon-button">
-                              <i class="bi
-                                        {% if user_attended %}
-                                          bi-star-fill
-                                        {% else %}
-                                          bi-star
-                                        {% endif %}"
-                                 id="star"></i>
-                              <span id="attended">
-                                {% if user_attended %}
-                                  <span class="default-text">Attended</span>
-                                  <span class="hover-text">Remove?</span>
-                                {% else %}
-                                  <span class="default-text">Attended?</span>
-                                  <span class="hover-text">Remove?</span>
-                                {% endif %}
-                              </span>
-                            </button>
-                          </form>
-                        {% elif not user.is_authenticated %}
-                          <span data-bs-toggle="tooltip"
-                                data-bs-title="You must be logged in to add a show">
-                            <a role="button"
-                               href="{% url 'login' %}?next={{ request.path }}"
-                               class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Attended?</a>
-                          </span>
-                        {% elif not event.public %}
-                          <span data-bs-toggle="tooltip" data-bs-title="Event is not a public event">
-                            <btn role="button"  class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button" disabled>Attended?</btn>
-                          </span>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% if setlist_certainty %}
-                <div class="col-12 col-lg-12 order-4">
-                  <div class="card h-100">
-                    <div class="card-header">
-                      Albums
-                      <span class="text-sm my-auto"
-                            data-bs-toggle="tooltip"
-                            data-bs-html="true"
-                            data-bs-title="Expand/Collapse All Rows">
-                        <a role="button"
-                           id="album-breakdown-btn"
-                           class="btn btn-sm btn-primary icon-button px-1"
-                           data-bs-toggle="collapse">
-                          <svg xmlns="http://www.w3.org/2000/svg"
-                               width="16"
-                               height="16"
-                               fill="currentColor"
-                               class="bi bi-three-dots"
-                               viewBox="0 0 16 16">
-                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                          </svg>
-                        </a>
-                      </span>
-                    </div>
-                    <div class="card-body p-0" id="albums"></div>
-                  </div>
-                </div>
-              {% endif %}
-              {% if event.event_tag.all %}
-                <div class="col-12 col-lg-12 order-last">
-                  <div class="card h-100">
-                    <div class="card-header">
-                      <span>Tags</span>
-                      <i class="bi bi-tag"></i>
-                    </div>
-                    <div class="card-body p-2" id="tags">
-                      {% for tag in event.event_tag.all %}
-                        <a href="{% url "events_by_tag" slug=tag.tag.slug %}">
-                          <span class="badge tag-badge">{{ tag.tag.slug }}</span></a>
-                      {% endfor %}
                     </div>
                   </div>
                 </div>
               {% endif %}
             </div>
+            {% if setlist_certainty %}
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    Albums
+                    <span class="text-sm my-auto"
+                          data-bs-toggle="tooltip"
+                          data-bs-html="true"
+                          data-bs-title="Expand/Collapse All Rows">
+                      <a role="button"
+                         id="album-breakdown-btn"
+                         class="btn btn-sm btn-primary icon-button px-1"
+                         data-bs-toggle="collapse">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="currentColor"
+                             class="bi bi-three-dots"
+                             viewBox="0 0 16 16">
+                          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                        </svg>
+                      </a>
+                    </span>
+                  </div>
+                  <div class="card-body p-0" id="albums"></div>
+                </div>
+              </div>
+            {% endif %}
+            {% if event.event_tag.all %}
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <span>Tags</span>
+                    <i class="bi bi-tag"></i>
+                  </div>
+                  <div class="card-body p-2" id="tags">
+                    {% for tag in event.event_tag.all %}
+                      <a href="{% url "events_by_tag" slug=tag.tag.slug %}">
+                        <span class="badge badge-primary tag-badge">{{ tag.tag.slug }}</span></a>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -843,11 +834,11 @@
             <div class="row">
               {% for comment in event.event_reviews.all %}
                 <div class="col-12 col-lg-6">
-                  <div class="card p-3 bg-default">
+                  <div class="card p-3">
                     <div class="row justify-content-between">
                       <div class="col">
                         <span class="text-sm">
-                          <span class="text-default">
+                          <span>
                             Reviewed by:
                             <span class="text-primary text-sm">{{ comment.user.username }}</span>
                           </span>
@@ -1140,12 +1131,15 @@
 
       const currentTheme = document.documentElement.getAttribute('data-bs-theme');
 
-      initializeShareCardGenerator({
-        buttonId: 'download-btn',
-        ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
-        downloadFilename: `databruce_${event_id}`,
-        activeTheme: currentTheme,
-      });
+      $('#downloadBtn').click(function() {
+        var btn = this;
+        initializeShareCardGenerator({
+          button: btn,
+          ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
+          downloadFilename: `databruce_${event_id}`,
+          activeTheme: currentTheme,
+        });
+      })
     });
   </script>
 {% endblock content %}

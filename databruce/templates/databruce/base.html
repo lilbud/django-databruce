@@ -70,7 +70,6 @@
     <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
     <!-- Other -->
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
-    <script src="{% static 'databruce/js/eventSearch.js' %}"></script>
     <!-- Datatables Scripts -->
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
     <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
@@ -146,103 +145,35 @@
         }
       });
 
-      myModal.addEventListener('shown.bs.modal', function() {
-        const myInput = document.getElementById('eventSearch');
-        myInput.focus();
-      });
-
-      $("form").on("keydown", "input:not(textarea)", function(event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-        }
-      });
-
-      $('#eventSearch').on('input', function() {
-        const query = $(this).val();
-
-        // If the query is a date, format to YYYY-MM-DD
-        if (/^\d/.test(query)) {
-          let numbersOnly = query.replace(/\D/g, '');
-          let formatted = '';
-
-          if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
-          if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
-          if (numbersOnly.length >= 6) formatted += '-' + numbersOnly.substring(6, 8);
-          $(this).val(formatted);
-        }
-
-        clearTimeout(searchTimer);
-
-        // Wait 500 milliseconds before calling the function
-        searchTimer = setTimeout(function() {
-          eventSearch(query);
-        }, 500);
-      });
-
-
-
-
-      // highlight link on offcanvas navbar if current page
-      const activePage = window.location.pathname;
-      const navLinks = $('a.bd-links-link').each(function(index, link) {
-        if (activePage === link.pathname) {
-          link.classList.add('active');
-        }
-      })
+      // Tooltips
       let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 
       tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
       });
-      const tabElements = document.querySelectorAll('[data-bs-toggle="pill"]');
-      tabElements.forEach(tabEl => {
-        tabEl.addEventListener('shown.bs.tab', (event) => {
-          var hash = event.target.getAttribute('data-bs-target') || event.target.getAttribute('href');
 
-          if (hash) {
-            history.replaceState(null, null, hash);
+
+      // 1. Update the URL hash when a tab is clicked
+      document.querySelectorAll('button[data-bs-toggle="tab"], a[data-bs-toggle="tab"], [data-bs-toggle="pill"]').forEach(tabEl => {
+        tabEl.addEventListener('shown.bs.tab', (e) => {
+          const hash = e.target.getAttribute('href') || e.target.getAttribute('data-bs-target');
+          if (hash && hash.startsWith('#')) {
+            history.pushState(null, null, hash); // Updates URL without jumping the page
           }
         });
       });
 
-      function activatePillFromUrlHash() {
-        const url = window.location.href;
-        if (url.includes("#")) {
-          const hash = url.substring(url.indexOf("#"));
-          var trigger = document.querySelector(`[data-bs-target="${hash}"]`);
-
-          if (trigger) {
-            const bsPill = new bootstrap.Tab(trigger);
-            bsPill.show();
+      window.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash;
+        if (hash) {
+          const triggerEl = document.querySelector(`[data-bs-target="${hash}"], [href="${hash}"]`);
+          if (triggerEl) {
+            const tab = new bootstrap.Tab(triggerEl);
+            tab.show();
           }
         }
-      }
-
-      activatePillFromUrlHash();
-
-      $(window).on('resize', function() {
-        DataTable.tables({
-            visible: true,
-            api: true
-          })
-          .columns.adjust()
-          .responsive.recalc();
-      });
-
-      // needed to fix pages with multiple tables behind tabs
-      $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function(e) {
-        setTimeout(() => {
-          let tables = DataTable.tables({
-            visible: true,
-            api: true
-          });
-          tables.columns.adjust();
-
-          if (tables.responsive) {
-            tables.responsive.recalc();
-          }
-        }, 50);
       });
     </script>
+    <script src="{% static 'databruce/js/eventSearch.js' %}"></script>
   </body>
 </html>

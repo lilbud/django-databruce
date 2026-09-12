@@ -63,7 +63,29 @@ DataTable.feature.register('customInputPaging', function (settings) {
   return container;
 });
 
+$(window).on('resize', function () {
+  DataTable.tables({
+    visible: true,
+    api: true
+  })
+    .columns.adjust()
+    .responsive.recalc();
+});
 
+// needed to fix pages with multiple tables behind tabs
+$('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+  setTimeout(() => {
+    let tables = DataTable.tables({
+      visible: true,
+      api: true
+    });
+    tables.columns.adjust();
+
+    if (tables.responsive) {
+      tables.responsive.recalc();
+    }
+  }, 50);
+});
 
 $.extend(true, DataTable.defaults, {
   searching: true,

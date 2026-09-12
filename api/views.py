@@ -443,11 +443,9 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         "leg",
         Prefetch(
           "setlist_event",
-          queryset=db_models.Setlist.objects.select_related("song")
-          .filter(
-            set_name__in=db_models.SetType.valid_sets(),
-          )
-          .order_by("song_num"),
+          queryset=db_models.Setlist.objects.select_related("song").order_by(
+            F("song_num").asc(nulls_first=True),
+          ),
         ),
         "type",
         "tags",
@@ -909,7 +907,8 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
         song__category=OuterRef("song__category"),
       )
       .values("song_id")
-      .order_by("song_num")
+      .distinct("song_id")
+      .order_by("song_id")
     )
 
     # Aggregate by category

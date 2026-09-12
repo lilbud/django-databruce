@@ -4,7 +4,8 @@
   {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+  <script src="{% static 'databruce/js/marked.umd.js' %}"></script>
+  <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
   <a href="#"
@@ -41,79 +42,46 @@
         <hr>
       </div>
     </div>
-    <div class="row">
-      <div class="col-12" id="eventContainer">
-        {% for event in events %}
-          <div class="row" id="{{ event.event_id|format_event_id }}">
-            <div class="col-12 px-3">
-              <a class="text-lg" href="{% url "event_details" id=event.event_id %}">
-                {% if event.date %}{{ event.date|date:'Y-m-d [D]' }}{% else %}{{ event.event_id|format_fuzzy }}{% endif %}
-                {% if event.early_late %}({{ event.early_late }}){% endif %} - {{ event.artist }} - {{ event.venue }}, {{ event.venue.city }}
-              </a>
-              {% regroup event.setlist_event.all by set_name as set_list %}
-              {% if set_list %}
-                <div class="row d-grid row-gap-2 mt-2 mb-3">
-                  {% for set, songs in set_list %}
-                    {% if set != "Soundcheck" %}
-                      <div class="text-sm">
-                        <div class="text-muted text-xs mb-1">{{ set }}:</div>
-                        {% for song in songs %}
-                          {% spaceless %}
-                            {% if song.debut or song.premiere %}
-                              <span class="fw-semibold fst-italic text-primary">{{ song.song.name }}</span>
-                            {% else %}
-                              <span>{{ song.song.name }}</span>
-                            {% endif %}
-                            {% if not forloop.last %}
-                              <span>{% if song.segue %} >{% else %} , {% endif %}</span>
-                            {% endif %}
-                          {% endspaceless %}
-                        {% endfor %}
-                      </div>
-                    {% else %}
-                      <div class="text-xs fst-italic my-1">
-                        <span>{{ set }}:</span>
-                        {% for song in songs %}
-                          {% spaceless %}
-                            {% if song.debut or song.premiere %}
-                              <span class="fw-semibold">{{ song.song.name }}</span>
-                            {% else %}
-                              <span>{{ song.song.name }}</span>
-                            {% endif %}
-                            {% if not forloop.last %}
-                              <span>{% if song.segue %} > {% else %} , {% endif %}</span>
-                            {% endif %}
-                          {% endspaceless %}
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              {% elif not set_list and not event.note %}
-                <div class="card message info my-2">
-                  <span>
-                    We currently have no information available for this event. If you do, please <a class="text-reset fw-semibold" href="{% url "contact" %}">get in touch.</a>
-                  </span>
-                </div>
-              {% elif event.setlist_event.all|length == 0 %}
-                <div class="card message error my-3">
-                  <span>No Setlist Known</span>
-                </div>
-              {% endif %}
-              {% if event.note %}
-                <div class="card">
-                  <div class="card-body text-xs event-note p-2">
-                    <div class="text-muted text-xs mb-1">Notes:</div>
-                    {{ event.note|format_event_note|safe }}
-                  </div>
-                </div>
-                {% comment %} <div class="text-muted mt-3 text-xs">Notes:</div> {% endcomment %}
-              {% endif %}
-            </div>
-          </div>
-          {% if not forloop.last %}<hr>{% endif %}
-        {% endfor %}
-      </div>
+    <div class="row row-cols-2 g-3" id="eventContainer">
+      {% for event in events %}
+        {% include "databruce/partials/event-list-item.html" with event=event %}
+      {% endfor %}
     </div>
   </div>
+  <script>
+    $(document).ready(async function() {
+      $('.userForm').submit(async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const addBtn = $(this).find('#add');
+
+        let action = addBtn.attr('data-action');
+        let event = addBtn.attr('data-event');
+        const url = `/events/${event}/${action}/`;
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const isAdded = data['action'] === 'added';
+
+          addBtn
+            .toggleClass('bi-star-fill', isAdded)
+            .toggleClass('bi-star', !isAdded)
+            .attr('data-attended', isAdded ? 'true' : 'false')
+            .attr('data-action', isAdded ? 'remove' : 'add');
+
+        } catch (error) {
+          console.error('Error during POST request:', error);
+        }
+      });
+    })
+  </script>
 {% endblock content %}

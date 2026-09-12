@@ -128,14 +128,14 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--color-primary-dark);
   scroll-margin-top: 60px;
 }
 
 h2,
 h3 {
   padding: .5em 0;
-  border-bottom: 1px solid var(--border-color-base);
+  border-width: 1px;
+  border-style: solid;
 }
 
 h1 {
@@ -163,8 +163,6 @@ h6 {
 }
 
 body {
-  background-color: var(--background-color-default);
-  color: var(--text-color-default) !important;
   font-size: 0.75rem !important;
   font-family: "Google Sans Flex", sans-serif;
   border-color: inherit !important;
@@ -238,18 +236,6 @@ ul:last-child {
   aspect-ratio: 1 / 1;
 }
 
-/* Navbar */
-.navbar {
-  background-color: var(--color-primary) !important;
-}
-
-.navbar .nav-item,
-.navbar .nav-item .btn,
-.navbar button.dropdown-toggle {
-  color: var(--color-white) !important;
-  border: none !important;
-}
-
 /* logo needs font size 0 to be centered, as it is an SVG */
 .navbar-brand,
 .navbar-brand-mobile {
@@ -299,7 +285,6 @@ a.text-reset,
   border-bottom: none !important;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  align-items: center;
 }
 
 .card-header>.d-flex {
@@ -315,11 +300,6 @@ a.text-reset,
   line-height: 1;
   height: 1.5rem;
   width: 1.5rem;
-}
-
-#options.collapse,
-#options.collapsing {
-  background-color: var(--background-color-highlight) !important;
 }
 
 .collapse-icon {
@@ -359,8 +339,6 @@ a.text-reset,
   margin-left: calc(-.5 * var(--bs-gutter-x));
 }
 
-
-
 #album .card-header {
   font-size: var(--text-xs) !important;
   font-weight: 500 !important;
@@ -376,15 +354,8 @@ a.text-reset,
 }
 
 .song-seen>a {
-  color: var(--color-primary) !important;
   font-weight: 600 !important;
 }
-
-.song-seen>.seenCount,
-.song-unseen>.song-name {
-  color: var(--text-color-default) !important;
-}
-
 
 /* Remove the border from the last row of cells to prevent card overlap */
 .card .table tbody tr:last-child th,
@@ -423,14 +394,13 @@ thead tr:first-child th {
 }
 
 .info-card {
-  background-color: var(--background-color-muted) !important;
-  border: 1px solid transparent !important;
+  border-width: 1px !important;
+  border-style: solid !important;
   padding: 0.5rem !important;
 }
 
 .info-card .title {
   font-size: var(--text-xs);
-  color: var(--text-color-muted) !important;
   line-height: 1rem;
   margin-bottom: 0.25rem !important;
   white-space: nowrap !important;
@@ -461,37 +431,12 @@ thead tr:first-child th {
   font-weight: 600 !important;
 }
 
-.card-header,
-.card-footer,
-.card,
-.list-group-item,
-.accordion-item,
-.modal-dialog,
-.modal-body {
-  background-color: var(--background-color-subtle);
-  color: var(--text-color-default);
-}
-
 .modal-dialog {
   border-radius: 0.5rem !important;
 }
 
 .modal-content {
   height: calc(100% - var(--bs-modal-margin) * 2);
-}
-
-.card-header,
-.card-footer,
-.card,
-.accordion-item {
-  border-color: var(--border-color-light);
-}
-
-.card.divider,
-.card .form-control,
-.card .form-select,
-.modal .form-control {
-  background-color: var(--background-color-default) !important;
 }
 
 #comment {
@@ -502,40 +447,12 @@ div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-value,
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-value,
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-condition {
-  border: 1px solid var(--bs-border-color) !important;
+  border-width: 1px;
+  border-style: solid;
 }
 
 #searchBuilderContainer .btn {
-  background-color: var(--color-primary) !important;
-  color: var(--color-white) !important;
   border: transparent !important;
-}
-
-#searchBuilderContainer .btn:hover {
-  background-color: var(--color-primary-dark) !important;
-}
-
-th,
-tr:not(.set-header) td:not(.song_num, .position, .highlighted, .sorting_1, [class*="dtcv-"]) {
-  background-color: var(--background-color-subtle) !important;
-}
-
-.form-control,
-.form-select {
-  background-color: var(--background-color-muted) !important;
-  border-color: var(--border-color-base) !important;
-}
-
-/* song number cell background when not position */
-td.song_num:not(:is([class*="opener"], [class*="closer"])) {
-  background-color: var(--background-color-muted) !important;
-  color: var(--text-color-default);
-}
-
-/* song number cell background when position */
-td.song_num[class*="opener"],
-td.song_num[class*="closer"] {
-  color: var(--color-contrast);
 }
 
 table th:not(.fc-day) {
@@ -543,14 +460,9 @@ table th:not(.fc-day) {
   font-weight: 500 !important;
 }
 
-table th:not(.fc-day, [class*="opener"], [class*="closer"], [class*="dt-ordering"]) {
-  background-color: var(--background-color-subtle) !important;
-}
-
 th.fc-day {
   /* padding: 0.2rem 0.5rem 0.15rem 0.5rem !important; */
   font-size: var(--text-xs) !important;
-  background-color: var(--background-color-subtle) !important;
   font-weight: 500 !important;
 }
 
@@ -567,20 +479,6 @@ th.fc-day {
 table tbody tr:not(.album-header, .set-header) td,
 tr.album-header>th {
   font-size: var(--text-xs) !important;
-}
-
-table td:not(.highlighted) a:not(.text-reset) {
-  color: var(--color-primary-dark) !important;
-}
-
-/* setlist table highlighting, different shades for light and dark */
-td.highlighted {
-  background-color: var(--background-color-highlight) !important;
-}
-
-/* change text color when setlist table rows highlighted */
-td.highlighted *:not(.badge) {
-  color: var(--text-color-default) !important;
 }
 
 table td a {
@@ -618,6 +516,8 @@ tbody tr:not(.set-header) {
   align-items: center !important;
   justify-content: center !important;
   border-radius: 100px !important;
+  border: none !important;
+  box-shadow: none !important;
   white-space: nowrap !important;
   width: max-content !important;
   cursor: pointer !important;
@@ -646,12 +546,20 @@ td .badge {
 
 /* font size clamp for event header. Inspired by WTED Archives */
 .event-header-date {
-  font-size: clamp(var(--text-xl), 3.8vw, var(--text-2xl)) !important;
+  font-size: clamp(var(--text-xl), 1.136rem + 0.485vw, var(--text-2xl)) !important;
 }
 
-.segue,
-.segue-mobile {
-  color: var(--color-primary-dark) !important;
+.event-header-venue {
+  font-size: clamp(var(--text-xs), 0.693rem + 0.242vw, var(--text-sm)) !important;
+  line-height: 1.5 !important;
+}
+
+.badge-row .badge {
+  /* Scales fluidly from 0.7rem to 0.75rem between 375px and 1200px viewports */
+  font-size: clamp(var(--text-2xs), 0.677rem + 0.097vw, var(--text-xs)) !important;
+
+  /* Keeps the badge pill padding proportional to the tiny text size */
+  /* padding: 0.25em 0.5em; */
 }
 
 .segue::before {
@@ -688,14 +596,12 @@ blockquote p {
 blockquote {
   margin: 0.5rem 0 !important;
   padding: 0.5rem !important;
-  border-left: 4px solid var(--color-primary) !important;
-  background-color: var(--background-color-muted);
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
 }
-
 
 .info-card small {
   margin-top: 0.1rem !important;
-  color: var(--text-color-muted) !important;
 }
 
 /* fix for scrolling table in card  */
@@ -751,22 +657,9 @@ td.fc-day {
   word-wrap: break-word !important;
 }
 
-/* dropdown items */
-.dropdown-item:hover {
-  background-color: var(--color-hover) !important;
-}
-
 /* remove border from disabled buttons */
 button:disabled {
   border-color: none !important
-}
-
-/* highlighting on jquery autocomplete menu */
-.ui-state-active:hover,
-.ui-state-active {
-  background-color: var(--color-primary) !important;
-  border-color: var(--color-primary) !important;
-  color: var(--text-color-default) !important;
 }
 
 /* column control dropdown */
@@ -776,7 +669,6 @@ button:disabled {
 
 .dropdown-item {
   font-size: var(--text-sm) !important;
-  color: var(--text-color-default) !important;
   overflow: hidden !important;
 }
 
@@ -792,21 +684,10 @@ button:disabled {
 .progress {
   height: 8px !important;
   border-radius: calc(infinity * 1px) !important;
-  background-color: var(--background-color-emphasis) !important;
-}
-
-.album-breakdown.complete .progress-bar {
-  background-color: var(--color-warning);
 }
 
 .progress-bar {
   border-radius: inherit !important;
-  background-color: var(--color-primary);
-}
-
-/* album breakdown on hover */
-.album-breakdown:hover {
-  background-color: color-mix(in oklab, var(--color-active) 15%, transparent) !important;
 }
 
 .tooltip-songs .song {
@@ -861,13 +742,9 @@ button:disabled {
 .nav-link.active {
   background-color: transparent !important;
   border-radius: 0 !important;
-  border-bottom: 3px solid var(--color-primary) !important;
-  color: var(--color-primary-dark) !important;
+  border-bottom-style: solid !important;
+  border-bottom-width: 3px !important;
   font-weight: 700 !important;
-}
-
-.nav-link:not(.active) {
-  color: var(--color-primary-dark) !important;
 }
 
 .card-header:has(.nav-pills) {
@@ -878,29 +755,9 @@ button>.badge {
   border-radius: calc(1px * infinity) !important;
 }
 
-button:not(.active)>.badge {
-  background-color: var(--color-blue-600) !important;
-  color: var(--color-blue-50) !important;
-}
-
-.dt-paging-button.page-item.active>button.page-link {
-  color: var(--color-white) !important;
-  background-color: var(--color-primary) !important;
-  border-color: var(--color-primary) !important;
-}
-
-.dt-paging-button.page-item:not(.active)>button.page-link {
-  color: var(--color-primary-dark) !important;
-}
-
 .page-link {
   padding: 0.3rem 0.7rem !important;
   font-size: var(--text-sm) !important;
-}
-
-/* inactive nav link color */
-a.nav-link:not(.active) {
-  color: var(--text-color-default) !important;
 }
 
 a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
@@ -923,35 +780,14 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   display: block;
 }
 
-/* links should be primary site color except buttons and certain classes */
-a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
-  color: var(--color-primary-dark) !important;
-}
-
-/* keep debug panel links white */
-#djDebugPanelList a {
-  color: white !important;
-}
-
 /* hides doubled column control buttons */
 .dt-column-header>.dtcc:nth-child(3) {
   display: none !important;
 }
 
-/* column control button icon color */
-table span.dtcc span.dtcc-button-icon,
-.set-header span {
-  color: var(--text-color-default) !important;
-}
-
 /* set-header default color */
 .set-header td {
-  background-color: var(--background-color-emphasis) !important;
   border: none !important;
-}
-
-.sorting_1 {
-  background-color: var(--background-color-muted) !important;
 }
 
 .set-header span,
@@ -959,43 +795,12 @@ table span.dtcc span.dtcc-button-icon,
   font-weight: 500 !important;
 }
 
-.song_num {
-  color: var(--text-color-default);
-}
+.badge {}
 
-/* set-header colors and badge colors */
-
-.show-opener,
-.pre-show-opener {
-  background-color: var(--color-primary) !important;
-}
-
-.set-2-opener {
-  background-color: var(--color-secondary) !important;
-}
-
-.set-1-closer,
-.main-set-closer,
-.set-2-closer,
-.pre-show-closer {
-  background-color: var(--color-warning) !important;
-}
-
-.encore-opener,
-.show-closer {
-  background-color: var(--color-danger) !important;
-}
-
-th.show-opener,
-th.set-2-opener,
-th.set-1-closer,
-th.main-set-closer,
-th.set-2-closer,
-th.pre-show-opener,
-th.pre-show-closer,
-th.encore-opener,
-th.show-closer {
-  color: #fff !important;
+.btn {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0.25rem !important;
 }
 
 /* button icon */
@@ -1007,18 +812,10 @@ th.show-closer {
   vertical-align: middle !important;
 }
 
-.nav-btn i {
+.navbar .btn i {
   font-weight: 900 !important;
   font-size: var(--text-xl);
 }
-
-/* .icon-button i:first {
-  padding-right: 0.5rem !important;
-}
-
-.icon-button i:last {
-  padding-left: 0.5rem !important;
-} */
 
 .icon-button {
   display: inline-flex;
@@ -1035,10 +832,6 @@ th.show-closer {
 .card-body.event-note blockquote>p {
   margin: 0 !important;
 }
-
-/* .card-body.event-note>p {
-  margin-top: 0.75rem !important;
-} */
 
 /* Ensure the last element has no margin regardless of tag */
 .card-body.event-note :last-child {
@@ -1070,7 +863,6 @@ div.dt-scroll-body {
 
 .btn,
 button {
-  gap: 0.5rem !important;
   align-items: center !important;
   vertical-align: middle !important;
 }
@@ -1123,11 +915,6 @@ button {
   }
 }
 
-.vertical-line {
-  border-left: 1px solid black;
-  height: auto;
-}
-
 .vr {
   margin: 0 0.75rem !important;
 }
@@ -1146,11 +933,11 @@ button {
 
 .album-breakdown .list-group-item {
   font-size: var(--text-3xs) !important;
-  background-color: var(--background-color-muted) !important;
 }
 
 #albums> :not(div:last-of-type) {
-  border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+  border-bottom-width: var(--bs-border-width);
+  border-bottom-style: solid;
 }
 
 .py-0\.5 {
@@ -1168,7 +955,8 @@ button {
 .fc-theme-standard td,
 .fc-theme-standard th,
 .fc-theme-standard .fc-scrollgrid {
-  border: 1px solid var(--border-color-base);
+  border-style: solid;
+  border-width: 1px;
 }
 
 .calendar.event:hover {
@@ -1176,49 +964,13 @@ button {
   box-shadow: inset 0 0 100px 100px 0, 0, 0, 0.1;
 }
 
-.calendar.release-event {
-  background-color: var(--color-warning) !important;
-  border-color: var(--color-contrast) !important;
-}
-
-.calendar.release-event-past {
-  background-color: transparent !important;
-  border-color: var(--color-warning) !important;
-}
-
+.calendar.release-event-past,
 .calendar.release-event-birthday {
   background-color: transparent !important;
-  border-color: var(--color-primary) !important;
-  color: var(--color-primary-dark) !important;
 }
 
-.calendar.event-run {
-  background-color: var(--color-secondary) !important;
-  border-color: var(--color-secondary) !important;
-  color: var(--color-contrast) !important;
-}
-
-.calendar.event {
-  color: var(--text-color-default) !important;
-}
-
-.calendar.event.show {
-  color: var(--color-contrast) !important;
-  background-color: var(--color-primary) !important;
-}
-
-.calendar.release-event .fc-event-main,
-.calendar.event-run .fc-event-main {
-  color: var(--color-contrast) !important;
-}
-
-.calendar.release-event-past .fc-event-main {
-  color: var(--color-warning) !important;
-  font-weight: 500 !important;
-}
-
+.calendar.release-event-past .fc-event-main,
 .calendar.release-event-birthday .fc-event-main {
-  color: var(--color-primary-dark) !important;
   font-weight: 500 !important;
 }
 
@@ -1271,16 +1023,15 @@ button {
   opacity: 0;
   visibility: hidden;
   overflow-y: scroll;
+  border-radius: var(--bs-border-radius) !important;
   padding: 0.3rem !important;
   overflow-x: hidden;
   transform: translateY(2px);
-  background-color: var(--background-color-default) !important;
-  border-radius: var(--bs-border-radius) !important;
-  border-color: var(--border-color-base) !important;
 }
 
 div.dt-button-collection {
-  border: var(--bs-border-width) solid var(--border-color-base) !important;
+  border-style: solid !important;
+  border-width: var(--bs-border-width);
 }
 
 .dropdown-menu.show {
@@ -1291,7 +1042,8 @@ div.dt-button-collection {
 }
 
 .ui-menu {
-  border: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color);
+  border-style: solid;
+  border-width: var(--bs-dropdown-border-width);
 }
 
 /* jquery autocomplete menu, display above all and scroll */
@@ -1300,7 +1052,6 @@ div.dt-button-collection {
   overflow-y: scroll;
   overflow-x: hidden;
   position: fixed;
-  background-color: var(--background-color-default) !important;
   z-index: 1100 !important;
   border-radius: var(--bs-border-radius);
   padding: 0.3rem !important;
@@ -1309,7 +1060,8 @@ div.dt-button-collection {
 .ui-widget {
   font-family: inherit !important;
   font-size: var(--text-sm) !important;
-  border: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color) !important;
+  border-style: solid;
+  border-width: var(--bs-dropdown-border-width);
 }
 
 /* Individual item styling */
@@ -1326,8 +1078,6 @@ div.dt-button-collection {
 
 /* Hover/Focus state */
 .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
-  color: var(--color-contrast) !important;
-  background-color: var(--color-primary) !important;
   border-radius: 0.3rem !important;
   border: none;
   margin: 0;
@@ -1354,11 +1104,6 @@ a>img {
   justify-content: center !important;
 }
 
-/* figure:not(.half) a {
-  width: 50% !important;
-  height: auto !important;
-} */
-
 figure.full a {
   width: 70% !important;
   height: auto !important;
@@ -1366,14 +1111,17 @@ figure.full a {
   justify-content: center !important;
 }
 
+figure.half a,
+figure.half img {
+  height: auto !important;
+}
+
 figure.half a {
   width: calc(50% - 0.5rem);
-  height: auto !important;
 }
 
 figure.half img {
   width: stretch !important;
-  height: auto !important;
 }
 
 figcaption {
@@ -1385,8 +1133,6 @@ figcaption {
 pre {
   padding: 1rem !important;
   border-radius: var(--bs-border-radius) !important;
-  background-color: var(--background-color-muted) !important;
-  color: var(--text-color-default) !important;
   word-wrap: break-word;
   white-space: pre-wrap;
   overflow-x: auto;
@@ -1397,7 +1143,8 @@ pre {
 
 .form-control,
 .form-select {
-  border: 1px solid var(--bs-border-color);
+  border-style: solid;
+  border-width: 1px;
 }
 
 .form-select-sm {
@@ -1406,11 +1153,9 @@ pre {
   border-radius: var(--bs-border-radius-sm);
 }
 
-/* .bi.bi-star,
-.bi.bi-star-fill {
-  height: 16px;
-  width: 16px;
-} */
+.set-row .song {
+  font-size: clamp(0.8rem, 1.5vw, 0.875rem) !important;
+}
 
 /* Ensure the arrow smoothly transitions when rotating */
 .custom-accordion-toggle .toggle-arrow {
@@ -1431,7 +1176,6 @@ pre {
   display: inline-block;
   font-size: var(--text-xs);
   border-radius: var(--bs-border-radius);
-  color: var(--text-color-default) !important;
 }
 
 .bd-links-heading {
@@ -1439,20 +1183,11 @@ pre {
   align-items: center !important;
 }
 
-.bd-links-link.active {
-  background-color: var(--color-primary) !important;
-  color: var(--color-contrast) !important;
-}
-
 .bd-links-link:hover {
   text-decoration: none !important;
-  background-color: var(--color-primary) !important;
-  color: var(--color-contrast) !important;
 }
 
 .list-unstyled .dropdown-item:hover {
-  background-color: var(--color-primary) !important;
-  color: var(--color-contrast) !important;
   border-radius: var(--bs-border-radius-sm) !important;
 }
 
@@ -1474,17 +1209,14 @@ pre {
   width: 250px;
 }
 
-.offcanvas {
-  background-color: var(--background-color-highlight) !important;
-}
-
 .border-top {
-  border-top: var(--bs-border-width) var(--bs-border-style) var(--border-color-dark) !important;
+  border-style: solid;
+  border-width: var(--bs-border-width);
+  border-color: var(--color-gray-600) !important;
 }
 
 .placeholder {
   height: 1.1rem !important;
-  background-color: var(--color-active) !important;
 }
 
 #chart {
@@ -1519,10 +1251,6 @@ pre {
   .dt-layout-end {
     columns: 2 !important;
   }
-
-  /* .dt-buttons {
-        width: 200px !important;
-    } */
 
   .dt-search {
     width: 100% !important;
@@ -1570,7 +1298,6 @@ pre {
   font-weight: 900 !important;
   font-size: var(--text-xl);
   line-height: 1;
-  color: var(--text-color-default) !important;
   vertical-align: middle !important;
 }
 
@@ -1578,10 +1305,6 @@ pre {
 .dtsb-search {
   margin-top: 1rem !important;
 }
-
-/* .modal-dialog {
-  max-width: 700px !important;
-} */
 
 @media (max-width: 550px) {
 
@@ -1612,20 +1335,9 @@ pre {
   cursor: wait !important;
 }
 
-.btn-prev:disabled,
-.btn-next:disabled {
-  color: var(--color-focus) !important;
-}
-
 .btn-prev,
 .btn-next {
-  color: var(--color-disabled-color) !important;
   font-weight: 700 !important;
-}
-
-.btn-prev:hover,
-.btn-next:hover {
-  color: var(--color-primary) !important;
 }
 
 .bi-chevron-right::before,
@@ -1643,10 +1355,6 @@ pre {
   column-gap: 0.5rem !important;
   row-gap: 0.5rem !important;
   display: flex !important;
-}
-
-a[href="https://datatables.net/tn/25"] {
-  color: red !important;
 }
 
 .set-header td span {
@@ -1741,13 +1449,15 @@ td.notes {
   height: 24px;
   background-size: cover;
   background-position: center;
-  border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+  border-style: solid;
+  border-width: var(--bs-border-width);
   border-radius: var(--bs-border-radius) !important;
 }
 
 .album-thumb img {
   border-radius: 0.25rem;
-  border: 1px solid var(--bs-border-color);
+  border-width: 1px;
+  border-style: solid;
   object-fit: cover;
 }
 
@@ -1772,21 +1482,10 @@ td.notes {
 }
 
 div.dtcv-container div.dtcv-card {
-  border: 1px solid var(--border-color-base);
+  border-width: 1px;
+  border-style: solid;
   border-radius: var(--bs-border-radius);
   padding: 1rem !important;
-  background-color: var(--background-color-default) !important;
-  color: var(--text-color-default) !important;
-}
-
-
-
-.dt-ordering-asc {
-  box-shadow: inset 0 3px 0 0 var(--color-primary) !important;
-}
-
-.dt-ordering-desc {
-  box-shadow: inset 0 -3px 0 0 var(--color-primary) !important;
 }
 
 table.dataTable th.dt-type-numeric div.dt-column-header {
@@ -1794,9 +1493,7 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 }
 
 .badge.tag-badge {
-  background-color: var(--color-primary) !important;
   font-family: 'JetBrains Mono', monospace !important;
-  color: var(--color-contrast) !important;
   font-weight: 500 !important;
   font-size: var(--text-3xs) !important;
   border-radius: 0.2rem !important;
@@ -1809,20 +1506,9 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 
 .count-badge {
   font-weight: 450 !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   border-radius: 100px !important;
-  padding: .1rem .15rem !important;
-}
-
-.nav-link.active .count-badge {
-  background-color: var(--color-blue-500) !important;
-  color: var(--color-white) !important;
-}
-
-.nav-link:not(.active) .count-badge {
-  background-color: var(--text-color-default) !important;
-  color: var(--color-contrast) !important;
+  padding: .2rem !important;
 }
 
 /* Completely hide the radio inputs */
@@ -1851,9 +1537,6 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
   position: relative;
   display: inline-block;
   margin: 0;
-
-  /* FIX: 8px padding on both sides creates a seamless 16px gap. 
-       Because padding keeps the hover state active, the flicker disappears. */
   padding: 0 4px;
 }
 
@@ -1877,15 +1560,9 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
 /* Hide the empty stars whenever the filled stars are triggered */
 .star-rating input[type="radio"]:checked~label .empty-star,
 .star-rating label:hover .empty-star,
-.star-rating label:hover~label .empty-star {
-  display: none;
-}
-
+.star-rating label:hover~label .empty-star,
+#addshow[data-attended="true"]:hover .default-text,
 #addshow .hover-text {
-  display: none;
-}
-
-#addshow[data-attended="true"]:hover .default-text {
   display: none;
 }
 
@@ -1905,17 +1582,26 @@ html {
 /* Styles and positions the button in the corner */
 .back-to-top {
   position: fixed;
-  /* bottom: 20px;
-  right: 20px; */
-  background-color: var(--color-blue-600);
+  background-color: var(--color-blue-500);
   color: #fff;
   padding: 15px 18px;
   text-decoration: none;
   border-radius: 100px;
   font-family: sans-serif;
   z-index: 9999;
-
   bottom: 30px;
   right: 30px;
-  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+}
+
+.badge[class*="subtle"],
+.btn[class*="subtle"] {
+  border-width: 0.1rem !important;
+  border-style: solid !important;
+}
+
+.badge[class*="outline"],
+.btn[class*="outline"] {
+  background-color: transparent !important;
+  border-width: 1px !important;
+  border-style: solid !important;
 }

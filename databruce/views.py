@@ -870,7 +870,7 @@ class EventDetailTestView(PageTitleMixin, TemplateView):
     if user.is_authenticated:
       context["user_attended"] = UserAttendedShow.objects.filter(
         user=user.pk,
-        event__id=event.pk,
+        event_id=event.pk,
       )
 
     context["users"] = UserAttendedShow.objects.filter(
@@ -926,6 +926,19 @@ class EventView(PageTitleMixin, TemplateView):
               "setlist_event",
               queryset=Setlist.objects.select_related("song").order_by(
                 F("song_num").asc(nulls_first=True),
+              ),
+            ),
+            "event_type__type",
+            "user_event__user",
+          )
+          .annotate(
+            # Check if a UserEvent exists linking this specific event to the logged-in user
+            was_present=Exists(
+              UserAttendedShow.objects.filter(
+                event_id=OuterRef("pk"),
+                user_id=self.request.user.id
+                if self.request.user.is_authenticated
+                else None,
               ),
             ),
           )
@@ -1274,6 +1287,8 @@ class AdvSearchView(PageTitleMixin, TemplateView):
       # 1. Unpack request.GET.lists() cleanly
       is_initial_submission = "form-TOTAL_FORMS" in request.GET
 
+      print(request.GET)
+
       if is_initial_submission:
         raw_params = {}
         clean_params = {}
@@ -1326,14 +1341,14 @@ class AdvSearchView(PageTitleMixin, TemplateView):
 
         # 2. Process '_exclude' transformations
         for key, value in list(raw_params.items()):
-          if key.endswith("_exclude") and value == "true":
+          if key.endswith("_exclude") and value.lower() == "true":
             field = key.replace("_exclude", "")
             if field in raw_params:
               clean_params[f"{field}__not"] = raw_params[field]
               raw_params.pop(field, None)
             continue
 
-          if not key.endswith("_exclude"):
+          if not key.endswith("_exclude") and not clean_params.get(f"{field}__not"):
             clean_params[key] = value
 
         # Clean formset items from formset.cleaned_data safely
@@ -1357,6 +1372,7 @@ class AdvSearchView(PageTitleMixin, TemplateView):
         if len(clean_params) != len(request.GET):
           redirect_url = reverse("adv_search_results")
           if clean_params:
+            print(clean_params)
             # CRITICAL: doseq=True ensures lists like {'type': ['4', '1']}
             # encode as 'type=4&type=1' instead of crashing/mangling
             redirect_url += "?" + urlencode(clean_params, doseq=True)

@@ -1,0 +1,111 @@
+<div class="col-12 event-card" id="{{ event.event_id|format_event_id }}">
+  <div class="card">
+    <div class="card-body">
+      <div class="header">
+        <div class="title text-2xl row d-flex justify-content-between">
+          <div class="col">
+            <a href="{% url "event_details" id=event.event_id %}"
+               class="text-reset
+                      {% for t in event.type.all %}
+                        {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
+                          text-danger
+                        {% else %}
+                          text-primary
+                        {% endif %}
+                      {% endfor %}fw-semibold">
+              {% if event.date %}{{ event.date|date:'Y-m-d [D]' }}{% else %}{{ event.event_id|format_fuzzy }}{% endif %}
+              {% if event.early_late %}({{ event.early_late }}){% endif %}
+            </a>
+          </div>
+          <div class="col-auto text-end" id="userPresent">
+            {% if user.is_authenticated and event.public and event.type.all.0.name not in "Rescheduled Cancelled Relocated No Gig Rumored" %}
+              <form method="post"
+                    id="userForm"
+                    class="userForm d-flex align-items-center">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn btn-link p-0 border-0 text-xl bi
+                               {% if event.was_present %}bi-star-fill{% else %}bi-star{% endif %}"
+                        data-event="{{ event.id }}"
+                        {% if event.was_present %}data-action="remove" data-attended="true"
+                        {% else %}
+                          data-action="add" data-attended="false"
+                        {% endif %}
+                        id="add"></button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+        <div class="subtitle my-1">
+          <div class="event-artist text-xl mb-1">{{ event.artist }}</div>
+          <div class="event-venue">
+            <div class="venue-name text-base mb-0">{{ event.venue }}</div>
+            <div class="venue-city text-2xs text-muted d-flex gap-1"><i class="bi bi-geo-alt-fill"></i>{{ event.venue.city }}</div>
+          </div>
+        </div>
+        <div class="badges my-3">
+          <span class="badge
+                       {% if event.type.all.0.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
+                         badge-danger
+                       {% else %}
+                         badge-primary
+                       {% endif %}">{{ event.type.all.0.name }}</span>
+        </div>
+      </div>
+      {% regroup event.setlist_event.all by set_name as set_list %}
+      {% if set_list %}
+        <hr>
+        <div class="row d-grid
+                    {% if set_name|length > 1 %}
+                      mt-2 mb-3{% endif %} row-gap-2 setlist">
+          {% for set, songs in set_list %}
+            {% if set == "Soundcheck" %}
+              <div class="set-row">
+                <span class="text-xs mb-1">{{ set }}:
+                  <span class="text-xs">
+                    {% for song in songs %}
+                      <span>{{ song.song.name }}</span>
+                      {% if not forloop.last %}
+                        <span>{% if song.segue %} >{% else %} , {% endif %}</span>
+                      {% endif %}
+                    {% endfor %}
+                  </span>
+                </span>
+              </div>
+            {% else %}
+              <div class="set-row">
+                <div class="text-muted text-xs mb-1 set-row-header">{{ set }}:</div>
+                <div class="song">
+                  {% for song in songs %}
+                    <span class="{% if song.debut or song.premiere %}fw-semibold fst-italic text-primary{% endif %}">{{ song.song.name }}</span>
+                    {% if not forloop.last %}
+                      <span>{% if song.segue %} >{% else %} , {% endif %}</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% elif not set_list and not event.note %}
+        <hr>
+        <div class="card message info my-2">
+          <span>
+            We currently have no information available for this event. If you do, please <a class="text-reset fw-semibold" href="{% url "contact" %}">get in touch.</a>
+          </span>
+        </div>
+      {% elif event.setlist_event.all|length == 0 and event.event_type.all.0 not in "Rescheduled Relocated" %}
+        <div class="card message error my-3">
+          <span>No Setlist Known</span>
+        </div>
+      {% endif %}
+      {% if event.note %}
+        <hr>
+        <div class="event-note">
+          <div class="text-muted mb-1">Notes:</div>
+          {{ event.note|format_event_note|safe }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

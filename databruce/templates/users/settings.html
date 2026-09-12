@@ -10,7 +10,7 @@
       <div class="card-body p-0 overflow-x-hidden">
         <div class="col">
           <div class="row mb-1 p-1 bg-highlight">
-            <div class="col text-xs text-center fw-semibold">Profile</div>
+            <div class="col text-xs text-center">Profile</div>
           </div>
           <form method="post"
                 class="p-3"
@@ -43,7 +43,7 @@
               </div>
             </div>
           </form>
-          <div class="row my-1 p-1 bg-highlight fw-semibold">
+          <div class="row my-1 p-1 bg-highlight">
             <div class="col text-xs text-center">Update Password</div>
           </div>
           <form method="post"
@@ -87,70 +87,69 @@
 {% endblock content %}
 {% block scripts %}
   <script>
-
-  function passwordChange(data, messageDiv) {
-    if ($(messageDiv).is(':empty')) {
-      // Container is empty: show the card immediately
-      $(messageDiv).addClass('mb-3');
-      $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
-      $(messageDiv).parent().show();
-
-    } else {
-      // Container is not empty: hide parent and clear content
-      $(messageDiv).parent().hide();
-      $(messageDiv).empty(); // Safely clears the old card
-
-      // Wait 1 second (1000ms) before showing the new card
-      setTimeout(() => {
+    function passwordChange(data, messageDiv) {
+      if ($(messageDiv).is(':empty')) {
+        // Container is empty: show the card immediately
         $(messageDiv).addClass('mb-3');
         $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
         $(messageDiv).parent().show();
-      }, 500);
+
+      } else {
+        // Container is not empty: hide parent and clear content
+        $(messageDiv).parent().hide();
+        $(messageDiv).empty(); // Safely clears the old card
+
+        // Wait 1 second (1000ms) before showing the new card
+        setTimeout(() => {
+          $(messageDiv).addClass('mb-3');
+          $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
+          $(messageDiv).parent().show();
+        }, 500);
+      }
     }
-  }
 
-  document.getElementById('profileForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // Stop standard form submission page reload
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+      e.preventDefault(); // Stop standard form submission page reload
 
-    const formData = new FormData(this);
-    const messageDiv = $('#profile-response-message>.col');
+      const formData = new FormData(this);
+      const messageDiv = $('#profile-response-message>.col');
 
-    fetch(this.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest' // Helps Django identify AJAX requests
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        passwordChange(data.messages, messageDiv);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  });
+      fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest' // Helps Django identify AJAX requests
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          passwordChange(data.messages, messageDiv);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
 
-  document.getElementById('changePasswordForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // Stop standard form submission page reload
+    document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+      e.preventDefault(); // Stop standard form submission page reload
 
-    const formData = new FormData(this);
-    const messageDiv = $('#password-response-message>.col');
+      const formData = new FormData(this);
+      const messageDiv = $('#password-response-message>.col');
 
-    fetch(this.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest' // Helps Django identify AJAX requests
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        passwordChange(data.messages, messageDiv);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  });
+      fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest' // Helps Django identify AJAX requests
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          passwordChange(data.messages, messageDiv);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
   </script>
 {% endblock scripts %}

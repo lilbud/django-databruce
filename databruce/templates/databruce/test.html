@@ -80,6 +80,16 @@
     </div>
     <div class="row mb-3 justify-content-center">
       <div class="col-auto">
+        <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
+             id="badge-row">
+          <span class="badge badge-purple">Test</span>
+          <span class="badge badge-purple-subtle">Test</span>
+          <span class="badge badge-purple-outline">Test</span>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-auto">
         <button class="btn btn-primary">Test</button>
         <button class="btn btn-primary-subtle">Test</button>
         <button class="btn btn-primary-outline">Test</button>
@@ -125,6 +135,13 @@
         <button class="btn btn-neutral">Test</button>
         <button class="btn btn-neutral-subtle">Test</button>
         <button class="btn btn-neutral-outline">Test</button>
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-center">
+      <div class="col-auto">
+        <button class="btn btn-purple">Test</button>
+        <button class="btn btn-purple-subtle">Test</button>
+        <button class="btn btn-purple-outline">Test</button>
       </div>
     </div>
     <div class="row mb-3">
@@ -189,7 +206,7 @@
   </div>
 </div>
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     var table = new DataTable('#eventTable', {
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=custom',
@@ -207,77 +224,77 @@
         ulList1.append('<li class="filter-item active" data-value=""><a href="">Show All</a></li>');
 
         const artistValueCounts = json.data.reduce((acc, row) => {
-            const val = row.artist.name;
-            if (val) acc[val] = (acc[val] || 0) + 1;
-            return acc;
+          const val = row.artist.name;
+          if (val) acc[val] = (acc[val] || 0) + 1;
+          return acc;
         }, {});
 
         const tourValueCounts = json.data.reduce((acc, row) => {
-            const val = row.tour.name;
-            if (val) acc[val] = (acc[val] || 0) + 1;
-            return acc;
+          const val = row.tour.name;
+          if (val) acc[val] = (acc[val] || 0) + 1;
+          return acc;
         }, {});
 
         // 4. Append each unique value with its count to the <ul>
-        $.each(artistValueCounts, function (value, count) {
-            ulList.append(
-                `<li class="filter-item" data-value="${value}">
+        $.each(artistValueCounts, function(value, count) {
+          ulList.append(
+            `<li class="filter-item" data-value="${value}">
                     <a href="">${value} (${count})</a>
                 </li>`
-            );
+          );
         });
-  
-        $.each(tourValueCounts, function (value, count) {
-            ulList1.append(
-                `<li class="filter-item" data-value="${value}">
+
+        $.each(tourValueCounts, function(value, count) {
+          ulList1.append(
+            `<li class="filter-item" data-value="${value}">
                     <a href="">${value} (${count})</a>
                 </li>`
-            );
+          );
         });
 
         // 5. Handle clicks on the list items
-        ulList.off('click', '.filter-item').on('click', '.filter-item', function (e) {
-            e.preventDefault();
+        ulList.off('click', '.filter-item').on('click', '.filter-item', function(e) {
+          e.preventDefault();
 
-            var selectedValue = $(this).attr('data-value');
-            
-            console.log("Selected Filter Value:", selectedValue);
+          var selectedValue = $(this).attr('data-value');
 
-            // Toggle an 'active' visual class for CSS styling
-            ulList.find('.filter-item').removeClass('active');
-            $(this).addClass('active');
+          console.log("Selected Filter Value:", selectedValue);
 
-            // Apply filter to column index 2 (office) and redraw the server-side table
-            table.column(2).search(selectedValue).draw();
+          // Toggle an 'active' visual class for CSS styling
+          ulList.find('.filter-item').removeClass('active');
+          $(this).addClass('active');
+
+          // Apply filter to column index 2 (office) and redraw the server-side table
+          table.column(2).search(selectedValue).draw();
         });
 
-        ulList1.off('click', '.filter-item').on('click', '.filter-item', function (e) {
-            e.preventDefault();
+        ulList1.off('click', '.filter-item').on('click', '.filter-item', function(e) {
+          e.preventDefault();
 
-            var selectedValue = $(this).attr('data-value');
-            
-            console.log("Selected Filter Value:", selectedValue);
+          var selectedValue = $(this).attr('data-value');
 
-            // Toggle an 'active' visual class for CSS styling
-            ulList.find('.filter-item').removeClass('active');
-            $(this).addClass('active');
+          console.log("Selected Filter Value:", selectedValue);
 
-            // Apply filter to column index 2 (office) and redraw the server-side table
-            table.column(5).search(selectedValue).draw();
+          // Toggle an 'active' visual class for CSS styling
+          ulList.find('.filter-item').removeClass('active');
+          $(this).addClass('active');
+
+          // Apply filter to column index 2 (office) and redraw the server-side table
+          table.column(5).search(selectedValue).draw();
         });
       }
     });
 
     // 💡 LOCK: Fires the exact millisecond before the AJAX request leaves the browser
-    table.on('preXhr', function () {
-        $('#artistContainer').addClass('list-locked');
-        $('#tourContainer').addClass('list-locked');
+    table.on('preXhr', function() {
+      $('#artistContainer').addClass('list-locked');
+      $('#tourContainer').addClass('list-locked');
     });
 
     // 🔓 UNLOCK: Fires the millisecond the server returns data (success or error)
-    table.on('xhr', function () {
-        $('#artistContainer').removeClass('list-locked');
-        $('#tourContainer').removeClass('list-locked');
+    table.on('xhr', function() {
+      $('#artistContainer').removeClass('list-locked');
+      $('#tourContainer').removeClass('list-locked');
     });
   });
 </script>

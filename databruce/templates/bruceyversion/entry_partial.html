@@ -1,14 +1,14 @@
 <a class="row entry-row"
    href="{% url "bruceyversion:entry_detail" id=entry.uuid %}">
-    <div class="col-3">
-        {{ entry.user }}
-        <br>
-        <span class="text-default">Votes: {{ entry.votes }}</span>
-    </div>
-    <div class="col-6 text-wrap text-break text-reset text-default">{{ entry.comment|truncatechars:200 }}</div>
-    <div class="col-3">
-        {{ entry.song.name }}
-        <br>
-        {{ entry.event.get_date }}
-    </div>
+  <div class="col-3">
+    {{ entry.user }}
+    <br>
+    <span>Votes: {{ entry.votes }}</span>
+  </div>
+  <div class="col-6 text-wrap text-break text-reset text-default">{{ entry.comment|truncatechars:200 }}</div>
+  <div class="col-3">
+    {{ entry.song.name }}
+    <br>
+    {{ entry.event.get_date }}
+  </div>
 </a>

@@ -49,7 +49,7 @@ def event_note_format(text: str) -> str:
 
   raw_html = markdown.markdown(text)
 
-  return mark_safe(raw_html)
+  return bleach.clean(raw_html, tags=[], strip=True)
 
 
 @register.filter(name="markdown")

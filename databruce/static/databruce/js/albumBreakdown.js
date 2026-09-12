@@ -30,6 +30,7 @@ async function albumBreakdown(url) {
   }
 
   const $albums = $('#albums');
+
   if (!$albums.length) {
     console.warn('Container #albums not found');
     return;
