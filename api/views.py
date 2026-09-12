@@ -18,6 +18,7 @@ from django.db.models import (
   Value,
 )
 from django.db.models.functions import Cast, Coalesce, Lower
+from django.db.models.manager import BaseManager
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import exceptions, viewsets
 from rest_framework.exceptions import ValidationError
@@ -38,6 +39,12 @@ class StandardSetPagination(PageNumberPagination):
   page_size = 10
   page_size_query_param = "per_page"
   max_page_size = 100
+
+
+class CustomLimitOffsetPagination(PageNumberPagination):
+  page_size_query_param = "page_size"
+  page_size = 10
+  max_page_size = 300
 
 
 class SubqueryCount(Subquery):
@@ -423,16 +430,14 @@ class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
   ordering_fields = ["event_id"]
 
 
-class EventViewSet(viewsets.ReadOnlyModelViewSet):
-  """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
-
-  def get_queryset(self):
+class EventListViewSet(viewsets.ReadOnlyModelViewSet):
+  def get_queryset(self) -> BaseManager:
     status_check = db_models.EventType.objects.filter(
       event_id=OuterRef("pk"),
-      type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
+      type_id__in=[6, 16, 21, 22, 23],  # Uses the through-table IDs directly
     )
 
-    return (
+    qs = (
       db_models.Event.objects.select_related(
         "artist",
         "tour",
@@ -450,8 +455,64 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         "type",
         "tags",
       )
-      .annotate(event_status=Exists(status_check))
+      .annotate(is_disrupted=Exists(status_check), type_name=F("type__name"))
     ).order_by("event_id")
+
+    if self.request.user.is_authenticated:
+      user_present = db_models.UserAttendedShow.objects.filter(
+        event_id=OuterRef("pk"),
+        user=self.request.user,
+      )
+
+      qs = qs.annotate(user_present=Exists(user_present))
+
+    return qs
+
+  serializer_class = api_serializers.EventListSerializer
+  filterset_class = api_filters.EventsFilter
+  pagination_class = CustomLimitOffsetPagination
+  ordering_fields = ["event_id"]
+
+
+class EventViewSet(viewsets.ReadOnlyModelViewSet):
+  """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
+
+  def get_queryset(self) -> BaseManager:
+    status_check = db_models.EventType.objects.filter(
+      event_id=OuterRef("pk"),
+      type_id__in=[6, 16, 21, 22, 23],  # Uses the through-table IDs directly
+    )
+
+    qs = (
+      db_models.Event.objects.select_related(
+        "artist",
+        "tour",
+        "venue__city__country",
+      )
+      .prefetch_related(
+        "venue__city__state",
+        "leg",
+        Prefetch(
+          "setlist_event",
+          queryset=db_models.Setlist.objects.select_related("song").order_by(
+            F("song_num").asc(nulls_first=True),
+          ),
+        ),
+        "type",
+        "tags",
+      )
+      .annotate(is_disrupted=Exists(status_check))
+    ).order_by("event_id")
+
+    if self.request.user.is_authenticated:
+      user_present = db_models.UserAttendedShow.objects.filter(
+        event_id=OuterRef("pk"),
+        user=self.request.user,
+      )
+
+      qs = qs.annotate(user_present=Exists(user_present))
+
+    return qs
 
   serializer_class = api_serializers.EventsSerializer
   filterset_class = api_filters.EventsFilter

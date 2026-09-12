@@ -105,7 +105,8 @@ def brucebase_url(event: str):
 
 
 @register.filter
-def format_fuzzy(value):
+def format_fuzzy(value) -> str:
+  """Format event_id as YYYY-MM-DD for events with no date."""
   year, month, day = value[0:4], value[4:6], value[6:8]
 
   if month == "00":

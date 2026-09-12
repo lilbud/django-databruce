@@ -812,9 +812,14 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   vertical-align: middle !important;
 }
 
+.year-selector {
+  font-size: clamp(var(--text-sm), -2vw + 3rem, var(--text-base)) !important;
+}
+
 .navbar .btn i {
   font-weight: 900 !important;
   font-size: var(--text-xl);
+  color: white !important;
 }
 
 .icon-button {
@@ -825,16 +830,16 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 }
 
 /* Apply margin to everything EXCEPT the very last element */
-.card-body.event-note p:not(:last-child) {
+.event-note p:not(:last-child) {
   margin-bottom: 0.5rem !important;
 }
 
-.card-body.event-note blockquote>p {
+.event-note blockquote>p {
   margin: 0 !important;
 }
 
 /* Ensure the last element has no margin regardless of tag */
-.card-body.event-note :last-child {
+.event-note :last-child {
   margin-bottom: 0 !important;
 }
 

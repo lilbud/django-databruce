@@ -665,12 +665,20 @@
     color: var(--color-blue-600) !important;
   }
 
+  .text-warning {
+    color: var(--color-yellow-600) !important;
+  }
+
   .bg-primary {
     background-color: var(--color-blue-500) !important;
   }
 
   .text-danger {
     color: var(--color-red-500) !important;
+  }
+
+  .text-info {
+    color: var(--color-cyan-500) !important;
   }
 
   .text-muted {

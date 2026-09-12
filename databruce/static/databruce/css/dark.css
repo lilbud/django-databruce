@@ -116,7 +116,7 @@
 
   .btn-danger,
   .badge-danger {
-    background-color: var(--color-red-900);
+    background-color: var(--color-red-700);
     color: var(--color-white);
   }
 
@@ -142,7 +142,7 @@
   /* warning */
   .btn-warning,
   .badge-warning {
-    background-color: var(--color-yellow-800);
+    background-color: var(--color-yellow-700);
     color: var(--color-white);
   }
 
@@ -660,6 +660,14 @@
 
   .text-danger {
     color: var(--color-red-400) !important;
+  }
+
+  .text-warning {
+    color: var(--color-yellow-600) !important;
+  }
+
+  .text-info {
+    color: var(--color-cyan-400) !important;
   }
 
   .text-muted {

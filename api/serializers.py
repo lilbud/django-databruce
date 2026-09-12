@@ -1,5 +1,4 @@
 import datetime
-from typing import Any
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
@@ -7,10 +6,22 @@ from rest_framework import serializers
 
 from bruceyversion.models import Entry, EntryComment
 from databruce import models
-from databruce.templatetags.filters import format_fuzzy
+from databruce.templatetags.filters import (
+  event_id_format,
+  event_note_format,
+  format_fuzzy,
+)
 from library.models import Article, Collection
 
 UserModel = get_user_model()
+
+EVENT_TYPE_COLOR_MAP = {
+  6: "danger",  # Cancelled
+  16: "danger",  # No Gig
+  21: "warning",  # Relocated
+  22: "warning",  # Rescheduled
+  23: "info",  # Rumored
+}
 
 
 class BaseSelect2Serializer(serializers.ModelSerializer):
@@ -31,18 +42,20 @@ class BaseSelect2Serializer(serializers.ModelSerializer):
     return str(attr) if attr is not None else str(obj)
 
 
-def get_date_from_instance(obj):
+def get_date_from_instance(obj) -> None | datetime.date | str:
   """Get event date from instance, creating date from id if needed."""
   event_id = getattr(obj, "event_id", None)
-  date = getattr(obj, "date", None)
+  date: datetime.date | None = getattr(obj, "date", None)
 
   if event_id is None:
     return None
 
   if not date:
-    date = datetime.datetime.strptime(format_fuzzy(event_id), "%Y-%m-%d")
+    return datetime.datetime.strptime(format_fuzzy(event_id), "%Y-%m-%d").strftime(
+      "%Y-%m-%d",
+    )
 
-  return date.strftime("%Y-%m-%d")
+  return date
 
 
 def get_formatted_city(obj):
@@ -115,6 +128,11 @@ class MinimalVenuesTextSerializer(BaseSerializer):
 
 
 class MinimalVenuesSerializer(BaseSerializer):
+  name = serializers.SerializerMethodField()
+
+  def get_name(self, obj):
+    return obj.get_name()
+
   class Meta:
     model = models.Venue
     fields = [
@@ -513,6 +531,95 @@ class EventTypesSerializer(BaseSerializer):
     fields = ["id", "name", "slug"]
 
 
+class EventListSerializer(BaseSerializer):
+  date = serializers.SerializerMethodField(method_name="get_date")
+  early_late = serializers.CharField(required=False, max_length=255)
+  artist = serializers.CharField(required=False, source="artist.name", max_length=255)
+  tour = serializers.CharField(required=False, source="tour.name", max_length=255)
+  venue = serializers.CharField(required=False, source="venue.get_name", max_length=255)
+  city = serializers.SerializerMethodField(required=False)
+
+  def get_city(self, obj):
+    try:
+      return get_formatted_city(obj.venue.city)
+    except AttributeError:
+      return None
+
+  leg = serializers.CharField(required=False, source="leg.name", max_length=255)
+  has_setlist = serializers.SerializerMethodField()
+
+  rank = serializers.IntegerField(required=False)
+  is_disrupted = serializers.BooleanField(required=False)
+  user_present = serializers.BooleanField(required=False)
+  public = serializers.BooleanField(required=False)
+
+  tags = serializers.SlugRelatedField(
+    many=True,
+    read_only=True,
+    slug_field="name",
+    required=False,
+  )
+
+  type = serializers.SerializerMethodField()
+
+  def get_type(self, obj):
+    return [
+      {"name": type.name, "class": EVENT_TYPE_COLOR_MAP.get(type.id, "primary")}
+      for type in obj.type.all()
+    ]
+
+  event_anchor = serializers.SerializerMethodField(required=False)
+  setlist = EventSetlistSerializer(
+    source="setlist_event",
+    read_only=True,
+    many=True,
+    required=False,
+  )
+
+  event_note = serializers.SerializerMethodField(required=False)
+
+  def get_event_anchor(self, obj) -> str:
+    return event_id_format(obj.event_id)
+
+  def get_has_setlist(self, obj) -> bool:
+    return bool(obj.setlist_event.exists())
+
+  def get_date(self, obj) -> None | datetime.date | str:
+    return get_date_from_instance(obj)
+
+  def get_event_note(self, obj) -> None | str:
+    if obj.note is None or obj.note == "":
+      return None
+
+    return event_note_format(obj.note)
+
+  class Meta:
+    model = models.Event
+    fields = [
+      "id",
+      "date",
+      "artist",
+      "tour",
+      "venue",
+      "city",
+      "leg",
+      "has_setlist",
+      "rank",
+      "is_disrupted",
+      "user_present",
+      "event_anchor",
+      "event_id",
+      "title",
+      "public",
+      "early_late",
+      "type",
+      "tags",
+      "note",
+      "setlist",
+      "event_note",
+    ]
+
+
 class EventsSerializer(BaseSerializer):
   date = serializers.SerializerMethodField(method_name="get_date")
   early_late = serializers.CharField(required=False, max_length=255)
@@ -535,7 +642,8 @@ class EventsSerializer(BaseSerializer):
   has_setlist = serializers.SerializerMethodField()
 
   rank = serializers.IntegerField(required=False)
-  event_status = serializers.BooleanField(required=False)
+  is_disrupted = serializers.BooleanField(required=False)
+  user_present = serializers.BooleanField(required=False)
   public = serializers.BooleanField(required=False)
 
   type = serializers.SlugRelatedField(
@@ -555,7 +663,7 @@ class EventsSerializer(BaseSerializer):
   def get_has_setlist(self, obj) -> bool:
     return bool(obj.setlist_event.exists())
 
-  def get_date(self, obj) -> None | str | Any:
+  def get_date(self, obj) -> None | datetime.date | str:
     return get_date_from_instance(obj)
 
   class Meta:
@@ -570,7 +678,8 @@ class EventsSerializer(BaseSerializer):
       "leg",
       "has_setlist",
       "rank",
-      "event_status",
+      "is_disrupted",
+      "user_present",
       "event_id",
       "title",
       "public",
@@ -579,28 +688,6 @@ class EventsSerializer(BaseSerializer):
       "tags",
       "note",
     ]
-
-  def __init__(self, *args, **kwargs):
-    # Always run the super init first to populate self.fields
-    super().__init__(*args, **kwargs)
-
-    # Access the request object safely from context
-    request = self.context.get("request")
-
-    if request:
-      # Check for your specific parameter (e.g., ?include_extended=true)
-      include_setlist = (
-        request.query_params.get("include_setlist", "false").lower() == "true"
-      )
-
-      if include_setlist:
-        # Add the field dynamically to self.fields
-        self.fields["setlist"] = EventSetlistSerializer(
-          source="setlist_event",  # Points to a model method or property
-          read_only=True,
-          many=True,
-          required=False,
-        )
 
 
 class AdvSearchSerializer(BaseSerializer):

@@ -454,7 +454,8 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Changed
 
 - Changed Event List view to use cards instead of just text. Also added a button for logged in users to add a seen show to their profile.
-- Event List Cards cleaned up and redesigned slightly. Still need to convert to generate via JS instead of in view but good enough for now.
+- Event List Cards cleaned up and redesigned.
+- Event List view now uses JS to render the cards, massively speeding up the page load.
 - Massive CSS cleanup, Moved all theme colors into their own separate files. `style.css` now only contains normal placement CSS. `dark.css` and `light.css` contain all theme colors and attribute color values. Should make adding new themes easier maybe? Was annoyed with the limited CSS variable style from Hummingbird.
 
 ## Removed

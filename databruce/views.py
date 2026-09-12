@@ -602,8 +602,8 @@ class EventDetailView(PageTitleMixin, TemplateView):
         "archive_links",
         "nugs_event",
         "release_event",
-        "event_type",
-        "event_tag",
+        "event_type__type",
+        "event_tag__tag",
         "event_article",
         "user_event",
         "event_reviews",
@@ -624,8 +624,6 @@ class EventDetailView(PageTitleMixin, TemplateView):
     context["setlist_certainty"] = bool(
       context["event"].setlist_certainty not in (None, "", "Unknown"),
     )
-
-    context["articles"] = context["event"].event_article.all()  # type: ignore
 
     if venue and venue.city and venue.city.timezone:
       tz_target = venue.city.timezone
@@ -711,6 +709,7 @@ class EventDetailView(PageTitleMixin, TemplateView):
           currency(context["event"].run.ticket_min),
           currency(context["event"].run.ticket_max),
         ]
+
     elif context["event"].ticket_range:
       context["ticket_range"] = [
         currency(float(x)) for x in context["event"].ticket_range.split("/")

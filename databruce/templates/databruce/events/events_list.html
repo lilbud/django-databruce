@@ -6,6 +6,7 @@
 {% block extrajs %}
   <script src="{% static 'databruce/js/marked.umd.js' %}"></script>
   <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
+  <script src="{% static 'databruce/js/eventCard.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
   <a href="#"
@@ -30,27 +31,53 @@
             </div>
           </div>
         </div>
-        <div class="row my-3 d-flex-inline text-center text-sm">
-          <p class="m-0">
+        <div class="row my-3 d-flex-inline text-center year-selector">
+          <div class="col-12 d-block d-xl-none" id="year-select">
+            <button class="btn btn-sm w-100 btn-primary dropdown-toggle position-relative"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ year }}</button>
+            <ul class="dropdown-menu">
+              {% for i in years %}
+                <li>
+                  <a class="dropdown-item"
+                     href="{% url "events_year" year=i %}?display=list">{{ i }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="d-none d-xl-block">
             {% for year in years reversed %}
               <a class="fw-medium mx-1"
                  href="{% url "events_year" year=year %}?display=list">{{ year }}</a>
               {% if not forloop.last %}/{% endif %}
             {% endfor %}
-          </p>
+          </div>
         </div>
         <hr>
       </div>
     </div>
     <div class="row row-cols-2 g-3" id="eventContainer">
-      {% for event in events %}
-        {% include "databruce/partials/event-list-item.html" with event=event %}
-      {% endfor %}
+      <div class="d-none">{% csrf_token %}</div>
     </div>
   </div>
   <script>
+    fetch(`/api/v1/event_list/?year={{ year }}&format=json&page_size=250`)
+      .then(response => response.json())
+      .then(data => {
+        data.results.forEach(function(item) {
+          var card = eventCard(item);
+          $('#eventContainer').append(card);
+        });
+      }).catch(error => {
+        console.error('Fetch error:', error);
+      });
+
     $(document).ready(async function() {
-      $('.userForm').submit(async function(e) {
+
+
+
+      $(document).on('submit', '.userForm', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         const addBtn = $(this).find('#add');

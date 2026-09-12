@@ -1,4 +1,4 @@
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -67,3 +67,42 @@ class DatatablesRenderer(JSONRenderer):
         data = {"data": data}
 
     return super().render(data, accepted_media_type, renderer_context)
+
+
+class EnvelopeOptionalPagination(PageNumberPagination):
+  page_size_query_param = "page_size"
+  page_size = 10
+  max_page_size = 1000
+
+  def paginate_queryset(self, queryset, request, view=None):
+    # Detect if 'all' was requested
+    if request.query_params.get(self.page_size_query_param) == "all":
+      # Safely get the total record count (supports querysets and standard lists)
+      try:
+        self.count = queryset.count()
+      except (AttributeError, TypeError):
+        self.count = len(queryset)
+
+      self.request = request
+
+      # If the database table is empty, force a minimal default size to prevent division errors
+      self.page_size = max(1, self.count)
+
+      # Mock pagination properties so get_paginated_response() has what it needs
+      self.page = self
+      self.has_next = lambda: False
+      self.has_previous = lambda: False
+
+      return list(queryset)
+
+    return super().paginate_queryset(queryset, request, view)
+
+  def get_next_link(self):
+    if self.request.query_params.get(self.page_size_query_param) == "all":
+      return None
+    return super().get_next_link()
+
+  def get_previous_link(self):
+    if self.request.query_params.get(self.page_size_query_param) == "all":
+      return None
+    return super().get_previous_link()

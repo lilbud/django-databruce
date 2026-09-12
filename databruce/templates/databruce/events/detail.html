@@ -349,7 +349,7 @@
                              data-bs-target="#userListModal"
                              class="text-reset">
                             <div class="text-xs text-muted">Users Present</div>
-                            <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list|length }}</div>
+                            <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list.count }}</div>
                           </a>
                           {% if user.is_authenticated %}
                             <form method="post" id="userForm">
@@ -727,7 +727,7 @@
           <div class="card">
             <div class="card-body">
               <ul>
-                {% for article in articles %}
+                {% for article in event.event_article.all %}
                   <li class="text-sm">
                     <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
                     ({{ article.source }})
