@@ -86,38 +86,39 @@
       {% endblock container %}
       {% include "./partials/searchbuilder.html" %}
     </div>
-    <div class="modal fade"
+    <div class="modal"
          id="searchModal"
          tabindex="-1"
          aria-labelledby="searchModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-body">
-            <div class="row mb-2">
-              <span class="text-muted">Note: Search is very much in beta. Best results will be when either using a date or part of a date + other field. Ex. Boston 1975</span>
-            </div>
-            <div class="row mb-3">
-              <form role="search" method="get" class="d-flex my-xl-auto">
+            <div class="row">
+              <div class="position-relative mb-3" id="searchGroup">
                 <input type="search"
                        id="eventSearch"
                        name="q"
                        class="form-control"
                        placeholder="Search by date (yyyy-mm-dd), venue, city, etc."
                        aria-label="Search">
-              </form>
-            </div>
-            <div class="row justify-content-center" id="loadingContainer">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <button type="button"
+                        class="btn-close position-absolute top-50 end-0 translate-middle-y me-4 d-none"
+                        id="clearFloatingInput"
+                        aria-label="Clear input"></button>
               </div>
             </div>
             <div class="row justify-content-center">
               <div class="col">
-                <ul id="results" class="list-group">
-                </ul>
+                <div class="search-results-scrollable overflow-y-auto">
+                  <ul id="results" class="list-group" tabindex="0">
+                  </ul>
+                </div>
               </div>
             </div>
+          </div>
+          <div class="modal-footer">
+            <span class="text-muted">Arrow Keys to navigate, Enter to Select, Esc. to close</span>
           </div>
         </div>
       </div>
@@ -132,19 +133,6 @@
       </div>
     </div>
     <script>
-      let searchTimer;
-
-      const myModal = document.getElementById('searchModal');
-      const bootstrapSearchModal = new bootstrap.Modal(myModal);
-
-      window.addEventListener('keydown', (event) => {
-        // Check for Cmd (Mac) or Ctrl (Windows/Linux) + K
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-          event.preventDefault(); // Stop default browser search behaviors
-          bootstrapSearchModal.show(); // Open the Bootstrap modal
-        }
-      });
-
       // Tooltips
       let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 

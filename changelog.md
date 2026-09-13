@@ -451,15 +451,20 @@ First public release of the site. Site was locked behind a login and accounts on
 
 ## Added
 
+- Keyboard input for Event Search modal. Arrow Keys to navigate, Enter to select.
+
 ## Changed
 
 - Changed Event List view to use cards instead of just text. Also added a button for logged in users to add a seen show to their profile.
 - Event List Cards cleaned up and redesigned.
 - Event List view now uses JS to render the cards, massively speeding up the page load.
 - Massive CSS cleanup, Moved all theme colors into their own separate files. `style.css` now only contains normal placement CSS. `dark.css` and `light.css` contain all theme colors and attribute color values. Should make adding new themes easier maybe? Was annoyed with the limited CSS variable style from Hummingbird.
+- Event Search Modal is now centered and is a bit faster. Also has clear input button.
 
 ## Removed
 
 ## Fixed
 
 - Fixed advanced search NOT filtering, wasn't working right
+- Fixed Calendar show events not showing up
+- Fixed broken Calendar styles

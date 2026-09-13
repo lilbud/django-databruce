@@ -206,7 +206,7 @@
 
   .btn-neutral,
   .badge-neutral {
-    background-color: var(--color-gray-500);
+    background-color: var(--color-gray-400);
     color: var(--color-white);
   }
 
@@ -297,7 +297,6 @@
   .card,
   .list-group-item,
   .accordion-item,
-  .modal-dialog,
   .modal-body {
     background-color: var(--color-gray-50);
     color: var(--color-gray-800);
@@ -317,8 +316,16 @@
   .card.divider,
   .card .form-control,
   .card .form-select,
-  .modal .form-control {
+  .modal .form-control,
+  .modal .list-group-item {
     background-color: var(--color-white) !important;
+  }
+
+  .search-item.active,
+  .search-item:hover {
+    background-color: var(--color-blue-600) !important;
+    border-color: var(--color-blue-700) !important;
+    color: var(--color-gray-100) !important;
   }
 
   div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
@@ -342,7 +349,7 @@
     background-color: var(--color-gray-50) !important;
   }
 
-  table td:not(.highlighted) a:not(.text-reset) {
+  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event) {
     color: var(--color-blue-600) !important;
   }
 
@@ -478,15 +485,21 @@
   }
 
   .set-1-closer,
-  .main-set-closer,
-  .set-2-closer,
   .pre-show-closer {
-    background-color: var(--color-yellow-500) !important;
+    background-color: var(--color-blue-600) !important;
   }
 
-  .encore-opener,
+  .main-set-closer,
+  .set-2-closer {
+    background-color: var(--color-teal-600) !important;
+  }
+
+  .encore-opener {
+    background-color: var(--color-red-400) !important;
+  }
+
   .show-closer {
-    background-color: var(--color-red-500) !important;
+    background-color: var(--color-red-600) !important;
   }
 
   th.show-opener,
@@ -519,44 +532,29 @@
 
   .calendar.release-event {
     background-color: var(--color-yellow-500) !important;
-    border-color: var(--color-white) !important;
+    border-color: var(--color-yellow-600) !important;
   }
 
   .calendar.release-event-past {
-    border-color: var(--color-yellow-500) !important;
+    background-color: var(--color-yellow-600) !important;
+    border-color: var(--color-yellow-700) !important;
   }
 
-  .calendar.release-event-birthday {
-    border-color: var(--color-blue-500) !important;
-    color: var(--color-blue-600) !important;
+  .calendar.event-birthday {
+    background-color: var(--color-teal-500) !important;
+    border-color: var(--color-teal-700) !important;
+    color: var(--color-teal-600) !important;
   }
 
   .calendar.event-run {
-    background-color: var(--color-teal-500) !important;
-    border-color: var(--color-teal-500) !important;
+    background-color: var(--color-green-600) !important;
+    border-color: var(--color-green-700) !important;
     color: var(--color-white) !important;
-  }
-
-  .calendar.event {
-    color: var(--color-gray-800) !important;
   }
 
   .calendar.event.show {
     color: var(--color-white) !important;
     background-color: var(--color-blue-500) !important;
-  }
-
-  .calendar.release-event .fc-event-main,
-  .calendar.event-run .fc-event-main {
-    color: var(--color-white) !important;
-  }
-
-  .calendar.release-event-past .fc-event-main {
-    color: var(--color-yellow-500) !important;
-  }
-
-  .calendar.release-event-birthday .fc-event-main {
-    color: var(--color-blue-600) !important;
   }
 
   .dropdown-menu:not(.ui-autocomplete) {

@@ -138,6 +138,10 @@ h3 {
   border-style: solid;
 }
 
+.fc-toolbar-title {
+  border: none !important;
+}
+
 h1 {
   font-size: var(--text-2xl);
 }
@@ -431,16 +435,22 @@ thead tr:first-child th {
   font-weight: 600 !important;
 }
 
-.modal-dialog {
+.modal-body {
   border-radius: 0.5rem !important;
-}
-
-.modal-content {
-  height: calc(100% - var(--bs-modal-margin) * 2);
 }
 
 #comment {
   height: 190px !important;
+}
+
+.search-results-scrollable {
+  max-height: 50vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optional cosmetic fix: ensures the container handles empty space nicely before AJAX runs */
+.search-results-scrollable:empty {
+  display: none;
 }
 
 div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
@@ -535,7 +545,7 @@ td .badge {
   border-radius: 5px !important;
   margin-top: -2px;
   font-family: 'JetBrains Mono Variable', monospace !important;
-  padding: .05rem .4rem !important;
+  padding: .2rem .4rem !important;
 }
 
 .bi.bi-check-lg {
@@ -969,9 +979,14 @@ button {
   box-shadow: inset 0 0 100px 100px 0, 0, 0, 0.1;
 }
 
-.calendar.release-event-past,
+/* .calendar.release-event-past,
 .calendar.release-event-birthday {
   background-color: transparent !important;
+} */
+
+
+.fc-event.main {
+  color: black !important;
 }
 
 .calendar.release-event-past .fc-event-main,
@@ -1158,8 +1173,12 @@ pre {
   border-radius: var(--bs-border-radius-sm);
 }
 
+.event-card .event-note {
+  font-size: clamp(var(--text-2xs), 0.693rem + 0.242vw, var(--text-xs)) !important;
+}
+
 .set-row .song {
-  font-size: clamp(0.8rem, 1.5vw, 0.875rem) !important;
+  font-size: var(--text-sm) !important;
 }
 
 /* Ensure the arrow smoothly transitions when rotating */

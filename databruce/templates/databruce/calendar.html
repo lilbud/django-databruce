@@ -1,36 +1,36 @@
 {% extends "databruce/wide_layout.html" %}
 {% block extrajs %}
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          validRange: {
-            start: '1965-06-01',
-            end: '{{ end_date }}',
-          },
-          fixedWeekCount: false,
-          initialDate: '{{ start_date }}',
-          schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-          dayMinWidth: 85,
-          height: 768,
-          dayMaxEventRows: true,
-          contentHeight: 768,
-          headerToolbar: {
-            start: 'title',
-            center: '',
-            end: 'prev,next'
-          },
-          themeSystem: 'bootstrap5',
-          eventSources: [
-            function(info, successCallback, failureCallback) {
-              fetch(`/api/v1/events/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        validRange: {
+          start: '1965-06-01',
+          end: '{{ end_date }}',
+        },
+        fixedWeekCount: false,
+        initialDate: '{{ start_date }}',
+        schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+        dayMinWidth: 85,
+        height: 768,
+        dayMaxEventRows: true,
+        contentHeight: 768,
+        headerToolbar: {
+          start: 'title',
+          center: '',
+          end: 'prev,next'
+        },
+        themeSystem: 'bootstrap5',
+        eventSources: [
+          function(info, successCallback, failureCallback) {
+            fetch(`/api/v1/events/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
               .then((resp) => resp.json())
               .then(function(data) {
                 var eventsList = [];
 
-                $(data.results).each(function (i, val){
+                $(data.results).each(function(i, val) {
                   var title = `${val.artist.name}: ${val.venue.name}`
 
                   if (val.early_late) {
@@ -38,183 +38,174 @@
                   }
 
                   if (val.type) {
-                    title += ` [${val.type.name}]`
+                    title += ` [${val.type[0]}]`
                   }
 
-                  eventsList.push(
-                    {
-                      title: title,
-                      start: val.date.display,
-                      url: `/events/${val.event_id}`,
-                      allDay: false,
-                      className: 'calendar event show px-1'
-                    }
-                  )
+                  eventsList.push({
+                    title: title,
+                    start: val.date,
+                    url: `/events/${val.event_id}`,
+                    allDay: false,
+                    className: 'calendar event show px-1'
+                  })
                 })
                 successCallback(eventsList);
               })
-            },
-            function (info, successCallback, failureCallback) {
-              fetch(`/api/v1/runs/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
+          },
+          function(info, successCallback, failureCallback) {
+            fetch(`/api/v1/runs/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
               .then((resp) => resp.json())
-              .then(function(data){
+              .then(function(data) {
                 var eventsList = [];
 
-                $(data.results).each(function (i, val){
-                  eventsList.push(
-                    {
-                      title: val.name,
-                      start: val.first_event.date.display,
-                      end: `${val.last_event.date.display}T23:59:59`,
-                      url: `/events/runs/${val.uuid}`,
-                      className: 'px-1 calendar event event-run',
-                    }
-                  )
+                $(data.results).each(function(i, val) {
+                  eventsList.push({
+                    title: val.name,
+                    start: val.first_event.date,
+                    end: `${val.last_event.date}T23:59:59`,
+                    url: `/events/runs/${val.uuid}`,
+                    className: 'px-1 calendar event-run',
+                  })
                 })
-                
+
                 successCallback(eventsList);
               })
-            },
-            function (info, successCallback, failureCallback) {
-              fetch(`/api/v1/releases/?format=json&start_date=${info.startStr}&end_date=${info.endStr}`)
+          },
+          function(info, successCallback, failureCallback) {
+            fetch(`/api/v1/releases/?format=json&start_date=${info.startStr}&end_date=${info.endStr}&current_year=true`)
               .then((resp) => resp.json())
-              .then(function(data){
+              .then(function(data) {
                 var eventsList = [];
-                
-                $(data.results).each(function (i, val){
+
+                $(data.results).each(function(i, val) {
                   let releaseDate = new Date(val.date);
-                  eventsList.push(
-                    {
-                      title: `${val.name} (${releaseDate.getFullYear()})`,
-                      start: val.date,
-                      url: `/releases/${val.uuid}`,
-                      className: 'px-1 calendar event release-event',
-                    }
-                  )
+                  eventsList.push({
+                    title: `${val.name}`,
+                    start: val.date,
+                    url: `/releases/${val.uuid}`,
+                    className: 'px-1 calendar release-event',
+                  })
                 })
-                
+
                 successCallback(eventsList);
               })
-            },
-            function (info, successCallback, failureCallback) {
-              
-              const midTime = info.start.getTime() + (info.end.getTime() - info.start.getTime()) / 2;
-              const midDate = new Date(midTime);
+          },
+          function(info, successCallback, failureCallback) {
 
-              const targetMonth = midDate.getMonth() + 1;
-              const currentViewYear = midDate.getFullYear();
+            const midTime = info.start.getTime() + (info.end.getTime() - info.start.getTime()) / 2;
+            const midDate = new Date(midTime);
 
-              fetch(`/api/v1/releases/?format=json&month=${targetMonth}&current_year=false`)
+            const targetMonth = midDate.getMonth() + 1;
+            const currentViewYear = midDate.getFullYear();
+
+            fetch(`/api/v1/releases/?format=json&month=${targetMonth}&current_year=false`)
               .then((resp) => resp.json())
-              .then(function(data){
+              .then(function(data) {
                 var eventsList = [];
                 const currentViewYear = info.start.getFullYear();
 
-                $(data.results).each(function (i, val){
+                $(data.results).each(function(i, val) {
 
                   let historicalDate = new Date(val.date);
                   let releaseDate = new Date(val.date);
                   historicalDate.setFullYear(currentViewYear);
 
-                  eventsList.push(
-                    {
-                      title: `${val.name} (${releaseDate.getFullYear()})`,
-                      start: historicalDate.toISOString().split('T')[0],
-                      url: `/releases/${val.uuid}`,
-                      className: 'px-1 calendar event release-event-past',
-                    }
-                  )
+                  eventsList.push({
+                    title: `${val.name} (${releaseDate.getFullYear()})`,
+                    start: historicalDate.toISOString().split('T')[0],
+                    url: `/releases/${val.uuid}`,
+                    className: 'px-1 calendar release-event-past',
+                  })
                 })
-                
+
                 successCallback(eventsList);
               })
-            },
-            function (info, successCallback, failureCallback) {
-              fetch(`/api/v1/relations/?format=json&month=${info.start.getMonth() + 2}&show_cal=true`)
+          },
+          function(info, successCallback, failureCallback) {
+            fetch(`/api/v1/relations/?format=json&month=${info.start.getMonth() + 2}&show_cal=true`)
               .then((resp) => resp.json())
-              .then(function(data){
+              .then(function(data) {
                 var eventsList = [];
                 const currentViewYear = info.start.getFullYear();
 
-                $(data.results).each(function (i, val){
+                $(data.results).each(function(i, val) {
 
                   let historicalDate = new Date(val.start_date);
                   let birthYear = historicalDate.getUTCFullYear();
                   historicalDate.setFullYear(currentViewYear);
 
-                  eventsList.push(
-                    {
-                      title: `${val.name} (${birthYear})`,
-                      start: historicalDate.toISOString().split('T')[0],
-                      className: 'px-1 calendar event release-event-birthday',
-                    }
-                  )
+                  eventsList.push({
+                    title: `${val.name} (${birthYear})`,
+                    start: historicalDate.toISOString().split('T')[0],
+                    className: 'px-1 calendar event-birthday',
+                  })
                 })
-                
+
                 successCallback(eventsList);
               })
-            },
-          ],
-          eventClick: function(info) {
-            // Check if the event has a URL
-            if (info.event.url) {
-              // Open the URL in a new tab
-              window.open(info.event.url, '_blank');
-              // Prevent the browser from navigating in the current tab
-              info.jsEvent.preventDefault();
-            }
           },
-
-          eventContent: function( info ) {
-            return {html: info.event.title};
+        ],
+        eventClick: function(info) {
+          // Check if the event has a URL
+          if (info.event.url) {
+            // Open the URL in a new tab
+            window.open(info.event.url, '_blank');
+            // Prevent the browser from navigating in the current tab
+            info.jsEvent.preventDefault();
           }
-        });
-        calendar.render();
+        },
 
-        $('#year-select > button').text(calendar.getDate().getFullYear())
+        eventContent: function(info) {
+          return {
+            html: info.event.title
+          };
+        }
       });
-    </script>
+      calendar.render();
+
+      $('#year-select > button').text(calendar.getDate().getFullYear())
+    });
+  </script>
 {% endblock extrajs %}
 {% load static %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-    <div class="col-12 col-xl-10">
-        <div class="row">
-            <div class="col">
-                <div class="d-flex justify-content-start mb-3">
-                    <div class="text-2xl mb-3 pe-2">Event Calendar</div>
-                    <div id="year-select">
-                        <button class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                id="my-button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">{{ start_date|date:'Y' }}</button>
-                        <ul class="dropdown-menu">
-                            {% for i in years %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
+  <div class="col-12 col-xl-10">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-start mb-3">
+          <div class="text-2xl mb-3 pe-2">Event Calendar</div>
+          <div id="year-select">
+            <button class="btn btn-sm btn-primary dropdown-toggle"
+                    type="button"
+                    id="my-button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ start_date|date:'Y' }}</button>
+            <ul class="dropdown-menu">
+              {% for i in years %}
+                <li>
+                  <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-        <div class="row">
-            <div id="calendar"></div>
-        </div>
+      </div>
     </div>
-    <script>
-    $(document).ready(function () {
+    <div class="row">
+      <div id="calendar"></div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function() {
       var date = new Date();
 
-      let currentMonth = (date.getMonth()+1).toString().padStart(2,"0");
-      let currentDay = date.getDate().toString().padStart(2,"0");
+      let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+      let currentDay = date.getDate().toString().padStart(2, "0");
 
       $(`td[data-date$='${currentMonth}-${currentDay}']`).addClass('today');
     });
-
-    </script>
+  </script>
 {% endblock content %}

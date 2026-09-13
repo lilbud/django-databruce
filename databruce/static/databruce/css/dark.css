@@ -296,7 +296,6 @@
   .card,
   .list-group-item,
   .accordion-item,
-  .modal-dialog,
   .modal-body {
     background-color: var(--color-gray-800);
     color: var(--color-gray-100);
@@ -316,8 +315,16 @@
   .card.divider,
   .card .form-control,
   .card .form-select,
-  .modal .form-control {
+  .modal .form-control,
+  .modal .list-group-item {
     background-color: var(--color-gray-900) !important;
+  }
+
+  .search-item.active,
+  .search-item:hover {
+    background-color: var(--color-blue-600) !important;
+    border-color: var(--color-blue-700) !important;
+    color: var(--color-white) !important;
   }
 
   div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-data,
@@ -478,15 +485,21 @@
   }
 
   .set-1-closer,
-  .main-set-closer,
-  .set-2-closer,
   .pre-show-closer {
-    background-color: var(--color-yellow-600) !important;
+    background-color: var(--color-blue-700) !important;
   }
 
-  .encore-opener,
+  .set-2-closer,
+  .main-set-closer {
+    background-color: var(--color-teal-800) !important;
+  }
+
+  .encore-opener {
+    background-color: var(--color-red-400) !important;
+  }
+
   .show-closer {
-    background-color: var(--color-red-600) !important;
+    background-color: var(--color-red-800) !important;
   }
 
   th.show-opener,
@@ -517,46 +530,40 @@
     border-color: var(--color-gray-700);
   }
 
+  .fc-theme-standard .fc-popover {
+    background: var(--color-gray-900);
+    border: 1px solid var(--color-gray-950);
+  }
+
+  .fc-popover-body {
+    padding: 1rem !important;
+  }
+
   .calendar.release-event {
-    background-color: var(--color-yellow-400) !important;
-    border-color: var(--color-white) !important;
+    background-color: var(--color-yellow-500) !important;
+    border-color: var(--color-yellow-600) !important;
   }
 
   .calendar.release-event-past {
-    border-color: var(--color-yellow-400) !important;
+    background-color: var(--color-yellow-600) !important;
+    border-color: var(--color-yellow-700) !important;
   }
 
-  .calendar.release-event-birthday {
-    border-color: var(--color-blue-500) !important;
-    color: var(--color-blue-600) !important;
+  .calendar.event-birthday {
+    background-color: var(--color-teal-500) !important;
+    border-color: var(--color-teal-800) !important;
+    color: var(--color-teal-600) !important;
   }
 
   .calendar.event-run {
-    background-color: var(--color-teal-400) !important;
-    border-color: var(--color-teal-400) !important;
+    background-color: var(--color-green-600) !important;
+    border-color: var(--color-green-700) !important;
     color: var(--color-white) !important;
-  }
-
-  .calendar.event {
-    color: var(--color-gray-100) !important;
   }
 
   .calendar.event.show {
     color: var(--color-white) !important;
     background-color: var(--color-blue-500) !important;
-  }
-
-  .calendar.release-event .fc-event-main,
-  .calendar.event-run .fc-event-main {
-    color: var(--color-white) !important;
-  }
-
-  .calendar.release-event-past .fc-event-main {
-    color: var(--color-yellow-400) !important;
-  }
-
-  .calendar.release-event-birthday .fc-event-main {
-    color: var(--color-blue-600) !important;
   }
 
   .dropdown-menu {

@@ -54,7 +54,7 @@ def event_note_format(text: str) -> str:
 
 @register.filter(name="markdown")
 def markdown_convert(note: str) -> str | None:
-  if note:
+  if note and note != "":
     raw_html = markdown.markdown(note)
 
     # 2. Define safe elements

@@ -16,7 +16,7 @@
   {% endif %}
   <div class="col d-grid gap-0 gx-0">
     <!-- next and last buttons-->
-    <div class="row mb-2 mb-xl-3 gx-0">
+    <div class="row mb-2 gx-0">
       <div class="col gap-0 column-gap-1 d-flex justify-content-end">
         {% if prev_event %}
           <a role="button"
@@ -252,7 +252,9 @@
           <div class="col-12 d-flex flex-column gap-3
                       {% if setlist_certainty %}col-xl-3 gap-3{% endif %}
                       order-2">
-            <div class="d-none d-xl-block">{% partial event-note %}</div>
+            {% if event.note %}
+              <div class="d-none d-xl-block">{% partial event-note %}</div>
+            {% endif %}
             <div class="row g-3">
               {% if start_time or scheduled_time %}
                 <div class="col-12 col-md-6 col-xl-12">
@@ -520,14 +522,14 @@
                   </ul>
                 {% endfor %}
               {% endif %}
-              {% if event.brucebase_url or event.nugs_event %}
+              {% if event.brucebase_url or event.nugs_event.all.0 %}
                 <ul class="ps-3">
                   {% if event.brucebase_url %}
                     <li class="ps-0">
                       <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
                     </li>
                   {% endif %}
-                  {% if event.nugs_event %}
+                  {% if event.nugs_event.all.0 %}
                     <li class="ps-0">
                       <a href="{{ event.nugs_event.all.0.url }}">Nugs Release</a>
                     </li>

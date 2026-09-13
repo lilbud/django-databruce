@@ -7,15 +7,16 @@ function eventCard(event) {
 
   if (!event.note && !event.setlist.length) {
     note_card = `
-        <div class="card message info my-2">
+        <div class="card message info mt-3">
           <span>
             We currently have no information available for this event. If you do, please <a class="text-reset fw-semibold" href="{% url "contact" %}">get in touch.</a>
           </span>
         </div>
     `
-  } else if (!event.setlist.length) {
+  } else if (!event.setlist.length && event.type[0].name != "No Gig") {
     note_card = `
-        <div class="card message error my-3">
+    <hr>
+        <div class="card message error mt-3">
           <span>No Setlist Known</span>
         </div>
     `
