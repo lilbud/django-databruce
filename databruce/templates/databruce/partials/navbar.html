@@ -88,20 +88,20 @@
         </li>
         {% if user.is_authenticated %}
           <li class="nav-item dropdown list-unstyled">
-            <button class="btn btn-sm
-                           {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                    aria-label="User account menu"
-                    id="userAccountDropdown">
+            <a class="btn btn-sm dropdown-toggle
+                      {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+               type="button"
+               data-bs-toggle="dropdown"
+               aria-expanded="false"
+               aria-haspopup="true"
+               aria-label="User account menu"
+               id="userAccountDropdown">
               <i class="bi bi-person-fill text-xl" aria-hidden="true"></i>
-            </button>
+            </a>
             <ul class="dropdown-menu dropdown-menu-end"
                 aria-labelledby="userAccountDropdown">
               <li>
-                <div class="text-sm px-4 py-1 dropdown-item pe-none">
+                <div class="text-sm px-4 py-1 dropdown-item pe-none fw-medium">
                   Hello {{ user }}
                   {% if user.is_superuser %}
                     (Admin)

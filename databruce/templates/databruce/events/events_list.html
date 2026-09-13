@@ -57,7 +57,7 @@
         <hr>
       </div>
     </div>
-    <div class="row row-cols-2 g-3" id="eventContainer">
+    <div class="row g-3" id="eventContainer">
       <div class="d-none">{% csrf_token %}</div>
     </div>
   </div>
@@ -74,9 +74,6 @@
       });
 
     $(document).ready(async function() {
-
-
-
       $(document).on('submit', '.userForm', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);

@@ -27,13 +27,28 @@
             </div>
           </div>
         </div>
-        <div class="row my-3 d-flex-inline text-center text-sm">
-          <p>
+        <div class="row my-3 d-flex-inline text-center year-selector">
+          <div class="col-12 d-block d-xl-none" id="year-select">
+            <button class="btn btn-sm w-100 btn-primary dropdown-toggle position-relative"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ year }}</button>
+            <ul class="dropdown-menu">
+              {% for i in years %}
+                <li>
+                  <a class="dropdown-item"
+                     href="{% url "events_year" year=i %}?display=list">{{ i }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="d-none d-xl-block">
             {% for year in years reversed %}
-              <a class="fw-medium mx-1" href="{% url "events_year" year=year %}">{{ year }}</a>
+              <a class="fw-medium mx-1"
+                 href="{% url "events_year" year=year %}?display=list">{{ year }}</a>
               {% if not forloop.last %}/{% endif %}
             {% endfor %}
-          </p>
+          </div>
         </div>
       </div>
     </div>

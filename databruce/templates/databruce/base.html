@@ -63,6 +63,7 @@
     <script src="{% static 'databruce/js/datatables/datatables.min.js' %}"></script>
     <script src="{% static 'databruce/js/datatables/dt_plus_remove.js' %}"></script>
     <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/light.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/dark.css' %}" />
@@ -160,6 +161,25 @@
             tab.show();
           }
         }
+      });
+      document.querySelectorAll('.dropdown').forEach(function(everydropdown) {
+        everydropdown.addEventListener('mouseenter', function() {
+          let el_link = this.querySelector('button[data-bs-toggle="dropdown"]');
+          if (el_link != null) {
+            let nextEl = el_link.nextElementSibling;
+            el_link.classList.add('show');
+            nextEl.classList.add('show');
+          }
+        });
+
+        everydropdown.addEventListener('mouseleave', function() {
+          let el_link = this.querySelector('button[data-bs-toggle="dropdown"]');
+          if (el_link != null) {
+            let nextEl = el_link.nextElementSibling;
+            el_link.classList.remove('show');
+            nextEl.classList.remove('show');
+          }
+        });
       });
     </script>
     <script src="{% static 'databruce/js/eventSearch.js' %}"></script>

@@ -6,7 +6,7 @@
   h4,
   h5,
   h6 {
-    color: var(--color-blue-600);
+    color: var(--color-blue-400);
   }
 
   h2,
@@ -33,7 +33,7 @@
     color: var(--color-blue-500) !important;
   }
 
-  .btn:not([class*="subtle"]):not([class*="outline"]):hover {
+  .btn:not([class*="subtle"]):not([class*="outline"], .dropdown-toggle.show):hover {
     background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)) !important;
   }
 
@@ -305,7 +305,12 @@
   .card-footer,
   .card,
   .accordion-item {
-    border-color: var(--color-gray-800);
+    border-color: var(--color-gray-900);
+  }
+
+  .event-card .card-header,
+  .event-card .card-footer {
+    border-color: var(--color-gray-600) !important;
   }
 
   .vr {
@@ -358,8 +363,8 @@
 
   .form-control,
   .form-select {
-    background-color: var(--color-gray-800) !important;
-    border-color: var(--color-gray-700) !important;
+    background-color: var(--color-gray-700) !important;
+    border-color: var(--color-gray-950) !important;
   }
 
   /* song number cell background when not position */
@@ -391,9 +396,7 @@
 
 
 
-  .dropdown-item:hover {
-    background-color: var(--color-gray-700) !important;
-  }
+
 
   .ui-state-active:hover,
   .ui-state-active {
@@ -402,9 +405,9 @@
     color: var(--color-gray-100) !important;
   }
 
-  .dropdown-item {
+  /* .dropdown-item {
     color: var(--color-gray-100) !important;
-  }
+  } */
 
   .progress {
     background-color: var(--color-gray-600) !important;
@@ -567,8 +570,16 @@
   }
 
   .dropdown-menu {
-    background-color: var(--color-gray-900) !important;
-    border-color: var(--color-gray-700) !important;
+    background-color: var(--color-gray-800) !important;
+    border-color: var(--color-gray-900) !important;
+  }
+
+  .dropdown-item:hover {
+    background-color: var(--color-blue-500) !important;
+  }
+
+  .dropdown-toggle.show {
+    background-color: var(--color-blue-600) !important;
   }
 
   div.dt-button-collection {
@@ -611,7 +622,7 @@
   }
 
   .offcanvas {
-    background-color: var(--color-gray-700) !important;
+    background-color: var(--color-gray-900) !important;
   }
 
   .placeholder {
@@ -712,14 +723,18 @@
   .select2-results__option.select2-results__message,
   .select2-results__option.select2-results__option--selectable:not(.select2-results__option--highlighted),
   .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
-    color: var(--color-gray-100) !important;
+    color: var(--color-gray-300) !important;
   }
 
-  .select2-dropdown,
+
   .select2-search__field,
   .select2-selection,
   .select2-selection--multiple,
   .select2-selection--single {
+    background-color: var(--color-gray-700) !important;
+  }
+
+  .select2-dropdown {
     background-color: var(--color-gray-800) !important;
   }
 
@@ -741,8 +756,8 @@
 
   .select2-container--default .select2-selection--multiple .select2-selection__choice,
   .select2-selection__choice {
-    background-color: var(--color-gray-600) !important;
-    border-color: var(--color-gray-600) !important;
+    background-color: var(--color-gray-800) !important;
+    border-color: var(--color-gray-800) !important;
   }
 
   .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__remove {

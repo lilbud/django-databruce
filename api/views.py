@@ -471,7 +471,7 @@ class EventListViewSet(viewsets.ReadOnlyModelViewSet):
   serializer_class = api_serializers.EventListSerializer
   filterset_class = api_filters.EventsFilter
   pagination_class = CustomLimitOffsetPagination
-  ordering_fields = ["event_id"]
+  ordering_fields = ["event_id", "artist__name", "tour__name", "venue__name"]
 
 
 class EventViewSet(viewsets.ReadOnlyModelViewSet):
