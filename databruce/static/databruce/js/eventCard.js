@@ -161,7 +161,7 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
     ? `<div class="event-title text-xs text-muted fst-italic my-1">${event.title}</div>`
     : "";
   const tourHtml = event.tour
-    ? `<div class="event-tour text-xs text-muted my-1"><i class="bi bi-bus-front me-1"></i>${event.tour}</div>`
+    ? `<div class="event-tour text-xs text-muted my-1"><i class="bi bi-bus-front me-1"></i>${event.tour.name}</div>`
     : "";
 
   return `
@@ -181,12 +181,12 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
       ${titleHtml}
       
       <div class="row event-artist text-xl mb-1">
-        <div class="col">${event.artist}</div>
+        <div class="col">${event.artist.name}</div>
       </div>
       ${tourHtml}
       
       <div class="row event-venue">
-        <div class="venue-name text-base">${event.venue}</div>
+        <div class="venue-name text-base">${event.venue.name}</div>
         <div class="venue-city text-2xs text-muted d-flex gap-1">
           <i class="bi bi-geo-alt-fill"></i>${event.city}
         </div>

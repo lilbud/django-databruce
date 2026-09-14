@@ -259,38 +259,38 @@
               {% if start_time or scheduled_time %}
                 <div class="col-12 col-md-6 col-xl-12">
                   <div class="card h-100">
-                    <div class="card-header pb-0">
+                    <div class="card-header">
                       <span class="d-flex gap-2">Set Times</span>
                     </div>
                     <div class="card-body">
                       <div class="row row-cols-2 row-cols-md-4 row-cols-xl-2 h-100 justify-content-between g-2">
                         <div class="col">
                           <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="title">Scheduled</div>
-                            <div class="value">{{ scheduled_time|default_if_none:"-" }}</div>
+                            <div class="info-card-title">Scheduled</div>
+                            <div class="info-card-value">{{ scheduled_time|default_if_none:"-" }}</div>
                           </div>
                         </div>
                         <div class="col">
                           <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="title">Start</div>
-                            <div class="value">{{ start_time|default_if_none:"-" }}</div>
+                            <div class="info-card-title">Start</div>
+                            <div class="info-card-value">{{ start_time|default_if_none:"-" }}</div>
                           </div>
                         </div>
                         <div class="col">
                           <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="title">End</div>
-                            <div class="value">{{ end_time|default_if_none:"-" }}</div>
+                            <div class="info-card-title">End</div>
+                            <div class="info-card-value">{{ end_time|default_if_none:"-" }}</div>
                           </div>
                         </div>
                         <div class="col">
                           <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="title">Length</div>
-                            <div class="value d-flex-inline justify-content-center text-center align-items-center gap-1">
+                            <div class="info-card-title">Length</div>
+                            <div class="info-card-value d-flex-inline justify-content-center text-center align-items-center gap-1">
                               {% if event.length %}
                                 {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
                                   <span data-bs-toggle="tooltip"
                                         data-bs-title="{% if event.rank_stats.length_rank == 1 %} Longest Show to Date {% else %} {{ event.rank_stats.length_rank|ordinal }} longest show {% endif %}"
-                                        class="badge text-2xs badge-primary">{{ event.length|time:"h:i:s" }}</span>
+                                        class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"h:i:s" }}</span>
                                 {% else %}
                                   <span>{{ event.length|time:"h:i:s" }}</span>
                                 {% endif %}

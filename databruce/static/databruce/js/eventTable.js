@@ -110,11 +110,65 @@ function eventTable(url) {
     initComplete: function (settings, json) {
       var api = this.api();
       var info = api.page.info();
-      $('#event-count-badge').text(info.recordsTotal);
+
+      const input = $('.page-input');
+      const prevBtn = $('.btn-prev');
+      const nextBtn = $('.btn-next');
+      const totalSpan = $('.total-pages');
+
+      // Initial button states
+      prevBtn.attr('disabled', info.page === 0);
+      nextBtn.attr('disabled', info.page >= info.pages - 1);
+
+      $('.eventTable_info').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+
+      api.on('draw', () => {
+        const pageInfo = api.page.info();
+
+        input.val(pageInfo.page + 1);
+        input.attr('max', pageInfo.pages);
+
+        totalSpan.text(`of ${pageInfo.pages || 1}`);
+
+        // Handle button states
+        prevBtn.attr('disabled', pageInfo.page === 0);
+        nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+
+        // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+        $('.eventTable_info').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+      });
+
+      totalSpan.text(`of ${info.pages || 1}`);
+
+      nextBtn.on('click', function () {
+        table.page('next').draw(false);
+      });
+
+      prevBtn.on('click', function () {
+        table.page('previous').draw(false);
+      });
+
+      input.on('change', function () {
+        let val = parseInt(this.value, 10) - 1;
+        const max = api.page.info().pages - 1;
+        if (val < 0) val = 0;
+        if (val > max) val = max;
+
+        input.attr('value', val);
+
+        api.page(val).draw('page');
+      });
     }
   });
 
-  let dropdown = $('#columnOrder');
+  let dropdown = $('.column-order');
+
+  table.on('xhr.dt', function (e, settings, json) {
+    if (!json || !json.data) return;
+
+    // Re-render your card layout using the current page's results
+    renderCards(json.data);
+  });
 
   // 3. Listen for dropdown changes to reorder the table
   dropdown.on('change', function () {
@@ -139,8 +193,9 @@ function eventTable(url) {
   });
 
   tableSearch(table, 'search');
+  tableSearch(table, 'cardSearch');
 
-  $('#PublicityFilter').on('change', function () {
+  $('.publicity-filter').on('change', function () {
     var selectedValue = this.value;
     table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
   });

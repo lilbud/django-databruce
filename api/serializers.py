@@ -646,12 +646,13 @@ class EventsSerializer(BaseSerializer):
   user_present = serializers.BooleanField(required=False)
   public = serializers.BooleanField(required=False)
 
-  type = serializers.SlugRelatedField(
-    many=True,
-    read_only=True,
-    slug_field="name",
-    required=False,
-  )
+  type = serializers.SerializerMethodField()
+
+  def get_type(self, obj):
+    return [
+      {"name": type.name, "class": EVENT_TYPE_COLOR_MAP.get(type.id, "primary")}
+      for type in obj.type.all()
+    ]
 
   tags = serializers.SlugRelatedField(
     many=True,
@@ -660,11 +661,30 @@ class EventsSerializer(BaseSerializer):
     required=False,
   )
 
+  event_anchor = serializers.SerializerMethodField(required=False)
+  setlist = EventSetlistSerializer(
+    source="setlist_event",
+    read_only=True,
+    many=True,
+    required=False,
+  )
+
+  event_note = serializers.SerializerMethodField(required=False)
+
+  def get_event_anchor(self, obj) -> str:
+    return event_id_format(obj.event_id)
+
   def get_has_setlist(self, obj) -> bool:
     return bool(obj.setlist_event.exists())
 
   def get_date(self, obj) -> None | datetime.date | str:
     return get_date_from_instance(obj)
+
+  def get_event_note(self, obj) -> None | str:
+    if obj.note is None or obj.note == "":
+      return None
+
+    return event_note_format(obj.note)
 
   class Meta:
     model = models.Event
@@ -680,6 +700,9 @@ class EventsSerializer(BaseSerializer):
       "rank",
       "is_disrupted",
       "user_present",
+      "event_anchor",
+      "setlist",
+      "event_note",
       "event_id",
       "title",
       "public",

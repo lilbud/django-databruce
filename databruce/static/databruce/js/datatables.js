@@ -118,8 +118,8 @@ $.extend(true, DataTable.defaults, {
     bottomStart: null,
     topEnd: null,
     bottomEnd: null,
-    top: ['customInputPaging', 'info'],
-    bottom: ['customInputPaging', 'info'],
+    // top: ['customInputPaging', 'info'],
+    // bottom: ['customInputPaging', 'info'],
   },
 });
 

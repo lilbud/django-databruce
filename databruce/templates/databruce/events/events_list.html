@@ -6,6 +6,7 @@
 {% block extrajs %}
   <script src="{% static 'databruce/js/marked.umd.js' %}"></script>
   <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
   <script src="{% static 'databruce/js/eventCard.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
@@ -26,8 +27,7 @@
               <a role="button"
                  data-bs-toggle="tooltip"
                  data-bs-title="View Events as List"
-                 class="btn btn-sm btn-primary icon-button disabled"
-                 aria-disabled="true"><i class="bi bi-list"></i>List</a>
+                 class="btn btn-sm btn-primary icon-button"><i class="bi bi-list"></i>List</a>
             </div>
           </div>
         </div>
@@ -57,7 +57,14 @@
         <hr>
       </div>
     </div>
-    <div class="row g-3" id="eventContainer">
+    <div class="row d-none d-xl-block" id="tableContainer">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-3 d-block d-xl-none" id="cardContainer">
       <div class="d-none">{% csrf_token %}</div>
     </div>
   </div>
@@ -67,11 +74,13 @@
       .then(data => {
         data.results.forEach(function(item) {
           var card = eventCard(item);
-          $('#eventContainer').append(card);
+          $('#cardContainer').append(card);
         });
       }).catch(error => {
         console.error('Fetch error:', error);
       });
+
+    eventTable('/api/v1/events/?year={{ year }}&format=custom');
 
     $(document).ready(async function() {
       $(document).on('submit', '.userForm', async function(e) {

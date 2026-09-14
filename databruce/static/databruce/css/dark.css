@@ -41,14 +41,14 @@
     background-image: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)) !important;
   }
 
-  .info-card-row .card {
+  /* .info-card-row .card {
     background-color: color-mix(in oklab, var(--color-blue-500) 50%, black) !important;
     border-color: color-mix(in oklab, var(--color-blue-500) 50%, black) !important;
-  }
+  } */
 
-  .info-card {
-    background-color: var(--color-gray-700) !important;
-    border-color: var(--color-gray-600) !important;
+  .card .card {
+    background-color: var(--color-gray-900) !important;
+    border-color: var(--color-gray-700) !important;
   }
 
   th.dt-ordering-asc,
@@ -283,11 +283,7 @@
     color: var(--color-gray-100) !important;
   }
 
-  .info-card .title {
-    color: var(--color-gray-300) !important;
-  }
-
-  .info-card small {
+  .info-card-title {
     color: var(--color-gray-400) !important;
   }
 
@@ -308,8 +304,8 @@
     border-color: var(--color-gray-900);
   }
 
-  .event-card .card-header,
-  .event-card .card-footer {
+  .card-header,
+  .card-footer {
     border-color: var(--color-gray-600) !important;
   }
 

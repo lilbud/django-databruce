@@ -22,7 +22,7 @@ from django.db.models import (
 )
 from django_filters import ModelMultipleChoiceFilter
 from django_filters import rest_framework as dj_filters
-from rest_framework.filters import BaseFilterBackend
+from rest_framework.filters import BaseFilterBackend, OrderingFilter
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -35,6 +35,42 @@ date = datetime.datetime.now(tz=datetime.UTC).date()
 
 class NumberInFilter(dj_filters.BaseInFilter, dj_filters.NumberFilter):
   pass
+
+
+class AliasedOrderingFilter(OrderingFilter):
+  """Custom ordering filter to support field aliasing.
+  Example mapping: ('api_exposed_name', 'db_internal_name')
+  """
+
+  def remove_invalid_fields(self, queryset, fields, view, request):
+    # Read the ordering_fields defined on the view
+    ordering_fields = getattr(view, "ordering_fields", None)
+
+    if not ordering_fields or ordering_fields == "__all__":
+      return super().remove_invalid_fields(queryset, fields, view, request)
+
+    # Create a mapping dictionary from the view's configuration
+    # Supports both aliases (tuples) and regular fields (strings)
+    alias_mapping = {}
+    for item in ordering_fields:
+      if isinstance(item, tuple) and len(item) == 2:
+        alias_mapping[item[0]] = item[1]
+      else:
+        alias_mapping[item] = item
+
+    validated_fields = []
+    for field in fields:
+      # Strip the minus sign for descending sort to check the clean field name
+      is_descending = field.startswith("-")
+      clean_field = field.lstrip("-")
+
+      if clean_field in alias_mapping:
+        db_field = alias_mapping[clean_field]
+        # Re-apply the minus sign if the original query was descending
+        final_field = f"-{db_field}" if is_descending else db_field
+        validated_fields.append(final_field)
+
+    return validated_fields
 
 
 class NotEqualFilterBackend(BaseFilterBackend):
@@ -667,12 +703,12 @@ class EventsFilter(dj_filters.FilterSet):
           default=SearchRank(vector, query, weights=[0.1, 0.3, 0.6, 1.0]),
         ),
       )
-      .exclude(event_exclude_filter)
+      # .exclude(event_exclude_filter)
       .filter(
         Q(event_id__startswith=str(value)) | date_conditions | Q(search=query),
         rank__gt=0.1,
       )
-      .order_by("event_id")[:25]
+      .order_by("event_id")
     )
 
   def filter_time_frame(self, queryset, name, value):
@@ -700,6 +736,17 @@ class EventsFilter(dj_filters.FilterSet):
 
     # 3. If no detail exists or venue wasn't found, just filter by the ID
     return queryset.filter(venue_id=value)
+
+  sort = dj_filters.OrderingFilter(
+    fields=(
+      ("venue__name", "venue"),
+      ("venue__city__name", "city"),
+      ("event_id", "date"),
+      ("artist__name", "artist"),
+      ("tour__name", "tour"),
+      ("note", "note"),
+    ),
+  )
 
   class Meta:
     model = models.Event

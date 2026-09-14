@@ -23,10 +23,8 @@ from django.db.models import (
   Avg,
   Count,
   Exists,
-  F,
   Min,
   OuterRef,
-  Prefetch,
   Q,
   QuerySet,
   Subquery,
@@ -880,7 +878,7 @@ class EventDetailTestView(PageTitleMixin, TemplateView):
 
 
 class EventView(PageTitleMixin, TemplateView):
-  template_name = "databruce/events/events_table.html"
+  template_name = "databruce/events/events.html"
   title = "Events"
 
   def get_context_data(self, **kwargs: dict[str, Any]):
@@ -901,49 +899,6 @@ class EventView(PageTitleMixin, TemplateView):
 
     context["title"] = f"{context['year']} Events"
     context["description"] = f"{context['year']} Events"
-
-    display = self.request.GET.get("display", "table")
-    context["display"] = display
-
-    if display:
-      if display == "table":
-        self.template_name = "databruce/events/events_table.html"
-
-      elif display == "list":
-        context["events"] = (
-          Event.objects.filter(
-            Q(date__year=context["year"]) | Q(event_id__startswith=context["year"]),
-          )
-          .order_by("event_id")
-          .select_related("artist", "venue", "tour")
-          .prefetch_related(
-            "leg",
-            "run",
-            "venue__city",
-            "venue__city__state",
-            Prefetch(
-              "setlist_event",
-              queryset=Setlist.objects.select_related("song").order_by(
-                F("song_num").asc(nulls_first=True),
-              ),
-            ),
-            "event_type__type",
-            "user_event__user",
-          )
-          .annotate(
-            # Check if a UserEvent exists linking this specific event to the logged-in user
-            was_present=Exists(
-              UserAttendedShow.objects.filter(
-                event_id=OuterRef("pk"),
-                user_id=self.request.user.id
-                if self.request.user.is_authenticated
-                else None,
-              ),
-            ),
-          )
-        )
-
-        self.template_name = "databruce/events/events_list.html"
 
     return context
 

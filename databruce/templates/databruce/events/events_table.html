@@ -36,16 +36,14 @@
             <ul class="dropdown-menu">
               {% for i in years %}
                 <li>
-                  <a class="dropdown-item"
-                     href="{% url "events_year" year=i %}?display=list">{{ i }}</a>
+                  <a class="dropdown-item" href="{% url "events_year" year=i %}">{{ i }}</a>
                 </li>
               {% endfor %}
             </ul>
           </div>
           <div class="d-none d-xl-block">
             {% for year in years reversed %}
-              <a class="fw-medium mx-1"
-                 href="{% url "events_year" year=year %}?display=list">{{ year }}</a>
+              <a class="fw-medium mx-1" href="{% url "events_year" year=year %}">{{ year }}</a>
               {% if not forloop.last %}/{% endif %}
             {% endfor %}
           </div>

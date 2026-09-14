@@ -1,0 +1,169 @@
+{% extends "databruce/narrow_layout.html" %}
+{% load static %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block extrajs %}
+  <script src="{% static 'databruce/js/marked.umd.js' %}"></script>
+  <script src="{% static 'databruce/js/masonry.pkgd.min.js' %}"></script>
+  <script src="{% static 'databruce/js/eventTable.js' %}"></script>
+  <script src="{% static 'databruce/js/eventCard.js' %}"></script>
+{% endblock extrajs %}
+{% block content %}
+  <a href="#"
+     class="back-to-top d-flex justify-content-center align-items-center"><i class="bi bi-caret-up-fill"></i></a>
+  <div class="col-12">
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-between mb-3">
+          <div class="text-2xl pe-2">{{ year }} Events</div>
+        </div>
+        <div class="row my-3 d-flex-inline text-center year-selector">
+          <div class="col-12 d-block d-lg-none" id="year-select">
+            <button class="btn btn-sm w-100 btn-primary dropdown-toggle position-relative"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">{{ year }}</button>
+            <ul class="dropdown-menu">
+              {% for i in years %}
+                <li>
+                  <a class="dropdown-item"
+                     href="{% url "events_year" year=i %}?display=list">{{ i }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="d-none d-lg-block">
+            {% for year in years reversed %}
+              <a class="fw-medium mx-1"
+                 href="{% url "events_year" year=year %}?display=list">{{ year }}</a>
+              {% if not forloop.last %}/{% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row d-none d-lg-block" id="tableContainer">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body p-0">{% include "databruce/partials/event_table.html" %}</div>
+        </div>
+      </div>
+    </div>
+    <div class="row d-block d-lg-none mb-3" id="controlContainer">
+      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-2 row-gap-2 flex-wrap">
+        <div class="col order-1 order-lg-2">
+          <label for="search" class="pb-1">Search</label>
+          <div class="input-group input-group-sm">
+            <input type="text"
+                   id="cardSearch"
+                   class="form-control form-control-sm"
+                   placeholder="Type to search table...">
+          </div>
+        </div>
+        <div class="col-12 col-lg-2 col-xl-1 order-2 order-lg-1">
+          <label for="PublicityFilter" class="pb-1">Publicity</label>
+          <select id="PublicityFilter"
+                  class="form-select form-select-sm publicity-filter">
+            <option value="">All</option>
+            <option value="true">Public</option>
+            <option value="false">Private</option>
+          </select>
+        </div>
+      </div>
+      <div class="my-3">
+        <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+             id="controls">
+          <div class="d-flex justify-content-center mb-2 mb-lg-0 align-items-center gap-2 order-2 col-12 col-lg-auto">
+            <button class="btn btn-sm border-0 btn-prev" aria-label="Previous page">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <input type="text"
+                   class="form-control form-control-sm text-center page-input m-0"
+                   min="1"
+                   value="1">
+            <span class="total-pages align-middle">of 1</span>
+            <button class="btn btn-sm border-0 btn-next" aria-label="Next page">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+          <div class="dt-info order-3 eventTable_info"
+               aria-live="polite"
+               role="status"></div>
+          <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
+               id="dropdown-container">
+            <label for="columnOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+            <select name=""
+                    id="columnOrder"
+                    class="form-select form-select-sm column-order"
+                    autocomplete="off">
+              <option value="0-asc" selected>Date (asc.)</option>
+              <option value="0-desc">Date (desc.)</option>
+              <option value="2-asc">Band (A-Z)</option>
+              <option value="2-desc">Band (Z-A)</option>
+              <option value="3-asc">Venue (A-Z)</option>
+              <option value="3-desc">Venue (Z-A)</option>
+              <option value="4-asc">Tour (A-Z)</option>
+              <option value="4-desc">Tour (Z-A)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-3 d-block d-lg-none row-gap-3 d-inline-flex"
+         id="cardContainer">
+      <div class="d-none">{% csrf_token %}</div>
+    </div>
+  </div>
+  <script>
+    let searchTimeout;
+    let lastSearchValue = '';
+
+    function renderCards(events) {
+      const container = $('#cardContainer');
+      const fragment = $(document.createDocumentFragment());
+      $(container).empty();
+
+      events.forEach(function(item) {
+        fragment.append(eventCard(item));
+      })
+
+      container.append(fragment);
+    }
+
+    eventTable('/api/v1/events/?year={{ year }}&format=custom');
+
+    $(document).on('submit', '.userForm', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const addBtn = $(this).find('#add');
+
+      let action = addBtn.attr('data-action');
+      let event = addBtn.attr('data-event');
+      const url = `/events/${event}/${action}/`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const isAdded = data['action'] === 'added';
+
+        addBtn
+          .toggleClass('bi-star-fill', isAdded)
+          .toggleClass('bi-star', !isAdded)
+          .attr('data-attended', isAdded ? 'true' : 'false')
+          .attr('data-action', isAdded ? 'remove' : 'add');
+
+      } catch (error) {
+        console.error('Error during POST request:', error);
+      }
+    });
+  </script>
+{% endblock content %}

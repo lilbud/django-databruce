@@ -72,6 +72,7 @@
 
 .page-title {
   font-size: clamp(var(--text-xl), 3.8vw, var(--text-2xl)) !important;
+  margin-bottom: 1rem !important;
 }
 
 .entry-row {
@@ -240,22 +241,25 @@ a.text-reset,
   justify-content: space-between !important;
   display: flex !important;
   border: 0 !important;
-}
-
-.card-header {
-  border-bottom: none !important;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.event-card .card-header,
-.event-card .card-footer {
-  display: block !important;
   border-style: solid !important;
 }
 
 .event-card .card-header {
   border-bottom-width: 1px !important;
+}
+
+.card-header {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.card-footer {
+  border-top-width: 1px !important;
+}
+
+.event-card .card-header,
+.event-card .card-footer {
+  display: block !important;
 }
 
 .event-card .card-footer {
@@ -269,7 +273,7 @@ a.text-reset,
 }
 
 .set-row .song {
-  font-size: clamp(var(--text-2xs), 0.636rem + 0.318vw, var(--text-sm)) !important;
+  font-size: var(--text-sm) !important;
 }
 
 .event-card .card-header,
@@ -383,26 +387,41 @@ thead tr:first-child th {
   padding: 0 !important;
 }
 
-.info-card {
+.card .card {
   border-width: 1px !important;
   border-style: solid !important;
   padding: 0.5rem !important;
 }
 
-.info-card .title {
+
+
+.info-card-title {
   font-size: var(--text-xs);
   line-height: 1rem;
-  margin-bottom: 0.25rem !important;
+  margin-bottom: 0.1rem !important;
   white-space: nowrap !important;
 }
 
-.info-card .title::after {
+.info-card-title::after {
   content: ":";
 }
 
-.info-card .value {
+.info-card-value {
   font-size: var(--text-sm);
   font-weight: 500;
+}
+
+.info-card-row .info-card {
+  padding: 1rem !important;
+}
+
+.info-card-row .info-card .info-card-title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.info-card-row .info-card .info-card-value {
+  font-size: var(--text-lg)
 }
 
 /* card */
@@ -506,7 +525,7 @@ tbody tr:not(.set-header) {
 }
 
 .badge {
-  font-size: var(--text-xs) !important;
+
   vertical-align: middle !important;
   font-weight: 500 !important;
   align-items: center !important;
@@ -517,6 +536,10 @@ tbody tr:not(.set-header) {
   white-space: nowrap !important;
   width: max-content !important;
   cursor: pointer !important;
+}
+
+.badge:not([class*="text-"]) {
+  font-size: var(--text-xs) !important;
 }
 
 .badge:not(.d-lg-none) {
@@ -596,9 +619,9 @@ blockquote {
   border-left-style: solid !important;
 }
 
-.info-card small {
+/* .info-card-title {
   margin-top: 0.1rem !important;
-}
+} */
 
 /* fix for scrolling table in card  */
 @media (max-width: 992px) {
@@ -835,7 +858,7 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 }
 
 /* Ensure the last element has no margin regardless of tag */
-.event-note :last-child {
+.card-body p:last-of-type {
   margin-bottom: 0 !important;
 }
 
@@ -1279,11 +1302,11 @@ pre {
     display: flex !important;
   }
 
-  .btn-group:not(.attended-btn),
+  /* .btn-group:not(.attended-btn),
   .dt-search {
     gap: 8px !important;
     display: flex !important;
-  }
+  } */
 
   div.dt-container div.dt-search input,
   #dropdown-btn {
@@ -1624,4 +1647,31 @@ html {
 
 .dropdown-menu.show {
   margin-top: -0.5vh !important;
+}
+
+/* Default Responsive Breakpoints (CSS Media Query Driver) */
+@media (min-width: 1200px) {
+  #viewWrapper[data-view="default"] #tableContainer {
+    display: block;
+  }
+
+  #viewWrapper[data-view="default"] #cardContainer {
+    display: none;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  #viewWrapper[data-view="default"] #tableContainer {
+    display: none;
+  }
+
+  #viewWrapper[data-view="default"] #cardContainer {
+    display: flex;
+  }
+}
+
+
+.form-control.page-input {
+  width: 30px;
+  height: calc(1.5em + 0.5rem + 2px)
 }
