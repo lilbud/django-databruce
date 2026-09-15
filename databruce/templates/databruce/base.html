@@ -75,6 +75,7 @@
     <script src="{% static 'databruce/js/datatables.js' %}"></script>
     <script src="{% static 'databruce/js/searchBuilder.js' %}"></script>
     <script src="{% static 'databruce/js/tableSearch.js' %}"></script>
+    <script src="{% static 'databruce/js/eventCard.js' %}"></script>
     {% block extrastyle %}
     {% endblock extrastyle %}
     {% block extrajs %}
@@ -157,11 +158,16 @@
         if (hash) {
           const triggerEl = document.querySelector(`[data-bs-target="${hash}"], [href="${hash}"]`);
           if (triggerEl) {
+            document.querySelectorAll('.nav-link.active, .tab-pane.active').forEach(el => {
+              el.classList.remove('active', 'show');
+            });
+
             const tab = new bootstrap.Tab(triggerEl);
             tab.show();
           }
         }
       });
+
       document.querySelectorAll('.dropdown').forEach(function(everydropdown) {
         everydropdown.addEventListener('mouseenter', function() {
           let el_link = this.querySelector('button[data-bs-toggle="dropdown"]');

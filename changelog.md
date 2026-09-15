@@ -461,6 +461,7 @@ First public release of the site. Site was locked behind a login and accounts on
 - Massive CSS cleanup, Moved all theme colors into their own separate files. `style.css` now only contains normal placement CSS. `dark.css` and `light.css` contain all theme colors and attribute color values. Should make adding new themes easier maybe? Was annoyed with the limited CSS variable style from Hummingbird.
 - Event Search Modal is now centered and is a bit faster. Also has clear input button.
 - Navbar buttons now open their dropdowns on hover. Also updated the colors on those.
+- Cleaned up nearly every page with table. Table controls/tabs are now separated from the cards, and the only thing in the card is the table. This will eventually lead to having card view on every page but not at this time
 
 ## Removed
 

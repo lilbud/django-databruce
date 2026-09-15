@@ -430,56 +430,13 @@ class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
   ordering_fields = ["event_id"]
 
 
-class EventListViewSet(viewsets.ReadOnlyModelViewSet):
-  def get_queryset(self) -> BaseManager:
-    status_check = db_models.EventType.objects.filter(
-      event_id=OuterRef("pk"),
-      type_id__in=[6, 16, 21, 22, 23],  # Uses the through-table IDs directly
-    )
-
-    qs = (
-      db_models.Event.objects.select_related(
-        "artist",
-        "tour",
-        "venue__city__country",
-      )
-      .prefetch_related(
-        "venue__city__state",
-        "leg",
-        Prefetch(
-          "setlist_event",
-          queryset=db_models.Setlist.objects.select_related("song").order_by(
-            F("song_num").asc(nulls_first=True),
-          ),
-        ),
-        "type",
-        "tags",
-      )
-      .annotate(is_disrupted=Exists(status_check), type_name=F("type__name"))
-    ).order_by("event_id")
-
-    if self.request.user.is_authenticated:
-      user_present = db_models.UserAttendedShow.objects.filter(
-        event_id=OuterRef("pk"),
-        user=self.request.user,
-      )
-
-      qs = qs.annotate(user_present=Exists(user_present))
-
-    return qs
-
-  serializer_class = api_serializers.EventListSerializer
-  filterset_class = api_filters.EventsFilter
-  ordering_fields = ["event_id", "artist__name", "tour__name", "venue__name"]
-
-
 class EventViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   def get_queryset(self) -> BaseManager:
     status_check = db_models.EventType.objects.filter(
       event_id=OuterRef("pk"),
-      type_id__in=[6, 16, 21, 22, 23],  # Uses the through-table IDs directly
+      type_id__in=[6, 16, 21, 22, 23],
     )
 
     qs = (

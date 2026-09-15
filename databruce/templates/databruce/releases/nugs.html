@@ -1,153 +1,210 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-    {% if user.is_superuser %}
-        {% include "databruce/partials/admin_new_btn.html" with view="nugsrelease" %}
-    {% endif %}
-    <div class="col-12">
-        <div class="row mb-3">
-            <div class="col">
-                <div class="text-2xl">Nugs Releases</div>
-                <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="tableControls">
-                            <div class="col-12 col-md-2">
-                                <label for="PublicityFilter" class="pb-1">Category</label>
-                                <select id="PublicityFilter" class="form-select form-select-sm">
-                                    <option value="">All</option>
-                                    {% for choice in categories %}
-                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <!-- Search -->
-                            <div class="col">
-                                <label for="search" class="pb-1">Search</label>
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <input type="text"
-                                           id="search"
-                                           class="form-control form-control-sm"
-                                           placeholder="Type to search table...">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="table-responsive">
-                                <table class="table table-hover display" id="releasesTable">
-                                    <thead>
-                                        <tr class="header">
-                                            <th class="all">Release Date</th>
-                                            <th class="all">Event</th>
-                                            <th class="all">Venue</th>
-                                            <th class="all">Category</th>
-                                            <th class="all">Link</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_new_btn.html" with view="nugsrelease" %}
+  {% endif %}
+  <div class="col-12">
+    <div class="row mb-3">
+      <div class="col">
+        <div class="text-2xl">Nugs Releases</div>
+        <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
+      </div>
     </div>
-    <script>
-    $(document).ready(function () {
-      let sb_columns = [0,1,2,3,4,5];
+    <div class="row">
+      <div id="tableControls">
+        <div class="col-12 col-md-2">
+          <label for="PublicityFilter" class="pb-1">Category</label>
+          <select id="PublicityFilter" class="form-select form-select-sm">
+            <option value="">All</option>
+            {% for choice in categories %}
+              <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Search -->
+        <div class="col">
+          <label for="search" class="pb-1">Search</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text"
+                   id="search"
+                   class="form-control form-control-sm"
+                   placeholder="Type to search table...">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="releasesTable">
+                  <thead>
+                    <tr class="header">
+                      <th class="all">Release Date</th>
+                      <th class="all">Event</th>
+                      <th class="all">Venue</th>
+                      <th class="all">Category</th>
+                      <th class="all">Link</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function formatDate(date) {
+      const dateItem = new Date(date);
+
+      // Configure the options for the required tokens
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZoneName: 'short', // Generates %Z (e.g., EST, EDT, GMT+2)
+        timeZone: 'UTC'
+      };
+
+      // Use en-US to force the AM/PM formatting structure
+      const formatter = new Intl.DateTimeFormat('en-US', options);
+      const parts = formatter.formatToParts(dateItem);
+
+      // Map the structured parts into an object for easy access
+      const {
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        dayPeriod,
+        timeZoneName
+      } =
+      parts.reduce((acc, part) => ({
+        ...acc,
+        [part.type]: part.value
+      }), {});
+
+      // Reconstruct into your exact pattern: %Y-%m-%d %I:%M %Z
+      const formattedDate = `${year}-${month}-${day} ${hour}:${minute} ${dayPeriod} ${timeZoneName}`;
+
+      return formattedDate
+    }
+
+
+    $(document).ready(function() {
+      let sb_columns = [0, 1, 2, 3, 4, 5];
 
       var table = new DataTable('#releasesTable', {
         ajax: {
           'url': '/api/v1/nugs_releases/?format=custom',
         },
-        columns: [
-          {
-            'data': 'date',
-            'name': 'date',
-            'width': '12rem',
-            'className': 'text-nowrap',
-            'type': 'text',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${data.time}">${data.date} ${data.time}</span>`
-              }
-            },
-          },
-          {
-            'data': 'event',
-            'name': 'event__event_id',
-            'width': '12rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/events/${data.event_id}">${data.date}</a>`
-              }
-            },
-          },
-          {
-            'data': 'event.venue',
-            'width': '15rem',
-            'name': 'event__venue__name, event__venue__city__name',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                if (row.city) {
-                  return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
-                }
+        columns: [{
+          'data': 'date',
+          'name': 'date',
+          'width': '12rem',
+          'className': 'text-nowrap',
+          'type': 'text',
+          'render': function(data, type, row, meta) {
+            const date = new Date(data);
+            const dayText = date.toLocaleDateString('en-US', {
+              weekday: 'long'
+            });
 
-                return `<a href="/venues/${data.uuid}">${data.name}</a>`
-              }
-            },
+            if (data) {
+              return `<span>${formatDate(data)}<br><small>${dayText}</small></span>`
+            }
           },
-          {
-            'data': 'category',
-            'name': 'category',
-            'orderable': false,
-            'columnControl': [],
-            'width': '6rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data;
-              }
-            },
-          },
-          {
-            'data': 'url',
-            'name': 'name',
-            'className': 'text-center',
-            'searchable': false,
-            'orderable': false,
-            'width': '6rem',
-            'columnControl': [],
-            'render': function (data, type, row, meta) {
-              if (data) {
+        }, {
+          'data': 'event',
+          'name': 'event__event_id',
+          'width': '12rem',
+          'render': function(data, type, row, meta) {
+            const date = new Date(data.date);
+            const dayText = date.toLocaleDateString('en-US', {
+              weekday: 'long'
+            });
 
-                if (data.includes('nugs')) {
-                  return `<a target="_blank" rel="noopener noreferrer" href="${data}"><span class="badge badge-purple">${row.name}</span></a>`
-                } else {
-                  return `<a target="_blank" rel="noopener noreferrer" href="${data}"><span class="badge badge-secondary">${row.name}</span></a>`
-                }
+            var dateItem;
 
-              }
-            },
+            if (data.early_late) {
+              dateItem = `<span class="text-primary">${data.date}</span><br><small>${data.early_late} • ${dayText}</small>`
+            } else {
+              dateItem = `${data.date}<br><small>${dayText}</small>`
+            }
+
+
+            return `<a href="/events/${data.event_id}">${dateItem}</a>`
+
           },
-        ]
+        }, {
+          'data': 'event.venue',
+          'width': '15rem',
+          'name': 'event__venue__name, event__venue__city__name',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              if (row.city) {
+                return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city.formatted}</small>`
+              }
+
+              return `<a href="/venues/${data.uuid}">${data.name}</a>`
+            }
+          },
+        }, {
+          'data': 'category',
+          'name': 'category',
+          'orderable': false,
+          'columnControl': [],
+          'width': '6rem',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return data;
+            }
+          },
+        }, {
+          'data': 'url',
+          'name': 'name',
+          'className': 'text-center',
+          'searchable': false,
+          'orderable': false,
+          'width': '6rem',
+          'columnControl': [],
+          'render': function(data, type, row, meta) {
+            if (data) {
+
+              if (data.includes('nugs')) {
+                return `<a target="_blank" rel="noopener noreferrer" href="${data}"><span class="badge badge-purple">${row.name}</span></a>`
+              } else {
+                return `<a target="_blank" rel="noopener noreferrer" href="${data}"><span class="badge badge-secondary">${row.name}</span></a>`
+              }
+
+            }
+          },
+        }, ]
       });
 
-      $('#PublicityFilter').on('change', function () {
+      $('#PublicityFilter').on('change', function() {
         var selectedValue = this.value;
-        table.order([[0, 'desc']]).column(3).search(selectedValue ? selectedValue : '', true, false).draw();
+        table.order([
+          [0, 'desc']
+        ]).column(3).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       tableSearch(table, 'search');
       searchBuilder(table, sb_columns);
     });
-    </script>
+  </script>
 {% endblock content %}

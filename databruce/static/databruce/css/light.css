@@ -46,14 +46,8 @@
     background-color: var(--color-gray-200) !important;
   }
 
-  button.active:hover>.badge,
-  button:not(.active):hover>.badge,
   button.active>.badge {
-    background-color: var(--color-gray-500) !important;
-    color: var(--color-white) !important;
-  }
-
-  .nav-pills button:not(.active):hover {
+    background-color: var(--color-white) !important;
     color: var(--color-black) !important;
   }
 
@@ -64,8 +58,10 @@
   /* primary */
 
   .btn-primary,
-  .badge-primary {
+  .badge-primary,
+  .nav-btn.active {
     background-color: var(--color-blue-500);
+    border-color: var(--color-blue-500);
     color: var(--color-white);
   }
 
@@ -87,6 +83,7 @@
   .btn-secondary,
   .badge-secondary {
     background-color: var(--color-teal-500);
+    border-color: var(--color-teal-500);
     color: var(--color-white);
   }
 
@@ -108,6 +105,7 @@
   .btn-danger,
   .badge-danger {
     background-color: var(--color-red-500);
+    border-color: var(--color-red-500);
     color: var(--color-white);
   }
 
@@ -135,6 +133,7 @@
   .btn-warning,
   .badge-warning {
     background-color: var(--color-yellow-500);
+    border-color: var(--color-yellow-500);
     color: var(--color-white);
   }
 
@@ -156,6 +155,7 @@
   .btn-info,
   .badge-info {
     background-color: var(--color-cyan-500);
+    border-color: var(--color-cyan-500);
     color: var(--color-white);
   }
 
@@ -177,6 +177,7 @@
   .btn-success,
   .badge-success {
     background-color: var(--color-green-600);
+    border-color: var(--color-green-600);
     color: var(--color-white);
   }
 
@@ -196,8 +197,10 @@
   /* neutral */
 
   .btn-neutral,
-  .badge-neutral {
+  .badge-neutral,
+  .nav-btn {
     background-color: var(--color-gray-400);
+    border-color: var(--color-gray-400);
     color: var(--color-white);
   }
 
@@ -219,6 +222,7 @@
   .btn-purple,
   .badge-purple {
     background-color: var(--color-purple-500);
+    border-color: var(--color-purple-500);
     color: var(--color-white);
   }
 
@@ -345,7 +349,7 @@
     background-color: var(--color-gray-50) !important;
   }
 
-  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event) {
+  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event, :has(small)) {
     color: var(--color-blue-600) !important;
   }
 
@@ -411,19 +415,16 @@
     background-color: color-mix(in oklab, var(--color-gray-500) 15%, transparent) !important;
   }
 
-  .nav-link {
+  /* .nav-link {
     color: var(--color-blue-600) !important;
   }
 
   .nav-link.active {
     border-bottom-color: var(--color-blue-600) !important;
     color: var(--color-blue-600) !important;
-  }
+  } */
 
-  button:not(.active)>.badge {
-    background-color: var(--color-blue-600) !important;
-    color: var(--color-blue-50) !important;
-  }
+
 
   .dt-paging-button.page-item.active>button.page-link {
     color: var(--color-white) !important;
@@ -441,6 +442,10 @@
 
   a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
     color: var(--color-blue-600) !important;
+  }
+
+  a small {
+    color: var(--color-gray-600) !important;
   }
 
   /* column control button icon color */
@@ -648,14 +653,9 @@
     box-shadow: inset 0 -3px 0 0 var(--color-blue-500) !important;
   }
 
-  .nav-link.active .count-badge {
-    background-color: var(--color-blue-500) !important;
-    color: var(--color-white) !important;
-  }
-
-  .nav-link:not(.active) .count-badge {
-    background-color: var(--color-gray-800) !important;
-    color: var(--color-white) !important;
+  .count-badge {
+    background-color: var(--color-white) !important;
+    color: var(--color-black) !important;
   }
 
   /* colors */

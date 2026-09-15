@@ -1,3 +1,15 @@
+function renderCards(events) {
+  const container = $('#cards');
+  const fragment = $(document.createDocumentFragment());
+  $(container).empty();
+
+  events.forEach(function (item) {
+    fragment.append(eventCard(item));
+  })
+
+  container.append(fragment);
+}
+
 function eventCard(event) {
   // Defensive: ensure required properties exist
   const badges = renderBadges(event.type ?? []);

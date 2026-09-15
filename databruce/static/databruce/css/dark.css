@@ -56,11 +56,9 @@
     background-color: var(--color-gray-900) !important;
   }
 
-  button.active:hover>.badge,
-  button:not(.active):hover>.badge,
-  button.active>.badge {
-    background-color: var(--color-gray-500) !important;
-    color: var(--color-white) !important;
+  button>.badge {
+    background-color: var(--color-white) !important;
+    color: var(--color-black) !important;
   }
 
   .nav-pills button:not(.active):hover {
@@ -73,8 +71,10 @@
 
   /* primary */
   .btn-primary,
-  .badge-primary {
+  .badge-primary,
+  .nav-btn.active {
     background-color: var(--color-blue-600);
+    border-color: var(--color-blue-600);
     color: var(--color-white);
   }
 
@@ -96,6 +96,7 @@
   .btn-secondary,
   .badge-secondary {
     background-color: var(--color-teal-700);
+    border-color: var(--color-teal-700);
     color: var(--color-white);
   }
 
@@ -117,6 +118,7 @@
   .btn-danger,
   .badge-danger {
     background-color: var(--color-red-700);
+    border-color: var(--color-red-700);
     color: var(--color-white);
   }
 
@@ -143,6 +145,7 @@
   .btn-warning,
   .badge-warning {
     background-color: var(--color-yellow-700);
+    border-color: var(--color-yellow-700);
     color: var(--color-white);
   }
 
@@ -164,6 +167,7 @@
   .btn-info,
   .badge-info {
     background-color: var(--color-cyan-600);
+    border-color: var(--color-cyan-600);
     color: var(--color-white);
   }
 
@@ -185,6 +189,7 @@
   .btn-success,
   .badge-success {
     background-color: var(--color-green-800);
+    border-color: var(--color-green-800);
     color: var(--color-white);
   }
 
@@ -206,6 +211,7 @@
   .btn-purple,
   .badge-purple {
     background-color: var(--color-purple-800);
+    border-color: var(--color-purple-800);
     color: var(--color-white);
   }
 
@@ -225,8 +231,10 @@
   /* neutral */
 
   .btn-neutral,
-  .badge-neutral {
+  .badge-neutral,
+  .nav-btn {
     background-color: var(--color-gray-600);
+    border-color: var(--color-gray-600);
     color: var(--color-white);
   }
 
@@ -301,7 +309,7 @@
   .card-footer,
   .card,
   .accordion-item {
-    border-color: var(--color-gray-900);
+    border-color: var(--color-gray-700);
   }
 
   .card-header,
@@ -349,7 +357,7 @@
     background-color: var(--color-gray-800) !important;
   }
 
-  table td:not(.highlighted) a:not(.text-reset) {
+  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event, :has(small)) {
     color: var(--color-blue-400) !important;
   }
 
@@ -360,7 +368,7 @@
   .form-control,
   .form-select {
     background-color: var(--color-gray-700) !important;
-    border-color: var(--color-gray-950) !important;
+    border-color: var(--color-gray-600) !important;
   }
 
   /* song number cell background when not position */
@@ -421,20 +429,6 @@
     background-color: color-mix(in oklab, var(--color-gray-500) 15%, transparent) !important;
   }
 
-  .nav-link {
-    color: var(--color-blue-400) !important;
-  }
-
-  .nav-link.active {
-    border-bottom-color: var(--color-blue-500) !important;
-    color: var(--color-blue-400) !important;
-  }
-
-  button:not(.active)>.badge {
-    background-color: var(--color-blue-500) !important;
-    color: var(--color-blue-50) !important;
-  }
-
   .dt-paging-button.page-item.active>button.page-link {
     color: var(--color-white) !important;
     background-color: var(--color-blue-500) !important;
@@ -451,6 +445,10 @@
 
   a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
     color: var(--color-blue-400) !important;
+  }
+
+  a small {
+    color: var(--color-gray-300) !important;
   }
 
   /* column control button icon color */
@@ -652,14 +650,9 @@
     box-shadow: inset 0 -3px 0 0 var(--color-blue-500) !important;
   }
 
-  .nav-link.active .count-badge {
-    background-color: var(--color-blue-500) !important;
-    color: var(--color-white) !important;
-  }
-
-  .nav-link:not(.active) .count-badge {
-    background-color: var(--color-gray-100) !important;
-    color: var(--color-gray-800) !important;
+  .count-badge {
+    background-color: var(--color-white) !important;
+    color: var(--color-black) !important;
   }
 
   /* colors */

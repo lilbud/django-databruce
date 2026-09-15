@@ -6,13 +6,17 @@ event_table_columns = [
     'width': '6rem',
     'className': 'text-wrap',
     'render': function (data, type, row, meta) {
+      const date = new Date(data);
+      const dayText = date.toLocaleDateString('en-US', { weekday: 'long' });
+      var dateItem;
+
       if (row.early_late) {
-        date = `${data}<br>(${row.early_late})`
+        dateItem = `<span class="text-primary">${data}</span><br><small>${row.early_late} • ${dayText}</small>`
       } else {
-        date = data
+        dateItem = `${data}<br><small>${dayText}</small>`
       }
 
-      return `<a href="/events/${row.event_id}">${date}</a>`
+      return `<a href="/events/${row.event_id}">${dateItem}</a>`
     },
   },
   {
@@ -24,7 +28,7 @@ event_table_columns = [
     'searchable': false,
     'columnControl': [],
     'render': function (data, type, row, meta) {
-      return data ? `<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Setlist"></i>` : ''
+      return data ? `<i class="bi bi-check-lg"></i>` : ''
     },
   },
   {
@@ -72,6 +76,7 @@ event_table_columns = [
     'data': 'title',
     'name': 'title',
     'width': '15rem',
+    'className': 'min-desktop',
     'render': function (data, type, row, meta) {
       if (row.event_status) {
         if (data) {
@@ -110,6 +115,7 @@ function eventTable(url) {
     initComplete: function (settings, json) {
       var api = this.api();
       var info = api.page.info();
+      $('#event-count-badge').text(info.recordsTotal);
 
       const input = $('.page-input');
       const prevBtn = $('.btn-prev');
@@ -117,6 +123,7 @@ function eventTable(url) {
       const totalSpan = $('.total-pages');
 
       // Initial button states
+      input.val(info.page + 1);
       prevBtn.attr('disabled', info.page === 0);
       nextBtn.attr('disabled', info.page >= info.pages - 1);
 

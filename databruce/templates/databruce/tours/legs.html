@@ -10,31 +10,33 @@
       </div>
     </div>
     <div class="row">
+      <div id="tableControls">
+        <!-- Search -->
+        <div class="col">
+          <label for="search" class="pb-1">Search</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text"
+                   id="search"
+                   class="form-control form-control-sm"
+                   placeholder="Type to search table...">
+          </div>
+        </div>
+        <div class="col-12 col-md-auto mt-2 mt-md-0">
+          <button type="button"
+                  id="sbButton"
+                  data-bs-toggle="modal"
+                  data-bs-target="#sbModal"
+                  class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
       <div class="col">
         <div class="card">
-          <div class="card-body">
-            <div id="tableControls">
-              <!-- Search -->
-              <div class="col">
-                <label for="search" class="pb-1">Search</label>
-                <div class="input-group input-group-sm">
-                  <span class="input-group-text">
-                    <i class="bi bi-search"></i>
-                  </span>
-                  <input type="text"
-                         id="search"
-                         class="form-control form-control-sm"
-                         placeholder="Type to search table...">
-                </div>
-              </div>
-              <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <button type="button"
-                        id="sbButton"
-                        data-bs-toggle="modal"
-                        data-bs-target="#sbModal"
-                        class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-              </div>
-            </div>
+          <div class="card-body p-0">
             <div class="row">
               <div class="table-responsive">
                 <table class="table table-hover display" id="tourLegTable">
@@ -58,65 +60,76 @@
     </div>
   </div>
   <script>
-  $(document).ready(function () {
-    let sb_columns = [1,2,3,4,5,6];
+    $(document).ready(function() {
+      let sb_columns = [1, 2, 3, 4, 5, 6];
 
-    var table = new DataTable('#tourLegTable', {
-      ajax: {
-        'url': '/api/v1/tour_legs/?format=custom',
-      },
-      columnDefs: [
-        { targets: [0,1], width: '12rem' },
-        { targets: [2, 3], width: '10rem' },
-        { targets: [4, 5], width: '1rem', className: 'text-center' },
-        { targets: [-1], width: '12rem' },
-      ],
-      order: [[3, 'desc']],
-      columns: [
-        {
+      var table = new DataTable('#tourLegTable', {
+        ajax: {
+          'url': '/api/v1/tour_legs/?format=custom',
+        },
+        columnDefs: [{
+          targets: [0, 1],
+          width: '12rem'
+        }, {
+          targets: [2, 3],
+          width: '10rem'
+        }, {
+          targets: [4, 5],
+          width: '1rem',
+          className: 'text-center'
+        }, {
+          targets: [-1],
+          width: '12rem'
+        }, ],
+        order: [
+          [3, 'desc']
+        ],
+        columns: [{
           'data': 'name',
           'name': 'name',
-          'render': function (data, type, row, meta) {
+          'render': function(data, type, row, meta) {
             if (data) {
               return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
             }
           },
-        },
-        {
+        }, {
           'data': 'tour',
           'name': 'tour__name',
-          'render': function (data, type, row, meta) {
+          'render': function(data, type, row, meta) {
             if (data) {
               return `<a href="/tours/${data.uuid}">${data.name}</a>`;
             }
           },
-        },
-        {
+        }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
-          'render': function (data, type, row, meta) {
+          'render': function(data, type, row, meta) {
             if (data) {
               return `<a href="/events/${data.event_id}">${data.date}</a>`;
             }
           },
-        },
-        {
+        }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
-          'render': function (data, type, row, meta) {
+          'render': function(data, type, row, meta) {
             if (data) {
               return `<a href="/events/${data.event_id}">${data.date}</a>`;
             }
           },
-        },
-        {'data': 'num_events', 'name': 'num_events'},
-        {'data': 'num_songs', 'name': 'num_songs'},
-        {'data': 'note', 'name': 'note'},
-      ]
-    });
+        }, {
+          'data': 'num_events',
+          'name': 'num_events'
+        }, {
+          'data': 'num_songs',
+          'name': 'num_songs'
+        }, {
+          'data': 'note',
+          'name': 'note'
+        }, ]
+      });
 
-    tableSearch(table, 'search');
-    searchBuilder(table, sb_columns);
-  });
+      tableSearch(table, 'search');
+      searchBuilder(table, sb_columns);
+    });
   </script>
 {% endblock content %}

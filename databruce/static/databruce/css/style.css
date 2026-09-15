@@ -312,25 +312,23 @@ a.text-reset,
 }
 
 .card-body:not(#setlistCard, [class*="p-"], [class*="px-"], [class*="py-"]),
-.card-body:has(.table):not(#setlistCard) {
-  padding: 1rem !important;
+.card-body:has(.table):not(#setlistCard, [class*="p-"], [class*="px-"], [class*="py-"]) {
+  padding: 1rem;
 }
 
 .card-body.list-card,
-.card-body:has(#headimg) {
+.card-body:has(#headimg),
+.tab-content .card-body:not(#setlistCard, [class*="p-"], [class*="px-"], [class*="py-"]) {
   padding: 0 !important;
 }
 
 #tableControls {
-  padding: 0 1rem 0.5rem 1rem !important;
+  margin-bottom: 1rem !important;
   row-gap: .5rem !important;
   align-items: flex-end !important;
   display: flex !important;
   gap: 0.25rem;
   flex-wrap: wrap;
-  margin-top: calc(-1 * var(--bs-gutter-y));
-  margin-right: calc(-.5 * var(--bs-gutter-x));
-  margin-left: calc(-.5 * var(--bs-gutter-x));
 }
 
 #album .card-header {
@@ -374,7 +372,7 @@ thead tr:first-child th {
 
 .row:has(>div[class*="dt-layout-"]:empty),
 .dt-layout-full,
-#setlistTable_wrapper>.dt-layout-table,
+.dt-layout-table,
 .index .dt-layout-table {
   margin-top: 0 !important;
 }
@@ -754,17 +752,22 @@ button:disabled {
   gap: 0.25rem !important;
 }
 
-.nav-link {
+.nav-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-wrap: nowrap !important;
+  gap: 0.35rem !important;
   font-weight: 500 !important;
 }
 
-.nav-link.active {
+/* .nav-link.active {
   background-color: transparent !important;
   border-radius: 0 !important;
   border-bottom-style: solid !important;
   border-bottom-width: 3px !important;
   font-weight: 700 !important;
-}
+} */
 
 .card-header:has(.nav-pills) {
   padding: 0rem 0.25rem !important;
@@ -814,10 +817,8 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   font-weight: 500 !important;
 }
 
-.badge {}
-
 .btn {
-  border: none !important;
+  border-width: 1px !important;
   box-shadow: none !important;
   border-radius: 0.25rem !important;
 }
@@ -832,7 +833,7 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 }
 
 .year-selector {
-  font-size: clamp(var(--text-sm), -2vw + 3rem, var(--text-base)) !important;
+  font-size: var(--text-sm) !important;
 }
 
 .navbar .btn i {
@@ -942,13 +943,7 @@ button {
   margin: 0 0.75rem !important;
 }
 
-.nav-link {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  text-wrap: nowrap !important;
-  gap: 0.35rem !important;
-}
+
 
 #albumTable_wrapper>.dt-layout-table {
   margin-top: 0 !important;

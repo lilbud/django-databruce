@@ -29,27 +29,23 @@
       </div>
     </div>
     <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
-        </div>
-      </div>
+      <div class="col">{% include "databruce/partials/event_table.html" %}</div>
     </div>
   </div>
   <script>
-  $(document).ready(function () {
-    eventTable('/api/v1/events/?type={{ type.id }}&format=custom');
+    $(document).ready(function() {
+      eventTable('/api/v1/events/?type={{ type.id }}&format=custom');
 
-    $(function () {
-      // bind change event to select
-      $('#type_select').on('change', function () {
-        var url = $(this).val() // get selected value
-        if (url) { // require a URL
-          window.location = url; // redirect
-        }
-        return false;
+      $(function() {
+        // bind change event to select
+        $('#type_select').on('change', function() {
+          var url = $(this).val() // get selected value
+          if (url) { // require a URL
+            window.location = url; // redirect
+          }
+          return false;
+        });
       });
     });
-  });
   </script>
 {% endblock content %}

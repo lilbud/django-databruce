@@ -1,5 +1,4 @@
 import datetime
-from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -803,24 +802,12 @@ class CoversSerializer(BaseSerializer):
 
 
 class NugsSerializer(BaseSerializer):
-  date = serializers.SerializerMethodField()
-  event = EventsSerializer(include=["id", "event_id", "venue", "date"])
+  event = EventsSerializer(include=["id", "event_id", "venue", "date", "early_late"])
   city = MinimalCitiesSerializer(required=False, source="event.venue.city")
   category = serializers.SerializerMethodField()
 
   def get_category(self, obj):
     return obj.get_category_display()
-
-  def get_date(self, obj):
-    try:
-      return {
-        "date": obj.date.strftime("%Y-%m-%d"),
-        "time": obj.date.astimezone(ZoneInfo("UTC")).strftime(
-          "%I:%M %Z",
-        ),
-      }
-    except AttributeError:
-      return None
 
   class Meta:
     model = models.NugsRelease

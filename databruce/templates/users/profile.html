@@ -61,7 +61,7 @@
       <div class="col">
         <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active button"
+            <button class="btn nav-btn"
                     id="pills-events-tab"
                     data-bs-toggle="pill"
                     data-bs-target="#events"
@@ -71,7 +71,7 @@
                     aria-selected="true">Shows</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link button"
+            <button class="btn nav-btn"
                     id="pills-songs-tab"
                     data-bs-toggle="pill"
                     data-bs-target="#songs"
@@ -81,7 +81,7 @@
                     aria-selected="false">Songs</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link button"
+            <button class="btn nav-btn"
                     id="pills-albums-tab"
                     data-bs-toggle="pill"
                     data-bs-target="#albums"
@@ -95,18 +95,14 @@
     </div>
     <div class="row">
       <div class="tab-content">
-        <div id="events" class="tab-pane fade show active">
-          <div class="card">
-            <div class="card-body">{% include "databruce/partials/event_table.html" %}</div>
-          </div>
-        </div>
+        <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
         <div id="songs" class="tab-pane fade">
           <div class="row mb-3">
             <div class="col">
               <div class="card">
                 <div class="card-header">Songs Seen</div>
                 <div class="card-body">
-                  <div id="tableControls">
+                  <div id="tableControls" class="px-3">
                     <div class="col-12 col-md-1">
                       <label for="categoryFilter" class="pb-1">Category</label>
                       <select id="categoryFilter" class="form-select form-select-sm">
@@ -151,7 +147,7 @@
               <div class="card">
                 <div class="card-header">Most Played Not Seen (100+ plays)</div>
                 <div class="card-body">
-                  <div id="tableControls">
+                  <div id="tableControls" class="px-3">
                     <div class="col-12 col-md-1">
                       <label for="categoryFilter" class="pb-1">Category</label>
                       <select id="categoryFilter" class="form-select form-select-sm">
@@ -198,7 +194,7 @@
                   Rare Songs (<100 Plays)
                 </div>
                 <div class="card-body">
-                  <div id="tableControls">
+                  <div id="tableControls" class="px-3">
                     <div class="col-12 col-md-1">
                       <label for="categoryRareFilter" class="pb-1">Category</label>
                       <select id="categoryRareFilter" class="form-select form-select-sm">
