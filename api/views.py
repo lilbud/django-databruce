@@ -19,7 +19,6 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast, Coalesce, Lower
 from django.db.models.manager import BaseManager
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import exceptions, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
@@ -105,7 +104,9 @@ class OnstageBandViewSet(viewsets.ReadOnlyModelViewSet):
 class BandViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  queryset = db_models.Band.objects.order_by("name")
+  queryset = db_models.Band.objects.order_by("name").prefetch_related(
+    "first_event", "last_event"
+  )
 
   serializer_class = api_serializers.BandsSerializer
   filterset_class = api_filters.BandsFilter
@@ -212,37 +213,52 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
-  serializer_class = api_serializers.AdvSearchSerializer
-  filter_backends = [
-    api_filters.DataTablesFilterBackend,
-    DjangoFilterBackend,
-    api_filters.NotEqualFilterBackend,
-  ]
+  serializer_class = api_serializers.EventsSerializer
+
+  # filter_backends = [
+  #   api_filters.DataTablesFilterBackend,
+  #   DjangoFilterBackend,
+  #   api_filters.NotEqualFilterBackend,
+  # ]
+
   filterset_class = api_filters.AdvSearchFilter
 
-  def get_queryset(self):
+  def get_queryset(self) -> BaseManager:
     status_check = db_models.EventType.objects.filter(
       event_id=OuterRef("pk"),
-      type_id__in=[6, 21, 22],  # Uses the through-table IDs directly
+      type_id__in=[6, 16, 21, 22, 23],
     )
 
-    return (
-      db_models.Event.objects.all()
-      .select_related(
+    qs = (
+      db_models.Event.objects.select_related(
         "artist",
         "tour",
         "venue__city__country",
-        "venue",
       )
       .prefetch_related(
-        "run",
         "venue__city__state",
         "leg",
-        "event_tag",
-        "event_type",
+        Prefetch(
+          "setlist_event",
+          queryset=db_models.Setlist.objects.select_related("song").order_by(
+            F("song_num").asc(nulls_first=True),
+          ),
+        ),
+        "type",
+        "tags",
       )
-      .annotate(event_status=Exists(status_check))
+      .annotate(is_disrupted=Exists(status_check))
     ).order_by("event_id")
+
+    if self.request.user.is_authenticated:
+      user_present = db_models.UserAttendedShow.objects.filter(
+        event_id=OuterRef("pk"),
+        user=self.request.user,
+      )
+
+      qs = qs.annotate(user_present=Exists(user_present))
+
+    return qs
 
   def filter_queryset(self, queryset):
     # 1. Let django-filter process the standard form fields first
@@ -471,34 +487,8 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     return qs
 
   serializer_class = api_serializers.EventsSerializer
+
   filterset_class = api_filters.EventsFilter
-  ordering_fields = ["event_id"]
-
-
-class AdvancedSearchViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = (
-    db_models.Event.objects.all()
-    .select_related(
-      "venue",
-      "artist",
-      "tour",
-      "venue__city__country",
-      "venue__venues_text",
-      "type",
-      "tags",
-    )
-    .prefetch_related(
-      "onstage",
-      "run",
-      "venue__city__state",
-      "leg",
-      "setlist_event",
-    )
-    .order_by("event_id")
-  )
-
-  serializer_class = api_serializers.AdvSearchSerializer
-  filter_backends = [api_filters.EventsFilter, api_filters.NotEqualFilterBackend]
 
 
 class NugsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -519,21 +509,16 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
   ).order_by("-date")
 
   serializer_class = api_serializers.NugsSerializer
-  filter_backends = [api_filters.DataTablesFilterBackend]
 
 
 class RelationsViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  # rel_aliases = db_models.RelationAlias.objects.filter(relation=OuterRef("id"))
-  onstage = db_models.Onstage.objects.select_related("relation").filter(
-    relation=OuterRef("id"),
-  )
-
   queryset = (
     db_models.Relation.objects.all()
     .order_by("name")
     .select_related("first_event", "last_event")
+    .prefetch_related("relation_alias")
   )
 
   serializer_class = api_serializers.RelationsSerializer
@@ -646,7 +631,6 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
       "event",
       "event__venue__city",
     )
-    .order_by("event__event_id")
     .prefetch_related(
       "show_opener",
       "s1_closer",
@@ -729,8 +713,8 @@ class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
       queryset.values("snippet_id")
       .annotate(
         count=Count("id", distinct=True),
-        first_event=Min("setlist__event__event_id"),
-        last_event=Max("setlist__event__event_id"),
+        first_event=Min("setlist__event_id"),
+        last_event=Max("setlist__event_id"),
       )
       .order_by("-count")
     )
@@ -739,6 +723,43 @@ class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
 
   serializer_class = api_serializers.IncludedSerializer
   filterset_class = api_filters.IncludedFilter
+
+
+# class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
+#   def get_queryset(self):
+#     # Subquery to fetch the ID of the first/last event related to the snippet
+#     first_event_id = (
+#       db_models.Event.objects.filter(
+#         id=OuterRef("setlist__event_id"),
+#       )
+#       .order_by("event_id")
+#       .values("id")[:1]
+#     )
+
+#     last_event_id = (
+#       db_models.Event.objects.filter(
+#         id=OuterRef("setlist__event_id"),
+#       )
+#       .order_by("-event_id")
+#       .values("id")[:1]
+#     )
+
+#     queryset = (
+#       db_models.Snippet.objects.all()
+#       .annotate(
+#         count=Count("setlist", distinct=True),
+#         first_event_id=Subquery(first_event_id),
+#         last_event_id=Subquery(last_event_id),
+#       )
+#       .select_related("setlist__song", "setlist__event", "snippet")
+#       .filter(count__gt=0)
+#       .order_by("-count")
+#     )
+
+#     return self.filter_queryset(queryset)
+
+#   serializer_class = api_serializers.IncludedSerializer
+#   filterset_class = api_filters.IncludedFilter
 
 
 class StatesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -773,18 +794,10 @@ class SongsViewSet(viewsets.ReadOnlyModelViewSet):
 class ToursViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  queryset = (
-    db_models.Tour.objects.all()
-    .select_related(
-      "first_event",
-      "last_event",
-      "band",
-      "first_event__artist",
-      "first_event__tour",
-      "last_event__artist",
-      "last_event__tour",
-    )
-    .order_by("-last_event__event_id")
+  queryset = db_models.Tour.objects.all().select_related(
+    "first_event",
+    "last_event",
+    "band",
   )
 
   serializer_class = api_serializers.ToursSerializer

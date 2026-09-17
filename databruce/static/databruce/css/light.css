@@ -41,10 +41,6 @@
     background-image: linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)) !important;
   }
 
-  th.dt-ordering-asc,
-  th.dt-ordering-desc {
-    background-color: var(--color-gray-200) !important;
-  }
 
   button.active>.badge {
     background-color: var(--color-white) !important;
@@ -459,9 +455,13 @@
     background-color: var(--color-gray-300) !important;
   }
 
+
+  th.dt-ordering-asc:not(.set),
+  th.dt-ordering-desc:not(.set),
   .sorting_1 {
     background-color: var(--color-gray-100) !important;
   }
+
 
   .song_num {
     color: var(--color-gray-800);
@@ -653,6 +653,14 @@
     box-shadow: inset 0 -3px 0 0 var(--color-blue-500) !important;
   }
 
+  .dt-ordering-asc.set {
+    box-shadow: inset 0 3px 0 0 var(--color-black) !important;
+  }
+
+  .dt-ordering-desc.set {
+    box-shadow: inset 0 -3px 0 0 var(--color-black) !important;
+  }
+
   .count-badge {
     background-color: var(--color-white) !important;
     color: var(--color-black) !important;
@@ -683,8 +691,11 @@
     color: var(--color-gray-600) !important;
   }
 
-  .userForm .bi-star-fill,
   .userForm .bi-star {
+    color: var(--color-black) !important;
+  }
+
+  .userForm .bi-star-fill {
     color: var(--color-yellow-500) !important;
   }
 

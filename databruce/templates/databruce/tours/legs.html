@@ -24,12 +24,19 @@
                    placeholder="Type to search table...">
           </div>
         </div>
-        <div class="col-12 col-md-auto mt-2 mt-md-0">
-          <button type="button"
-                  id="sbButton"
-                  data-bs-toggle="modal"
-                  data-bs-target="#sbModal"
-                  class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+           id="controls">
+        <div class="dt-info order-3 table_info" aria-live="polite" role="status"></div>
+        <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
+             id="dropdown-container">
+          <label for="columnOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <select name=""
+                  id="columnOrder"
+                  class="form-select form-select-sm column-order"
+                  autocomplete="off"></select>
         </div>
       </div>
     </div>
@@ -61,26 +68,24 @@
   </div>
   <script>
     $(document).ready(function() {
-      let sb_columns = [1, 2, 3, 4, 5, 6];
-
       var table = new DataTable('#tourLegTable', {
         ajax: {
           'url': '/api/v1/tour_legs/?format=custom',
         },
+        pageLength: -1,
         columnDefs: [{
           targets: [0, 1],
           width: '12rem'
         }, {
           targets: [2, 3],
-          width: '10rem'
+          width: '10rem',
+          type: 'date',
+          className: 'dt-left'
         }, {
           targets: [4, 5],
           width: '1rem',
           className: 'text-center'
-        }, {
-          targets: [-1],
-          width: '12rem'
-        }, ],
+        }],
         order: [
           [3, 'desc']
         ],
@@ -124,12 +129,84 @@
           'name': 'num_songs'
         }, {
           'data': 'note',
-          'name': 'note'
-        }, ]
+          'name': 'note',
+          'width': '12rem'
+        }, ],
+        initComplete: function(settings, json) {
+          let api = this.api();
+          let select = $('#columnOrder');
+
+          select.empty();
+
+          api.columns().every(function(index) {
+            let column = this;
+
+            if (column.orderable()) {
+              let headerText = $(column.header()).text().trim();
+
+              // 1. Safely retrieve DataTables' detected data type for this column
+              // Accounts for both modern DataTables 2.0+ and legacy DataTables 1.x environments
+              let type = typeof column.type === 'function' ?
+                column.type() :
+                settings.aoColumns[index].sType;
+
+              // 2. Set fallback default text labels (Text / Strings)
+              let ascLabel = '(A-Z)';
+              let descLabel = '(Z-A)';
+
+              // 3. Dynamically adjust labels based on the detected type
+              if (type && (type.indexOf('num') !== -1)) {
+                // Triggers for 'num', 'num-fmt', 'html-num', etc.
+                ascLabel = '(Least)';
+                descLabel = '(Most)';
+              } else if (type && (type.indexOf('date') !== -1)) {
+                // Triggers for 'date' or custom registered date-time formats
+                ascLabel = '(asc.)';
+                descLabel = '(desc.)';
+              }
+
+              // Append the options using the index-direction value format
+              select.append(`<option value="${index}-asc">${headerText} ${ascLabel}</option>`);
+              select.append(`<option value="${index}-desc">${headerText} ${descLabel}</option>`);
+            }
+          });
+
+          select.on('change', function() {
+            let val = $(this).val();
+            if (val) {
+              let parts = val.split('-');
+              let columnIndex = parseInt(parts[0], 10);
+              let direction = parts[1];
+
+              api.order([columnIndex, direction]).draw();
+            }
+          });
+
+          api.on('order.dt', function() {
+            // Get current ordering array: e.g., [[0, 'asc']]
+            let currentOrder = api.order();
+
+            if (currentOrder.length > 0) {
+              let currentColumnIndex = currentOrder[0][0];
+              let currentDirection = currentOrder[0][1];
+
+              // Reconstruct the expected value string (e.g., "0-asc")
+              let targetValue = `${currentColumnIndex}-${currentDirection}`;
+
+              // Update the dropdown value to match without triggering its change event
+              select.val(targetValue);
+            }
+          });
+
+          // Run an initial sync to match whatever default order the table loaded with
+          let initialOrder = api.order();
+          if (initialOrder.length > 0) {
+            select.val(`${initialOrder[0][0]}-${initialOrder[0][1]}`);
+          }
+        }
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
     });
   </script>
 {% endblock content %}

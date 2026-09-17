@@ -1297,12 +1297,14 @@ class AdvSearchView(PageTitleMixin, TemplateView):
         for key, value in list(raw_params.items()):
           if key.endswith("_exclude") and value.lower() == "true":
             field = key.replace("_exclude", "")
+
             if field in raw_params:
               clean_params[f"{field}__not"] = raw_params[field]
               raw_params.pop(field, None)
+
             continue
 
-          if not key.endswith("_exclude") and not clean_params.get(f"{field}__not"):
+          if not key.endswith("_exclude") and not clean_params.get(f"{key}__not"):
             clean_params[key] = value
 
         # Clean formset items from formset.cleaned_data safely
@@ -1812,6 +1814,12 @@ class BandDetailView(PageTitleMixin, TemplateView):
 class ReleaseView(PageTitleMixin, TemplateView):
   template_name = "databruce/releases/releases.html"
   title = "Releases"
+
+  def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["categories"] = Release.ReleaseType.choices
+
+    return context
 
 
 class ReleaseDetailView(PageTitleMixin, TemplateView):

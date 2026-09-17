@@ -14,7 +14,6 @@ from django.db.models import (
   F,
   Model,
   Q,
-  QuerySet,
   Subquery,
   TextField,
   Value,
@@ -200,6 +199,8 @@ class DataTablesFilterBackend(BaseFilterBackend):
       order_list.append(order)
       i += 1
 
+    print(order_list)
+
     return order_list
 
   def get_fields(self, request):
@@ -257,8 +258,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
   def check_renderer_format(self, request):
     return request.accepted_renderer.format == "custom"
 
-  def filter_queryset(self, request: Request, queryset: QuerySet, view: APIView):
-
+  def filter_queryset(self, request, queryset, view):
     if not self.check_renderer_format(request):
       return queryset
 
@@ -282,6 +282,8 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
       if search_value:
         is_filtered = True
+
+        print(config["name"])
 
         for field in config["name"]:
           lookup = f"{field}__{search_type}"
@@ -369,7 +371,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
       queryset = queryset.filter(sb_filter)
 
     if order_list:
-      return queryset.order_by(*order_list).distinct()
+      queryset = queryset.order_by(*order_list).distinct()
 
     return queryset
 
@@ -687,14 +689,6 @@ class EventsFilter(dj_filters.FilterSet):
       )
       ranking_cases.append(When(exact_date_match, then=Value(1.0)))
 
-    event_exclude_filter = Q(
-      Q(tour__num_songs=0)
-      | Q(
-        setlist_certainty__in=["Unknown"],
-      )
-      | Q(public=False),
-    )
-
     return (
       queryset.annotate(
         search=vector,
@@ -703,7 +697,6 @@ class EventsFilter(dj_filters.FilterSet):
           default=SearchRank(vector, query, weights=[0.1, 0.3, 0.6, 1.0]),
         ),
       )
-      # .exclude(event_exclude_filter)
       .filter(
         Q(event_id__startswith=str(value)) | date_conditions | Q(search=query),
         rank__gt=0.1,
@@ -1230,6 +1223,10 @@ class SetlistEntryFilter(dj_filters.FilterSet):
     lookup_expr="exact",
     label="country",
   )
+
+  class Meta:
+    model = models.SetlistEntries
+    fields = "__all__"
 
 
 class SetlistSongsFilter(dj_filters.FilterSet):

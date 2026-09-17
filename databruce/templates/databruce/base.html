@@ -83,6 +83,7 @@
   </head>
   <body>
     {% include "./partials/navbar.html" %}
+    <div class="d-none">{% csrf_token %}</div>
     <div class="padded-body">
       {% block container %}
       {% endblock container %}
@@ -159,6 +160,11 @@
           const triggerEl = document.querySelector(`[data-bs-target="${hash}"], [href="${hash}"]`);
           if (triggerEl) {
             document.querySelectorAll('.nav-link.active, .tab-pane.active').forEach(el => {
+
+              if (el.id === hash.replace('#', '')) {
+                return
+              }
+
               el.classList.remove('active', 'show');
             });
 

@@ -1,29 +1,32 @@
 event_table_columns = [
   {
+    'data': 'user_present',
+    'name': 'user_present',
+    'width': '1rem',
+    'className': 'text-center text-xs user-present',
+    'orderable': false,
+    'searchable': false,
+    'columnControl': [],
+    'render': function (data, type, row, meta) {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      return renderAttendanceForm(row, csrfToken);
+    },
+  },
+  {
     'data': 'date',
     'name': 'event_id',
-    'type': 'text',
+    'type': 'date',
     'width': '6rem',
     'className': 'text-wrap',
     'render': function (data, type, row, meta) {
-      const date = new Date(data);
-      const dayText = date.toLocaleDateString('en-US', { weekday: 'long' });
-      var dateItem;
-
-      if (row.early_late) {
-        dateItem = `<span class="text-primary">${data}</span><br><small>${row.early_late} • ${dayText}</small>`
-      } else {
-        dateItem = `${data}<br><small>${dayText}</small>`
-      }
-
-      return `<a href="/events/${row.event_id}">${dateItem}</a>`
+      return eventDateFormat(row);
     },
   },
   {
     'data': 'has_setlist',
     'name': 'has_setlist',
     'width': '1rem',
-    'className': 'text-center text-xs',
+    'className': 'text-center text-xs setlist',
     'orderable': false,
     'searchable': false,
     'columnControl': [],
@@ -106,28 +109,31 @@ function eventTable(url) {
     ajax: {
       'url': url,
     },
+    layout: {
+      topStart: {
+        customOrder: {
+          selectId: '#eventTableOrder'
+        }
+      }
+    },
     columns: event_table_columns,
-    columnDefs: [
-      { 'target': '_all', columnControl: [], ordering: { indicators: false } },
-    ],
-    serverSide: true,
-    processing: true,
+    order: [[1, 'asc']],
     initComplete: function (settings, json) {
       var api = this.api();
       var info = api.page.info();
       $('#event-count-badge').text(info.recordsTotal);
 
-      const input = $('.page-input');
-      const prevBtn = $('.btn-prev');
-      const nextBtn = $('.btn-next');
-      const totalSpan = $('.total-pages');
+      const input = $('.event-controls .page-input');
+      const prevBtn = $('.event-controls .btn-prev');
+      const nextBtn = $('.event-controls .btn-next');
+      const totalSpan = $('.event-controls .total-pages');
 
       // Initial button states
       input.val(info.page + 1);
       prevBtn.attr('disabled', info.page === 0);
       nextBtn.attr('disabled', info.page >= info.pages - 1);
 
-      $('.eventTable_info').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+      $('#eventTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
 
       api.on('draw', () => {
         const pageInfo = api.page.info();
@@ -142,7 +148,7 @@ function eventTable(url) {
         nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
 
         // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-        $('.eventTable_info').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+        $('#eventTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
       });
 
       totalSpan.text(`of ${info.pages || 1}`);
@@ -168,8 +174,6 @@ function eventTable(url) {
     }
   });
 
-  let dropdown = $('.column-order');
-
   table.on('xhr.dt', function (e, settings, json) {
     if (!json || !json.data) return;
 
@@ -177,33 +181,71 @@ function eventTable(url) {
     renderCards(json.data);
   });
 
-  // 3. Listen for dropdown changes to reorder the table
-  dropdown.on('change', function () {
-    let rawValue = $(this).val();
-
-    // Don't trigger sorting if the default placeholder option is selected
-    if (!rawValue) return;
-
-    // Split the combined string value (e.g., "2-desc" becomes index 2, direction "desc")
-    let parts = rawValue.split('-');
-    let selectedColumnIndex = parseInt(parts[0], 10);
-    let direction = parts[1];
-
-    console.log(selectedColumnIndex, direction)
-
-    // Apply ordering rule and refresh interface layout
-    table.order([selectedColumnIndex, direction]).draw();
-  });
-
-  $(window).on('resize', function () {
-    table.columns.adjust();
-  });
-
   tableSearch(table, 'search');
-  tableSearch(table, 'cardSearch');
 
   $('.publicity-filter').on('change', function () {
     var selectedValue = this.value;
-    table.order([[0, 'asc']]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
+    table.order([[1, 'asc']]).column(7).search(selectedValue ? selectedValue : '', true, false).draw();
   });
+}
+
+$(document).on('submit', '.userForm', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const addBtn = $(this).find('#add');
+
+  let action = addBtn.attr('data-action');
+  let event = addBtn.attr('data-event');
+  const url = `/events/${event}/${action}/`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const isAdded = data['action'] === 'added';
+
+    addBtn
+      .toggleClass('bi-star-fill', isAdded)
+      .toggleClass('bi-star', !isAdded)
+      .attr('data-attended', isAdded ? 'true' : 'false')
+      .attr('data-action', isAdded ? 'remove' : 'add');
+
+  } catch (error) {
+    console.error('Error during POST request:', error);
+  }
+});
+
+function renderAttendanceForm(event, csrfToken) {
+  if (!event.public) return "";
+
+  const isAttending = event.user_present;
+  const iconClass = isAttending ? "bi-star-fill" : "bi-star";
+  const action = isAttending ? "remove" : "add";
+  const attended = isAttending ? "true" : "false";
+  const blockedTypes = ["Rescheduled", "Cancelled", "Relocated", "No Gig"];
+
+  if (blockedTypes.includes(event.type?.[0]?.name)) {
+    return "";
+  }
+
+  return `
+    <form method="post" id="userForm" class="userForm d-flex justify-content-center align-items-center">
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+      <button
+        type="submit"
+        class="btn btn-link p-0 border-0 bi ${iconClass}"
+        data-event="${event.id}"
+        data-action="${action}"
+        data-attended="${attended}"
+        id="add"
+      ></button>
+    </form>
+  `;
 }

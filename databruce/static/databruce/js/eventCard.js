@@ -89,34 +89,6 @@ function renderNoteCard(event) {
   return "";
 }
 
-function renderAttendanceForm(event, csrfToken) {
-  if (!event.public) return "";
-
-  const isAttending = event.user_present;
-  const iconClass = isAttending ? "bi-star-fill" : "bi-star";
-  const action = isAttending ? "remove" : "add";
-  const attended = isAttending ? "true" : "false";
-  const blockedTypes = ["Rescheduled", "Cancelled", "Relocated", "No Gig"];
-
-  if (blockedTypes.includes(event.type?.[0]?.name)) {
-    return "";
-  }
-
-  return `
-    <form method="post" id="userForm" class="userForm d-flex align-items-center">
-      <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-      <button
-        type="submit"
-        class="btn btn-link p-0 border-0 text-xl bi ${iconClass}"
-        data-event="${event.id}"
-        data-action="${action}"
-        data-attended="${attended}"
-        id="add"
-      ></button>
-    </form>
-  `;
-}
-
 function renderSetlist(setlist) {
   if (!setlist.length) return "";
 
@@ -180,7 +152,7 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
     <div class="card-header">
       <div class="row mb-2 d-flex justify-content-between">
         <div class="col">${badges}</div>
-        <div class="col-auto text-end" id="userPresent">${attendanceForm}</div>
+        <div class="col-auto text-end text-xl" id="userPresent">${attendanceForm}</div>
       </div>
       
       <div class="title text-2xl row d-flex justify-content-between mb-1">
@@ -198,7 +170,7 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
       ${tourHtml}
       
       <div class="row event-venue">
-        <div class="venue-name text-base">${event.venue.name}</div>
+        <div class="venue-name text-base">${event.venue ? event.venue.name : ""}</div>
         <div class="venue-city text-2xs text-muted d-flex gap-1">
           <i class="bi bi-geo-alt-fill"></i>${event.city}
         </div>

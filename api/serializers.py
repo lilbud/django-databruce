@@ -161,7 +161,7 @@ class MinimalEventSerializer(BaseSerializer):
 
   class Meta:
     model = models.Event
-    fields = ["date", "event_id"]
+    fields = ["date", "event_id", "early_late"]
 
 
 class MinimalTourLegsSerializer(BaseSerializer):
@@ -347,8 +347,8 @@ class EventRunSerializer(BaseSerializer):
   band = MinimalBandsSerializer()
   venue = MinimalVenuesSerializer(include=["uuid", "name"])
   city = serializers.CharField(source="venue.city", required=False, max_length=255)
-  first_event = MinimalEventSerializer(required=False, include=["event_id", "date"])
-  last_event = MinimalEventSerializer(required=False, include=["event_id", "date"])
+  first_event = MinimalEventSerializer(required=False)
+  last_event = MinimalEventSerializer(required=False)
 
   class Meta:
     model = models.Run
@@ -729,12 +729,13 @@ class AdvSearchSerializer(BaseSerializer):
   leg = serializers.CharField(required=False, source="leg.name", max_length=255)
   has_setlist = serializers.SerializerMethodField()
 
-  type = serializers.SlugRelatedField(
-    many=True,
-    read_only=True,
-    slug_field="name",
-    required=False,
-  )
+  type = serializers.SerializerMethodField()
+
+  def get_type(self, obj):
+    return [
+      {"name": type.name, "class": EVENT_TYPE_COLOR_MAP.get(type.id, "primary")}
+      for type in obj.type.all()
+    ]
 
   tags = serializers.SlugRelatedField(
     many=True,
@@ -743,19 +744,33 @@ class AdvSearchSerializer(BaseSerializer):
     required=False,
   )
 
-  rank = serializers.IntegerField(required=False)
-  event_status = serializers.BooleanField(required=False)
-  public = serializers.BooleanField(required=False)
+  event_anchor = serializers.SerializerMethodField(required=False)
+  setlist = EventSetlistSerializer(
+    source="setlist_event",
+    read_only=True,
+    many=True,
+    required=False,
+  )
 
-  def get_has_setlist(self, obj):
-    return obj.setlist_certainty != "Unknown"
+  def get_event_anchor(self, obj) -> str:
+    return event_id_format(obj.event_id)
 
-  def get_date(self, obj):
+  def get_has_setlist(self, obj) -> bool:
+    return bool(obj.setlist_event.exists())
+
+  def get_date(self, obj) -> None | datetime.date | str:
     return get_date_from_instance(obj)
+
+  def get_event_note(self, obj) -> None | str:
+    if obj.note is None or obj.note == "":
+      return None
+
+    return event_note_format(obj.note)
 
   class Meta:
     model = models.Event
     fields = [
+      "id",
       "date",
       "artist",
       "tour",
@@ -763,8 +778,8 @@ class AdvSearchSerializer(BaseSerializer):
       "city",
       "leg",
       "has_setlist",
-      "rank",
-      "event_status",
+      "event_anchor",
+      "setlist",
       "event_id",
       "title",
       "public",
@@ -814,18 +829,29 @@ class NugsSerializer(BaseSerializer):
     fields = ["id", "event", "date", "city", "url", "name", "category"]
 
 
+class RelationAliasSerializer(serializers.ModelSerializer):
+  type_display = serializers.CharField(
+    source="get_type_display",
+    read_only=True,
+    max_length=255,
+  )
+
+  class Meta:
+    model = models.RelationAlias
+    fields = ["id", "name", "type", "type_display"]
+
+
 class RelationsSerializer(BaseSerializer):
   first_event = MinimalEventSerializer(required=False)
   last_event = MinimalEventSerializer(required=False)
-  aliases = serializers.ListField(required=False)
-  nicknames = serializers.ListField(required=False)
-  birthday = serializers.SerializerMethodField()
 
-  def get_birthday(self, obj):
-    try:
-      return obj.start_date.strftime("%Y-%m-%d")
-    except AttributeError:
-      return None
+  aliases = serializers.SlugRelatedField(
+    source="relation_alias",
+    many=True,
+    read_only=True,
+    slug_field="name",
+    required=False,
+  )
 
   class Meta:
     model = models.Relation
@@ -834,11 +860,9 @@ class RelationsSerializer(BaseSerializer):
       "first_event",
       "last_event",
       "start_date",
-      "birthday",
       "instruments",
       "name",
       "aliases",
-      "nicknames",
       "uuid",
       "num_events",
     ]
@@ -851,7 +875,7 @@ class OnstageBandSerializer(BaseSerializer):
 
   class Meta:
     model = models.OnstageBandMember
-    fields = ["id", "first", "last", "relation"]
+    fields = ["id", "first", "last", "relation", "count"]
 
 
 class ReleasesSerializer(BaseSerializer):
@@ -1044,42 +1068,73 @@ class SnippetSerializer(BaseSerializer):
     fields = ["event", "song", "venue", "notes"]
 
 
-class IncludedSerializer(BaseSerializer):
-  count = serializers.IntegerField(required=False)
-
-  event_map = {
-    s.event_id: MinimalEventSerializer(s).data for s in models.Event.objects.all()
-  }
-
-  song_map = {
-    s.id: MinimalSongsSerializer(
-      s,
-      include=["uuid", "name", "category", "original"],
-    ).data
-    for s in models.Song.objects.all()
-  }
-
-  first_event = serializers.SerializerMethodField()
-  last_event = serializers.SerializerMethodField()
-  snippet = serializers.SerializerMethodField()
-
-  def get_snippet(self, obj):
-    return self.song_map[obj["snippet_id"]]
-
-  def get_first_event(self, obj):
-    return self.event_map[obj["first_event"]]
-
-  def get_last_event(self, obj):
-    return self.event_map[obj["last_event"]]
+class IncludedSerializer(serializers.ModelSerializer):
+  count = serializers.IntegerField(read_only=True)
+  snippet = serializers.SerializerMethodField(required=False)
+  first_event = serializers.SerializerMethodField(required=False)
+  last_event = serializers.SerializerMethodField(required=False)
 
   class Meta:
     model = models.Snippet
-    fields = [
-      "count",
-      "snippet",
-      "first_event",
-      "last_event",
-    ]
+    fields = ["count", "snippet", "first_event", "last_event"]
+
+  def to_representation(self, instance):
+    # Optional bulk prefetching step for the batch being serialized
+    if isinstance(self.instance, list) and not hasattr(self, "_event_cache"):
+      event_ids = set()
+      for obj in self.instance:
+        if obj["first_event"]:
+          event_ids.add(obj["first_event"])
+        if obj["last_event"]:
+          event_ids.add(obj["last_event"])
+
+      events = models.Event.objects.filter(id__in=event_ids)
+      self._event_cache = {e.id: MinimalEventSerializer(e).data for e in events}
+
+      song_ids = set()
+
+      for obj in self.instance:
+        song_ids.add(obj["snippet_id"])
+
+      songs = models.Song.objects.filter(id__in=song_ids)
+      self._song_cache = {
+        s.id: MinimalSongsSerializer(s, include=["name", "slug"]).data for s in songs
+      }
+
+    return super().to_representation(instance)
+
+  def get_first_event(self, obj):
+    event_id = obj["first_event"]
+
+    if not event_id:
+      return None
+
+    if hasattr(self, "_event_cache"):
+      return self._event_cache.get(event_id)
+
+    event = models.Event.objects.get(pk=event_id)
+    return MinimalEventSerializer(event).data if event else None
+
+  def get_last_event(self, obj):
+    event_id = obj["last_event"]
+
+    if not event_id:
+      return None
+
+    if hasattr(self, "_event_cache"):
+      return self._event_cache.get(event_id)
+
+    event = models.Event.objects.get(pk=event_id)
+    return MinimalEventSerializer(event).data if event else None
+
+  def get_snippet(self, obj):
+    song_id = obj["snippet_id"]
+
+    if hasattr(self, "_song_cache"):
+      return self._song_cache.get(song_id)
+
+    song = models.Song.objects.get(pk=song_id)
+    return MinimalSongsSerializer(song).data if song else None
 
 
 class TourLegsSerializer(BaseSerializer):
@@ -1179,7 +1234,7 @@ class LyricsSerializer(BaseSerializer):
 
 class SetlistEntrySerializer(BaseSerializer):
   event = EventsSerializer(
-    include=["date", "event_id"],
+    include=["date", "event_id", "early_late"],
   )
   show_opener = MinimalSongsSerializer(include=["uuid", "name"])
   s1_closer = MinimalSongsSerializer(include=["uuid", "name"])

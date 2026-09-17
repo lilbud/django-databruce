@@ -806,8 +806,6 @@ class Relation(BaseModel):
   end_date = models.DateField(default=None, blank=True)
   show_cal = models.BooleanField(default=False, db_column="show_calendar")
 
-  aliases = models.ManyToManyField(to="Relation", through="RelationAlias")
-
   class Meta:
     db_table = "relations"
     verbose_name = "relation"
@@ -827,7 +825,13 @@ class RelationAlias(BaseModel):
 
   id = models.UUIDField(primary_key=True)
 
-  relation = models.ForeignKey(to=Relation, on_delete=models.CASCADE, null=True)
+  relation = models.ForeignKey(
+    to=Relation,
+    on_delete=models.CASCADE,
+    null=True,
+    db_column="relation_id",
+    related_name="relation_alias",
+  )
 
   name = models.CharField(max_length=255)
 
@@ -1896,56 +1900,74 @@ class ReleaseDisc(BaseModel):
 class SetlistEntries(models.Model):
   id = models.AutoField(primary_key=True)
 
-  event = models.OneToOneField(
+  event = models.ForeignKey(
     Event,
     on_delete=models.DO_NOTHING,
     db_column="event_id",
   )
 
-  show_opener = models.OneToOneField(
+  show_opener = models.ForeignKey(
     to=Song,
     on_delete=models.DO_NOTHING,
     related_name="show_opener",
     db_column="show_opener",
+    default=None,
+    blank=True,
+    null=True,
   )
 
-  s1_closer = models.OneToOneField(
+  s1_closer = models.ForeignKey(
     to=Song,
     on_delete=models.DO_NOTHING,
     related_name="s1_closer",
     db_column="s1_closer",
+    default=None,
+    blank=True,
+    null=True,
   )
 
-  s2_opener = models.OneToOneField(
+  s2_opener = models.ForeignKey(
     to=Song,
     on_delete=models.DO_NOTHING,
     related_name="s2_opener",
     db_column="s2_opener",
+    default=None,
+    blank=True,
+    null=True,
   )
 
-  main_closer = models.OneToOneField(
+  main_closer = models.ForeignKey(
     to=Song,
     on_delete=models.DO_NOTHING,
     related_name="main_closer",
     db_column="main_closer",
+    default=None,
+    blank=True,
+    null=True,
   )
 
-  encore_opener = models.OneToOneField(
+  encore_opener = models.ForeignKey(
     to=Song,
     on_delete=models.DO_NOTHING,
     related_name="encore_opener",
     db_column="encore_opener",
+    default=None,
+    blank=True,
+    null=True,
   )
 
-  show_closer = models.OneToOneField(
+  show_closer = models.ForeignKey(
     to=Song,
     on_delete=models.DO_NOTHING,
     related_name="show_closer",
     db_column="show_closer",
+    default=None,
+    blank=True,
+    null=True,
   )
 
   class Meta:
-    managed = False
+    managed = True
     db_table = "setlist_entries"
 
   def __str__(self) -> str:

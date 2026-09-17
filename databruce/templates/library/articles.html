@@ -1,80 +1,107 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-    {% if user.is_superuser %}
-        {% include "databruce/partials/admin_new_btn.html" with view="article" app="library" %}
-    {% endif %}
-    <div class="col-12">
-        <div class="row mb-3">
-            <div class="col">
-                <div class="text-2xl">Databruce Article Library</div>
-                <div class="text-base">Bruce related articles sourced from various corners of the internet.</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="tableControls">
-                            <div class="col col-lg-2">
-                                <label for="PublicityFilter" class="pb-1">Category</label>
-                                <select id="PublicityFilter" class="form-select form-select-sm">
-                                    <option value="">All</option>
-                                    {% for choice in categories|dictsort:1 %}
-                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col col-lg-2">
-                                <label for="LanguageFilter" class="pb-1">Language</label>
-                                <select id="LanguageFilter" class="form-select form-select-sm">
-                                    <option value="">All</option>
-                                    {% for choice in languages|dictsort:1 %}
-                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <!-- Search -->
-                            <div class="col-12 col-lg">
-                                <label for="search" class="pb-1">Search</label>
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <input type="text"
-                                           id="search"
-                                           class="form-control form-control-sm"
-                                           placeholder="Type to search table...">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="table-responsive">
-                                <table class="table table-hover display" id="articleTable">
-                                    <thead>
-                                        <tr>
-                                            <th class="all">Title</th>
-                                            <th class="all">Author</th>
-                                            <th class="min-desktop">Type</th>
-                                            <th class="all">Source</th>
-                                            <th class="min-desktop">Collection</th>
-                                            <th class="min-desktop">Publish Date</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_new_btn.html" with view="article" app="library" %}
+  {% endif %}
+  <div class="col-12">
+    <div class="row mb-3">
+      <div class="col">
+        <div class="text-2xl">Databruce Article Library</div>
+        <div class="text-base">Bruce related articles sourced from various corners of the internet.</div>
+      </div>
     </div>
-    <script>
-    $(document).ready(function () {
-      let sb_columns = [0,1,2,3,4];
+    <div id="tableControls">
+      <div class="col col-lg-2">
+        <label for="PublicityFilter" class="pb-1">Category</label>
+        <select id="PublicityFilter" class="form-select form-select-sm">
+          <option value="">All</option>
+          {% for choice in categories|dictsort:1 %}
+            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col col-lg-2">
+        <label for="LanguageFilter" class="pb-1">Language</label>
+        <select id="LanguageFilter" class="form-select form-select-sm">
+          <option value="">All</option>
+          {% for choice in languages|dictsort:1 %}
+            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <!-- Search -->
+      <div class="col-12 col-lg">
+        <label for="search" class="pb-1">Search</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text"
+                 id="search"
+                 class="form-control form-control-sm"
+                 placeholder="Type to search table...">
+        </div>
+      </div>
+    </div>
+    <div class="row my-3">
+      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+           id="relationTableControls">
+        {% include "databruce/partials/table_pagination.html" %}
+        <div class="dt-info order-3"
+             aria-live="polite"
+             role="status"
+             id="tableInfo"></div>
+        <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
+             id="dropdown-container">
+          <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <select name=""
+                  id="tableOrder"
+                  class="form-select form-select-sm column-order"
+                  autocomplete="off">
+            <option value="1-asc" selected>Date (asc.)</option>
+            <option value="1-desc">Date (desc.)</option>
+            <option value="3-asc">Band (A-Z)</option>
+            <option value="3-desc">Band (Z-A)</option>
+            <option value="4-asc">Venue (A-Z)</option>
+            <option value="4-desc">Venue (Z-A)</option>
+            <option value="5-asc">Tour (A-Z)</option>
+            <option value="5-desc">Tour (Z-A)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="row">
+              <div class="table-responsive">
+                <table class="table table-hover display" id="articleTable">
+                  <thead>
+                    <tr>
+                      <th class="all">Title</th>
+                      <th class="all">Author</th>
+                      <th class="min-desktop">Type</th>
+                      <th class="all">Source</th>
+                      <th class="min-desktop">Collection</th>
+                      <th class="min-desktop">Publish Date</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      let sb_columns = [0, 1, 2, 3, 4];
 
       const truncateText = (str) => {
         return str.length > 70 ? str.slice(0, 70) + '...' : str;
@@ -84,71 +111,126 @@
         ajax: {
           'url': '/api/v1/articles/?format=custom',
         },
-        responsive: {
-          details: false,
-        },
-        columns: [
-          {
-            'data': 'title',
-            'name': 'title',
-            'width': '20rem',
-            'class': 'text-wrap',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/library/article/${row.slug}">${truncateText(data)}</a>`
-              }
-            },
-          },
-          {
-            'data': 'author',
-            'name': 'author',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data
-              }
-            },
-          },
-          {
-            'data': 'category',
-            'name': 'category',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data
-              }
-            },
-          },
-          {'data': 'source', 'name': 'source'},
-          {'data': 'collection', 'name': 'collection__name'},
-          {
-            'data': 'published_at',
-            'name': 'published_at',
-            'type': 'text',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data
-              }
-            },
-          },
-          {'data': 'language', 'name': 'language', visible: false},
+        order: [
+          [0, 'asc']
         ],
+        columns: [{
+          'data': 'title',
+          'name': 'title',
+          'width': '20rem',
+          'class': 'text-wrap',
+          'render': function(data, type, row, meta) {
+
+            return data ? `<a href="/library/article/${row.slug}">${truncateText(data)}</a>` : '';
+
+          },
+        }, {
+          'data': 'author',
+          'name': 'author',
+          'render': function(data, type, row, meta) {
+            return data ? data : ''
+          },
+        }, {
+          'data': 'category',
+          'name': 'category',
+          'render': function(data, type, row, meta) {
+            return data ? data : ''
+          },
+        }, {
+          'data': 'source',
+          'name': 'source'
+        }, {
+          'data': 'collection',
+          'name': 'collection__name'
+        }, {
+          'data': 'published_at',
+          'name': 'published_at',
+          'type': 'text',
+          'render': function(data, type, row, meta) {
+            return data ? data : ''
+          },
+        }, {
+          'data': 'language',
+          'name': 'language',
+          'visible': false,
+          'orderable': false,
+        }, ],
+        initComplete: function(settings, json) {
+          var api = this.api();
+          let info = api.page.info()
+
+          const input = $('.page-input');
+          const prevBtn = $('.btn-prev');
+          const nextBtn = $('.btn-next');
+          const totalSpan = $('.total-pages');
+          const tableInfo = $('#tableInfo');
+
+          // Initial button states
+          input.val(info.page + 1);
+          prevBtn.attr('disabled', info.page === 0);
+          nextBtn.attr('disabled', info.page >= info.pages - 1);
+
+          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+
+          api.on('draw', () => {
+            const pageInfo = api.page.info();
+
+            input.val(pageInfo.page + 1);
+            input.attr('max', pageInfo.pages);
+
+            totalSpan.text(`of ${pageInfo.pages || 1}`);
+
+            // Handle button states
+            prevBtn.attr('disabled', pageInfo.page === 0);
+            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+
+            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+          });
+
+          totalSpan.text(`of ${info.pages || 1}`);
+
+          nextBtn.on('click', function() {
+            table.page('next').draw(false);
+          });
+
+          prevBtn.on('click', function() {
+            table.page('previous').draw(false);
+          });
+
+          input.on('change', function() {
+            let val = parseInt(this.value, 10) - 1;
+            const max = api.page.info().pages - 1;
+            if (val < 0) val = 0;
+            if (val > max) val = max;
+
+            input.attr('value', val);
+
+            api.page(val).draw('page');
+          });
+        }
       });
 
-      $('#PublicityFilter').on('change', function () {
+      $('#PublicityFilter').on('change', function() {
         var selectedValue = this.value;
 
         value = selectedValue.replaceAll(' ', '-');
-        table.order([[0, 'asc']]).column(2).search(value ? value : '', true, false).draw();
+        table.order([
+          [0, 'asc']
+        ]).column(2).search(value ? value : '', true, false).draw();
       });
 
-      $('#LanguageFilter').on('change', function () {
+      $('#LanguageFilter').on('change', function() {
         var selectedValue = this.value;
 
         value = selectedValue.replaceAll(' ', '-');
-        table.order([[0, 'asc']]).column(6).search(value ? value : '', true, false).draw();
+        table.order([
+          [0, 'asc']
+        ]).column(6).search(value ? value : '', true, false).draw();
       });
 
       tableSearch(table, 'search');
       searchBuilder(table, sb_columns);
     });
-    </script>
+  </script>
 {% endblock content %}

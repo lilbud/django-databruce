@@ -11,7 +11,6 @@
 {% block content %}
   <a href="#"
      class="back-to-top d-flex justify-content-center align-items-center"><i class="bi bi-caret-up-fill"></i></a>
-  <div class="d-none">{% csrf_token %}</div>
   <div class="col-12">
     <div class="row">
       <div class="col">
@@ -43,48 +42,11 @@
         </div>
       </div>
     </div>
-    <div class="d-none d-lg-block" id="tableContainer">{% include "databruce/partials/event_table.html" %}</div>
-    <div id="cardContainer" class="d-block d-lg-none">
-      {% include "databruce/partials/event_table_controls.html" %}
-      <div class="g-3" id="cards"></div>
-    </div>
+    {% include "databruce/partials/event_table.html" %}
   </div>
   <script>
     let searchTimeout;
     let lastSearchValue = '';
     eventTable('/api/v1/events/?year={{ year }}&format=custom');
-
-    $(document).on('submit', '.userForm', async function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      const addBtn = $(this).find('#add');
-
-      let action = addBtn.attr('data-action');
-      let event = addBtn.attr('data-event');
-      const url = `/events/${event}/${action}/`;
-
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const isAdded = data['action'] === 'added';
-
-        addBtn
-          .toggleClass('bi-star-fill', isAdded)
-          .toggleClass('bi-star', !isAdded)
-          .attr('data-attended', isAdded ? 'true' : 'false')
-          .attr('data-action', isAdded ? 'remove' : 'add');
-
-      } catch (error) {
-        console.error('Error during POST request:', error);
-      }
-    });
   </script>
 {% endblock content %}

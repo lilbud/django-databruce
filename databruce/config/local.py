@@ -112,6 +112,7 @@ if DEBUG:
       "rest_framework.filters.SearchFilter",
       "api.filters.DataTablesFilterBackend",
       "rest_framework.filters.OrderingFilter",
+      "api.filters.NotEqualFilterBackend",
     ],
     "PAGE_SIZE": 50,
   }

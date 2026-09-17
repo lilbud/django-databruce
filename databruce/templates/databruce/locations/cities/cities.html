@@ -11,6 +11,33 @@
       </div>
     </div>
     {% include "databruce/partials/table_controls.html" %}
+    <div class="row my-3">
+      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+           id="cityTableControls">
+        {% include "databruce/partials/table_pagination.html" %}
+        <div class="dt-info order-3"
+             aria-live="polite"
+             role="status"
+             id="tableInfo"></div>
+        <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
+             id="dropdown-container">
+          <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <select name=""
+                  id="tableOrder"
+                  class="form-select form-select-sm column-order"
+                  autocomplete="off">
+            <option value="1-asc" selected>Date (asc.)</option>
+            <option value="1-desc">Date (desc.)</option>
+            <option value="3-asc">Band (A-Z)</option>
+            <option value="3-desc">Band (Z-A)</option>
+            <option value="4-asc">Venue (A-Z)</option>
+            <option value="4-desc">Venue (Z-A)</option>
+            <option value="5-asc">Tour (A-Z)</option>
+            <option value="5-desc">Tour (Z-A)</option>
+          </select>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col">
         <div class="card">
@@ -51,6 +78,13 @@
         order: [
           [1, 'asc']
         ],
+        layout: {
+          topStart: {
+            customOrder: {
+              selectId: '#tableOrder'
+            }
+          }
+        },
         columns: [{
           'data': 'num_events',
           'name': 'num_events'
@@ -81,20 +115,80 @@
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
+          'width': '8rem',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`
-            }
+            return eventDateFormat(data)
           },
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
+          'width': '8rem',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`
-            }
+            return eventDateFormat(data)
           },
-        }, ]
+        }, ],
+        initComplete: function(settings, json) {
+          let api = this.api();
+          let info = api.page.info();
+          let values = api.column(3).data().unique().toArray();
+          let container = $('#PublicityFilter');
+
+          values.forEach(element => {
+            var option = `<option value="${element}">${element}</option>`;
+            container.append(option);
+          });
+          const input = $('#cityTableControls .page-input');
+          const prevBtn = $('#cityTableControls .btn-prev');
+          const nextBtn = $('#cityTableControls .btn-next');
+          const totalSpan = $('#cityTableControls .total-pages');
+          const tableInfo = $('#tableInfo');
+
+          // Initial button states
+          input.val(info.page + 1);
+          prevBtn.attr('disabled', info.page === 0);
+          nextBtn.attr('disabled', info.page >= info.pages - 1);
+
+          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+
+          api.on('draw', () => {
+            const pageInfo = api.page.info();
+
+            input.val(pageInfo.page + 1);
+            input.attr('max', pageInfo.pages);
+
+            totalSpan.text(`of ${pageInfo.pages || 1}`);
+
+            // Handle button states
+            prevBtn.attr('disabled', pageInfo.page === 0);
+            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+
+            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+          });
+
+          totalSpan.text(`of ${info.pages || 1}`);
+
+          nextBtn.on('click', function() {
+            table.page('next').draw(false);
+          });
+
+          prevBtn.on('click', function() {
+            table.page('previous').draw(false);
+          });
+
+          input.on('change', function() {
+            let val = parseInt(this.value, 10) - 1;
+            const max = api.page.info().pages - 1;
+            if (val < 0) val = 0;
+            if (val > max) val = max;
+
+            input.attr('value', val);
+
+            api.page(val).draw('page');
+          });
+        }
       });
 
       tableSearch(table, 'search');

@@ -317,13 +317,12 @@ a.text-reset,
 }
 
 .card-body.list-card,
-.card-body:has(#headimg),
-.tab-content .card-body:not(#setlistCard, [class*="p-"], [class*="px-"], [class*="py-"]) {
+.card-body:has(#headimg) {
   padding: 0 !important;
 }
 
 #tableControls {
-  margin-bottom: 1rem !important;
+  /* margin-bottom: 1rem !important; */
   row-gap: .5rem !important;
   align-items: flex-end !important;
   display: flex !important;
@@ -803,9 +802,9 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 }
 
 /* hides doubled column control buttons */
-.dt-column-header>.dtcc:nth-child(3) {
+/* .dt-column-header>.dtcc:nth-child(3) {
   display: none !important;
-}
+} */
 
 /* set-header default color */
 .set-header td {
@@ -1669,4 +1668,9 @@ html {
 .form-control.page-input {
   width: 30px;
   height: calc(1.5em + 0.5rem + 2px)
+}
+
+/* hide ordering control from non-orderable columns */
+.dt-orderable-none .dtcc {
+  display: none !important;
 }

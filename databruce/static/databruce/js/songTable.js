@@ -7,6 +7,7 @@ song_table_columns = [
     'data': 'count',
     'name': 'count',
     'width': '1rem',
+    'type': 'num',
     'className': 'all text-center',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
@@ -30,9 +31,10 @@ song_table_columns = [
     'data': 'first_event',
     'name': 'first_event',
     'width': '10rem',
+    'type': 'date',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/events/${data.event_id}">${data.date}</a>`
+        return eventDateFormat(data);
       }
     },
   },
@@ -40,9 +42,10 @@ song_table_columns = [
     'data': 'last_event',
     'name': 'last_event',
     'width': '10rem',
+    'type': 'date',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/events/${data.event_id}">${data.date}</a>`
+        return eventDateFormat(data);
       }
     },
   },
@@ -64,15 +67,72 @@ function songTable(url, height, tableID) {
     ajax: {
       'url': url,
     },
-    scrollY: height,
+    layout: {
+      topStart: {
+        customOrder: {
+          selectId: '#songTableOrder'
+        }
+      }
+    },
+    order: [[0, 'desc']],
     columns: song_table_columns,
     initComplete: function (settings, json) {
-      var info = this.api().page.info();
+      let api = this.api();
+      var info = api.page.info();
       $('#song-count-badge').text(info.recordsTotal);
+
+      const input = $('.song-controls .page-input');
+      const prevBtn = $('.song-controls .btn-prev');
+      const nextBtn = $('.song-controls .btn-next');
+      const totalSpan = $('.song-controls .total-pages');
+
+      // Initial button states
+      input.val(info.page + 1);
+      prevBtn.attr('disabled', info.page === 0);
+      nextBtn.attr('disabled', info.page >= info.pages - 1);
+
+      $('#songTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+
+      api.on('draw', () => {
+        const pageInfo = api.page.info();
+
+        input.val(pageInfo.page + 1);
+        input.attr('max', pageInfo.pages);
+
+        totalSpan.text(`of ${pageInfo.pages || 1}`);
+
+        // Handle button states
+        prevBtn.attr('disabled', pageInfo.page === 0);
+        nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+
+        // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+        $('songTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+      });
+
+      totalSpan.text(`of ${info.pages || 1}`);
+
+      nextBtn.on('click', function () {
+        table.page('next').draw(false);
+      });
+
+      prevBtn.on('click', function () {
+        table.page('previous').draw(false);
+      });
+
+      input.on('change', function () {
+        let val = parseInt(this.value, 10) - 1;
+        const max = api.page.info().pages - 1;
+        if (val < 0) val = 0;
+        if (val > max) val = max;
+
+        input.attr('value', val);
+
+        api.page(val).draw('page');
+      });
     }
   });
 
-  tableSearch(table, 'song-search');
+  tableSearch(table, 'songSearch');
 
   $('#categoryFilter').on('change', function () {
     var selectedValue = this.value;

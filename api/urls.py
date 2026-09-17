@@ -54,11 +54,11 @@ router.register(
   views.SetlistStatsViewSet,
   basename="setlist_stats",
 )
-router.register(
-  r"advanced_search",
-  views.AdvancedSearchViewSet,
-  basename="advanced_search",
-)
+# router.register(
+#   r"advanced_search",
+#   views.AdvancedSearchViewSet,
+#   basename="advanced_search",
+# )
 router.register(
   r"setlist_notes",
   views.SetlistNotesViewSet,

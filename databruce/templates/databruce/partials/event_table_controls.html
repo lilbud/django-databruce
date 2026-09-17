@@ -21,24 +21,8 @@
 <div class="row my-3">
   <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
        id="controls">
-    <div class="d-flex justify-content-center mb-2 mb-lg-0 align-items-center gap-2 order-2 col-12 col-lg-auto">
-      <button class="btn btn-sm btn-primary border-0 btn-prev"
-              aria-label="Previous page">
-        <i class="bi bi-chevron-left"></i>
-      </button>
-      <input type="text"
-             class="form-control form-control-sm text-center page-input m-0"
-             min="1"
-             value="1">
-      <span class="total-pages align-middle">of 1</span>
-      <button class="btn btn-sm btn-primary border-0 btn-next"
-              aria-label="Next page">
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-    <div class="dt-info order-3 eventTable_info"
-         aria-live="polite"
-         role="status"></div>
+    {% include "databruce/partials/table_pagination.html" %}
+    <div class="dt-info order-3 table_info" aria-live="polite" role="status"></div>
     <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
          id="dropdown-container">
       <label for="columnOrder" class="form-label mb-0 text-nowrap">Order By:</label>
@@ -46,14 +30,14 @@
               id="columnOrder"
               class="form-select form-select-sm column-order"
               autocomplete="off">
-        <option value="0-asc" selected>Date (asc.)</option>
-        <option value="0-desc">Date (desc.)</option>
-        <option value="2-asc">Band (A-Z)</option>
-        <option value="2-desc">Band (Z-A)</option>
-        <option value="3-asc">Venue (A-Z)</option>
-        <option value="3-desc">Venue (Z-A)</option>
-        <option value="4-asc">Tour (A-Z)</option>
-        <option value="4-desc">Tour (Z-A)</option>
+        <option value="1-asc" selected>Date (asc.)</option>
+        <option value="1-desc">Date (desc.)</option>
+        <option value="3-asc">Band (A-Z)</option>
+        <option value="3-desc">Band (Z-A)</option>
+        <option value="4-asc">Venue (A-Z)</option>
+        <option value="4-desc">Venue (Z-A)</option>
+        <option value="5-asc">Tour (A-Z)</option>
+        <option value="5-desc">Tour (Z-A)</option>
       </select>
     </div>
   </div>
