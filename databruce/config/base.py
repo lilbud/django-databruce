@@ -167,25 +167,26 @@ LOGIN_REDIRECT_URL = "/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# REST_FRAMEWORK = {
-#   "DEFAULT_RENDERER_CLASSES": (
-#     "rest_framework.renderers.JSONRenderer",
-#     "databruce.pagination.DatatablesRenderer",
-#   ),
-#   "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",
-#   "DEFAULT_PERMISSION_CLASSES": [
-#     "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-#   ],
-#   "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-#   "DEFAULT_FILTER_BACKENDS": [
-#     "django_filters.rest_framework.DjangoFilterBackend",
-#     "rest_framework.filters.SearchFilter",
-#     "api.filters.DataTablesFilterBackend",
-#     "rest_framework.filters.OrderingFilter",
-#     "api.filters.NotEqualFilterBackend",
-#   ],
-#   "PAGE_SIZE": 50,
-# }
+REST_FRAMEWORK = {
+  "DEFAULT_RENDERER_CLASSES": (
+    "rest_framework.renderers.JSONRenderer",
+    "rest_framework.renderers.BrowsableAPIRenderer",
+    "databruce.pagination.DatatablesRenderer",
+  ),
+  "DEFAULT_PAGINATION_CLASS": "databruce.pagination.DatatablesLimitOffsetPagination",
+  "DEFAULT_PERMISSION_CLASSES": [
+    "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+  ],
+  "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+  "DEFAULT_FILTER_BACKENDS": [
+    "django_filters.rest_framework.DjangoFilterBackend",
+    "rest_framework.filters.SearchFilter",
+    "api.filters.DataTablesFilterBackend",
+    "rest_framework.filters.OrderingFilter",
+    "api.filters.NotEqualFilterBackend",
+  ],
+  "PAGE_SIZE": 50,
+}
 
 SPECTACULAR_SETTINGS = {
   "TITLE": "Databruce",
