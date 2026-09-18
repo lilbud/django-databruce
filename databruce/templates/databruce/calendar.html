@@ -31,6 +31,7 @@
                 var eventsList = [];
 
                 $(data.results).each(function(i, val) {
+                  console.log(val)
                   var title = `${val.artist.name}: ${val.venue.name}`
 
                   if (val.early_late) {
@@ -38,7 +39,7 @@
                   }
 
                   if (val.type) {
-                    title += ` [${val.type[0]}]`
+                    title += ` [${val.type[0]['name']}]`
                   }
 
                   eventsList.push({

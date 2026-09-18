@@ -182,53 +182,40 @@
     <script>
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      function createPlaceholderItem() {
-        return `
-    <li class="list-group-item py-0.5 placeholder-glow">
-    <div class="row">
-      <div class="col-12 placeholder p-0 align-middle">
-      </div>
-    </div>
-    </li>`;
-      }
-
-      function createMultiListItem(item1, item2) {
-        return `
-    <li class="list-group-item py-0.5 px-3">
-    <div class="row row-cols-2 fw-medium">
-      ${item1}
-      ${item2}
-    </div>
-    </li>
-    `
-      }
-
-      function createListItem(item) {
-        return `<li class="list-group-item py-0.5 px-3">${item}</li>`
-      }
-
       function getEventData(url, containerId) {
+        var container = $(containerId);
+        var list = $('<ul />').addClass('list-group list-group-flush');
+
+        container.append(list);
+
         fetch(url)
           .then(response => response.json())
           .then(data => {
-            var container = $(containerId);
-            var list = $('<ul />').addClass('list-group list-group-flush');
-
-            data.results.forEach((item, index) => {
-              var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`
-              var item2 = `<div class="col-9 py-0 text-wrap">${item.venue}</div>`
+            let items = data.results.map((item) => {
+              var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`;
+              var item2 = `<div class="col-9 py-0 text-wrap">${item.venue}</div>`;
 
               if (item.early_late) {
-                item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`
+                item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`;
               }
 
-              var listItem = createMultiListItem(item1, item2);
+              return `
+          <li class="list-group-item py-0.5 px-3">
+            <div class="row row-cols-2 fw-medium">
+              ${item1}
+              ${item2}
+            </div>
+          </li>
+        `;
+            }).join("");
 
-              $(list).append(listItem);
-            });
-
-            $(container).html($(list).prop('outerHTML'));
-          }).catch(error => console.error('Error:', error));
+            list.append(items);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            // Show an error message if the fetch fails
+            list.empty().append('<li class="list-group-item text-danger">Failed to load events.</li>');
+          });
       }
 
       $(document).ready(function() {
@@ -237,27 +224,10 @@
         var month = date.getMonth() + 1;
         var day = date.getDate();
 
-        $(".list-card").each(function() {
-          var container = $(this).empty();
-          var loadingList = $('<ul />').addClass('list-group list-group-flush');
-          var limit = 5;
-
-          if ($(this).attr('id') === "update") {
-            var limit = 10;
-          }
-
-          for (let i = 0; i < limit; i++) {
-            loadingList.append(createPlaceholderItem());
-          }
-
-          container.append(loadingList);
-        })
-
         getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
 
         /* SETLIST TABLE */
-
-        var url = '/api/v1/setlists/?event={{ featured_event.event.id }}&format=json&show_only=true';
+        var url = '/api/v1/setlists_index/?event={{ featured_event.event.id }}&format=json&show_only=true';
 
         let setlistOptions = {
           rowGroup: {

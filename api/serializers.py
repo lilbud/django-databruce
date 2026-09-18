@@ -499,13 +499,13 @@ class IndexSetlistSerializer(BaseSerializer):
 
 
 class IndexEventsSerializer(BaseSerializer):
-  # 1. Change venue to a SerializerMethodField
   venue = serializers.SlugRelatedField(
     source="venue.venues_text",
     slug_field="formatted",
     read_only=True,
     required=False,
   )
+
   date = serializers.CharField(max_length=255)
 
   class Meta:
@@ -1079,24 +1079,26 @@ class IncludedSerializer(serializers.ModelSerializer):
     fields = ["count", "snippet", "first_event", "last_event"]
 
   def to_representation(self, instance):
-    # Optional bulk prefetching step for the batch being serialized
-    if isinstance(self.instance, list) and not hasattr(self, "_event_cache"):
+    if (
+      isinstance(self.instance, list)
+      and not hasattr(self, "_event_cache")
+      and not hasattr(self, "_song_cache")
+    ):
       event_ids = set()
+      song_ids = set()
+
       for obj in self.instance:
         if obj["first_event"]:
           event_ids.add(obj["first_event"])
         if obj["last_event"]:
           event_ids.add(obj["last_event"])
+        if obj["snippet_id"]:
+          song_ids.add(obj["snippet_id"])
 
-      events = models.Event.objects.filter(id__in=event_ids)
-      self._event_cache = {e.id: MinimalEventSerializer(e).data for e in events}
-
-      song_ids = set()
-
-      for obj in self.instance:
-        song_ids.add(obj["snippet_id"])
-
+      events = models.Event.objects.filter(event_id__in=event_ids)
       songs = models.Song.objects.filter(id__in=song_ids)
+
+      self._event_cache = {e.event_id: MinimalEventSerializer(e).data for e in events}
       self._song_cache = {
         s.id: MinimalSongsSerializer(s, include=["name", "slug"]).data for s in songs
       }
@@ -1263,50 +1265,40 @@ class SetlistSongsSerializer(BaseSerializer):
   last_event = serializers.SerializerMethodField(required=False)
 
   def to_representation(self, instance):
-    if not hasattr(self, "_page_maps_loaded"):
-      page_data = (
-        self.parent.instance
-        if self.parent and hasattr(self.parent, "instance")
-        else [instance]
-      )
+    if (
+      isinstance(self.instance, list)
+      and not hasattr(self, "_event_cache")
+      and not hasattr(self, "_song_cache")
+    ):
+      event_ids = set()
+      song_ids = set()
 
-      song_ids = {item["song_id"] for item in page_data if "song_id" in item}  # type: ignore
-      event_ids = {
-        e_id
-        for item in page_data  # type: ignore
-        for e_id in (item.get("first_event"), item.get("last_event"))
-        if e_id
-      }
+      for obj in self.instance:
+        if obj["first_event"]:
+          event_ids.add(obj["first_event"])
+        if obj["last_event"]:
+          event_ids.add(obj["last_event"])
+        if obj["song_id"]:
+          song_ids.add(obj["song_id"])
 
-      songs = models.Song.objects.filter(id__in=song_ids)
       events = models.Event.objects.filter(event_id__in=event_ids)
+      songs = models.Song.objects.filter(id__in=song_ids)
 
-      self._song_map = {
-        s.id: MinimalSongsSerializer(
-          s,
-          include=[
-            "uuid",
-            "name",
-            "category",
-            "original",
-            "num_plays_public",
-          ],
-        ).data
-        for s in songs
+      self._event_cache = {e.event_id: MinimalEventSerializer(e).data for e in events}
+      self._song_cache = {
+        s.id: MinimalSongsSerializer(s, include=["name", "slug"]).data for s in songs
       }
-      self._event_map = {e.event_id: MinimalEventSerializer(e).data for e in events}
-      self._page_maps_loaded = True
 
     return super().to_representation(instance)
 
   def get_song(self, obj):
-    return self._song_map.get(obj["song_id"])
+    return self._song_cache.get(obj["song_id"])
 
   def get_first_event(self, obj):
-    return self._event_map.get(obj["first_event"])
+    return self._event_cache.get(obj["first_event"])
 
   def get_last_event(self, obj):
-    return self._event_map.get(obj["last_event"])
+    return self._event_cache.get(obj["last_event"])
 
   class Meta:
     model = models.Setlist
@@ -1369,13 +1361,28 @@ class SetlistBreakdownSerializer(BaseSerializer):
   category = serializers.CharField(required=False, max_length=255)
   category_slug = serializers.CharField(required=False, max_length=255)
 
-  songs_map = {
-    s.id: MinimalSongsSerializer(
-      s,
-      include=["id", "name", "original_artist", "original"],
-    ).data
-    for s in models.Song.objects.all()
-  }
+  def to_representation(self, instance):
+    if isinstance(self.instance, list) and not hasattr(self, "_song_cache"):
+      song_ids = set()
+
+      for obj in self.instance:
+        combined = obj["songs"] + obj["album_songs"]
+
+        if combined:
+          for song_id in set(combined):
+            song_ids.add(song_id)
+
+      songs = models.Song.objects.filter(id__in=song_ids)
+
+      self._song_cache = {
+        s.id: MinimalSongsSerializer(
+          s,
+          include=["id", "name", "original_artist", "original"],
+        ).data
+        for s in songs
+      }
+
+    return super().to_representation(instance)
 
   album_complete = serializers.SerializerMethodField(required=False)
 
@@ -1423,7 +1430,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
 
   def get_songs(self, obj):
     try:
-      return [self.songs_map[s] for s in obj["songs"]]
+      return [self._song_cache[s] for s in obj["songs"]]
     except KeyError:
       return []
 

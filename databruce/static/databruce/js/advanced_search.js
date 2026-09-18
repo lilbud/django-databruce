@@ -1,3 +1,18 @@
+function formatSongOutput(result) {
+  // If the item has children, it is a group header
+  if (result.children) {
+    // Return a jQuery object with your custom DOM structure
+    return $(`
+            <div class="custom-select2-group">
+                <span class="group-title">${result.text}</span>
+            </div>
+        `);
+  }
+
+  // Return normal text for standard song items
+  return result.text;
+}
+
 function get_options({ ajax_url = false }) {
   var options = {
     theme: "bootstrap-5",
@@ -21,6 +36,30 @@ function get_options({ ajax_url = false }) {
         }
       },
       processResults: function (data) {
+
+        if (ajax_url.includes("songs")) {
+          let grouped = Object.groupBy(data.results, (item) => item.original);
+          groupResults = [];
+
+          Object.entries(grouped).forEach(([key, value]) => {
+            if (key === "true") {
+              groupResults.push({
+                text: "Originals",
+                children: value
+              })
+            } else {
+              groupResults.push({
+                text: "Covers",
+                children: value
+              })
+            }
+          });
+
+          return {
+            results: groupResults
+          };
+        }
+
         return {
           results: $.map(data.results, function (item) {
             return {
@@ -38,6 +77,10 @@ function get_options({ ajax_url = false }) {
 
     if (options.ajax.url.includes("state")) {
       options.minimumInputLength = 2;
+    }
+
+    if (options.ajax.url.includes("song")) {
+      options.templateResult = formatSongOutput;
     }
   };
 

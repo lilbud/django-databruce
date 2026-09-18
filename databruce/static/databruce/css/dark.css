@@ -547,13 +547,13 @@
   }
 
   .calendar.event-birthday {
-    background-color: var(--color-teal-500) !important;
+    background-color: var(--color-teal-700) !important;
     border-color: var(--color-teal-800) !important;
     color: var(--color-teal-600) !important;
   }
 
   .calendar.event-run {
-    background-color: var(--color-green-600) !important;
+    background-color: var(--color-green-700) !important;
     border-color: var(--color-green-700) !important;
     color: var(--color-white) !important;
   }
@@ -718,7 +718,6 @@
   .select2-selection--single,
   .select2-selection__choice,
   .select2-selection__placeholder,
-  .select2-results__group,
   .select2-results__options,
   .select2-results__option.select2-results__message,
   .select2-results__option.select2-results__option--selectable:not(.select2-results__option--highlighted),
@@ -726,6 +725,23 @@
     color: var(--color-gray-300) !important;
   }
 
+  /* Reset Select2's default group padding so your custom container fits perfectly */
+  .select2-container--default .select2-results__group {
+    padding: 0 !important;
+  }
+
+  /* Style your custom template wrapper */
+  .custom-select2-group {
+    background-color: var(--color-gray-700) !important;
+    color: var(--color-white);
+  }
+
+  .select2-results__group {
+    padding: 0 !important;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--color-gray-100) !important;
+  }
 
   .select2-search__field,
   .select2-selection,

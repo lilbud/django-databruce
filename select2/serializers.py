@@ -109,6 +109,7 @@ class BandSelect2Serializer(serializers.ModelSerializer):
 
 class SongSelect2Serializer(serializers.ModelSerializer):
   text = serializers.SerializerMethodField()
+  rank = serializers.FloatField(required=False)
 
   def get_text(self, obj):
     if not obj.original:
@@ -118,7 +119,7 @@ class SongSelect2Serializer(serializers.ModelSerializer):
 
   class Meta:
     model = models.Song
-    fields = ["id", "text"]
+    fields = ["id", "text", "original", "rank"]
 
 
 class TagSelect2Serializer(serializers.ModelSerializer):

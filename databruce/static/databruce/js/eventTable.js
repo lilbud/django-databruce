@@ -116,6 +116,7 @@ function eventTable(url) {
         }
       }
     },
+    pageLength: 100,
     columns: event_table_columns,
     order: [[1, 'asc']],
     initComplete: function (settings, json) {

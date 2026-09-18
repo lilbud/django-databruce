@@ -76,7 +76,7 @@ class Select2BandViewset(BaseSelect2View):
 
 
 class Select2SongViewset(BaseSelect2View):
-  queryset = models.Song.objects.all().only("id", "name")
+  queryset = models.Song.objects.all().only("id", "name", "original", "original_artist")
   serializer_class = serializers.SongSelect2Serializer
   filterset_class = filters.SongSelect2Filter
 

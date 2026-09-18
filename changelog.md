@@ -447,11 +447,12 @@ First public release of the site. Site was locked behind a login and accounts on
 - Signup page had no opengraph description
 - Fixed advanced_search issue where start_date would cause an error
 
-# v1.21 (September 2026)
+# v1.21 (September 18, 2026)
 
 ## Added
 
 - Keyboard input for Event Search modal. Arrow Keys to navigate, Enter to select.
+- Home page now caches OTD and Featured Show
 
 ## Changed
 

@@ -1,4 +1,9 @@
-from django.db.models import Q
+from django.contrib.postgres.search import (
+  SearchQuery,
+  SearchRank,
+  SearchVector,
+)
+from django.db.models import Case, Q, Value, When
 from django_filters import rest_framework as filters
 
 from databruce import models
@@ -103,10 +108,33 @@ class SongSelect2Filter(filters.FilterSet):
     if not value:
       return queryset
 
-    # 1. Build an unaccented full-text search query from user input
-    # 2. Build an unaccented search vector from the 'name' database column
-    return queryset.filter(
-      name__unaccent__icontains=value,
+    query = SearchQuery(value, search_type="websearch")
+
+    vector = SearchVector("name") + SearchVector(
+      "original_artist",
+    )
+
+    ranking_cases = [
+      When(Q(name__unaccent__iexact=value) & Q(original=True), then=Value(1.0)),
+      # Ensure this complex rule evaluates before the broader icontains rule
+      When(Q(name__unaccent__icontains=value) & Q(original=True), then=Value(0.9)),
+      When(Q(name__unaccent__iexact=value) & Q(original=False), then=Value(0.95)),
+      When(Q(name__unaccent__icontains=value) & Q(original=False), then=Value(0.85)),
+    ]
+
+    return (
+      queryset.annotate(
+        search=vector,
+        rank=Case(
+          *ranking_cases,  # Unpack the valid cases here safely
+          default=SearchRank(vector, query, weights=[0.1, 0.3, 0.6, 1.0]),
+        ),
+      )
+      .filter(
+        Q(search=query),
+        rank__gt=0.1,
+      )
+      .order_by("-rank")
     )
 
 

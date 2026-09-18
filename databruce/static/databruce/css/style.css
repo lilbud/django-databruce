@@ -1643,28 +1643,6 @@ html {
   margin-top: -0.5vh !important;
 }
 
-/* Default Responsive Breakpoints (CSS Media Query Driver) */
-@media (min-width: 1200px) {
-  #viewWrapper[data-view="default"] #tableContainer {
-    display: block;
-  }
-
-  #viewWrapper[data-view="default"] #cardContainer {
-    display: none;
-  }
-}
-
-@media (max-width: 1199.98px) {
-  #viewWrapper[data-view="default"] #tableContainer {
-    display: none;
-  }
-
-  #viewWrapper[data-view="default"] #cardContainer {
-    display: flex;
-  }
-}
-
-
 .form-control.page-input {
   width: 30px;
   height: calc(1.5em + 0.5rem + 2px)
@@ -1673,4 +1651,13 @@ html {
 /* hide ordering control from non-orderable columns */
 .dt-orderable-none .dtcc {
   display: none !important;
+}
+
+.custom-select2-group {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding: 4px 6px;
+  font-weight: bold;
 }

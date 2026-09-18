@@ -1,4 +1,5 @@
 import datetime
+from datetime import time
 from typing import Any
 
 from django.contrib.auth import get_user_model
@@ -19,6 +20,9 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast, Coalesce, Lower
 from django.db.models.manager import BaseManager
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import exceptions, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
@@ -32,6 +36,13 @@ from library.models import Article
 UserModel = get_user_model()
 
 date = datetime.datetime.now(tz=datetime.UTC).date()
+
+
+def get_seconds_until_midnight():
+  """Calculates time remaining today to ensure the cache expires exactly at midnight."""
+  now = timezone.now()
+  midnight = datetime.datetime.combine(now.date(), time.max, tzinfo=now.tzinfo)
+  return int((midnight - now).total_seconds())
 
 
 class StandardSetPagination(PageNumberPagination):
@@ -105,7 +116,8 @@ class BandViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
   queryset = db_models.Band.objects.order_by("name").prefetch_related(
-    "first_event", "last_event"
+    "first_event",
+    "last_event",
   )
 
   serializer_class = api_serializers.BandsSerializer
@@ -416,6 +428,7 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
     return condition
 
 
+@method_decorator(cache_page(get_seconds_until_midnight()), name="list")
 class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
     db_models.Setlist.objects.all()
@@ -424,16 +437,18 @@ class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
       "song",
     )
     .prefetch_related(
+      "ltp",
       "setlist_notes",
     )
     .order_by("event__event_id", F("song_num").asc(nulls_first=True))
   )
 
-  serializer_class = api_serializers.IndexSetlistSerializer
+  serializer_class = api_serializers.SetlistSerializer
   filterset_class = api_filters.SetlistFilter
   ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
 
 
+@method_decorator(cache_page(get_seconds_until_midnight()), name="list")
 class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
     db_models.Event.objects.all().select_related(
