@@ -3,28 +3,28 @@ from django.urls import reverse
 
 
 class StaticViewSitemap(Sitemap):
-    priority = 0.5
-    changefreq = "never"
+  priority = 0.5
+  changefreq = "never"
 
-    def items(self):
-        return [
-            "events",
-            "tours",
-            "songs",
-            "venues",
-            "cities",
-            "states",
-            "countries",
-            "relations",
-            "bands",
-            "releases",
-            "bootlegs",
-            "nugs",
-            "adv_search",
-            "note_search",
-            "about",
-            "links",
-        ]
+  def items(self):
+    return [
+      "events",
+      "tours",
+      "songs",
+      "venues",
+      "cities",
+      "states",
+      "countries",
+      "relations",
+      "bands",
+      "releases",
+      "bootlegs",
+      "nugs_releases",
+      "adv_search",
+      "note_search",
+      "about",
+      "links",
+    ]
 
-    def location(self, item):
-        return reverse(f"{item}")
+  def location(self, item):
+    return reverse(f"{item}")
