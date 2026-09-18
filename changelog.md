@@ -465,7 +465,8 @@ First public release of the site. Site was locked behind a login and accounts on
 - Cleaned up nearly every page with table. Table controls/tabs are now separated from the cards, and the only thing in the card is the table. This will eventually lead to having card view on every page but not at this time
 - All pages with event tables now show cards on mobile and table on desktop
 - All tables now have controls moved outside of the table container
-- Profile page still screwy but it does work
+- All tables mobile view now hides unnecessary columns to reduce scrolling
+- Article Search redesigned result cards and pagination
 
 ## Removed
 

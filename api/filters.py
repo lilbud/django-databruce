@@ -199,8 +199,6 @@ class DataTablesFilterBackend(BaseFilterBackend):
       order_list.append(order)
       i += 1
 
-    print(order_list)
-
     return order_list
 
   def get_fields(self, request):

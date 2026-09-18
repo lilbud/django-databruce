@@ -85,6 +85,9 @@ function slotTable(url) {
         }
       }
     },
+    responsive: {
+      details: false,
+    },
     columns: setlist_slots,
     initComplete: function () {
       let api = this.api();

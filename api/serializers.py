@@ -1,6 +1,9 @@
 import datetime
 
+import markdown
+import nh3
 from django.contrib.auth import get_user_model
+from django.utils.safestring import mark_safe
 from rest_framework import serializers
 
 from bruceyversion.models import Entry, EntryComment
@@ -1286,7 +1289,8 @@ class SetlistSongsSerializer(BaseSerializer):
 
       self._event_cache = {e.event_id: MinimalEventSerializer(e).data for e in events}
       self._song_cache = {
-        s.id: MinimalSongsSerializer(s, include=["name", "slug"]).data for s in songs
+        s.id: MinimalSongsSerializer(s, include=["name", "slug", "category"]).data
+        for s in songs
       }
 
     return super().to_representation(instance)
@@ -1592,6 +1596,36 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
   )
 
   rank = serializers.FloatField(required=False)
+
+  content = serializers.SerializerMethodField()
+
+  def get_content(self, obj):
+    raw_html = markdown.markdown(obj.content[:500])
+    # 2. Define safe elements
+    allowed_tags = [
+      "p",
+      "strong",
+      "em",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "ul",
+      "ol",
+      "li",
+      "br",
+      "code",
+      "pre",
+      "blockquote",
+    ]
+
+    # 3. Clean the HTML (strips script tags, onerror events, etc.)
+    cleaned_html = nh3.clean(
+      raw_html,
+      tags=set(allowed_tags),
+    )
+
+    return mark_safe(cleaned_html)
 
   class Meta:
     model = Article

@@ -51,9 +51,9 @@
                       <th class="all">Name</th>
                       <th class="all">First</th>
                       <th class="all">Last</th>
-                      <th class="all">Instruments</th>
-                      <th class="all">Aliases</th>
-                      <th class="all">Birthday</th>
+                      <th class="min-desktop">Instruments</th>
+                      <th class="min-desktop">Aliases</th>
+                      <th class="min-desktop">Birthday</th>
                     </tr>
                   </thead>
                 </table>
@@ -75,13 +75,10 @@
         order: [
           [1, 'asc']
         ],
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#tableOrder'
-            }
-          }
+        responsive: {
+          details: false,
         },
+        pageLength: 100,
         columns: [{
           'data': 'num_events',
           'name': 'num_events',
@@ -92,9 +89,7 @@
           'data': 'name',
           'name': 'name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/relations/${row.uuid}">${data}</a>`;
-            }
+            return data ? `<a href="/relations/${row.uuid}">${data}</a>` : '';
           },
         }, {
           'data': 'first_event',
@@ -117,7 +112,7 @@
           'data': 'aliases',
           'name': 'relation_alias__name',
           'render': function(data, type, row, meta) {
-            return data.join("; ")
+            return data ? data.join("; ") : ''
           },
         }, {
           'data': 'start_date',

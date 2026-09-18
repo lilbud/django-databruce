@@ -666,7 +666,7 @@
   /* colors */
 
   .text-primary {
-    color: var(--color-blue-400) !important;
+    color: var(--color-blue-500) !important;
   }
 
   .bg-primary {

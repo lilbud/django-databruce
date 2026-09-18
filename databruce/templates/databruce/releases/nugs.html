@@ -10,12 +10,12 @@
     <div class="row mb-3">
       <div class="col">
         <div class="text-2xl">Nugs Releases</div>
-        <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows.</div>
+        <div class="text-base mb-2">Shows released on Nugs. Links lead to the page where you can purchase those shows. All times are listed in UTC.</div>
       </div>
     </div>
     <div class="row">
       <div id="tableControls">
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 order-2 order-lg-1">
           <label for="PublicityFilter" class="pb-1">Category</label>
           <select id="PublicityFilter" class="form-select form-select-sm">
             <option value="">All</option>
@@ -25,7 +25,7 @@
           </select>
         </div>
         <!-- Search -->
-        <div class="col">
+        <div class="col order-1 order-lg-2">
           <label for="search" class="pb-1">Search</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">
@@ -77,7 +77,7 @@
                     <tr class="header">
                       <th class="all">Release Date</th>
                       <th class="all">Event</th>
-                      <th class="all">Venue</th>
+                      <th class="min-desktop">Venue</th>
                       <th class="all">Category</th>
                       <th class="all">Link</th>
                     </tr>
@@ -101,7 +101,7 @@
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: true,
+        hour12: false,
         timeZoneName: 'short', // Generates %Z (e.g., EST, EDT, GMT+2)
         timeZone: 'UTC'
       };
@@ -126,15 +126,13 @@
       }), {});
 
       // Reconstruct into your exact pattern: %Y-%m-%d %I:%M %Z
-      const formattedDate = `${year}-${month}-${day} ${hour}:${minute} ${dayPeriod} ${timeZoneName}`;
+      const formattedDate = `${year}-${month}-${day} ${hour}:${minute}`;
 
       return formattedDate
     }
 
 
     $(document).ready(function() {
-      let sb_columns = [0, 1, 2, 3, 4, 5];
-
       var table = new DataTable('#releasesTable', {
         ajax: {
           'url': '/api/v1/nugs_releases/?format=custom',
@@ -142,26 +140,26 @@
         order: [
           [0, 'desc']
         ],
+        responsive: {
+          details: false,
+        },
+        pageLength: 100,
         columns: [{
           'data': 'date',
           'name': 'date',
-          'width': '12rem',
           'className': 'text-nowrap',
-          'type': 'text',
+          'type': 'date',
           'render': function(data, type, row, meta) {
             const date = new Date(data);
             const dayText = date.toLocaleDateString('en-US', {
               weekday: 'long'
             });
 
-            if (data) {
-              return `<span>${formatDate(data)}<br><small>${dayText}</small></span>`
-            }
+            return data ? `<span>${formatDate(data)}<br><small>${dayText}</small></span>` : ''
           },
         }, {
           'data': 'event',
           'name': 'event__event_id',
-          'width': '12rem',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data)
           },

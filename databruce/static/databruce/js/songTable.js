@@ -74,11 +74,15 @@ function songTable(url, height, tableID) {
         }
       }
     },
+    responsive: {
+      details: false,
+    },
     order: [[0, 'desc']],
     columns: song_table_columns,
     initComplete: function (settings, json) {
       let api = this.api();
       var info = api.page.info();
+      console.log($('#song-count-badge'))
       $('#song-count-badge').text(info.recordsTotal);
 
       const input = $('.song-controls .page-input');

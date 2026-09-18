@@ -8,7 +8,7 @@
               data-website-id="63174c56-d806-4f1c-9a2c-372a17a4a4ee"></script>
     {% endif %}
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width" />
     <meta name="description"
           content="{{ description|safe|truncatechars:200|default_if_none:"A Springsteen Setlist Database" }}">
     <meta name="keywords" content="Databruce, Setlists, Springsteen">
@@ -45,6 +45,8 @@
     <link rel="stylesheet"
           href="{% static 'databruce/css/leaflet/leaflet.css' %}" />
     <script src="{% static 'databruce/js/leaflet/leaflet.js' %}"></script>
+    <!-- Marked -->
+    <script src="{% static 'databruce/js/marked.umd.js' %}"></script>
     <!--JQuery-->
     <link rel="stylesheet"
           href="{% static 'databruce/css/jquery/jquery-ui.min.css' %}">
@@ -83,6 +85,8 @@
   </head>
   <body>
     {% include "./partials/navbar.html" %}
+    <a href="#"
+       class="back-to-top d-flex d-md-none justify-content-center align-items-center"><i class="bi bi-caret-up-fill"></i></a>
     <div class="d-none">{% csrf_token %}</div>
     <div class="padded-body">
       {% block container %}

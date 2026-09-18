@@ -40,9 +40,7 @@ event_table_columns = [
     'className': 'text-wrap',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (data) {
-        return `<a href="/bands/${data.uuid}">${data.name}</a>`
-      }
+      return data ? `<a href="/bands/${data.uuid}">${data.name}</a>` : '';
     },
   },
   {
@@ -52,11 +50,7 @@ event_table_columns = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (data) {
-        if (row.city) {
-          return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
-        }
-
-        return `<a href="/venues/${data.uuid}">${data.name}</a>`
+        return row.city ? `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>` : `<a href="/venues/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -67,11 +61,7 @@ event_table_columns = [
     'className': 'text-wrap',
     'render': function (data, type, row, meta) {
       if (data) {
-        if (row.leg) {
-          return `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg}</small>`
-        }
-
-        return `<a href="/tours/${data.uuid}">${data.name}</a>`
+        return row.leg ? `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg}</small>` : `<a href="/tours/${data.uuid}">${data.name}</a>`
       }
     },
   },
@@ -81,14 +71,7 @@ event_table_columns = [
     'width': '15rem',
     'className': 'min-desktop',
     'render': function (data, type, row, meta) {
-      if (row.event_status) {
-        if (data) {
-          return `<span class="text-danger fw-semibold">[${row.type[0]}] ${data}</span>`
-        }
-        return `<span class="text-danger fw-semibold">[${row.type[0]}]</span>`
-      }
-
-      return data;
+      return row.event_status ? `<span class="text-danger fw-semibold">[${row.type[0]}] ${data || ''}</span>` : data
     },
   },
   {
@@ -115,6 +98,9 @@ function eventTable(url) {
           selectId: '#eventTableOrder'
         }
       }
+    },
+    responsive: {
+      details: false,
     },
     pageLength: 100,
     columns: event_table_columns,
@@ -171,6 +157,12 @@ function eventTable(url) {
         input.attr('value', val);
 
         api.page(val).draw('page');
+      });
+
+      let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+      tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
       });
     }
   });
@@ -237,16 +229,20 @@ function renderAttendanceForm(event, csrfToken) {
   }
 
   return `
+    <span data-bs-toggle="tooltip" data-bs-title="${isAttending ? "Remove from profile" : "Add to profile"}">
+
     <form method="post" id="userForm" class="userForm d-flex justify-content-center align-items-center">
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
       <button
         type="submit"
-        class="btn btn-link p-0 border-0 bi ${iconClass}"
+        class="btn btn-link p-0 border-0 bi ${iconClass} star-btn"
         data-event="${event.id}"
         data-action="${action}"
         data-attended="${attended}"
+
         id="add"
       ></button>
     </form>
+    </span>
   `;
 }

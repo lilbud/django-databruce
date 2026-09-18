@@ -51,8 +51,8 @@
                       <th class="all">Name</th>
                       <th class="all">State</th>
                       <th class="all">Country</th>
-                      <th class="all">First</th>
-                      <th class="all">Last</th>
+                      <th class="min-desktop">First</th>
+                      <th class="min-desktop">Last</th>
                     </tr>
                   </thead>
                 </table>
@@ -65,8 +65,6 @@
   </div>
   <script>
     $(document).ready(function() {
-      let sb_columns = [0, 2, 3, 4, 5];
-
       var table = new DataTable('#cityTable', {
         ajax: {
           'url': '/api/v1/cities/?format=custom',
@@ -78,39 +76,33 @@
         order: [
           [1, 'asc']
         ],
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#tableOrder'
-            }
-          }
+        responsive: {
+          details: false,
         },
+        pageLength: 100,
         columns: [{
           'data': 'num_events',
-          'name': 'num_events'
+          'name': 'num_events',
+          'type': 'num'
         }, {
           'data': 'name',
           'name': 'name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/cities/${row.uuid}">${data}</a>`
-            }
+
+            return data ? `<a href="/cities/${row.uuid}">${data}</a>` : '';
+
           },
         }, {
           'data': 'state',
           'name': 'state__name, state__abbrev',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/states/${data.uuid}">${data.name}</a>`
-            }
+            return data ? `<a href="/states/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'country',
           'name': 'country__name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/countries/${data.uuid}">${data.name}</a>`
-            }
+            return data ? `<a href="/countries/${data.uuid}">${data.name}</a>` : ''
           },
         }, {
           'data': 'first_event',
@@ -132,17 +124,11 @@
         initComplete: function(settings, json) {
           let api = this.api();
           let info = api.page.info();
-          let values = api.column(3).data().unique().toArray();
-          let container = $('#PublicityFilter');
 
-          values.forEach(element => {
-            var option = `<option value="${element}">${element}</option>`;
-            container.append(option);
-          });
-          const input = $('#cityTableControls .page-input');
-          const prevBtn = $('#cityTableControls .btn-prev');
-          const nextBtn = $('#cityTableControls .btn-next');
-          const totalSpan = $('#cityTableControls .total-pages');
+          const input = $('.page-input');
+          const prevBtn = $('.btn-prev');
+          const nextBtn = $('.btn-next');
+          const totalSpan = $('.total-pages');
           const tableInfo = $('#tableInfo');
 
           // Initial button states
@@ -192,7 +178,6 @@
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
     });
   </script>
 {% endblock content %}

@@ -12,7 +12,7 @@
     </div>
     <div class="row">
       <div id="tableControls">
-        <div class="col-12 col-md-1">
+        <div class="col-12 col-md-1 order-2 order-lg-1">
           <label for="PublicityFilter" class="pb-1">Category</label>
           <select id="PublicityFilter" class="form-select form-select-sm">
             <option value="">All</option>
@@ -21,7 +21,7 @@
           </select>
         </div>
         <!-- Search -->
-        <div class="col">
+        <div class="col order-1 order-lg-2">
           <label for="search" class="pb-1">Search</label>
           <div class="input-group input-group-sm">
             <input type="text"
@@ -30,13 +30,13 @@
                    placeholder="Type to search table...">
           </div>
         </div>
-        <div class="col-12 col-md-auto mt-2 mt-md-0">
+        {% comment %} <div class="col-12 col-md-auto mt-2 mt-md-0 order-last">
           <button type="button"
                   id="sbButton"
                   data-bs-toggle="modal"
                   data-bs-target="#sbModal"
                   class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
-        </div>
+        </div> {% endcomment %}
       </div>
     </div>
     <div class="row my-3">
@@ -49,9 +49,9 @@
              id="songTableInfo"></div>
         <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
              id="dropdown-container">
-          <label for="songTableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
           <select name=""
-                  id="songTableOrder"
+                  id="tableOrder"
                   class="form-select form-select-sm column-order"
                   autocomplete="off">
             <option value="1-asc" selected>Date (asc.)</option>
@@ -76,15 +76,15 @@
                   <thead>
                     <tr class="custom">
                       <th class="all">Name</th>
-                      <th class="all">Lyrics</th>
+                      <th class="min-desktop">Lyrics</th>
                       <th class="all">Orig. Artist</th>
-                      <th class="all">Category</th>
+                      <th class="min-desktop">Category</th>
                       <th class="all">First</th>
                       <th class="all">Last</th>
                       <th class="all">Public</th>
                       <th class="all">Private</th>
-                      <th class="all">Opener</th>
-                      <th class="all">Closer</th>
+                      <th class="min-desktop">Opener</th>
+                      <th class="min-desktop">Closer</th>
                       <th class="all">Original</th>
                     </tr>
                   </thead>
@@ -98,8 +98,6 @@
   </div>
   <script>
     $(document).ready(function() {
-      let sb_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-
       var table = new DataTable('#songsTable', {
         ajax: {
           'url': '/api/v1/songs/?format=custom',
@@ -107,21 +105,16 @@
         order: [
           [0, 'asc']
         ],
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#songTableOrder'
-            }
-          }
+        responsive: {
+          details: false,
         },
+        pageLength: 100,
         columns: [{
           'data': 'name',
           'name': 'sort_song_name, name',
           'width': '20rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a class="text-wrap" href="/songs/${row.uuid}">${data}</a>`
-            }
+            return data ? `<a class="text-wrap" href="/songs/${row.uuid}">${data}</a>` : ''
           },
         }, {
           'data': 'has_lyrics',
@@ -133,9 +126,7 @@
           'className': 'dt-center',
           'columnControl': [],
           'render': function(data, type, row, meta) {
-            if (data) {
-              return data ? '<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i>' : '';
-            }
+            return data ? '<i class="bi bi-check-lg" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Has Lyrics"></i>' : '';
           },
         }, {
           'data': 'original_artist',
@@ -149,7 +140,7 @@
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
-          'width': '9rem',
+          'width': '8rem',
           'type': 'date',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data);
@@ -157,7 +148,7 @@
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
-          'width': '9rem',
+          'width': '8rem',
           'type': 'date',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data);
@@ -192,10 +183,10 @@
         initComplete: function() {
           let api = this.api();
           let info = api.page.info();
-          const input = $('#songTableControls .page-input');
-          const prevBtn = $('#songTableControls .btn-prev');
-          const nextBtn = $('#songTableControls .btn-next');
-          const totalSpan = $('#songTableControls .total-pages');
+          const input = $('.page-input');
+          const prevBtn = $('.btn-prev');
+          const nextBtn = $('.btn-next');
+          const totalSpan = $('.total-pages');
           const tableInfo = $('#songTableInfo');
 
           // Initial button states
@@ -224,11 +215,11 @@
           totalSpan.text(`of ${info.pages || 1}`);
 
           nextBtn.on('click', function() {
-            songTable.page('next').draw(false);
+            table.page('next').draw(false);
           });
 
           prevBtn.on('click', function() {
-            songTable.page('previous').draw(false);
+            table.page('previous').draw(false);
           });
 
           input.on('change', function() {
@@ -241,6 +232,11 @@
 
             api.page(val).draw('page');
           });
+          let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+          tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+          });
         }
       });
 
@@ -252,7 +248,6 @@
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
     });
   </script>
 {% endblock content %}

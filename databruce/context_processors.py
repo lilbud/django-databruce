@@ -33,7 +33,7 @@ def get_navbar_links() -> list[dict[str, Any]]:
     },
     {
       "name": "Tours",
-      "match_keyword": "tours",
+      "match_keywords": ["tours", "tour_legs"],
       "icon": "bi-bus-front-fill",
       "children": [
         {"name": "Tours", "url": "tours"},
@@ -70,11 +70,11 @@ def get_navbar_links() -> list[dict[str, Any]]:
     },
     {
       "name": "Releases",
-      "match_keyword": "releases",
+      "match_keyword": ["releases", "nugs_releases"],
       "icon": "bi-vinyl-fill",
       "children": [
         {"name": "Official Releases", "url": "releases"},
-        {"name": "Nugs Releases", "url": "nugs"},
+        {"name": "Nugs Releases", "url": "nugs_releases"},
       ],
     },
     {

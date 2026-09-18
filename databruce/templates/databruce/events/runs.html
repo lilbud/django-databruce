@@ -51,10 +51,10 @@
                   <thead>
                     <tr>
                       <th class="all">Name</th>
-                      <th class="all">Band</th>
-                      <th class="all">Venue</th>
+                      <th class="min-desktop">Band</th>
+                      <th class="min-desktop">Venue</th>
                       <th class="all">Events</th>
-                      <th class="all">Songs</th>
+                      <th class="min-desktop">Songs</th>
                       <th class="all">First</th>
                       <th class="all">Last</th>
                     </tr>
@@ -75,23 +75,12 @@
         ajax: {
           'url': '/api/v1/runs/?format=custom',
         },
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#columnOrder'
-            }
-          }
-        },
-        columnDefs: [{
-          targets: "_all",
-          className: 'text-wrap text-xs'
-        }, {
-          targets: [3, 4],
-          className: 'text-center'
-        }, ],
         order: [
           [6, 'desc']
         ],
+        responsive: {
+          details: false,
+        },
         columns: [{
           'data': 'name',
           'name': 'name',
@@ -103,6 +92,7 @@
         }, {
           'data': 'band',
           'name': 'band__name',
+
           'render': function(data, type, row, meta) {
             if (data) {
               return '<a href="/bands/' + data.uuid + '">' + data.name + '</a>';
@@ -111,6 +101,7 @@
         }, {
           'data': 'venue',
           'name': 'venue__name',
+
           'render': function(data, type, row, meta) {
             if (data) {
               return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
@@ -127,7 +118,7 @@
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
-          'width': '10rem',
+
           'type': 'date',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data);
@@ -135,7 +126,7 @@
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
-          'width': '10rem',
+
           'type': 'date',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data);

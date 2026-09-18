@@ -12,7 +12,7 @@
     </div>
     <div class="row">
       <div id="tableControls">
-        <div class="col-12 col-md-1">
+        <div class="col-12 col-md-1 order-2 order-lg-2">
           <label for="PublicityFilter" class="pb-1">Category</label>
           <select id="PublicityFilter" class="form-select form-select-sm">
             <option value="">All</option>
@@ -22,7 +22,7 @@
           </select>
         </div>
         <!-- Search -->
-        <div class="col">
+        <div class="col order-1 order-lg-2">
           <label for="search" class="pb-1">Search</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">
@@ -36,7 +36,6 @@
         </div>
       </div>
     </div>
-    {% comment %} {% include "databruce/partials/table_controls.html" %} {% endcomment %}
     <div class="row my-3">
       <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
            id="relationTableControls">
@@ -74,9 +73,9 @@
                   <thead>
                     <tr class="header">
                       <th class="all">Name</th>
-                      <th class="all">Date</th>
+                      <th class="min-desktop">Date</th>
                       <th class="all">Type</th>
-                      <th class="all">Length</th>
+                      <th class="min-desktop">Length</th>
                     </tr>
                   </thead>
                 </table>
@@ -96,6 +95,10 @@
         order: [
           [1, 'desc']
         ],
+        responsive: {
+          details: false,
+        },
+        pageLength: 100,
         columns: [{
           'data': 'name',
           'name': 'name',

@@ -22,14 +22,14 @@
     <hr>
     <div class="row">
       <div id="tableControls">
-        <div class="col-12 col-md-1">
+        <div class="col-12 col-md-1 order-2 order-lg-1">
           <label for="PublicityFilter" class="pb-1">Language</label>
           <select id="PublicityFilter" class="form-select form-select-sm">
             <option value="">All</option>
           </select>
         </div>
         <!-- Search -->
-        <div class="col">
+        <div class="col order-1 order-lg-2">
           <label for="search" class="pb-1">Search</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">
@@ -58,14 +58,7 @@
                   id="tableOrder"
                   class="form-select form-select-sm column-order"
                   autocomplete="off">
-            <option value="1-asc" selected>Date (asc.)</option>
-            <option value="1-desc">Date (desc.)</option>
-            <option value="3-asc">Band (A-Z)</option>
-            <option value="3-desc">Band (Z-A)</option>
-            <option value="4-asc">Venue (A-Z)</option>
-            <option value="4-desc">Venue (Z-A)</option>
-            <option value="5-asc">Tour (A-Z)</option>
-            <option value="5-desc">Tour (Z-A)</option>
+            <option value="1-asc" selected></option>
           </select>
         </div>
       </div>
@@ -80,11 +73,11 @@
                   <thead>
                     <tr>
                       <th class="all">Song</th>
-                      <th class="all">Version</th>
-                      <th class="all">Source</th>
+                      <th class="min-desktop">Version</th>
+                      <th class="min-desktop">Source</th>
                       <th class="all">Language</th>
-                      <th class="all">Translator</th>
-                      <th class="all">Note</th>
+                      <th class="min-desktop">Translator</th>
+                      <th class="min-desktop">Note</th>
                     </tr>
                   </thead>
                 </table>
@@ -97,8 +90,6 @@
   </div>
   <script>
     $(document).ready(function() {
-
-
       var table = new DataTable('#lyricTable', {
         ajax: {
           'url': '/api/v1/lyrics/?format=custom',
@@ -106,20 +97,14 @@
         order: [
           [0, 'asc']
         ],
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#tableOrder'
-            }
-          }
+        responsive: {
+          details: false,
         },
         columns: [{
           'data': 'song',
           'name': 'song__sort_song_name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/lyrics/${row.uuid}">${data}</a>`
-            }
+            return data ? `<a href="/lyrics/${row.uuid}">${data}</a>` : ''
           },
         }, {
           'data': 'version',
@@ -137,6 +122,7 @@
           'data': 'note',
           'name': 'note'
         }, ],
+
         initComplete: function(settings, json) {
           let api = this.api();
           let info = api.page.info();

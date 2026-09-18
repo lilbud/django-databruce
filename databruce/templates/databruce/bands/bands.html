@@ -12,7 +12,7 @@
     </div>
     <div class="row">
       <div id="tableControls">
-        <div class="col-12 col-md-1">
+        <div class="col-12 col-md-1 order-2 order-lg-1">
           <label for="PublicityFilter" class="pb-1">Category</label>
           <select id="PublicityFilter" class="form-select form-select-sm">
             <option value="">All</option>
@@ -21,7 +21,7 @@
           </select>
         </div>
         <!-- Search -->
-        <div class="col">
+        <div class="col order-1 order-lg-2">
           <label for="search" class="pb-1">Search</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">
@@ -91,31 +91,26 @@
       let sb_columns = [0, 1, 2, 3];
 
       var table = new DataTable("#bandTable", {
-        columnDefs: [{
-          target: -1,
-          visible: false
-        }, {
-          type: "num",
-          targets: [0],
-          width: "1rem"
-        }, ],
         order: [
           [1, "asc"]
         ],
         ajax: {
           url: "/api/v1/bands/?format=custom",
         },
+        responsive: {
+          details: false,
+        },
+        pageLength: 100,
         columns: [{
           data: "num_events",
           name: "num_events",
-          className: "dt-center"
+          type: 'num',
+          width: '1rem',
         }, {
           data: "name",
           name: "name",
           render: function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/bands/${row.uuid}">${data}</a>`;
-            }
+            return data ? `<a href="/bands/${row.uuid}">${data}</a>` : '';
           },
         }, {
           data: "first_event",
@@ -135,6 +130,7 @@
           data: "bruce_band",
           name: "bruce_band",
           orderable: false,
+          visible: false,
         }, ],
         initComplete: function(settings, json) {
           var api = this.api();

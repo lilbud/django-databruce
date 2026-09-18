@@ -151,15 +151,6 @@ DataTable.feature.register('customInputPaging', function (settings) {
   return container;
 });
 
-$(window).on('resize', function () {
-  DataTable.tables({
-    visible: true,
-    api: true
-  })
-    .columns.adjust()
-    .responsive.recalc();
-});
-
 // needed to fix pages with multiple tables behind tabs
 $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
   setTimeout(() => {
@@ -201,7 +192,9 @@ Object.assign(DataTable.defaults, {
   search: {
     regex: true
   },
-  responsive: false,
+  responsive: {
+    details: false
+  },
   order: [],
   layout: {
     topStart: {

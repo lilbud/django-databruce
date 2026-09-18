@@ -26,14 +26,7 @@
                   id="tableOrder"
                   class="form-select form-select-sm column-order"
                   autocomplete="off">
-            <option value="1-asc" selected>Date (asc.)</option>
-            <option value="1-desc">Date (desc.)</option>
-            <option value="3-asc">Band (A-Z)</option>
-            <option value="3-desc">Band (Z-A)</option>
-            <option value="4-asc">Venue (A-Z)</option>
-            <option value="4-desc">Venue (Z-A)</option>
-            <option value="5-asc">Tour (A-Z)</option>
-            <option value="5-desc">Tour (Z-A)</option>
+            <option value="1-asc" selected></option>
           </select>
         </div>
       </div>
@@ -64,8 +57,6 @@
   </div>
   <script>
     $(document).ready(function() {
-      let sb_columns = [0, 1, 2, 3, 4];
-
       var table = new DataTable('#stateTable', {
         ajax: {
           'url': '/api/v1/states/?format=custom',
@@ -73,51 +64,39 @@
         order: [
           [1, 'asc']
         ],
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#tableOrder'
-            }
-          }
+        responsive: {
+          details: false,
         },
-        columnDefs: [{
-          targets: [0],
-          width: '1rem'
-        }, ],
         columns: [{
           'data': 'num_events',
-          'name': 'num_events'
+          'name': 'num_events',
+          'type': 'num',
+          'width': '1rem',
         }, {
           'data': 'name',
           'name': 'name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/states/${row.uuid}">${row.name}</a>`;
-            }
+            return data ? `<a href="/states/${row.uuid}">${row.name}</a>` : '';
           },
         }, {
           'data': 'country',
           'name': 'country__name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/countries/${data.uuid}">${data.name}</a>`;
-            }
+            return data ? `<a href="/countries/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`
-            }
+            return eventDateFormat(data);
           },
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`
-            }
+            return eventDateFormat(data);
           },
         }, ],
         initComplete: function(settings, json) {

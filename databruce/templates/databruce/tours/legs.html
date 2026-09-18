@@ -32,9 +32,9 @@
         <div class="dt-info order-3 table_info" aria-live="polite" role="status"></div>
         <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
              id="dropdown-container">
-          <label for="columnOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
           <select name=""
-                  id="columnOrder"
+                  id="tableOrder"
                   class="form-select form-select-sm column-order"
                   autocomplete="off"></select>
         </div>
@@ -50,12 +50,11 @@
                   <thead>
                     <tr>
                       <th class="all">Name</th>
-                      <th class="all">Tour</th>
                       <th class="all">First</th>
                       <th class="all">Last</th>
                       <th class="all">Shows</th>
-                      <th class="all">Songs</th>
-                      <th class="all">Note</th>
+                      <th class="min-desktop">Songs</th>
+                      <th class="min-desktop">Note</th>
                     </tr>
                   </thead>
                 </table>
@@ -72,20 +71,10 @@
         ajax: {
           'url': '/api/v1/tour_legs/?format=custom',
         },
+        responsive: {
+          details: false,
+        },
         pageLength: -1,
-        columnDefs: [{
-          targets: [0, 1],
-          width: '12rem'
-        }, {
-          targets: [2, 3],
-          width: '10rem',
-          type: 'date',
-          className: 'dt-left'
-        }, {
-          targets: [4, 5],
-          width: '1rem',
-          className: 'text-center'
-        }],
         order: [
           [3, 'desc']
         ],
@@ -94,43 +83,38 @@
           'name': 'name',
           'render': function(data, type, row, meta) {
             if (data) {
-              return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
-            }
-          },
-        }, {
-          'data': 'tour',
-          'name': 'tour__name',
-          'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/tours/${data.uuid}">${data.name}</a>`;
+              return `<a href="/tours/legs/${row.uuid}">${data}</a><br><small>${row.tour.name}</small>`;
             }
           },
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
-            }
+            return eventDateFormat(data);
           },
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
-            }
+            return eventDateFormat(data);
           },
         }, {
           'data': 'num_events',
-          'name': 'num_events'
+          'name': 'num_events',
+          'type': 'num',
+          'width': '1rem',
+          'className': 'text-center'
         }, {
           'data': 'num_songs',
-          'name': 'num_songs'
+          'name': 'num_songs',
+          'type': 'num',
+          'width': '1rem',
+          'className': 'text-center'
         }, {
           'data': 'note',
           'name': 'note',
-          'width': '12rem'
         }, ],
         initComplete: function(settings, json) {
           let api = this.api();

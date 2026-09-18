@@ -861,7 +861,11 @@ class EventRunViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class LyricsViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = db_models.Lyric.objects.all().select_related("song").order_by("song__name")
+  queryset = (
+    db_models.Lyric.objects.all()
+    .select_related("song")
+    .order_by("song__sort_song_name")
+  )
   serializer_class = api_serializers.LyricsSerializer
 
 
@@ -1081,7 +1085,7 @@ class ArticlesViewSet(viewsets.ModelViewSet):
 
 
 class ArticlesSearchViewSet(viewsets.ModelViewSet):
-  queryset = Article.objects.all()
+  queryset = Article.objects.all().select_related("collection")
   serializer_class = api_serializers.ArticlesSearchSerializer
   lookup_field = (
     "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)

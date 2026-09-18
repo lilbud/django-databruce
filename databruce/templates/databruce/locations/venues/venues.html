@@ -49,8 +49,8 @@
                     <tr>
                       <th class="text-center all">Events</th>
                       <th class="all">Name</th>
-                      <th class="all">City</th>
-                      <th class="all">State</th>
+                      <th class="min-desktop">City</th>
+                      <th class="min-desktop">State</th>
                       <th class="all">Country</th>
                       <th class="all">First</th>
                       <th class="all">Last</th>
@@ -66,19 +66,9 @@
   </div>
   <script>
     $(document).ready(function() {
-
-      let sb_columns = [0, 1, 2, 3, 4, 5, 6];
-
       var table = new DataTable('#venueTable', {
         ajax: {
           'url': '/api/v1/venues/?format=custom',
-        },
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#tableOrder'
-            }
-          }
         },
         columnDefs: [{
           'targets': [0],
@@ -91,44 +81,41 @@
         order: [
           [1, 'asc']
         ],
+        responsive: {
+          details: false,
+        },
+        pageLength: 100,
         columns: [{
           'data': 'num_events',
-          'name': 'num_events'
+          'name': 'num_events',
+          'type': 'num',
         }, {
           'data': 'name',
           'name': 'name, detail',
           'width': '12rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="/venues/' + row.uuid + '">' + data + '</a>';
-            }
+            return data ? '<a href="/venues/' + row.uuid + '">' + data + '</a>' : ''
           },
         }, {
           'data': 'city',
           'name': 'city__name, city__aliases',
           'width': '10rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="/cities/' + data.uuid + '">' + data.name + '</a>';
-            }
+            return data ? `<a href="/states/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'state',
           'name': 'city__state__name, city__state__abbrev',
           'width': '8rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="/states/' + data.uuid + '">' + data.name + '</a>';
-            }
+            return data ? `<a href="/states/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'country',
           'name': 'city__country__name, city__country__alpha_2',
           'width': '10rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="/countries/' + data.uuid + '">' + data.name + '</a>';
-            }
+            return data ? `<a href="/countries/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'first_event',

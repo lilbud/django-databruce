@@ -79,8 +79,6 @@
   </div>
   <script>
     $(document).ready(function() {
-      let sb_columns = [0, 1, 2, 3];
-
       var table = new DataTable('#countryTable', {
         ajax: {
           'url': '/api/v1/countries/?format=custom',
@@ -93,12 +91,8 @@
         order: [
           [1, 'asc']
         ],
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#tableOrder'
-            }
-          }
+        responsive: {
+          details: false,
         },
         columns: [{
           'data': 'num_events',
@@ -108,9 +102,7 @@
           'data': 'name',
           'name': 'name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/countries/${row.uuid}">${row.name}</a>`;
-            }
+            return data ? `<a href="/countries/${row.uuid}">${row.name}</a>` : '';
           },
         }, {
           'data': 'first_event',
@@ -186,7 +178,6 @@
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
     });
   </script>
 {% endblock content %}

@@ -15,7 +15,7 @@
       </div>
     </div>
     <div id="tableControls">
-      <div class="col col-lg-2">
+      <div class="col col-lg-2 order-2 order-lg-1">
         <label for="PublicityFilter" class="pb-1">Category</label>
         <select id="PublicityFilter" class="form-select form-select-sm">
           <option value="">All</option>
@@ -24,7 +24,7 @@
           {% endfor %}
         </select>
       </div>
-      <div class="col col-lg-2">
+      <div class="col col-lg-2 order-3 order-lg-2">
         <label for="LanguageFilter" class="pb-1">Language</label>
         <select id="LanguageFilter" class="form-select form-select-sm">
           <option value="">All</option>
@@ -34,7 +34,7 @@
         </select>
       </div>
       <!-- Search -->
-      <div class="col-12 col-lg">
+      <div class="col-12 col-lg order-1 order-lg-3">
         <label for="search" class="pb-1">Search</label>
         <div class="input-group input-group-sm">
           <span class="input-group-text">
@@ -101,8 +101,6 @@
   </div>
   <script>
     $(document).ready(function() {
-      let sb_columns = [0, 1, 2, 3, 4];
-
       const truncateText = (str) => {
         return str.length > 70 ? str.slice(0, 70) + '...' : str;
       };
@@ -114,15 +112,17 @@
         order: [
           [0, 'asc']
         ],
+        responsive: {
+          details: false,
+        },
+        pageLength: 100,
         columns: [{
           'data': 'title',
           'name': 'title',
           'width': '20rem',
           'class': 'text-wrap',
           'render': function(data, type, row, meta) {
-
             return data ? `<a href="/library/article/${row.slug}">${truncateText(data)}</a>` : '';
-
           },
         }, {
           'data': 'author',
@@ -230,7 +230,6 @@
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
     });
   </script>
 {% endblock content %}

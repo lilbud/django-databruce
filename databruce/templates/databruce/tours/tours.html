@@ -46,25 +46,12 @@
         <div class="dt-info order-3 table_info" aria-live="polite" role="status"></div>
         <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
              id="dropdown-container">
-          <label for="columnOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
           <select name=""
-                  id="columnOrder"
+                  id="tableOrder"
                   class="form-select form-select-sm column-order"
                   autocomplete="off">
-            <option value="0-asc" selected>Name (A-Z)</option>
-            <option value="0-desc">Name (Z-A)</option>
-            <option value="1-asc">Band (A-Z)</option>
-            <option value="1-desc">Band (Z-A)</option>
-            <option value="2-asc">First Event (asc.)</option>
-            <option value="2-desc">First Event (desc.)</option>
-            <option value="3-asc">Last Event (asc.)</option>
-            <option value="3-desc">Last Event (desc.)</option>
-            <option value="4-asc">Shows (Most)</option>
-            <option value="4-desc">Shows (Least)</option>
-            <option value="5-asc">Songs (Most)</option>
-            <option value="5-desc">Songs (Least)</option>
-            <option value="6-asc">Legs (Most)</option>
-            <option value="6-desc">Legs (Least)</option>
+            <option value="0-asc" selected></option>
           </select>
         </div>
       </div>
@@ -79,12 +66,12 @@
                   <thead>
                     <tr class="header">
                       <th class="all">Name</th>
-                      <th class="all">Band</th>
+                      <th class="min-desktop">Band</th>
                       <th class="all">First</th>
                       <th class="all">Last</th>
                       <th class="all">Shows</th>
                       <th class="all">Songs</th>
-                      <th class="all">Legs</th>
+                      <th class="min-desktop">Legs</th>
                     </tr>
                   </thead>
                 </table>
@@ -109,15 +96,15 @@
           width: '1rem',
           className: 'dt-center'
         }, {
-          targets: [2, 3],
-          width: '8rem'
-        }, {
           targets: [1],
           width: '12rem'
         }, ],
         order: [
           [3, 'desc']
         ],
+        responsive: {
+          details: false,
+        },
         columns: [{
           'data': 'name',
           'name': 'name',
@@ -133,15 +120,17 @@
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
+          'type': 'date',
           'render': function(data, type, row, meta) {
-            return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : ''
+            return eventDateFormat(data)
           },
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
+          'type': 'date',
           'render': function(data, type, row, meta) {
             if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
+              return eventDateFormat(data)
             }
           },
         }, {
