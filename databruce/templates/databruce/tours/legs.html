@@ -83,7 +83,7 @@
           'name': 'name',
           'render': function(data, type, row, meta) {
             if (data) {
-              return `<a href="/tours/legs/${row.uuid}">${data}</a><br><small>${row.tour.name}</small>`;
+              return `<a href="/tour_legs/${row.uuid}">${data}</a><br><small>${row.tour.name}</small>`;
             }
           },
         }, {

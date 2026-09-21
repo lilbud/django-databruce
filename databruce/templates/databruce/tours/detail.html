@@ -60,7 +60,7 @@
             Songs<span class="badge count-badge" id="song-count-badge">0</span>
           </button>
         </li>
-        {% if info.num_songs > 0 %}
+        {% if info.num_songs > 0 and info.id != 25 and info.id != 48 %}
           <li class="nav-item" role="presentation">
             <button class="btn nav-btn"
                     id="pills-slots-tab"
@@ -75,19 +75,10 @@
       </ul>
     </div>
     <div class="tab-content">
-      <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+      <div id="events" class="tab-pane fade show active">
+        <div class="row justify-content-center align-items-center">{% include "databruce/partials/event_table.html" %}</div>
+      </div>
       <div id="legs" class="tab-pane fade">
-        <div class="mb-3">
-          <div class="col order-1 order-lg-2">
-            <label for="search" class="pb-1">Search</label>
-            <div class="input-group input-group-sm">
-              <input type="text"
-                     id="legSearch"
-                     class="form-control form-control-sm"
-                     placeholder="Type to search table...">
-            </div>
-          </div>
-        </div>
         <div class="card">
           <div class="card-body p-0">
             <div class="row">
@@ -110,75 +101,72 @@
         </div>
       </div>
       <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
-      <div id="slots" class="tab-pane fade">{% include "databruce/partials/slot_table.html" %}</div>
+      {% if info.num_songs > 0 and info.id != 25 and info.id != 48 %}
+        <div id="slots" class="tab-pane fade">{% include "databruce/partials/slot_table.html" %}</div>
+      {% endif %}
     </div>
   </div>
   <script>
-    $(document).ready(function() {
-      eventTable('/api/v1/events/?tour={{ info.id }}&format=custom');
-      songTable('/api/v1/setlist_songs/?tour={{ info.id }}&format=custom');
+    eventTable('/api/v1/events/?tour={{ info.id }}&format=custom');
+    songTable('/api/v1/setlist_songs/?tour={{ info.id }}&format=custom');
 
-      var legTable = new DataTable('#legTable', {
-        ajax: {
-          'url': '/api/v1/tour_legs/?tour={{ info.id }}&format=custom',
+    var legTable = new DataTable('#legTable', {
+      ajax: {
+        'url': '/api/v1/tour_legs/?tour={{ info.id }}&format=custom',
+      },
+      pageLength: -1,
+      order: [
+        [4, 'desc']
+      ],
+      responsive: {
+        details: false,
+      },
+      initComplete: function(settings, json) {
+        var info = this.api().page.info();
+        $('#leg-count-badge').text(info.recordsTotal);
+      },
+      columns: [{
+        'data': 'name',
+        'name': 'name',
+        'width': '20rem',
+        'render': function(data, type, row, meta) {
+          if (data) {
+            return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
+          }
         },
-        pageLength: -1,
-        order: [
-          [4, 'desc']
-        ],
-        initComplete: function(settings, json) {
-          var info = this.api().page.info();
-          $('#leg-count-badge').text(info.recordsTotal);
+      }, {
+        'data': 'num_events',
+        'name': 'num_events',
+        'width': '1rem'
+      }, {
+        'data': 'num_songs',
+        'name': 'num_songs',
+        'width': '1rem'
+      }, {
+        'data': 'first_event',
+        'name': 'first_event__event_id, first_event__early_late',
+        'width': '6rem',
+        'render': function(data, type, row, meta) {
+          if (data) {
+            return `<a href="/events/${data.event_id}">${data.date}</a>`;
+          }
         },
-        columns: [{
-          'data': 'name',
-          'name': 'name',
-          'width': '20rem',
-          'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
-            }
-          },
-        }, {
-          'data': 'num_events',
-          'name': 'num_events',
-          'width': '1rem'
-        }, {
-          'data': 'num_songs',
-          'name': 'num_songs',
-          'width': '1rem'
-        }, {
-          'data': 'first_event',
-          'name': 'first_event__event_id, first_event__early_late',
-          'width': '6rem',
-          'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
-            }
-          },
-        }, {
-          'data': 'last_event',
-          'name': 'last_event__event_id, last_event__early_late',
-          'width': '6rem',
-          'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
-            }
-          },
-        }, {
-          'data': 'note',
-          'name': 'note',
-          'width': '16rem'
-        }, ]
-      });
-
-      tableSearch(legTable, 'legSearch');
-      searchBuilder(legTable, [0, 1, 2, 3, 4]);
-
-      // remove old searchbuilder
-      $('.dtsb-searchBuilder').remove();
-
-      slotTable('/api/v1/setlist_entries/?tour={{ info.id }}&format=custom');
+      }, {
+        'data': 'last_event',
+        'name': 'last_event__event_id, last_event__early_late',
+        'width': '6rem',
+        'render': function(data, type, row, meta) {
+          if (data) {
+            return `<a href="/events/${data.event_id}">${data.date}</a>`;
+          }
+        },
+      }, {
+        'data': 'note',
+        'name': 'note',
+        'width': '16rem'
+      }, ]
     });
+
+    slotTable('/api/v1/setlist_entries/?tour={{ info.id }}&format=custom');
   </script>
 {% endblock content %}

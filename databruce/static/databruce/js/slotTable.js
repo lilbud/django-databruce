@@ -85,6 +85,7 @@ function slotTable(url) {
         }
       }
     },
+    pageLength: -1,
     responsive: {
       details: false,
     },

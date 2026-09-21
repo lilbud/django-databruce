@@ -1,6 +1,6 @@
 <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-2 row-gap-2 flex-wrap">
   <div class="col order-1 order-lg-2">
-    <label for="search" class="pb-1">Search</label>
+    <label for="slotSearch" class="pb-1">Search</label>
     <div class="input-group input-group-sm">
       <input type="text"
              id="slotSearch"
@@ -12,7 +12,7 @@
 <div class="row my-3">
   <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
        id="slotTableControls">
-    {% include "databruce/partials/table_pagination.html" %}
+    {% comment %} {% include "databruce/partials/table_pagination.html" %} {% endcomment %}
     <div class="dt-info order-3"
          aria-live="polite"
          role="status"

@@ -74,6 +74,7 @@ function songTable(url, height, tableID) {
         }
       }
     },
+    pageLength: 100,
     responsive: {
       details: false,
     },

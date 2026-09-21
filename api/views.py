@@ -1075,7 +1075,7 @@ class ItemInsertLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ArticlesViewSet(viewsets.ModelViewSet):
-  queryset = Article.objects.all()
+  queryset = Article.objects.all().select_related("collection")
   serializer_class = api_serializers.ArticlesSerializer
   lookup_field = (
     "slug"  # Use slug in URLs instead of PK (e.g. /api/articles/my-article-slug/)

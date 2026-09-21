@@ -475,3 +475,21 @@ First public release of the site. Site was locked behind a login and accounts on
 - Fixed advanced search NOT filtering, wasn't working right
 - Fixed Calendar show events not showing up
 - Fixed broken Calendar styles
+
+# v1.22 (September 21, 2026)
+
+## Added
+
+- Added "originals/covers" dividers to advanced search song dropdown
+
+## Changed
+
+- All event/song tables now hide search/filters under a collapsable dropdown
+- Tour Legs and slots tables now show all results without pagination
+- Events Year selector changed to a standard Select element which works better on mobile
+
+## Removed
+
+## Fixed
+
+- Advanced Search fixed with some odd queries, might need wider testing

@@ -572,9 +572,9 @@
     background-color: var(--color-blue-500) !important;
   }
 
-  .dropdown-toggle.show {
+  /* .dropdown-toggle.show {
     background-color: var(--color-blue-600) !important;
-  }
+  } */
 
   div.dt-button-collection {
     border-color: var(--color-gray-700);

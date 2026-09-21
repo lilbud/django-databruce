@@ -1624,6 +1624,11 @@ html {
   height: calc(1.5em + 0.5rem + 2px)
 }
 
+.form-label {
+  /* padding-bottom: 0.25rem !important; */
+  margin-bottom: 0 !important;
+}
+
 /* hide ordering control from non-orderable columns */
 .dt-orderable-none .dtcc {
   display: none !important;
@@ -1636,6 +1641,12 @@ html {
   justify-content: center;
   padding: 4px 6px;
   font-weight: bold;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[role="group"] .select2-results__group {
+  padding: 0 !important;
+
+
 }
 
 #userForm .star-btn {

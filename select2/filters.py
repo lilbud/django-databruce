@@ -131,8 +131,7 @@ class SongSelect2Filter(filters.FilterSet):
         ),
       )
       .filter(
-        Q(search=query),
-        rank__gt=0.1,
+        rank__gte=0.85,
       )
       .order_by("-rank")
     )
