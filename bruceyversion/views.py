@@ -121,15 +121,24 @@ class EntryDetailView(PageTitleMixin, TemplateView):
     context = super().get_context_data(**kwargs)
     context["title"] = self.title
 
-    context["entry"] = (
+    context["entry"] = get_object_or_404(
       bv_models.Entry.objects.select_related(
         "user",
         "event",
         "song",
-      )
-      .prefetch_related("entry_comment")
-      .get(uuid=self.kwargs["id"])
+      ).prefetch_related("entry_comment"),
+      uuid=self.kwargs["id"],
     )
+
+    # context["entry"] = (
+    #   bv_models.Entry.objects.select_related(
+    #     "user",
+    #     "event",
+    #     "song",
+    #   )
+    #   .prefetch_related("entry_comment")
+    #   .get(uuid=self.kwargs["id"])
+    # )
 
     if context["entry"].status == bv_models.Entry.ModerationStatus.PENDING:
       messages.warning(self.request, "This entry is awaiting moderation")

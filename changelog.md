@@ -493,3 +493,16 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Fixed
 
 - Advanced Search fixed with some odd queries, might need wider testing
+
+# v1.23 (September 22, 2026)
+
+## Added
+
+## Changed
+
+## Removed
+
+## Fixed
+
+- Fixed issue where invalid Bruceyversion entry would lead to an error instead of 404
+- Fixed N+1 Query issue on the blog main page due to a missing `.select_related()`.

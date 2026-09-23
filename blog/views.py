@@ -20,7 +20,11 @@ class Blog(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
     context = super().get_context_data(**kwargs)
-    posts = BlogPost.objects.all().order_by("-published_at", "-created_at")
+    posts = (
+      BlogPost.objects.all()
+      .select_related("author")
+      .order_by("-published_at", "-created_at")
+    )
     paginator = Paginator(posts, 10)
     page_number = self.request.GET.get("page", 1)
     context["page"] = paginator.get_page(page_number)
