@@ -69,7 +69,6 @@ event_table_columns = [
     'data': 'title',
     'name': 'title',
     'width': '15rem',
-    'className': 'min-desktop',
     'render': function (data, type, row, meta) {
       return row.event_status ? `<span class="text-danger fw-semibold">[${row.type[0]}] ${data || ''}</span>` : data
     },
@@ -102,6 +101,7 @@ function eventTable(url) {
     responsive: {
       details: false,
     },
+    autoWidth: false,
     pageLength: 100,
     columns: event_table_columns,
     order: [[1, 'asc']],

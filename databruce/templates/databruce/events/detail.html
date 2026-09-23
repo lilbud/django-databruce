@@ -145,7 +145,7 @@
                  role="tab"
                  aria-controls="stats"
                  aria-selected="false">Stats</a>
-              {% if articles|length > 0 %}
+              {% if event.event_article.all|length > 0 %}
                 <a class="nav-link text-sm"
                    id="article-tab"
                    data-bs-toggle="pill"
@@ -154,594 +154,595 @@
                    role="tab"
                    aria-controls="article"
                    aria-selected="false">Articles
-                  <span class="badge count-badge" id="count-badge">{{ articles|length }}</span>{% endif %}
-              </a>
-            </nav>
-          </div>
+                  <span class="badge count-badge" id="count-badge">{{ event.event_article.all|length }}</span>
+              {% endif %}
+            </a>
+          </nav>
         </div>
       </div>
     </div>
-    <!-- setlist and notes -->
-    {% if event.note %}
-      {% partialdef event-note %}
-        <div class="card">
-          <div class="card-header">
-            Notes
-            <i class="bi bi-pencil"></i>
-          </div>
-          <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
+  </div>
+  <!-- setlist and notes -->
+  {% if event.note %}
+    {% partialdef event-note %}
+      <div class="card">
+        <div class="card-header">
+          Notes
+          <i class="bi bi-pencil"></i>
         </div>
-      {% endpartialdef %}
-    {% endif %}
-    <div class="tab-content overflow-hidden" id="myTabContent">
-      <div class="tab-pane fade show active"
-           id="overview"
-           role="tabpanel"
-           aria-labelledby="overview-tab"
-           tabindex="0">
-        {% if not setlist_certainty and not event.note %}
-          <div class="row mb-3">
-            <div class="col-12">
-              <div class="card message info">
-                <span>
-                  We currently have no information available for this event. If you do, please <a class="text-reset fw-semibold" href="{% url "contact" %}">get in touch.</a>
-                </span>
+        <div class="card-body event-note">{{ event.note|markdown|safe|default_if_none:"" }}</div>
+      </div>
+    {% endpartialdef %}
+  {% endif %}
+  <div class="tab-content overflow-hidden" id="myTabContent">
+    <div class="tab-pane fade show active"
+         id="overview"
+         role="tabpanel"
+         aria-labelledby="overview-tab"
+         tabindex="0">
+      {% if not setlist_certainty and not event.note %}
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="card message info">
+              <span>
+                We currently have no information available for this event. If you do, please <a class="text-reset fw-semibold" href="{% url "contact" %}">get in touch.</a>
+              </span>
+            </div>
+          </div>
+        </div>
+      {% elif event.note %}
+        <div class="row mb-3 d-block d-xl-none">
+          <div class="col-12">{% partial event-note %}</div>
+        </div>
+      {% endif %}
+      <div class="row
+                  {% if setlist_certainty %}row-cols-xl-2 row-gap-3 gx-3{% endif %}">
+        {% if setlist_certainty %}
+          <div class="col-12 col-xl-9 order-1">
+            <div class="card">
+              <div class="card-header">
+                <div class="d-flex justify-content-between w-100">
+                  <span>Setlist</span>
+                  <span data-bs-toggle="tooltip"
+                        data-bs-html="true"
+                        data-bs-title="Setlist Options">
+                    <a role="button"
+                       class="btn btn-sm btn-primary icon-button collapse-toggle"
+                       data-bs-toggle="collapse"
+                       href="#options"
+                       aria-expanded="false"
+                       aria-controls="options">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-chevron-down collapse-icon"
+                           viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                      </svg>
+                    </a>
+                  </span>
+                </div>
+              </div>
+              <div class="collapse bg-highlight" id="options">
+                <div class="px-3 py-2 d-flex gap-2">
+                  <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
+                  <button id="download-btn"
+                          class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
+                </div>
+              </div>
+              <div class="card-body p-0" id="setlistCard">
+                <div class="table-responsive">
+                  <table class="table table-hover display nowrap" id="setlistTable">
+                    <thead>
+                      <tr>
+                        <th class="song_num">#</th>
+                        <th class="song">Song</th>
+                        <th class="gap min-tablet-l">Gap</th>
+                        <th class="tour_num min-tablet-l">Tour</th>
+                        <th class="last_event min-tablet-l">Last</th>
+                        <th class="notes min-desktop">Note</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        {% elif event.note %}
-          <div class="row mb-3 d-block d-xl-none">
-            <div class="col-12">{% partial event-note %}</div>
-          </div>
         {% endif %}
-        <div class="row
-                    {% if setlist_certainty %}row-cols-xl-2 row-gap-3 gx-3{% endif %}">
+        <div class="col-12 d-flex flex-column gap-3
+                    {% if setlist_certainty %}col-xl-3 gap-3{% endif %}
+                    order-2">
+          {% if event.note %}
+            <div class="d-none d-xl-block">{% partial event-note %}</div>
+          {% endif %}
+          <div class="row g-3">
+            {% if start_time or scheduled_time or event.length %}
+              <div class="col-12 col-md-6 col-xl-12">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <span class="d-flex gap-2">Set Times</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="row row-cols-2 row-cols-md-4 row-cols-xl-2 h-100 justify-content-between g-2">
+                      <div class="col">
+                        <div class="card info-card h-100 text-center justify-content-center">
+                          <div class="info-card-title">Scheduled</div>
+                          <div class="info-card-value">{{ scheduled_time|default_if_none:"-" }}</div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card info-card h-100 text-center justify-content-center">
+                          <div class="info-card-title">Start</div>
+                          <div class="info-card-value">{{ start_time|default_if_none:"-" }}</div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card info-card h-100 text-center justify-content-center">
+                          <div class="info-card-title">End</div>
+                          <div class="info-card-value">{{ end_time|default_if_none:"-" }}</div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="card info-card h-100 text-center justify-content-center">
+                          <div class="info-card-title">Length</div>
+                          <div class="info-card-value d-flex-inline justify-content-center text-center align-items-center gap-1">
+                            {% if event.length %}
+                              {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
+                                <span data-bs-toggle="tooltip"
+                                      data-bs-title="{% if event.rank_stats.length_rank == 1 %} Longest Show to Date {% else %} {{ event.rank_stats.length_rank|ordinal }} longest show {% endif %}"
+                                      class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"h:i:s" }}</span>
+                              {% else %}
+                                <span>{{ event.length|time:"h:i:s" }}</span>
+                              {% endif %}
+                            {% else %}
+                              -
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+            {% if event.public %}
+              <div class="col-12 col-md-6 col-xl-12">
+                <div class="card h-100">
+                  <div class="card-body px-3 py-0">
+                    <div class="row gx-2">
+                      <div class="col py-3">
+                        <a type="button"
+                           class="text-reset"
+                           data-bs-toggle="modal"
+                           data-bs-target="#userReviewModal">
+                          <div class="text-xs text-muted text-reset">Rating</div>
+                          <div class="text-lg fw-medium">{{ review_score|default_if_none:"0" }} / 5</div>
+                          <div class="text-muted text-3xs mb-2">{{ event.event_reviews.all|length }} Review{{ event.event_reviews.all|pluralize }}</div>
+                        </a>
+                        {% if user.is_authenticated %}
+                          {% if not user_review %}
+                            <button id="reviewshow"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#userAddReviewModal"
+                                    type="submit"
+                                    name="submit"
+                                    class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
+                          {% else %}
+                            <button id="reviewshow"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#userAddReviewModal"
+                                    type="submit"
+                                    name="submit"
+                                    class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
+                          {% endif %}
+                        {% else %}
+                          <span data-bs-toggle="tooltip"
+                                data-bs-title="You must be logged in to review a show">
+                            <a role="button"
+                               href="{% url 'login' %}?next={{ request.path }}"
+                               class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</a>
+                          </span>
+                        {% endif %}
+                      </div>
+                      <span class="vr p-0"></span>
+                      <div class="col py-3">
+                        <a type="button"
+                           data-bs-toggle="modal"
+                           data-bs-target="#userListModal"
+                           class="text-reset">
+                          <div class="text-xs text-muted">Users Present</div>
+                          <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list.count }}</div>
+                        </a>
+                        {% if user.is_authenticated %}
+                          <form method="post" id="userForm">
+                            {% csrf_token %}
+                            <button id="addshow"
+                                    type="submit"
+                                    name="submit"
+                                    {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
+                                    class="btn btn-sm text-xs w-100 text-nowrap
+                                           {% if user_attended %}
+                                             btn-success
+                                           {% else %}
+                                             btn-neutral
+                                           {% endif %}
+                                           icon-button">
+                              <i class="bi
+                                        {% if user_attended %}
+                                          bi-star-fill
+                                        {% else %}
+                                          bi-star
+                                        {% endif %}"
+                                 id="star"></i>
+                              <span id="attended">
+                                {% if user_attended %}
+                                  <span class="default-text">Attended</span>
+                                  <span class="hover-text">Remove?</span>
+                                {% else %}
+                                  <span class="default-text">Attended?</span>
+                                  <span class="hover-text">Remove?</span>
+                                {% endif %}
+                              </span>
+                            </button>
+                          </form>
+                        {% elif not user.is_authenticated %}
+                          <span data-bs-toggle="tooltip"
+                                data-bs-title="You must be logged in to add a show">
+                            <a role="button"
+                               href="{% url 'login' %}?next={{ request.path }}"
+                               class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Attended?</a>
+                          </span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
           {% if setlist_certainty %}
-            <div class="col-12 col-xl-9 order-1">
+            <div class="col-12">
               <div class="card">
                 <div class="card-header">
-                  <div class="d-flex justify-content-between w-100">
-                    <span>Setlist</span>
-                    <span data-bs-toggle="tooltip"
-                          data-bs-html="true"
-                          data-bs-title="Setlist Options">
-                      <a role="button"
-                         class="btn btn-sm btn-primary icon-button collapse-toggle"
-                         data-bs-toggle="collapse"
-                         href="#options"
-                         aria-expanded="false"
-                         aria-controls="options">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             class="bi bi-chevron-down collapse-icon"
-                             viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
-                        </svg>
-                      </a>
-                    </span>
-                  </div>
+                  Albums
+                  <span class="text-sm my-auto"
+                        data-bs-toggle="tooltip"
+                        data-bs-html="true"
+                        data-bs-title="Expand/Collapse All Rows">
+                    <a role="button"
+                       id="album-breakdown-btn"
+                       class="btn btn-sm btn-primary icon-button px-1"
+                       data-bs-toggle="collapse">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-three-dots"
+                           viewBox="0 0 16 16">
+                        <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                      </svg>
+                    </a>
+                  </span>
                 </div>
-                <div class="collapse bg-highlight" id="options">
-                  <div class="px-3 py-2 d-flex gap-2">
-                    <button id="copySetlist" class="btn btn-sm btn-primary text-xs px-2 py-1">Copy Setlist</button>
-                    <button id="download-btn"
-                            class="btn btn-primary btn-sm icon-button text-xs px-2 py-1">Download</button>
-                  </div>
+                <div class="card-body p-0" id="albums"></div>
+              </div>
+            </div>
+          {% endif %}
+          {% if event.event_tag.all %}
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <span>Tags</span>
+                  <i class="bi bi-tag"></i>
                 </div>
-                <div class="card-body p-0" id="setlistCard">
-                  <div class="table-responsive">
-                    <table class="table table-hover display nowrap" id="setlistTable">
-                      <thead>
-                        <tr>
-                          <th class="song_num">#</th>
-                          <th class="song">Song</th>
-                          <th class="gap min-tablet-l">Gap</th>
-                          <th class="tour_num min-tablet-l">Tour</th>
-                          <th class="last_event min-tablet-l">Last</th>
-                          <th class="notes min-desktop">Note</th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
+                <div class="card-body p-2" id="tags">
+                  {% for tag in event.event_tag.all %}
+                    <a href="{% url "events_by_tag" slug=tag.tag.slug %}">
+                      <span class="badge badge-primary tag-badge">{{ tag.tag.slug }}</span></a>
+                  {% endfor %}
                 </div>
               </div>
             </div>
           {% endif %}
-          <div class="col-12 d-flex flex-column gap-3
-                      {% if setlist_certainty %}col-xl-3 gap-3{% endif %}
-                      order-2">
-            {% if event.note %}
-              <div class="d-none d-xl-block">{% partial event-note %}</div>
-            {% endif %}
-            <div class="row g-3">
-              {% if start_time or scheduled_time %}
-                <div class="col-12 col-md-6 col-xl-12">
-                  <div class="card h-100">
-                    <div class="card-header">
-                      <span class="d-flex gap-2">Set Times</span>
-                    </div>
-                    <div class="card-body">
-                      <div class="row row-cols-2 row-cols-md-4 row-cols-xl-2 h-100 justify-content-between g-2">
-                        <div class="col">
-                          <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="info-card-title">Scheduled</div>
-                            <div class="info-card-value">{{ scheduled_time|default_if_none:"-" }}</div>
-                          </div>
-                        </div>
-                        <div class="col">
-                          <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="info-card-title">Start</div>
-                            <div class="info-card-value">{{ start_time|default_if_none:"-" }}</div>
-                          </div>
-                        </div>
-                        <div class="col">
-                          <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="info-card-title">End</div>
-                            <div class="info-card-value">{{ end_time|default_if_none:"-" }}</div>
-                          </div>
-                        </div>
-                        <div class="col">
-                          <div class="card info-card h-100 text-center justify-content-center">
-                            <div class="info-card-title">Length</div>
-                            <div class="info-card-value d-flex-inline justify-content-center text-center align-items-center gap-1">
-                              {% if event.length %}
-                                {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
-                                  <span data-bs-toggle="tooltip"
-                                        data-bs-title="{% if event.rank_stats.length_rank == 1 %} Longest Show to Date {% else %} {{ event.rank_stats.length_rank|ordinal }} longest show {% endif %}"
-                                        class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"h:i:s" }}</span>
-                                {% else %}
-                                  <span>{{ event.length|time:"h:i:s" }}</span>
-                                {% endif %}
-                              {% else %}
-                                -
-                              {% endif %}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
-              {% if event.public %}
-                <div class="col-12 col-md-6 col-xl-12">
-                  <div class="card h-100">
-                    <div class="card-body px-3 py-0">
-                      <div class="row gx-2">
-                        <div class="col py-3">
-                          <a type="button"
-                             class="text-reset"
-                             data-bs-toggle="modal"
-                             data-bs-target="#userReviewModal">
-                            <div class="text-xs text-muted text-reset">Rating</div>
-                            <div class="text-lg fw-medium">{{ review_score|default_if_none:"0" }} / 5</div>
-                            <div class="text-muted text-3xs mb-2">{{ event.event_reviews.all|length }} Review{{ event.event_reviews.all|pluralize }}</div>
-                          </a>
-                          {% if user.is_authenticated %}
-                            {% if not user_review %}
-                              <button id="reviewshow"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#userAddReviewModal"
-                                      type="submit"
-                                      name="submit"
-                                      class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
-                            {% else %}
-                              <button id="reviewshow"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#userAddReviewModal"
-                                      type="submit"
-                                      name="submit"
-                                      class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
-                            {% endif %}
-                          {% else %}
-                            <span data-bs-toggle="tooltip"
-                                  data-bs-title="You must be logged in to review a show">
-                              <a role="button"
-                                 href="{% url 'login' %}?next={{ request.path }}"
-                                 class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</a>
-                            </span>
-                          {% endif %}
-                        </div>
-                        <span class="vr p-0"></span>
-                        <div class="col py-3">
-                          <a type="button"
-                             data-bs-toggle="modal"
-                             data-bs-target="#userListModal"
-                             class="text-reset">
-                            <div class="text-xs text-muted">Users Present</div>
-                            <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list.count }}</div>
-                          </a>
-                          {% if user.is_authenticated %}
-                            <form method="post" id="userForm">
-                              {% csrf_token %}
-                              <button id="addshow"
-                                      type="submit"
-                                      name="submit"
-                                      {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
-                                      class="btn btn-sm text-xs w-100 text-nowrap
-                                             {% if user_attended %}
-                                               btn-success
-                                             {% else %}
-                                               btn-neutral
-                                             {% endif %}
-                                             icon-button">
-                                <i class="bi
-                                          {% if user_attended %}
-                                            bi-star-fill
-                                          {% else %}
-                                            bi-star
-                                          {% endif %}"
-                                   id="star"></i>
-                                <span id="attended">
-                                  {% if user_attended %}
-                                    <span class="default-text">Attended</span>
-                                    <span class="hover-text">Remove?</span>
-                                  {% else %}
-                                    <span class="default-text">Attended?</span>
-                                    <span class="hover-text">Remove?</span>
-                                  {% endif %}
-                                </span>
-                              </button>
-                            </form>
-                          {% elif not user.is_authenticated %}
-                            <span data-bs-toggle="tooltip"
-                                  data-bs-title="You must be logged in to add a show">
-                              <a role="button"
-                                 href="{% url 'login' %}?next={{ request.path }}"
-                                 class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Attended?</a>
-                            </span>
-                          {% endif %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
-            </div>
-            {% if setlist_certainty %}
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-header">
-                    Albums
-                    <span class="text-sm my-auto"
-                          data-bs-toggle="tooltip"
-                          data-bs-html="true"
-                          data-bs-title="Expand/Collapse All Rows">
-                      <a role="button"
-                         id="album-breakdown-btn"
-                         class="btn btn-sm btn-primary icon-button px-1"
-                         data-bs-toggle="collapse">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             class="bi bi-three-dots"
-                             viewBox="0 0 16 16">
-                          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                        </svg>
-                      </a>
-                    </span>
-                  </div>
-                  <div class="card-body p-0" id="albums"></div>
-                </div>
-              </div>
-            {% endif %}
-            {% if event.event_tag.all %}
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-header">
-                    <span>Tags</span>
-                    <i class="bi bi-tag"></i>
-                  </div>
-                  <div class="card-body p-2" id="tags">
-                    {% for tag in event.event_tag.all %}
-                      <a href="{% url "events_by_tag" slug=tag.tag.slug %}">
-                        <span class="badge badge-primary tag-badge">{{ tag.tag.slug }}</span></a>
-                    {% endfor %}
-                  </div>
-                </div>
-              </div>
-            {% endif %}
-          </div>
         </div>
       </div>
-      <div class="tab-pane fade"
-           id="onstage"
-           role="tabpanel"
-           aria-labelledby="onstage-tab"
-           tabindex="1">
-        <div class="col-12 overflow-hidden">
-          <div class="card">
-            <div class="card-header">Onstage</div>
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover display nowrap" id="onstageTable">
-                  <thead>
-                    <th class="all">Guest</th>
-                    <th class="all">Person</th>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade"
-           id="notes"
-           role="tabpanel"
-           aria-labelledby="notes-tab"
-           tabindex="2">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">Notes</div>
-            <div class="card-body"></div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade"
-           id="links"
-           role="tabpanel"
-           aria-labelledby="links-tab"
-           tabindex="3">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">Links</div>
-            <div class="card-body p-3">
-              {% if event.archive_links.count > 0 %}
-                <div class="text-sm">Radio Nowhere:</div>
-                <ul>
-                  {% for link in event.archive_links.all %}
-                    <li>
-                      <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-              {% if event.release_event.all %}
-                <div class="text-sm">Released In Full On:</div>
-                <ul>
-                  {% for release in event.release_event.all %}
-                    <li>
-                      <a href="{% url "release_details" id=release.uuid %}">{{ release.name }}</a>
-                      <span>({{ release.date }})</span>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-              {% if event.release_track_event.all and not event.release_event %}
-                {% regroup event.release_track_event.all by release as release_list %}
-                <div class="text-sm mb-2 fw-semibold">Included On:</div>
-                {% for release in release_list %}
-                  <div class="text-sm ms-3">{{ release.grouper }}</div>
-                  <ul>
-                    {% for track in release.list %}
-                      <li>{{ track.song.name }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endfor %}
-              {% endif %}
-              {% if event.brucebase_url or event.nugs_event.all.0 %}
-                <ul class="ps-3">
-                  {% if event.brucebase_url %}
-                    <li class="ps-0">
-                      <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
-                    </li>
-                  {% endif %}
-                  {% if event.nugs_event.all.0 %}
-                    <li class="ps-0">
-                      <a href="{{ event.nugs_event.all.0.url }}">Nugs Release</a>
-                    </li>
-                  {% endif %}
-                </ul>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade"
-           id="stats"
-           role="tabpanel"
-           aria-labelledby="stats-tab"
-           tabindex="2">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">Stats</div>
-            <div class="card-body d-grid">
-              <div class="row mb-2">
-                <div class="col">
-                  <div class="card divider">
-                    <div class="card-body text-center fw-semibold text-base p-1">Show Stats</div>
-                  </div>
-                </div>
-              </div>
-              <div class="row row-cols-1 row-cols-md-2 row-cols-md-3 row-cols-lg-6 g-2 mb-3">
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Tour</div>
-                    <div class="value">
-                      {% if event.rank_stats.tour_num %}
-                        {{ event.rank_stats.tour_num }} of {{ event.rank_stats.tour_total }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Tour Leg</div>
-                    <div class="value">
-                      {% if event.leg %}
-                        {{ event.rank_stats.tour_leg_num }} of {{ event.rank_stats.tour_leg_total }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Venue</div>
-                    <div class="value">
-                      {% if event.rank_stats.venue_num %}
-                        {{ event.rank_stats.venue_num }} of {{ event.rank_stats.venue_total }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">City</div>
-                    <div class="value">
-                      {% if event.rank_stats.city_num %}
-                        {{ event.rank_stats.city_num }} of {{ event.rank_stats.city_total }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Run</div>
-                    <div class="value">
-                      {% if event.rank_stats.run_num %}
-                        {{ event.rank_stats.run_num }} of {{ event.rank_stats.run_total }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Length Rank</div>
-                    <div class="value">
-                      {% if event.rank_stats.length_rank %}
-                        #{{ event.rank_stats.length_rank }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col">
-                  <div class="card divider">
-                    <div class="card-body text-center fw-semibold text-base p-1">Box Office Stats</div>
-                  </div>
-                </div>
-              </div>
-              <div class="row row-cols-1 row-cols-md-2 row-cols-xl-6 g-2">
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Tickets Sold / Total</div>
-                    <div class="value">
-                      {% if event.sales %}
-                        {{ event.sales|intcomma }}
-                      {% elif event.run.total_sales %}
-                        {{ event.run.total_sales|intcomma }}
-                      {% else %}
-                        -
-                      {% endif %}
-                      /
-                      {% if event.capacity %}
-                        {{ event.capacity|intcomma }}
-                      {% elif event.run.total_capacity %}
-                        {{ event.run.total_capacity|intcomma }}
-                      {% elif event.sellout %}
-                        {{ event.sales|intcomma }}
-                      {% elif event.run.sellout %}
-                        {{ event.run.total_sales|intcomma }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                    {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Gross</div>
-                    <div class="value">
-                      {% if event.gross %}
-                        {{ event.gross|currency }}
-                      {% elif event.run.total_gross %}
-                        {{ event.run.total_gross|currency }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                    {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Ticket Price Range</div>
-                    <div class="value">{{ ticket_range|default_if_none:"-" }}</div>
-                    {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Promoter</div>
-                    <div class="value">
-                      {% if event.run.promo_company %}
-                        {{ event.run.promo_company }}
-                      {% else %}
-                        {{ event.promo_company|default_if_none:"-" }}
-                      {% endif %}
-                    </div>
-                    {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card info-card">
-                    <div class="title">Source</div>
-                    <div class="value">
-                      {% if event.run.box_office_source %}
-                        {{ event.run.box_office_source }}
-                      {% elif event.box_office_source %}
-                        {{ event.box_office_source }}
-                      {% else %}
-                        -
-                      {% endif %}
-                    </div>
-                    {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade"
-           id="articles"
-           role="tabpanel"
-           aria-labelledby="article-tab"
-           tabindex="5">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <ul>
-                {% for article in event.event_article.all %}
-                  <li class="text-sm">
-                    <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
-                    ({{ article.source }})
-                    <span class="fw-semibold">[{{ article.get_category_display }}]</span>
-                  </li>
-                {% endfor %}
-              </ul>
+    </div>
+    <div class="tab-pane fade"
+         id="onstage"
+         role="tabpanel"
+         aria-labelledby="onstage-tab"
+         tabindex="1">
+      <div class="col-12 overflow-hidden">
+        <div class="card">
+          <div class="card-header">Onstage</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover display nowrap" id="onstageTable">
+                <thead>
+                  <th class="all">Guest</th>
+                  <th class="all">Person</th>
+                </thead>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="tab-pane fade"
+         id="notes"
+         role="tabpanel"
+         aria-labelledby="notes-tab"
+         tabindex="2">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">Notes</div>
+          <div class="card-body"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade"
+         id="links"
+         role="tabpanel"
+         aria-labelledby="links-tab"
+         tabindex="3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">Links</div>
+          <div class="card-body p-3">
+            {% if event.archive_links.count > 0 %}
+              <div class="text-sm">Radio Nowhere:</div>
+              <ul>
+                {% for link in event.archive_links.all %}
+                  <li>
+                    <a href="https://archive.org/details/{{ link }}">{{ link }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            {% if event.release_event.all %}
+              <div class="text-sm">Released In Full On:</div>
+              <ul>
+                {% for release in event.release_event.all %}
+                  <li>
+                    <a href="{% url "release_details" id=release.uuid %}">{{ release.name }}</a>
+                    <span>({{ release.date }})</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            {% if event.release_track_event.all and not event.release_event %}
+              {% regroup event.release_track_event.all by release as release_list %}
+              <div class="text-sm mb-2 fw-semibold">Included On:</div>
+              {% for release in release_list %}
+                <div class="text-sm ms-3">{{ release.grouper }}</div>
+                <ul>
+                  {% for track in release.list %}
+                    <li>{{ track.song.name }}</li>
+                  {% endfor %}
+                </ul>
+              {% endfor %}
+            {% endif %}
+            {% if event.brucebase_url or event.nugs_event.all.0 %}
+              <ul class="ps-3">
+                {% if event.brucebase_url %}
+                  <li class="ps-0">
+                    <a href="https://brucebase.wikidot.com/{{ event.event_id|brucebase_url }}">Brucebase</a>
+                  </li>
+                {% endif %}
+                {% if event.nugs_event.all.0 %}
+                  <li class="ps-0">
+                    <a href="{{ event.nugs_event.all.0.url }}">Nugs Release</a>
+                  </li>
+                {% endif %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade"
+         id="stats"
+         role="tabpanel"
+         aria-labelledby="stats-tab"
+         tabindex="2">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">Stats</div>
+          <div class="card-body d-grid">
+            <div class="row mb-2">
+              <div class="col">
+                <div class="card divider">
+                  <div class="card-body text-center fw-semibold text-base p-1">Show Stats</div>
+                </div>
+              </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-md-3 row-cols-lg-6 g-2 mb-3">
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Tour</div>
+                  <div class="value">
+                    {% if event.rank_stats.tour_num %}
+                      {{ event.rank_stats.tour_num }} of {{ event.rank_stats.tour_total }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Tour Leg</div>
+                  <div class="value">
+                    {% if event.leg %}
+                      {{ event.rank_stats.tour_leg_num }} of {{ event.rank_stats.tour_leg_total }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Venue</div>
+                  <div class="value">
+                    {% if event.rank_stats.venue_num %}
+                      {{ event.rank_stats.venue_num }} of {{ event.rank_stats.venue_total }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">City</div>
+                  <div class="value">
+                    {% if event.rank_stats.city_num %}
+                      {{ event.rank_stats.city_num }} of {{ event.rank_stats.city_total }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Run</div>
+                  <div class="value">
+                    {% if event.rank_stats.run_num %}
+                      {{ event.rank_stats.run_num }} of {{ event.rank_stats.run_total }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Length Rank</div>
+                  <div class="value">
+                    {% if event.rank_stats.length_rank %}
+                      #{{ event.rank_stats.length_rank }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col">
+                <div class="card divider">
+                  <div class="card-body text-center fw-semibold text-base p-1">Box Office Stats</div>
+                </div>
+              </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-6 g-2">
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Tickets Sold / Total</div>
+                  <div class="value">
+                    {% if event.sales %}
+                      {{ event.sales|intcomma }}
+                    {% elif event.run.total_sales %}
+                      {{ event.run.total_sales|intcomma }}
+                    {% else %}
+                      -
+                    {% endif %}
+                    /
+                    {% if event.capacity %}
+                      {{ event.capacity|intcomma }}
+                    {% elif event.run.total_capacity %}
+                      {{ event.run.total_capacity|intcomma }}
+                    {% elif event.sellout %}
+                      {{ event.sales|intcomma }}
+                    {% elif event.run.sellout %}
+                      {{ event.run.total_sales|intcomma }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                  {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Gross</div>
+                  <div class="value">
+                    {% if event.gross %}
+                      {{ event.gross|currency }}
+                    {% elif event.run.total_gross %}
+                      {{ event.run.total_gross|currency }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                  {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Ticket Price Range</div>
+                  <div class="value">{{ ticket_range|default_if_none:"-" }}</div>
+                  {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Promoter</div>
+                  <div class="value">
+                    {% if event.run.promo_company %}
+                      {{ event.run.promo_company }}
+                    {% else %}
+                      {{ event.promo_company|default_if_none:"-" }}
+                    {% endif %}
+                  </div>
+                  {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
+                </div>
+              </div>
+              <div class="col">
+                <div class="card info-card">
+                  <div class="title">Source</div>
+                  <div class="value">
+                    {% if event.run.box_office_source %}
+                      {{ event.run.box_office_source }}
+                    {% elif event.box_office_source %}
+                      {{ event.box_office_source }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                  {% if event.run %}<small>Across All Shows on Run</small>{% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade"
+         id="articles"
+         role="tabpanel"
+         aria-labelledby="article-tab"
+         tabindex="5">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <ul>
+              {% for article in event.event_article.all %}
+                <li class="text-sm">
+                  <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
+                  ({{ article.source }})
+                  <span class="fw-semibold">[{{ article.get_category_display }}]</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
   <div class="modal fade"
        id="userListModal"
@@ -907,9 +908,9 @@
         createdRow: function(row, data) {
           $(row).attr('data-set-name', slugify(data.set_name));
 
-          var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+          var notAllowedSets = ['Soundcheck']
 
-          if (allowedSets.includes(data.set_name)) {
+          if (!notAllowedSets.includes(data.set_name)) {
             $(row).attr('data-album', data.song.category_slug);
           }
 

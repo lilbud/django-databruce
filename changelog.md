@@ -496,13 +496,25 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.23 (September 22, 2026)
 
+## Fixed
+
+- Fixed issue where invalid Bruceyversion entry would lead to an error instead of 404
+- Fixed N+1 Query issue on the blog main page due to a missing `.select_related()`.
+
+# v1.24 (September 23, 2026)
+
 ## Added
 
+- Added Nugs Release essays written by Erik Flannigan, pulled from Nugs blog
+- Added lengths to Nugs Releases, pulled from Nugs API
+- Added show lengths to shows with a Nugs Release. While these are mostly correct for post-Reunion shows, pre-Reunion might be off since the recordings don't account for set break/intermission (which are of an unknown length).
+
 ## Changed
+
+- Changed several Public Rehearsal shows to have "Public Rehearsal" as the set name for the whole show.
 
 ## Removed
 
 ## Fixed
 
-- Fixed issue where invalid Bruceyversion entry would lead to an error instead of 404
-- Fixed N+1 Query issue on the blog main page due to a missing `.select_related()`.
+- Fixed home page setlist notes not joining with semicolon

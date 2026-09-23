@@ -3,6 +3,7 @@ import datetime
 import markdown
 import nh3
 from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from rest_framework import serializers
 
@@ -820,16 +821,40 @@ class CoversSerializer(BaseSerializer):
 
 
 class NugsSerializer(BaseSerializer):
-  event = EventsSerializer(include=["id", "event_id", "venue", "date", "early_late"])
-  city = MinimalCitiesSerializer(required=False, source="event.venue.city")
+  event = EventsSerializer(include=["event_id", "venue", "date", "early_late"])
+  city = serializers.SerializerMethodField(required=False)
+
+  def get_city(self, obj):
+    try:
+      return get_formatted_city(obj.event.venue.city)
+    except AttributeError:
+      return None
+
   category = serializers.SerializerMethodField()
+  article = serializers.SerializerMethodField(required=False)
+
+  def get_article(self, obj):
+    if not obj.article:
+      return None
+
+    return reverse_lazy("library:article_detail", args=[obj.article.slug])
 
   def get_category(self, obj):
     return obj.get_category_display()
 
   class Meta:
     model = models.NugsRelease
-    fields = ["id", "event", "date", "city", "url", "name", "category"]
+    fields = [
+      "id",
+      "event",
+      "date",
+      "city",
+      "url",
+      "name",
+      "category",
+      "article",
+      "length",
+    ]
 
 
 class RelationAliasSerializer(serializers.ModelSerializer):

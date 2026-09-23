@@ -765,6 +765,17 @@ class NugsRelease(BaseModel):
     choices=Category.choices,
   )
 
+  article = models.ForeignKey(
+    to="library.Article",
+    on_delete=models.SET_NULL,
+    db_column="article_id",
+    related_name="article",
+    blank=True,
+    null=True,
+  )
+
+  length = models.TimeField(default=None, blank=True)
+
   class Meta:
     db_table = "nugs_releases"
     verbose_name = "nugs release"
@@ -1217,6 +1228,7 @@ class SetType(models.TextChoices):
   SHOW = "Show", _("Show")
   RECORDING = "Recording", _("Recording")
   REHEARSAL = "Rehearsal", _("Rehearsal")
+  PUBLIC_REHEARSAL = "Public Rehearsal", _("Public Rehearsal")
 
   @classmethod
   def valid_sets(cls) -> list[str]:
@@ -1227,7 +1239,7 @@ class SetType(models.TextChoices):
       cls.ENCORE,
       cls.PRE_SHOW,
       cls.POST_SHOW,
-      cls.REHEARSAL,
+      cls.PUBLIC_REHEARSAL,
     ]
 
 

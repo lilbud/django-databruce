@@ -662,8 +662,12 @@
   }
 
   .count-badge {
-    background-color: var(--color-white) !important;
-    color: var(--color-black) !important;
+    background-color: var(--color-black) !important;
+    color: var(--color-white) !important;
+  }
+
+  .active .count-badge {
+    background-color: var(--color-blue-500) !important;
   }
 
   /* colors */

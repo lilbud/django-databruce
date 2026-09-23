@@ -520,6 +520,7 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
     )
     .prefetch_related(
       "event__venue__city__state",
+      "article",
     )
   ).order_by("-date")
 
