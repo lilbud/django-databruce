@@ -556,11 +556,11 @@ td .badge {
   padding: .2rem .4rem !important;
 }
 
-.bi.bi-check-lg {
+/* .bi.bi-check-lg {
   height: 14px !important;
   width: 14px !important;
   font-size: var(--text-sm) !important;
-}
+} */
 
 /* font size clamp for event header. Inspired by WTED Archives */
 .event-header-date {
@@ -843,6 +843,19 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   color: white !important;
 }
 
+.navbar .nav-item,
+.navbar .nav-item .btn,
+.navbar button.dropdown-toggle {
+  color: var(--color-white) !important;
+}
+
+.navbar .btn.active,
+.navbar .btn:hover,
+.navbar .btn:hover i,
+.navbar .btn.active i {
+  color: var(--color-black) !important;
+}
+
 .icon-button {
   display: inline-flex;
   justify-content: center;
@@ -1047,9 +1060,7 @@ button {
   opacity: 0;
   visibility: hidden;
   overflow-y: scroll;
-  /* border-radius: var(--bs-border-radius) !important; */
-  border-top-left-radius: 0px !important;
-  border-top-right-radius: 0px !important;
+  border-radius: var(--bs-border-radius) !important;
   padding: 0.3rem !important;
   overflow-x: hidden;
   transform: translateY(2px);
@@ -1286,6 +1297,12 @@ pre {
   .dt-container .dropdown-toggle {
     max-width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  .dropdown-toggle.show {
+    color: var(--color-white) !important;
+    background-color: var(--color-blue-800) !important;
+    border-color: var(--color-blue-800) !important;
   }
 
   .dt-container input[type="search"] {
@@ -1661,4 +1678,14 @@ html {
   display: flex !important;
   gap: 0.25rem !important;
   align-items: center !important;
+}
+
+#djDebugPanelList a,
+#djDebugPanelList a small {
+  color: white !important;
+}
+
+#djDebugPanelList a:hover,
+#djDebugPanelList a:hover small {
+  color: black !important;
 }

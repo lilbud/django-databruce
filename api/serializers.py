@@ -522,7 +522,7 @@ class EventSetlistSerializer(BaseSerializer):
 
   class Meta:
     model = models.Setlist
-    fields = ["song", "song_num", "debut", "premiere", "set_name", "segue"]
+    fields = ["song", "debut", "premiere", "set_name", "segue"]
 
 
 class EventTypesSerializer(BaseSerializer):
@@ -1314,7 +1314,10 @@ class SetlistSongsSerializer(BaseSerializer):
 
       self._event_cache = {e.event_id: MinimalEventSerializer(e).data for e in events}
       self._song_cache = {
-        s.id: MinimalSongsSerializer(s, include=["name", "slug", "category"]).data
+        s.id: MinimalSongsSerializer(
+          s,
+          include=["name", "slug"],
+        ).data
         for s in songs
       }
 
@@ -1336,6 +1339,41 @@ class SetlistSongsSerializer(BaseSerializer):
       "count",
       "first_event",
       "last_event",
+    ]
+
+
+class SetlistSongCountSerializer(BaseSerializer):
+  count = serializers.IntegerField(required=False)
+  song = serializers.SerializerMethodField(required=False)
+
+  def to_representation(self, instance):
+    if isinstance(self.instance, list) and not hasattr(self, "_song_cache"):
+      song_ids = set()
+
+      for obj in self.instance:
+        if obj["song_id"]:
+          song_ids.add(obj["song_id"])
+
+      songs = models.Song.objects.filter(id__in=song_ids)
+
+      self._song_cache = {
+        s.id: MinimalSongsSerializer(
+          s,
+          include=["name", "slug"],
+        ).data
+        for s in songs
+      }
+
+    return super().to_representation(instance)
+
+  def get_song(self, obj):
+    return self._song_cache.get(obj["song_id"])
+
+  class Meta:
+    model = models.Setlist
+    fields = [
+      "song",
+      "count",
     ]
 
 

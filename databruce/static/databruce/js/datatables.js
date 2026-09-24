@@ -158,6 +158,7 @@ $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pil
       visible: true,
       api: true
     });
+
     tables.columns.adjust();
 
     if (tables.responsive) {

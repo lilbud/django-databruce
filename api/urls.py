@@ -90,6 +90,11 @@ router.register(
   basename="setlist_songs",
 )
 router.register(
+  r"setlist_song_count",
+  views.SetlistSongCountViewSet,
+  basename="setlist_song_count",
+)
+router.register(
   r"setlist_breakdown",
   views.SetlistBreakdown,
   basename="setlist_breakdown",

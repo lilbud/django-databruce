@@ -673,25 +673,39 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
     queryset = (
-      db_models.Setlist.objects.filter(filter)
-      .select_related("song", "event")
-      .prefetch_related("song__first_event", "song__last_event")
-      .all()
+      db_models.Setlist.objects.filter(filter).select_related("song", "event").all()
     )
 
-    queryset = (
-      queryset.values("song_id")
-      .annotate(
-        count=Count("id", distinct=True),
-        first_event=Min("event__event_id"),
-        last_event=Max("event__event_id"),
-      )
-      .order_by("-count")
+    queryset = queryset.values("song_id").annotate(
+      count=Count("id", distinct=True),
+      first_event=Min("event__event_id"),
+      last_event=Max("event__event_id"),
     )
 
     return self.filter_queryset(queryset)  # type: ignore
 
   serializer_class = api_serializers.SetlistSongsSerializer
+  filterset_class = api_filters.SetlistSongsFilter
+  ordering_fields = ["count"]
+
+
+class SetlistSongCountViewSet(viewsets.ReadOnlyModelViewSet):
+  def get_queryset(self):
+    filter = Q(
+      set_name__in=db_models.SetType.valid_sets(),
+      event__public=True,
+      nobruce=False,
+    )
+
+    queryset = db_models.Setlist.objects.filter(filter).select_related("song", "event")
+
+    queryset = queryset.values("song_id").annotate(
+      count=Count("id", distinct=True),
+    )
+
+    return self.filter_queryset(queryset)  # type: ignore
+
+  serializer_class = api_serializers.SetlistSongCountSerializer
   filterset_class = api_filters.SetlistSongsFilter
   ordering_fields = ["count"]
 

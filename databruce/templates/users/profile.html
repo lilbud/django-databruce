@@ -37,7 +37,7 @@
           <div class="info-card-title">First Show</div>
           <div class="info-card-value">
             {% if first_event %}
-              <a href="{% url 'event_details' id=first_event.event_id %}">{{ first_event }}</a>
+              <a href="{% url 'event_details' id=first_event.event.event_id %}">{{ first_event.event.get_date }}</a>
             {% else %}
               N/A
             {% endif %}
@@ -49,7 +49,7 @@
           <div class="info-card-title">Latest Show</div>
           <div class="info-card-value" id="user-last-show">
             {% if last_event %}
-              <a href="{% url 'event_details' id=last_event.event_id %}">{{ last_event }}</a>
+              <a href="{% url 'event_details' id=last_event.event.event_id %}">{{ last_event.event.get_date }}</a>
             {% else %}
               N/A
             {% endif %}
@@ -60,6 +60,16 @@
     <div class="row mb-3">
       <div class="col">
         <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
+          <li class="nav-item active" role="presentation">
+            <button class="btn nav-btn active"
+                    id="pills-overview-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#overview"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-overview"
+                    aria-selected="true">Overview</button>
+          </li>
           <li class="nav-item" role="presentation">
             <button class="btn nav-btn"
                     id="pills-events-tab"
@@ -95,10 +105,67 @@
     </div>
     <div class="row">
       <div class="tab-content">
-        <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
+        <div class="tab-pane fade show active" id="overview">
+          <div class="row d-flex row-cols-lg-3 g-3">
+            <div class="col-12 col-lg-4">
+              <div class="card">
+                <div class="card-header d-block">
+                  Most Seen Songs
+                  <button class="btn btn-sm text-sm p-0"
+                          id="seenListCopy"
+                          data-bs-toggle="tooltip"
+                          data-bs-title="Copy List to Clipboard"
+                          onclick="copyListtoClipboard(this);">
+                    <i class="bi bi-copy"></i>
+                  </button>
+                </div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush placeholder-glow" id="seenList">
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div class="card">
+                <div class="card-header d-block">
+                  Most Played Not Seen (100+ plays)
+                  <button class="btn btn-sm text-sm p-0"
+                          id="notSeenListCopy"
+                          data-bs-toggle="tooltip"
+                          data-bs-title="Copy List to Clipboard"
+                          onclick="copyListtoClipboard(this);">
+                    <i class="bi bi-copy"></i>
+                  </button>
+                </div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush placeholder-glow" id="notSeenList">
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div class="card">
+                <div class="card-header d-block">
+                  Rare Songs (<100 Plays)
+                  <button class="btn btn-sm text-sm p-0"
+                          id="rareListCopy"
+                          data-bs-toggle="tooltip"
+                          data-bs-title="Copy List to Clipboard"
+                          onclick="copyListtoClipboard(this);">
+                    <i class="bi bi-copy"></i>
+                  </button>
+                </div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush placeholder-glow" id="rareList">
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="events" class="tab-pane fade">{% include "databruce/partials/event_table.html" %}</div>
         <div id="songs" class="tab-pane fade">
-          <div class="d-grid row-gap-3">
-            <div class="card message info">Songs Seen</div>
+          <div class="d-grid gap-3">
             <div class="row">
               <div class="col">
                 <div class="card">
@@ -133,7 +200,7 @@
                      id="songTableInfo"></div>
               </div>
             </div>
-            <div class="card message info">Most Played Not Seen (100+ plays)</div>
+            {% comment %} <div class="card message info">Most Played Not Seen (100+ plays)</div>
             <div class="row">
               <div class="col">
                 <div class="card">
@@ -165,7 +232,8 @@
                 <div class="dt-info order-3"
                      aria-live="polite"
                      role="status"
-                     id="TableInfo"></div>
+                     id="TableInfo">
+</div>
               </div>
             </div>
             <div class="card message info">
@@ -203,9 +271,11 @@
                 <div class="dt-info order-3"
                      aria-live="polite"
                      role="status"
-                     id="TableInfo"></div>
+                     id="TableInfo">
+</div>
               </div>
             </div>
+            {% endcomment %}
           </div>
         </div>
         <div id="albums" class="tab-pane fade">
@@ -224,31 +294,64 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
-      /* album breakdown */
-      let searchTimeout;
+    /* album breakdown */
+    let searchTimeout;
 
-      fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
+    function overviewCard(url, listID) {
+      const container = $(listID);
+
+      container.empty();
+      for (let i = 0; i < 10; i++) {
+        container.append(`
+          <li class="list-group-item d-flex justify-content-between align-items-center py-0.5 placeholder-glow" aria-hidden="true">
+            <span class="placeholder col-6 bg-secondary opacity-50 rounded-pill"></span>
+            <span class="placeholder col-1 bg-secondary opacity-25 rounded-pill"></span>
+          </li>
+        `);
+      }
+
+      fetch(url)
         .then(response => response.json()) // Parse JSON response
         .then(data => {
-          var container = $('#albumCardContainer');
-          var itemsToAppend = []; // Temporary array to hold all cloned jQuery elements
+
+          let items = []
 
           data.results.forEach((item, index) => {
-            var col = $('#example').clone();
-            const album = item.slug;
-            var list = $('<ul />').addClass('list-group list-group-flush');
-            let albumArtUrl = `/static/databruce/img/albums/${album}.jpg`;
-            const percent = item.album_percent.toFixed(0)
+            var listItem = $('<li />').addClass('list-group-item d-flex justify-content-between align-items-center  py-0.5');
 
-            if (!album) {
-              albumArtUrl = '/static/databruce/img/albums/default.svg';
-            }
+            listItem.append(`<a class="text-reset song" href="/songs/${item.song.slug}">${item.song.name}</a>`);
+            listItem.append(`<span class="song-count">${item.count}</span>`);
 
-            col.removeClass('d-none');
-            col.attr('id', `album-${index}`);
+            items.push(listItem);
+          });
 
-            const html = `
+          container.empty();
+          container.append(items)
+        }).catch(error => console.error('Error:', error));
+    }
+
+    fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
+      .then(response => response.json()) // Parse JSON response
+      .then(data => {
+        var container = $('#albumCardContainer');
+        var itemsToAppend = []; // Temporary array to hold all cloned jQuery elements
+
+        data.results.forEach((item, index) => {
+          var col = $('#example').clone();
+          const album = item.slug;
+
+          var list = $('<ul />').addClass('list-group list-group-flush');
+          let albumArtUrl = `/static/databruce/img/albums/${album}.jpg`;
+          const percent = item.album_percent.toFixed(0)
+
+          if (!album) {
+            albumArtUrl = '/static/databruce/img/albums/default.svg';
+          }
+
+          col.removeClass('d-none');
+          col.attr('id', `album-${index}`);
+
+          const html = `
           <div class="row justify-content-between align-items-center">
               <div class="col fw-semibold text-reset text-nowrap">${item.name}</div>
               <div class="col-auto">
@@ -257,314 +360,72 @@
             </div>
           `;
 
-            col.find('.card-header').append(html)
+          col.find('.card-header').append(html)
 
-            item.songs.forEach((i) => {
-              var listItem = $('<li />').addClass('list-group-item d-inline-flex gap-1')
+          item.songs.forEach((i) => {
+            var listItem = $('<li />').addClass('list-group-item d-inline-flex gap-1')
 
-              if (i.times_seen > 0) {
-                listItem.addClass('fw-semibold text-primary')
-                listItem.append(`<a class="text-reset" href="/songs/${i.slug}">${i.name}</a>`);
-                listItem.append(`<span>(${i.times_seen})</span>`);
-              } else {
-                listItem.addClass('fw-semibold text-default')
-                listItem.append(`<a class="text-reset" href="/songs/${i.slug}">${i.name}</a>`);
-              }
+            if (i.times_seen > 0) {
+              listItem.addClass('fw-semibold text-primary')
+              listItem.append(`<a class="text-reset" href="/songs/${i.slug}">${i.name}</a>`);
+              listItem.append(`<span>(${i.times_seen})</span>`);
+            } else {
+              listItem.addClass('text-default')
+              listItem.append(`<a class="text-reset" href="/songs/${i.slug}">${i.name}</a>`);
+            }
 
-              list.append(listItem);
-            });
-
-            $(col).find('.card-body').append(list);
-            itemsToAppend.push(col[0]);
+            list.append(listItem);
           });
 
-          container.append(itemsToAppend);
+          $(col).find('.card-body').append(list);
+          itemsToAppend.push(col[0]);
+        });
 
-          // Initialize Masonry cleanly on the fully populated container
-          container.masonry({
-            itemSelector: '.col-lg-4:not(.d-none)',
-            percentPosition: true,
-            horizontalOrder: true // CRITICAL: Forces Masonry to layout items left-to-right first
-          });
-        }).catch(error => console.error('Error:', error));
+        container.append(itemsToAppend);
 
-      // needed to initalize masonry when tab is loaded correctly
-      $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function(e) {
-        console.log('switched tab to albums')
-        $('#albumCardContainer').masonry('layout');
+        // Initialize Masonry cleanly on the fully populated container
+        container.masonry({
+          itemSelector: '.col-lg-4:not(.d-none)',
+          percentPosition: true,
+          horizontalOrder: true // CRITICAL: Forces Masonry to layout items left-to-right first
+        });
+      }).catch(error => console.error('Error:', error));
+
+    // needed to initalize masonry when tab is loaded correctly
+    $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function(e) {
+      let tables = DataTable.tables({
+        visible: true,
+        api: true
       });
 
-      /* datatables */
-      eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
+      tables.columns.adjust();
+      $('#albumCardContainer').masonry('layout');
+    });
 
-      /* USER SEEN */
-      var songTable = new DataTable('#songTable', {
-        ajax: {
-          'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom',
-        },
-        scrollY: '30vh',
-        order: [
-          [0, 'desc']
-        ],
-        columns: [{
-          'data': 'count',
-          'name': 'count',
-          'width': '1rem',
-          'type': 'num',
-          'className': 'all text-center',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return data
-            }
-          },
-        }, {
-          'data': 'song',
-          'name': 'song__sort_song_name',
-          'width': '15rem',
-          'className': 'all',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return `<a href="/songs/${data.uuid}">${data.name}</a>`
-            }
-          },
-        }, {
-          'data': 'song.category',
-          'name': 'song__category',
-          'width': '15rem',
-          'className': ''
-        }, {
-          'data': 'first_event',
-          'name': 'first_event',
-          'width': '10rem',
-          'type': 'date',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return eventDateFormat(data);
-            }
-          },
-        }, {
-          'data': 'last_event',
-          'name': 'last_event',
-          'width': '10rem',
-          'type': 'date',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return eventDateFormat(data);
-            }
-          },
-        }, {
-          'data': 'song__original',
-          'name': 'song__original',
-          'visible': false,
-          'orderable': false
-        }, ],
-        initComplete: function(settings, json) {
-          let api = this.api();
-          var info = api.page.info();
+    /* datatables */
+    eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
 
-          const input = $('#userSeenTableControls .page-input');
-          const prevBtn = $('#userSeenTableControls .btn-prev');
-          const nextBtn = $('#userSeenTableControls .btn-next');
-          const totalSpan = $('#userSeenTableControls .total-pages');
+    /* USER SEEN */
+    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&format=json&ordering=-count&limit=10', '#seenList')
 
-          // Initial button states
-          input.val(info.page + 1);
-          prevBtn.attr('disabled', info.page === 0);
-          nextBtn.attr('disabled', info.page >= info.pages - 1);
-
-          $('#songTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
-
-          api.on('draw', () => {
-            const pageInfo = api.page.info();
-
-            input.val(pageInfo.page + 1);
-            input.attr('max', pageInfo.pages);
-
-            totalSpan.text(`of ${pageInfo.pages || 1}`);
-
-            // Handle button states
-            prevBtn.attr('disabled', pageInfo.page === 0);
-            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
-
-            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-            $('songTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
-          });
-
-          totalSpan.text(`of ${info.pages || 1}`);
-
-          nextBtn.on('click', function() {
-            console.log('next page')
-            songTable.page('next').draw(false);
-          });
-
-          prevBtn.on('click', function() {
-            songTable.page('previous').draw(false);
-          });
-
-          input.on('change', function() {
-            let val = parseInt(this.value, 10) - 1;
-            const max = api.page.info().pages - 1;
-            if (val < 0) val = 0;
-            if (val > max) val = max;
-
-            input.attr('value', val);
-
-            api.page(val).draw('page');
-          });
-        }
-      });
-
-      /* MOST PLAYED NOT SEEN */
-      var notSeenTable = new DataTable('#notSeenTable', {
-        ajax: {
-          'url': '/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom',
-        },
-        scrollY: '30vh',
-        layout: {
-          topStart: {
-            customOrder: {
-              selectId: '#songTableOrder'
-            }
-          }
-        },
-        order: [
-          [0, 'desc']
-        ],
-        columns: [{
-          'data': 'count',
-          'name': 'count',
-          'width': '1rem',
-          'type': 'num',
-          'className': 'all text-center',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return data
-            }
-          },
-        }, {
-          'data': 'song',
-          'name': 'song__sort_song_name',
-          'width': '15rem',
-          'className': 'all',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return `<a href="/songs/${data.uuid}">${data.name}</a>`
-            }
-          },
-        }, {
-          'data': 'song.category',
-          'name': 'song__category',
-          'width': '15rem',
-          'className': ''
-        }, {
-          'data': 'first_event',
-          'name': 'first_event',
-          'width': '10rem',
-          'type': 'date',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return eventDateFormat(data);
-            }
-          },
-        }, {
-          'data': 'last_event',
-          'name': 'last_event',
-          'width': '10rem',
-          'type': 'date',
-          'render': function(data, type, row, meta) {
-            if (type === 'display' && data) {
-              return eventDateFormat(data);
-            }
-          },
-        }, {
-          'data': 'song__original',
-          'name': 'song__original',
-          'visible': false,
-          'orderable': false
-        }, ],
-        initComplete: function(settings, json) {
-          let api = this.api();
-          var info = api.page.info();
-          $('#song-count-badge').text(info.recordsTotal);
-
-          const input = $('#userNotSeenTableControls .page-input');
-          const prevBtn = $('#userNotSeenTableControls .btn-prev');
-          const nextBtn = $('#userNotSeenTableControls .btn-next');
-          const totalSpan = $('#userNotSeenTableControls .total-pages');
-
-          // Initial button states
-          input.val(info.page + 1);
-          prevBtn.attr('disabled', info.page === 0);
-          nextBtn.attr('disabled', info.page >= info.pages - 1);
-
-          $('#userNotSeenTableControls #TableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
-
-          api.on('draw', () => {
-            const pageInfo = api.page.info();
-
-            input.val(pageInfo.page + 1);
-            input.attr('max', pageInfo.pages);
-
-            totalSpan.text(`of ${pageInfo.pages || 1}`);
-
-            // Handle button states
-            prevBtn.attr('disabled', pageInfo.page === 0);
-            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
-
-            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-            $('songTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
-          });
-
-          totalSpan.text(`of ${info.pages || 1}`);
-
-          nextBtn.on('click', function() {
-            notSeenTable.page('next').draw(false);
-          });
-
-          prevBtn.on('click', function() {
-            notSeenTable.page('previous').draw(false);
-          });
-
-          input.on('change', function() {
-            let val = parseInt(this.value, 10) - 1;
-            const max = api.page.info().pages - 1;
-            if (val < 0) val = 0;
-            if (val > max) val = max;
-
-            input.attr('value', val);
-
-            api.page(val).draw('page');
-          });
-        }
-      });
-
-      //songTable('/api/v1/setlist_songs/?user_unseen={{ info.id }}&public_plays=100&format=custom', '30vh', '#notSeenTable');
-
-      /* RARE TABLE */
-      song_table_defs = [{
-        targets: '_all',
-        className: 'text-wrap text-xs'
-      }, ]
-
-      song_table_columns = [{
+    var songTable = new DataTable('#songTable', {
+      ajax: {
+        'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom&ordering=-count',
+      },
+      order: [
+        [0, 'desc']
+      ],
+      responsive: {
+        details: false,
+      },
+      columns: [{
         'data': 'count',
         'name': 'count',
         'width': '1rem',
+        'type': 'num',
         'className': 'all text-center',
         'render': function(data, type, row, meta) {
-          if (type === 'display' && data) {
-            return data
-          }
-        },
-      }, {
-        'data': 'song.num_plays_public',
-        'name': 'song__num_plays_public',
-        'width': '1rem',
-        'className': 'all text-center',
-        'render': function(data, type, row, meta) {
-          if (type === 'display' && data) {
-            return data
-          }
+          return data ? data : ''
         },
       }, {
         'data': 'song',
@@ -606,80 +467,110 @@
         'name': 'song__original',
         'visible': false,
         'orderable': false
-      }, ]
+      }, ],
+      initComplete: function(settings, json) {
+        let api = this.api();
+        var info = api.page.info();
 
-      var rareTable = new DataTable('#rareTable', {
-        ajax: {
-          'url': '/api/v1/setlist_songs/?user={{ info.id }}&user_rare=true&format=custom',
-        },
-        scrollY: '30vh',
-        order: [
-          [0, 'desc']
-        ],
-        columns: song_table_columns,
-        initComplete: function(settings, json) {
-          let api = this.api();
-          var info = api.page.info();
-          $('#song-count-badge').text(info.recordsTotal);
+        const input = $('#userSeenTableControls .page-input');
+        const prevBtn = $('#userSeenTableControls .btn-prev');
+        const nextBtn = $('#userSeenTableControls .btn-next');
+        const totalSpan = $('#userSeenTableControls .total-pages');
 
-          const input = $('#rareTableControls .page-input');
-          const prevBtn = $('#rareTableControls .btn-prev');
-          const nextBtn = $('#rareTableControls .btn-next');
-          const totalSpan = $('#rareTableControls .total-pages');
+        // Initial button states
+        input.val(info.page + 1);
+        prevBtn.attr('disabled', info.page === 0);
+        nextBtn.attr('disabled', info.page >= info.pages - 1);
 
-          // Initial button states
-          input.val(info.page + 1);
-          prevBtn.attr('disabled', info.page === 0);
-          nextBtn.attr('disabled', info.page >= info.pages - 1);
+        $('#songTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
 
-          $('#rareTableControls #TableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+        api.on('draw', () => {
+          const pageInfo = api.page.info();
 
-          api.on('draw', () => {
-            const pageInfo = api.page.info();
+          input.val(pageInfo.page + 1);
+          input.attr('max', pageInfo.pages);
 
-            input.val(pageInfo.page + 1);
-            input.attr('max', pageInfo.pages);
+          totalSpan.text(`of ${pageInfo.pages || 1}`);
 
-            totalSpan.text(`of ${pageInfo.pages || 1}`);
+          // Handle button states
+          prevBtn.attr('disabled', pageInfo.page === 0);
+          nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
 
-            // Handle button states
-            prevBtn.attr('disabled', pageInfo.page === 0);
-            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+          // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+          $('songTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+        });
 
-            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-            $('#rareTableControls #TableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
-          });
+        totalSpan.text(`of ${info.pages || 1}`);
 
-          totalSpan.text(`of ${info.pages || 1}`);
+        nextBtn.on('click', function() {
+          console.log('next page')
+          songTable.page('next').draw(false);
+        });
 
-          nextBtn.on('click', function() {
-            rareTable.page('next').draw(false);
-          });
+        prevBtn.on('click', function() {
+          songTable.page('previous').draw(false);
+        });
 
-          prevBtn.on('click', function() {
-            rareTable.page('previous').draw(false);
-          });
+        input.on('change', function() {
+          let val = parseInt(this.value, 10) - 1;
+          const max = api.page.info().pages - 1;
+          if (val < 0) val = 0;
+          if (val > max) val = max;
 
-          input.on('change', function() {
-            let val = parseInt(this.value, 10) - 1;
-            const max = api.page.info().pages - 1;
-            if (val < 0) val = 0;
-            if (val > max) val = max;
+          input.attr('value', val);
 
-            input.attr('value', val);
+          api.page(val).draw('page');
+        });
+      }
+    });
 
-            api.page(val).draw('page');
-          });
-        }
+    /* MOST PLAYED NOT SEEN */
+    overviewCard('/api/v1/setlist_song_count/?user_unseen={{ info.id }}&public_plays=100&limit=10&ordering=-count&format=json', '#notSeenList')
+
+    /* RARE CARD */
+    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&user_rare=true&format=json&ordering=-count&limit=10', '#rareList')
+
+    function copyListtoClipboard(btn) {
+      // 1. Find the parent card using native closest()
+      const card = btn.closest('.card');
+      const icon = btn.querySelector('i');
+      if (!card) return; // Safety check
+
+      const contents = card.querySelectorAll('ul li');
+
+      // Clone the header text node specifically, so we don't copy the button text
+      const header = card.querySelector('.card-header');
+      const title = header.firstChild.textContent.trim();
+
+      // 2. Map over the elements to create the array of strings
+      const lines = Array.from(contents).map(li => {
+        const song = li.querySelector('.song')?.textContent.trim() || '';
+        const count = li.querySelector('.song-count')?.textContent.trim() || '';
+        return `${song} - ${count}`;
       });
 
-      $('#categoryRareFilter').on('change', function() {
-        var selectedValue = this.value;
-        table.order([
-          [0, 'desc'],
-          [1, 'asc']
-        ]).column(6).search(selectedValue ? selectedValue : '', true, false).draw();
-      });
-    })
+      let textToCopy = `${title}:\n${lines.join('\n')}`;
+
+      if (lines.length > 0) {
+        navigator.clipboard.writeText(textToCopy)
+          .then(function() {
+            console.log('List copied to clipboard!');
+
+            icon.classList.remove('bi-copy');
+            icon.classList.add('bi-check-lg', 'text-success', 'text-lg');
+
+            // Revert back after 2 seconds (2000 milliseconds)
+            setTimeout(() => {
+              icon.classList.remove('bi-check-lg', 'text-success', 'text-lg');
+              icon.classList.add('bi-copy');
+            }, 3000);
+          })
+          .catch(function(err) {
+            console.error('Failed to copy text: ', err);
+          });
+      } else {
+        alert('No items found to copy.');
+      }
+    }
   </script>
 {% endblock content %}

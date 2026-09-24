@@ -233,23 +233,23 @@ class UserProfileView(PageTitleMixin, TemplateView):
     context["title"] = f'User "{context["info"]}"'
     context["description"] = f"{context['info']} Profile"
 
-    user_events = Event.objects.filter(
-      user_event__user_id=context["info"].pk,
-    )
+    user_events = UserAttendedShow.objects.filter(
+      user_id=context["info"].pk,
+    ).select_related("event")
 
     context["user_event_count"] = user_events.count()
 
     context["user_songs_count"] = (
       Setlist.objects.filter(
-        event__event_id__in=user_events.values("event_id"),
+        event_id__in=user_events.values("event_id"),
         set_name__in=SetType.valid_sets(),
       )
       .distinct("song_id")
       .order_by("song_id")
     ).count()
 
-    context["first_event"] = user_events.order_by("event_id").first()
-    context["last_event"] = user_events.order_by("-event_id").first()
+    context["first_event"] = user_events.order_by("event__event_id").first()
+    context["last_event"] = user_events.order_by("-event__event_id").first()
 
     return context
 
@@ -683,14 +683,14 @@ class EventDetailView(PageTitleMixin, TemplateView):
         event_id=event.pk,
       )
 
-      context["user_review"] = existing_review.exists()
+      context["user_review"] = existing_review.first()
 
       if context["user_review"]:
-        review = existing_review.first()
+        review = existing_review
         context["review_form"] = self.ReviewForm(
           initial={
-            "content": review.content,
-            "rating": str(review.rating),
+            "content": review.content,  # type: ignore
+            "rating": str(review.rating),  # type: ignore
           },
         )
 

@@ -181,6 +181,7 @@
       document.querySelectorAll('.dropdown').forEach(function(everydropdown) {
         everydropdown.addEventListener('mouseenter', function() {
           let el_link = this.querySelector('button[data-bs-toggle="dropdown"]');
+
           if (el_link != null) {
             let nextEl = el_link.nextElementSibling;
             el_link.classList.add('show');
@@ -190,6 +191,7 @@
 
         everydropdown.addEventListener('mouseleave', function() {
           let el_link = this.querySelector('button[data-bs-toggle="dropdown"]');
+
           if (el_link != null) {
             let nextEl = el_link.nextElementSibling;
             el_link.classList.remove('show');

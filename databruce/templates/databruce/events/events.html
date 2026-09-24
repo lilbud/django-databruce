@@ -28,8 +28,7 @@
           <div class="row my-2 d-flex-inline text-center year-selector">
             <div class="d-none d-lg-block">
               {% for year in years reversed %}
-                <a class="fw-medium mx-1"
-                   href="{% url "events_year" year=year %}?display=list">{{ year }}</a>
+                <a class="fw-medium mx-1" href="{% url "events_year" year=year %}">{{ year }}</a>
                 {% if not forloop.last %}/{% endif %}
               {% endfor %}
             </div>

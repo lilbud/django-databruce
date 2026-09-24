@@ -49,43 +49,59 @@
     </div>
   </div>
   <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
       var table = new DataTable('#userTable', {
         ajax: {
           'url': '/api/v1/users/?format=custom'
         },
-        columnDefs: [
-          {'targets': '_all', 'className': 'dt-left' },
-          {'targets': [0, 1], 'width': '1rem', 'className': 'dt-center' },
-          {'targets': [0], 'columnControl': [] },
-          {'targets': [1], 'type': 'num' },
-          {'targets': [2], 'className': 'dt-left' },
-          {'targets': [-1], 'type': 'text' },
-        ],
-        columns: [
-          {
-            'data': 'is_staff',
-            'name': 'is_staff',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data ? `<i class="bi bi-check-lg text-base check"></i>` : '';
-              }
-            },
+        responsive: {
+          details: false,
+        },
+        columnDefs: [{
+          'targets': '_all',
+          'className': 'dt-left'
+        }, {
+          'targets': [0, 1],
+          'width': '1rem',
+          'className': 'dt-center'
+        }, {
+          'targets': [0],
+          'columnControl': []
+        }, {
+          'targets': [1],
+          'type': 'num'
+        }, {
+          'targets': [2],
+          'className': 'dt-left'
+        }, {
+          'targets': [-1],
+          'type': 'text'
+        }, ],
+        columns: [{
+          'data': 'is_staff',
+          'name': 'is_staff',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return data ? `<i class="bi bi-check-lg text-base check"></i>` : '';
+            }
           },
-          { 'data': 'event_count', 'name': 'event_count' },
-          { 
-            'data': 'uuid',
-            'name': 'user_slug',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/profile/${data}">${row.username}</a>`
-              }
-            },
+        }, {
+          'data': 'event_count',
+          'name': 'event_count'
+        }, {
+          'data': 'uuid',
+          'name': 'user_slug',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a href="/profile/${data}">${row.username}</a>`
+            }
           },
-          { 'data': 'date_joined', 'name': 'date_joined' },
-        ]
+        }, {
+          'data': 'date_joined',
+          'name': 'date_joined'
+        }, ]
       });
-      
+
       tableSearch(table, 'search');
     });
   </script>

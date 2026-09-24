@@ -29,7 +29,11 @@
     <div class="my-3">
       <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
            id="controls">
-        <div class="dt-info order-3 table_info" aria-live="polite" role="status"></div>
+        <div class="order-1 mb-0">{% include "databruce/partials/table_pagination.html" %}</div>
+        <div class="dt-info order-3 table_info"
+             id="tableInfo"
+             aria-live="polite"
+             role="status"></div>
         <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
              id="dropdown-container">
           <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
@@ -74,9 +78,8 @@
         responsive: {
           details: false,
         },
-        pageLength: -1,
         order: [
-          [3, 'desc']
+          [2, 'desc']
         ],
         columns: [{
           'data': 'name',
@@ -117,76 +120,58 @@
           'name': 'note',
         }, ],
         initComplete: function(settings, json) {
-          let api = this.api();
-          let select = $('#columnOrder');
+          var api = this.api();
+          var info = api.page.info();
 
-          select.empty();
+          const input = $('.page-input');
+          const prevBtn = $('.btn-prev');
+          const nextBtn = $('.btn-next');
+          const totalSpan = $('.total-pages');
+          const tableInfo = $('#tableInfo')
 
-          api.columns().every(function(index) {
-            let column = this;
+          // Initial button states
+          input.val(info.page + 1);
+          prevBtn.attr('disabled', info.page === 0);
+          nextBtn.attr('disabled', info.page >= info.pages - 1);
 
-            if (column.orderable()) {
-              let headerText = $(column.header()).text().trim();
+          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
 
-              // 1. Safely retrieve DataTables' detected data type for this column
-              // Accounts for both modern DataTables 2.0+ and legacy DataTables 1.x environments
-              let type = typeof column.type === 'function' ?
-                column.type() :
-                settings.aoColumns[index].sType;
+          api.on('draw', () => {
+            const pageInfo = api.page.info();
 
-              // 2. Set fallback default text labels (Text / Strings)
-              let ascLabel = '(A-Z)';
-              let descLabel = '(Z-A)';
+            input.val(pageInfo.page + 1);
+            input.attr('max', pageInfo.pages);
 
-              // 3. Dynamically adjust labels based on the detected type
-              if (type && (type.indexOf('num') !== -1)) {
-                // Triggers for 'num', 'num-fmt', 'html-num', etc.
-                ascLabel = '(Least)';
-                descLabel = '(Most)';
-              } else if (type && (type.indexOf('date') !== -1)) {
-                // Triggers for 'date' or custom registered date-time formats
-                ascLabel = '(asc.)';
-                descLabel = '(desc.)';
-              }
+            totalSpan.text(`of ${pageInfo.pages || 1}`);
 
-              // Append the options using the index-direction value format
-              select.append(`<option value="${index}-asc">${headerText} ${ascLabel}</option>`);
-              select.append(`<option value="${index}-desc">${headerText} ${descLabel}</option>`);
-            }
+            // Handle button states
+            prevBtn.attr('disabled', pageInfo.page === 0);
+            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+
+            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
           });
 
-          select.on('change', function() {
-            let val = $(this).val();
-            if (val) {
-              let parts = val.split('-');
-              let columnIndex = parseInt(parts[0], 10);
-              let direction = parts[1];
+          totalSpan.text(`of ${info.pages || 1}`);
 
-              api.order([columnIndex, direction]).draw();
-            }
+          nextBtn.on('click', function() {
+            table.page('next').draw(false);
           });
 
-          api.on('order.dt', function() {
-            // Get current ordering array: e.g., [[0, 'asc']]
-            let currentOrder = api.order();
-
-            if (currentOrder.length > 0) {
-              let currentColumnIndex = currentOrder[0][0];
-              let currentDirection = currentOrder[0][1];
-
-              // Reconstruct the expected value string (e.g., "0-asc")
-              let targetValue = `${currentColumnIndex}-${currentDirection}`;
-
-              // Update the dropdown value to match without triggering its change event
-              select.val(targetValue);
-            }
+          prevBtn.on('click', function() {
+            table.page('previous').draw(false);
           });
 
-          // Run an initial sync to match whatever default order the table loaded with
-          let initialOrder = api.order();
-          if (initialOrder.length > 0) {
-            select.val(`${initialOrder[0][0]}-${initialOrder[0][1]}`);
-          }
+          input.on('change', function() {
+            let val = parseInt(this.value, 10) - 1;
+            const max = api.page.info().pages - 1;
+            if (val < 0) val = 0;
+            if (val > max) val = max;
+
+            input.attr('value', val);
+
+            api.page(val).draw('page');
+          });
+
         }
       });
 

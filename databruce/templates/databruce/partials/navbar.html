@@ -4,7 +4,7 @@
      id="navbar">
   <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
     <!-- Mobile Left Menu Toggle -->
-    <button class="btn d-xl-none d-block py-0"
+    <button class="btn d-xl-none d-block py-0 border-0"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasNavbar"
@@ -26,20 +26,19 @@
     <!-- Desktop Navigation Links (Dynamic) -->
     <ul class="navbar-nav ms-2 me-auto my-2 my-xl-0 flex-wrap row-gap-1 column-gap-1 d-none d-xl-flex">
       <li class="nav-item">
-        <a class="btn btn-sm"
-           role="button"
-           type="button"
-           href="{% url 'blog:blog' %}">News</a>
+        <button class="btn btn-sm border-0
+                       {% if "blog" in request.resolver_match.route %}active{% endif %}"
+                href="{% url 'blog:blog' %}">News</button>
       </li>
       {% for item in nav_links %}
         {% if item.children %}
           <!-- Dropdown Nav Item -->
           <li class="nav-item dropdown">
-            <button class="btn btn-sm dropdown-toggle
-                           {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}fw-bold{% endif %}
+            <button class="btn btn-sm dropdown-toggle border-0
+                           {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}active{% endif %}
                            {% if item.match_keywords %}
                              {% for kw in item.match_keywords %}
-                               {% if kw in request.resolver_match.route %}fw-bold{% endif %}
+                               {% if kw in request.resolver_match.route %}active{% endif %}
                              {% endfor %}
                            {% endif %}"
                     type="button"
@@ -89,8 +88,8 @@
         </li>
         {% if user.is_authenticated %}
           <li class="nav-item dropdown list-unstyled">
-            <a class="btn btn-sm dropdown-toggle
-                      {% if 'profile' in request.resolver_match.route %}fw-bold{% endif %}"
+            <a class="btn btn-sm border-0 dropdown-toggle
+                      {% if 'profile' in request.resolver_match.route %}active{% endif %}"
                type="button"
                data-bs-toggle="dropdown"
                aria-expanded="false"
@@ -138,16 +137,28 @@
           </li>
         {% else %}
           <li class="nav-item d-inline px-2 mb-0">
-            <a class="btn btn-sm border-0"
-               role="button"
-               href="{% url 'login' %}?next={{ request.path }}">Login</a>
+            <button class="btn btn-sm border-0"
+                    href="{% url 'login' %}?next={{ request.path }}">Login</button>
           </li>
         {% endif %}
       </div>
-      {% include "./theme_toggler.html" %}
+      <li class="nav-item d-none d-xl-block"
+          id="toggle-container"
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          data-bs-title="Toggle Theme">
+        <button class="btn btn-sm border-0 bd-theme-btn"
+                id="bd-theme"
+                type="button"
+                aria-label="Toggle Theme">
+          <i class="bi bi-sun-fill theme-icon text-xl" aria-hidden="true"></i>
+          <i class="bi bi-moon-stars-fill theme-icon text-xl" aria-hidden="true"></i>
+          <span class="d-lg-none my-auto" id="bd-theme-text">Toggle Theme</span>
+        </button>
+      </li>
     </ul>
     <!-- Mobile Right Menu Toggle -->
-    <button class="btn d-xl-none d-block py-0"
+    <button class="btn d-xl-none d-block py-0 border-0"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasNavbarEnd"

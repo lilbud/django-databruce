@@ -518,3 +518,19 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Fixed
 
 - Fixed home page setlist notes not joining with semicolon
+
+# v1.25 (September 24, 2026)
+
+## Added
+
+- Added "overview" to profile page. This has several cards for song based stats like "most played not seen" and "rare songs". These cards also allow for copying list to clipboard. Feature taken from WTED Archives.
+
+## Changed
+
+- Navbar links now change color on hover rather than background
+
+## Removed
+
+- Removed "Rare Songs" and "Most Played Not Seen" tables from User Profile. These have been changed to cards on the "overview" tab.
+
+## Fixed

@@ -1304,18 +1304,21 @@ class SetlistSongsFilter(dj_filters.FilterSet):
     label="Public Plays (>=)",
   )
 
+  count_lt = dj_filters.NumberFilter(
+    field_name="count",
+    lookup_expr="lt",
+  )
+
+  count_gt = dj_filters.NumberFilter(
+    field_name="count",
+    lookup_expr="gt",
+  )
+
   def filter_rare(self, queryset, name, value):
     lookup = "song__num_plays_public__lte"
     return queryset.filter(**{lookup: 100})
 
   def filter_unseen(self, queryset, name, value):
-    events = models.UserAttendedShow.objects.filter(user_id=value).values_list(
-      "event_id",
-    )
-
-    if len(events) == 0:
-      return queryset.none()
-
     songs = queryset.filter(**{name: value}).values_list(
       "song_id",
       flat=True,
