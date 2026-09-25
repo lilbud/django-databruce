@@ -85,27 +85,19 @@
           'data': 'name',
           'name': 'name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="/events/runs/' + row.uuid + '">' + row.name + '</a>';
-            }
+            return data ? `<a href="/runs/${row.slug}">${row.name}</a>` : '';
           },
         }, {
           'data': 'band',
           'name': 'band__name',
-
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="/bands/' + data.uuid + '">' + data.name + '</a>';
-            }
+            return data ? `<a href="/bands/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'venue',
           'name': 'venue__name',
-
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>`
-            }
+            return data ? `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>` : '';
           },
         }, {
           'data': 'num_events',

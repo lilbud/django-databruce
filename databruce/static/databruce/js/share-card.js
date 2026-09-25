@@ -56,11 +56,7 @@ function initializeShareCardGenerator(config) {
           'className': 'text-center',
           'width': '',
           'render': function (data, type, row, meta) {
-            if (data) {
-              return data
-            }
-
-            return ''
+            return data ? data : '';
           },
           'createdCell': function (td, cellData, rowData, row, col) {
             $(td).addClass('songnum');

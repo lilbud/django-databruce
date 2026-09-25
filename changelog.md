@@ -534,4 +534,16 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Removed "Rare Songs" and "Most Played Not Seen" tables from User Profile. These have been changed to cards on the "overview" tab.
 
-## Fixed
+# v1.26 (September 25, 2026)
+
+## Changed
+
+- Lightened shade of primary color text.
+- Changed Event Run URLs to use slugs instead of UUID.
+- Changed Tour URLs to use slugs instead of UUID.
+- Changed Tour Leg URLs to use slugs instead of UUID.
+- URLs for Locations, Relations, and Bands will all be converted to use Slugs instead of UUIDs.
+
+## Removed
+
+- Removed Political Tour Legs (Forward, Fresh Start for America). Really no point as many of these are only a few shows and not really part of a "tour" persay. They're still grouped under a "Political Rallies" tour, but the legs aren't needed.

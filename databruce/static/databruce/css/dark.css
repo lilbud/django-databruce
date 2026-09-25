@@ -646,15 +646,10 @@
     color: var(--color-black) !important;
   }
 
-  .active .count-badge {
-    background-color: var(--color-blue-500) !important;
-    color: var(--color-white) !important;
-  }
-
   /* colors */
 
   .text-primary {
-    color: var(--color-blue-500) !important;
+    color: var(--color-blue-400) !important;
   }
 
   .bg-primary {

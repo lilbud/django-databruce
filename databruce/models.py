@@ -1093,6 +1093,19 @@ class SetlistNote(models.Model):
     return self.note
 
 
+class SongCategory(BaseModel):
+  id = models.AutoField(primary_key=True)
+  name = models.TextField(default=None, blank=True)
+  slug = models.TextField(default=None, blank=True)
+  uuid = models.UUIDField(default=uuid4, editable=False)
+
+  class Meta:
+    managed = True
+    db_table = "song_categories"
+    verbose_name = "song category"
+    verbose_name_plural = "song categories"
+
+
 class Song(BaseModel):
   id = models.AutoField(primary_key=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
@@ -1152,12 +1165,13 @@ class Song(BaseModel):
   original = models.BooleanField(default=False)
   lyrics = models.BooleanField(default=False)
 
-  category = models.CharField(default=None, blank=True, max_length=255)
-
-  category_slug = models.SlugField(
-    unique=True,
+  category = models.ForeignKey(
+    to=SongCategory,
+    on_delete=models.SET_NULL,
+    db_column="category_id",
+    default=None,
     blank=True,
-    db_column="category_slug",
+    null=True,
   )
 
   spotify_id = models.CharField(default=None, blank=True, max_length=255)
@@ -1489,6 +1503,7 @@ class TourLeg(BaseModel):
   )
 
   name = models.CharField(default=None, blank=True, max_length=255)
+  slug = models.CharField(default=None, blank=True, max_length=255)
 
   first_event = models.ForeignKey(
     to=Event,
@@ -1549,6 +1564,7 @@ class Run(BaseModel):
   )
 
   name = models.CharField(max_length=255)
+  slug = models.CharField(max_length=255)
 
   num_events = models.IntegerField(
     default=0,

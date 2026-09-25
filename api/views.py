@@ -445,7 +445,7 @@ class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
 
   serializer_class = api_serializers.SetlistSerializer
   filterset_class = api_filters.SetlistFilter
-  ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
+  ordering_fields = ["event__event_id", "song_num", "song__name"]
 
 
 @method_decorator(cache_page(get_seconds_until_midnight()), name="list")
@@ -608,10 +608,10 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
     db_models.Setlist.objects.all()
     .select_related(
       "event",
-      "song",
+      "song__category",
     )
     .prefetch_related(
-      "ltp",
+      # "ltp",
       "setlist_notes",
     )
     .order_by("event__event_id", F("song_num").asc(nulls_first=True))
@@ -619,7 +619,7 @@ class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
 
   serializer_class = api_serializers.SetlistSerializer
   filterset_class = api_filters.SetlistFilter
-  ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
+  ordering_fields = ["event__event_id", "song_num", "song__name"]
 
 
 class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
@@ -637,7 +637,7 @@ class SetlistMobileViewSet(viewsets.ReadOnlyModelViewSet):
 
   serializer_class = api_serializers.SetlistMobileSerializer
   filterset_class = api_filters.SetlistFilter
-  ordering_fields = ["event__event_id", "song_num", "song__category", "song__name"]
+  ordering_fields = ["event__event_id", "song_num", "song__name"]
 
 
 class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -959,7 +959,7 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
     # Album songs subquery: songs from releases matching this category
     album_songs_subquery = (
       db_models.ReleaseTrack.objects.filter(
-        release__name=OuterRef("song__category"),
+        release__name=OuterRef("song__category__name"),
       )
       .values("song_id")
       .order_by("position")
@@ -968,24 +968,25 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
     # Setlist songs subquery: songs from this event matching this category
     setlist_songs_subquery = (
       event_setlist.filter(
-        song__category=OuterRef("song__category"),
+        song__category_id=OuterRef("song__category_id"),
       )
       .values("song_id")
-      .distinct("song_id")
-      .order_by("song_id")
+      .distinct()
     )
 
     # Aggregate by category
     return (
-      event_setlist.select_related("song", "event")
-      .values(category=F("song__category"))
+      event_setlist.select_related("song", "event", "song__category")
+      .values(category=F("song__category_id"))
       .annotate(
-        song_count=Count("song_id", distinct=True),  # songs in this category
+        song_count=Count(
+          "song_id",
+          distinct=True,
+        ),
         total_setlist_songs=SubqueryCount(
           total_setlist_songs,
-        ),  # total songs in setlist
+        ),
         songs=ArraySubquery(setlist_songs_subquery),
-        category_slug=F("song__category_slug"),
         album_songs=ArraySubquery(album_songs_subquery),
       )
     )

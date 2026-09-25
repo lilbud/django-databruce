@@ -148,7 +148,7 @@ class MinimalVenuesSerializer(BaseSerializer):
 class MinimalToursSerializer(BaseSerializer):
   class Meta:
     model = models.Tour
-    fields = ["name", "uuid"]
+    fields = ["name", "slug"]
 
 
 class MinimalUserSerializer(BaseSerializer):
@@ -171,7 +171,7 @@ class MinimalEventSerializer(BaseSerializer):
 class MinimalTourLegsSerializer(BaseSerializer):
   class Meta:
     model = models.TourLeg
-    fields = ["name", "uuid"]
+    fields = ["name", "slug"]
 
 
 class MinimalEventRunSerializer(BaseSerializer):
@@ -189,6 +189,19 @@ class MinimalRelationsSerializer(BaseSerializer):
 class MinimalSongsSerializer(BaseSerializer):
   first_event = MinimalEventSerializer(required=False)
   last_event = MinimalEventSerializer(required=False)
+  category = serializers.CharField(
+    source="category.name",
+    required=False,
+    max_length=255,
+  )
+
+  original_artist = serializers.SerializerMethodField()
+
+  def get_original_artist(self, obj):
+    if obj.original:
+      return None
+
+    return obj.original_artist
 
   class Meta:
     model = models.Song
@@ -196,7 +209,6 @@ class MinimalSongsSerializer(BaseSerializer):
       "id",
       "name",
       "album",
-      "category_slug",
       "slug",
       "category",
       "uuid",
@@ -359,6 +371,7 @@ class EventRunSerializer(BaseSerializer):
     fields = [
       "id",
       "name",
+      "slug",
       "band",
       "venue",
       "city",
@@ -366,7 +379,6 @@ class EventRunSerializer(BaseSerializer):
       "last_event",
       "num_events",
       "num_songs",
-      "uuid",
     ]
 
 
@@ -391,7 +403,7 @@ class ToursSerializer(BaseSerializer):
     model = models.Tour
     fields = [
       "id",
-      "uuid",
+      "slug",
       "name",
       "first_event",
       "last_event",
@@ -520,9 +532,14 @@ class IndexEventsSerializer(BaseSerializer):
 class EventSetlistSerializer(BaseSerializer):
   song = serializers.CharField(source="song.name", max_length=255)
 
+  highlight = serializers.SerializerMethodField()
+
+  def get_highlight(self, obj):
+    return bool(obj.debut or obj.premiere)
+
   class Meta:
     model = models.Setlist
-    fields = ["song", "debut", "premiere", "set_name", "segue"]
+    fields = ["song", "highlight", "set_name", "segue"]
 
 
 class EventTypesSerializer(BaseSerializer):
@@ -919,10 +936,18 @@ class ReleasesSerializer(BaseSerializer):
     fields = ["uuid", "name", "date", "length", "event", "month_day", "type"]
 
 
+class SongCategorySerializer(BaseSerializer):
+  class Meta:
+    model = models.SongCategory
+    fields = ["id", "name", "slug"]
+
+
 class SongsSerializer(BaseSerializer):
   first_event = MinimalEventSerializer()
   last_event = MinimalEventSerializer()
   has_lyrics = serializers.SerializerMethodField(required=False)
+  album = ReleasesSerializer(required=False)
+  category = serializers.IntegerField(source="category_id")
 
   def get_has_lyrics(self, obj):
     return obj.lyrics_song.exists()
@@ -939,12 +964,13 @@ class SongsSerializer(BaseSerializer):
       "num_plays_private",
       "opener",
       "closer",
-      "category",
       "has_lyrics",
       "sort_song_name",
       "uuid",
       "slug",
       "original",
+      "album",
+      "category",
     ]
 
 
@@ -980,12 +1006,33 @@ class SetlistNotesSerializer(BaseSerializer):
 
 
 class SetlistSerializer(BaseSerializer):
-  song = MinimalSongsSerializer(include=["name", "uuid", "category_slug", "slug", "id"])
-  last_event = MinimalEventSerializer(
-    source="ltp",
-    required=False,
-    include=["date", "event_id"],
-  )
+  song = SongsSerializer(include=["name", "slug", "category"])
+
+  def to_representation(self, instance):
+    if isinstance(self.instance, list) and not hasattr(self, "_event_cache"):
+      event_ids = set()
+
+      for obj in self.instance:
+        try:
+          event_ids.add(obj.ltp_id)
+        except AttributeError:
+          continue
+
+      events = models.Event.objects.filter(id__in=event_ids)
+      self._event_cache = {
+        e.id: MinimalEventSerializer(e, include=["date", "event_id"]).data
+        for e in events
+      }
+
+    return super().to_representation(instance)
+
+  last_event = serializers.SerializerMethodField(required=False)
+
+  def get_last_event(self, obj):
+    if obj.ltp_id:
+      return self._event_cache[obj.ltp_id]
+
+    return None
 
   notes = serializers.SlugRelatedField(
     source="setlist_notes",
@@ -994,6 +1041,21 @@ class SetlistSerializer(BaseSerializer):
     required=False,
     slug_field="note",
   )
+
+  tour_num = serializers.SerializerMethodField(required=False)
+  tour_total = serializers.SerializerMethodField(required=False)
+
+  def get_tour_num(self, obj):
+    if obj.tour_num == 0:
+      return None
+
+    return obj.tour_num
+
+  def get_tour_total(self, obj):
+    if obj.tour_total == 0:
+      return None
+
+    return obj.tour_total
 
   gap = serializers.SerializerMethodField()
 
@@ -1007,7 +1069,6 @@ class SetlistSerializer(BaseSerializer):
     model = models.Setlist
     fields = [
       "song",
-      "ltp",
       "segue",
       "debut",
       "premiere",
@@ -1016,12 +1077,10 @@ class SetlistSerializer(BaseSerializer):
       "nobruce",
       "sign_request",
       "instrumental",
-      "id",
       "tour_num",
       "tour_total",
       "song_num",
       "position",
-      "uuid",
       "notes",
       "last_event",
     ]
@@ -1176,7 +1235,7 @@ class TourLegsSerializer(BaseSerializer):
     model = models.TourLeg
     fields = [
       "id",
-      "uuid",
+      "slug",
       "name",
       "tour",
       "first_event",
@@ -1266,12 +1325,12 @@ class SetlistEntrySerializer(BaseSerializer):
   event = EventsSerializer(
     include=["date", "event_id", "early_late"],
   )
-  show_opener = MinimalSongsSerializer(include=["uuid", "name"])
-  s1_closer = MinimalSongsSerializer(include=["uuid", "name"])
-  s2_opener = MinimalSongsSerializer(include=["uuid", "name"])
-  main_closer = MinimalSongsSerializer(include=["uuid", "name"])
-  encore_opener = MinimalSongsSerializer(include=["uuid", "name"])
-  show_closer = MinimalSongsSerializer(include=["uuid", "name"])
+  show_opener = MinimalSongsSerializer(include=["name", "slug"])
+  s1_closer = MinimalSongsSerializer(include=["name", "slug"])
+  s2_opener = MinimalSongsSerializer(include=["name", "slug"])
+  main_closer = MinimalSongsSerializer(include=["name", "slug"])
+  encore_opener = MinimalSongsSerializer(include=["name", "slug"])
+  show_closer = MinimalSongsSerializer(include=["name", "slug"])
 
   class Meta:
     model = models.SetlistEntries
@@ -1316,7 +1375,7 @@ class SetlistSongsSerializer(BaseSerializer):
       self._song_cache = {
         s.id: MinimalSongsSerializer(
           s,
-          include=["name", "slug"],
+          include=["name", "slug", "category"],
         ).data
         for s in songs
       }
@@ -1425,12 +1484,15 @@ class UserAttendedShowsSerializer(BaseSerializer):
 class SetlistBreakdownSerializer(BaseSerializer):
   total_setlist_songs = serializers.IntegerField(required=False)
   song_count = serializers.IntegerField(required=False)
-  category = serializers.CharField(required=False, max_length=255)
-  category_slug = serializers.CharField(required=False, max_length=255)
+  category = serializers.SerializerMethodField(required=False)
+
+  def get_category(self, obj):
+    return self._category_cache.get(obj["category"])
 
   def to_representation(self, instance):
     if isinstance(self.instance, list) and not hasattr(self, "_song_cache"):
       song_ids = set()
+      category_ids = set()
 
       for obj in self.instance:
         combined = obj["songs"] + obj["album_songs"]
@@ -1439,7 +1501,13 @@ class SetlistBreakdownSerializer(BaseSerializer):
           for song_id in set(combined):
             song_ids.add(song_id)
 
+        if obj["category"]:
+          category_ids.add(obj["category"])
+
       songs = models.Song.objects.filter(id__in=song_ids)
+      categories = models.SongCategory.objects.filter(id__in=category_ids)
+
+      self._category_cache = {c.id: SongCategorySerializer(c).data for c in categories}
 
       self._song_cache = {
         s.id: MinimalSongsSerializer(
@@ -1459,7 +1527,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
     remove = [689, 1021, 514]
 
     # Skip non-album categories
-    if obj["category"] in ("Covers", "Originals"):
+    if obj["category"] in (8, 19):
       return False
 
     album_songs = obj.get("album_songs", [])
@@ -1509,7 +1577,6 @@ class SetlistBreakdownSerializer(BaseSerializer):
       "songs",
       "category",
       "album_complete",
-      "category_slug",
     ]
 
 

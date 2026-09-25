@@ -10,7 +10,7 @@
   <div class="col-12">
     <div class="row">
       <div class="col">
-        <div class="d-flex mb-3">
+        <div class="d-flex justify-content-start mb-3">
           <div class="text-2xl pe-2">Events by Type</div>
           <div id="type-select" class="pe-2">
             <button class="btn btn-sm btn-primary dropdown-toggle"
@@ -28,8 +28,8 @@
         </div>
       </div>
     </div>
+    {% include "databruce/partials/event_table.html" %}
   </div>
-  {% include "databruce/partials/event_table.html" %}
   <script>
     $(document).ready(function() {
       eventTable('/api/v1/events/?type={{ type.id }}&format=custom');

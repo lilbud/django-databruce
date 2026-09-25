@@ -1059,7 +1059,6 @@ button {
 .dropdown-menu:not(.ui-autocomplete) {
   opacity: 0;
   visibility: hidden;
-  /* overflow-y: scroll; */
   border-radius: var(--bs-border-radius) !important;
   padding: 0.3rem !important;
   overflow-x: hidden;

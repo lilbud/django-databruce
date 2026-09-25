@@ -19,8 +19,8 @@ function createSongListItem(song) {
 
 function createTooltipContent(item, tooltipSongs) {
   const categoryLabel = item.album_complete
-    ? `${item.category} (Complete)`
-    : item.category;
+    ? `${item.category.name} (Complete)`
+    : item.category.name;
   return `<div class='text-start'><span class='text-xs'>${escapeHtml(categoryLabel)}</span><hr><span class='tooltip-songs'>${tooltipSongs}</span></div>`;
 }
 
@@ -50,7 +50,7 @@ async function albumBreakdown(url) {
 
     // Build HTML in memory to minimize DOM reflows
     for (const item of results) {
-      const album = item.category_slug;
+      const album = item.category;
       const percent = ((item.song_count / maxNum) * 100).toFixed(0);
       const rowClass = item.album_complete
         ? "col px-2 py-1 album-breakdown complete"
@@ -67,24 +67,24 @@ async function albumBreakdown(url) {
       }).join('<br>');
 
       const tooltip = createTooltipContent(item, tooltipSongs);
-      let albumArtUrl = `/static/databruce/img/albums/${album}.jpg`;
+      let albumArtUrl = `/static/databruce/img/albums/${album.slug}.jpg`;
 
-      if (album === 'originals' || album === 'covers') {
+      if (album.slug === 'originals' || album.slug === 'covers') {
         albumArtUrl = '/static/databruce/img/albums/default.svg';
       }
 
       const html = `
-        <div class="${rowClass}" data-bs-toggle="collapse" data-album="${album}" href="#${album}-collapse">
+        <div class="${rowClass}" data-bs-toggle="collapse" data-album="${album.id}" href="#${album.slug}-collapse">
             <div class="row mx-0 g-3 align-items-center" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="${tooltip}">
                 <div class="col-auto ps-0 category">
-                    <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.category)}">
+                    <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.category.name)}">
                 </div>
                 <div class="col progress px-0">
                     <div class="progress-bar" style="width:${percent}%"></div>
                 </div>
                 <div class="col-auto percent text-center pe-0 text-xs text-nowrap">${item.song_count}</div>
             </div>
-            <div class="collapse" id="${album}-collapse">
+            <div class="collapse" id="${album.slug}-collapse">
                 <ul class="list-group pt-2 pb-1">${songs}</ul>
             </div>
         </div>`;

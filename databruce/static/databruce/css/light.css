@@ -650,7 +650,7 @@
 
   /* colors */
   .text-primary {
-    color: var(--color-blue-600) !important;
+    color: var(--color-blue-500) !important;
   }
 
   .text-warning {

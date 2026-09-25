@@ -17,12 +17,12 @@
     <div class="text-base">
       <div class="fw-semibold">Tour:</div>
       <div>
-        <a href="{% url "tour_details" id=info.tour.uuid %}">{{ info.tour }}</a>
+        <a href="{% url "tour_details" slug=info.tour.slug %}">{{ info.tour }}</a>
       </div>
     </div>
     <div class="mt-2 mb-3">
       <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
-        <li class="nav-item active" role="presentation">
+        <li class="nav-item" role="presentation">
           <button class="btn nav-btn active"
                   id="pills-events-tab"
                   data-bs-toggle="pill"

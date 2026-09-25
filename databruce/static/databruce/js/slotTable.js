@@ -15,7 +15,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/songs/${data.uuid}">${data.name}</a>`
+        return `<a href="/songs/${data.slug}">${data.name}</a>`
       }
     },
   },
@@ -25,7 +25,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/songs/${data.uuid}">${data.name}</a>`
+        return `<a href="/songs/${data.slug}">${data.name}</a>`
       }
     },
   },
@@ -35,7 +35,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/songs/${data.uuid}">${data.name}</a>`
+        return `<a href="/songs/${data.slug}">${data.name}</a>`
       }
     },
   },
@@ -45,7 +45,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/songs/${data.uuid}">${data.name}</a>`
+        return `<a href="/songs/${data.slug}">${data.name}</a>`
       }
     },
   },
@@ -55,7 +55,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/songs/${data.uuid}">${data.name}</a>`
+        return `<a href="/songs/${data.slug}">${data.name}</a>`
       }
     },
   },
@@ -65,7 +65,7 @@ setlist_slots = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (type === 'display' && data) {
-        return `<a href="/songs/${data.uuid}">${data.name}</a>`
+        return `<a href="/songs/${data.slug}">${data.name}</a>`
       }
     },
   },

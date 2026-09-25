@@ -126,7 +126,7 @@ function formatSongs(songs, highlightSpecial) {
   const formatted = songs
     .map((song) => {
       let name = song.song;
-      if (highlightSpecial && (song.debut || song.premiere)) {
+      if (highlightSpecial && (song.highlight)) {
         name = `<span class="fw-semibold fst-italic text-primary">${song.song}</span>`;
       } else {
         name = `<span>${song.song}</span>`;

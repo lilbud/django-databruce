@@ -99,13 +99,13 @@
                     <a href="{% url 'events_by_type' slug=event.event_type.type.slug %}"><span class="badge badge-primary">Type: {{ event.event_type.type.name }}</span></a>
                   {% endif %}
                   {% if event.tour %}
-                    <a href="{% url 'tour_details' id=event.tour.uuid %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>
+                    <a href="{% url 'tour_details' slug=event.tour.slug %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>
                   {% endif %}
                   {% if event.leg %}
-                    <a href="{% url 'leg_details' id=event.leg.uuid %}"><span class="badge badge-primary">Tour Leg: {{ event.leg.name }}</span></a>
+                    <a href="{% url 'leg_details' slug=event.leg.slug %}"><span class="badge badge-primary">Tour Leg: {{ event.leg.name }}</span></a>
                   {% endif %}
                   {% if event.run %}
-                    <a href="{% url 'run_details' id=event.run.uuid %}"><span class="badge badge-primary">Run: {{ event.run.name }}</span></a>
+                    <a href="{% url 'run_details' slug=event.run.slug %}"><span class="badge badge-primary">Run: {{ event.run.name }}</span></a>
                   {% endif %}
                 </div>
               </div>
@@ -911,7 +911,7 @@
           var notAllowedSets = ['Soundcheck']
 
           if (!notAllowedSets.includes(data.set_name)) {
-            $(row).attr('data-album', data.song.category_slug);
+            $(row).attr('data-album', data.song.category);
           }
 
           return row
@@ -1035,7 +1035,7 @@
         'className': 'min-desktop',
         'render': (data, type, row) => {
           if (row.notes?.length) {
-            const cleanedNotes = row.notes.join('; ').replace(/''/g, "'");
+            const cleanedNotes = row.notes;
             return `<span class="setlist-note">${cleanedNotes}</span>`;
           }
           return '';

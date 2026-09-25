@@ -24,7 +24,7 @@
     {% endif %}
     <div class="mt-2 mb-3">
       <ul class="nav nav-pills gap-0 column-gap-1 row-gap-1" role="tablist">
-        <li class="nav-item active" role="presentation">
+        <li class="nav-item" role="presentation">
           <button class="btn nav-btn active"
                   id="pills-events-tab"
                   data-bs-toggle="pill"
@@ -130,9 +130,7 @@
         'name': 'name',
         'width': '20rem',
         'render': function(data, type, row, meta) {
-          if (data) {
-            return `<a href="/tours/legs/${row.uuid}">${data}</a>`;
-          }
+          return data ? `<a href="/tour_legs/${row.slug}">${data}</a>` : '';
         },
       }, {
         'data': 'num_events',
@@ -147,18 +145,14 @@
         'name': 'first_event__event_id, first_event__early_late',
         'width': '6rem',
         'render': function(data, type, row, meta) {
-          if (data) {
-            return `<a href="/events/${data.event_id}">${data.date}</a>`;
-          }
+          return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : '';
         },
       }, {
         'data': 'last_event',
         'name': 'last_event__event_id, last_event__early_late',
         'width': '6rem',
         'render': function(data, type, row, meta) {
-          if (data) {
-            return `<a href="/events/${data.event_id}">${data.date}</a>`;
-          }
+          return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : '';
         },
       }, {
         'data': 'note',

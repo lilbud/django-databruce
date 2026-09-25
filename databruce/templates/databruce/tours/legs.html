@@ -83,11 +83,9 @@
         ],
         columns: [{
           'data': 'name',
-          'name': 'name',
+          'name': 'name, tour__name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/tour_legs/${row.uuid}">${data}</a><br><small>${row.tour.name}</small>`;
-            }
+            return data ? `<a href="/tour_legs/${row.slug}">${data}</a><br><small>${row.tour.name}</small>` : '';
           },
         }, {
           'data': 'first_event',

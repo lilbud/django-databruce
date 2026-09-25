@@ -61,7 +61,7 @@ event_table_columns = [
     'className': 'text-wrap',
     'render': function (data, type, row, meta) {
       if (data) {
-        return row.leg ? `<a href="/tours/${data.uuid}">${data.name}</a><br><small>${row.leg}</small>` : `<a href="/tours/${data.uuid}">${data.name}</a>`
+        return row.leg ? `<a href="/tours/${data.slug}">${data.name}</a><br><small>${row.leg}</small>` : `<a href="/tours/${data.slug}">${data.name}</a>`
       }
     },
   },

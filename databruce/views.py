@@ -1086,7 +1086,7 @@ class TourDetailView(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
-    context["info"] = get_object_or_404(Tour, uuid=self.kwargs["id"])
+    context["info"] = get_object_or_404(Tour, slug=self.kwargs["slug"])
     context["title"] = f"{context['info']}"
 
     return context
@@ -1964,7 +1964,7 @@ class RunDetailView(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
     context = super().get_context_data(**kwargs)
-    context["info"] = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    context["info"] = get_object_or_404(self.queryset, slug=self.kwargs["slug"])
     context["title"] = f"{context['info']}"
 
     if context["info"].ticket_range:
@@ -1998,7 +1998,7 @@ class TourLegDetailView(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
     context = super().get_context_data(**kwargs)
-    self.leg = get_object_or_404(self.queryset, uuid=self.kwargs["id"])
+    self.leg = get_object_or_404(self.queryset, slug=self.kwargs["slug"])
     context["info"] = self.leg
     context["title"] = f"{context['info']}"
 
