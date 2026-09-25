@@ -512,6 +512,7 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Changed
 
 - Changed several Public Rehearsal shows to have "Public Rehearsal" as the set name for the whole show.
+- Filter Toggle on event table now has an arrow and changing text to reflect open/closed state
 
 ## Removed
 

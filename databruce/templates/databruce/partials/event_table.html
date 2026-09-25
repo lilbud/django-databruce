@@ -20,12 +20,23 @@
   </div> {% endcomment %}
   <div class="row justify-content-center align-items-center mt-3">
     <div class="col-12">
-      <a class="btn btn-secondary text-sm w-100"
+      <a class="btn btn-secondary text-sm w-100 collapse-toggle"
+         id="filterCollapseToggle"
          data-bs-toggle="collapse"
          href="#filterCollapse"
          role="button"
          aria-expanded="false"
-         aria-controls="filterCollapse">Show Filters</a>
+         aria-controls="filterCollapse">
+        <span id="collapseText">Show Filters</span>
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="16"
+             height="16"
+             fill="currentColor"
+             class="bi bi-chevron-down collapse-icon"
+             viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+        </svg>
+      </a>
     </div>
   </div>
   <div class="collapse" id="filterCollapse">
@@ -124,3 +135,15 @@
     </div>
   </div>
 </div>
+<script>
+  const myCollapse = document.getElementById('filterCollapse');
+  const toggleBtn = document.getElementById('collapseText');
+
+  myCollapse.addEventListener('show.bs.collapse', () => {
+    toggleBtn.textContent = 'Hide Filters';
+  });
+
+  myCollapse.addEventListener('hide.bs.collapse', () => {
+    toggleBtn.textContent = 'Show Filters';
+  });
+</script>
