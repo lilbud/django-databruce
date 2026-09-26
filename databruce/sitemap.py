@@ -18,7 +18,6 @@ class StaticViewSitemap(Sitemap):
       "relations",
       "bands",
       "releases",
-      "bootlegs",
       "nugs_releases",
       "adv_search",
       "note_search",

@@ -69,50 +69,55 @@
     </div>
   </div>
   <script>
-    $(document).ready(function () {
-      let sb_columns = [1,2,3,4];
+    $(document).ready(function() {
+      let sb_columns = [1, 2, 3, 4];
 
       var table = new DataTable('#releasesTable', {
         ajax: {
           'url': '/api/v1/bootlegs/?archive=false&format=custom',
         },
-        columns: [
-          {
-            'data': 'title',
-            'name': 'title',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return '<a href="https://www.springsteenlyrics.com/bootlegs.php?item=' + row.slid + '">'+ data +'</a>';
-              }
-            },
+        responsive: {
+          details: false,
+        },
+        columns: [{
+          'data': 'title',
+          'name': 'title',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return '<a href="https://www.springsteenlyrics.com/bootlegs.php?item=' + row.slid + '">' + data + '</a>';
+            }
           },
-          {'data': 'label', 'name': 'label'},
-          {'data': 'source', 'name': 'source'},
-          {'data': 'type', 'name': 'type'},
-          {
-            'data': 'event',
-            'name': 'event__event_id',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/events/${data.event_id}">${data.date}</a>`
-              }
-            },
+        }, {
+          'data': 'label',
+          'name': 'label'
+        }, {
+          'data': 'source',
+          'name': 'source'
+        }, {
+          'data': 'type',
+          'name': 'type'
+        }, {
+          'data': 'event',
+          'name': 'event__event_id',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`
+            }
           },
-          {
-            'data': 'archive.url',
-            'name': 'archive__url',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a target="_blank" rel="noopener noreferrer" href="https://archive.org/details/${data}">Archive.org</a>`
-              }
-            },         
+        }, {
+          'data': 'archive.url',
+          'name': 'archive__url',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a target="_blank" rel="noopener noreferrer" href="https://archive.org/details/${data}">Archive.org</a>`
+            }
           },
-        ],
+        }, ],
         initComplete: function(settings, json) {
           var table = this.api();
           var values = table.column(3).data().unique().toArray();
           var container = $('#PublicityFilter');
-          
+
           values.forEach(element => {
             var option = `<option value="${element}">${element}</option>`;
             container.append(option);
@@ -120,13 +125,14 @@
         }
       });
 
+      /*
       $('#PublicityFilter').on('change', function () {
         var selectedValue = this.value;
         table.order([[4, 'asc']]).column(3).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
+      searchBuilder(table, sb_columns);*/
     });
   </script>
 {% endblock content %}

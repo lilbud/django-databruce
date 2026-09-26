@@ -820,9 +820,12 @@ class ArchiveLinksSerializer(BaseSerializer):
 
 
 class BootlegsSerializer(BaseSerializer):
+  event = MinimalEventSerializer()
+  archive = ArchiveLinksSerializer(required=False)
+
   class Meta:
     model = models.Bootleg
-    fields = ["id", "event", "url"]
+    fields = ["id", "event", "archive", "title", "label", "source", "type"]
 
 
 class ContinentsSerializer(BaseSerializer):

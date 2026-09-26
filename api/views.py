@@ -131,7 +131,7 @@ class BootlegViewSet(viewsets.ReadOnlyModelViewSet):
     db_models.Bootleg.objects.select_related(
       "event",
     )
-    .prefetch_related("archive")
+    # .prefetch_related("archive")
     .order_by("event")
   )
 
