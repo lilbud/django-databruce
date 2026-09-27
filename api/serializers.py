@@ -950,7 +950,7 @@ class SongsSerializer(BaseSerializer):
   last_event = MinimalEventSerializer()
   has_lyrics = serializers.SerializerMethodField(required=False)
   album = ReleasesSerializer(required=False)
-  category = serializers.IntegerField(source="category_id")
+  category = SongCategorySerializer(required=False)
 
   def get_has_lyrics(self, obj):
     return obj.lyrics_song.exists()
