@@ -47,7 +47,7 @@
       </div>
     {% endif %}
     <!-- event info -->
-    <div class="row mb-3 gx-0">
+    <div class="row mb-2 mb-lg-3 gx-0">
       <div class="col">
         <div class="card">
           <div class="card-body" id="eventHeader">
@@ -181,7 +181,7 @@
          aria-labelledby="overview-tab"
          tabindex="0">
       {% if not setlist_certainty and not event.note %}
-        <div class="row mb-3">
+        <div class="row mb-2">
           <div class="col-12">
             <div class="card message info">
               <span>
@@ -191,12 +191,12 @@
           </div>
         </div>
       {% elif event.note %}
-        <div class="row mb-3 d-block d-xl-none">
+        <div class="row mb-2 d-block d-xl-none">
           <div class="col-12">{% partial event-note %}</div>
         </div>
       {% endif %}
       <div class="row
-                  {% if setlist_certainty %}row-cols-xl-2 row-gap-3 gx-3{% endif %}">
+                  {% if setlist_certainty %}row-cols-xl-2 row-gap-2 row-gap-lg-3 gx-2 gx-lg-3{% endif %}">
         {% if setlist_certainty %}
           <div class="col-12 col-xl-9 order-1">
             <div class="card">
@@ -250,13 +250,13 @@
             </div>
           </div>
         {% endif %}
-        <div class="col-12 d-flex flex-column gap-3
-                    {% if setlist_certainty %}col-xl-3 gap-3{% endif %}
+        <div class="col-12 d-flex flex-column gap-2 gap-lg-3
+                    {% if setlist_certainty %}col-xl-3{% endif %}
                     order-2">
           {% if event.note %}
             <div class="d-none d-xl-block">{% partial event-note %}</div>
           {% endif %}
-          <div class="row g-3">
+          <div class="d-flex flex-column gap-2 gap-lg-3">
             {% if start_time or scheduled_time or event.length %}
               <div class="col-12 col-md-6 col-xl-12">
                 <div class="card h-100">
@@ -969,7 +969,7 @@
           ].filter(Boolean).join('');
 
           const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
-          const notes = row.notes ? `<span class="text-wrap fw-light d-block d-lg-none setlist-note">${row.notes}</span>` : '';
+          const notes = row.notes ? `<span class="text-wrap fw-light d-block d-lg-none setlist-note">${row.notes.join("; ").replaceAll("''", "'")}</span>` : '';
 
           return `
                 <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">

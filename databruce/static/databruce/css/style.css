@@ -537,9 +537,9 @@ tbody tr:not(.set-header) {
   cursor: pointer !important;
 }
 
-.badge:not([class*="text-"]) {
+/* .badge:not([class*="text-"]) {
   font-size: var(--text-xs) !important;
-}
+} */
 
 .badge:not(.d-lg-none) {
   display: inline-flex !important;
@@ -553,14 +553,8 @@ td .badge {
   border-radius: 5px !important;
   margin-top: -2px;
   font-family: 'JetBrains Mono Variable', monospace !important;
-  padding: .2rem .4rem !important;
+  padding: .2rem .25rem !important;
 }
-
-/* .bi.bi-check-lg {
-  height: 14px !important;
-  width: 14px !important;
-  font-size: var(--text-sm) !important;
-} */
 
 /* font size clamp for event header. Inspired by WTED Archives */
 .event-header-date {
@@ -1453,7 +1447,19 @@ td.notes {
 
 /* smaller font size for setlist notes */
 .setlist-note {
-  font-size: 0.7rem !important;
+  font-size: var(--text-2xs) !important;
+}
+
+@media (max-width: 767px) {
+  .min-tablet-l {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .min-desktop {
+    display: none !important;
+  }
 }
 
 .album-art {
