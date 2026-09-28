@@ -48,7 +48,10 @@ class RegexpReplace(Func):
 
 
 class BaseModel(models.Model):
-  created_at = models.DateTimeField(db_index=True, default=timezone.now)
+  created_at = models.DateTimeField(
+    db_index=True,
+    default=timezone.now,
+  )
   updated_at = models.DateTimeField(auto_now=True)
 
   class Meta:
@@ -114,7 +117,12 @@ class Band(BaseModel):
   )
 
   bruce_band = models.BooleanField(default=False, db_column="springsteen_band")
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
   note = models.CharField(default=None, blank=True, max_length=255)
 
   class Meta:
@@ -130,10 +138,39 @@ class Band(BaseModel):
 
 
 class Bootleg(BaseModel):
+  class CategoryChoices(models.TextChoices):
+    AUD_COMP = "aud_comp", _("Audio Compilation")
+    AUD_INTER = "aud_inter", _("Audio Interview")
+    AUD_LIVE1967 = "aud_live1967", _("Audio 1967-1974")
+    AUD_LIVE1975 = "aud_live1975", _("Audio 1975-1977")
+    AUD_LIVE1978 = "aud_live1978", _("Audio 1978-1979")
+    AUD_LIVE1980 = "aud_live1980", _("Audio 1980-1983")
+    AUD_LIVE1984 = "aud_live1984", _("Audio 1984-1987")
+    AUD_LIVE1988 = "aud_live1988", _("Audio 1988-1991")
+    AUD_LIVE1992 = "aud_live1992", _("Audio 1992-1994")
+    AUD_LIVE1995 = "aud_live1995", _("Audio 1995-1998")
+    AUD_LIVE1999 = "aud_live1999", _("Audio 1999-2001")
+    AUD_LIVE2002 = "aud_live2002", _("Audio 2002-2004")
+    AUD_LIVE2005 = "aud_live2005", _("Audio 2005")
+    AUD_LIVE2006 = "aud_live2006", _("Audio 2006")
+    AUD_LIVE2007 = "aud_live2007", _("Audio 2007-2008")
+    AUD_LIVE2009 = "aud_live2009", _("Audio 2009-2011")
+    AUD_LIVE2012 = "aud_live2012", _("Audio 2012-2013")
+    AUD_LIVE2014 = "aud_live2014", _("Audio 2014 >")
+    VID_COMP = "vid_comp", _("Video Compilation")
+    VID_INTER = "vid_inter", _("Video Interview")
+    VID_LIVE = "vid_live", _("Video Live")
+
   id = models.AutoField(primary_key=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
-  slid = models.IntegerField(default=0)
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  slid = models.IntegerField(default=0, help_text="SpringsteenLyrics ID", blank=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+    blank=True,
+  )
 
   event = models.ForeignKey(
     to="Event",
@@ -145,25 +182,83 @@ class Bootleg(BaseModel):
     blank=True,
   )
 
-  category = models.CharField(default=None, blank=True, max_length=255)
+  category = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="SpringsteenLyrics Category",
+    choices=CategoryChoices.choices,
+  )
+
   title = models.CharField(default=None, blank=True, max_length=255)
-  label = models.CharField(default=None, blank=True, max_length=255)
-  source = models.CharField(default=None, blank=True, max_length=255)
-  source_info = models.CharField(default=None, blank=True, max_length=255)
-  version_info = models.CharField(default=None, blank=True, max_length=255)
-  transfer = models.CharField(default=None, blank=True, max_length=255)
-  editor = models.CharField(default=None, blank=True, max_length=255)
-  type = models.CharField(default=None, blank=True, max_length=255)
-  catalog_number = models.CharField(default=None, blank=True, max_length=255)
-  media_type = models.CharField(default=None, blank=True, max_length=255)
-  has_info = models.BooleanField()
-  has_artwork = models.BooleanField()
+
+  label = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Release Label",
+  )
+
+  source = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Bootleg Source",
+  )
+
+  source_info = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Bootleg Source Info",
+  )
+  version_info = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Bootleg Version Info (MJK Multiple Recorder Project)",
+  )
+  transfer = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Who handled tape transfer",
+  )
+  editor = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Who edited the bootleg",
+  )
+  type = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Type of Bootleg (AUD, SBD, etc)",
+  )
+  catalog_number = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Catalog Number (Retail Boots Only)",
+  )
+  media_type = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Media Type (Vinyl, CD, etc)",
+  )
+  has_info = models.BooleanField(default=False)
+  has_artwork = models.BooleanField(default=False)
 
   archive = models.ForeignKey(
     to=ArchiveLinks,
     on_delete=models.DO_NOTHING,
     db_column="archive_id",
     default=None,
+    null=True,
+    blank=True,
+    help_text="Radio Nowhere Archive ID",
   )
 
   class Meta:
@@ -181,7 +276,12 @@ class Bootleg(BaseModel):
 class City(BaseModel):
   id = models.AutoField(primary_key=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
   name = models.CharField(default=None, max_length=255)
 
   state = models.ForeignKey(
@@ -205,7 +305,12 @@ class City(BaseModel):
   )
 
   num_events = models.IntegerField(default=0)
-  aliases = models.CharField(default=None, blank=True, max_length=255)
+  aliases = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="City Aliases/Nicknames (Philly, etc)",
+  )
 
   first_event = models.ForeignKey(
     to="Event",
@@ -227,7 +332,7 @@ class City(BaseModel):
     null=True,
   )
 
-  timezone = TimeZoneField(use_pytz=False, default="UTC")
+  timezone = TimeZoneField(use_pytz=False, default="UTC", help_text="City Timezone")
 
   class Meta:
     db_table = "cities"
@@ -272,9 +377,25 @@ class Country(BaseModel):
     null=True,
   )
 
-  alpha_2 = models.CharField(default=None, max_length=2)
-  aliases = models.CharField(default=None, blank=True, max_length=255)
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  alpha_2 = models.CharField(
+    default=None,
+    max_length=2,
+    help_text="2 letter country code",
+  )
+
+  aliases = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Country Alias (United Kingdom, Holland, etc.)",
+  )
+
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
 
   first_event = models.ForeignKey(
     to="Event",
@@ -302,7 +423,7 @@ class Country(BaseModel):
     verbose_name_plural = "countries"
 
   def __str__(self) -> str:
-    return self.name
+    return f"[{self.id}] {self.name} ({self.alpha_2})"
 
 
 class Cover(BaseModel):
@@ -348,7 +469,12 @@ class State(BaseModel):
   )
 
   num_events = models.IntegerField(default=0)
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
 
   first_event = models.ForeignKey(
     to="Event",
@@ -400,7 +526,12 @@ class Venue(BaseModel):
 
   num_events = models.IntegerField(default=0)
   note = models.CharField(default=None, blank=True, max_length=255)
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
 
   first_event = models.ForeignKey(
     to="Event",
@@ -443,6 +574,7 @@ class Venue(BaseModel):
     default=None,
     null=True,
     blank=True,
+    help_text="Venue that this venue belongs to. E.g. Building on a college campus, theatre in a larger venue, etc.",
   )
 
   class Meta:
@@ -522,13 +654,26 @@ class Event(BaseModel):
     AFTERNOON = "Afternoon", _("Afternoon")
     MORNING = "Morning", _("Morning")
 
+  class EventCertainty(models.TextChoices):
+    UNKNOWN_DATE = "Unknown Date", _("Unknown Date")
+    CONFIRMED = "Confirmed", _("Confirmed")
+    PROBABLE = "Probable", _("Probable")
+    UNKNOWN_LOCATION = "Unknown Location", _("Unknown Location")
+
+  class SetlistCertainty(models.TextChoices):
+    UNKNOWN = "Unknown", _("Unknown")
+    CONFIRMED = "Confirmed", _("Confirmed")
+    PROBABLE = "Probable", _("Probable")
+
   id = models.AutoField(primary_key=True)
+
   num = models.IntegerField(
     db_column="event_num",
     blank=True,
     null=True,
     default=None,
   )
+
   event_id = models.CharField(max_length=11, db_column="event_id", unique=True)
   date = models.DateField(default=None, db_column="event_date", blank=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
@@ -538,9 +683,10 @@ class Event(BaseModel):
     default=None,
     blank=True,
     null=True,
+    help_text="For multiple events at same venue on same day",
   )
 
-  public = models.BooleanField(default=False)
+  public = models.BooleanField(default=False, help_text="Event Publicity")
 
   artist = models.ForeignKey(
     to=Band,
@@ -579,6 +725,7 @@ class Event(BaseModel):
     db_column="tour_leg",
     blank=True,
     null=True,
+    help_text="Tour Leg",
   )
 
   run = models.ForeignKey(
@@ -588,6 +735,7 @@ class Event(BaseModel):
     db_column="run",
     blank=True,
     null=True,
+    help_text="Event Run",
   )
 
   title = models.CharField(
@@ -597,23 +745,12 @@ class Event(BaseModel):
     null=True,
   )
 
-  class EventCertainty(models.TextChoices):
-    UNKNOWN_DATE = "Unknown Date", _("Unknown Date")
-    CONFIRMED = "Confirmed", _("Confirmed")
-    RUMORED = "Rumored", _("Rumored")
-    PROBABLE = "Probable", _("Probable")
-    UNKNOWN_LOCATION = "Unknown Location", _("Unknown Location")
-
-  class SetlistCertainty(models.TextChoices):
-    UNKNOWN = "Unknown", _("Unknown")
-    CONFIRMED = "Confirmed", _("Confirmed")
-    PROBABLE = "Probable", _("Probable")
-
   event_certainty = models.CharField(
     choices=EventCertainty.choices,
     default=None,
     blank=True,
     null=True,
+    help_text="Designation for how certain the date and location are",
   )
 
   setlist_certainty = models.CharField(
@@ -621,28 +758,68 @@ class Event(BaseModel):
     default=None,
     blank=True,
     null=True,
+    help_text="Designation for how certain the setlist is",
   )
 
   note = models.CharField(default=None, blank=True, max_length=255)
   summary = models.CharField(max_length=255, blank=True)
 
-  bootleg = models.BooleanField(default=False)
-  is_stats_eligible = models.BooleanField(default=True)
+  bootleg = models.BooleanField(default=False, help_text="Event has a bootleg")
+  is_stats_eligible = models.BooleanField(
+    default=True,
+    help_text="Event is stats eligible",
+  )
 
-  start_time = models.DateTimeField(blank=True, default=None, null=True)
-  end_time = models.DateTimeField(blank=True, default=None, null=True)
-  scheduled_time = models.DateTimeField(blank=True, default=None, null=True)
-  length = models.TimeField(blank=True, default=None, null=True)
+  start_time = models.DateTimeField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Event Start Time (Enter in events timezone)",
+  )
+  end_time = models.DateTimeField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Event End Time (Enter in events timezone)",
+  )
+  scheduled_time = models.DateTimeField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Event Scheduled Time (Enter in events timezone)",
+  )
+  length = models.TimeField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Event Length (YYYY-MM-DD HH:MM:SS)",
+  )
 
-  sales = models.BigIntegerField(blank=True, default=None, null=True)
-  capacity = models.BigIntegerField(blank=True, default=None, null=True)
-  gross = models.BigIntegerField(blank=True, default=None, null=True)
+  sales = models.BigIntegerField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Total Tickets Sold",
+  )
+  capacity = models.BigIntegerField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Total Tickets Available",
+  )
+  gross = models.BigIntegerField(
+    blank=True,
+    default=None,
+    null=True,
+    help_text="Total Gross",
+  )
   ticket_min = models.DecimalField(
     max_digits=10,
     decimal_places=2,
     blank=True,
     null=True,
     default=None,
+    help_text="Minimum Ticket Price",
   )
   ticket_max = models.DecimalField(
     max_digits=10,
@@ -650,12 +827,38 @@ class Event(BaseModel):
     blank=True,
     null=True,
     default=None,
+    help_text="Maximum Ticket Price",
   )
-  box_office_source = models.CharField(blank=True, max_length=255, default=None)
-  box_office_note = models.CharField(blank=True, max_length=255, default=None)
-  sellout = models.BooleanField(blank=True, null=True, default=None)
-  ticket_range = models.CharField(blank=True, max_length=255, default=None)
-  promo_company = models.CharField(blank=True, max_length=255, default=None)
+  box_office_source = models.CharField(
+    blank=True,
+    max_length=255,
+    default=None,
+    help_text="Source of Box Office Data",
+  )
+  box_office_note = models.CharField(
+    blank=True,
+    max_length=255,
+    default=None,
+    help_text="Box Office Note",
+  )
+  sellout = models.BooleanField(
+    blank=True,
+    null=True,
+    default=None,
+    help_text="All tickets sold",
+  )
+  ticket_range = models.CharField(
+    blank=True,
+    max_length=255,
+    default=None,
+    help_text="Ticket Price Range",
+  )
+  promo_company = models.CharField(
+    blank=True,
+    max_length=255,
+    default=None,
+    help_text="Company involved in promoting event",
+  )
 
   type = models.ManyToManyField(
     "Type",
@@ -675,11 +878,13 @@ class Event(BaseModel):
   def __str__(self) -> str:
     if self.date:
       if self.early_late:
-        return f"{self.date.strftime('%Y-%m-%d [%a]')} ({self.early_late})"
+        date = f"{self.date.strftime('%Y-%m-%d [%a]')} ({self.early_late})"
 
-      return f"{self.date.strftime('%Y-%m-%d [%a]')}"
+      date = f"{self.date.strftime('%Y-%m-%d [%a]')}"
 
-    return format_fuzzy(self.event_id)
+    date = format_fuzzy(self.event_id)
+
+    return f"[{self.id}] {date}"
 
   def save(self, *args, **kwargs):
     if self.note:
@@ -750,13 +955,24 @@ class NugsRelease(BaseModel):
     db_column="release_date",
     blank=True,
     null=True,
+    help_text="Release Date (Enter midnight if time unknown)",
   )
 
-  url = models.CharField(default=None, db_column="nugs_url", max_length=255)
+  url = models.CharField(
+    default=None,
+    db_column="nugs_url",
+    max_length=255,
+    help_text="Nugs URL (Typically nugs.net/[ID].html)",
+  )
 
   thumbnail = models.CharField(default=None, db_column="thumbnail_url", max_length=255)
 
-  name = models.CharField(default=None, blank=True, max_length=255)
+  name = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Name of Release (Nugs, LivePhish, etc.)",
+  )
 
   category = models.CharField(
     default=None,
@@ -772,6 +988,7 @@ class NugsRelease(BaseModel):
     related_name="article",
     blank=True,
     null=True,
+    help_text="Nugs Release Essay",
   )
 
   length = models.TimeField(default=None, blank=True)
@@ -789,7 +1006,12 @@ class NugsRelease(BaseModel):
 class Relation(BaseModel):
   id = models.AutoField(primary_key=True)
   uuid = models.UUIDField(default=uuid4, editable=False)
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
   brucebase_url = models.CharField(default=None, blank=True, max_length=255)
   name = models.CharField(default=None, blank=True, max_length=255)
   num_events = models.IntegerField(default=0)
@@ -815,7 +1037,11 @@ class Relation(BaseModel):
   instruments = models.CharField(default=None, blank=True, max_length=255)
   start_date = models.DateField(default=None, blank=True)
   end_date = models.DateField(default=None, blank=True)
-  show_cal = models.BooleanField(default=False, db_column="show_calendar")
+  show_cal = models.BooleanField(
+    default=False,
+    db_column="show_calendar",
+    help_text="Show Relation Birthday on Calendar (Use only for those who are members of a Bruce band)",
+  )
 
   class Meta:
     db_table = "relations"
@@ -891,10 +1117,20 @@ class Onstage(BaseModel):
     default=None,
     blank=True,
     null=True,
+    help_text="Relation is member of band onstage",
   )
 
-  note = models.CharField(default=None, blank=True, max_length=255)
-  guest = models.BooleanField(default=False)
+  note = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Note about relation onstage",
+  )
+
+  guest = models.BooleanField(
+    default=False,
+    help_text="Whether relation is a guest (If they're a member of the event band or not)",
+  )
 
   class Meta:
     db_table = "onstage"
@@ -939,9 +1175,13 @@ class ReleaseTrack(BaseModel):
     null=True,
   )
 
-  track = models.CharField(db_column="track", max_length=255)
+  track = models.CharField(
+    db_column="track",
+    max_length=255,
+    help_text="Position (Usually Vinyl Releases Only: A1, B2, etc.)",
+  )
 
-  position = models.IntegerField(default=1)
+  position = models.IntegerField(default=1, help_text="Overall track position")
 
   song = models.ForeignKey(
     to="Song",
@@ -960,7 +1200,12 @@ class ReleaseTrack(BaseModel):
     null=True,
   )
 
-  note = models.CharField(default=None, blank=True, max_length=255)
+  note = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Note about track",
+  )
 
   setlist = models.ForeignKey(
     to="Setlist",
@@ -1023,8 +1268,18 @@ class Release(BaseModel):
     db_column="release_date",
     verbose_name="Release Date",
   )
-  short_name = models.CharField(default=None, blank=True, max_length=255)
-  thumb = models.CharField(default=None, blank=True, max_length=255)
+  short_name = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Short Name/Abbreviation (Born to Run - BTR, Wild and the Innocent: WIESS, etc.)",
+  )
+  thumb = models.CharField(
+    default=None,
+    blank=True,
+    max_length=255,
+    help_text="Thumbnail URL",
+  )
   note = models.CharField(default=None, blank=True, max_length=255)
   mbid = models.UUIDField(
     default=None,
@@ -1176,7 +1431,12 @@ class Song(BaseModel):
 
   spotify_id = models.CharField(default=None, blank=True, max_length=255)
 
-  mbid = models.UUIDField(default=None, editable=True, null=True)
+  mbid = models.UUIDField(
+    default=None,
+    editable=True,
+    null=True,
+    help_text="MusicBrainz ID",
+  )
 
   length = models.TimeField(default=None, blank=True, null=True)
 
@@ -1307,11 +1567,26 @@ class Setlist(BaseModel):
     null=True,
     max_length=255,
   )
-  segue = models.BooleanField(default=False)
-  premiere = models.BooleanField(default=False)
-  debut = models.BooleanField(default=False)
-  instrumental = models.BooleanField(default=False)
-  nobruce = models.BooleanField(default=False)
+  segue = models.BooleanField(
+    default=False,
+    help_text="Whether song segues into the next song",
+  )
+  premiere = models.BooleanField(
+    default=False,
+    help_text="Whether song is a premiere (First Time Played)",
+  )
+  debut = models.BooleanField(
+    default=False,
+    help_text="Whether song is a tour debut (First Time Played on tour)",
+  )
+  instrumental = models.BooleanField(
+    default=False,
+    help_text="Whether song is played instrumentally",
+  )
+  nobruce = models.BooleanField(
+    default=False,
+    help_text="Whether song is played without Bruce",
+  )
 
   position = models.CharField(
     default=None,
@@ -1321,8 +1596,8 @@ class Setlist(BaseModel):
     max_length=50,
   )
 
-  last = models.IntegerField(default=0)
-  next = models.IntegerField(default=0)
+  last = models.IntegerField(default=0, help_text="Events since last played")
+  next = models.IntegerField(default=0, help_text="Events until next played")
 
   tour_num = models.IntegerField(default=0)
   tour_total = models.IntegerField(default=0)
@@ -1331,6 +1606,8 @@ class Setlist(BaseModel):
     to=Event,
     on_delete=models.SET_NULL,
     db_column="last_time_played",
+    verbose_name="Last Time Played",
+    help_text="The last event this song was played at",
     related_name="ltp_event",
     default=None,
     blank=True,
@@ -1339,12 +1616,30 @@ class Setlist(BaseModel):
 
   sign_request = models.BooleanField(default=False)
 
-  is_opener = models.BooleanField(default=False)
-  is_closer = models.BooleanField(default=False)
-  is_set_opener = models.BooleanField(default=False)
-  is_set_closer = models.BooleanField(default=False)
-  is_last_in_show = models.BooleanField(default=False)
-  is_main_set_closer = models.BooleanField(default=False)
+  is_opener = models.BooleanField(
+    default=False,
+    help_text="Whether song is an show/set opener (First song played in show/set)",
+  )
+  is_closer = models.BooleanField(
+    default=False,
+    help_text="Whether song is an show/set closer (Last song played in show/set)",
+  )
+  is_set_opener = models.BooleanField(
+    default=False,
+    help_text="Whether song is an set opener (First song played in set)",
+  )
+  is_set_closer = models.BooleanField(
+    default=False,
+    help_text="Whether song is an set closer (Last song played in set)",
+  )
+  is_last_in_show = models.BooleanField(
+    default=False,
+    help_text="Whether song is the last song played in show",
+  )
+  is_main_set_closer = models.BooleanField(
+    default=False,
+    help_text="Whether song is the last song played in main set (Show/Set 2)",
+  )
 
   class Meta:
     managed = True
@@ -1413,13 +1708,18 @@ class Snippet(BaseModel):
     null=True,
   )
 
-  position = models.IntegerField(db_column="snippet_pos", default=1)
+  position = models.IntegerField(
+    db_column="snippet_pos",
+    default=1,
+    help_text="Snippet position in base song",
+  )
 
   note = models.CharField(
     default=None,
     db_column="snippet_note",
     blank=True,
     null=True,
+    help_text="Note about the snippet",
   )
 
   class Meta:
@@ -1593,27 +1893,57 @@ class Run(BaseModel):
     default=None,
   )
   note = models.CharField(default=None, blank=True, max_length=255)
-  total_sales = models.IntegerField(blank=True)
-  total_capacity = models.IntegerField(blank=True)
-  total_gross = models.BigIntegerField(blank=True)
+  total_sales = models.IntegerField(
+    blank=True,
+    help_text="Number of tickets sold for entire run. Many box office reports will group all shows in run together.",
+  )
+  total_capacity = models.IntegerField(
+    blank=True,
+    help_text="Number of tickets available for entire run. Many box office reports will group all shows in run together.",
+  )
+  total_gross = models.BigIntegerField(
+    blank=True,
+    help_text="Gross for entire run. Many box office reports will group all shows in run together.",
+  )
   ticket_min = models.DecimalField(
     max_digits=10,
     decimal_places=2,
     blank=True,
     null=True,
+    help_text="Lowest ticket price.",
   )
   ticket_max = models.DecimalField(
     max_digits=10,
     decimal_places=2,
     blank=True,
     null=True,
+    help_text="Highest ticket price.",
   )
-  ticket_range = models.CharField(blank=True, max_length=255)
-  box_office_source = models.CharField(blank=True, max_length=255)
-  box_office_note = models.CharField(blank=True, max_length=255)
-  sellout = models.BooleanField(blank=True)
-  promo_company = models.CharField(blank=True, max_length=255)
-  num_sellout = models.IntegerField(blank=True)
+  ticket_range = models.CharField(
+    blank=True,
+    max_length=255,
+    help_text="Range of ticket prices.",
+  )
+  box_office_source = models.CharField(
+    blank=True,
+    max_length=255,
+    help_text="Source of box office data.",
+  )
+  box_office_note = models.CharField(
+    blank=True,
+    max_length=255,
+    help_text="Notes about box office data.",
+  )
+  sellout = models.BooleanField(blank=True, help_text="Did all shows on run sell out?")
+  promo_company = models.CharField(
+    blank=True,
+    max_length=255,
+    help_text="Promo company.",
+  )
+  num_sellout = models.IntegerField(
+    blank=True,
+    help_text="Number of shows that sold out on run.",
+  )
 
   class Meta:
     db_table = "runs"
@@ -1759,10 +2089,15 @@ class Guest(BaseModel):
   relation = models.ForeignKey(
     to=Relation,
     on_delete=models.CASCADE,
-    db_column="guest_id",
+    db_column="relation_id",
   )
 
-  note = models.CharField(blank=True, default=None, max_length=255)
+  note = models.CharField(
+    blank=True,
+    default=None,
+    max_length=255,
+    help_text="Note about the guest (instrument, who they are, why they appear, etc.)",
+  )
 
   class Meta:
     db_table = "guests"
@@ -1809,6 +2144,7 @@ class Lyric(BaseModel):
     null=True,
     blank=True,
     default=None,
+    help_text="Where the lyric came from",
   )
 
   text = models.CharField(db_column="lyrics", blank=True, default=None, max_length=255)
@@ -1819,8 +2155,18 @@ class Lyric(BaseModel):
     max_length=255,
     choices=Langauge.choices,
   )
-  note = models.CharField(blank=True, default=None, max_length=255)
-  translator = models.CharField(blank=True, default=None, max_length=255)
+  note = models.CharField(
+    blank=True,
+    default=None,
+    max_length=255,
+    help_text="Note about the lyric",
+  )
+  translator = models.CharField(
+    blank=True,
+    default=None,
+    max_length=255,
+    help_text="Person who translated the lyric",
+  )
 
   class Meta:
     db_table = "lyrics"
@@ -2013,7 +2359,7 @@ class Contact(BaseModel):
   email = models.EmailField()
   is_user = models.BooleanField(default=False)
   subject = models.CharField(choices=Subject.choices, max_length=50)
-  message = models.CharField(max_length=255)
+  message = models.CharField(max_length=255, editable=False)
 
   class Meta:
     db_table = "contact"
@@ -2183,7 +2529,11 @@ class Tag(BaseModel):
   id = models.AutoField(primary_key=True)
   name = models.CharField(max_length=255)
   slug = models.SlugField(unique=True, blank=True)
-  description = models.CharField(blank=True, max_length=255)
+  description = models.CharField(
+    blank=True,
+    max_length=255,
+    help_text="Description of Tag",
+  )
   uuid = models.UUIDField(default=uuid4, editable=False)
 
   class Meta:

@@ -12,8 +12,8 @@ class BlogCategory(BaseModel):
   name = dj_models.CharField(max_length=100)
   slug = dj_models.SlugField(unique=True, blank=True)
   uuid = dj_models.UUIDField(default=uuid4, editable=False)
-  created_at = dj_models.DateTimeField(auto_now_add=True)
-  updated_at = dj_models.DateTimeField(auto_now=True)
+  # created_at = dj_models.DateTimeField(auto_now_add=True)
+  # updated_at = dj_models.DateTimeField(auto_now=True)
 
   class Meta:
     db_table = "blog_category"

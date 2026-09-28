@@ -17,12 +17,20 @@ set_names = [
   "Post-Show",
 ];
 
+function nextPage(table) {
+  table.page('next').draw(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+function prevPage(table) {
+  table.page('previous').draw(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 DataTable.feature.register('customOrder', function (settings, opts) {
   // 1. Validate that the user passed an external target dropdown selector
   let targetSelector = opts.selectId;
   if (!targetSelector) return null;
-
-  console.log(targetSelector);
 
   let select = $(targetSelector);
   if (select.length === 0) return null;
@@ -231,4 +239,5 @@ function eventDateFormat(event) {
   }
 
   return event.event_id ? `<a href="/events/${event.event_id}">${dateItem}</a>` : event;
-}
+};
+

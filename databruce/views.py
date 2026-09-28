@@ -1772,6 +1772,26 @@ class TestTableView(PageTitleMixin, TemplateView):
   template_name = "databruce/test_table.html"
   title = "Table"
 
+  def get_context_data(self, **kwargs: dict[str, Any]):
+    context = super().get_context_data(**kwargs)
+
+    context["title"] = "Test Table"
+    context["api_route"] = "/api/v1/events/?year=1978"
+    context["columns_config"] = [
+      {"field": "date", "label": "ID"},
+      {
+        "field": "has_setlist",
+        "label": "Setlist",
+        "type": "bool",
+        "class": "text-center",
+      },
+      {"field": "artist.name", "label": "Artist"},
+      {"field": "venue.name", "label": "Venue"},
+      {"field": "tour.name", "label": "Tour"},
+    ]
+
+    return context
+
 
 class TestEventView(PageTitleMixin, TemplateView):
   template_name = "databruce/test_event_table.html"

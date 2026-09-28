@@ -547,3 +547,13 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Removed
 
 - Removed Political Tour Legs (Forward, Fresh Start for America). Really no point as many of these are only a few shows and not really part of a "tour" persay. They're still grouped under a "Political Rallies" tour, but the legs aren't needed.
+
+# v1.27 (September 28, 2026)
+
+## Changed
+
+- All tables have had their controls moved to a collapse element.
+- Disabled pagination on some tables when not really needed. Tables like Countries/States, as well as tour legs.
+- Tour Leg table now groups results by Tour
+
+## Removed

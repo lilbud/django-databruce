@@ -20,7 +20,7 @@
         <div id="tableControls">
           <!-- Search -->
           <div class="col">
-            <label for="search" class="pb-1">Search</label>
+            <label for="search" class="form-label col-2 col-md-1 text-nowrap">Search</label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">
                 <i class="bi bi-search"></i>
@@ -58,60 +58,61 @@
     </div>
   </div>
   <script>
-    $(document).ready(function () {
-      let sb_columns = [0,1,2,3,4];
+    $(document).ready(function() {
+      let sb_columns = [0, 1, 2, 3, 4];
 
       var table = new DataTable('#table', {
         order: [0, 'asc'],
         ajax: {
           'url': '/api/v1/setlist_notes/?note={{ query }}&format=custom',
         },
-        columnDefs: [
-          { targets: '_all', className: 'text-wrap text-xs', defaultContent: '' },
-        ],
-        columns: [
-          {
-            'data': 'event',
-            'name': 'event__event_id, event__early_late',
-            'className': 'text-nowrap all',
-            'width': '8rem',
-            'type': 'text',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/events/${data.event_id}">${data.date}</a>`;
-              }
-            },
+        columnDefs: [{
+          targets: '_all',
+          className: 'text-wrap text-xs',
+          defaultContent: ''
+        }, ],
+        columns: [{
+          'data': 'event',
+          'name': 'event__event_id, event__early_late',
+          'className': 'text-nowrap all',
+          'width': '8rem',
+          'type': 'text',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`;
+            }
           },
-          {
-            'data': 'event.venue',
-            'name': 'event__venue__name, event__venue__detail',
-            'className': 'text-nowrap all',
-            'width': '12rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/venues/${data.uuid}">${data.name}</a>`
-              }
-            },
+        }, {
+          'data': 'event.venue',
+          'name': 'event__venue__name, event__venue__detail',
+          'className': 'text-nowrap all',
+          'width': '12rem',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a href="/venues/${data.uuid}">${data.name}</a>`
+            }
           },
-          {
-            'data': 'set_name',
-            'name': 'setlist__set_name',
-            'className': 'text-nowrap',
-            'width': '8rem',
+        }, {
+          'data': 'set_name',
+          'name': 'setlist__set_name',
+          'className': 'text-nowrap',
+          'width': '8rem',
+        }, {
+          'data': 'song',
+          'name': 'setlist__song__name',
+          'className': 'text-nowrap',
+          'width': '12rem',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a href="/songs/${data.slug}">${data.name}</a>`;
+            }
           },
-          {
-            'data': 'song',
-            'name': 'setlist__song__name',
-            'className': 'text-nowrap',
-            'width': '12rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/songs/${data.slug}">${data.name}</a>`;
-              }
-            },
-          },
-          {'data': 'note', 'name': 'note', 'className': 'text-wrap', 'width': '15rem'},
-        ]
+        }, {
+          'data': 'note',
+          'name': 'note',
+          'className': 'text-wrap',
+          'width': '15rem'
+        }, ]
       });
 
       tableSearch(table, 'search');

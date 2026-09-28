@@ -114,13 +114,14 @@ function eventTable(url) {
       const prevBtn = $('.event-controls .btn-prev');
       const nextBtn = $('.event-controls .btn-next');
       const totalSpan = $('.event-controls .total-pages');
+      const tableInfo = $('.event_table_info')
 
       // Initial button states
       input.val(info.page + 1);
       prevBtn.attr('disabled', info.page === 0);
       nextBtn.attr('disabled', info.page >= info.pages - 1);
 
-      $('#eventTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+      tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
 
       api.on('draw', () => {
         const pageInfo = api.page.info();
@@ -135,18 +136,14 @@ function eventTable(url) {
         nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
 
         // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-        $('#eventTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+        tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
       });
 
       totalSpan.text(`of ${info.pages || 1}`);
 
-      nextBtn.on('click', function () {
-        table.page('next').draw(false);
-      });
+      nextBtn.on('click', function () { nextPage(table); });
 
-      prevBtn.on('click', function () {
-        table.page('previous').draw(false);
-      });
+      prevBtn.on('click', function () { prevPage(table); });
 
       input.on('change', function () {
         let val = parseInt(this.value, 10) - 1;
@@ -157,6 +154,7 @@ function eventTable(url) {
         input.attr('value', val);
 
         api.page(val).draw('page');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
       let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

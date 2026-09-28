@@ -16,7 +16,7 @@
             <div class="row align-items-end d-flex row-gap-2 gx-1 mb-3">
               <!-- Search -->
               <div class="col">
-                <label for="search" class="pb-1">Search</label>
+                <label for="search" class="form-label col-2 col-md-1 text-nowrap">Search</label>
                 <div class="input-group input-group-sm">
                   <span class="input-group-text">
                     <i class="bi bi-search"></i>
@@ -37,7 +37,8 @@
             </div>
             <div class="row">
               <div class="table-responsive">
-                <table class="table table-hover display" id="{% spaceless %}
+                <table class="table table-hover display"
+                       id="{% spaceless %}
                              {% block table_id %}
                              {% endblock table_id %}
                            {% endspaceless %}">

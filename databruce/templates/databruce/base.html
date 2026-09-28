@@ -86,7 +86,7 @@
   <body>
     {% include "./partials/navbar.html" %}
     <a href="#"
-       class="back-to-top d-flex d-md-none justify-content-center align-items-center"><i class="bi bi-caret-up-fill"></i></a>
+       class="back-to-top d-flex justify-content-center align-items-center"><i class="bi bi-caret-up-fill"></i></a>
     <div class="d-none">{% csrf_token %}</div>
     <div class="padded-body">
       {% block container %}
@@ -212,6 +212,17 @@
               tables.responsive.recalc();
             }
           }, 50);
+        });
+
+        const myCollapse = document.getElementById('filterCollapse');
+        const toggleBtn = document.getElementById('collapseText');
+
+        myCollapse.addEventListener('show.bs.collapse', () => {
+          toggleBtn.textContent = 'Hide Filters';
+        });
+
+        myCollapse.addEventListener('hide.bs.collapse', () => {
+          toggleBtn.textContent = 'Show Filters';
         });
       });
     </script>

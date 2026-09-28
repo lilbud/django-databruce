@@ -358,7 +358,7 @@
     color: var(--color-white);
   }
 
-  table th:not(.fc-day, [class*="opener"], [class*="closer"], [class*="dt-ordering"]) {
+  table tr:not(.set-header) th:not(.fc-day, [class*="opener"], [class*="closer"], [class*="dt-ordering"]) {
     background-color: var(--color-gray-50) !important;
   }
 
@@ -433,7 +433,8 @@
   }
 
   /* set-header default color */
-  .set-header td {
+  .set-header td,
+  .set-header th {
     background-color: var(--color-gray-300) !important;
   }
 

@@ -1,19 +1,19 @@
 {% extends "databruce/narrow_layout.html" %}
-{% load static %}
+{% load static filters %}
 {% block extrajs %}
   <script src="{% static 'databruce/js/table.js' %}"></script>
   <script src="{% static 'databruce/js/albumBreakdown.js' %}"></script>
+  <script src="{% static 'databruce/js/api-table-engine.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col overflow-hidden" id="testTable">
-    <!-- Added w-100 and mx-0 to remove negative margin blowouts on mobile -->
-    <div class="row row-cols-1 row-cols-xl-2 gy-3 gx-0 w-100 mx-0">
-      <div class="col-12 col-xl-9 pe-xl-3 px-0">
-        <!-- Cleared mobile padding -->
-        <div class="card w-100">
+  <div class="col" id="testTable">
+    <div class="row">
+      <div class="col-12">
+        {% render_api_table api_route columns_config filters_config %}
+        {% comment %} <div class="card w-100">
           <div class="card-body p-0" id="setlistCard">
             <div class="table-responsive">
-              <table class="table table-hover display nowrap" id="setlistTable">
+              <table class="table table-hover display nowrap" id="eventTable">
                 <thead>
                   <tr>
                     <!-- Added missing tr tag for semantic validation -->
@@ -28,203 +28,9 @@
               </table>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="col-12 col-xl-3 px-0">
-        <div class="card">
-          <div class="card-header">Notes</div>
-          <div class="card-body">Notes Here</div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            Albums
-            <span class="text-sm my-auto"
-                  data-bs-toggle="tooltip"
-                  data-bs-html="true"
-                  data-bs-title="Expand/Collapse All Rows">
-              <a role="button"
-                 id="album-breakdown-btn"
-                 class="btn btn-sm btn-primary icon-button px-1"
-                 data-bs-toggle="collapse">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     width="16"
-                     height="16"
-                     fill="currentColor"
-                     class="bi bi-three-dots"
-                     viewBox="0 0 16 16">
-                  <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                </svg>
-              </a>
-            </span>
-          </div>
-          <div class="card-body p-0" id="albums"></div>
-        </div>
+        </div> {% endcomment %}
       </div>
     </div>
   </div>
-  <script>
-    var event = '19770208-01'
-    var event_id = '1717'
-    var url = `/api/v1/setlists/?event=${event_id}&format=json`;
-    
-    let setlistOptions = {
-      createdRow: function (row, data) {
-        row.addClass(slugify(data.set_name));
-
-        var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
-
-        if (allowedSets.includes(data.set_name)) {
-          var album = data.song.category_slug;
-          row.attr('data-album', album);
-        }
-
-        return row
-      },
-      rowGroup: {
-        groupVal: 'set_name'
-      },
-      url: `/api/v1/setlists/?event=${event_id}&format=json`
-    }
-
-    columns = [
-      {
-        'data': 'song_num',
-        'className': 'text-center',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return data
-          }
-          
-          return ''
-        },
-        'createdCell': function (td, cellData, rowData, row, col) {
-          if (rowData.position) {
-            var position = slugify(rowData.position);
-            $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position)
-          }
-
-          return td;
-        },
-      },
-      {
-        'data': 'song',
-        'className': 'text-wrap',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          var song = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
-          var segue = row.segue ? `<span class="segue"></span>` : '';
-
-          song = `${song} ${segue}`;
-
-          var badges = $('<span />');
-          var baseBadge = `<span class="badge" data-bs-toggle="tooltip"></span>`
-
-          if (row.instrumental) {
-            var badge = $(baseBadge).clone();
-            $(badge).addClass('badge-info').text('Inst.').attr('data-bs-title', 'Instrumental');
-            badges.append($(badge).prop('outerHTML'));
-          }
-
-          if (row.sign_request) {
-            var badge = $(baseBadge).clone();
-            $(badge).addClass('badge-info').text('Sign').attr('data-bs-title', 'Sign Request');
-            $(badges).append($(badge).prop('outerHTML'));
-          }
-
-          if (row.nobruce) {
-            var badge = $(baseBadge).clone();
-            $(badge).addClass('badge-warning').text('No Boss').attr('data-bs-title', 'Song Played Without Bruce');
-            $(badges).append($(badge).prop('outerHTML'));
-          }
-
-          if (row.notes) {
-            var notes = `<br><span class="text-wrap d-inline-block d-md-none fw-light setlist-note">${row.notes}</span>`;
-            return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') + notes : song + notes;
-          }
-
-          return badges.children().length > 0 ? song + $(badges).addClass('ms-2').prop('outerHTML') : song;
-        }
-      },
-      {
-        'data': 'last',
-        'className': 'text-center text-nowrap',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          var badge = $('<span />').addClass('badge align-middle text-nowrap').attr('data-bs-toggle', 'tooltip');
-          var gap = row.gap == 0 ? null : row.gap
-          var debut = row.debut;
-          var premiere = row.premiere;
-
-          if (gap >= 50 && !debut) {
-            $(badge).addClass('badge-primary').text(`${gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
-            return $(badge).prop('outerHTML');
-          } else if (premiere) {
-            $(badge).addClass('badge-secondary').text(`First`).attr('data-bs-title', 'FTP');
-            return $(badge).prop('outerHTML');
-          } else if (debut && !premiere && gap) {
-            $(badge).addClass('badge-primary').text(`${gap}, TD`).attr('data-bs-title', 'Tour Debut');
-            return $(badge).prop('outerHTML');
-          } else if (debut && !premiere && !gap) {
-            $(badge).addClass('badge-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
-            return $(badge).prop('outerHTML');
-          } else {
-            return gap;
-          }
-        }
-      },
-      {
-        'data': 'tour_num',
-        'className': 'text-center',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          var num = row.tour_num;
-          var total = row.tour_total;
-
-          var badge = $('<span />').addClass('badge align-middle').attr('data-bs-toggle', 'tooltip');
-
-          if (num == total && total == 1) {
-            $(badge).addClass('badge-secondary').text('Only').attr('data-bs-title', 'Only Tour Performance');
-            return $(badge).prop('outerHTML');
-          } else if (num == total && total > 1) {
-            $(badge).addClass('badge-warning').text(`${num}/${total}`).attr('data-bs-title', `Final Tour Performance<br>(${num}/${total})`);
-            return $(badge).prop('outerHTML');
-          } else if (num && total) {
-            return `${num}/${total}`
-          } else {
-            return null
-          }
-        }
-      },
-      {
-        'data': 'last_event',
-        'className': 'text-center',
-        'width': '',
-        'render': function (data, type, row, meta) {
-          if (data) {
-            return `<a class="text-reset" href="/events/${data.event_id}">${data.date}</a>`;
-          }
-
-          return ''
-        }
-      },
-      {
-        'data': 'notes',
-        'className': '',
-        'render': function (data, type, row, meta) {
-          if (row.notes) {
-            return `<span class="setlist-note">${row.notes.replaceAll("''", "'")}</span>`
-          }
-
-          return ''
-        }
-      },
-    ]
-
-    createTable(url, columns, '#setlistTable', setlistOptions);
-    await albumBreakdown(`/api/v1/setlist_breakdown/?event=${event_id}&format=json&ordering=-num`)
-
-    {% comment %} const myTable = new Table("#setlistTable", setlistOptions); {% endcomment %}
-
-  </script>
+  <script></script>
 {% endblock content %}

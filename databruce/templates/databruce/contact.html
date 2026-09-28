@@ -20,16 +20,16 @@
           {% for field in form %}
             <div class="mb-2">
               {{ field.errors }}
-              <label class="form-label text-lg" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+              <label class="form-label pb-1" for="{{ field.id_for_label }}">{{ field.label }}:</label>
               {% if field.help_text %}
-                <div class="text-sm"
+                <div class="text-xs mb-2"
                      {% if field.id_for_label %}id="{{ field.id_for_label }}_helptext"{% endif %}>{{ field.help_text|safe }}</div>
               {% endif %}
               {{ field }}
             </div>
           {% endfor %}
-          <div class="col-12 mx-auto">
-            <button class="btn btn-sm btn-primary" type="submit">Submit</button>
+          <div class="col-12 col-lg mx-auto mt-4">
+            <button class="btn btn-sm btn-primary w-100" type="submit">Submit</button>
           </div>
         </form>
       </div>

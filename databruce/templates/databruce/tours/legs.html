@@ -9,42 +9,49 @@
         <div class="text-2xl">Tour Legs</div>
       </div>
     </div>
-    <div class="row">
-      <div id="tableControls">
-        <!-- Search -->
-        <div class="col">
-          <label for="search" class="pb-1">Search</label>
-          <div class="input-group input-group-sm">
-            <span class="input-group-text">
-              <i class="bi bi-search"></i>
-            </span>
-            <input type="text"
-                   id="search"
-                   class="form-control form-control-sm"
-                   placeholder="Type to search table...">
-          </div>
-        </div>
+    <div class="row justify-content-center align-items-center mt-3">
+      <div class="col-12">
+        <a class="btn btn-secondary text-sm w-100 collapse-toggle"
+           id="filterCollapseToggle"
+           data-bs-toggle="collapse"
+           href="#filterCollapse"
+           role="button"
+           aria-expanded="false"
+           aria-controls="filterCollapse">
+          <span id="collapseText">Show Filters</span>
+          <svg xmlns="http://www.w3.org/2000/svg"
+               width="16"
+               height="16"
+               fill="currentColor"
+               class="bi bi-chevron-down collapse-icon"
+               viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+          </svg>
+        </a>
       </div>
     </div>
-    <div class="my-3">
-      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
-           id="controls">
-        <div class="order-1 mb-0">{% include "databruce/partials/table_pagination.html" %}</div>
-        <div class="dt-info order-3 table_info"
-             id="tableInfo"
-             aria-live="polite"
-             role="status"></div>
-        <div class="order-1 order-lg-3 d-flex col-12 col-lg-3 mb-3 mb-lg-0 align-items-center justify-content-center justify-content-sm-start gap-2"
+    <div class="collapse" id="filterCollapse">
+      <div class="flex-column d-grid row-gap-2 pt-3 px-1">
+        <div class="col-12 d-flex align-items-center justify-content-center gap-2">
+          <label for="search" class="form-label col-2 col-md-1 text-nowrap">Search:</label>
+          <input type="text"
+                 id="search"
+                 class="form-control form-control-sm"
+                 placeholder="Type to search table...">
+        </div>
+        <div class="d-flex col-12 align-items-center justify-content-center justify-content-sm-start gap-2"
              id="dropdown-container">
-          <label for="tableOrder" class="form-label mb-0 text-nowrap">Order By:</label>
+          <label for="tableOrder" class="form-label col-2 col-md-1 text-nowrap">Order By:</label>
           <select name=""
                   id="tableOrder"
                   class="form-select form-select-sm column-order"
-                  autocomplete="off"></select>
+                  autocomplete="off">
+            <option value="0-asc" selected></option>
+          </select>
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row mt-4 mb-3">
       <div class="col">
         <div class="card">
           <div class="card-body p-0">
@@ -57,7 +64,7 @@
                       <th class="all">First</th>
                       <th class="all">Last</th>
                       <th class="all">Shows</th>
-                      <th class="min-desktop">Songs</th>
+                      <th class="all">Songs</th>
                       <th class="min-desktop">Note</th>
                     </tr>
                   </thead>
@@ -78,18 +85,29 @@
         responsive: {
           details: false,
         },
+        rowGroup: {
+          emptyDataGroup: '',
+          className: 'text-center set-header',
+          dataSrc: function(row) {
+            return row.tour.name
+          },
+        },
+        pageLength: -1,
         order: [
           [2, 'desc']
         ],
+        autoWidth: true,
         columns: [{
           'data': 'name',
-          'name': 'name, tour__name',
+          'name': 'tour__name, name',
+          'width': '24rem',
           'render': function(data, type, row, meta) {
-            return data ? `<a href="/tour_legs/${row.slug}">${data}</a><br><small>${row.tour.name}</small>` : '';
+            return data ? `<a href="/tour_legs/${row.slug}">${data}</a>` : '';
           },
         }, {
           'data': 'first_event',
           'name': 'first_event__event_id, first_event__early_late',
+          'width': '8rem',
           'type': 'date',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data);
@@ -97,6 +115,7 @@
         }, {
           'data': 'last_event',
           'name': 'last_event__event_id, last_event__early_late',
+          'width': '8rem',
           'type': 'date',
           'render': function(data, type, row, meta) {
             return eventDateFormat(data);
@@ -116,6 +135,7 @@
         }, {
           'data': 'note',
           'name': 'note',
+          'width': '20rem',
         }, ],
         initComplete: function(settings, json) {
           var api = this.api();
@@ -125,14 +145,11 @@
           const prevBtn = $('.btn-prev');
           const nextBtn = $('.btn-next');
           const totalSpan = $('.total-pages');
-          const tableInfo = $('#tableInfo')
 
           // Initial button states
           input.val(info.page + 1);
           prevBtn.attr('disabled', info.page === 0);
           nextBtn.attr('disabled', info.page >= info.pages - 1);
-
-          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
 
           api.on('draw', () => {
             const pageInfo = api.page.info();
@@ -145,18 +162,16 @@
             // Handle button states
             prevBtn.attr('disabled', pageInfo.page === 0);
             nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
-
-            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
           });
 
           totalSpan.text(`of ${info.pages || 1}`);
 
           nextBtn.on('click', function() {
-            table.page('next').draw(false);
+            nextPage(table)
           });
 
           prevBtn.on('click', function() {
-            table.page('previous').draw(false);
+            prevPage(table);
           });
 
           input.on('change', function() {

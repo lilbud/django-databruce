@@ -1,0 +1,41 @@
+<div class="api-table-wrapper" data-api-url="{{ api_url }}">
+  <!-- Unified Search & Filter Controls -->
+  <div class="row g-3 mb-4 table-controls">
+    <div class="col-md-6">
+      <!-- Global automated search control input -->
+      <input type="text"
+             class="form-control generic-table-search"
+             placeholder="Search records...">
+    </div>
+    {% for filter in filters %}
+      <div class="col-md-3">
+        <select class="form-select generic-table-filter"
+                data-filter-param="{{ filter.param_name }}">
+          <option value="">All {{ filter.label }}</option>
+          {% for value, display in filter.options %}
+            <option value="{{ value }}">{{ display }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endfor %}
+  </div>
+  <!-- Generic Skeleton Layout Table Structure -->
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered generic-datatable">
+      <thead>
+        <tr>
+          {% for col in columns %}
+            <th data-field="{{ col.field }}"
+                data-type="{{ col.type|default:'text' }}"
+                class="{{ col.class|default:'text-start' }}">{{ col.label }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody class="generic-table-body">
+        <tr>
+          <td colspan="{{ columns|length }}" class="text-center text-muted py-4">Loading data...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

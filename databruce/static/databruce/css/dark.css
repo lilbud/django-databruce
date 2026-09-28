@@ -336,8 +336,7 @@
     background-color: var(--color-blue-500) !important;
   }
 
-  th,
-  tr:not(.set-header) td:not(.song_num, .position, .highlighted, .sorting_1, [class*="dtcv-"]) {
+  table tr:not(.set-header) td:not(.song_num, .position, .highlighted, .sorting_1, [class*="dtcv-"]) {
     background-color: var(--color-gray-800) !important;
   }
 
@@ -365,7 +364,7 @@
     color: var(--color-white);
   }
 
-  table th:not([class*="opener"], [class*="closer"], [class*="dt-ordering"]) {
+  table tr:not(.set-header) th:not(.fc-day, [class*="opener"], [class*="closer"], [class*="dt-ordering"]) {
     background-color: var(--color-gray-800) !important;
   }
 
@@ -442,8 +441,9 @@
   }
 
   /* set-header default color */
-  .set-header td {
-    background-color: var(--color-gray-600) !important;
+  .set-header td,
+  .set-header th {
+    background-color: var(--color-gray-700) !important;
   }
 
 

@@ -1035,7 +1035,7 @@
         'className': 'min-desktop',
         'render': (data, type, row) => {
           if (row.notes?.length) {
-            const cleanedNotes = row.notes;
+            const cleanedNotes = row.notes.join("; ").replaceAll("''", "'");
             return `<span class="setlist-note">${cleanedNotes}</span>`;
           }
           return '';

@@ -10,6 +10,19 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 
+@register.inclusion_tag("databruce/api_table_skeleton.html")
+def render_api_table(api_url, table_columns, filters=None):
+  """api_url: String URL endpoint for the REST API
+  table_columns: List of dicts, e.g., [{'field': 'id', 'label': 'ID'}, ...]
+  filters: List of dicts specifying filter configurations
+  """
+  return {
+    "api_url": api_url,
+    "columns": table_columns,
+    "filters": filters or [],
+  }
+
+
 class EMarkdown(markdown.Markdown):
   def convert(self, text):
     # Call the standard conversion and strip hidden whitespace/newlines

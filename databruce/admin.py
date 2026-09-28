@@ -1,5 +1,5 @@
 from datetime import time
-from typing import Any
+from typing import Any, Never
 
 from django import forms
 from django.contrib import admin, messages
@@ -32,6 +32,11 @@ from . import models as db_models
 site.unregister(Group)
 
 
+class CustomModelAdmin(ModelAdmin):
+  # 1. Globally mark these as read-only for any inheriting class
+  readonly_fields = ("created_at", "updated_at")
+
+
 @admin.register(db_models.CustomUser)
 class UserAdmin(DefaultUserAdmin, ModelAdmin):
   search_fields = ["username"]
@@ -46,6 +51,14 @@ class UserAdmin(DefaultUserAdmin, ModelAdmin):
     "is_active",
     "uuid",
   ]
+
+  def get_readonly_fields(
+    self,
+    request: HttpRequest,
+    obj: Any | None = ...,
+  ) -> list[str] | tuple[str, ...] | tuple[Never]:
+    fields = super().get_readonly_fields(request, obj)
+    return (*fields, "date_joined", "last_login")
 
   def get_search_results(
     self,
@@ -197,7 +210,7 @@ class ReleaseTrackInline(StackedInline):
 
 
 @admin.register(db_models.ArchiveLinks)
-class ArchiveAdmin(ModelAdmin):
+class ArchiveAdmin(CustomModelAdmin):
   search_fields = ["event__id", "url"]
   list_select_related = ["event", "event__venue", "event__venue__city"]
   autocomplete_fields = ["event"]
@@ -206,12 +219,17 @@ class ArchiveAdmin(ModelAdmin):
 
 
 @admin.register(db_models.UserAttendedShow)
-class UserAttendedShowsAdmin(ModelAdmin):
+class UserAttendedShowsAdmin(CustomModelAdmin):
+  def get_queryset(self, request: HttpRequest) -> QuerySet:
+    return (
+      super()
+      .get_queryset(request)
+      .select_related("user", "event", "event__venue", "event__venue__city")
+    )
+
   search_fields = ["user__username", "event", "event__date"]
   list_select_related = [
     "user",
-    "event",
-    "event__venue",
     "event__venue__city",
   ]
   list_display = ["id", "user__username", "event"]
@@ -233,7 +251,7 @@ class BandsForm(NoteForm):
 
   class Meta:
     model = db_models.Band
-    fields = ["note"]
+    fields = "__all__"
 
 
 class RunForm(NoteForm):
@@ -243,11 +261,11 @@ class RunForm(NoteForm):
 
   class Meta:
     model = db_models.Run
-    fields = ["note"]
+    fields = "__all__"
 
 
 @admin.register(db_models.Band)
-class BandAdmin(ModelAdmin):
+class BandAdmin(CustomModelAdmin):
   form = BandsForm
   search_fields = ["name"]
   list_display = ["id", "name"]
@@ -264,7 +282,7 @@ class BandAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Guest)
-class GuestAdmin(ModelAdmin):
+class GuestAdmin(CustomModelAdmin):
   autocomplete_fields = ["setlist", "relation"]
   search_fields = [
     "relation__name",
@@ -278,11 +296,11 @@ class GuestAdmin(ModelAdmin):
     "setlist__song",
     "relation__name",
   ]
-  list_select_related = ["setlist", "relation", "setlist__song"]
+  list_select_related = ["setlist", "relation", "setlist__song", "setlist__event"]
 
 
 @admin.register(db_models.Bootleg)
-class BootlegAdmin(ModelAdmin):
+class BootlegAdmin(CustomModelAdmin):
   search_fields = [
     "event__event_id",
     "event__date",
@@ -298,7 +316,7 @@ class BootlegAdmin(ModelAdmin):
 
 
 @admin.register(db_models.City)
-class CityAdmin(ModelAdmin):
+class CityAdmin(CustomModelAdmin):
   search_fields = ["name"]
   list_select_related = [
     "state",
@@ -312,20 +330,18 @@ class CityAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Continent)
-class ContinentAdmin(ModelAdmin):
+class ContinentAdmin(CustomModelAdmin):
   search_fields = ["name"]
   list_display = ["id", "name"]
-  list_display_links = ["id"]
+  list_display_links = ["id", "name"]
 
 
 @admin.register(db_models.Country)
-class CountryAdmin(ModelAdmin):
+class CountryAdmin(CustomModelAdmin):
   search_fields = ["name"]
   list_display = ["id", "name"]
-  list_display_links = ["id"]
+  list_display_links = ["id", "name"]
   list_select_related = [
-    "first_event",
-    "last_event",
     "first_event__venue",
     "last_event__venue",
   ]
@@ -333,7 +349,7 @@ class CountryAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Cover)
-class CoverAdmin(ModelAdmin):
+class CoverAdmin(CustomModelAdmin):
   search_fields = ["event"]
   list_select_related = ["event", "event__venue", "event__venue__city"]
   list_display = ["id", "event", "url"]
@@ -343,7 +359,7 @@ class CoverAdmin(ModelAdmin):
 
 
 @admin.register(db_models.NugsRelease)
-class NugsAdmin(ModelAdmin):
+class NugsAdmin(CustomModelAdmin):
   search_fields = ["event"]
   autocomplete_fields = ["event"]
 
@@ -433,8 +449,17 @@ class EventForm(forms.ModelForm):
 
 
 @admin.register(db_models.Event)
-class EventAdmin(ModelAdmin):
+class EventAdmin(CustomModelAdmin):
   form = EventForm
+
+  def get_queryset(self, request: HttpRequest) -> QuerySet:
+    return (
+      super()
+      .get_queryset(request)
+      .select_related("venue", "tour", "artist")
+      .prefetch_related("run", "leg")
+    )
+
   search_fields = ["id", "event_id", "date"]
   autocomplete_fields = [
     "venue",
@@ -471,7 +496,7 @@ class EventAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Type)
-class TypeAdmin(ModelAdmin):
+class TypeAdmin(CustomModelAdmin):
   search_fields = ["name", "slug"]
   list_display = ["id", "name"]
   list_display_links = ["id"]
@@ -479,49 +504,60 @@ class TypeAdmin(ModelAdmin):
 
 @admin.register(db_models.EventType)
 class EventTypeAdmin(ModelAdmin):
+  autocomplete_fields = ["event", "type"]
   search_fields = ["type__name", "type__slug"]
   list_display = ["id", "event", "type"]
-  list_select_related = ["event", "type"]
+  list_select_related = ["event", "type", "event__venue", "event__venue__city"]
   list_display_links = ["id"]
 
 
 @admin.register(db_models.Tag)
-class TagAdmin(ModelAdmin):
+class TagAdmin(CustomModelAdmin):
   search_fields = ["name", "slug"]
   list_display = ["id", "name"]
+  prepopulated_fields = {"slug": ("name",)}
   list_display_links = ["id"]
 
 
 @admin.register(db_models.EventTag)
 class EventTagAdmin(ModelAdmin):
+  def get_queryset(self, request):
+    return (
+      super()
+      .get_queryset(request)
+      .select_related("tag", "event", "event__venue", "event__venue__city")
+    )
+
   search_fields = ["tag__name", "tag__slug"]
   list_display = ["id", "event", "tag"]
-  list_select_related = ["event", "tag"]
+  autocomplete_fields = ["event", "tag"]
+  list_select_related = ["event", "tag", "event__venue"]
   list_display_links = ["id"]
 
 
 @admin.register(db_models.Song)
-class SongAdmin(ModelAdmin):
+class SongAdmin(CustomModelAdmin):
   search_fields = ["name", "original_artist"]
   list_select_related = ["first_event", "last_event", "album"]
   autocomplete_fields = ["first_event", "last_event", "album"]
   list_display = ["id", "name"]
+  prepopulated_fields = {"slug": ("name",)}
   list_display_links = ["id"]
   ordering = ("name",)
 
 
 class LyricForm(forms.ModelForm):
-  note = forms.CharField(
+  text = forms.CharField(
     widget=MarkdownWidget(),
   )
 
   class Meta:
     model = db_models.Lyric
-    fields = ["note"]
+    fields = "__all__"
 
 
 @admin.register(db_models.Lyric)
-class LyricsAdmin(ModelAdmin):
+class LyricsAdmin(CustomModelAdmin):
   search_fields = ["song__name", "text"]
   autocomplete_fields = ["song"]
   list_display = ["id", "song__name"]
@@ -532,8 +568,30 @@ class LyricsAdmin(ModelAdmin):
   form = LyricForm
 
 
+class SetlistNoteInline(StackedInline):
+  model = db_models.SetlistNote
+  collapsible = True
+
+  def get_queryset(self, request):
+    return super().get_queryset(request).select_related("setlist")
+
+  fields = [
+    "setlist",
+    "num",
+    "note",
+  ]
+
+  fk_name = "setlist"
+  extra = 0
+
+  autocomplete_fields = ["setlist"]
+  list_select_related = ["setlist"]
+
+  list_display = ["setlist", "num", "note"]
+
+
 @admin.register(db_models.Setlist)
-class SetlistAdmin(ModelAdmin):
+class SetlistAdmin(CustomModelAdmin):
   autocomplete_fields = ["event", "song", "ltp"]
   search_fields = ["song__name", "set_name", "event__event_id"]
   list_select_related = [
@@ -544,12 +602,22 @@ class SetlistAdmin(ModelAdmin):
     "ltp",
   ]
   list_display = ["id", "event", "set_name", "song_num", "song"]
+  readonly_fields = ["last", "next", "tour_num", "tour_total", "ltp"]
   list_display_links = ["id", "event", "song"]
+  inlines = [SetlistNoteInline]
 
 
 @admin.register(db_models.Onstage)
-class OnstageAdmin(ModelAdmin):
+class OnstageAdmin(CustomModelAdmin):
+  def get_queryset(self, request):
+    return (
+      super()
+      .get_queryset(request)
+      .select_related("relation", "band", "event", "event__venue", "event__venue__city")
+    )
+
   search_fields = ["relation__name", "band__name"]
+
   list_select_related = [
     "relation",
     "band",
@@ -557,6 +625,7 @@ class OnstageAdmin(ModelAdmin):
     "event__venue",
     "event__venue__city",
   ]
+
   list_display = ["id", "event__event_id", "relation__name", "band__name"]
   list_display_links = ["id"]
   autocomplete_fields = ["event", "relation", "band"]
@@ -564,7 +633,19 @@ class OnstageAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Relation)
-class RelationAdmin(ModelAdmin):
+class RelationAdmin(CustomModelAdmin):
+  def get_queryset(self, request):
+    return (
+      super()
+      .get_queryset(request)
+      .select_related(
+        "first_event",
+        "last_event",
+        "first_event__venue",
+        "last_event__venue",
+      )
+    )
+
   search_fields = ["name"]
   list_display = ["id", "name"]
   list_select_related = ["first_event", "last_event"]
@@ -574,7 +655,7 @@ class RelationAdmin(ModelAdmin):
 
 
 @admin.register(db_models.ReleaseDisc)
-class ReleaseDiscAdmin(ModelAdmin):
+class ReleaseDiscAdmin(CustomModelAdmin):
   search_fields = ["release__name"]
   list_display = ["id", "name", "release__name"]
   list_select_related = ["release"]
@@ -583,7 +664,15 @@ class ReleaseDiscAdmin(ModelAdmin):
 
 
 @admin.register(db_models.ReleaseTrack)
-class ReleaseTrackAdmin(ModelAdmin):
+class ReleaseTrackAdmin(CustomModelAdmin):
+  def get_queryset(self, request):
+    return (
+      super()
+      .get_queryset(request)
+      .select_related("release", "song")
+      .prefetch_related("event", "disc", "setlist")
+    )
+
   search_fields = ["release__name", "song__name"]
   list_select_related = ["release", "song", "event", "disc", "setlist"]
   list_display = ["id", "release__name", "track", "song", "song__name"]
@@ -599,11 +688,11 @@ class ReleaseForm(forms.ModelForm):
 
   class Meta:
     model = db_models.Release
-    fields = ["note"]
+    fields = "__all__"
 
 
 @admin.register(db_models.Release)
-class ReleaseAdmin(ModelAdmin):
+class ReleaseAdmin(CustomModelAdmin):
   def get_queryset(self, request):
     base_qs = super().get_queryset(request)
     return base_qs.prefetch_related("event")
@@ -613,11 +702,12 @@ class ReleaseAdmin(ModelAdmin):
   list_display = ["id", "name", "type", "date", "mbid"]
   list_display_links = ["id"]
   autocomplete_fields = ["event"]
+  prepopulated_fields = {"slug": ("name",)}
   inlines = [ReleaseTrackInline]
 
 
 @admin.register(db_models.Snippet)
-class SnippetAdmin(ModelAdmin):
+class SnippetAdmin(CustomModelAdmin):
   search_fields = [
     "snippet__name",
     "setlist",
@@ -649,7 +739,7 @@ class SnippetAdmin(ModelAdmin):
 
 
 @admin.register(db_models.State)
-class StateAdmin(ModelAdmin):
+class StateAdmin(CustomModelAdmin):
   search_fields = ["name", "abbrev", "country__name"]
   list_select_related = [
     "country",
@@ -669,7 +759,7 @@ class StateAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Tour)
-class TourAdmin(ModelAdmin):
+class TourAdmin(CustomModelAdmin):
   def get_queryset(self, request):
     base_qs = super().get_queryset(request)
     return base_qs.prefetch_related(
@@ -685,11 +775,13 @@ class TourAdmin(ModelAdmin):
     "name",
     "band__name",
   ]
+  prepopulated_fields = {"slug": ("name",)}
+
   list_display_links = ["id"]
 
 
 @admin.register(db_models.TourLeg)
-class TourLegAdmin(ModelAdmin):
+class TourLegAdmin(CustomModelAdmin):
   search_fields = ["name"]
   list_select_related = [
     "first_event",
@@ -702,13 +794,20 @@ class TourLegAdmin(ModelAdmin):
   ]
   list_display = ["id", "tour", "name", "first_event", "last_event"]
   autocomplete_fields = ["first_event", "last_event", "tour"]
+  prepopulated_fields = {"slug": ("name",)}
   list_display_links = ["id"]
 
 
 @admin.register(db_models.Venue)
-class VenueAdmin(ModelAdmin):
+class VenueAdmin(CustomModelAdmin):
   search_fields = ["name"]
-  list_select_related = ["first_event", "last_event", "city"]
+  list_select_related = [
+    "first_event",
+    "last_event",
+    "city",
+    "first_event__venue",
+    "last_event__venue",
+  ]
   list_display = [
     "id",
     "name",
@@ -719,7 +818,7 @@ class VenueAdmin(ModelAdmin):
 
   def get_queryset(self, request):
     base_qs = super().get_queryset(request)
-    return base_qs.prefetch_related("city")
+    return base_qs.prefetch_related("first_event", "last_event").select_related("city")
 
   def get_search_results(self, request, queryset, search_term):
     queryset, may_have_duplicates = super().get_search_results(
@@ -744,7 +843,7 @@ class VenueAdmin(ModelAdmin):
 
 
 @admin.register(db_models.Run)
-class RunAdmin(ModelAdmin):
+class RunAdmin(CustomModelAdmin):
   form = RunForm
   search_fields = ["name", "band__name"]
   autocomplete_fields = ["band", "first_event", "last_event", "venue"]
@@ -758,12 +857,13 @@ class RunAdmin(ModelAdmin):
     "first_event__venue__city",
     "last_event__venue__city",
   ]
+  prepopulated_fields = {"slug": ("name",)}
   list_display = ["id", "name", "band", "num_events", "first_event", "last_event"]
   list_display_links = ["id"]
 
 
 @admin.register(db_models.Contact)
-class ContactAdmin(ModelAdmin):
+class ContactAdmin(CustomModelAdmin):
   search_fields = ["email", "subject", "message"]
   list_display = [
     "id",
@@ -775,19 +875,29 @@ class ContactAdmin(ModelAdmin):
   ]
   list_display_links = ["id"]
 
+  def get_readonly_fields(
+    self,
+    request: HttpRequest,
+    obj: Any | None = ...,
+  ) -> list[str] | tuple[str, ...] | tuple[Never]:
+    fields = super().get_readonly_fields(request, obj)
+    return (*fields, "message")
+
 
 @admin.register(BlogCategory)
-class CategoryAdmin(ModelAdmin):
+class BlogCategoryAdmin(CustomModelAdmin):
   list_display = ("name", "slug", "created_at")
   search_fields = ["name", "slug"]
   prepopulated_fields = {"slug": ("name",)}
+  readonly_fields = ("created_at", "updated_at")
 
 
 @admin.register(BlogTag)
-class BlogTagAdmin(ModelAdmin):
+class BlogTagAdmin(CustomModelAdmin):
   list_display = ("name", "slug", "created_at")
   search_fields = ["name", "slug"]
   prepopulated_fields = {"slug": ("name",)}
+  readonly_fields = ("created_at", "updated_at")
 
 
 class TagInline(StackedInline):
@@ -821,7 +931,7 @@ class PostForm(forms.ModelForm):
 
 
 @admin.register(BlogPost)
-class PostAdmin(ModelAdmin):
+class PostAdmin(CustomModelAdmin):
   form = PostForm
   list_filter = (
     "published",
@@ -863,14 +973,34 @@ class PostAdmin(ModelAdmin):
 
 
 @admin.register(Collection)
-class CollectionAdmin(ModelAdmin):
+class CollectionAdmin(CustomModelAdmin):
   list_display = ("name", "slug", "created_at")
   search_fields = ["name", "slug"]
   prepopulated_fields = {"slug": ("name",)}
 
 
+class ArticleForm(forms.ModelForm):
+  content = forms.CharField(
+    widget=MarkdownWidget(),
+  )
+
+  class Meta:
+    model = Article
+    fields = [
+      "title",
+      "slug",
+      "author",
+      "collection",
+      "excerpt",
+      "published_at",
+      "content",
+    ]
+
+
 @admin.register(Article)
-class ArticleAdmin(ModelAdmin):
+class ArticleAdmin(CustomModelAdmin):
+  form = ArticleForm
+
   def get_queryset(self, request: HttpRequest) -> dj_models.QuerySet:
     return (
       super()
@@ -887,7 +1017,7 @@ class ArticleAdmin(ModelAdmin):
 
 
 @admin.register(Entry)
-class EntryAdmin(ModelAdmin):
+class EntryAdmin(CustomModelAdmin):
   # This places action buttons directly inside each row of the table list
   list_display = ["id", "status_badge"]
   actions_row = ["mark_row_approved", "mark_row_rejected"]

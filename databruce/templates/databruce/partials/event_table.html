@@ -21,16 +21,16 @@
     </div>
   </div>
   <div class="collapse" id="filterCollapse">
-    <div class="flex-column d-grid row-gap-2 py-3 px-1">
+    <div class="flex-column d-grid row-gap-2 pt-3 px-1">
       <div class="col-12 d-flex align-items-center justify-content-center gap-2">
-        <label for="search" class="form-label col-2 col-lg-1 text-nowrap">Search:</label>
+        <label for="search" class="form-label col-2 col-md-1 text-nowrap">Search:</label>
         <input type="text"
                id="search"
                class="form-control form-control-sm"
                placeholder="Type to search table...">
       </div>
       <div class="col-12 d-flex align-items-center justify-content-center gap-2">
-        <label for="PublicityFilter" class="form-label col-2 col-lg-1 text-nowrap">Publicity:</label>
+        <label for="PublicityFilter" class="form-label col-2 col-md-1 text-nowrap">Publicity:</label>
         <select id="PublicityFilter"
                 class="form-select form-select-sm publicity-filter">
           <option value="">All</option>
@@ -40,7 +40,7 @@
       </div>
       <div class="d-flex col-12 align-items-center justify-content-center justify-content-sm-start gap-2"
            id="dropdown-container">
-        <label for="eventTableOrder" class="form-label col-2 col-lg-1 text-nowrap">Order By:</label>
+        <label for="eventTableOrder" class="form-label col-2 col-md-1 text-nowrap">Order By:</label>
         <select name=""
                 id="eventTableOrder"
                 class="form-select form-select-sm column-order"
@@ -60,11 +60,11 @@
   <div class="row mt-4 mb-3">
     <div class="d-flex flex-column flex-lg-row align-items-center justify-content-center column-gap-3 flex-wrap event-controls"
          id="eventTableControls">
-      <div class="order-1 mb-0">{% include "databruce/partials/table_pagination.html" %}</div>
-      <div class="dt-info order-2 table_info"
+      {% include "databruce/partials/table_pagination.html" %}
+      <div class="dt-info order-2 event_table_info"
            aria-live="polite"
            role="status"
-           id="eventTableInfo"></div>
+           id="tableInfo"></div>
     </div>
   </div>
 </div>

@@ -11,7 +11,7 @@
         <div id="tableControls">
           <!-- Publicity Filter -->
           <div class="col-12 col-md-1">
-            <label for="PublicityFilter" class="pb-1">Publicity</label>
+            <label for="PublicityFilter" class="form-label col-2 col-lg-1">Publicity</label>
             <select id="PublicityFilter" class="form-select form-select-sm">
               <option value="">All</option>
               <option value="true">Public</option>
@@ -20,7 +20,7 @@
           </div>
           <!-- Search -->
           <div class="col">
-            <label for="search" class="pb-1">Search</label>
+            <label for="search" class="form-label col-2 col-md-1 text-nowrap">Search</label>
             <div class="input-group input-group-sm">
               <input type="text"
                      id="search"
@@ -54,48 +54,56 @@
         ajax: {
           'url': '/api/v1/setlist_notes/?format=custom',
         },
-        columnDefs: [
-          { targets: '_all', className: 'text-wrap text-xs', defaultContent: '' },
-          { targets: [-1], visible: false },
-        ],
-        columns: [
-          {
-            'data': 'event',
-            'name': 'event__event_id, event__early_late',
-            'className': 'text-nowrap all',
-            'width': '8rem',
-            'type': 'text',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return `<a href="/events/${data.event_id}">${data.date}</a>`;
-              }
-            },
+        columnDefs: [{
+          targets: '_all',
+          className: 'text-wrap text-xs',
+          defaultContent: ''
+        }, {
+          targets: [-1],
+          visible: false
+        }, ],
+        columns: [{
+          'data': 'event',
+          'name': 'event__event_id, event__early_late',
+          'className': 'text-nowrap all',
+          'width': '8rem',
+          'type': 'text',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return `<a href="/events/${data.event_id}">${data.date}</a>`;
+            }
           },
-          {
-            'data': 'set_name',
-            'name': 'setlist__set_name',
-            'className': 'text-nowrap',
-            'width': '8rem',
+        }, {
+          'data': 'set_name',
+          'name': 'setlist__set_name',
+          'className': 'text-nowrap',
+          'width': '8rem',
+        }, {
+          'data': 'song',
+          'name': 'setlist__song__name',
+          'className': 'text-nowrap',
+          'width': '12rem',
+          'render': function(data, type, row, meta) {
+            if (data) {
+              return data
+            }
           },
-          {
-            'data': 'song',
-            'name': 'setlist__song__name',
-            'className': 'text-nowrap',
-            'width': '12rem',
-            'render': function (data, type, row, meta) {
-              if (data) {
-                return data
-              }
-            },
-          },
-          {'data': 'note', 'name': 'note', 'className': 'text-wrap', 'width': '15rem'},
-          {'data': 'event.public', 'name': 'event__public' },
-        ]
+        }, {
+          'data': 'note',
+          'name': 'note',
+          'className': 'text-wrap',
+          'width': '15rem'
+        }, {
+          'data': 'event.public',
+          'name': 'event__public'
+        }, ]
       });
 
-      $('#PublicityFilter').on('change', function () {
+      $('#PublicityFilter').on('change', function() {
         var selectedValue = this.value;
-        table.order([[0, 'asc']]).column(4).search(selectedValue ? selectedValue : '', true, false).draw();
+        table.order([
+          [0, 'asc']
+        ]).column(4).search(selectedValue ? selectedValue : '', true, false).draw();
       });
 
       tableSearch(table, 'search');
