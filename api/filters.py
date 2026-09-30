@@ -281,8 +281,6 @@ class DataTablesFilterBackend(BaseFilterBackend):
       if search_value:
         is_filtered = True
 
-        print(config["name"])
-
         for field in config["name"]:
           lookup = f"{field}__{search_type}"
 

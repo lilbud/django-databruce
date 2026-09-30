@@ -1,6 +1,6 @@
 event_table_defs = [
   { targets: [0, 2, 7], width: '1rem', orderable: false, columnControl: [] },
-  { targets: [0], orderable: false, searchable: false },
+  { targets: [0, 2], orderable: false, searchable: false },
   { targets: [7], visible: false },
 ]
 
@@ -16,7 +16,7 @@ event_table_columns = [
   },
   {
     'data': 'date',
-    'name': 'event_id',
+    'name': 'event_id, date, early_late',
     'type': 'date',
     'width': '6rem',
     'className': 'text-wrap',
