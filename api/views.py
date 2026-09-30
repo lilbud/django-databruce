@@ -643,9 +643,6 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
     set_name__in=db_models.SetType.valid_sets(),
     event__public=True,
     nobruce=False,
-  ) | Q(
-    set_name__in=["Recording", "Rehearsal"],
-    event__public=False,
   )
 
   queryset = db_models.Setlist.objects.filter(filter).select_related(
@@ -665,13 +662,13 @@ class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SetlistSongCountViewSet(viewsets.ReadOnlyModelViewSet):
-  filter = Q(
-    set_name__in=db_models.SetType.valid_sets(),
-    event__public=True,
-    nobruce=False,
-  )
-
-  queryset = db_models.Setlist.objects.filter(filter).select_related("song", "event")
+  queryset = db_models.Setlist.objects.filter(
+    Q(
+      set_name__in=db_models.SetType.valid_sets(),
+      event__public=True,
+      nobruce=False,
+    ),
+  ).select_related("song", "event")
 
   queryset = queryset.values("song_id").annotate(
     count=Count("id", distinct=True),
@@ -913,8 +910,12 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
     )
 
     # Base setlist for this event (reused for total count and filtering)
-    event_setlist = db_models.Setlist.objects.filter(
-      event_filter,
+    event_setlist = (
+      db_models.Setlist.objects.filter(
+        event_filter,
+      )
+      .order_by("song_num")
+      .select_related("song", "song__category")
     )
 
     # Total songs in entire setlist (for percentage calculations, etc.)

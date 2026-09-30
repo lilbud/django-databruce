@@ -23,21 +23,21 @@
       <div class="col">
         <div class="card info-card">
           <div class="info-card-title">Shows Seen</div>
-          <div class="info-card-value" id="user-event-count">{{ user_event_count }}</div>
+          <div class="info-card-value" id="user-event-count">{{ info.num_events }}</div>
         </div>
       </div>
       <div class="col">
         <div class="card info-card">
           <div class="info-card-title">Songs Seen</div>
-          <div class="info-card-value" id="user-song-count">{{ user_songs_count }}</div>
+          <div class="info-card-value" id="user-song-count">{{ info.num_songs }}</div>
         </div>
       </div>
       <div class="col">
         <div class="card info-card">
           <div class="info-card-title">First Show</div>
           <div class="info-card-value">
-            {% if first_event %}
-              <a href="{% url 'event_details' id=first_event.event.event_id %}">{{ first_event.event.get_date }}</a>
+            {% if info.first_event %}
+              <a href="{% url 'event_details' id=info.first_event.event_id %}">{{ info.first_event.get_date }}</a>
             {% else %}
               N/A
             {% endif %}
@@ -48,8 +48,8 @@
         <div class="card info-card">
           <div class="info-card-title">Latest Show</div>
           <div class="info-card-value" id="user-last-show">
-            {% if last_event %}
-              <a href="{% url 'event_details' id=last_event.event.event_id %}">{{ last_event.event.get_date }}</a>
+            {% if info.last_event %}
+              <a href="{% url 'event_details' id=info.last_event.event_id %}">{{ info.last_event.get_date }}</a>
             {% else %}
               N/A
             {% endif %}
@@ -385,7 +385,7 @@
         },
       }, {
         'data': 'song.category',
-        'name': 'song__category',
+        'name': 'song__category__name',
         'width': '15rem',
         'className': ''
       }, {
@@ -394,7 +394,7 @@
         'width': '10rem',
         'type': 'date',
         'render': function(data, type, row, meta) {
-          return data ? eventDateFormat(data);
+          return data ? eventDateFormat(data) : '';
           '';
         },
       }, {

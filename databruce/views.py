@@ -24,6 +24,7 @@ from django.db.models import (
   Count,
   Exists,
   OuterRef,
+  Prefetch,
   Q,
   QuerySet,
   Subquery,
@@ -63,6 +64,8 @@ from .models import (
   Contact,
   Country,
   Event,
+  EventTag,
+  EventType,
   Lyric,
   NugsRelease,
   Onstage,
@@ -228,27 +231,12 @@ class UserProfileView(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
     context = super().get_context_data(**kwargs)
-    context["info"] = get_object_or_404(UserModel, uuid=self.kwargs["id"])
+    context["info"] = get_object_or_404(
+      UserModel.objects.prefetch_related("first_event", "last_event"),
+      uuid=self.kwargs["id"],
+    )
     context["title"] = f'User "{context["info"]}"'
     context["description"] = f"{context['info']} Profile"
-
-    user_events = UserAttendedShow.objects.filter(
-      user_id=context["info"].pk,
-    ).select_related("event")
-
-    context["user_event_count"] = user_events.count()
-
-    context["user_songs_count"] = (
-      Setlist.objects.filter(
-        event_id__in=user_events.values("event_id"),
-        set_name__in=SetType.valid_sets(),
-      )
-      .distinct("song_id")
-      .order_by("song_id")
-    ).count()
-
-    context["first_event"] = user_events.order_by("event__event_id").first()
-    context["last_event"] = user_events.order_by("-event__event_id").first()
 
     return context
 
@@ -535,17 +523,26 @@ class UserAddShowView(LoginRequiredMixin, View):
 
 class UserRemoveShowView(LoginRequiredMixin, View):
   def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-    event_id = kwargs["event_id"]
+
+    try:
+      event_id = int(kwargs["event_id"])  # type: ignore
+    except (ValueError, TypeError):
+      return JsonResponse({"error": "Invalid event ID format"}, status=400)
 
     # Securely filter by the authenticated user's ID
-    UserAttendedShow.objects.filter(
+    attendance = UserAttendedShow.objects.filter(
       user_id=request.user.id,  # type: ignore
       event_id=event_id,
-    ).delete()
+    ).first()
 
-    count = UserAttendedShow.objects.filter(event_id=event_id).count()
+    if attendance:
+      attendance.delete()  # This triggers the model's delete() method
 
-    return JsonResponse({"action": "removed", "count": count})
+      count = UserAttendedShow.objects.filter(user_id=request.user.id).count()  # type: ignore
+
+      return JsonResponse({"action": "removed", "count": count})
+
+    return JsonResponse({"action": "error"})
 
 
 class UserAddReviewView(View):
@@ -593,14 +590,21 @@ class EventDetailView(PageTitleMixin, TemplateView):
         "artist",
         "tour",
         "venue__city",
+        "rank_stats",
       ).prefetch_related(
         "leg",
         "run",
+        Prefetch(
+          "event_type",
+          queryset=EventType.objects.select_related("type"),
+        ),
+        Prefetch(
+          "event_tag",
+          queryset=EventTag.objects.select_related("tag"),
+        ),
         "archive_links",
         "nugs_event",
         "release_event",
-        "event_type__type",
-        "event_tag__tag",
         "event_article",
         "user_event",
         "event_reviews",

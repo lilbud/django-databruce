@@ -24,6 +24,7 @@ class CustomUser(AbstractUser):
   )
 
   num_events = models.IntegerField(default=0)
+  num_songs = models.IntegerField(default=0)
 
   first_event = models.ForeignKey(
     to="Event",

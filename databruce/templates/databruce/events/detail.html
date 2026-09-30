@@ -72,9 +72,9 @@
                     {% else %}
                       <span>Unknown Artist</span>
                     {% endif %}
-                    {% for t in event.type.all %}
-                      {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
-                        <span class="text-lg text-danger">[{{ t.name }}]</span>
+                    {% for t in event.event_type.all %}
+                      {% if t.type.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
+                        <span class="text-lg text-danger">[{{ t.type.name }}]</span>
                       {% endif %}
                     {% endfor %}
                   </div>
@@ -99,8 +99,8 @@
               <div class="col">
                 <div class="badge-row d-inline-flex flex-wrap gap-0 row-gap-1 column-gap-1"
                      id="badge-row">
-                  {% if event.event_type.length > 0 %}
-                    <a href="{% url 'events_by_type' slug=event.event_type.type.slug %}"><span class="badge badge-primary">Type: {{ event.event_type.type.name }}</span></a>
+                  {% if event.event_type.all|length > 0 %}
+                    <a href="{% url 'events_by_type' slug=event.event_type.all.0.type.slug %}"><span class="badge badge-primary">Type: {{ event.event_type.all.0.type.name }}</span></a>
                   {% endif %}
                   {% if event.tour %}
                     <a href="{% url 'tour_details' slug=event.tour.slug %}"><span class="badge badge-primary">Tour: {{ event.tour }}</span></a>
@@ -260,151 +260,153 @@
           {% if event.note %}
             <div class="d-none d-xl-block">{% partial event-note %}</div>
           {% endif %}
-          <div class="d-flex flex-column gap-2 gap-lg-3">
-            {% if start_time or scheduled_time or event.length %}
-              <div class="col-12 col-md-6 col-xl-12">
-                <div class="card h-100">
-                  <div class="card-header">
-                    <span class="d-flex gap-2">Set Times</span>
-                  </div>
-                  <div class="card-body">
-                    <div class="row row-cols-2 row-cols-md-4 row-cols-xl-2 h-100 justify-content-between g-2">
-                      <div class="col">
-                        <div class="card info-card h-100 text-center justify-content-center">
-                          <div class="info-card-title">Scheduled</div>
-                          <div class="info-card-value">{{ scheduled_time|default_if_none:"-" }}</div>
+          {% if start_time or scheduled_time or event.length or event.public %}
+            <div class="d-flex flex-column gap-2 gap-lg-3">
+              {% if start_time or scheduled_time or event.length %}
+                <div class="col-12 col-md-6 col-xl-12">
+                  <div class="card h-100">
+                    <div class="card-header">
+                      <span class="d-flex gap-2">Set Times</span>
+                    </div>
+                    <div class="card-body">
+                      <div class="row row-cols-2 row-cols-md-4 row-cols-xl-2 h-100 justify-content-between g-2">
+                        <div class="col">
+                          <div class="card info-card h-100 text-center justify-content-center">
+                            <div class="info-card-title">Scheduled</div>
+                            <div class="info-card-value">{{ scheduled_time|default_if_none:"-" }}</div>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col">
-                        <div class="card info-card h-100 text-center justify-content-center">
-                          <div class="info-card-title">Start</div>
-                          <div class="info-card-value">{{ start_time|default_if_none:"-" }}</div>
+                        <div class="col">
+                          <div class="card info-card h-100 text-center justify-content-center">
+                            <div class="info-card-title">Start</div>
+                            <div class="info-card-value">{{ start_time|default_if_none:"-" }}</div>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col">
-                        <div class="card info-card h-100 text-center justify-content-center">
-                          <div class="info-card-title">End</div>
-                          <div class="info-card-value">{{ end_time|default_if_none:"-" }}</div>
+                        <div class="col">
+                          <div class="card info-card h-100 text-center justify-content-center">
+                            <div class="info-card-title">End</div>
+                            <div class="info-card-value">{{ end_time|default_if_none:"-" }}</div>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col">
-                        <div class="card info-card h-100 text-center justify-content-center">
-                          <div class="info-card-title">Length</div>
-                          <div class="info-card-value d-flex-inline justify-content-center text-center align-items-center gap-1">
-                            {% if event.length %}
-                              {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
-                                <span data-bs-toggle="tooltip"
-                                      data-bs-title="{% if event.rank_stats.length_rank == 1 %} Longest Show to Date {% else %} {{ event.rank_stats.length_rank|ordinal }} longest show {% endif %}"
-                                      class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"h:i:s" }}</span>
+                        <div class="col">
+                          <div class="card info-card h-100 text-center justify-content-center">
+                            <div class="info-card-title">Length</div>
+                            <div class="info-card-value d-flex-inline justify-content-center text-center align-items-center gap-1">
+                              {% if event.length %}
+                                {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
+                                  <span data-bs-toggle="tooltip"
+                                        data-bs-title="{% if event.rank_stats.length_rank == 1 %} Longest Show to Date {% else %} {{ event.rank_stats.length_rank|ordinal }} longest show {% endif %}"
+                                        class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"h:i:s" }}</span>
+                                {% else %}
+                                  <span>{{ event.length|time:"h:i:s" }}</span>
+                                {% endif %}
                               {% else %}
-                                <span>{{ event.length|time:"h:i:s" }}</span>
+                                -
                               {% endif %}
-                            {% else %}
-                              -
-                            {% endif %}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            {% endif %}
-            {% if event.public %}
-              <div class="col-12 col-md-6 col-xl-12">
-                <div class="card h-100">
-                  <div class="card-body px-3 py-0">
-                    <div class="row gx-2">
-                      <div class="col py-3">
-                        <a type="button"
-                           class="text-reset"
-                           data-bs-toggle="modal"
-                           data-bs-target="#userReviewModal">
-                          <div class="text-xs text-muted text-reset">Rating</div>
-                          <div class="text-lg fw-medium">{{ review_score|default_if_none:"0" }} / 5</div>
-                          <div class="text-muted text-3xs mb-2">{{ event.event_reviews.all|length }} Review{{ event.event_reviews.all|pluralize }}</div>
-                        </a>
-                        {% if user.is_authenticated %}
-                          {% if not user_review %}
-                            <button id="reviewshow"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#userAddReviewModal"
-                                    type="submit"
-                                    name="submit"
-                                    class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
+              {% endif %}
+              {% if event.public %}
+                <div class="col-12 col-md-6 col-xl-12">
+                  <div class="card h-100">
+                    <div class="card-body px-3 py-0">
+                      <div class="row gx-2">
+                        <div class="col py-3">
+                          <a type="button"
+                             class="text-reset"
+                             data-bs-toggle="modal"
+                             data-bs-target="#userReviewModal">
+                            <div class="text-xs text-muted text-reset">Rating</div>
+                            <div class="text-lg fw-medium">{{ review_score|default_if_none:"0" }} / 5</div>
+                            <div class="text-muted text-3xs mb-2">{{ event.event_reviews.all|length }} Review{{ event.event_reviews.all|pluralize }}</div>
+                          </a>
+                          {% if user.is_authenticated %}
+                            {% if not user_review %}
+                              <button id="reviewshow"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#userAddReviewModal"
+                                      type="submit"
+                                      name="submit"
+                                      class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
+                            {% else %}
+                              <button id="reviewshow"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#userAddReviewModal"
+                                      type="submit"
+                                      name="submit"
+                                      class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
+                            {% endif %}
                           {% else %}
-                            <button id="reviewshow"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#userAddReviewModal"
-                                    type="submit"
-                                    name="submit"
-                                    class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="You must be logged in to review a show">
+                              <a role="button"
+                                 href="{% url 'login' %}?next={{ request.path }}"
+                                 class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</a>
+                            </span>
                           {% endif %}
-                        {% else %}
-                          <span data-bs-toggle="tooltip"
-                                data-bs-title="You must be logged in to review a show">
-                            <a role="button"
-                               href="{% url 'login' %}?next={{ request.path }}"
-                               class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</a>
-                          </span>
-                        {% endif %}
-                      </div>
-                      <span class="vr p-0"></span>
-                      <div class="col py-3">
-                        <a type="button"
-                           data-bs-toggle="modal"
-                           data-bs-target="#userListModal"
-                           class="text-reset">
-                          <div class="text-xs text-muted">Users Present</div>
-                          <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list.count }}</div>
-                        </a>
-                        {% if user.is_authenticated %}
-                          <form method="post" id="userForm">
-                            {% csrf_token %}
-                            <button id="addshow"
-                                    type="submit"
-                                    name="submit"
-                                    {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
-                                    class="btn btn-sm text-xs w-100 text-nowrap
-                                           {% if user_attended %}
-                                             btn-success
-                                           {% else %}
-                                             btn-neutral
-                                           {% endif %}
-                                           icon-button">
-                              <i class="bi
-                                        {% if user_attended %}
-                                          bi-star-fill
-                                        {% else %}
-                                          bi-star
-                                        {% endif %}"
-                                 id="star"></i>
-                              <span id="attended">
-                                {% if user_attended %}
-                                  <span class="default-text">Attended</span>
-                                  <span class="hover-text">Remove?</span>
-                                {% else %}
-                                  <span class="default-text">Attended?</span>
-                                  <span class="hover-text">Remove?</span>
-                                {% endif %}
-                              </span>
-                            </button>
-                          </form>
-                        {% elif not user.is_authenticated %}
-                          <span data-bs-toggle="tooltip"
-                                data-bs-title="You must be logged in to add a show">
-                            <a role="button"
-                               href="{% url 'login' %}?next={{ request.path }}"
-                               class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Attended?</a>
-                          </span>
-                        {% endif %}
+                        </div>
+                        <span class="vr p-0"></span>
+                        <div class="col py-3">
+                          <a type="button"
+                             data-bs-toggle="modal"
+                             data-bs-target="#userListModal"
+                             class="text-reset">
+                            <div class="text-xs text-muted">Users Present</div>
+                            <div class="text-lg mb-4 fw-medium" id="userCount">{{ user_list.count }}</div>
+                          </a>
+                          {% if user.is_authenticated %}
+                            <form method="post" id="userForm">
+                              {% csrf_token %}
+                              <button id="addshow"
+                                      type="submit"
+                                      name="submit"
+                                      {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
+                                      class="btn btn-sm text-xs w-100 text-nowrap
+                                             {% if user_attended %}
+                                               btn-success
+                                             {% else %}
+                                               btn-neutral
+                                             {% endif %}
+                                             icon-button">
+                                <i class="bi
+                                          {% if user_attended %}
+                                            bi-star-fill
+                                          {% else %}
+                                            bi-star
+                                          {% endif %}"
+                                   id="star"></i>
+                                <span id="attended">
+                                  {% if user_attended %}
+                                    <span class="default-text">Attended</span>
+                                    <span class="hover-text">Remove?</span>
+                                  {% else %}
+                                    <span class="default-text">Attended?</span>
+                                    <span class="hover-text">Remove?</span>
+                                  {% endif %}
+                                </span>
+                              </button>
+                            </form>
+                          {% elif not user.is_authenticated %}
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-title="You must be logged in to add a show">
+                              <a role="button"
+                                 href="{% url 'login' %}?next={{ request.path }}"
+                                 class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Attended?</a>
+                            </span>
+                          {% endif %}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            {% endif %}
-          </div>
+              {% endif %}
+            </div>
+          {% endif %}
           {% if setlist_certainty %}
             <div class="col-12">
               <div class="card">
@@ -912,10 +914,8 @@
         createdRow: function(row, data) {
           $(row).attr('data-set-name', slugify(data.set_name));
 
-          var notAllowedSets = ['Soundcheck']
-
-          if (!notAllowedSets.includes(data.set_name)) {
-            $(row).attr('data-album', data.song.category);
+          if (data.song.category) {
+            $(row).attr('data-album', data.song.category.id);
           }
 
           return row

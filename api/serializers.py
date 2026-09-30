@@ -61,20 +61,6 @@ def get_date_from_instance(obj) -> None | datetime.date | str:
   return date
 
 
-def get_formatted_city(obj):
-  try:
-    if obj.state:
-      if getattr(obj.country, "alpha_2", "").upper() == "US":
-        return f"{obj.name}, {obj.state.abbrev}"
-
-      return f"{obj.name}, {obj.state.abbrev}, {obj.country.name}"
-
-  except AttributeError:
-    return None
-  else:
-    return f"{obj.name}, {obj.country.name}"
-
-
 class BaseSerializer(serializers.ModelSerializer):
   def __init__(self, *args, **kwargs) -> None:
     # Don't pass 'fields' up to the superclass
@@ -245,94 +231,6 @@ class EventSetlistSerializer(BaseSerializer):
     fields = ["song", "highlight", "set_name", "segue"]
 
 
-class EventListSerializer(BaseSerializer):
-  date = serializers.SerializerMethodField(method_name="get_date")
-  early_late = serializers.CharField(required=False, max_length=255)
-  artist = serializers.CharField(required=False, source="artist.name", max_length=255)
-  tour = serializers.CharField(required=False, source="tour.name", max_length=255)
-  venue = serializers.CharField(required=False, source="venue.get_name", max_length=255)
-  city = serializers.SerializerMethodField(required=False)
-
-  def get_city(self, obj):
-    try:
-      return get_formatted_city(obj.venue.city)
-    except AttributeError:
-      return None
-
-  leg = serializers.CharField(required=False, source="leg.name", max_length=255)
-  has_setlist = serializers.SerializerMethodField()
-
-  rank = serializers.IntegerField(required=False)
-
-  user_present = serializers.BooleanField(required=False)
-  public = serializers.BooleanField(required=False)
-
-  tags = serializers.SlugRelatedField(
-    many=True,
-    read_only=True,
-    slug_field="name",
-    required=False,
-  )
-
-  type = serializers.SerializerMethodField()
-
-  def get_type(self, obj):
-    return [
-      {"name": type.name, "class": EVENT_TYPE_COLOR_MAP.get(type.id, "primary")}
-      for type in obj.type.all()
-    ]
-
-  event_anchor = serializers.SerializerMethodField(required=False)
-  setlist = EventSetlistSerializer(
-    source="setlist_event",
-    read_only=True,
-    many=True,
-    required=False,
-  )
-
-  event_note = serializers.SerializerMethodField(required=False)
-
-  def get_event_anchor(self, obj) -> str:
-    return event_id_format(obj.event_id)
-
-  def get_has_setlist(self, obj) -> bool:
-    return bool(obj.setlist_event.exists())
-
-  def get_date(self, obj) -> None | datetime.date | str:
-    return get_date_from_instance(obj)
-
-  def get_event_note(self, obj) -> None | str:
-    if obj.note is None or obj.note == "":
-      return None
-
-    return event_note_format(obj.note)
-
-  class Meta:
-    model = models.Event
-    fields = [
-      "id",
-      "date",
-      "artist",
-      "tour",
-      "venue",
-      "city",
-      "leg",
-      "has_setlist",
-      "rank",
-      "user_present",
-      "event_anchor",
-      "event_id",
-      "title",
-      "public",
-      "early_late",
-      "type",
-      "tags",
-      "note",
-      "setlist",
-      "event_note",
-    ]
-
-
 class CountriesSerializer(BaseSerializer):
   first_event = MinimalEventSerializer(required=False)
   last_event = MinimalEventSerializer(required=False)
@@ -364,11 +262,6 @@ class CitiesSerializer(BaseSerializer):
   state = StatesSerializer(required=False, include=["name", "uuid"])
   country = CountriesSerializer(include=["name", "uuid"])
   first_event = MinimalEventSerializer(required=False)
-  last_event = MinimalEventSerializer(required=False)
-  formatted = serializers.SerializerMethodField()
-
-  def get_formatted(self, obj):
-    return get_formatted_city(obj)
 
   class Meta:
     model = models.City
@@ -435,14 +328,11 @@ class EventsSerializer(BaseSerializer):
     include=["slug", "name"],
   )
 
-  city = serializers.SerializerMethodField(required=False)
-
-  def get_city(self, obj):
-    try:
-      return get_formatted_city(obj.venue.city)
-    except AttributeError:
-      return None
-
+  city = serializers.CharField(
+    required=False,
+    source="venue.city.formatted",
+    max_length=255,
+  )
   leg = serializers.CharField(required=False, source="leg.name", max_length=255)
 
   rank = serializers.IntegerField(required=False)
@@ -494,7 +384,6 @@ class EventsSerializer(BaseSerializer):
       "leg",
       "rank",
       "user_present",
-      # "event_anchor",
       "setlist",
       "event_note",
       "event_id",
@@ -503,7 +392,6 @@ class EventsSerializer(BaseSerializer):
       "early_late",
       "type",
       "tags",
-      "note",
     ]
 
 
@@ -567,11 +455,11 @@ class AdvSearchSerializer(BaseSerializer):
     required=False,
     include=["slug", "name"],
   )
-  city = serializers.SerializerMethodField(required=False)
-
-  def get_city(self, obj):
-    return get_formatted_city(obj.venue.city)
-
+  city = serializers.CharField(
+    required=False,
+    source="venue.city.formatted",
+    max_length=255,
+  )
   leg = serializers.CharField(required=False, source="leg.name", max_length=255)
   has_setlist = serializers.SerializerMethodField()
 
@@ -650,14 +538,11 @@ class CoversSerializer(BaseSerializer):
 
 class NugsSerializer(BaseSerializer):
   event = EventsSerializer(include=["event_id", "venue", "date", "early_late"])
-  city = serializers.SerializerMethodField(required=False)
-
-  def get_city(self, obj):
-    try:
-      return get_formatted_city(obj.event.venue.city)
-    except AttributeError:
-      return None
-
+  city = serializers.CharField(
+    source="event.venue.city.formatted",
+    read_only=True,
+    max_length=255,
+  )
   category = serializers.SerializerMethodField()
   article = serializers.SerializerMethodField(required=False)
 
@@ -778,11 +663,7 @@ class SongsSerializer(BaseSerializer):
   has_lyrics = serializers.SerializerMethodField(required=False)
   album = ReleasesSerializer(required=False)
 
-  category = serializers.CharField(
-    source="category.name",
-    required=False,
-    max_length=255,
-  )
+  category = SongCategorySerializer(required=False)
 
   def get_has_lyrics(self, obj):
     return obj.lyrics_song.exists()
@@ -856,7 +737,7 @@ class SetlistSerializer(BaseSerializer):
 
     return super().to_representation(instance)
 
-  song = SongsSerializer(include=["name", "slug"])
+  song = SongsSerializer(include=["name", "slug", "category"])
 
   last_event = serializers.SerializerMethodField(required=False)
 
@@ -1168,15 +1049,17 @@ class SetlistSongsSerializer(BaseSerializer):
   last_event = serializers.SerializerMethodField(required=False)
 
   def to_representation(self, instance):
-    if (
-      isinstance(self.instance, list)
-      and not hasattr(self, "_event_cache")
-      and not hasattr(self, "_song_cache")
-    ):
+    if not hasattr(self, "_caches_initialized"):
+      self._caches_initialized = True
+
+      # Determine the list of items being serialized
+      dataset = self.instance if isinstance(self.instance, list) else [self.instance]
+
       event_ids = set()
       song_ids = set()
 
-      for obj in self.instance:
+      for obj in dataset:
+        assert obj is not None
         if obj["first_event"]:
           event_ids.add(obj["first_event"])
         if obj["last_event"]:
@@ -1184,19 +1067,24 @@ class SetlistSongsSerializer(BaseSerializer):
         if obj["song_id"]:
           song_ids.add(obj["song_id"])
 
-      events = models.Event.objects.filter(event_id__in=event_ids)
-      songs = models.Song.objects.filter(id__in=song_ids).select_related("category")
-
       self._event_cache = {
         e.event_id: EventsSerializer(e, include=["date", "event_id", "early_late"]).data
-        for e in events
+        for e in models.Event.objects.filter(event_id__in=event_ids)
       }
+
       self._song_cache = {
-        s.id: SongsSerializer(
-          s,
-          include=["name", "slug", "category"],
-        ).data
-        for s in songs
+        s["id"]: {
+          "id": s["id"],
+          "name": s["name"],
+          "category": s["category__name"],
+        }
+        for s in models.Song.objects.filter(id__in=song_ids)
+        .select_related("category")
+        .values(
+          "id",
+          "name",
+          "category__name",
+        )
       }
 
     return super().to_representation(instance)
@@ -1225,27 +1113,37 @@ class SetlistSongCountSerializer(BaseSerializer):
   song = serializers.SerializerMethodField(required=False)
 
   def to_representation(self, instance):
-    if isinstance(self.instance, list) and not hasattr(self, "_song_cache"):
+    # Initialize bulk caches ONCE on the parent serializer instance
+    if not hasattr(self, "_caches_initialized"):
+      self._caches_initialized = True
+
+      dataset = self.instance if isinstance(self.instance, list) else [self.instance]
+
       song_ids = set()
 
-      for obj in self.instance:
+      for obj in dataset:
+        assert obj is not None
         if obj["song_id"]:
           song_ids.add(obj["song_id"])
 
-      songs = models.Song.objects.filter(id__in=song_ids)
-
       self._song_cache = {
-        s.id: SongsSerializer(
-          s,
-          include=["name", "slug"],
-        ).data
-        for s in songs
+        s["id"]: {
+          "id": s["id"],
+          "name": s["name"],
+          "slug": s["slug"],
+        }
+        for s in models.Song.objects.filter(id__in=song_ids).values(
+          "id",
+          "name",
+          "slug",
+        )
       }
 
     return super().to_representation(instance)
 
   def get_song(self, obj):
-    return self._song_cache.get(obj["song_id"])
+    song_cache = getattr(self, "_song_cache", {})
+    return song_cache.get(obj["song_id"])
 
   class Meta:
     model = models.Setlist
@@ -1282,89 +1180,134 @@ class SetlistBreakdownSerializer(BaseSerializer):
   total_setlist_songs = serializers.IntegerField(required=False)
   song_count = serializers.IntegerField(required=False)
   category = serializers.SerializerMethodField(required=False)
-
-  def get_category(self, obj):
-    return self._category_cache.get(obj["category"])
+  album_complete = serializers.SerializerMethodField(required=False)
+  album_in_order = serializers.SerializerMethodField(required=False)
+  songs = serializers.SerializerMethodField(required=False)
 
   def to_representation(self, instance):
-    if isinstance(self.instance, list) and not hasattr(self, "_song_cache"):
+    # Initialize bulk caches ONCE on the parent serializer instance
+    if not hasattr(self, "_caches_initialized"):
+      self._caches_initialized = True
+
+      # Determine the list of items being serialized
+      dataset = self.instance if isinstance(self.instance, list) else [self.instance]
+
       song_ids = set()
       category_ids = set()
 
-      for obj in self.instance:
-        combined = obj["songs"] + obj["album_songs"]
+      for obj in dataset:
+        assert obj is not None
+        combined = (obj.get("songs") or []) + (obj.get("album_songs") or [])
+        song_ids.update(combined)
 
-        if combined:
-          for song_id in set(combined):
-            song_ids.add(song_id)
-
-        if obj["category"]:
+        if obj.get("category"):
           category_ids.add(obj["category"])
 
-      songs = models.Song.objects.filter(id__in=song_ids)
-      categories = models.SongCategory.objects.filter(id__in=category_ids)
-
-      self._category_cache = {c.id: SongCategorySerializer(c).data for c in categories}
+      # Build data maps without repeatedly invoking full DRF serializer instances
+      self._category_cache = {
+        c["id"]: {"id": c["id"], "name": c["name"], "slug": c["slug"]}
+        for c in models.SongCategory.objects.filter(
+          id__in=category_ids,
+        ).values("id", "name", "slug")
+      }
 
       self._song_cache = {
-        s.id: SongsSerializer(
-          s,
-          include=["id", "name", "original_artist", "original"],
-        ).data
-        for s in songs
+        s["id"]: {
+          "id": s["id"],
+          "name": s["name"],
+          "original_artist": s["original_artist"],
+          "original": s["original"],
+        }
+        for s in models.Song.objects.filter(id__in=song_ids).values(
+          "id",
+          "name",
+          "original_artist",
+          "original",
+        )
       }
 
     return super().to_representation(instance)
 
-  album_complete = serializers.SerializerMethodField(required=False)
+  def get_category(self, obj):
+    return getattr(self, "_category_cache", {}).get(obj["category"])
+
+  def get_songs(self, obj):
+    song_cache = getattr(self, "_song_cache", {})
+    return [song_cache[s] for s in obj.get("songs", []) if s in song_cache]
 
   def get_album_complete(self, obj):
-    """Check if all songs on album are present in setlist in order."""
-    # intros/outros that shouldn't be counted in setlist for album check
-    remove = [689, 1021, 514]
-
+    """Check if every song ID in album_songs is present in setlist_songs."""
     # Skip non-album categories
-    if obj["category"] in (8, 19):
+    if obj.get("category") in (8, 19):
       return False
 
-    album_songs = obj.get("album_songs", [])
-    setlist_songs = obj.get("songs", [])
+    raw_album_songs = obj.get("album_songs") or []
+    raw_setlist_songs = obj.get("songs") or []
 
     # Edge case: empty album is trivially complete
-    if not album_songs:
+    if not raw_album_songs:
       return True
 
-    # Edge case: no setlist songs to check
-    if not setlist_songs:
+    # Edge case: no setlist songs means album cannot be complete
+    if not raw_setlist_songs:
       return False
 
-    ignore_set = set(remove)
+    # Standardize data types (cast all elements to int) to prevent type mismatch bugs
+    try:
+      album_set = {int(x) for x in raw_album_songs if x is not None}
+      setlist_set = {int(x) for x in raw_setlist_songs if x is not None}
+    except (ValueError, TypeError):
+      album_set = set(raw_album_songs)
+      setlist_set = set(raw_setlist_songs)
 
+    if not album_set:
+      return True
+
+    # Check set containment (Order does not matter)
+    return album_set.issubset(setlist_set)
+
+  def get_album_in_order(self, obj):
+    """Check if album songs present in the setlist appear in exact relative album sequence."""
+    # Non-album categories can't be in order
+    if obj.get("category") in (8, 19):
+      return False
+
+    album_songs = obj.get("album_songs") or []
+    setlist_songs = obj.get("songs") or []
+
+    if not album_songs or not setlist_songs:
+      return False
+
+    # Exclude intros, outros, or fillers that don't count against sequence continuity
+    remove = {689, 1021, 514}
     filtered_setlist = [
-      song_id for song_id in setlist_songs if song_id not in ignore_set
+      int(s) for s in setlist_songs if s is not None and int(s) not in remove
     ]
 
     if not filtered_setlist:
       return False
 
-    # Check if album songs appear in order within filtered setlist
-    album_idx = 0
+    # Build map of album song_id -> expected track position index
+    album_order_map = {
+      int(song_id): idx
+      for idx, song_id in enumerate(album_songs)
+      if song_id is not None
+    }
 
-    if set(setlist_songs).issubset(set(album_songs)) and len(setlist_songs) == len(
-      album_songs,
-    ):
-      return True
+    # Extract only the album songs that appeared in the setlist, keeping their setlist order
+    played_album_songs = [
+      album_order_map[s] for s in filtered_setlist if s in album_order_map
+    ]
 
-    # Check if we found all album songs in order
-    return album_idx == len(album_songs)
+    # Must have played at least 2 album songs to establish a sequence
+    if len(played_album_songs) < 2:
+      return len(played_album_songs) == 1
 
-  songs = serializers.SerializerMethodField(required=False)
-
-  def get_songs(self, obj):
-    try:
-      return [self._song_cache[s] for s in obj["songs"]]
-    except KeyError:
-      return []
+    # Verify indices strictly increase (e.g., track 1 -> track 2 -> track 3)
+    return all(
+      played_album_songs[i] < played_album_songs[i + 1]
+      for i in range(len(played_album_songs) - 1)
+    )
 
   class Meta:
     model = models.Setlist
@@ -1374,6 +1317,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
       "songs",
       "category",
       "album_complete",
+      "album_in_order",
     ]
 
 

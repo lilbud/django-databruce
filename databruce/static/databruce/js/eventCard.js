@@ -62,7 +62,7 @@ function renderBadges(types) {
 }
 
 function renderNoteCard(event) {
-  const hasNote = Boolean(event.note);
+  const hasNote = Boolean(event.event_note);
   const hasSetlist = event.setlist?.length > 0;
   const firstTypeName = event.type?.[0]?.name;
   const blockedTypes = ["Rescheduled", "Cancelled", "Relocated", "No Gig"];

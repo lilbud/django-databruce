@@ -570,3 +570,18 @@ First public release of the site. Site was locked behind a login and accounts on
 - Changed venues to use slugs instead of UUIDs for URL
 - Updated songs page to be a table, improved performance
 - Updated "Users" page with new layout
+
+# v1.29 (September 30, 2026)
+
+## Changed
+
+- Optimized AlbumBreakdown and SetlistSongs serializers, greatly reduced load time
+
+## Fixed
+
+- Fixed issue where removing shows from profile didn't work
+- Fixed missing categories from profile song table
+
+## Added
+
+- Added num_events, num_songs and first/last event to the users model. Rather than tallying these on the fly they're stored in the DB now.
