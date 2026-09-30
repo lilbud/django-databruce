@@ -502,13 +502,13 @@ class TypeAdmin(CustomModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.EventType)
-class EventTypeAdmin(ModelAdmin):
-  autocomplete_fields = ["event", "type"]
-  search_fields = ["type__name", "type__slug"]
-  list_display = ["id", "event", "type"]
-  list_select_related = ["event", "type", "event__venue", "event__venue__city"]
-  list_display_links = ["id"]
+# @admin.register(db_models.EventType)
+# class EventTypeAdmin(ModelAdmin):
+#   autocomplete_fields = ["event", "type"]
+#   search_fields = ["type__name", "type__slug"]
+#   list_display = ["event", "type"]
+#   list_select_related = ["event", "type", "event__venue", "event__venue__city"]
+#   list_display_links = ["event", "type"]
 
 
 @admin.register(db_models.Tag)
@@ -519,20 +519,16 @@ class TagAdmin(CustomModelAdmin):
   list_display_links = ["id"]
 
 
-@admin.register(db_models.EventTag)
-class EventTagAdmin(ModelAdmin):
-  def get_queryset(self, request):
-    return (
-      super()
-      .get_queryset(request)
-      .select_related("tag", "event", "event__venue", "event__venue__city")
-    )
+# @admin.register(db_models.EventTag)
+# class EventTagAdmin(ModelAdmin):
+#   def get_queryset(self, request):
+#     return super().get_queryset(request).select_related("tag", "event")
 
-  search_fields = ["tag__name", "tag__slug"]
-  list_display = ["id", "event", "tag"]
-  autocomplete_fields = ["event", "tag"]
-  list_select_related = ["event", "tag", "event__venue"]
-  list_display_links = ["id"]
+#   search_fields = ["tag__name", "tag__slug"]
+#   list_display = ["event", "tag"]
+#   autocomplete_fields = ["event", "tag"]
+#   list_select_related = ["event", "tag"]
+#   list_display_links = ["event", "tag"]
 
 
 @admin.register(db_models.Song)

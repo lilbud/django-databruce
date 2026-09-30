@@ -471,8 +471,6 @@ class EventsSerializer(BaseSerializer):
     required=False,
   )
 
-  event_anchor = serializers.SerializerMethodField(required=False)
-
   setlist = EventSetlistSerializer(
     source="setlist_event",
     read_only=True,
@@ -481,9 +479,6 @@ class EventsSerializer(BaseSerializer):
   )
 
   event_note = serializers.SerializerMethodField(required=False)
-
-  def get_event_anchor(self, obj) -> str:
-    return event_id_format(obj.event_id)
 
   def get_date(self, obj) -> None | datetime.date | str:
     return get_date_from_instance(obj)
@@ -506,7 +501,7 @@ class EventsSerializer(BaseSerializer):
       "leg",
       "rank",
       "user_present",
-      "event_anchor",
+      # "event_anchor",
       "setlist",
       "event_note",
       "event_id",

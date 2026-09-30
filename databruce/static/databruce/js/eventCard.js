@@ -21,7 +21,7 @@ function eventCard(event) {
   const cardBody = renderCardBody(setlistHtml, noteCard);
 
   return `
-    <div class="col-12 event-card" id="${event.event_anchor}">
+    <div class="col-12 event-card" id="${event.event_id}">
       <div class="card">
         ${renderCardHeader(event, badges, attendanceForm, earlyLate)}
         ${cardBody}

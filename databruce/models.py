@@ -2506,7 +2506,7 @@ class Type(BaseModel):
 
 
 class EventType(models.Model):
-  id = models.AutoField(primary_key=True)
+  pk = models.CompositePrimaryKey("event_id", "type_id")
 
   event = models.ForeignKey(
     to=Event,
@@ -2519,8 +2519,7 @@ class EventType(models.Model):
   class Meta:
     managed = True
     db_table = "event_types"
-
-    unique_together = ("event", "type")
+    unique_together = (("event", "type"),)
     verbose_name = "Event Type"
     verbose_name_plural = "Event Types"
 
@@ -2553,8 +2552,7 @@ class Tag(BaseModel):
 
 
 class EventTag(models.Model):
-  id = models.AutoField(primary_key=True)
-
+  pk = models.CompositePrimaryKey("event_id", "tag_id")
   event = models.ForeignKey(
     to=Event,
     on_delete=models.CASCADE,
@@ -2567,6 +2565,7 @@ class EventTag(models.Model):
   class Meta:
     managed = True
     verbose_name = "Event Tag"
+    unique_together = (("event", "tag"),)
     verbose_name_plural = "Event Tags"
     db_table = "event_tags"
 

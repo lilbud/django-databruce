@@ -260,6 +260,7 @@ dependencies = [
     { name = "django-timezone-field" },
     { name = "django-unfold" },
     { name = "django-unfold-markdown" },
+    { name = "django-unfold-modal" },
     { name = "django-watchfiles" },
     { name = "djangorestframework" },
     { name = "djlint" },
@@ -296,6 +297,7 @@ requires-dist = [
     { name = "django-timezone-field", specifier = ">=7.2.2" },
     { name = "django-unfold", specifier = ">=0.77.1" },
     { name = "django-unfold-markdown", specifier = ">=0.1.2" },
+    { name = "django-unfold-modal", specifier = ">=0.2.2" },
     { name = "django-watchfiles", specifier = ">=1.4.0" },
     { name = "djangorestframework", specifier = ">=3.17.2" },
     { name = "djlint", specifier = ">=1.36.4" },
@@ -417,14 +419,14 @@ wheels = [
 
 [[package]]
 name = "django-unfold"
-version = "0.103.0"
+version = "0.108.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/93/9e/4f6721d2354dfe937192582eba74020ebe25a6e0242381afa2389dde6c55/django_unfold-0.103.0.tar.gz", hash = "sha256:8ab0f1204148f28fca961d159823afc91e7ecbd7df5f4c32f8442a4e453b2273", size = 1125894 }
+sdist = { url = "https://files.pythonhosted.org/packages/48/30/f539fe86cd247d9468f84ec21468fd3ae91f5215e0f0c3264a600cc34cdb/django_unfold-0.108.0.tar.gz", hash = "sha256:f791e6b3ca8a6f84da3a9bdc09ea8f6269194f317fcd2b871bb123c815fa557a", size = 1163440 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d4/93/b1657a7da69d7dc20b4bf6776eee5ffaaffe22415ad39a1276e0d3ba7e98/django_unfold-0.103.0-py3-none-any.whl", hash = "sha256:161cd07cf644a0c64ba6bbd7ff2202a9c2b5a20734df6dd749d667f50bd8a8ba", size = 1253971 },
+    { url = "https://files.pythonhosted.org/packages/9a/cb/29cd61b8ff07602eb2c9966f298e5da05ef510f99efa46487d15a1529b55/django_unfold-0.108.0-py3-none-any.whl", hash = "sha256:6cb928bc0d9a9487075334084f738c44729b36e6c6fd0b9bfbdd6a504c1e827d", size = 1291690 },
 ]
 
 [[package]]
@@ -438,6 +440,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fb/c5/3d1e9d43fce9a0b646bf4f40fdce056af45cda39ede35a2d1cdebfb25ddc/django_unfold_markdown-0.1.2.tar.gz", hash = "sha256:6b4d8c627c08901fc6088a4aa85c357510fa4c9e55fcb2e81f2bdf10628076ec", size = 117597 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/da/6d/c4ded7b49db7e4c8daddafb28b6ec377a5e435879e370e048537342e65c3/django_unfold_markdown-0.1.2-py3-none-any.whl", hash = "sha256:a9614d7eac13c0b6be1288dfe7750987cbb99810372803a880b90b07ee014ce0", size = 119709 },
+]
+
+[[package]]
+name = "django-unfold-modal"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-unfold" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/f7/6d5cbf812563f0765811ba83b22ae14fc53fc1eee37cb500afc095afc732/django_unfold_modal-0.2.2.tar.gz", hash = "sha256:d1eae682640cd398654d4f918fdcffcbfbe8214937de3f538de5545a2d832cbf", size = 336990 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6f/52/89a563036ec11aed848f5e4d855153e961653a01ee9bab591c03637b65f1/django_unfold_modal-0.2.2-py3-none-any.whl", hash = "sha256:e303a0e04cbae9e934c05878d986ee222668762712524f9ed3ddca9db8ca14a0", size = 24284 },
 ]
 
 [[package]]

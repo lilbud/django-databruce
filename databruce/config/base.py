@@ -15,6 +15,7 @@ from pathlib import Path
 
 from django.templatetags.static import static
 from dotenv import load_dotenv
+from unfold_modal.utils import get_modal_scripts, get_modal_styles
 
 load_dotenv()
 
@@ -28,6 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # Application definition
 INSTALLED_APPS = [
   "unfold",  # before django.contrib.admin
+  "unfold_modal",
   "unfold_markdown",
   "unfold.contrib.filters",  # optional, if special filters are needed
   "unfold.contrib.forms",  # optional, if special form elements are needed
@@ -221,10 +223,12 @@ SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 UNFOLD = {
   "STYLES": [
     lambda request: static("admin/css/custom_unfold.css"),
+    *get_modal_styles(),
   ],
   "SCRIPTS": [
     lambda request: static("admin/js/jquery-4.0.0.min.js"),
     lambda request: static("admin/js/custom_unfold.js"),
+    *get_modal_scripts(),
   ],
   "SIDEBAR": {
     "show_all_applications": True,  # Ensures non-configured models still show up
