@@ -61,7 +61,7 @@ LOGGING = {
   },
   "root": {
     # Added mail_admins to catch all unexpected errors globally
-    "handlers": ["access", "error", "mail_admins"],
+    "handlers": ["access", "error"],
     "level": "INFO",
   },
   "handlers": {
@@ -92,7 +92,7 @@ LOGGING = {
   "loggers": {
     "django": {
       # Added mail_admins here to catch Django-specific core/request errors
-      "handlers": ["access", "mail_admins"],
+      "handlers": ["access"],
       "level": "INFO",
       "propagate": True,
     },
