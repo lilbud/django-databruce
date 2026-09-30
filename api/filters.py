@@ -1406,7 +1406,7 @@ class TourLegFilter(dj_filters.FilterSet):
 
 
 class SongsPageFilter(dj_filters.FilterSet):
-  song = dj_filters.NumberFilter(field_name="id__song_id", lookup_expr="exact")
+  song = dj_filters.NumberFilter(field_name="song_id", lookup_expr="exact")
 
 
 class SongsFilter(dj_filters.FilterSet):

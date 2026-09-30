@@ -89,7 +89,7 @@
           'width': '12rem',
           'render': function(data, type, row, meta) {
             if (data) {
-              return `<a href="/venues/${data.uuid}">${data.name}</a>`
+              return `<a href="/venues/${data.slug}">${data.name}</a>`
             }
           },
         }, {

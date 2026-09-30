@@ -395,11 +395,11 @@ class TestViews(BaseDataTest):
     assert response.status_code == 200
 
   def test_artist(self):
-    response = self.client.get(reverse("band_details", args=[self.artist.uuid]))
+    response = self.client.get(reverse("band_details", args=[self.artist.slug]))
     assert response.status_code == 200
 
   def test_tour(self):
-    response = self.client.get(reverse("tour_details", args=[self.tour.uuid]))
+    response = self.client.get(reverse("tour_details", args=[self.tour.slug]))
     assert response.status_code == 200
 
   def test_city(self):

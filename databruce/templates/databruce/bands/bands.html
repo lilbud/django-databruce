@@ -150,7 +150,7 @@
           data: "name",
           name: "name",
           render: function(data, type, row, meta) {
-            return data ? `<a href="/bands/${row.uuid}">${data}</a>` : '';
+            return data ? `<a href="/bands/${row.slug}">${data}</a>` : '';
           },
         }, {
           data: "first_event",

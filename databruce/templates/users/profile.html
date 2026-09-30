@@ -200,96 +200,21 @@
                      id="songTableInfo"></div>
               </div>
             </div>
-            {% comment %} <div class="card message info">Most Played Not Seen (100+ plays)</div>
-            <div class="row">
-              <div class="col">
-                <div class="card">
-                  <div class="card-body p-0">
-                    <div class="row">
-                      <div class="table-responsive">
-                        <table class="table table-hover display" id="notSeenTable">
-                          <thead>
-                            <tr>
-                              <th class="all">Total Plays</th>
-                              <th class="all">Name</th>
-                              <th class="all">Category</th>
-                              <th class="all">First</th>
-                              <th class="all">Last</th>
-                              <th class="all">Original</th>
-                            </tr>
-                          </thead>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row my-2">
-              <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap song-controls"
-                   id="userNotSeenTableControls">
-                {% include "databruce/partials/table_pagination.html" %}
-                <div class="dt-info order-3"
-                     aria-live="polite"
-                     role="status"
-                     id="TableInfo">
-</div>
-              </div>
-            </div>
-            <div class="card message info">
-              Rare Songs (<100 Plays)
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="card">
-                  <div class="card-body p-0">
-                    <div class="row">
-                      <div class="table-responsive">
-                        <table class="table table-hover display" id="rareTable">
-                          <thead>
-                            <tr>
-                              <th class="all">Times Seen</th>
-                              <th class="all">Total</th>
-                              <th class="all">Name</th>
-                              <th class="all">Category</th>
-                              <th class="all">First</th>
-                              <th class="all">Last</th>
-                              <th class="all">Original</th>
-                            </tr>
-                          </thead>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row my-2">
-              <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap song-controls"
-                   id="rareTableControls">
-                {% include "databruce/partials/table_pagination.html" %}
-                <div class="dt-info order-3"
-                     aria-live="polite"
-                     role="status"
-                     id="TableInfo">
-</div>
-              </div>
-            </div>
-            {% endcomment %}
           </div>
         </div>
         <div id="albums" class="tab-pane fade">
           <div class="col-12">
-            <div class="row g-3" id="albumCardContainer">
-              <div class="col-12 col-md-6 col-lg-4 d-none" id="example">
-                <div class="card" id="album">
-                  <div class="card-header d-block py-0.5"></div>
-                  <div class="card-body p-0"></div>
-                </div>
-              </div>
-            </div>
+            <div class="row g-3" id="albumCardContainer"></div>
           </div>
         </div>
+        <template id="albumTemplate">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card album-card" id="album">
+              <div class="card-header d-block py-2"></div>
+              <div class="card-body p-0"></div>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -330,65 +255,88 @@
         }).catch(error => console.error('Error:', error));
     }
 
+    /* MOST SEEN */
+    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&format=json&ordering=-count&limit=10', '#seenList')
+
+    /* MOST PLAYED NOT SEEN */
+    overviewCard('/api/v1/setlist_song_count/?user_unseen={{ info.id }}&public_plays=100&limit=10&ordering=-count&format=json', '#notSeenList')
+
+    /* RARE CARD */
+    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&user_rare=true&format=json&ordering=-count&limit=10', '#rareList')
+
+
     fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')
-      .then(response => response.json()) // Parse JSON response
+      .then(response => response.json())
       .then(data => {
         var container = $('#albumCardContainer');
-        var itemsToAppend = []; // Temporary array to hold all cloned jQuery elements
+        var itemsToAppend = [];
+
+        // Grab the template element content
+        var template = document.getElementById('albumTemplate').content;
 
         data.results.forEach((item, index) => {
-          var col = $('#example').clone();
-          const album = item.slug;
+          // Clone the template's internal fragment
+          var clone = document.importNode(template, true);
+          var col = $(clone).find('.col-12'); // Wrap the root column element in jQuery
 
+          const album = item.slug;
           var list = $('<ul />').addClass('list-group list-group-flush');
           let albumArtUrl = `/static/databruce/img/albums/${album}.jpg`;
-          const percent = item.album_percent.toFixed(0)
 
           if (!album) {
             albumArtUrl = '/static/databruce/img/albums/default.svg';
           }
 
-          col.removeClass('d-none');
+          // Safe to assign index id directly now
           col.attr('id', `album-${index}`);
 
           const html = `
-          <div class="row justify-content-between align-items-center">
-              <div class="col fw-semibold text-reset text-nowrap">${item.name}</div>
-              <div class="col-auto">
-                <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.name)}">
-              </div>
-            </div>
-          `;
+      <div class="row justify-content-between align-items-center">
+          <div class="col fw-semibold text-reset text-nowrap">${item.name}</div>
+          <div class="col-auto">
+            <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.name)}">
+          </div>
+        </div>
+      `;
 
-          col.find('.card-header').append(html)
+          col.find('.card-header').append(html);
 
           item.songs.forEach((i) => {
-            var listItem = $('<li />').addClass('list-group-item d-inline-flex gap-1')
+            var listItem = $('<li />').addClass('list-group-item d-inline-flex gap-1');
 
             if (i.times_seen > 0) {
-              listItem.addClass('fw-semibold text-primary')
+              listItem.addClass('fw-semibold text-primary');
               listItem.append(`<a class="text-reset" href="/songs/${i.slug}">${i.name}</a>`);
               listItem.append(`<span>(${i.times_seen})</span>`);
             } else {
-              listItem.addClass('text-default')
+              listItem.addClass('text-default');
               listItem.append(`<a class="text-reset" href="/songs/${i.slug}">${i.name}</a>`);
             }
 
             list.append(listItem);
           });
 
-          $(col).find('.card-body').append(list);
+          col.find('.card-body').append(list);
+
+          // Push the clean, un-rendered element to our array
           itemsToAppend.push(col[0]);
         });
 
+        // Append all clean cards directly to the container
         container.append(itemsToAppend);
 
-        // Initialize Masonry cleanly on the fully populated container
-        container.masonry({
-          itemSelector: '.col-lg-4:not(.d-none)',
+        // Initialize Masonry safely without template pollution
+        var $container = container.masonry({
+          itemSelector: '.col-lg-4', // No more needing :not(.d-none)
           percentPosition: true,
-          horizontalOrder: true // CRITICAL: Forces Masonry to layout items left-to-right first
+          horizontalOrder: true
         });
+
+        // Let the browser paint heights before calling layout
+        setTimeout(function() {
+          $container.masonry('layout');
+        }, 0);
+
       }).catch(error => console.error('Error:', error));
 
     // needed to initalize masonry when tab is loaded correctly
@@ -399,14 +347,14 @@
       });
 
       tables.columns.adjust();
-      $('#albumCardContainer').masonry('layout');
+      //$('#albumCardContainer').masonry('layout');
     });
 
     /* datatables */
     eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
 
     /* USER SEEN */
-    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&format=json&ordering=-count&limit=10', '#seenList')
+
 
     var songTable = new DataTable('#songTable', {
       ajax: {
@@ -524,11 +472,6 @@
       }
     });
 
-    /* MOST PLAYED NOT SEEN */
-    overviewCard('/api/v1/setlist_song_count/?user_unseen={{ info.id }}&public_plays=100&limit=10&ordering=-count&format=json', '#notSeenList')
-
-    /* RARE CARD */
-    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&user_rare=true&format=json&ordering=-count&limit=10', '#rareList')
 
     function copyListtoClipboard(btn) {
       // 1. Find the parent card using native closest()

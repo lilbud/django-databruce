@@ -10,20 +10,16 @@
   <div class="col-12">
     <div class="row">
       <div class="col">
-        <div class="d-flex justify-content-start mb-3">
-          <div class="text-2xl pe-2">Events by Type</div>
-          <div id="type-select" class="pe-2">
-            <button class="btn btn-sm btn-primary dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">{{ type }}</button>
-            <ul class="dropdown-menu">
+        <div class="d-flex justify-content-between">
+          <div class="text-2xl">Events by Type</div>
+          <div id="year-select">
+            <select onchange="location = this.value;"
+                    class="form-select form-select-sm type-filter">
               {% for i in types %}
-                <li>
-                  <a class="dropdown-item" href="{% url "events_by_type" slug=i.slug %}">{{ i.name }}</a>
-                </li>
+                <option value="{% url "events_by_type" slug=i.slug %}"
+                        {% if i.name == type.name %}selected{% endif %}>{{ i.name }}</option>
               {% endfor %}
-            </ul>
+            </select>
           </div>
         </div>
       </div>

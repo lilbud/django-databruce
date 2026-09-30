@@ -111,10 +111,10 @@
                       {% endif %}
                     </td>
                     <td class="text-nowrap">
-                      <a href="{% url 'band_details' id=event.artist.uuid %}">{{ event.artist }}</a>
+                      <a href="{% url 'band_details' slug=event.artist.slug %}">{{ event.artist }}</a>
                     </td>
                     <td class="text-nowrap">
-                      <a href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
+                      <a href="{% url 'venue_details' slug=event.venue.slug %}">{{ event.venue.get_name }}</a>
                       <br />
                       <small>{{ event.venue.city }}</small>
                     </td>

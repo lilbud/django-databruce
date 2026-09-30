@@ -23,6 +23,8 @@ class CustomUser(AbstractUser):
     db_column="discord_name",
   )
 
+  event_count = models.IntegerField(default=0)
+
   groups = models.ManyToManyField(
     "auth.Group",
     blank=True,
@@ -94,6 +96,7 @@ class Band(BaseModel):
   uuid = models.UUIDField(default=uuid4, editable=False)
   brucebase_url = models.CharField(default=None, blank=True, max_length=255)
   name = models.CharField(default=None, blank=True, max_length=255)
+  slug = models.CharField(default=None, blank=True, max_length=255)
   num_events = models.IntegerField(default=0)
 
   first_event = models.ForeignKey(
@@ -344,7 +347,7 @@ class City(BaseModel):
     if self.country_id in [6, 37] and self.state_id:  # type: ignore
       return f"{self.name}, {self.state.abbrev}"  # type: ignore
 
-    return f"{self.name}, {self.country}"
+    return f"{self.name}, {self.country.name}"  # type: ignore
 
 
 class Continent(BaseModel):
@@ -513,6 +516,7 @@ class Venue(BaseModel):
   uuid = models.UUIDField(default=uuid4, editable=False)
   brucebase_url = models.CharField(default=None, blank=True, max_length=255)
   name = models.CharField(default=None, max_length=255)
+  slug = models.CharField(default=None, max_length=255)
   detail = models.CharField(default=None, blank=True, max_length=255)
 
   city = models.ForeignKey(
@@ -908,9 +912,9 @@ class Event(BaseModel):
   def get_date(self) -> str:
     if self.date:
       if self.early_late:
-        return f"{self.date.strftime('%Y-%m-%d')} ({self.early_late})"
+        return f"{self.date.strftime('%Y-%m-%d [%a]')} ({self.early_late})"
 
-      return f"{self.date.strftime('%Y-%m-%d')}"
+      return f"{self.date.strftime('%Y-%m-%d [%a]')}"
 
     return format_fuzzy(self.event_id)
 
@@ -1947,7 +1951,6 @@ class Run(BaseModel):
 
   class Meta:
     db_table = "runs"
-    ordering = ["name"]
     verbose_name = "run"
     verbose_name_plural = "runs"
 
@@ -2147,7 +2150,7 @@ class Lyric(BaseModel):
     help_text="Where the lyric came from",
   )
 
-  text = models.CharField(db_column="lyrics", blank=True, default=None, max_length=255)
+  text = models.TextField(db_column="lyrics", blank=True, default=None, max_length=255)
 
   language = models.CharField(
     blank=True,
@@ -2391,7 +2394,7 @@ class SetlistPosition(models.Model):
 
 
 class SongPage(models.Model):
-  id = models.ForeignKey(
+  id = models.OneToOneField(
     Setlist,
     on_delete=models.DO_NOTHING,
     primary_key=True,
@@ -2418,7 +2421,7 @@ class SongPage(models.Model):
   )
 
   class Meta:
-    managed = False
+    managed = True
     db_table = "songs_page"
 
   def __str__(self) -> str:

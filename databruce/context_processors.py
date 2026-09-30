@@ -17,7 +17,7 @@ def get_navbar_links() -> list[dict[str, Any]]:
       "icon": "bi-calendar-fill",
       "children": [
         {"name": "Events By Year", "url": "events"},
-        {"name": "Events By Run", "url": "runs"},
+        {"name": "Event Runs", "url": "runs"},
         {
           "name": "Events By Type",
           "url": "events_by_type",

@@ -23,7 +23,6 @@ from django.db.models import (
   Avg,
   Count,
   Exists,
-  Min,
   OuterRef,
   Q,
   QuerySet,
@@ -918,18 +917,16 @@ class VenueDetailView(PageTitleMixin, TemplateView):
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
 
-    context["info"] = (
-      Venue.objects.filter(
-        uuid=self.kwargs["id"],
-      )
-      .annotate(
+    context["info"] = get_object_or_404(
+      Venue.objects.all().annotate(
         aliases=ArraySubquery(
-          VenueAlias.objects.filter(
-            venue=OuterRef("id"),
-          ).values_list("name", flat=True),
+          VenueAlias.objects.filter(venue=OuterRef("id")).values_list(
+            "name",
+            flat=True,
+          ),
         ),
-      )
-      .first()
+      ),
+      slug=self.kwargs["slug"],
     )
 
     venue = context["info"]
@@ -985,45 +982,29 @@ class SongDetailView(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
-    try:
-      context["info"] = get_object_or_404(
-        Song.objects.prefetch_related(
-          "album",
-          "last_event",
-        ),
-        uuid=self.kwargs["id"],
-      )
-    except KeyError:
-      context["info"] = get_object_or_404(
-        Song.objects.prefetch_related(
-          "album",
-          "last_event",
-        ),
-        slug=self.kwargs["slug"],
-      )
+
+    context["info"] = get_object_or_404(
+      Song.objects.prefetch_related(
+        "album",
+        "last_event",
+      ).select_related(
+        "category",
+      ),
+      slug=self.kwargs["slug"],
+    )
 
     song = context["info"]
     song_name = getattr(song, "name", "Unknown Song")
 
     context["title"] = f"{song_name}"
 
-    context["setlists"] = (
-      Setlist.objects.filter(
-        song_id=song.pk,
-      )
-      .select_related("event", "song")
-      .prefetch_related("setlist_position")
-    )
-
     context["positions"] = (
-      context["setlists"]
-      .filter(position__isnull=False)
+      Setlist.objects.filter(song_id=song.pk, position__isnull=False)
       .values("position")
       .annotate(
         count=Count("position"),
-        num=Min("song_num"),
       )
-    ).order_by("num")
+    )
 
     first_event = getattr(context["info"], "first_event", None)
     first_event_id = first_event.event_id if first_event else None
@@ -1825,7 +1806,7 @@ class BandDetailView(PageTitleMixin, TemplateView):
 
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
-    context["info"] = get_object_or_404(Band, uuid=self.kwargs["id"])
+    context["info"] = get_object_or_404(Band, slug=self.kwargs["slug"])
     context["title"] = f"{context['info']}"
 
     return context

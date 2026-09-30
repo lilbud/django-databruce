@@ -10,25 +10,21 @@
   <div class="col-12">
     <div class="row">
       <div class="col">
-        <div class="d-flex justify-content-start mb-3">
-          <div class="text-2xl pe-2">Events by Tag</div>
-          <div id="type-select" class="pe-2">
-            <button class="btn btn-sm btn-primary dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">{{ tag }}</button>
-            <ul class="dropdown-menu">
+        <div class="d-flex flex-wrap justify-content-between row-gap-2">
+          <div class="text-2xl">Events by Tag</div>
+          <div id="tag-select" class="col-12 col-lg-auto">
+            <select onchange="location = this.value;"
+                    class="form-select form-select-sm tag-filter">
               {% for i in tags %}
-                <li>
-                  <a class="dropdown-item" href="{% url "events_by_tag" slug=i.slug %}">{{ i.name }}</a>
-                </li>
+                <option value="{% url "events_by_tag" slug=i.slug %}"
+                        {% if i.name == tag.name %}selected{% endif %}>{{ i.name }}</option>
               {% endfor %}
-            </ul>
+            </select>
           </div>
         </div>
       </div>
     </div>
-    <div class="row mb-2">
+    <div class="row my-3">
       <div class="col">
         <div class="prefix-container">
           <span class="prefix">Description</span>

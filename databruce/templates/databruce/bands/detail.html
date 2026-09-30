@@ -131,17 +131,13 @@
           'data': 'first',
           'name': 'first__event_id, first__date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
-            }
+            return data ? eventDateFormat(data) : '';
           },
         }, {
           'data': 'last',
           'name': 'first__event_id, first__date',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`;
-            }
+            return data ? eventDateFormat(data) : '';
           },
         }, ],
         initComplete: function(settings, json) {

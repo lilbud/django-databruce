@@ -1,12 +1,13 @@
+event_table_defs = [
+  { targets: [0, 2, 7], width: '1rem', orderable: false, columnControl: [] },
+  { targets: [7], visible: false },
+]
+
 event_table_columns = [
   {
     'data': 'user_present',
     'name': 'user_present',
-    'width': '1rem',
-    'className': 'text-center text-xs user-present',
-    'orderable': false,
-    'searchable': false,
-    'columnControl': [],
+    'className': 'text-center text-xs',
     'render': function (data, type, row, meta) {
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
       return renderAttendanceForm(row, csrfToken);
@@ -23,13 +24,9 @@ event_table_columns = [
     },
   },
   {
-    'data': 'has_setlist',
-    'name': 'has_setlist',
-    'width': '1rem',
-    'className': 'text-center text-xs setlist',
-    'orderable': false,
-    'searchable': false,
-    'columnControl': [],
+    'data': 'setlist',
+    'name': 'setlist',
+    'className': 'text-center text-xs',
     'render': function (data, type, row, meta) {
       return data ? `<i class="bi bi-check-lg"></i>` : ''
     },
@@ -40,7 +37,7 @@ event_table_columns = [
     'className': 'text-wrap',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      return data ? `<a href="/bands/${data.uuid}">${data.name}</a>` : '';
+      return data ? `<a href="/bands/${data.slug}">${data.name}</a>` : '';
     },
   },
   {
@@ -50,14 +47,16 @@ event_table_columns = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (data) {
-        return row.city ? `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>` : `<a href="/venues/${data.uuid}">${data.name}</a>`
+        return row.city ? `<a href="/venues/${data.slug}">${data.name}</a><br><small>${row.city}</small>` : `<a href="/venues/${data.slug}">${data.name}</a>`
       }
+
+      return '';
     },
   },
   {
     'data': 'tour',
     'name': 'tour__name',
-    'width': '10rem',
+    'width': '12rem',
     'className': 'text-wrap',
     'render': function (data, type, row, meta) {
       if (data) {
@@ -76,12 +75,8 @@ event_table_columns = [
   {
     'data': 'public',
     'name': 'public',
-    'visible': false,
-    'orderable': false,
     'render': function (data, type, row, meta) {
-      if (data != null) {
-        return data;
-      }
+      return data;
     },
   },
 ]
@@ -98,11 +93,10 @@ function eventTable(url) {
         }
       }
     },
-    responsive: {
-      details: false,
-    },
+    scrollX: true,
     autoWidth: false,
     pageLength: 100,
+    columnDefs: event_table_defs,
     columns: event_table_columns,
     order: [[1, 'asc']],
     initComplete: function (settings, json) {
@@ -131,11 +125,9 @@ function eventTable(url) {
 
         totalSpan.text(`of ${pageInfo.pages || 1}`);
 
-        // Handle button states
         prevBtn.attr('disabled', pageInfo.page === 0);
         nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
 
-        // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
         tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
       });
 
@@ -167,8 +159,6 @@ function eventTable(url) {
 
   table.on('xhr.dt', function (e, settings, json) {
     if (!json || !json.data) return;
-
-    // Re-render your card layout using the current page's results
     renderCards(json.data);
   });
 

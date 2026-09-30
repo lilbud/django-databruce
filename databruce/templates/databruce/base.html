@@ -217,12 +217,28 @@
         const myCollapse = document.getElementById('filterCollapse');
         const toggleBtn = document.getElementById('collapseText');
 
-        myCollapse.addEventListener('show.bs.collapse', () => {
-          toggleBtn.textContent = 'Hide Filters';
-        });
+        if (myCollapse) {
 
-        myCollapse.addEventListener('hide.bs.collapse', () => {
-          toggleBtn.textContent = 'Show Filters';
+          myCollapse.addEventListener('show.bs.collapse', () => {
+            toggleBtn.textContent = 'Hide Filters';
+          });
+
+          myCollapse.addEventListener('hide.bs.collapse', () => {
+            toggleBtn.textContent = 'Show Filters';
+          });
+        }
+
+
+        $(window).on('resize', function() {
+          let tables = DataTable.tables({
+            visible: true,
+            api: true
+          });
+          tables.columns.adjust();
+
+          if (tables.responsive) {
+            tables.responsive.recalc();
+          }
         });
       });
     </script>

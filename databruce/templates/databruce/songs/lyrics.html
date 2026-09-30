@@ -94,8 +94,6 @@
                       <th class="min-desktop">Version</th>
                       <th class="min-desktop">Source</th>
                       <th class="all">Language</th>
-                      <th class="min-desktop">Translator</th>
-                      <th class="min-desktop">Note</th>
                     </tr>
                   </thead>
                 </table>
@@ -137,14 +135,7 @@
         }, {
           'data': 'language',
           'name': 'language'
-        }, {
-          'data': 'translator',
-          'name': 'translator'
-        }, {
-          'data': 'note',
-          'name': 'note'
-        }, ],
-
+        }],
         initComplete: function(settings, json) {
           let api = this.api();
           let info = api.page.info();

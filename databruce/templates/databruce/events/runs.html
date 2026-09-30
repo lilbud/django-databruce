@@ -90,8 +90,6 @@
   </div>
   <script>
     $(document).ready(function() {
-      var sb_columns = [1, 2, 3, 4, 5, 6, 7, 8];
-
       var table = new DataTable('#runTable', {
         ajax: {
           'url': '/api/v1/runs/?format=custom',
@@ -112,13 +110,13 @@
           'data': 'band',
           'name': 'band__name',
           'render': function(data, type, row, meta) {
-            return data ? `<a href="/bands/${data.uuid}">${data.name}</a>` : '';
+            return data ? data : '';
           },
         }, {
           'data': 'venue',
           'name': 'venue__name',
           'render': function(data, type, row, meta) {
-            return data ? `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>` : '';
+            return data ? `${data}<br><small>${row.city}</small>` : '';
           },
         }, {
           'data': 'num_events',
@@ -202,7 +200,6 @@
       });
 
       tableSearch(table, 'search');
-      searchBuilder(table, sb_columns);
     });
   </script>
 {% endblock content %}

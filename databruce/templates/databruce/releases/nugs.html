@@ -185,7 +185,7 @@
           'width': '15rem',
           'name': 'event__venue__name, event__venue__city__name',
           'render': function(data, type, row, meta) {
-            return row.city ? `<a href="/venues/${data.uuid}">${data.name}</a><br><small>${row.city}</small>` : `<a href="/venues/${data.uuid}">${data.name}</a>`
+            return row.city ? `<a href="/venues/${data.slug}">${data.name}</a><br><small>${row.city}</small>` : `<a href="/venues/${data.slug}">${data.name}</a>`
           },
         }, {
           'data': 'category',

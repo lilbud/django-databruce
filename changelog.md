@@ -556,4 +556,17 @@ First public release of the site. Site was locked behind a login and accounts on
 - Disabled pagination on some tables when not really needed. Tables like Countries/States, as well as tour legs.
 - Tour Leg table now groups results by Tour
 
-## Removed
+# v1.28 (September 29, 2026)
+
+## Added
+
+- Added slug field to bands
+- Added slug field to venues
+
+## Changed
+
+- Cleaned up API fields best I could, some are still a bit slow
+- Changed bands to use slugs instead of UUIDs for URL
+- Changed venues to use slugs instead of UUIDs for URL
+- Updated songs page to be a table, improved performance
+- Updated "Users" page with new layout

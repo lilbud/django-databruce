@@ -125,7 +125,7 @@
           'name': 'sort_song_name, name',
           'width': '20rem',
           'render': function(data, type, row, meta) {
-            return data ? `<a class="text-wrap" href="/songs/${row.uuid}">${data}</a>` : ''
+            return data ? `<a class="text-wrap" href="/songs/${row.slug}">${data}</a>` : ''
           },
         }, {
           'data': 'has_lyrics',

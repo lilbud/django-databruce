@@ -110,11 +110,6 @@ router.register(
   basename="year_song_breakdown",
 )
 router.register(
-  r"event_tags",
-  views.EventTagsViewSet,
-  basename="event_tags",
-)
-router.register(
   r"tags",
   views.TagsViewSet,
   basename="tags",

@@ -28,7 +28,7 @@
         </div>
       </div>
     {% endif %}
-    <div class="row my-3">
+    <div class="row mt-3 mb-2">
       <div class="col">
         <div class="card">
           <div class="card-body">
@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="row row-cols-3 row-cols-lg-6 mb-3 g-2">
+      <div class="row row-cols-3 row-cols-lg-6 mb-2 g-2">
         <div class="col">
           <div class="card p-3">
             <div class="text-xs text-muted">Events</div>
@@ -114,7 +114,7 @@
           </div>
         </div>
       </div>
-      <div class="row row-cols-1 row-cols-lg-2 g-3">
+      <div class="row row-cols-1 row-cols-lg-2 g-2">
         <div class="col order-2">
           <div class="card">
             <div class="card-header">Featured Show</div>
@@ -128,7 +128,7 @@
                     </div>
                     <div class="row">
                       <a class="text-reset"
-                         href="{% url 'band_details' id=featured.artist.uuid %}">{{ featured.artist.name }}</a>
+                         href="{% url 'band_details' slug=featured.artist.slug %}">{{ featured.artist.name }}</a>
                     </div>
                   </div>
                 {% endwith %}
@@ -146,8 +146,8 @@
             </div>
           </div>
         </div>
-        <div class="col order-3 gy-3 row-gap-3">
-          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-3">
+        <div class="col order-3">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-2">
             {% if latest_event %}
               <div class="col order-1">
                 <div class="card">
@@ -155,7 +155,7 @@
                   <div class="card-body p-0 px-3 pb-2">
                     <a href="{% url "event_details" id=latest_event.event_id %}">
                       <div class="text-lg fw-semibold gap-1 d-flex">
-                        {{ latest_event }}
+                        {{ latest_event.get_date }}
                         <i class="bi bi-box-arrow-up-right text-xs"></i>
                       </div>
                     </a>

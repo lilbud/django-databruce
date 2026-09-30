@@ -66,7 +66,7 @@
                   <div class="text-wrap fw-semibold event-header-date">
                     <span class="text-primary" id="date">{{ event.get_date }}</span>
                     <a class="text-reset"
-                       href="{% url 'band_details' id=event.artist.uuid %}"
+                       href="{% url 'band_details' slug=event.artist.slug %}"
                        id="artist">{{ event.artist }}</a>
                     {% for t in event.type.all %}
                       {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
@@ -79,7 +79,7 @@
                   <div class="col event-header-venue">
                     {% if event.venue %}
                       <a class="text-reset fw-semibold"
-                         href="{% url 'venue_details' id=event.venue.uuid %}">{{ event.venue.get_name }}</a>
+                         href="{% url 'venue_details' slug=event.venue.slug %}">{{ event.venue.get_name }}</a>
                       {% if event.venue.city %}
                         <div class="fw-light">
                           <a class="fw-light text-reset"

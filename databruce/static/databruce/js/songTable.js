@@ -33,9 +33,7 @@ song_table_columns = [
     'width': '10rem',
     'type': 'date',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return eventDateFormat(data);
-      }
+      return data ? eventDateFormat(data) : '';
     },
   },
   {

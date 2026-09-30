@@ -40,7 +40,7 @@
                     <ul>
                       {% for venue in shared_loc %}
                         <li>
-                          <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
+                          <a href="{% url "venue_details" slug=venue.slug %}">{{ venue.name }}</a>
                         </li>
                       {% endfor %}
                     </ul>
@@ -172,7 +172,7 @@
                 <ul>
                   {% for venue in child_venues %}
                     <li>
-                      <a href="{% url "venue_details" id=venue.uuid %}">{{ venue.name }}</a>
+                      <a href="{% url "venue_details" slug=venue.slug %}">{{ venue.name }}</a>
                     </li>
                   {% endfor %}
                 </ul>

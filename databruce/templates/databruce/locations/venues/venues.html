@@ -128,7 +128,7 @@
           'name': 'name, detail',
           'width': '12rem',
           'render': function(data, type, row, meta) {
-            return data ? '<a href="/venues/' + row.uuid + '">' + data + '</a>' : ''
+            return data ? `<a href="/venues/${row.slug}">${data}</a>` : ''
           },
         }, {
           'data': 'city',

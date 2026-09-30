@@ -1,6 +1,14 @@
 {% extends "databruce/wide_layout.html" %}
 {% block extrajs %}
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.19/index.global.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.1.0/all/global.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@7.1.0/all/global.js'></script>
+  <!-- THEME JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@7.1.0/global.js"></script>
+  <!-- STYLESHEETS -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@7.1.0/skeleton.css'
+        rel='stylesheet' />
+  <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@7.1.0/theme.css'
+        rel='stylesheet' />
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
@@ -22,7 +30,6 @@
           center: '',
           end: 'prev,next'
         },
-        themeSystem: 'bootstrap5',
         eventSources: [
           function(info, successCallback, failureCallback) {
             fetch(`/api/v1/events/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
@@ -176,21 +183,17 @@
   <div class="col-12 col-xl-10">
     <div class="row">
       <div class="col">
-        <div class="d-flex justify-content-start mb-3">
-          <div class="text-2xl mb-3 pe-2">Event Calendar</div>
-          <div id="year-select">
-            <button class="btn btn-sm btn-primary dropdown-toggle"
-                    type="button"
-                    id="my-button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">{{ start_date|date:'Y' }}</button>
-            <ul class="dropdown-menu">
+        <div class="d-flex flex-wrap justify-content-between row-gap-2 mb-3">
+          <div class="text-2xl">Event Calendar</div>
+          <div id="year-select" class="col-12 col-lg-auto">
+            <select id="yearSelect"
+                    onchange="location = this.value;"
+                    class="form-select form-select-sm year-filter">
               {% for i in years %}
-                <li>
-                  <a class="dropdown-item" href="{% url "calendar" %}?start={{ i }}">{{ i }}</a>
-                </li>
+                <option value="{% url "events_year" year=i %}"
+                        {% if i == year %}selected{% endif %}>{{ i }}</option>
               {% endfor %}
-            </ul>
+            </select>
           </div>
         </div>
       </div>
