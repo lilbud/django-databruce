@@ -124,7 +124,7 @@
                   <div class="col-12 px-2 pt-2 text-sm">
                     <div class="row">
                       <a class="fw-medium"
-                         href="{% url "event_details" id=featured.event_id %}">{{ featured.get_date }} - {{ featured.venue.venues_text.formatted }}</a>
+                         href="{% url "event_details" id=featured.event_id %}">{{ featured.get_date }} - {{ featured.venue.formatted }}</a>
                     </div>
                     <div class="row">
                       <a class="text-reset"
@@ -159,7 +159,7 @@
                         <i class="bi bi-box-arrow-up-right text-xs"></i>
                       </div>
                     </a>
-                    <span class="text-sm text-muted">{{ latest_event.venue.venues_text.formatted }}</span>
+                    <span class="text-sm text-muted">{{ latest_event.venue.formatted }}</span>
                   </div>
                 </div>
               </div>

@@ -65,9 +65,13 @@
                 <div class="row">
                   <div class="text-wrap fw-semibold event-header-date">
                     <span class="text-primary" id="date">{{ event.get_date }}</span>
-                    <a class="text-reset"
-                       href="{% url 'band_details' slug=event.artist.slug %}"
-                       id="artist">{{ event.artist }}</a>
+                    {% if event.artist %}
+                      <a class="text-reset"
+                         href="{% url 'band_details' slug=event.artist.slug %}"
+                         id="artist">{{ event.artist }}</a>
+                    {% else %}
+                      <span>Unknown Artist</span>
+                    {% endif %}
                     {% for t in event.type.all %}
                       {% if t.name in "Rescheduled Cancelled Relocated No Gig Rumored" %}
                         <span class="text-lg text-danger">[{{ t.name }}]</span>

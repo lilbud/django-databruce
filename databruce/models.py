@@ -581,6 +581,8 @@ class Venue(BaseModel):
     help_text="Venue that this venue belongs to. E.g. Building on a college campus, theatre in a larger venue, etc.",
   )
 
+  formatted = models.CharField(max_length=255)
+
   class Meta:
     db_table = "venues"
     verbose_name = "venue"
@@ -615,24 +617,24 @@ class Venue(BaseModel):
     return name
 
 
-class VenueText(models.Model):
-  id = models.OneToOneField(
-    Venue,
-    on_delete=models.DO_NOTHING,
-    related_name="venues_text",
-    primary_key=True,
-    db_column="id",
-  )
+# class VenueText(models.Model):
+#   id = models.OneToOneField(
+#     Venue,
+#     on_delete=models.DO_NOTHING,
+#     related_name="venues_text",
+#     primary_key=True,
+#     db_column="id",
+#   )
 
-  location = models.CharField(max_length=255)
-  formatted = models.CharField(db_column="full_location", max_length=255)
+#   location = models.CharField(max_length=255)
+#   formatted = models.CharField(db_column="full_location", max_length=255)
 
-  class Meta:
-    managed = False
-    db_table = "venues_text"
+#   class Meta:
+#     managed = False
+#     db_table = "venues_text"
 
-  def __str__(self) -> str:
-    return self.formatted
+#   def __str__(self) -> str:
+#     return self.formatted
 
 
 class VenueAlias(BaseModel):

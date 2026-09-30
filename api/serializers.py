@@ -187,7 +187,7 @@ class EventSearchSerializer(BaseSerializer):
   date = serializers.SerializerMethodField(method_name="get_date")
   venue = serializers.CharField(
     required=False,
-    source="venue.venues_text.formatted",
+    source="venue.formatted",
     max_length=255,
   )
   city = serializers.CharField(
@@ -219,9 +219,8 @@ class EventSearchSerializer(BaseSerializer):
 
 
 class IndexEventsSerializer(BaseSerializer):
-  venue = serializers.SlugRelatedField(
-    source="venue.venues_text",
-    slug_field="formatted",
+  venue = serializers.CharField(
+    source="venue.formatted",
     read_only=True,
     required=False,
   )
@@ -403,12 +402,6 @@ class VenuesSerializer(BaseSerializer):
 
   first_event = MinimalEventSerializer(required=False)
   last_event = MinimalEventSerializer(required=False)
-
-  formatted = serializers.CharField(
-    source="venues_text.formatted",
-    required=False,
-    max_length=255,
-  )
 
   def get_name(self, obj):
     if obj.detail:

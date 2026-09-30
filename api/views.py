@@ -77,7 +77,7 @@ class EventSearchViewSet(viewsets.ReadOnlyModelViewSet):
     db_models.Event.objects.select_related(
       "artist",
       "tour",
-      "venue__venues_text",
+      "venue",
     ).prefetch_related("run", "leg", "event_type")
   ).order_by("event_id")
 
@@ -214,7 +214,6 @@ class VenuesViewSet(viewsets.ReadOnlyModelViewSet):
     db_models.Venue.objects.all()
     .select_related(
       "city__country",
-      "venues_text",
     )
     .prefetch_related("city__state", "first_event", "last_event")
     .order_by("name")
@@ -438,7 +437,7 @@ class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
 class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
     db_models.Event.objects.all().select_related(
-      "venue__venues_text",
+      "venue",
     )
   ).order_by("event_id")
 
@@ -492,7 +491,7 @@ class NugsViewSet(viewsets.ReadOnlyModelViewSet):
     db_models.NugsRelease.objects.all()
     .filter(date__isnull=False)
     .select_related(
-      "event__venue__venues_text",
+      "event__venue",
       "event__tour",
       "event__artist",
       "event__venue__city__country",
