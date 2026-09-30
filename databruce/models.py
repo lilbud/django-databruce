@@ -23,7 +23,27 @@ class CustomUser(AbstractUser):
     db_column="discord_name",
   )
 
-  event_count = models.IntegerField(default=0)
+  num_events = models.IntegerField(default=0)
+
+  first_event = models.ForeignKey(
+    to="Event",
+    on_delete=models.SET_NULL,
+    related_name="user_first",
+    db_column="first_event",
+    default=None,
+    blank=True,
+    null=True,
+  )
+
+  last_event = models.ForeignKey(
+    to="Event",
+    on_delete=models.SET_NULL,
+    related_name="user_last",
+    db_column="last_event",
+    default=None,
+    blank=True,
+    null=True,
+  )
 
   groups = models.ManyToManyField(
     "auth.Group",
@@ -336,6 +356,7 @@ class City(BaseModel):
   )
 
   timezone = TimeZoneField(use_pytz=False, default="UTC", help_text="City Timezone")
+  formatted = models.CharField(default=None, max_length=255)
 
   class Meta:
     db_table = "cities"
@@ -344,10 +365,7 @@ class City(BaseModel):
     unique_together = (("name", "state"),)
 
   def __str__(self) -> str:
-    if self.country_id in [6, 37] and self.state_id:  # type: ignore
-      return f"{self.name}, {self.state.abbrev}"  # type: ignore
-
-    return f"{self.name}, {self.country.name}"  # type: ignore
+    return self.formatted
 
 
 class Continent(BaseModel):
@@ -615,26 +633,6 @@ class Venue(BaseModel):
       return "N/A"
 
     return name
-
-
-# class VenueText(models.Model):
-#   id = models.OneToOneField(
-#     Venue,
-#     on_delete=models.DO_NOTHING,
-#     related_name="venues_text",
-#     primary_key=True,
-#     db_column="id",
-#   )
-
-#   location = models.CharField(max_length=255)
-#   formatted = models.CharField(db_column="full_location", max_length=255)
-
-#   class Meta:
-#     managed = False
-#     db_table = "venues_text"
-
-#   def __str__(self) -> str:
-#     return self.formatted
 
 
 class VenueAlias(BaseModel):
@@ -1229,7 +1227,6 @@ class ReleaseTrack(BaseModel):
     db_table = "release_tracks"
     verbose_name = "release track"
     verbose_name_plural = "release tracks"
-    ordering = ["release__name", "track"]
 
   def __str__(self) -> str:
     if self.disc:
@@ -1520,6 +1517,7 @@ class SetType(models.TextChoices):
       cls.PRE_SHOW,
       cls.POST_SHOW,
       cls.PUBLIC_REHEARSAL,
+      cls.REHEARSAL,
     ]
 
 
@@ -2078,7 +2076,7 @@ class UserAttendedShow(BaseModel):
     unique_together = ("user", "event")
 
   def __str__(self) -> str:
-    return f"{self.event} - {self.user}"
+    return "test"
 
 
 class Guest(BaseModel):
