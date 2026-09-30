@@ -80,7 +80,7 @@ function eventSearch(query) {
           data.results.forEach(element => {
             $(resultsContainer).append(
               `<a href="/events/${element.event_id}" tabindex="-1" class="list-group-item search-item">
-                ${element.date}<br>${element.venue.name} - ${element.artist || 'Unknown Artist'}
+                ${element.date}<br>${element.venue.name} - ${element.artist.name || 'Unknown Artist'}
               </a>`
             );
           });

@@ -24,7 +24,7 @@
              data-bs-toggle="tooltip"
              data-bs-placement="top"
              data-bs-html="true"
-             data-bs-title="<div>{{ prev_event }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue.name }}</div>"
+             data-bs-title="<div>{{ prev_event.get_date }}<br>{{ prev_event.artist }}<br>{{ prev_event.venue.name }}</div>"
              href="{% url 'event_details' id=prev_event.event_id %}"><i class="bi bi-chevron-left"></i>Prev</a>
         {% endif %}
         {% if next_event %}
@@ -33,7 +33,7 @@
              data-bs-toggle="tooltip"
              data-bs-placement="top"
              data-bs-html="true"
-             data-bs-title="<div>{{ next_event }}<br>{{ next_event.artist }}<br>{{ next_event.venue.name }}</div>"
+             data-bs-title="<div>{{ next_event.get_date }}<br>{{ next_event.artist }}<br>{{ next_event.venue.name }}</div>"
              href="{% url 'event_details' id=next_event.event_id %}">Next<i class="bi bi-chevron-right"></i></a>
         {% endif %}
       </div>
