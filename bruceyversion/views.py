@@ -267,7 +267,7 @@ class SongEntryListView(TemplateView):
     queryset = (
       bv_models.Entry.objects.select_related("song")
       .filter(
-        song__uuid=self.kwargs["id"],
+        song__slug=self.kwargs["slug"],
       )
       .annotate(user_vote_count=SubqueryCount(users))
       .order_by("-votes")
@@ -276,7 +276,7 @@ class SongEntryListView(TemplateView):
     if queryset:
       context["song"] = queryset.first().song  # type: ignore
     else:
-      context["song"] = db_models.Song.objects.get(uuid=self.kwargs["id"])
+      context["song"] = db_models.Song.objects.get(slug=self.kwargs["slug"])
 
     context["title"] = f"Bruceyversion Entries for: {context['song'].name}"
 

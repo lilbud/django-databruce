@@ -948,7 +948,7 @@ class ReleaseTracksSerializer(BaseSerializer):
     include=[
       "id",
       "name",
-      "uuid",
+      "slug",
     ],
   )
   length = serializers.TimeField(format="%M:%S", required=False)  # type: ignore

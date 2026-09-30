@@ -1,308 +1,305 @@
 {% extends "databruce/narrow_layout.html" %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block content %}
-    <div class="col-12 col-lg-6">
-        <span class="text-sm">
-            <a href="{% url "bruceyversion:entries" %}">Back to Entries</a>
-        </span>
-        <div class="page-title mb-3">{{ title }}</div>
-        {% if messages %}
-            <div class="row mb-3">
-                <div class="col">
-                    {% for message in messages %}
-                        <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
-                    {% endfor %}
-                </div>
+  <div class="col-12 col-lg-6">
+    <span class="text-sm">
+      <a href="{% url "bruceyversion:entries" %}">Back to Entries</a>
+    </span>
+    <div class="page-title mb-3">{{ title }}</div>
+    {% if messages %}
+      <div class="row mb-3">
+        <div class="col">
+          {% for message in messages %}
+            <div class="card message {{ message.tags }} fst-italic p-2">{{ message|safe }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    <div class="row d-flex-inline gx-2 gy-2 mb-2">
+      <div class="col-9">
+        <div class="card h-100">
+          <div class="card-header">Entry Info</div>
+          <div class="card-body">
+            <div class="prefix-container text-sm">
+              <span class="prefix">Event</span>
+              <span class="value">
+                <a href="{% url "event_details" id=entry.event.event_id %}">{{ entry.event.get_date }} - {{ entry.event.venue }}</a>
+              </span>
             </div>
+            <div class="prefix-container text-sm">
+              <span class="prefix">Song</span>
+              <span class="value"><a href="{% url "song_details" slug=entry.song.slug %}">{{ entry.song.name }}</a></span>
+            </div>
+            <div class="prefix-container text-sm">
+              <span class="prefix">User</span>
+              <span class="value"><a href="{% url "profile" id=entry.user.uuid %}">{{ entry.user.username }}</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="card h-100">
+          <div class="card-header">Votes</div>
+          <div class="card-body d-flex align-items-center gap-2 flex-wrap">
+            <div class="col-12 col-lg-6">
+              <span class="d-flex text-xl" id="vote-count">{{ entry.votes }}</span>
+            </div>
+            <div class="col-12 col-lg-6">
+              {% if user.is_authenticated %}
+                {% if entry.user.id == user.id %}
+                  <span data-bs-toggle="tooltip"
+                        data-bs-title="You cannot vote on your own entry">
+                    <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
+                  </span>
+                {% elif entry.status == 'PENDING' or entry.status == 'REJECTED' %}
+                  <span data-bs-toggle="tooltip"
+                        data-bs-title="You cannot vote on pending entries">
+                    <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
+                  </span>
+                {% else %}
+                  <form method="post" id="voteForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="entry" value="{{ entry.id }}">
+                    <button class="btn btn-sm
+                                   {% if user_voted %}btn-danger{% else %}btn-primary{% endif %}"
+                            id="vote-btn"
+                            type="submit"
+                            data-voted="{{ user_voted|yesno:'true,false' }}"
+                            name="submit">{% if user_voted %}Remove{% else %}Vote{% endif %}</button>
+                  </form>
+                {% endif %}
+              {% else %}
+                <span data-bs-toggle="tooltip"
+                      data-bs-title="You must be logged in to vote">
+                  <a role="button"
+                     href="{% url 'login' %}?next={{ request.path }}"
+                     class="btn btn-sm btn-primary"
+                     id="vote-btn">Login</a>
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card mb-3">
+      <div class="card-header">Entry</div>
+      <div class="card-body text-sm">{{ entry.comment|markdown_safe }}</div>
+    </div>
+    <div class="card mb-2" id="commentCard">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        Comments
+        {% if user.is_authenticated %}
+          {% if entry.status == "PENDING" %}
+            <span data-bs-toggle="tooltip"
+                  data-bs-title="You cannot comment on pending entries">
+              <button class="btn btn-secondary text-xs py-1 px-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#commentModal"
+                      disabled>Update Comment</button>
+            </span>
+          {% else %}
+            {% if not user_comment %}
+              <button class="btn btn-secondary text-xs py-1 px-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#commentModal">Submit Comment</button>
+            {% else %}
+              <span data-bs-toggle="tooltip"
+                    data-bs-title="You already commented, click to update">
+                <button class="btn btn-secondary text-xs py-1 px-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#commentModal">Update Comment</button>
+              </span>
+            {% endif %}
+          {% endif %}
+        {% else %}
+          <span data-bs-toggle="tooltip"
+                data-bs-title="You must be logged in to vote">
+            <a role="button"
+               href="{% url "login" %}?next={{ request.path }}"
+               class="btn btn-sm btn-primary"
+               id="vote-btn">Login</a>
+          </span>
         {% endif %}
-        <div class="row d-flex-inline gx-2 gy-2 mb-2">
-            <div class="col-9">
-                <div class="card h-100">
-                    <div class="card-header">Entry Info</div>
-                    <div class="card-body">
-                        <div class="prefix-container text-sm">
-                            <span class="prefix">Event</span>
-                            <span class="value">
-                                <a href="{% url "event_details" id=entry.event.event_id %}">{{ entry.event.get_date }} - {{ entry.event.venue }}</a>
-                            </span>
-                        </div>
-                        <div class="prefix-container text-sm">
-                            <span class="prefix">Song</span>
-                            <span class="value"><a href="{% url "song_details" id=entry.song.uuid %}">{{ entry.song.name }}</a></span>
-                        </div>
-                        <div class="prefix-container text-sm">
-                            <span class="prefix">User</span>
-                            <span class="value"><a href="{% url "profile" id=entry.user.uuid %}">{{ entry.user.username }}</a></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="card h-100">
-                    <div class="card-header">Votes</div>
-                    <div class="card-body d-flex align-items-center gap-2 flex-wrap">
-                        <div class="col-12 col-lg-6">
-                            <span class="d-flex text-xl" id="vote-count">{{ entry.votes }}</span>
-                        </div>
-                        <div class="col-12 col-lg-6">
-                            {% if user.is_authenticated %}
-                                {% if entry.user.id == user.id %}
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="You cannot vote on your own entry">
-                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
-                                    </span>
-                                {% elif entry.status == 'PENDING' or entry.status == 'REJECTED' %}
-                                    <span data-bs-toggle="tooltip"
-                                          data-bs-title="You cannot vote on pending entries">
-                                        <button class="btn btn-sm btn-primary" id="vote-btn" disabled>Vote</button>
-                                    </span>
-                                {% else %}
-                                    <form method="post" id="voteForm">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="entry" value="{{ entry.id }}">
-                                        <button class="btn btn-sm
-                                                       {% if user_voted %}btn-danger{% else %}btn-primary{% endif %}"
-                                                id="vote-btn"
-                                                type="submit"
-                                                data-voted="{{ user_voted|yesno:'true,false' }}"
-                                                name="submit">
-                                            {% if user_voted %}Remove{% else %}Vote{% endif %}
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            {% else %}
-                                <span data-bs-toggle="tooltip"
-                                      data-bs-title="You must be logged in to vote">
-                                    <a role="button"
-                                       href="{% url 'login' %}?next={{ request.path }}"
-                                       class="btn btn-sm btn-primary"
-                                       id="vote-btn">Login</a>
-                                </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card mb-3">
-            <div class="card-header">Entry</div>
-            <div class="card-body text-sm">{{ entry.comment|markdown_safe }}</div>
-        </div>
-        <div class="card mb-2" id="commentCard">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                Comments
-                {% if user.is_authenticated %}
-                    {% if entry.status == "PENDING" %}
-                        <span data-bs-toggle="tooltip"
-                              data-bs-title="You cannot comment on pending entries">
-                            <button class="btn btn-secondary text-xs py-1 px-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#commentModal"
-                                    disabled>Update Comment</button>
-                        </span>
-                    {% else %}
-                        {% if not user_comment %}
-                            <button class="btn btn-secondary text-xs py-1 px-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#commentModal">Submit Comment</button>
-                        {% else %}
-                            <span data-bs-toggle="tooltip"
-                                  data-bs-title="You already commented, click to update">
-                                <button class="btn btn-secondary text-xs py-1 px-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#commentModal">Update Comment</button>
-                            </span>
-                        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if entry.entry_comment.all|length > 0 %}
+          {% for comment in entry.entry_comment.all %}
+            <div class="row">
+              <div class="col">
+                <div class="card info-card">
+                  <span class="text-primary">{{ comment.user.username }}</span>
+                  <span class="mb-2">
+                    <span class="fw-medium">{{ comment.created_at }}</span>
+                    {% if comment.updated_at != comment.created_at %}
+                      <span class="text-muted">(Edited: {{ comment.updated_at }})</span>
                     {% endif %}
-                {% else %}
-                    <span data-bs-toggle="tooltip"
-                          data-bs-title="You must be logged in to vote">
-                        <a role="button"
-                           href="{% url "login" %}?next={{ request.path }}"
-                           class="btn btn-sm btn-primary"
-                           id="vote-btn">Login</a>
+                  </span>
+                  {% if comment.comment|length > 200 %}
+                    <span data-bs-toggle="tooltip" data-bs-title="Click to view more">
+                      <a role="button"
+                         data-bs-toggle="modal"
+                         data-bs-target="#viewCommentModal">{{ comment.comment|linebreaks|truncatechars:200 }}</a>
                     </span>
-                {% endif %}
-            </div>
-            <div class="card-body">
-                {% if entry.entry_comment.all|length > 0 %}
-                    {% for comment in entry.entry_comment.all %}
-                        <div class="row">
-                            <div class="col">
-                                <div class="card info-card">
-                                    <span class="text-primary">{{ comment.user.username }}</span>
-                                    <span class="mb-2">
-                                        <span class="fw-medium">{{ comment.created_at }}</span>
-                                        {% if comment.updated_at != comment.created_at %}
-                                            <span class="text-muted">(Edited: {{ comment.updated_at }})</span>
-                                        {% endif %}
-                                    </span>
-                                    {% if comment.comment|length > 200 %}
-                                        <span data-bs-toggle="tooltip" data-bs-title="Click to view more">
-                                            <a role="button"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#viewCommentModal">
-                                            {{ comment.comment|linebreaks|truncatechars:200 }}</a>
-                                        </span>
-                                    {% else %}
-                                        <span>{{ comment.comment|linebreaks|truncatechars:200 }}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% include "./comment_modal.html" with comment=comment %}
-                        {% if not forloop.last %}<hr>{% endif %}
-                    {% endfor %}
-                {% else %}
-                    <div class="card message info">No comments for this entry, submit one above</div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="modal fade"
-         id="commentModal"
-         tabindex="-1"
-         aria-labelledby="commentModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    {% if user_comment %}
-                        <h1 class="modal-title fs-5" id="commentModalLabel">Update Comment</h1>
-                    {% else %}
-                        <h1 class="modal-title fs-5" id="commentModalLabel">Add Comment</h1>
-                    {% endif %}
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                  {% else %}
+                    <span>{{ comment.comment|linebreaks|truncatechars:200 }}</span>
+                  {% endif %}
                 </div>
-                <div class="modal-body">
-                    <form method="post" id="comment-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="entry" value="{{ entry.id }}">
-                        <label for="{{ form.comment.id_for_label }}" class="fw-medium">{{ form.comment.label }}</label>
-                        {{ form.comment }}
-                        {% if form.comment.help_text %}
-                            <div class="form-text text-muted text-xs mb-2">{{ form.comment.help_text }}</div>
-                        {% endif %}
-                        <span class="button-container">
-                            <button id="submit-comment"
-                                    class="btn btn-primary text-xs mt-2"
-                                    type="submit">Submit</button>
-                        </span>
-                    </form>
-                </div>
+              </div>
             </div>
-        </div>
+            {% include "./comment_modal.html" with comment=comment %}
+            {% if not forloop.last %}<hr>{% endif %}
+          {% endfor %}
+        {% else %}
+          <div class="card message info">No comments for this entry, submit one above</div>
+        {% endif %}
+      </div>
     </div>
-    <script>
-      $(document).ready(function () {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+  </div>
+  <div class="modal fade"
+       id="commentModal"
+       tabindex="-1"
+       aria-labelledby="commentModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          {% if user_comment %}
+            <h1 class="modal-title fs-5" id="commentModalLabel">Update Comment</h1>
+          {% else %}
+            <h1 class="modal-title fs-5" id="commentModalLabel">Add Comment</h1>
+          {% endif %}
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" id="comment-form">
+            {% csrf_token %}
+            <input type="hidden" name="entry" value="{{ entry.id }}">
+            <label for="{{ form.comment.id_for_label }}" class="fw-medium">{{ form.comment.label }}</label>
+            {{ form.comment }}
+            {% if form.comment.help_text %}
+              <div class="form-text text-muted text-xs mb-2">{{ form.comment.help_text }}</div>
+            {% endif %}
+            <span class="button-container">
+              <button id="submit-comment"
+                      class="btn btn-primary text-xs mt-2"
+                      type="submit">Submit</button>
+            </span>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-        $('#voteForm').submit(async function (e) {
-          e.preventDefault();
-          const formData = new FormData(this);
+      $('#voteForm').submit(async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
 
-          try {
-            const response = await fetch("{% url 'bruceyversion:entry_vote' %}", {
-              method: 'POST',
-              body: formData
-            });
+        try {
+          const response = await fetch("{% url 'bruceyversion:entry_vote' %}", {
+            method: 'POST',
+            body: formData
+          });
 
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
 
-            const data = await response.json();
+          const data = await response.json();
 
-            if (!data['success']) {
-              alert(data['message']);
-              $('#vote-btn').prop('disabled', true);
+          if (!data['success']) {
+            alert(data['message']);
+            $('#vote-btn').prop('disabled', true);
+          } else {
+            // Update vote count display
+            $('#vote-count').text(data['votes']);
+
+            // Toggle button UI based on returned vote state
+            const $btn = $('#vote-btn');
+            if (data['voted']) {
+              $btn.text('Remove')
+                .removeClass('btn-primary')
+                .addClass('btn-danger')
+                .data('voted', true);
             } else {
-              // Update vote count display
-              $('#vote-count').text(data['votes']);
-
-              // Toggle button UI based on returned vote state
-              const $btn = $('#vote-btn');
-              if (data['voted']) {
-                $btn.text('Remove')
-                    .removeClass('btn-primary')
-                    .addClass('btn-danger')
-                    .data('voted', true);
-              } else {
-                $btn.text('Vote')
-                    .removeClass('btn-danger')
-                    .addClass('btn-primary')
-                    .data('voted', false);
-              }
+              $btn.text('Vote')
+                .removeClass('btn-danger')
+                .addClass('btn-primary')
+                .data('voted', false);
             }
-
-          } catch (error) {
-            console.error('Error during POST request:', error);
           }
-        });
 
-        $('#comment-form').submit(async function(e) {
-          e.preventDefault();
-          const formData = new FormData(this);
+        } catch (error) {
+          console.error('Error during POST request:', error);
+        }
+      });
 
-          try {
-            const response = await fetch("{% url 'bruceyversion:entry_comment_submit' %}", {
-              method: 'POST',
-              body: formData
-            });
+      $('#comment-form').submit(async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
 
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+        try {
+          const response = await fetch("{% url 'bruceyversion:entry_comment_submit' %}", {
+            method: 'POST',
+            body: formData
+          });
 
-            const data = await response.json(); // Parses the JSON response body
-            const modalElement = document.getElementById('commentModal');
-
-            var url = '{{ request.path }}'
-            
-            console.log(url);
-            if (url) { // require a URL
-              window.location = url; // redirect
-            }
-
-          } catch (error) {
-            console.error('Error during POST request:', error);
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
           }
-        });
 
-        $('#update-comment-form').submit(async function(e) {
-          e.preventDefault();
-          const formData = new FormData(this);
+          const data = await response.json(); // Parses the JSON response body
+          const modalElement = document.getElementById('commentModal');
 
-          try {
-            const response = await fetch("{% url 'bruceyversion:entry_comment_update' %}", {
-              method: 'POST',
-              body: formData
-            });
+          var url = '{{ request.path }}'
 
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json(); // Parses the JSON response body
-            const modalElement = document.getElementById('updateCommentModal');
-
-            var url = '{{ request.path }}'
-            
-            console.log(url);
-            if (url) { // require a URL
-              window.location = url; // redirect
-            }
-
-          } catch (error) {
-            console.error('Error during POST request:', error);
+          console.log(url);
+          if (url) { // require a URL
+            window.location = url; // redirect
           }
-        })
+
+        } catch (error) {
+          console.error('Error during POST request:', error);
+        }
+      });
+
+      $('#update-comment-form').submit(async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+          const response = await fetch("{% url 'bruceyversion:entry_comment_update' %}", {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json(); // Parses the JSON response body
+          const modalElement = document.getElementById('updateCommentModal');
+
+          var url = '{{ request.path }}'
+
+          console.log(url);
+          if (url) { // require a URL
+            window.location = url; // redirect
+          }
+
+        } catch (error) {
+          console.error('Error during POST request:', error);
+        }
       })
-    </script>
+    })
+  </script>
 {% endblock content %}

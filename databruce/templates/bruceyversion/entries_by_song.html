@@ -6,7 +6,7 @@
   <div class="col-12 col-lg-8">
     <div class="page-title mb-1">
       Bruceyversion Entries For:
-      <a href="{% url "song_details" id=song.uuid %}">{{ song.name }}</a>
+      <a href="{% url "song_details" slug=song.slug %}">{{ song.name }}</a>
     </div>
     {% if page %}
       <div class="text-sm mb-4 d-flex align-items-center gap-2 text-nowrap">

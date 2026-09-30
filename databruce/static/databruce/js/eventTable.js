@@ -1,5 +1,6 @@
 event_table_defs = [
   { targets: [0, 2, 7], width: '1rem', orderable: false, columnControl: [] },
+  { targets: [0], orderable: false, searchable: false },
   { targets: [7], visible: false },
 ]
 

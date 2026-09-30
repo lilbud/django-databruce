@@ -159,6 +159,16 @@
                         class="btn btn-sm bi bi-search icon-button btn-primary w-100 gap-1 search">Searchbuilder</button>
               </div>
             </div>
+            <div class="row my-3">
+              <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap song-controls"
+                   id="userSeenTableControls">
+                {% include "databruce/partials/table_pagination.html" %}
+                <div class="dt-info order-3"
+                     aria-live="polite"
+                     role="status"
+                     id="songTableInfo"></div>
+              </div>
+            </div>
             <div class="card">
               <div class="card-body p-0">
                 <div class="row">
@@ -182,6 +192,16 @@
                     </table>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap song-controls"
+                   id="userSeenTableControls">
+                {% include "databruce/partials/table_pagination.html" %}
+                <div class="dt-info order-3"
+                     aria-live="polite"
+                     role="status"
+                     id="songTableInfo"></div>
               </div>
             </div>
           </div>
@@ -467,6 +487,59 @@
         initComplete: function(settings, json) {
           var info = this.api().page.info();
           $('#event-count-badge').text(info.recordsTotal);
+
+          let api = this.api();
+          var info = api.page.info();
+
+          const input = $('.page-input');
+          const prevBtn = $('.btn-prev');
+          const nextBtn = $('.btn-next');
+          const totalSpan = $('.total-pages');
+          const tableInfo = $('#songTableInfo');
+
+          // Initial button states
+          input.val(info.page + 1);
+          prevBtn.attr('disabled', info.page === 0);
+          nextBtn.attr('disabled', info.page >= info.pages - 1);
+
+          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+
+          api.on('draw', () => {
+            const pageInfo = api.page.info();
+
+            input.val(pageInfo.page + 1);
+            input.attr('max', pageInfo.pages);
+
+            totalSpan.text(`of ${pageInfo.pages || 1}`);
+
+            // Handle button states
+            prevBtn.attr('disabled', pageInfo.page === 0);
+            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+
+            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+          });
+
+          totalSpan.text(`of ${info.pages || 1}`);
+
+          nextBtn.on('click', function() {
+            nextPage(table)
+          });
+
+          prevBtn.on('click', function() {
+            prevPage(table);
+          });
+
+          input.on('change', function() {
+            let val = parseInt(this.value, 10) - 1;
+            const max = api.page.info().pages - 1;
+            if (val < 0) val = 0;
+            if (val > max) val = max;
+
+            input.attr('value', val);
+
+            api.page(val).draw('page');
+          });
         }
       });
 
@@ -522,7 +595,7 @@
           'name': 'setlist__song__name',
           'width': '12rem',
           'render': function(data, type, row, meta) {
-            return data ? `<a href="/songs/${data.uuid}">${data.name}</a>` : ''
+            return data ? `<a href="/songs/${data.slug}">${data.name}</a>` : ''
           },
         }, {
           'data': 'notes',

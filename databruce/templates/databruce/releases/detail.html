@@ -239,7 +239,7 @@
           'name': 'song__sort_song_name',
           'render': function(data, type, row, meta) {
             if (data) {
-              return `<a href="/songs/${data.uuid}">${data.name}</a>`;
+              return `<a href="/songs/${data.slug}">${data.name}</a>`;
             }
           },
         }, {

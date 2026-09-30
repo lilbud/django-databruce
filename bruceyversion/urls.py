@@ -18,7 +18,7 @@ urlpatterns = [
   path("", EntryListView.as_view(), name="entries"),
   path("entries/", EntryListView.as_view(), name="entries"),
   path("entries/<uuid:id>/", EntryDetailView.as_view(), name="entry_detail"),
-  path("song/<uuid:id>/", SongEntryListView.as_view(), name="entry_by_song"),
+  path("song/<str:slug>/", SongEntryListView.as_view(), name="entry_by_song"),
   path(
     "event/<str:id>/",
     EventEntryListView.as_view(),

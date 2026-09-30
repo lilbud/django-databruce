@@ -71,7 +71,7 @@
                     title: val.name,
                     start: val.first_event.date,
                     end: `${val.last_event.date}T23:59:59`,
-                    url: `/events/runs/${val.uuid}`,
+                    url: `/runs/${val.slug}`,
                     className: 'px-1 calendar event-run',
                   })
                 })
@@ -190,7 +190,7 @@
                     onchange="location = this.value;"
                     class="form-select form-select-sm year-filter">
               {% for i in years %}
-                <option value="{% url "events_year" year=i %}"
+                <option value="{% url "calendar" %}?start={{ i }}-01"
                         {% if i == year %}selected{% endif %}>{{ i }}</option>
               {% endfor %}
             </select>
