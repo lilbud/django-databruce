@@ -854,7 +854,12 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 .navbar .btn:hover,
 .navbar .btn:hover i,
 .navbar .btn.active i {
-  color: var(--color-black) !important;
+  color: var(--color-blue-950) !important;
+}
+
+#bd-theme-mobile-end,
+#bd-theme-mobile-end i {
+  color: var(--color-blue-950) !important;
 }
 
 .icon-button {
@@ -1022,7 +1027,7 @@ button {
 .prefix-container {
   display: flex !important;
   text-wrap: wrap !important;
-  font-size: var(--text-sm) !important;
+  /* font-size: var(--text-sm) !important; */
   width: 100% !important;
   flex-direction: column !important;
 }
@@ -1618,19 +1623,6 @@ html {
   right: 30px;
 }
 
-.badge[class*="subtle"],
-.btn[class*="subtle"] {
-  border-width: 0.1rem !important;
-  border-style: solid !important;
-}
-
-.badge[class*="outline"],
-.btn[class*="outline"] {
-  background-color: transparent !important;
-  border-width: 1px !important;
-  border-style: solid !important;
-}
-
 @media (min-width: 992px) {
   .dropdown:hover .dropdown-menu {
     display: block;
@@ -1692,12 +1684,15 @@ html {
   align-items: center !important;
 }
 
-#djDebugPanelList a,
-#djDebugPanelList a small {
-  color: white !important;
+.nav-underline .nav-link.active,
+.nav-underline .show>.nav-link {
+  font-weight: 500 !important;
 }
 
-#djDebugPanelList a:hover,
-#djDebugPanelList a:hover small {
-  color: black !important;
+a.underline-0:hover {
+  text-decoration: none !important;
+}
+
+.btn {
+  border-color: transparent !important;
 }

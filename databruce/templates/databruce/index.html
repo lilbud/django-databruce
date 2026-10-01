@@ -8,45 +8,43 @@
   <script src="{% static 'databruce/js/setlistTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
-  <div class="col-12 col-lg-8 col-xxl-6">
-    <div class="row justify-content-center logo-row">
+  <div class="col-12">
+    <div class="row justify-content-center">
+      <div class="col-auto">
+        <a class="underline-0 btn btn-sm btn-neutral text-xs fw-medium"
+           href="{% url "blog:blog_post" slug=latest_blog_post.slug %}">{{ latest_blog_post }}</a>
+      </div>
+    </div>
+    <div class="row justify-content-center logo-row my-4">
       <div class="main-logo" role="img" aria-label="Databruce">
         <span class="sr-only">Databruce</span>
       </div>
     </div>
-    {% if not user.is_authenticated %}
-      <div class="row my-3 justify-content-center">
-        <div class="d-flex justify-content-center gap-2">
-          <a href="{% url "login" %}"
-             type="button"
-             role="button"
-             class="btn btn-sm btn-primary">Login</a>
-          <a href="{% url "signup" %}"
-             type="button"
-             role="button"
-             class="btn btn-sm btn-primary">Create Account</a>
-        </div>
+    {% comment %} {% if not user.is_authenticated %} {% endcomment %}
+    <div class="row mb-4 justify-content-center">
+      <div class="d-flex justify-content-center gap-2">
+        <a href="{% url "login" %}"
+           type="button"
+           role="button"
+           class="btn btn-sm btn-primary">Login</a>
+        <a href="{% url "signup" %}"
+           type="button"
+           role="button"
+           class="btn btn-sm btn-neutral">Register</a>
+        <a href="{% url "blog:blog" %}"
+           type="button"
+           role="button"
+           class="btn btn-sm btn-neutral">News</a>
+        <a href="{% url "blog:blog_post" slug="about-databruce" %}"
+           type="button"
+           role="button"
+           class="btn btn-sm btn-neutral">About Site</a>
       </div>
-    {% endif %}
-    <div class="row mt-3 mb-2">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <div class="prefix-container">
-              <span class="prefix">Latest Blog Post ({{ latest_blog_post.published_at|date:"Y-m-d" }})</span>
-              <span class="value">
-                <a href="{% url "blog:blog_post" slug=latest_blog_post.slug %}">
-                  <div class="text-sm fw-semibold gap-1 d-flex">
-                    {{ latest_blog_post }}
-                    <i class="bi bi-box-arrow-up-right text-xs"></i>
-                  </div>
-                </a></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row row-cols-3 row-cols-lg-6 mb-2 g-2">
+    </div>
+    {% comment %} {% endif %} {% endcomment %}
+  <div class="row mb-4 justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="row row-cols-3 row-cols-lg-6 mb-2 g-3">
         <div class="col">
           <div class="card p-3">
             <div class="text-xs text-muted">Events</div>
@@ -114,7 +112,11 @@
           </div>
         </div>
       </div>
-      <div class="row row-cols-1 row-cols-lg-2 g-2">
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="row row-cols-1 gx-3 row-gap-3">
         <div class="col order-2">
           <div class="card">
             <div class="card-header">Featured Show</div>
@@ -146,60 +148,53 @@
             </div>
           </div>
         </div>
-        <div class="col order-3">
-          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-2">
-            {% if latest_event %}
-              <div class="col order-1">
-                <div class="card">
-                  <div class="card-header">Latest Event</div>
-                  <div class="card-body p-0 px-3 pb-2">
-                    <a href="{% url "event_details" id=latest_event.event_id %}">
-                      <div class="text-lg fw-semibold gap-1 d-flex">
-                        {{ latest_event.get_date }}
-                        <i class="bi bi-box-arrow-up-right text-xs"></i>
-                      </div>
-                    </a>
-                    <span class="text-sm text-muted">{{ latest_event.venue.formatted }}</span>
+        {% if latest_event %}
+          <div class="col order-1">
+            <div class="card">
+              <div class="card-header">Latest Event</div>
+              <div class="card-body p-0 px-3 pb-2">
+                <a href="{% url "event_details" id=latest_event.event_id %}">
+                  <div class="text-lg fw-semibold gap-1 d-flex">
+                    {{ latest_event.get_date }}
+                    <i class="bi bi-box-arrow-up-right text-xs"></i>
                   </div>
-                </div>
-              </div>
-            {% endif %}
-            <div class="col order-last">
-              <div class="card">
-                <div class="card-header">
-                  On This Day
-                  <a role="button"
-                     class="btn btn-sm btn-primary text-xs py-0.5 px-1"
-                     href="{% url 'adv_search_results' %}?month={% now "n" %}&day={% now "j" %}">See More</a>
-                </div>
-                <div class="card-body p-0 list-card" id="otd"></div>
+                </a>
+                <span class="text-sm text-muted">{{ latest_event.venue.formatted }}</span>
               </div>
             </div>
+          </div>
+        {% endif %}
+        <div class="col order-3">
+          <div class="card">
+            <div class="card-header">On This Day</div>
+            <div class="card-body p-0 list-card" id="otd"></div>
           </div>
         </div>
       </div>
     </div>
-    <script>
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  </div>
+</div>
+<script>
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      function getEventData(url, containerId) {
-        var container = $(containerId);
-        var list = $('<ul />').addClass('list-group list-group-flush');
+  function getEventData(url, containerId) {
+    var container = $(containerId);
+    var list = $('<ul />').addClass('list-group list-group-flush');
 
-        container.append(list);
+    container.append(list);
 
-        fetch(url)
-          .then(response => response.json())
-          .then(data => {
-            let items = data.results.map((item) => {
-              var item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`;
-              var item2 = `<div class="col-9 py-0 text-wrap">${item.venue}</div>`;
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        let items = data.results.map((item) => {
+          var item1 = `<div class="col-3 col-lg-1 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date}</a></div>`;
+          var item2 = `<div class="col-auto py-0 text-wrap">${item.venue}</div>`;
 
-              if (item.early_late) {
-                item1 = `<div class="col-3 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`;
-              }
+          if (item.early_late) {
+            item1 = `<div class="col-3 col-lg-1 py-0 text-nowrap"><a href="/events/${item.event_id}">${item.date} (${item.early_late})</a></div>`;
+          }
 
-              return `
+          return `
           <li class="list-group-item py-0.5 px-3">
             <div class="row row-cols-2 fw-medium">
               ${item1}
@@ -207,92 +202,92 @@
             </div>
           </li>
         `;
-            }).join("");
+        }).join("");
 
-            list.append(items);
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            // Show an error message if the fetch fails
-            list.empty().append('<li class="list-group-item text-danger">Failed to load events.</li>');
-          });
+        list.append(items);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Show an error message if the fetch fails
+        list.empty().append('<li class="list-group-item text-danger">Failed to load events.</li>');
+      });
+  }
+
+  $(document).ready(function() {
+    var date = new Date();
+
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+
+    getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
+
+    /* SETLIST TABLE */
+    var url = '/api/v1/setlists_index/?event={{ featured_event.id }}&format=json&show_only=true';
+
+    let setlistOptions = {
+      rowGroup: {
+        groupVal: 'set_name'
       }
+    }
 
-      $(document).ready(function() {
-        var date = new Date();
-
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-
-        getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
-
-        /* SETLIST TABLE */
-        var url = '/api/v1/setlists_index/?event={{ featured_event.id }}&format=json&show_only=true';
-
-        let setlistOptions = {
-          rowGroup: {
-            groupVal: 'set_name'
-          }
+    let setlistColumns = [{
+      'data': 'song_num',
+      'className': 'text-center songnum',
+      'width': '',
+      'render': function(data, type, row, meta) {
+        return data ? data : ''
+      },
+      'createdCell': function(td, cellData, rowData) {
+        if (rowData.position) {
+          var position = slugify(rowData.position);
+          $(td)
+            .addClass(`${position} position`)
+            .attr({
+              'data-bs-toggle': 'tooltip',
+              'data-bs-title': rowData.position,
+              'data-bs-html': true
+            });
         }
 
-        let setlistColumns = [{
-          'data': 'song_num',
-          'className': 'text-center songnum',
-          'width': '',
-          'render': function(data, type, row, meta) {
-            return data ? data : ''
-          },
-          'createdCell': function(td, cellData, rowData) {
-            if (rowData.position) {
-              var position = slugify(rowData.position);
-              $(td)
-                .addClass(`${position} position`)
-                .attr({
-                  'data-bs-toggle': 'tooltip',
-                  'data-bs-title': rowData.position,
-                  'data-bs-html': true
-                });
-            }
+        return td;
+      },
+    }, {
+      'data': 'song',
+      'className': 'text-wrap',
+      'width': '',
+      'render': function(data, type, row, meta) {
+        const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+        const segue = row.segue ? ' <span class="segue"></span>' : '';
+        let bustBadge = '';
 
-            return td;
-          },
-        }, {
-          'data': 'song',
-          'className': 'text-wrap',
-          'width': '',
-          'render': function(data, type, row, meta) {
-            const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
-            const segue = row.segue ? ' <span class="segue"></span>' : '';
-            let bustBadge = '';
+        const activeBadges = SONG_BADGES
+          .filter(b => row[b.key])
+          .map(b => createBadge(b.class, b.label, b.title))
 
-            const activeBadges = SONG_BADGES
-              .filter(b => row[b.key])
-              .map(b => createBadge(b.class, b.label, b.title))
+        if (row.gap >= 50 && !row.debut) {
+          const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
+        }
 
-            if (row.gap >= 50 && !row.debut) {
-              const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
-            }
+        const allBadges = [
+          ...activeBadges,
+          bustBadge
+        ].filter(Boolean).join('');
 
-            const allBadges = [
-              ...activeBadges,
-              bustBadge
-            ].filter(Boolean).join('');
+        const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
 
-            const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
+        const notes = row.notes ? `<span class="text-wrap fw-light d-block setlist-note">${row.notes.join('; ')}</span>` : '';
 
-            const notes = row.notes ? `<span class="text-wrap fw-light d-block setlist-note">${row.notes.join('; ')}</span>` : '';
-
-            return `
+        return `
         <div class="d-flex d-md-inline-flex justify-content-between align-items-center w-100">
         <span>${songLink}${segue}</span>
         ${badgeContainer}
         </div>
         ${notes}
       `;
-          }
-        }, ]
+      }
+    }, ]
 
-        createTable(url, setlistColumns, '#setlistTable', setlistOptions);
-      })
-    </script>
+    createTable(url, setlistColumns, '#setlistTable', setlistOptions);
+  })
+</script>
 {% endblock content %}

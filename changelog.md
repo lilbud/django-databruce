@@ -571,11 +571,13 @@ First public release of the site. Site was locked behind a login and accounts on
 - Updated songs page to be a table, improved performance
 - Updated "Users" page with new layout
 
-# v1.29 (September 30, 2026)
+# v1.29 (October 1, 2026)
 
 ## Changed
 
 - Optimized AlbumBreakdown and SetlistSongs serializers, greatly reduced load time
+- Home page redesign. Single column and repositioned some things
+- Redid some of the theme colors. Removed the `outline` button as it was unused.
 
 ## Fixed
 
