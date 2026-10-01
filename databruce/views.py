@@ -120,39 +120,54 @@ class IndexView(PageTitleMixin, TemplateView):
     day = date.day
 
     event_filter = Q(
-      Q(event__date__month=month)
-      & Q(event__date__day=day)
-      & Q(event__artist__bruce_band=True)
-      & Q(set_name__in=SetType.valid_sets())
-      & Q(event__setlist_certainty="Confirmed")
-      & ~Q(event__tour__name__icontains="misc.")
-      & ~Q(event__tour_id__in=[25, 48]),
+      Q(date__month=month)
+      & Q(date__day=day)
+      & Q(artist__bruce_band=True)
+      & Q(setlist_event__set_name__in=SetType.valid_sets())
+      & Q(setlist_certainty="Confirmed")
+      & ~Q(tour__name__icontains="misc.")
+      & ~Q(tour_id__in=[25, 48]),
     )
 
     queryset = (
-      Setlist.objects.select_related(
-        "event__artist",
-        "event__venue",
-        "event__tour",
+      Event.objects.select_related(
+        "artist",
+        "venue",
+        "tour",
       )
+      .prefetch_related("setlist_event")
       .filter(event_filter)
       .distinct("event_id")
       .order_by("-event_id")
       .first()
     )
 
-    if not queryset:
-      queryset = (
-        Setlist.objects.select_related(
-          "event__artist",
-          "event__venue",
-          "event__tour",
-        )
-        .filter(event__event_id="19780919-01")
-        .distinct("event_id")
-        .order_by("-event_id")
-        .first()
-      )
+    print(queryset)
+
+    # queryset = (
+    #   Setlist.objects.select_related(
+    #     "event__artist",
+    #     "event__venue",
+    #     "event__tour",
+    #   )
+    #   .filter(event_filter)
+    #   .distinct("event_id")
+    #   .order_by("-event_id")
+    #   .first()
+    # )
+
+    # if not queryset:
+    #   queryset = (
+    #     Setlist.objects.select_related(
+    #       "event__artist",
+    #       "event__venue",
+    #       "event__tour",
+    #     )
+    #     .filter(event__event_id="19780919-01")
+    #     .distinct("event_id")
+    #     .order_by("-event_id")
+    #     .first()
+    #   )
 
     context["featured_event"] = queryset
 

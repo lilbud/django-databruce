@@ -120,7 +120,7 @@
             <div class="card-header">Featured Show</div>
             <div class="card-body p-0" id="setlistCard">
               <div class="col-12">
-                {% with featured=featured_event.event %}
+                {% with featured=featured_event %}
                   <div class="col-12 px-2 pt-2 text-sm">
                     <div class="row">
                       <a class="fw-medium"
@@ -227,7 +227,7 @@
         getEventData(`/api/v1/events_index/?month=${month}&day=${day}&format=json`, '#otd')
 
         /* SETLIST TABLE */
-        var url = '/api/v1/setlists_index/?event={{ featured_event.event.id }}&format=json&show_only=true';
+        var url = '/api/v1/setlists_index/?event={{ featured_event.id }}&format=json&show_only=true';
 
         let setlistOptions = {
           rowGroup: {
