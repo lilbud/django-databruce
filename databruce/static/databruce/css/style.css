@@ -878,6 +878,16 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   margin: 0 !important;
 }
 
+.card-footer>.event-note {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  /* min-height: 2.75rem; */
+}
+
 /* Ensure the last element has no margin regardless of tag */
 .card-body p:last-of-type {
   margin-bottom: 0 !important;
@@ -1674,9 +1684,13 @@ html {
   font-size: var(--text-lg) !important;
 }
 
-.event-card #userForm .star-btn {
-  font-size: var(--text-xl) !important;
+.event-card #userForm {
+  height: 18px !important;
 }
+
+/* .event-card #userForm .star-btn {
+  font-size: var(--text-xl) !important;
+} */
 
 .nav-link {
   display: flex !important;

@@ -48,7 +48,7 @@
   .btn-primary,
   .badge-primary,
   .nav-btn.active {
-    background-color: var(--color-blue-400) !important;
+    background-color: var(--color-blue-300) !important;
     color: var(--color-blue-950) !important;
   }
 

@@ -21,10 +21,9 @@ function eventCard(event) {
   const cardBody = renderCardBody(setlistHtml, noteCard);
 
   return `
-    <div class="col-12 event-card" id="${event.event_id}">
-      <div class="card">
+    <div class="col-12 col-md-6 col-lg-4 event-card" id="${event.event_id}">
+      <div class="card h-100">
         ${renderCardHeader(event, badges, attendanceForm, earlyLate)}
-        ${cardBody}
         ${renderCardFooter(event)}
       </div>
     </div>
@@ -63,7 +62,7 @@ function renderBadges(types) {
 
 function renderNoteCard(event) {
   const hasNote = Boolean(event.event_note);
-  const hasSetlist = event.setlist?.length > 0;
+  const hasSetlist = event.has_setlist;
   const firstTypeName = event.type?.[0]?.name;
   const blockedTypes = ["Rescheduled", "Cancelled", "Relocated", "No Gig"];
 
@@ -141,36 +140,34 @@ function formatSongs(songs, highlightSpecial) {
 
 function renderCardHeader(event, badges, attendanceForm, earlyLate) {
   const eventClass = event.type?.[0]?.class ?? "default";
-  const titleHtml = event.title
-    ? `<div class="event-title text-xs text-muted fst-italic my-1">${event.title}</div>`
-    : "";
-  const tourHtml = event.tour
-    ? `<div class="event-tour text-xs text-muted my-1"><i class="bi bi-bus-front me-1"></i>${event.tour.name}</div>`
-    : "";
-
+  // const titleHtml = event.title
+  //   ? `<div class="event-title text-xs text-muted fst-italic my-1">${event.title}</div>`
+  //   : "";
+  // const tourHtml = event.tour
+  //   ? `<div class="event-tour text-xs text-muted my-1"><i class="bi bi-bus-front me-1"></i>${event.tour.name}</div>`
+  //   : "";
+  // 
   return `
     <div class="card-header">
       <div class="row mb-2 d-flex justify-content-between">
         <div class="col">${badges}</div>
-        <div class="col-auto text-end text-xl" id="userPresent">${attendanceForm}</div>
+        <div class="col-auto text-end" id="userPresent">${attendanceForm}</div>
       </div>
       
-      <div class="title text-2xl row d-flex justify-content-between mb-1">
+      <div class="title text-xl row d-flex justify-content-between mb-1">
         <div class="col">
           <a href="/events/${event.event_id}" class="text-reset text-${eventClass} fw-semibold">
             ${event.date} ${earlyLate}
           </a>
         </div>
       </div>
-      ${titleHtml}
-      
-      <div class="row event-artist text-xl mb-1">
+
+      <div class="row event-artist text-base mb-1">
         <div class="col">${event.artist.name}</div>
       </div>
-      ${tourHtml}
-      
+
       <div class="row event-venue">
-        <div class="venue-name text-base">${event.venue ? event.venue.name : ""}</div>
+        <div class="venue-name text-sm">${event.venue ? event.venue.name : ""}</div>
         <div class="venue-city text-2xs text-muted d-flex gap-1">
           <i class="bi bi-geo-alt-fill"></i>${event.city}
         </div>
@@ -181,16 +178,22 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
 
 function renderCardFooter(event) {
   // BUG FIX: was using event.event_note instead of event.note
-  const noteContent = event.event_note ? event.event_note : null;
+  var noteContent = event.event_note ? event.event_note : null;
 
   if (!noteContent) {
-    return "";
+    return `
+    <div class="card-footer">
+
+    </div>
+  `;
   }
 
   return `
     <div class="card-footer">
       <div class="text-muted me-2">Notes:</div>
-      ${noteContent}
+      <span class="event-note">
+        ${noteContent}
+      </span>
     </div>
   `;
 }

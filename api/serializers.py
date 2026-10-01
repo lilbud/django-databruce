@@ -325,7 +325,7 @@ class EventsSerializer(BaseSerializer):
   tour = ToursSerializer(required=False, include=["slug", "name"])
   venue = VenuesSerializer(
     required=False,
-    include=["slug", "name"],
+    include=["slug", "name", "formatted"],
   )
 
   city = serializers.CharField(
@@ -333,6 +333,7 @@ class EventsSerializer(BaseSerializer):
     source="venue.city.formatted",
     max_length=255,
   )
+
   leg = serializers.CharField(required=False, source="leg.name", max_length=255)
 
   rank = serializers.IntegerField(required=False)
@@ -354,12 +355,17 @@ class EventsSerializer(BaseSerializer):
     required=False,
   )
 
-  setlist = EventSetlistSerializer(
-    source="setlist_event",
-    read_only=True,
-    many=True,
-    required=False,
-  )
+  # setlist = EventSetlistSerializer(
+  #   source="setlist_event",
+  #   read_only=True,
+  #   many=True,
+  #   required=False,
+  # )
+
+  has_setlist = serializers.SerializerMethodField()
+
+  def get_has_setlist(self, obj):
+    return obj.setlist_certainty in ["Confirmed", "Probable"]
 
   event_note = serializers.SerializerMethodField(required=False)
 
@@ -384,7 +390,8 @@ class EventsSerializer(BaseSerializer):
       "leg",
       "rank",
       "user_present",
-      "setlist",
+      # "setlist",
+      "has_setlist",
       "event_note",
       "event_id",
       "title",

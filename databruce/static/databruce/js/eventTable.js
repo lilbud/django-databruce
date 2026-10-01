@@ -69,6 +69,7 @@ event_table_columns = [
     'data': 'title',
     'name': 'title',
     'width': '15rem',
+    'className': 'text-wrap',
     'render': function (data, type, row, meta) {
       return row.event_status ? `<span class="text-danger fw-semibold">[${row.type[0]}] ${data || ''}</span>` : data
     },

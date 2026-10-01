@@ -454,16 +454,9 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
       db_models.Event.objects.select_related(
         "artist",
         "tour",
-        "venue__city__country",
+        "venue__city",
       ).prefetch_related(
-        "venue__city__state",
         "leg",
-        Prefetch(
-          "setlist_event",
-          queryset=db_models.Setlist.objects.select_related("song").order_by(
-            F("song_num").asc(nulls_first=True),
-          ),
-        ),
         "type",
         "tags",
       )
