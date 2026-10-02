@@ -37,7 +37,7 @@
     {% if article.event %}
       <div class="text-sm">
         Event: <span class="fw-semibold">
-        <a href="{% url "event_details" id=article.event.event_id %}">{{ article.event }}</a>
+        <a href="{% url "event_details" id=article.event.event_id %}">{{ article.event.get_date }} - {{ article.event.venue.formatted }}</a>
         </span>
       </div>
     {% endif %}

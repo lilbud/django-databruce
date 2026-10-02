@@ -914,7 +914,9 @@
         createdRow: function(row, data) {
           $(row).attr('data-set-name', slugify(data.set_name));
 
-          if (data.song.category) {
+          var ignoreSets = ['Soundcheck']
+
+          if (data.song.category && !ignoreSets.includes(data.set_name)) {
             $(row).attr('data-album', data.song.category.id);
           }
 

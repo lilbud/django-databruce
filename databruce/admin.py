@@ -361,7 +361,7 @@ class CoverAdmin(CustomModelAdmin):
 @admin.register(db_models.NugsRelease)
 class NugsAdmin(CustomModelAdmin):
   search_fields = ["event"]
-  autocomplete_fields = ["event"]
+  autocomplete_fields = ["event", "article"]
 
   list_select_related = ["event", "event__venue", "event__venue__city"]
   list_display = ["id", "event", "url", "date"]
@@ -988,6 +988,8 @@ class ArticleForm(forms.ModelForm):
       "author",
       "language",
       "source",
+      "source_url",
+      "event",
       "category",
       "collection",
       "excerpt",
@@ -1009,7 +1011,7 @@ class ArticleAdmin(CustomModelAdmin):
     )
 
   list_display = ("title", "author", "created_at")
-  search_fields = ["title", "author", "content"]
+  search_fields = ["title", "author"]
   list_select_related = ["collection"]
   autocomplete_fields = ["collection", "event"]
   prepopulated_fields = {"slug": ("title",)}

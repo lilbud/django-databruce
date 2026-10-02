@@ -21,9 +21,10 @@ UserModel = get_user_model()
 EVENT_TYPE_COLOR_MAP = {
   6: "danger",  # Cancelled
   16: "danger",  # No Gig
+  20: "secondary",  # Relocated
   21: "warning",  # Relocated
   22: "warning",  # Rescheduled
-  23: "info",  # Rumored
+  23: "purple",  # Rumored
 }
 
 

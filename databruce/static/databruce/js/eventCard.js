@@ -139,7 +139,7 @@ function formatSongs(songs, highlightSpecial) {
 }
 
 function renderCardHeader(event, badges, attendanceForm, earlyLate) {
-  const eventClass = event.type?.[0]?.class ?? "default";
+  // const eventClass = event.type?.[0]?.class ?? "default";
   // const titleHtml = event.title
   //   ? `<div class="event-title text-xs text-muted fst-italic my-1">${event.title}</div>`
   //   : "";
@@ -156,7 +156,7 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
       
       <div class="title text-xl row d-flex justify-content-between mb-1">
         <div class="col">
-          <a href="/events/${event.event_id}" class="text-reset text-${eventClass} fw-semibold">
+          <a href="/events/${event.event_id}" class="text-reset fw-semibold">
             ${event.date} ${earlyLate}
           </a>
         </div>

@@ -59,13 +59,13 @@
   .btn-primary,
   .badge-primary,
   .nav-btn.active {
-    background-color: var(--color-blue-500) !important;
+    background-color: var(--color-blue-400) !important;
     color: var(--color-blue-950) !important;
   }
 
   .btn-primary-subtle,
   .badge-primary-subtle {
-    background-color: var(--color-blue-700) !important;
+    background-color: var(--color-blue-800) !important;
     color: var(--color-blue-200) !important;
   }
 
@@ -79,8 +79,8 @@
 
   .btn-secondary-subtle,
   .badge-secondary-subtle {
+    background-color: var(--color-teal-800) !important;
     color: var(--color-teal-200) !important;
-    background-color: var(--color-teal-700) !important;
   }
 
   /* success */
@@ -93,8 +93,8 @@
 
   .btn-success-subtle,
   .badge-success-subtle {
+    background-color: var(--color-green-800) !important;
     color: var(--color-green-200) !important;
-    background-color: var(--color-green-700) !important;
   }
 
   /* warning */
@@ -106,8 +106,8 @@
 
   .btn-warning-subtle,
   .badge-warning-subtle {
+    background-color: var(--color-yellow-800) !important;
     color: var(--color-yellow-200) !important;
-    background-color: var(--color-yellow-700) !important;
   }
 
   /* info */
@@ -120,8 +120,8 @@
 
   .btn-info-subtle,
   .badge-info-subtle {
-    color: var(--color-cyan-200) !important;
-    background-color: var(--color-cyan-700) !important;
+    background-color: var(--color-cyan-800) !important;
+    color: var(--color-cyan-100) !important;
   }
 
   /* danger */
@@ -134,41 +134,40 @@
 
   .btn-danger-subtle,
   .badge-danger-subtle {
-    color: var(--color-red-200) !important;
     background-color: var(--color-red-800) !important;
-  }
-
-  #addshow[data-attended="true"]:hover {
-    background-color: var(--color-red-100) !important;
-    color: var(--color-red-800) !important;
+    color: var(--color-red-100) !important;
   }
 
   /* neutral */
-
   .btn-neutral,
   .badge-neutral,
   .nav-btn {
     background-color: var(--color-gray-400) !important;
-    color: var(--color-gray-900) !important;
+    color: var(--color-black) !important;
   }
 
   .btn-neutral-subtle,
   .badge-neutral-subtle {
     color: var(--color-gray-200) !important;
-    background-color: var(--color-gray-500) !important;
+    background-color: var(--color-gray-600) !important;
   }
 
   /* purple */
   .btn-purple,
   .badge-purple {
     background-color: var(--color-purple-300) !important;
-    color: var(--color-purple-900) !important;
+    color: var(--color-black) !important;
   }
 
   .btn-purple-subtle,
   .badge-purple-subtle {
-    color: var(--color-purple-200) !important;
-    background-color: var(--color-purple-800) !important;
+    background-color: var(--color-purple-900) !important;
+    color: var(--color-purple-100) !important;
+  }
+
+  #addshow[data-attended="true"]:hover {
+    background-color: var(--color-red-100) !important;
+    color: var(--color-red-800) !important;
   }
 
   .card.message.info {
