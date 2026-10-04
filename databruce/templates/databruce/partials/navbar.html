@@ -137,8 +137,9 @@
           </li>
         {% else %}
           <li class="nav-item d-inline px-2 mb-0">
-            <button class="btn btn-sm border-0"
-                    href="{% url 'login' %}?next={{ request.path }}">Login</button>
+            <a class="btn btn-sm border-0"
+               role="button"
+               href="{% url 'login' %}?next={{ request.path }}">Login</a>
           </li>
         {% endif %}
       </div>
