@@ -666,6 +666,13 @@ class EventDetailView(PageTitleMixin, TemplateView):
         event.end_time.astimezone(tz_target).strftime("%I:%M%p").lower()
       )
 
+    if event.start_time and event.end_time and not event.length:
+      context["duration"] = event.end_time.astimezone(
+        tz_target,
+      ) - event.start_time.astimezone(tz_target)
+    elif event.length:
+      context["duration"] = event.length
+
     neighbor_qs = Event.objects.select_related("venue", "artist", "tour")
 
     context["prev_event"] = (

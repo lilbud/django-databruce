@@ -783,13 +783,13 @@ class SetlistSerializer(BaseSerializer):
 
     return obj.tour_total
 
-  gap = serializers.SerializerMethodField()
+  gap = serializers.IntegerField(required=False, source="last")
 
-  def get_gap(self, obj):
-    if obj.last == 0:
-      return None
+  # def get_gap(self, obj):
+  #   if obj.last == 0:
+  #     return None
 
-    return obj.last
+  #   return obj.last
 
   class Meta:
     model = models.Setlist
@@ -1246,7 +1246,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
   def get_album_complete(self, obj):
     """Check if every song ID in album_songs is present in setlist_songs."""
     # Skip non-album categories
-    if obj.get("category") in (8, 19):
+    if obj.get("category") in (9, 20):
       return False
 
     raw_album_songs = obj.get("album_songs") or []

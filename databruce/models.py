@@ -766,7 +766,7 @@ class Event(BaseModel):
     help_text="Designation for how certain the setlist is",
   )
 
-  note = models.CharField(default=None, blank=True, max_length=255)
+  note = models.TextField(default=None, blank=True, null=True)
   summary = models.CharField(max_length=255, blank=True)
 
   bootleg = models.BooleanField(default=False, help_text="Event has a bootleg")
@@ -1529,6 +1529,7 @@ class Setlist(BaseModel):
     SET_2_OPENER = "Set 2 Opener", _("Set 2 Opener")
     SET_1_CLOSER = "Set 1 Closer", _("Set 1 Closer")
     MAIN_SET_CLOSER = "Main Set Closer", _("Main Set Closer")
+    SHOW_CLOSER = "Show Closer", _("Show Closer")
     SET_2_CLOSER = "Set 2 Closer", _("Set 2 Closer")
     PRE_SHOW_OPENER = "Pre-Show Opener", _("Pre-Show Opener")
     PRE_SHOW_CLOSER = "Pre-Show Closer", _("Pre-Show Closer")
@@ -2507,7 +2508,7 @@ class Type(BaseModel):
 
 
 class EventType(models.Model):
-  pk = models.CompositePrimaryKey("event_id", "type_id")
+  id = models.AutoField(primary_key=True)
 
   event = models.ForeignKey(
     to=Event,
@@ -2553,7 +2554,7 @@ class Tag(BaseModel):
 
 
 class EventTag(models.Model):
-  pk = models.CompositePrimaryKey("event_id", "tag_id")
+  id = models.AutoField(primary_key=True)
   event = models.ForeignKey(
     to=Event,
     on_delete=models.CASCADE,

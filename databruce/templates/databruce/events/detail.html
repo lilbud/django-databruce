@@ -296,9 +296,9 @@
                                 {% if event.rank_stats.length_rank and event.rank_stats.length_rank <= 10 %}
                                   <span data-bs-toggle="tooltip"
                                         data-bs-title="{% if event.rank_stats.length_rank == 1 %} Longest Show to Date {% else %} {{ event.rank_stats.length_rank|ordinal }} longest show {% endif %}"
-                                        class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"h:i:s" }}</span>
+                                        class="badge text-xs badge-primary py-0.5 px-1">{{ event.length|time:"H:i:s" }}</span>
                                 {% else %}
-                                  <span>{{ event.length|time:"h:i:s" }}</span>
+                                  <span>{{ event.length|time:"H:i:s" }}</span>
                                 {% endif %}
                               {% else %}
                                 -
