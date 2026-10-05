@@ -15,13 +15,18 @@
            href="{% url "blog:blog_post" slug=latest_blog_post.slug %}">{{ latest_blog_post }}</a>
       </div>
     </div>
-    <div class="row justify-content-center logo-row my-4">
-      <div class="main-logo" role="img" aria-label="Databruce">
-        <span class="sr-only">Databruce</span>
-      </div>
+    <div class="row justify-content-center logo-container my-4">
+      <!-- 1. Multi-color Logo -->
+      <img src="{% static 'databruce/img/full-logo-blue-white.svg' %}"
+           class="logo-white"
+           alt="Logo">
+      <!-- 2. Full Black Logo -->
+      <img src="{% static 'databruce/img/full-logo-blue-black.svg' %}"
+           class="logo-black"
+           alt="Logo">
     </div>
     {% comment %} {% if not user.is_authenticated %} {% endcomment %}
-    <div class="row mb-4 justify-content-center">
+    <div class="row mb-5 justify-content-center">
       <div class="d-flex justify-content-center gap-2">
         <a href="{% url "login" %}"
            type="button"
@@ -42,14 +47,14 @@
       </div>
     </div>
     {% comment %} {% endif %} {% endcomment %}
-  <div class="row mb-4 justify-content-center">
-    <div class="col-12 col-lg-8">
+  <div class="row my-4 justify-content-center">
+    <div class="col-12 col-xl-8">
       <div class="row row-cols-3 row-cols-lg-6 mb-2 g-3">
         <div class="col">
           <div class="card p-3">
-            <div class="text-xs text-muted">Events</div>
+            <div class="text-sm text-muted mb-1">Events</div>
             <a href="{% url "events" %}">
-              <div class="text-lg fw-semibold gap-1 d-flex">
+              <div class="text-2xl fw-semibold gap-1 d-flex">
                 {{ event_count }}
                 <i class="bi bi-box-arrow-up-right text-xs"></i>
               </div>
@@ -58,9 +63,9 @@
         </div>
         <div class="col">
           <div class="card p-3">
-            <div class="text-xs text-muted">Songs</div>
+            <div class="text-sm text-muted mb-1">Songs</div>
             <a href="{% url "songs" %}">
-              <div class="text-lg fw-semibold gap-1 d-flex">
+              <div class="text-2xl fw-semibold gap-1 d-flex">
                 {{ song_count }}
                 <i class="bi bi-box-arrow-up-right text-xs"></i>
               </div>
@@ -69,9 +74,9 @@
         </div>
         <div class="col">
           <div class="card p-3">
-            <div class="text-xs text-muted">Tours</div>
+            <div class="text-sm text-muted mb-1">Tours</div>
             <a href="{% url "tours" %}">
-              <div class="text-lg fw-semibold gap-1 d-flex">
+              <div class="text-2xl fw-semibold gap-1 d-flex">
                 {{ tour_count }}
                 <i class="bi bi-box-arrow-up-right text-xs"></i>
               </div>
@@ -80,9 +85,9 @@
         </div>
         <div class="col">
           <div class="card p-3">
-            <div class="text-xs text-muted">Venues</div>
+            <div class="text-sm text-muted mb-1">Venues</div>
             <a href="{% url "venues" %}">
-              <div class="text-lg fw-semibold gap-1 d-flex">
+              <div class="text-2xl fw-semibold gap-1 d-flex">
                 {{ venue_count }}
                 <i class="bi bi-box-arrow-up-right text-xs"></i>
               </div>
@@ -91,9 +96,9 @@
         </div>
         <div class="col">
           <div class="card p-3">
-            <div class="text-xs text-muted">Relations</div>
+            <div class="text-sm text-muted mb-1">Relations</div>
             <a href="{% url "relations" %}">
-              <div class="text-lg fw-semibold gap-1 d-flex">
+              <div class="text-2xl fw-semibold gap-1 d-flex">
                 {{ relation_count }}
                 <i class="bi bi-box-arrow-up-right text-xs"></i>
               </div>
@@ -102,9 +107,9 @@
         </div>
         <div class="col">
           <div class="card p-3">
-            <div class="text-xs text-muted">Bands</div>
+            <div class="text-sm text-muted mb-1">Bands</div>
             <a href="{% url "bands" %}">
-              <div class="text-lg fw-semibold gap-1 d-flex">
+              <div class="text-2xl fw-semibold gap-1 d-flex">
                 {{ band_count }}
                 <i class="bi bi-box-arrow-up-right text-xs"></i>
               </div>
@@ -115,7 +120,7 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-xl-8">
       <div class="row row-cols-1 gx-3 row-gap-3">
         <div class="col order-2">
           <div class="card">
@@ -159,7 +164,7 @@
                     <i class="bi bi-box-arrow-up-right text-xs"></i>
                   </div>
                 </a>
-                <span class="text-sm text-muted">{{ latest_event.venue.formatted }}</span>
+                <span class="text-xs text-muted">{{ latest_event.venue.formatted }}</span>
               </div>
             </div>
           </div>

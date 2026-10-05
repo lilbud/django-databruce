@@ -49,8 +49,16 @@
     color: var(--color-white) !important;
   }
 
-  .main-logo {
+  /* .main-logo-dark {
     background-image: var(--main-logo-white);
+  } */
+
+  .logo-container .logo-white {
+    display: block;
+  }
+
+  .logo-container .logo-black {
+    display: none
   }
 
   /* badge and button colors */

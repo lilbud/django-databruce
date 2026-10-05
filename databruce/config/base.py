@@ -46,6 +46,7 @@ INSTALLED_APPS = [
   "django.contrib.sites",
   "django_browser_reload",
   "django.contrib.humanize",
+  # "silk",
   "api",
   "blog",
   "library",
@@ -82,6 +83,7 @@ MIDDLEWARE = [
   "django.middleware.http.ConditionalGetMiddleware",
   "django_browser_reload.middleware.BrowserReloadMiddleware",
   "databruce.middleware.CleanQueryStringMiddleware",
+  # "silk.middleware.SilkyMiddleware",
 ]
 
 TESTING = "test" in sys.argv

@@ -411,28 +411,28 @@
             }
           },
         }, {
-          'data': 'id',
-          'name': 'last',
+          'data': 'gap',
+          'name': 'gap',
           'width': '1rem',
           'className': 'dt-center',
           'render': function(data, type, row, meta) {
             if (data) {
               var badge = $('<span />').addClass('badge').attr('data-bs-toggle', 'tooltip').attr('data-bs-html', 'true');
 
-              if (row.gap >= 50 && !row.debut) {
-                $(badge).addClass('badge-primary').text(`${row.gap}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
+              if (data >= 50 && !row.debut) {
+                $(badge).addClass('badge-primary').text(`${data}, Bustout`).attr('data-bs-title', '≥50 shows on current tour since last played');
                 return $(badge).prop('outerHTML');
               } else if (row.premiere) {
                 $(badge).addClass('badge-secondary').text(`First`).attr('data-bs-title', 'FTP');
                 return $(badge).prop('outerHTML');
-              } else if (row.debut && !row.premiere && row.gap) {
-                $(badge).addClass('badge-primary').text(`${row.gap}, TD`).attr('data-bs-title', 'Tour Debut');
+              } else if (row.debut && !row.premiere && data) {
+                $(badge).addClass('badge-primary').text(`${data}, TD`).attr('data-bs-title', 'Tour Debut');
                 return $(badge).prop('outerHTML');
-              } else if (row.debut && !row.premiere && !row.gap) {
+              } else if (row.debut && !row.premiere && !data) {
                 $(badge).addClass('badge-primary').text(`TD`).attr('data-bs-title', 'Tour Debut');
                 return $(badge).prop('outerHTML');
               } else {
-                return row.gap;
+                return data;
               }
             }
           },

@@ -1,3 +1,18 @@
+function formatSongOutput(result) {
+  // If the item has children, it is a group header
+  if (result.children) {
+    // Return a jQuery object with your custom DOM structure
+    return $(`
+            <div class="custom-select2-group">
+                <span class="group-title">${result.text}</span>
+            </div>
+        `);
+  }
+
+  // Return normal text for standard song items
+  return result.text;
+}
+
 function get_options({ ajax_url = false }) {
   var options = {
     theme: "bootstrap-5",
@@ -12,8 +27,8 @@ function get_options({ ajax_url = false }) {
     maximumSelectionLength: 3,
     width: '100%', // need to override the changed default
     ajax: {
-      delay: 500,
-      url: '/api/v1/',
+      delay: 250,
+      url: '/api/select2/',
       dataType: 'json',
       data: function (params) {
         return {
@@ -21,21 +36,35 @@ function get_options({ ajax_url = false }) {
         }
       },
       processResults: function (data) {
+
+        if (ajax_url.includes("songs")) {
+          let grouped = Object.groupBy(data.results, (item) => item.original);
+          groupResults = [];
+
+          Object.entries(grouped).forEach(([key, value]) => {
+            if (key === "true") {
+              groupResults.push({
+                text: "Originals",
+                children: value
+              })
+            } else {
+              groupResults.push({
+                text: "Covers",
+                children: value
+              })
+            }
+          });
+
+          return {
+            results: groupResults
+          };
+        }
+
         return {
           results: $.map(data.results, function (item) {
-            var text = item.name;
-
-            if (item.original_artist) {
-              text = `${item.name} (${item.original_artist})`;
-            }
-
-            if (item.text) {
-              text = item.text;
-            }
-
             return {
               id: item.id,
-              text: text
+              text: item.text
             };
           })
         };
@@ -45,6 +74,14 @@ function get_options({ ajax_url = false }) {
 
   if (ajax_url) {
     options.ajax.url += ajax_url;
+
+    if (options.ajax.url.includes("state")) {
+      options.minimumInputLength = 2;
+    }
+
+    if (options.ajax.url.includes("song")) {
+      options.templateResult = formatSongOutput;
+    }
   };
 
   return options;
@@ -143,20 +180,27 @@ function addForm() {
   totalForms.value++;
 };
 
-
+function resetForm() {
+  window.location.reload();
+}
 
 $(document).ready(function () {
   var row = $('#setlist-search').find('.song-row').last();
 
+  $('#start_date').mask('0000-00-00');
+  $('#end_date').mask('0000-00-00');
+
   $('#city').select2(get_options({ ajax_url: 'cities/' }));
   $('#state').select2(get_options({ ajax_url: 'states/' }));
   $('#country').select2(get_options({ ajax_url: 'countries/' }));
+  $('#continent').select2(get_options({ ajax_url: 'continents/' }));
   $('#tour').select2(get_options({ ajax_url: 'tours/' }));
   $('#tour-leg').select2(get_options({ ajax_url: 'tour_legs/' }));
   $('#relation').select2(get_options({ ajax_url: 'relations/' }));
   $('#band').select2(get_options({ ajax_url: 'bands/' }));
   $('#venue').select2(get_options({ ajax_url: 'venues/' }));
-  $('#type').select2(get_options({ ajax_url: 'event_types/' }));
+  $('#type').select2(get_options({ ajax_url: 'types/' }));
+  $('#tag').select2(get_options({ ajax_url: 'tags/' }));
 
   row.find('.song2').parent().hide();
   row.find('.song1').select2(get_options({ ajax_url: 'songs/' }));

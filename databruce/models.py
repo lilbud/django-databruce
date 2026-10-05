@@ -4,8 +4,7 @@ from uuid import uuid4
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.db import models
-from django.db.models import F, Func, Value
-from django.db.models.functions import Lower, Trim
+from django.db.models import Func
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from timezone_field import TimeZoneField
@@ -1455,21 +1454,6 @@ class Song(BaseModel):
 
   aliases = models.CharField(default=None, blank=True, max_length=255)
 
-  sort_song_name = models.GeneratedField(
-    expression=Trim(
-      Lower(
-        RegexpReplace(
-          F("name"),
-          Value(r'^[\("“‘]*(The |An ) ??|^[\("“‘]+'),
-          Value(""),
-          Value("i"),
-        ),
-      ),
-    ),
-    output_field=models.CharField(max_length=255),
-    db_persist=True,
-  )
-
   search_vector = models.GeneratedField(
     expression=SearchVector("name", config="unaccent"),
     output_field=SearchVectorField(),
@@ -1602,8 +1586,29 @@ class Setlist(BaseModel):
     max_length=50,
   )
 
-  last = models.IntegerField(default=0, help_text="Events since last played")
-  next = models.IntegerField(default=0, help_text="Events until next played")
+  gap = models.IntegerField(default=0, help_text="Events since last played")
+
+  last = models.ForeignKey(
+    to="self",
+    on_delete=models.SET_NULL,
+    related_name="last_setlist",
+    db_column="last",
+    default=None,
+    null=True,
+    blank=True,
+    help_text="Last time this song was played",
+  )
+
+  next = models.ForeignKey(
+    to="self",
+    on_delete=models.SET_NULL,
+    related_name="next_setlist",
+    db_column="next",
+    default=None,
+    null=True,
+    blank=True,
+    help_text="Next time this song will be played",
+  )
 
   tour_num = models.IntegerField(default=0)
   tour_total = models.IntegerField(default=0)
@@ -2395,39 +2400,39 @@ class SetlistPosition(models.Model):
     return f"{self.id} - {self.position}"
 
 
-class SongPage(models.Model):
-  id = models.OneToOneField(
-    Setlist,
-    on_delete=models.DO_NOTHING,
-    primary_key=True,
-    related_name="songs_page",
-    db_column="id",
-  )
+# class SongPage(models.Model):
+#   id = models.OneToOneField(
+#     Setlist,
+#     on_delete=models.DO_NOTHING,
+#     primary_key=True,
+#     related_name="songs_page",
+#     db_column="id",
+#   )
 
-  prev = models.ForeignKey(
-    Setlist,
-    on_delete=models.DO_NOTHING,
-    blank=True,
-    null=True,
-    related_name="prev_setlist",
-    db_column="prev",
-  )
+#   prev = models.ForeignKey(
+#     Setlist,
+#     on_delete=models.DO_NOTHING,
+#     blank=True,
+#     null=True,
+#     related_name="prev_setlist",
+#     db_column="prev",
+#   )
 
-  next = models.ForeignKey(
-    Setlist,
-    on_delete=models.DO_NOTHING,
-    blank=True,
-    null=True,
-    related_name="next_setlist",
-    db_column="next",
-  )
+#   next = models.ForeignKey(
+#     Setlist,
+#     on_delete=models.DO_NOTHING,
+#     blank=True,
+#     null=True,
+#     related_name="next_setlist",
+#     db_column="next",
+#   )
 
-  class Meta:
-    managed = True
-    db_table = "songs_page"
+#   class Meta:
+#     managed = True
+#     db_table = "songs_page"
 
-  def __str__(self) -> str:
-    return f"{self.id}"
+#   def __str__(self) -> str:
+#     return f"{self.id}"
 
 
 class SetlistStats(models.Model):

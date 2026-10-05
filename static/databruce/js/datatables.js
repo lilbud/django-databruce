@@ -1,10 +1,11 @@
-//DataTable.type('num', 'className', 'dt-center');
-//DataTable.type('string', 'className', 'dt-left');
-DateTime.defaults.minDate = new Date('1965-01-01 00:00:00');
-DateTime.defaults.maxDate = new Date();
+DataTable.type('num', 'className', 'dt-center');
+DataTable.type('string', 'className', 'dt-left');
+DataTable.type('date', 'className', 'dt-left');
+DataTable.defaults.minDate = new Date('1965-01-01 00:00:00');
+DataTable.defaults.maxDate = new Date();
 DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
-DataTable.defaults.column.columnControl = ['order', ['orderAsc', 'orderDesc', 'orderRemove']];
+DataTable.defaults.column.orderSequence = ['asc', 'desc'];
 
 set_names = [
   "Show",
@@ -13,98 +14,121 @@ set_names = [
   "Encore",
   "Pre-Show",
   "Post-Show",
-]
+];
 
-DataTable.feature.register('customInputPaging', function (settings) {
-  const api = new DataTable.Api(settings);
+function nextPage(table) {
+  table.page('next').draw(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
-  // Create UI container elements
-  const container = document.createElement('div');
-  container.className = 'd-inline-flex align-items-center justify-content-center gap-2 m-0';
-  container.id = 'paging-container';
-  container.innerHTML = `
-        <button class="btn btn-sm border-0 btn-prev" aria-label="Previous page"><i class="bi bi-chevron-left"></i></button>
-        <input type="text" class="form-control form-control-sm text-center page-input m-0" min="1" value="1" style="width: 30px; height: calc(1.5em + 0.5rem + 2px);">
-        <span class="total-pages align-middle">of 1</span>
-        <button class="btn btn-sm border-0 btn-next" aria-label="Next page"><i class="bi bi-chevron-right"></i></button>
-    `;
+function prevPage(table) {
+  table.page('previous').draw(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
-  const input = container.querySelector('.page-input');
-  const prevBtn = container.querySelector('.btn-prev');
-  const nextBtn = container.querySelector('.btn-next');
-  const totalSpan = container.querySelector('.total-pages');
+DataTable.feature.register('customOrder', function (settings, opts) {
+  // 1. Validate that the user passed an external target dropdown selector
+  let targetSelector = opts.selectId;
+  if (!targetSelector) return null;
 
-  // Update UI whenever the table redraws / changes pages
-  api.on('draw', () => {
-    const pageInfo = api.page.info();
-    input.value = pageInfo.page + 1;
-    input.max = pageInfo.pages;
-    totalSpan.textContent = `of ${pageInfo.pages || 1}`;
+  let select = $(targetSelector);
+  if (select.length === 0) return null;
 
-    // Handle button states
-    prevBtn.disabled = pageInfo.page === 0;
-    nextBtn.disabled = pageInfo.page >= pageInfo.pages - 1;
+  // Create a native DataTable API instance for this specific table context
+  let api = new DataTable.Api(settings);
+
+  // Clear loading/placeholder items
+  select.empty();
+
+  // 2. Loop through columns and read DataTables 2.0 standard native type() method
+  api.columns().every(function (index) {
+    let column = this;
+
+    if (column.orderable()) {
+      let headerText = $(column.header()).text().trim();
+      let type = column.type(); // Modern native DT 2.0 type check
+
+      // Standard text fallbacks
+      let ascLabel = '(A-Z)';
+      let descLabel = '(Z-A)';
+
+      // Dynamically alter text strings depending on evaluated column contents
+      if (type && type.includes('num')) {
+        ascLabel = '(Least)';
+        descLabel = '(Most)';
+      } else if (type && type.includes('date')) {
+        ascLabel = '(asc.)';
+        descLabel = '(desc.)';
+      }
+
+      select.append(`<option value="${index}-asc">${headerText} ${ascLabel}</option>`);
+      select.append(`<option value="${index}-desc">${headerText} ${descLabel}</option>`);
+    }
   });
 
-  // Jump to page typed into input box
-  input.addEventListener('change', () => {
-    let val = parseInt(input.value, 10) - 1;
-    const max = api.page.info().pages - 1;
-    if (val < 0) val = 0;
-    if (val > max) val = max;
-    api.page(val).draw('page');
+  // 3. Dropdown-to-Table Sync (Cleanly namespaced event)
+  select.on('change.dtCustomOrder', function () {
+    let val = $(this).val();
+    if (val) {
+      let parts = val.split('-');
+      let columnIndex = parseInt(parts[0], 10);
+      let direction = parts[1];
+
+      api.order([columnIndex, direction]).draw();
+    }
   });
 
-  // Click navigation button events
-  prevBtn.addEventListener('click', () => api.page('previous').draw('page'));
-  nextBtn.addEventListener('click', () => api.page('next').draw('page'));
+  // 4. Table-to-Dropdown Sync (Fires when header tags are clicked directly)
+  api.on('order.dt.dtCustomOrder', function () {
+    let currentOrder = api.order();
+    if (currentOrder.length > 0) {
+      let currentColumnIndex = currentOrder[0][0];
+      let currentDirection = currentOrder[0][1];
+      let targetValue = `${currentColumnIndex}-${currentDirection}`;
 
-  return container;
-});
+      select.val(targetValue);
+    }
+  });
 
-$.fn.dataTable === DataTable
+  // Initialize immediate sync for default initial sorting state on boot
+  api.trigger('order.dt');
 
-$.extend(true, DataTable.defaults, {
-  searching: true,
-  fixedHeader: true,
-  info: true,
-  scrollX: true,
-  scrollCollapse: true,
-  serverSide: true,
-  processing: true,
-  paging: true,
-  autoWidth: true,
-  ordering: {
-    indicators: false,
-    handler: true
-  },
-  pageLength: 50,
-  language: {
-    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-    infoEmpty: "No records available",
-    infoFiltered: "(filtered from _MAX_ total records)"
-  },
-  search: {
-    regex: true
-  },
-  // cardView: true,
-  responsive: false,
-  order: [],
-  layout: {
-    topStart: [],
-    bottomStart: null,
-    topEnd: null,
-    bottomEnd: null,
-    top: ['customInputPaging', 'info'],
-    bottom: ['customInputPaging', 'info'],
-  },
+  // DataTables 2.0 features return a DOM node if injecting objects into the layout.
+  // Because our dropdown resides externally outside the table, we return null safely.
+  return null;
 });
 
 // needed to fix pages with multiple tables behind tabs
-$(document).ready(function () {
-  $('a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
-    $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
-  });
+Object.assign(DataTable.defaults, {
+  searching: true,
+  fixedHeader: {
+    headerOffset: 52,
+  },
+  // scrollX: true,
+  serverSide: true,
+  processing: true,
+  paging: true,
+  // autoWidth: false,
+  ordering: {
+    indicators: false,
+    handler: true,
+  },
+  pageLength: 50,
+  search: {
+    regex: true
+  },
+  responsive: {
+    details: {
+      type: ''
+    }
+  },
+  layout: {
+    topStart: {
+      customOrder: {
+        selectId: '#tableOrder'
+      },
+    },
+  },
 });
 
 function slugify(str) {
@@ -129,3 +153,21 @@ function escapeHtml(str) {
 function renderLink(url, data, text) {
   return `<a href="${url}${data}">${text}</a>`
 }
+
+function eventDateFormat(event) {
+  if (!event) return '';
+
+
+  const date = new Date(event.date || event);
+  const dayText = date.toLocaleDateString('en-US', { weekday: 'long' });
+  var dateItem;
+
+  if (event.early_late) {
+    dateItem = `<span class="text-primary">${event.date}</span><br><small>${event.early_late} • ${dayText}</small>`
+  } else {
+    dateItem = `${event.date || event}<br><small>${dayText}</small>`
+  }
+
+  return event.event_id ? `<a href="/events/${event.event_id}">${dateItem}</a>` : event;
+};
+

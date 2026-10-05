@@ -122,14 +122,14 @@
         pageLength: 100,
         columns: [{
           'data': 'name',
-          'name': 'sort_song_name, name',
+          'name': 'slug, name',
           'width': '20rem',
           'render': function(data, type, row, meta) {
             return data ? `<a class="text-wrap" href="/songs/${row.slug}">${data}</a>` : ''
           },
         }, {
-          'data': 'has_lyrics',
-          'name': 'has_lyrics',
+          'data': 'lyrics',
+          'name': 'lyrics',
           'searchable': false,
           'orderable': false,
           'type': 'boolean',
@@ -144,7 +144,7 @@
           'name': 'original_artist',
           'width': '10rem'
         }, {
-          'data': 'category.name',
+          'data': 'category',
           'name': 'category__name',
           'className': 'text-wrap',
           'width': '15rem'

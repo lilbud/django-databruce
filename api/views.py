@@ -159,8 +159,8 @@ class SongsPageViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
     db_models.Setlist.objects.all()
     .prefetch_related(
-      "songs_page__prev__song",
-      "songs_page__next__song",
+      "last__song",
+      "next__song",
       "setlist_notes",
     )
     .select_related(
@@ -722,43 +722,6 @@ class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
   filterset_class = api_filters.IncludedFilter
 
 
-# class IncludedSongViewSet(viewsets.ReadOnlyModelViewSet):
-#   def get_queryset(self):
-#     # Subquery to fetch the ID of the first/last event related to the snippet
-#     first_event_id = (
-#       db_models.Event.objects.filter(
-#         id=OuterRef("setlist__event_id"),
-#       )
-#       .order_by("event_id")
-#       .values("id")[:1]
-#     )
-
-#     last_event_id = (
-#       db_models.Event.objects.filter(
-#         id=OuterRef("setlist__event_id"),
-#       )
-#       .order_by("-event_id")
-#       .values("id")[:1]
-#     )
-
-#     queryset = (
-#       db_models.Snippet.objects.all()
-#       .annotate(
-#         count=Count("setlist", distinct=True),
-#         first_event_id=Subquery(first_event_id),
-#         last_event_id=Subquery(last_event_id),
-#       )
-#       .select_related("setlist__song", "setlist__event", "snippet")
-#       .filter(count__gt=0)
-#       .order_by("-count")
-#     )
-
-#     return self.filter_queryset(queryset)
-
-#   serializer_class = api_serializers.IncludedSerializer
-#   filterset_class = api_filters.IncludedFilter
-
-
 class StatesViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
@@ -774,16 +737,12 @@ class StatesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SongsViewSet(viewsets.ReadOnlyModelViewSet):
-  """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
-
   queryset = (
-    db_models.Song.objects.all().prefetch_related(
-      "first_event",
-      "last_event",
-      "lyrics_song",
-    )
-  ).order_by("sort_song_name")
-
+    db_models.Song.objects.all()
+    .select_related("category")
+    .prefetch_related("first_event", "last_event")
+    .order_by("slug")
+  )
   serializer_class = api_serializers.SongsSerializer
   filterset_class = api_filters.SongsFilter
 

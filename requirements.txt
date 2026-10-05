@@ -27,3 +27,4 @@ drf-spectacular
 django-msgspec
 strip-markdown
 bleach
+django-silk

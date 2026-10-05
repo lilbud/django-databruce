@@ -64,20 +64,23 @@ def get_date_from_instance(obj) -> None | datetime.date | str:
 
 class BaseSerializer(serializers.ModelSerializer):
   def __init__(self, *args, **kwargs) -> None:
-    # Don't pass 'fields' up to the superclass
     include = kwargs.pop("include", None)
     exclude = kwargs.pop("exclude", None)
     super().__init__(*args, **kwargs)
 
+    # Fallback to check DRF context if initialized statically as a field
+    if include is None and self.context:
+      include = self.context.get(f"{self.__class__.__name__.lower()}_include")
+    if exclude is None and self.context:
+      exclude = self.context.get(f"{self.__class__.__name__.lower()}_exclude")
+
     if include is not None:
-      # Drop any fields that are not specified in the 'fields' argument
       allowed = set(include)
       existing = set(self.fields)
       for field_name in existing - allowed:
         self.fields.pop(field_name)
 
     if exclude is not None:
-      # Drop any fields specifically specified in the 'exclude' argument
       for field_name in exclude:
         self.fields.pop(field_name, None)
 
@@ -658,28 +661,27 @@ class SongCategorySerializer(BaseSerializer):
 
 
 class SongsSerializer(BaseSerializer):
+  # DRF will handle these in a highly optimized batched execution pipeline
   first_event = EventsSerializer(
-    required=False,
+    read_only=True,
     include=["date", "event_id", "early_late"],
+    required=False,
   )
-
   last_event = EventsSerializer(
-    required=False,
+    read_only=True,
     include=["date", "event_id", "early_late"],
+    required=False,
   )
 
-  has_lyrics = serializers.SerializerMethodField(required=False)
-  album = ReleasesSerializer(required=False)
-
-  category = SongCategorySerializer(required=False)
-
-  def get_has_lyrics(self, obj):
-    return obj.lyrics_song.exists()
+  category = serializers.CharField(
+    required=False,
+    source="category.name",
+    max_length=255,
+  )
 
   class Meta:
     model = models.Song
     fields = [
-      "id",
       "name",
       "first_event",
       "last_event",
@@ -688,12 +690,8 @@ class SongsSerializer(BaseSerializer):
       "num_plays_private",
       "opener",
       "closer",
-      "has_lyrics",
-      "sort_song_name",
-      "uuid",
+      "lyrics",
       "slug",
-      "original",
-      "album",
       "category",
     ]
 
@@ -745,7 +743,7 @@ class SetlistSerializer(BaseSerializer):
 
     return super().to_representation(instance)
 
-  song = SongsSerializer(include=["name", "slug", "category"])
+  song = SongsSerializer(include=["name", "slug"])
 
   last_event = serializers.SerializerMethodField(required=False)
 
@@ -966,16 +964,16 @@ class SongsPageSerializer(BaseSerializer):
     required=False,
   )
 
-  prev = SetlistSerializer(
-    source="songs_page.prev",
+  last = SetlistSerializer(
     include=["id", "song", "segue"],
     required=False,
+    read_only=True,
   )
 
   next = SetlistSerializer(
-    source="songs_page.next",
     include=["id", "song", "segue"],
     required=False,
+    read_only=True,
   )
 
   notes = serializers.SerializerMethodField(required=False)
@@ -991,17 +989,16 @@ class SongsPageSerializer(BaseSerializer):
   gap = serializers.SerializerMethodField()
 
   def get_gap(self, obj):
-    if obj.last == 0:
+    if obj.gap == 0:
       return None
 
-    return obj.last
+    return obj.gap
 
   class Meta:
     model = models.Setlist
     fields = [
-      # "id",
       "position",
-      "prev",
+      "last",
       "next",
       "event",
       "gap",

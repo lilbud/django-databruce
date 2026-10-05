@@ -122,7 +122,7 @@
         },
         columns: [{
           'data': 'song',
-          'name': 'song__sort_song_name',
+          'name': 'song__slug',
           'render': function(data, type, row, meta) {
             return data ? `<a href="/lyrics/${row.uuid}">${data}</a>` : ''
           },

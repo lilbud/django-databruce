@@ -789,25 +789,11 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   text-decoration: underline !important;
 }
 
-.main-logo {
-  width: 70%;
-  max-width: 400px;
+.logo-container img {
+  width: 90%;
+  max-width: 700px;
   height: auto;
-  /* Adjust as needed */
-  aspect-ratio: 939 / 182;
-
-  /* Use background instead of content */
-  background-image: var(--main-logo-black);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  display: block;
 }
-
-/* hides doubled column control buttons */
-/* .dt-column-header>.dtcc:nth-child(3) {
-  display: none !important;
-} */
 
 /* set-header default color */
 .set-header td {
