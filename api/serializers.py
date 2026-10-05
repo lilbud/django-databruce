@@ -781,13 +781,7 @@ class SetlistSerializer(BaseSerializer):
 
     return obj.tour_total
 
-  gap = serializers.IntegerField(required=False, source="last")
-
-  # def get_gap(self, obj):
-  #   if obj.last == 0:
-  #     return None
-
-  #   return obj.last
+  gap = serializers.IntegerField()
 
   class Meta:
     model = models.Setlist
