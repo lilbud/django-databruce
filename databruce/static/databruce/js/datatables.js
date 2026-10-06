@@ -157,7 +157,6 @@ function renderLink(url, data, text) {
 function eventDateFormat(event) {
   if (!event) return '';
 
-
   const date = new Date(event.date || event);
   const dayText = date.toLocaleDateString('en-US', { weekday: 'long' });
   var dateItem;

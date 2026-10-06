@@ -5,13 +5,14 @@
   h3,
   h4,
   h5,
-  h6 {
+  h6,
+  a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
     color: var(--color-blue-400);
   }
 
   h2,
   h3 {
-    border-color: var(--color-gray-700);
+    border-color: var(--color-gray-500);
   }
 
   .navbar {
@@ -75,6 +76,13 @@
   .badge-primary-subtle {
     background-color: var(--color-blue-800) !important;
     color: var(--color-blue-200) !important;
+    border-color: var(--color-blue-400) !important;
+  }
+
+  .btn-primary-subtle-outline {
+    background-color: var(--color-blue-700) !important;
+    color: var(--color-blue-50) !important;
+    border-color: var(--color-blue-400) !important;
   }
 
   /* secondary */
@@ -283,13 +291,7 @@
     background-color: var(--color-gray-800) !important;
   }
 
-  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event, :has(small)) {
-    color: var(--color-blue-400) !important;
-  }
 
-  td small {
-    color: var(--color-gray-300) !important;
-  }
 
   .form-control,
   .form-select {
@@ -369,10 +371,17 @@
     color: var(--color-gray-100) !important;
   }
 
-  a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
-    color: var(--color-blue-400) !important;
+
+  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event) {
+    color: var(--color-gray-100) !important;
   }
 
+  a.bmc-btn {
+    color: #000000 !important;
+    background-color: #FFDD00 !important;
+  }
+
+  td small,
   a small {
     color: var(--color-gray-300) !important;
   }
@@ -388,7 +397,6 @@
   .set-header th {
     background-color: var(--color-gray-700) !important;
   }
-
 
   th.dt-ordering-asc:not(.set),
   th.dt-ordering-desc:not(.set),

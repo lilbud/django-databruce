@@ -587,3 +587,11 @@ First public release of the site. Site was locked behind a login and accounts on
 ## Added
 
 - Added num_events, num_songs and first/last event to the users model. Rather than tallying these on the fly they're stored in the DB now.
+
+# v1.30 (October 6, 2026)
+
+- 1.30 update
+- Added BuyMeACoffee donation link
+- Redid User Profile page
+- Moved all table controls to be under collapsable header
+- Many detail page URLs use slugs instead of UUIDs now

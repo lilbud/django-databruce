@@ -48,7 +48,7 @@ event_table_columns = [
     'width': '12rem',
     'render': function (data, type, row, meta) {
       if (data) {
-        return row.city ? `<a href="/venues/${data.slug}">${data.name}</a><br><small>${row.city}</small>` : `<a href="/venues/${data.slug}">${data.name}</a>`
+        return row.city ? `<a href="/venues/${data.slug}">${data.name}<br><small>${row.city}</small></a>` : `<a href="/venues/${data.slug}">${data.name}</a>`
       }
 
       return '';

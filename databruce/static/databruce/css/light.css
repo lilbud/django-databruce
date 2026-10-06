@@ -5,7 +5,8 @@
   h3,
   h4,
   h5,
-  h6 {
+  h6,
+  a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
     color: var(--color-blue-500);
   }
 
@@ -65,6 +66,12 @@
   .badge-primary-subtle {
     background-color: var(--color-blue-100) !important;
     color: var(--color-blue-950) !important;
+  }
+
+  .btn-primary-subtle-outline {
+    background-color: var(--color-blue-100) !important;
+    color: var(--color-blue-950) !important;
+    border-color: var(--color-blue-400) !important;
   }
 
   /* secondary */
@@ -279,9 +286,7 @@
     background-color: var(--color-gray-50) !important;
   }
 
-  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event, :has(small)) {
-    color: var(--color-blue-600) !important;
-  }
+
 
   .form-control,
   .form-select {
@@ -357,8 +362,13 @@
     color: var(--color-gray-800) !important;
   }
 
-  a:not(.text-reset, .dropdown-item, .btn, .bd-links-link, .back-to-top) {
-    color: var(--color-blue-600) !important;
+  table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event, :has(small)) {
+    color: var(--color-gray-950) !important;
+  }
+
+  .bmc-btn {
+    color: #000000 !important;
+    background-color: #FFDD00 !important;
   }
 
   #djDebugToolbar a {

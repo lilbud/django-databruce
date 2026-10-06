@@ -283,7 +283,6 @@ class CitiesSerializer(BaseSerializer):
 
 
 class VenuesSerializer(BaseSerializer):
-  name = serializers.SerializerMethodField()
   city = CitiesSerializer(required=False, include=["name", "uuid", "formatted"])
   state = StatesSerializer(
     required=False,
@@ -299,12 +298,6 @@ class VenuesSerializer(BaseSerializer):
 
   first_event = MinimalEventSerializer(required=False)
   last_event = MinimalEventSerializer(required=False)
-
-  def get_name(self, obj):
-    if obj.detail:
-      return f"{obj.name}, {obj.detail}"
-
-    return obj.name
 
   class Meta:
     model = models.Venue
@@ -1237,7 +1230,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
   def get_album_complete(self, obj):
     """Check if every song ID in album_songs is present in setlist_songs."""
     # Skip non-album categories
-    if obj.get("category") in (9, 20):
+    if obj.get("category") in [8, 19]:
       return False
 
     raw_album_songs = obj.get("album_songs") or []

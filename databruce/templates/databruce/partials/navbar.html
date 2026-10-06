@@ -26,9 +26,9 @@
     <!-- Desktop Navigation Links (Dynamic) -->
     <ul class="navbar-nav ms-2 me-auto my-2 my-xl-0 flex-wrap row-gap-1 column-gap-1 d-none d-xl-flex">
       <li class="nav-item">
-        <button class="btn btn-sm border-0
-                       {% if "blog" in request.resolver_match.route %}active{% endif %}"
-                href="{% url 'blog:blog' %}">News</button>
+        <a class="btn btn-sm border-0
+                  {% if "blog" in request.resolver_match.route %}active{% endif %}"
+           href="{% url 'blog:blog' %}">News</a>
       </li>
       {% for item in nav_links %}
         {% if item.children %}

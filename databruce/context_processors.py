@@ -121,10 +121,15 @@ def get_navbar_links() -> list[dict[str, Any]]:
     },
     {
       "name": "Other",
-      "match_keyword": ["bruceyversion"],
+      "match_keyword": ["bruceyversion", "donate"],
       "icon": "bi-book-half",
       "children": [
         {"name": "Bruceyversion", "url": "bruceyversion:entries"},
+        {
+          "name": "Donate",
+          "url": "blog:blog_post",
+          "kwargs": {"slug": "donate"},
+        },
       ],
     },
   ]
