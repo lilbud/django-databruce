@@ -86,7 +86,6 @@ class BaseSerializer(serializers.ModelSerializer):
 
 
 class UsersSerializer(BaseSerializer):
-  count = serializers.IntegerField(required=False, source="event_count")
   date_joined = serializers.SerializerMethodField()
 
   def get_date_joined(self, obj):
@@ -101,7 +100,8 @@ class UsersSerializer(BaseSerializer):
       "is_staff",
       "date_joined",
       "uuid",
-      "event_count",
+      "count",
+      "num_songsnum_events",
     ]
 
 

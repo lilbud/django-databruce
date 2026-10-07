@@ -360,7 +360,7 @@ class CoverAdmin(CustomModelAdmin):
 
 @admin.register(db_models.NugsRelease)
 class NugsAdmin(CustomModelAdmin):
-  search_fields = ["event"]
+  search_fields = ["event__event_id", "event__date"]
   autocomplete_fields = ["event", "article"]
 
   list_select_related = ["event", "event__venue", "event__venue__city"]
