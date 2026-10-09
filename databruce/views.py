@@ -122,11 +122,13 @@ class IndexView(PageTitleMixin, TemplateView):
     event_filter = Q(
       Q(date__month=month)
       & Q(date__day=day)
-      & Q(artist__bruce_band=True)
+      & Q(
+        artist__bruce_band=True,
+      )
       & Q(setlist_event__set_name__in=SetType.valid_sets())
       & Q(setlist_certainty="Confirmed")
       & ~Q(tour__name__icontains="misc.")
-      & ~Q(tour_id__in=[25, 48]),
+      & ~Q(tour_id__in=[25, 48]),  # broadway
     )
 
     queryset = (
@@ -142,7 +144,7 @@ class IndexView(PageTitleMixin, TemplateView):
       .first()
     )
 
-    print(queryset)
+    # print(queryset)
 
     # queryset = (
     #   Setlist.objects.select_related(

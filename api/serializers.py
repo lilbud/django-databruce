@@ -96,11 +96,9 @@ class UsersSerializer(BaseSerializer):
     fields = [
       "id",
       "username",
-      "count",
       "is_staff",
       "date_joined",
       "uuid",
-      "count",
       "num_songs",
       "num_events",
     ]
@@ -1067,8 +1065,8 @@ class SetlistSongsSerializer(BaseSerializer):
 
       self._song_cache = {
         s["id"]: {
-          "id": s["id"],
           "name": s["name"],
+          "slug": s["slug"],
           "category": s["category__name"],
         }
         for s in models.Song.objects.filter(id__in=song_ids)
@@ -1076,6 +1074,7 @@ class SetlistSongsSerializer(BaseSerializer):
         .values(
           "id",
           "name",
+          "slug",
           "category__name",
         )
       }
@@ -1459,12 +1458,12 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
     read_only=True,
   )
 
-  rank = serializers.FloatField(required=False)
+  final_rank = serializers.FloatField(required=False)
 
   content = serializers.SerializerMethodField()
 
   def get_content(self, obj):
-    raw_html = markdown.markdown(obj.content[:500])
+    raw_html = markdown.markdown(obj.content[:300])
     # 2. Define safe elements
     allowed_tags = [
       "p",
@@ -1501,7 +1500,7 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
       "collection",
       "content",
       "published_at",
-      "rank",
+      "final_rank",
     ]
 
 

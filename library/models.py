@@ -4,7 +4,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.db import models
 from django.db.models import Value
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Lower
 from django.utils.translation import gettext_lazy as _
 
 from databruce.models import BaseModel, Event
@@ -129,6 +129,7 @@ class Article(BaseModel):
     verbose_name_plural = "Articles"
     indexes = [
       GinIndex(fields=["fts_vector"], name="idx_articles_fts_vector"),
+      models.Index(Lower("title"), name="idx_lower_title"),
     ]
 
   def __str__(self) -> str:

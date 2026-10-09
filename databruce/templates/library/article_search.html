@@ -87,6 +87,13 @@
         date_after: 'date_after',
       };
 
+      searchForm.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault(); // Stop standard browser form submission/reload
+          searchForm.requestSubmit(); // Safely triggers your existing 'submit' handler
+        }
+      });
+
       // Form submit handler
       searchForm.addEventListener('submit', (event) => {
         event.preventDefault();

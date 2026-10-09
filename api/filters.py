@@ -11,7 +11,9 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models import (
   Case,
   CharField,
+  ExpressionWrapper,
   F,
+  FloatField,
   Model,
   Q,
   Subquery,
@@ -1504,15 +1506,32 @@ class ArticleFilter(dj_filters.FilterSet):
 
     query = SearchQuery(value, config="english")
 
+    # return (
+    #   queryset.filter(fts_vector=query)
+    #   .annotate(
+    #     # Checks if title contains the raw search term (icontains)
+    #     # or matches via search query
+    #     in_title=Q(title__icontains=value),
+    #     rank=SearchRank("fts_vector", query, weights=[0.1, 0.2, 0.5, 1.0]),
+    #   )
+    #   .order_by("-in_title", "-rank")
+    # )
+
     return (
       queryset.filter(fts_vector=query)
       .annotate(
-        # Checks if title contains the raw search term (icontains)
-        # or matches via search query
-        in_title=Q(title__icontains=value),
-        rank=SearchRank("fts_vector", query, weights=[0.1, 0.2, 0.5, 1.0]),
+        base_rank=SearchRank("fts_vector", query, weights=[0.1, 0.2, 0.5, 1.0]),
+        final_rank=ExpressionWrapper(
+          F("base_rank")
+          + Case(
+            When(title__icontains=value, then=2.0),
+            default=0.0,
+            output_field=FloatField(),
+          ),
+          output_field=FloatField(),
+        ),
       )
-      .order_by("-in_title", "-rank")
+      .order_by("-final_rank")
     )
 
 

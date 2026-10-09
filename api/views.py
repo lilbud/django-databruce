@@ -22,7 +22,6 @@ from django.db.models.functions import Cast, Coalesce
 from django.db.models.manager import BaseManager
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from rest_framework import exceptions, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
@@ -31,6 +30,7 @@ from api import filters as api_filters
 from api import serializers as api_serializers
 from bruceyversion.models import Entry, EntryComment
 from databruce import models as db_models
+from databruce.utils import cache_until_midnight
 from library.models import Article
 
 UserModel = get_user_model()
@@ -385,7 +385,7 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
 
     if query["position"] == "followed_by" and query["song_2"]:
       condition = Q(setlist_event__song_id=query["song_1"]) & Q(
-        setlist_event__songs_page__next__song_id=query["song_2"],
+        setlist_event__next__song_id=query["song_2"],
       )
 
     else:
@@ -406,14 +406,14 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
         condition = Q(setlist_event__set_name__in=db_models.SetType.valid_sets()) & Q(
           Q(setlist_event__song_id=query["song_1"])
           & ~Q(
-            setlist_event__songs_page__next__song_id=query["song_2"],
+            setlist_event__next__song_id=query["song_2"],
           ),
         )
 
     return condition
 
 
-@method_decorator(cache_page(get_seconds_until_midnight()), name="list")
+@method_decorator(cache_until_midnight, name="dispatch")
 class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
     db_models.Setlist.objects.all()
@@ -433,7 +433,7 @@ class IndexSetlistViewSet(viewsets.ReadOnlyModelViewSet):
   ordering_fields = ["event__event_id", "song_num", "song__name"]
 
 
-@method_decorator(cache_page(get_seconds_until_midnight()), name="list")
+@method_decorator(cache_until_midnight, name="dispatch")
 class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = (
     db_models.Event.objects.all().select_related(
@@ -1003,7 +1003,7 @@ class ItemInsertLogViewSet(viewsets.ReadOnlyModelViewSet):
   serializer_class = api_serializers.ItemInsertLogSerializer
 
 
-class ArticlesViewSet(viewsets.ModelViewSet):
+class ArticlesViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Article.objects.all().select_related("collection")
   serializer_class = api_serializers.ArticlesSerializer
   lookup_field = (
@@ -1013,7 +1013,7 @@ class ArticlesViewSet(viewsets.ModelViewSet):
   filterset_class = api_filters.ArticleFilter
 
 
-class ArticlesSearchViewSet(viewsets.ModelViewSet):
+class ArticlesSearchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Article.objects.all().select_related("collection")
   serializer_class = api_serializers.ArticlesSearchSerializer
   lookup_field = (
