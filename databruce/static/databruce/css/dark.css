@@ -620,7 +620,7 @@
   }
 
   .text-muted {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-300) !important;
   }
 
   .userForm .bi-star {

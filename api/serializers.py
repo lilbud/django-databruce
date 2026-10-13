@@ -665,11 +665,7 @@ class SongsSerializer(BaseSerializer):
     required=False,
   )
 
-  category = serializers.CharField(
-    required=False,
-    source="category.name",
-    max_length=255,
-  )
+  category = SongCategorySerializer(required=False)
 
   class Meta:
     model = models.Song
@@ -735,7 +731,7 @@ class SetlistSerializer(BaseSerializer):
 
     return super().to_representation(instance)
 
-  song = SongsSerializer(include=["name", "slug"])
+  song = SongsSerializer(include=["name", "slug", "category"])
 
   last_event = serializers.SerializerMethodField(required=False)
 
@@ -1169,8 +1165,8 @@ class UserAttendedShowsSerializer(BaseSerializer):
 
 
 class SetlistBreakdownSerializer(BaseSerializer):
-  total_setlist_songs = serializers.IntegerField(required=False)
-  song_count = serializers.IntegerField(required=False)
+  total_songs = serializers.IntegerField(required=False)
+  # song_count = serializers.IntegerField(required=False)
   category = serializers.SerializerMethodField(required=False)
   album_complete = serializers.SerializerMethodField(required=False)
   album_in_order = serializers.SerializerMethodField(required=False)
@@ -1230,7 +1226,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
   def get_album_complete(self, obj):
     """Check if every song ID in album_songs is present in setlist_songs."""
     # Skip non-album categories
-    if obj.get("category") in [8, 20]:
+    if obj.get("category") in [8, 19]:
       return False
 
     raw_album_songs = obj.get("album_songs") or []
@@ -1304,8 +1300,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
   class Meta:
     model = models.Setlist
     fields = [
-      "total_setlist_songs",
-      "song_count",
+      "total_songs",
       "songs",
       "category",
       "album_complete",

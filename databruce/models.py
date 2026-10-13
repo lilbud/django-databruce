@@ -601,6 +601,10 @@ class Venue(BaseModel):
 
   formatted = models.CharField(max_length=255)
 
+  capacity = models.IntegerField(default=0)
+  website_url = models.CharField(default=None, blank=True, max_length=255)
+  wikipedia_url = models.CharField(default=None, blank=True, max_length=255)
+
   class Meta:
     db_table = "venues"
     verbose_name = "venue"
@@ -1968,44 +1972,39 @@ class Run(BaseModel):
     return self.name
 
 
-class EventRankStat(models.Model):
+class EventRankStats(models.Model):
+  # Set the primary key explicitly to match your MV's unique index
   event = models.OneToOneField(
-    Event,
+    "Event",
     on_delete=models.DO_NOTHING,
     primary_key=True,
     db_column="id",
     related_name="rank_stats",
   )
 
-  # Tour Stats
-  tour_num = models.IntegerField()
-  tour_total = models.IntegerField()
+  tour_num = models.BigIntegerField()
+  tour_total = models.BigIntegerField()
+  tour_leg_num = models.BigIntegerField(null=True)
+  tour_leg_total = models.BigIntegerField(null=True)
+  run_num = models.BigIntegerField(null=True)
+  run_total = models.BigIntegerField(null=True)
 
-  # Leg Stats
-  tour_leg_num = models.IntegerField(blank=True)
-  tour_leg_total = models.IntegerField(blank=True)
+  venue_num = models.BigIntegerField()
+  venue_total = models.BigIntegerField()
+  city_num = models.BigIntegerField()
+  city_total = models.BigIntegerField()
+  state_num = models.BigIntegerField()
+  state_total = models.BigIntegerField()
+  country_num = models.BigIntegerField()
+  country_total = models.BigIntegerField()
+  continent_num = models.BigIntegerField()
+  continent_total = models.BigIntegerField()
 
-  # Run Stats
-  run_num = models.IntegerField(blank=True)
-  run_total = models.IntegerField(blank=True)
-
-  # Venue Stats
-  venue_num = models.IntegerField()
-  venue_total = models.IntegerField()
-
-  # City Stats
-  city_num = models.IntegerField()
-  city_total = models.IntegerField()
-
-  # Length Rank
-  length_rank = models.IntegerField(blank=True)
+  length_rank = models.BigIntegerField(null=True)
 
   class Meta:
-    managed = True
+    managed = False  # Django will not manage migrations for this table
     db_table = "event_rank_stats"
-
-  def __str__(self) -> str:
-    return f"{self.event}"
 
 
 class StudioSession(BaseModel):

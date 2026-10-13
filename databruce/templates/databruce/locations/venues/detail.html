@@ -18,38 +18,88 @@
     </div>
     <div class="row">
       <div class="col-12">
-        {% if info.aliases or shared_loc %}
-          <div class="card mb-3">
-            <div class="card-body text-sm">
-              <div class="row d-flex gy-2 gy-md-1">
+        <div class="card mb-3">
+          <div class="card-body text-sm">
+            <div class="row d-flex gy-2 gy-md-1">
+              <div class="prefix-container">
+                <span class="prefix">Nicknames/AKA</span>
+                <span class="value">{{ info.aliases|join:'; ' }}</span>
+              </div>
+              {% if info.address %}
                 <div class="prefix-container">
-                  <span class="prefix">Nicknames/AKA</span>
-                  <span class="value">{{ info.aliases|join:'; ' }}</span>
-                </div>
-                {% if info.address %}
-                  <div class="prefix-container">
-                    <div class="col">
-                      <span class="prefix">Address</span>
-                      <span class="value">{{ info.address }}</span>
-                    </div>
+                  <div class="col">
+                    <span class="prefix">Address</span>
+                    <span class="value">{{ info.address }}</span>
                   </div>
-                {% endif %}
+                </div>
+              {% endif %}
+              {% if info.capacity %}
+                <div class="prefix-container">
+                  <div class="col">
+                    <span class="prefix">Capacity</span>
+                    <span class="value">{{ info.capacity }}</span>
+                  </div>
+                </div>
+              {% endif %}
+              {% if info.website_url or info.wikipedia_url %}
+                {% comment %} <div class="prefix-container">
+                  <div class="col">
+                    <span class="prefix">Links</span>
+                    <span class="value">
+                      {% if info.website_url %}
+                        <a href="{{ info.website_url }}">Official Website</a>
+                      {% endif %}
+                      ,
+                      {% if info.wikipedia_url %}
+                        <a href="{{ info.wikipedia_url }}">Wikipedia</a>
+                      {% endif %}
+                    </span>
+                  </div>
+                </div> {% endcomment %}
                 <div>
-                  <div class="fw-medium">Same Address As:</div>
+                  <div class="fw-medium">Links:</div>
                   <div>
                     <ul>
-                      {% for venue in shared_loc %}
+                      {% if info.website_url %}
                         <li>
-                          <a href="{% url "venue_details" slug=venue.slug %}">{{ venue.name }}</a>
+                          <a target="_blank" href="{{ info.website_url }}">Official Website</a>
                         </li>
-                      {% endfor %}
+                      {% endif %}
+                      {% if info.wikipedia_url %}
+                        <li>
+                          <a target="_blank" href="{{ info.wikipedia_url }}">Wikipedia</a>
+                        </li>
+                      {% endif %}
+                      {% if info.brucebase_url %}
+                        <li>
+                          <a target="_blank"
+                             href="https://brucebase.wikidot.com/venue:{{ info.brucebase_url }}">Brucebase</a>
+                        </li>
+                      {% endif %}
+                      {% if info.mbid %}
+                        <li>
+                          <a target="_blank" href="https://musicbrainz.org/place/{{ info.mbid }}">Musicbrainz</a>
+                        </li>
+                      {% endif %}
                     </ul>
                   </div>
+                </div>
+              {% endif %}
+              <div>
+                <div class="fw-medium">Same Address As:</div>
+                <div>
+                  <ul>
+                    {% for venue in shared_loc %}
+                      <li>
+                        <a href="{% url "venue_details" slug=venue.slug %}">{{ venue.name }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
-        {% endif %}
+        </div>
       </div>
     </div>
     {% if info.note %}
@@ -104,16 +154,6 @@
                     aria-selected="false">Child Venues</button>
           </li>
         {% endif %}
-        <li class="nav-item" role="presentation">
-          <button class="btn nav-btn"
-                  id="pills-links-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#links"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-links"
-                  aria-selected="false">Links</button>
-        </li>
         {% if info.latitude %}
           <li class="nav-item" role="presentation">
             <button class="btn nav-btn"
@@ -131,25 +171,6 @@
     <div class="tab-content">
       <div id="events" class="tab-pane fade show active">{% include "databruce/partials/event_table.html" %}</div>
       <div id="songs" class="tab-pane fade">{% include "databruce/partials/song_table.html" %}</div>
-      <div id="links" class="tab-pane fade">
-        <div class="card">
-          <div class="card-body p-2">
-            <ul>
-              {% if info.brucebase_url %}
-                <li>
-                  <a target="_blank"
-                     href="https://brucebase.wikidot.com/venue:{{ info.brucebase_url }}">Brucebase</a>
-                </li>
-              {% endif %}
-              {% if info.mbid %}
-                <li>
-                  <a target="_blank" href="https://musicbrainz.org/place/{{ info.mbid }}">Musicbrainz</a>
-                </li>
-              {% endif %}
-            </ul>
-          </div>
-        </div>
-      </div>
       <div id="map" class="tab-pane fade">
         <div class="card">
           <div class="card-body p-0">

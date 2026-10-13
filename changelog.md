@@ -595,3 +595,19 @@ First public release of the site. Site was locked behind a login and accounts on
 - Redid User Profile page
 - Moved all table controls to be under collapsable header
 - Many detail page URLs use slugs instead of UUIDs now
+
+# v1.31 (October 13, 2026)
+
+# Fixed
+
+- Fixed notes search page layout, move controls to collapse
+- Fixed album breakdown marking non albums as complete (originals/covers)
+
+# Added
+
+- Added Website URL, Wikipedia URL, and Capacity to venues if present on Musicbrainz
+
+# Changed
+
+- Updated color of dark theme muted text
+- moved Venue links to info card

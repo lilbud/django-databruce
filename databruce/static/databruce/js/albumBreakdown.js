@@ -46,12 +46,18 @@ async function albumBreakdown(url) {
     const { results } = await response.json();
     const tooltips = [];
 
-    const maxNum = Math.max(...results.map(obj => obj.song_count));
+    // const maxNum = Math.max(...results.map(obj => obj.song_count));
+
+    const maxLength = Object.values(results).reduce((max, item) => {
+      return Math.max(max, item.songs?.length || 0);
+    }, 0);
+
+    console.log(maxLength);
 
     // Build HTML in memory to minimize DOM reflows
     for (const item of results) {
       const album = item.category;
-      const percent = ((item.song_count / maxNum) * 100).toFixed(0);
+      const percent = ((item.songs.length / maxLength) * 100).toFixed(0);
       const rowClass = item.album_complete
         ? "col px-2 py-1 album-breakdown complete"
         : "col px-2 py-1 album-breakdown";
@@ -74,7 +80,7 @@ async function albumBreakdown(url) {
       }
 
       const html = `
-        <div class="${rowClass}" data-bs-toggle="collapse" data-album="${album.id}" href="#${album.slug}-collapse">
+        <div class="${rowClass}" data-bs-toggle="collapse" data-album="${album.id}" href="#row-${album.id}-collapse" id="row-${album.id}">
             <div class="row mx-0 g-3 align-items-center" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="${tooltip}">
                 <div class="col-auto ps-0 category">
                     <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.category.name)}">
@@ -82,9 +88,9 @@ async function albumBreakdown(url) {
                 <div class="col progress px-0">
                     <div class="progress-bar" style="width:${percent}%"></div>
                 </div>
-                <div class="col-auto percent text-center pe-0 text-xs text-nowrap">${item.song_count}</div>
+                <div class="col-auto percent text-center pe-0 text-xs text-nowrap">${item.songs.length}</div>
             </div>
-            <div class="collapse" id="${album.slug}-collapse">
+            <div class="collapse" id="row-${album.id}-collapse">
                 <ul class="list-group pt-2 pb-1">${songs}</ul>
             </div>
         </div>`;
