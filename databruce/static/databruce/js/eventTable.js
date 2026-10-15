@@ -47,11 +47,7 @@ event_table_columns = [
     'className': 'text-nowrap',
     'width': '12rem',
     'render': function (data, type, row, meta) {
-      if (data) {
-        return row.city ? `<a href="/venues/${data.slug}">${data.name}<br><small>${row.city}</small></a>` : `<a href="/venues/${data.slug}">${data.name}</a>`
-      }
-
-      return '';
+      return data ? `<a href="/venues/${data.slug}">${data.name}<br><small>${row.city}</small></a>` : ``
     },
   },
   {
@@ -60,9 +56,7 @@ event_table_columns = [
     'width': '12rem',
     'className': 'text-wrap',
     'render': function (data, type, row, meta) {
-      if (data) {
-        return row.leg ? `<a href="/tours/${data.slug}">${data.name}</a><br><small>${row.leg}</small>` : `<a href="/tours/${data.slug}">${data.name}</a>`
-      }
+      return data ? `<a href="/tours/${data.slug}">${data.name}</a>${row.leg ? `<br><small>${row.leg}</small>` : ''}` : '';
     },
   },
   {
@@ -88,6 +82,14 @@ function eventTable(url) {
     ajax: {
       'url': url,
     },
+    on: {
+      // Plain JS callback mapping arguments directly
+      xhr: function (e, settings, json, xhr) {
+        if (!json || !json.data) return;
+        renderCards(json.data);
+        reloadTooltips();
+      }
+    },
     layout: {
       topStart: {
         customOrder: {
@@ -104,81 +106,108 @@ function eventTable(url) {
     initComplete: function (settings, json) {
       var api = this.api();
       var info = api.page.info();
-      $('#event-count-badge').text(info.recordsTotal);
 
-      const input = $('.event-controls .page-input');
-      const prevBtn = $('.event-controls .btn-prev');
-      const nextBtn = $('.event-controls .btn-next');
-      const totalSpan = $('.event-controls .total-pages');
-      const tableInfo = $('.event_table_info')
+      const eventCountBadge = document.getElementById('event-count-badge');
+
+      if (eventCountBadge) {
+        eventCountBadge.textContent = info.recordsTotal;
+      }
+
+      const input = document.querySelectorAll('.event-controls .page-input');
+      const prevBtn = document.querySelectorAll('.event-controls .btn-prev');
+      const nextBtn = document.querySelectorAll('.event-controls .btn-next');
+      const totalSpan = document.querySelectorAll('.event-controls .total-pages');
+      const tableInfo = document.querySelector('.event_table_info');
 
       // Initial button states
-      input.val(info.page + 1);
-      prevBtn.attr('disabled', info.page === 0);
-      nextBtn.attr('disabled', info.page >= info.pages - 1);
+      input.forEach(el => {
+        el.value = info.page + 1;
 
-      tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+        el.addEventListener('change', function () {
+          let val = parseInt(this.value, 10) - 1;
+          const max = api.page.info().pages - 1;
+
+          if (val < 0) val = 0;
+          if (val > max) val = max;
+
+          this.value = val;
+          api.page(val).draw('page');
+        })
+      });
+
+      prevBtn.forEach(el => {
+        el.disabled = info.page === 0;
+
+        el.addEventListener('click', function () {
+          prevPage(table);
+        });
+      });
+
+      nextBtn.forEach(el => {
+        el.disabled = info.page >= info.pages - 1;
+
+        el.addEventListener('click', function () {
+          nextPage(table);
+        });
+      });
+
+      tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
 
       api.on('draw', () => {
         const pageInfo = api.page.info();
 
-        input.val(pageInfo.page + 1);
-        input.attr('max', pageInfo.pages);
+        input.forEach(el => {
+          el.value = pageInfo.page + 1;
+          el.setAttribute('max', pageInfo.pages);
+        });
 
-        totalSpan.text(`of ${pageInfo.pages || 1}`);
+        totalSpan.forEach(el => {
+          el.textContent = `of ${pageInfo.pages || 1}`;
+        });
 
-        prevBtn.attr('disabled', pageInfo.page === 0);
-        nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+        prevBtn.forEach(el => {
+          el.disabled = pageInfo.page === 0;
+        });
 
-        tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+        nextBtn.forEach(el => {
+          el.disabled = pageInfo.page >= pageInfo.pages - 1;
+        });
+
+        tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
       });
 
-      totalSpan.text(`of ${info.pages || 1}`);
+      // totalSpan.textContent = `of ${info.pages || 1}`;
+      totalSpan.forEach(el => {
+        el.textContent = `of ${info.pages || 1}`;
+      })
 
-      nextBtn.on('click', function () { nextPage(table); });
-
-      prevBtn.on('click', function () { prevPage(table); });
-
-      input.on('change', function () {
-        let val = parseInt(this.value, 10) - 1;
-        const max = api.page.info().pages - 1;
-        if (val < 0) val = 0;
-        if (val > max) val = max;
-
-        input.attr('value', val);
-
-        api.page(val).draw('page');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-
-      let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-
-      tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-      });
+      reloadTooltips();
     }
-  });
-
-  table.on('xhr.dt', function (e, settings, json) {
-    if (!json || !json.data) return;
-    renderCards(json.data);
   });
 
   tableSearch(table, 'search');
 
-  $('.publicity-filter').on('change', function () {
+  const publicityFilter = document.getElementById('PublicityFilter');
+
+  publicityFilter.addEventListener('change', function () {
     var selectedValue = this.value;
     table.order([[1, 'asc']]).column(7).search(selectedValue ? selectedValue : '', true, false).draw();
   });
 }
 
-$(document).on('submit', '.userForm', async function (e) {
-  e.preventDefault();
-  const formData = new FormData(this);
-  const addBtn = $(this).find('#add');
+document.addEventListener('submit', async function (e) {
+  // Find the closest matching form if it's part of the event delegation
+  const form = e.target.closest('.userForm');
+  if (!form) return;
 
-  let action = addBtn.attr('data-action');
-  let event = addBtn.attr('data-event');
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  const addBtn = form.querySelector('#add');
+
+  let action = addBtn.getAttribute('data-action');
+  let event = addBtn.getAttribute('data-event');
+
   const url = `/events/${event}/${action}/`;
 
   try {
@@ -194,11 +223,10 @@ $(document).on('submit', '.userForm', async function (e) {
     const data = await response.json();
     const isAdded = data['action'] === 'added';
 
-    addBtn
-      .toggleClass('bi-star-fill', isAdded)
-      .toggleClass('bi-star', !isAdded)
-      .attr('data-attended', isAdded ? 'true' : 'false')
-      .attr('data-action', isAdded ? 'remove' : 'add');
+    addBtn.classList.toggle('bi-star-fill', isAdded);
+    addBtn.classList.toggle('bi-star', !isAdded);
+    addBtn.setAttribute('data-attended', isAdded ? 'true' : 'false');
+    addBtn.setAttribute('data-action', isAdded ? 'remove' : 'add');
 
   } catch (error) {
     console.error('Error during POST request:', error);

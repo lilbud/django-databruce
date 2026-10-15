@@ -1,14 +1,4 @@
-function slugify(str) {
-  if (!str) return '';
-
-  return String(str)
-    .toLowerCase() // Convert to lowercase
-    .trim() // Trim leading/trailing whitespace
-    .replace(/[^a-z0-9]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-}
-
-function showTablePlaceholder($tbody, colCount, rowCount = 3) {
+function showTablePlaceholder(tbody, colCount, rowCount = 3) {
   const placeholderRows = Array(rowCount).fill(`
     <tr class="placeholder-row">
       <td colspan="${colCount}" class="p-0">
@@ -19,7 +9,8 @@ function showTablePlaceholder($tbody, colCount, rowCount = 3) {
     </tr>
   `).join('');
 
-  $tbody.html(placeholderRows);
+  // tbody.html(placeholderRows);
+  tbody.innerHTML = placeholderRows;
 }
 
 const getNestedValue = (obj, path) => {
@@ -33,12 +24,18 @@ function rowGroup(data, groupVal) {
 }
 
 async function createTable(url, columns, tableSelectorOrElem, options) {
-  const $table = $(tableSelectorOrElem);
-  const $tbody = $table.find('tbody').length ? $table.find('tbody') : $('<tbody>').appendTo($table);
-  const colCount = $table.find('thead th').length || columns.length;
+  let table = '';
 
-  // Show multiple placeholder rows
-  // showTablePlaceholder($tbody, colCount, 3);
+  // check if table being passed is an element or a string
+  try {
+    table = document.querySelector(tableSelectorOrElem);
+  } catch (error) {
+    table = tableSelectorOrElem;
+  }
+
+  // const table = document.querySelector(tableSelectorOrElem);
+  const tbody = table.querySelector('tbody') || table.appendChild(document.createElement('tbody'));
+  const colCount = table.querySelector('thead th').length || columns.length;
 
   try {
     const response = await fetch(url);
@@ -48,36 +45,27 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
     }
 
     let data = await response.json();
-    let table = $(tableSelectorOrElem);
-    let tbody = table.find('tbody');
 
-    if (!tbody.length) {
-      table.append('<tbody></tbody>');
-      tbody = table.find('tbody');
-    }
-
-    showTablePlaceholder($tbody, colCount, data.count);
+    showTablePlaceholder(tbody, colCount, data.count);
 
     if (options && options.rowGroup) {
       data = rowGroup(data.results, options.rowGroup.groupVal);
     }
 
-    // Create a DocumentFragment to minimize reflows
-    const fragment = $(document.createDocumentFragment());
-
-    // console.log(options && options.rowGroup);
+    tbody.innerHTML = '';
 
     if (options && options.rowGroup) {
       Object.entries(data).forEach(([key, value]) => {
-        const columnsCount = tbody.closest('table').find('thead th').length || 2;
-        let setHeader = $(`<tr class="set-header"><td class="py-0" colspan="${columnsCount}"><span>${key}</span></td></tr>`);
+        const setHeader = document.createElement('tr');
+        setHeader.className = 'set-header';
+        setHeader.innerHTML = `<td class="py-0" colspan="${colCount}"><span>${key}</span></td>`;
 
         if (key !== "Unknown") {
-          fragment.append(setHeader);
+          tbody.append(setHeader);
         }
 
         value.forEach((rowVal) => {
-          let row = $('<tr />');
+          let row = document.createElement('tr');
 
           columns.forEach((col) => {
             const className = col.className ? `${col.className} ${col.data}` : col.data;
@@ -86,7 +74,9 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
             // Compute cell content
             let cellContent = col.render(rawVal, 'display', rowVal, null)
 
-            let cell = $('<td />').html(cellContent).addClass(className);
+            let cell = document.createElement('td');
+            cell.innerHTML = cellContent;
+            cell.className = className;
 
             if (col.createdCell) {
               cell = col.createdCell(cell, cellContent, rowVal, null, 0) || cell;
@@ -99,42 +89,37 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
             row.append(cell);
           });
 
-          fragment.append(row);
+          tbody.append(row);
         });
       });
-
     }
     else {
       data.results.forEach((item) => {
-        let row = $('<tr />');
+        const row = document.createElement('tr');
 
         columns.forEach((col) => {
           const className = col.className ? `${col.className} ${col.data}` : col.data;
           const rawVal = item[col.data];
-
-          // Compute cell content without mutating 'col'
-          let cellContent = '';
+          const cell = document.createElement('td');
+          cell.className = className;
 
           if (rawVal != null) {
-            cellContent = col.render ? col.render(rawVal, 'display', item, null) : rawVal;
+            cell.innerHTML = col.render ? col.render(rawVal, 'display', item, null) : rawVal;
           }
-
-          let cell = $('<td />').html(cellContent).addClass(className);
 
           row.append(cell);
         });
-        fragment.append(row);
+
+        tbody.append(row);
       });
     }
 
-    // Append everything in a single DOM update
-    tbody.empty().append(fragment);
+    // tbody.innerHTML = '';
+    // tbody.append(fragment);
 
   } catch (error) {
     console.error('Fetch operation failed:', error);
   }
 
-  // Properly scope variables
-  const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  const tooltipList = tooltipTriggerList.map((el) => new bootstrap.Tooltip(el));
+  reloadTooltips();
 }

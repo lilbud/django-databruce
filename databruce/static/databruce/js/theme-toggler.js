@@ -21,22 +21,18 @@
   }
 
   const updateIcon = (theme) => {
-    $('.theme-icon').hide();
+    const isDark = theme === 'dark';
 
-    if (theme === 'dark') {
-      $('.theme-icon.bi-moon-stars-fill').show();
-      // $('#toggle-container').attr('data-bs-title', 'Toggle Theme (Light)');
-    } else {
-      $('.theme-icon.bi-sun-fill').show();
-      // $('#toggle-container').attr('data-bs-title', 'Toggle Theme (Dark)');
-    }
+    // Toggle 'd-none' based on whether the theme matches the icon
+    document.querySelector('.theme-icon.bi-moon-stars-fill').classList.toggle('d-none', !isDark);
+    document.querySelector('.theme-icon.bi-sun-fill').classList.toggle('d-none', isDark);
   }
 
   setTheme(getPreferredTheme())
 
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     const storedTheme = getStoredTheme()
-    // console.log(storedTheme)
+
     if (storedTheme !== 'light' && storedTheme !== 'dark') {
       setTheme(getPreferredTheme())
     }
@@ -44,16 +40,15 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     var currentTheme = document.documentElement.getAttribute('data-bs-theme');
+    const themeBtn = document.querySelector('.bd-theme-btn');
 
     updateIcon(currentTheme);
 
-    $('.bd-theme-btn').on('click', function () {
+    themeBtn.addEventListener('click', () => {
       currentTheme = document.documentElement.getAttribute('data-bs-theme');
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
       setTheme(newTheme);
       setStoredTheme(newTheme);
-
       updateIcon(newTheme);
     })
   })

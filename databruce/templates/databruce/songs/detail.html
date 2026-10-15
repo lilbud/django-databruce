@@ -367,7 +367,7 @@
           'name': 'event__event_id',
           'width': '10rem',
           'render': function(data, type, row, meta) {
-            return data ? eventDateFormat(data) : '';
+            return eventDateFormat(data);
           },
         }, {
           'data': 'event.artist',
@@ -544,7 +544,6 @@
       });
 
       tableSearch(table, 'song-search');
-      searchBuilder(table, sb_columns);
 
       $('#PublicityFilter').on('change', function() {
         var selectedValue = this.value;
@@ -637,13 +636,13 @@
           'data': 'first_event',
           'name': 'first_event',
           'render': function(data, type, row, meta) {
-            return data ? eventDateFormat(data) : '';
+            return eventDateFormat(data);
           },
         }, {
           'data': 'last_event',
           'name': 'last_event',
           'render': function(data, type, row, meta) {
-            return data ? eventDateFormat(data) : '';
+            return eventDateFormat(data);
           },
         }, ],
         initComplete: function(settings, json) {

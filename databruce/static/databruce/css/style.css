@@ -1641,11 +1641,6 @@ html {
   height: calc(1.5em + 0.5rem + 2px)
 }
 
-.form-label {
-  /* padding-bottom: 0.25rem !important; */
-  margin-bottom: 0 !important;
-}
-
 /* hide ordering control from non-orderable columns */
 .dt-orderable-none .dtcc {
   display: none !important;
@@ -1662,8 +1657,6 @@ html {
 
 .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[role="group"] .select2-results__group {
   padding: 0 !important;
-
-
 }
 
 #userForm .star-btn {
@@ -1672,6 +1665,23 @@ html {
 
 .event-card #userForm {
   height: 18px !important;
+}
+
+.song-row {
+  margin-top: 0 !important;
+}
+
+.lg-sub-html {
+  font-family: inherit;
+  font-size: 1rem;
+  color: #cccccc;
+  text-align: center;
+  padding: 10px 20px;
+}
+
+.dataTables_wrapper {
+  /* Set a min-height roughly equal to a typical table page size */
+  min-height: 600px;
 }
 
 /* .event-card #userForm .star-btn {

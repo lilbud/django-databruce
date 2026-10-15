@@ -120,9 +120,7 @@
           'data': 'relation',
           'name': 'relation__name',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/relations/${data.uuid}">${data.name}</a>`;
-            }
+            return data ? `<a href="/relations/${data.uuid}">${data.name}</a>` : '';
           },
         }, {
           'data': 'relation.instruments',
@@ -131,18 +129,19 @@
           'data': 'first',
           'name': 'first__event_id, first__date',
           'render': function(data, type, row, meta) {
-            return data ? eventDateFormat(data) : '';
+            return eventDateFormat(data);
           },
         }, {
           'data': 'last',
           'name': 'first__event_id, first__date',
           'render': function(data, type, row, meta) {
-            return data ? eventDateFormat(data) : '';
+            return eventDateFormat(data);
           },
         }, ],
         initComplete: function(settings, json) {
           var info = this.api().page.info();
-          $('#member-count-badge').text(info.recordsTotal);
+          const memberCountBadge = document.getElementById('member-count-badge');
+          memberCountBadge.textContent = info.recordsTotal;
         }
       });
     });

@@ -4,6 +4,7 @@ function initializeShareCardGenerator(config) {
   const button = config.button;
   const originalText = button.innerHTML;
   const width = 540;
+  const url = config.ajaxUrl;
 
   button.disabled = true;
   button.innerHTML = '<span class="spinner-border spinner-border-sm py-auto" role="status"></span> Generating Image...';
@@ -14,6 +15,8 @@ function initializeShareCardGenerator(config) {
     .then(response => response.text())
     .then(htmlContent => {
       const sandbox = document.createElement('div');
+
+
       sandbox.style.position = 'fixed';
       sandbox.style.top = '-9999px';
       sandbox.style.left = '-9999px';
@@ -22,7 +25,7 @@ function initializeShareCardGenerator(config) {
       sandbox.innerHTML = htmlContent;
       document.body.appendChild(sandbox);
 
-      const $sandboxTable = $(sandbox).find('#setlistTable');
+      const $sandboxTable = sandbox.querySelector('#setlistTable');
 
       if (config.activeTheme === 'dark') {
         sandbox.setAttribute('data-bs-theme', 'dark');
@@ -30,19 +33,9 @@ function initializeShareCardGenerator(config) {
         sandbox.setAttribute('data-bs-theme', 'light');
       }
 
-      var url = config.ajaxUrl;
-
       let setlistOptions = {
         createdRow: function (row, data) {
-          row.addClass(slugify(data.set_name));
-
-          var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal', 'Soundcheck']
-
-          if (allowedSets.includes(data.set_name)) {
-            var album = data.song.category_slug;
-            row.attr('data-album', album);
-          }
-
+          row.className = slugify(data.set_name);
           return row
         },
         rowGroup: {
@@ -59,11 +52,11 @@ function initializeShareCardGenerator(config) {
             return data ? data : '';
           },
           'createdCell': function (td, cellData, rowData, row, col) {
-            $(td).addClass('songnum');
+            td.classList.add('songnum');
 
             if (rowData.position) {
               var position = slugify(rowData.position);
-              $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
+              td.classList.add(position, 'position');
             }
 
             return td;
@@ -84,9 +77,9 @@ function initializeShareCardGenerator(config) {
             const tourBadge = getTourPositionBadge(row);
             let bustBadge = ''
 
-            if (row.gap >= 50 && !row.debut) {
-              const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
-            }
+            // if (row.gap >= 50 && !row.debut) {
+            //   const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
+            // }
 
             // Combine all active badges into one list, filtering out nulls
             const allBadges = [

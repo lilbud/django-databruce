@@ -58,28 +58,28 @@
         <!-- start_date and end_date: 2 column row with even spacing -->
         <div class="row gx-2">
           <div class="col-6 col-md-2">
-            <label class="form-label">{{ form.start_date.label }}</label>
+            <label class="form-label mb-1">{{ form.start_date.label }}</label>
             <div>{{ form.start_date }}</div>
           </div>
           <div class="col-6 col-md-2">
-            <label class="form-label">{{ form.end_date.label }}</label>
+            <label class="form-label mb-1">{{ form.end_date.label }}</label>
             <div>{{ form.end_date }}</div>
           </div>
         </div>
         <!-- month and day: 2 column row with even spacing -->
         <div class="row gx-2">
           <div class="col-6 col-md-2">
-            <label class="form-label">{{ form.month.label }}</label>
+            <label class="form-label mb-1">{{ form.month.label }}</label>
             {{ form.month }}
           </div>
           <div class="col-6 col-md-1">
-            <label class="form-label">{{ form.day.label }}</label>
+            <label class="form-label mb-1">{{ form.day.label }}</label>
             {{ form.day }}
           </div>
         </div>
         <!-- day_of_week with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.day_of_week.label }}</label>
+          <label class="form-label mb-1">{{ form.day_of_week.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.day_of_week_exclude }}</div>
             <div class="col col-md-2">{{ form.day_of_week }}</div>
@@ -88,17 +88,17 @@
         <!-- form.tag and form.type: 2 column row at small breakpoints, separate rows at larger -->
         <div class="row gx-2 row-gap-3">
           <div class="col-12 col-lg-3">
-            <label class="form-label d-block">{{ form.type.label }}</label>
+            <label class="form-label mb-1">{{ form.type.label }}</label>
             <div>{{ form.type }}</div>
           </div>
           <div class="col-12 col-lg-3">
-            <label class="form-label d-block">{{ form.tag.label }}</label>
+            <label class="form-label mb-1">{{ form.tag.label }}</label>
             <div>{{ form.tag }}</div>
           </div>
         </div>
         <!-- venue with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.venue.label }}</label>
+          <label class="form-label mb-1">{{ form.venue.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.venue_exclude }}</div>
             <div class="col col-lg-4">{{ form.venue }}</div>
@@ -106,7 +106,7 @@
         </div>
         <!-- city with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.city.label }}</label>
+          <label class="form-label mb-1">{{ form.city.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.city_exclude }}</div>
             <div class="col col-lg-4">{{ form.city }}</div>
@@ -114,7 +114,7 @@
         </div>
         <!-- state with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.state.label }}</label>
+          <label class="form-label mb-1">{{ form.state.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.state_exclude }}</div>
             <div class="col col-lg-4">{{ form.state }}</div>
@@ -122,7 +122,7 @@
         </div>
         <!-- country with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.country.label }}</label>
+          <label class="form-label mb-1">{{ form.country.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.country_exclude }}</div>
             <div class="col col-lg-4">{{ form.country }}</div>
@@ -130,7 +130,7 @@
         </div>
         <!-- continent with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.continent.label }}</label>
+          <label class="form-label mb-1">{{ form.continent.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.continent_exclude }}</div>
             <div class="col col-lg-4">{{ form.continent }}</div>
@@ -138,7 +138,7 @@
         </div>
         <!-- tour with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.tour.label }}</label>
+          <label class="form-label mb-1">{{ form.tour.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.tour_exclude }}</div>
             <div class="col col-lg-4">{{ form.tour }}</div>
@@ -146,7 +146,7 @@
         </div>
         <!-- tour_leg with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.tour_leg.label }}</label>
+          <label class="form-label mb-1">{{ form.tour_leg.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.tour_leg_exclude }}</div>
             <div class="col col-lg-4">{{ form.tour_leg }}</div>
@@ -154,7 +154,7 @@
         </div>
         <!-- relation with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.relation.label }}</label>
+          <label class="form-label mb-1">{{ form.relation.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.relation_exclude }}</div>
             <div class="col col-lg-4">{{ form.relation }}</div>
@@ -162,7 +162,7 @@
         </div>
         <!-- band with exclude -->
         <div>
-          <label class="form-label d-block">{{ form.band.label }}</label>
+          <label class="form-label mb-1">{{ form.band.label }}</label>
           <div class="row gx-2">
             <div class="col-2 col-md-1">{{ form.band_exclude }}</div>
             <div class="col col-lg-4">{{ form.band }}</div>
@@ -170,14 +170,16 @@
         </div>
         <!-- conjunction -->
         <div>
-          <label class="form-label d-block">{{ form.conjunction.label }}</label>
+          <label class="form-label mb-1">{{ form.conjunction.label }}</label>
           <div class="row gx-2">
             <div class="col-4 col-lg-1">{{ form.conjunction }}</div>
           </div>
         </div>
         {{ formset.management_form }}
         <!-- setlist-search -->
-        <div id="setlist-search" class="mt-3">{% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}</div>
+        <div id="setlist-search" class="mt-3 row row-gap-2">
+          {% include "./setlist_form.html" with form=formset.forms.0 prefix=0 %}
+        </div>
         <!-- form buttons: span width at lg, wrap to single column at small -->
         <div class="row g-2 mt-4" id="form-buttons">
           <div class="col-12 col-lg order-1">

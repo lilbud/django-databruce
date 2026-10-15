@@ -394,7 +394,7 @@
         'width': '10rem',
         'type': 'date',
         'render': function(data, type, row, meta) {
-          return data ? eventDateFormat(data) : '';
+          return eventDateFormat(data);
           '';
         },
       }, {
@@ -403,7 +403,7 @@
         'width': '10rem',
         'type': 'date',
         'render': function(data, type, row, meta) {
-          return data ? eventDateFormat(data) : '';
+          return eventDateFormat(data);
         },
       }, {
         'data': 'song__original',

@@ -1,13 +1,12 @@
 function renderCards(events) {
-  const container = $('#cards');
-  const fragment = $(document.createDocumentFragment());
-  $(container).empty();
+  const container = document.getElementById('cards');
+
+  // Clear existing cards
+  container.innerHTML = "";
 
   events.forEach(function (item) {
-    fragment.append(eventCard(item));
-  })
-
-  container.append(fragment);
+    container.insertAdjacentHTML('beforeend', eventCard(item));
+  });
 }
 
 function eventCard(event) {
@@ -61,12 +60,11 @@ function renderBadges(types) {
 }
 
 function renderNoteCard(event) {
-  const hasNote = Boolean(event.event_note);
   const hasSetlist = event.has_setlist;
   const firstTypeName = event.type?.[0]?.name;
   const blockedTypes = ["Rescheduled", "Cancelled", "Relocated", "No Gig"];
 
-  if (!hasNote && !hasSetlist) {
+  if (event.event_note && !hasSetlist) {
     return `
       <div class="card message info">
         <span>
@@ -139,14 +137,6 @@ function formatSongs(songs, highlightSpecial) {
 }
 
 function renderCardHeader(event, badges, attendanceForm, earlyLate) {
-  // const eventClass = event.type?.[0]?.class ?? "default";
-  // const titleHtml = event.title
-  //   ? `<div class="event-title text-xs text-muted fst-italic my-1">${event.title}</div>`
-  //   : "";
-  // const tourHtml = event.tour
-  //   ? `<div class="event-tour text-xs text-muted my-1"><i class="bi bi-bus-front me-1"></i>${event.tour.name}</div>`
-  //   : "";
-  // 
   return `
     <div class="card-header">
       <div class="row mb-2 d-flex justify-content-between">
@@ -181,11 +171,7 @@ function renderCardFooter(event) {
   var noteContent = event.event_note ? event.event_note : null;
 
   if (!noteContent) {
-    return `
-    <div class="card-footer">
-
-    </div>
-  `;
+    return `<div class="card-footer"></div>`;
   }
 
   return `

@@ -912,12 +912,12 @@
 
       let setlistOptions = {
         createdRow: function(row, data) {
-          $(row).attr('data-set-name', slugify(data.set_name));
+          const setAlbum = data.song.category && data.set_name != 'Soundcheck';
 
-          var ignoreSets = ['Soundcheck']
+          row.setAttribute('data-set-name', slugify(data.set_name))
 
-          if (data.song.category && !ignoreSets.includes(data.set_name)) {
-            $(row).attr('data-album', data.song.category.id);
+          if (setAlbum) {
+            row.setAttribute('data-album', data.song.category.id);
           }
 
           return row
@@ -1139,7 +1139,18 @@
       })
 
       const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+      const downloadBtn = document.getElementById('download-btn');
 
+      downloadBtn.addEventListener('click', function() {
+        initializeShareCardGenerator({
+          button: downloadBtn,
+          ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
+          downloadFilename: `databruce_${event_id}`,
+          activeTheme: currentTheme,
+        });
+      })
+
+      /*
       $('#downloadBtn').click(function() {
         var btn = this;
         initializeShareCardGenerator({
@@ -1148,7 +1159,7 @@
           downloadFilename: `databruce_${event_id}`,
           activeTheme: currentTheme,
         });
-      })
+      })*/
     });
   </script>
 {% endblock content %}

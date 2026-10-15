@@ -104,55 +104,9 @@ function slotTable(url) {
         }
       });
 
-      const input = $('#slotTableControls .page-input');
-      const prevBtn = $('#slotTableControls .btn-prev');
-      const nextBtn = $('#slotTableControls .btn-next');
-      const totalSpan = $('#slotTableControls .total-pages');
-      const tableInfo = $('#slotTableInfo');
+      const tableInfo = document.getElementById('slotTableInfo');
+      tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
 
-      // Initial button states
-      input.val(info.page + 1);
-      prevBtn.attr('disabled', info.page === 0);
-      nextBtn.attr('disabled', info.page >= info.pages - 1);
-
-      tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
-
-      api.on('draw', () => {
-        const pageInfo = api.page.info();
-
-        input.val(pageInfo.page + 1);
-        input.attr('max', pageInfo.pages);
-
-        totalSpan.text(`of ${pageInfo.pages || 1}`);
-
-        // Handle button states
-        prevBtn.attr('disabled', pageInfo.page === 0);
-        nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
-
-        // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-        tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
-      });
-
-      totalSpan.text(`of ${info.pages || 1}`);
-
-      nextBtn.on('click', function () {
-        slotTable.page('next').draw(false);
-      });
-
-      prevBtn.on('click', function () {
-        slotTable.page('previous').draw(false);
-      });
-
-      input.on('change', function () {
-        let val = parseInt(this.value, 10) - 1;
-        const max = api.page.info().pages - 1;
-        if (val < 0) val = 0;
-        if (val > max) val = max;
-
-        input.attr('value', val);
-
-        api.page(val).draw('page');
-      });
     }
   });
 

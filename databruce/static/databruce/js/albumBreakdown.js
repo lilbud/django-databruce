@@ -1,15 +1,3 @@
-
-// Helper utility function for escaping HTML
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function createSongListItem(song) {
   const display = song.original
     ? song.name
@@ -29,9 +17,9 @@ async function albumBreakdown(url) {
     throw new Error('Valid URL string is required');
   }
 
-  const $albums = $('#albums');
+  const albums = document.getElementById('albums');
 
-  if (!$albums.length) {
+  if (!albums) {
     console.warn('Container #albums not found');
     return;
   }
@@ -95,7 +83,7 @@ async function albumBreakdown(url) {
             </div>
         </div>`;
 
-      $albums.append(html);
+      albums.insertAdjacentHTML('beforeend', html);
     }
 
     // Initialize Tooltips
@@ -103,46 +91,37 @@ async function albumBreakdown(url) {
       tooltips.push(new bootstrap.Tooltip(el));
     });
 
-    // Event delegation for hover effects
-    const $setlistTable = $('#setlistTable');
+    const setlistTable = document.getElementById('setlistTable');
 
-    $albums.on('mouseenter', '.album-breakdown', function () {
-      const album = $(this).data('album');
-      $(this).css('cursor', 'pointer');
+    // Assuming 'albums' is a vanilla DOM element
+    albums.addEventListener('mouseover', function (e) {
+      const breakdown = e.target.closest('.album-breakdown');
+      if (!breakdown) return;
 
-      $setlistTable.find('tbody tr:not(.set-header)').each(function () {
-        const $tr = $(this);
+      const album = breakdown.dataset.album;
+      breakdown.style.cursor = 'pointer';
 
-        if ($tr.data('album') === album) {
-          $tr.removeClass('opacity-25');
-          $tr.children('td:not(.position)').addClass('highlighted');
+      const rows = setlistTable.querySelectorAll('tbody tr:not(.set-header)');
+      rows.forEach(tr => {
+        if (tr.dataset.album === album) {
+          tr.classList.remove('opacity-25');
+          tr.querySelectorAll('td:not(.position)').forEach(td => td.classList.add('highlighted'));
         } else {
-          $tr.addClass('opacity-25');
+          tr.classList.add('opacity-25');
         }
       });
-    }).on('mouseleave', '.album-breakdown', function () {
-      $(`#setlistTable tr`).removeClass('opacity-25').children('td').removeClass('highlighted');
     });
 
+    albums.addEventListener('mouseout', function (e) {
+      const breakdown = e.target.closest('.album-breakdown');
+      if (!breakdown) return;
 
-    // Toggle album breakdown collapse elements
-    $('#album-breakdown-btn').click(function () {
-      const $collapses = $albums.find('.collapse');
-      const anyClosed = $collapses.not('.show').length > 0;
-
-      $collapses.each(function () {
-        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(this);
-        anyClosed ? bsCollapse.show() : bsCollapse.hide();
+      const allRows = setlistTable.querySelectorAll('tr');
+      allRows.forEach(tr => {
+        tr.classList.remove('opacity-25');
+        tr.querySelectorAll('td').forEach(td => td.classList.remove('highlighted'));
       });
     });
-
-    // Cleanup tooltips
-    // return {
-    //   destroy() {
-    //     tooltips.forEach(t => t.dispose());
-    //     $albums.off('mouseenter mouseleave').empty();
-    //   }
-    // };
   } catch (error) {
     console.error('Error fetching album breakdown:', error);
   }

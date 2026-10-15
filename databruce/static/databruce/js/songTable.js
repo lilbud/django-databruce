@@ -17,7 +17,7 @@ song_table_columns = [
   },
   {
     'data': 'song',
-    'name': 'song__sort_song_name',
+    'name': 'song__slug, song__name',
     'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
@@ -33,7 +33,7 @@ song_table_columns = [
     'width': '10rem',
     'type': 'date',
     'render': function (data, type, row, meta) {
-      return data ? eventDateFormat(data) : '';
+      return eventDateFormat(data);
     },
   },
   {
@@ -81,64 +81,88 @@ function songTable(url, height, tableID) {
     initComplete: function (settings, json) {
       let api = this.api();
       var info = api.page.info();
-      console.log($('#song-count-badge'))
-      $('#song-count-badge').text(info.recordsTotal);
+      const songCountBadge = document.getElementById('song-count-badge');
+      songCountBadge.textContent = info.recordsTotal;
 
-      const input = $('.song-controls .page-input');
-      const prevBtn = $('.song-controls .btn-prev');
-      const nextBtn = $('.song-controls .btn-next');
-      const totalSpan = $('.song-controls .total-pages');
+      const input = document.querySelectorAll('.song-controls .page-input');
+      const prevBtn = document.querySelectorAll('.song-controls .btn-prev');
+      const nextBtn = document.querySelectorAll('.song-controls .btn-next');
+      const totalSpan = document.querySelectorAll('.song-controls .total-pages');
+      const tableInfo = document.getElementById('songTableInfo');
 
       // Initial button states
-      input.val(info.page + 1);
-      prevBtn.attr('disabled', info.page === 0);
-      nextBtn.attr('disabled', info.page >= info.pages - 1);
+      // input.value = info.page + 1;
+      input.forEach(el => {
+        el.value = info.page + 1;
 
-      $('#songTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+        el.addEventListener('change', function () {
+          let val = parseInt(this.value, 10) - 1;
+          const max = api.page.info().pages - 1;
+
+          if (val < 0) val = 0;
+          if (val > max) val = max;
+
+          this.value = val;
+          api.page(val).draw('page');
+        })
+      });
+
+      prevBtn.forEach(el => {
+        el.disabled = info.page === 0;
+
+        el.addEventListener('click', function () {
+          prevPage(table);
+        });
+      });
+
+      nextBtn.forEach(el => {
+        el.disabled = info.page >= info.pages - 1;
+
+        el.addEventListener('click', function () {
+          nextPage(table);
+        });
+      });
+
+      tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
 
       api.on('draw', () => {
         const pageInfo = api.page.info();
 
-        input.val(pageInfo.page + 1);
-        input.attr('max', pageInfo.pages);
+        input.forEach(el => {
+          el.value = pageInfo.page + 1;
+          el.max = pageInfo.pages;
+        });
 
-        totalSpan.text(`of ${pageInfo.pages || 1}`);
+        totalSpan.forEach(el => {
+          el.textContent = `of ${pageInfo.pages || 1}`;
+        });
 
-        // Handle button states
-        prevBtn.attr('disabled', pageInfo.page === 0);
-        nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+        prevBtn.forEach(el => {
+          el.disabled = pageInfo.page === 0;
+        });
 
-        // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-        $('songTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+        nextBtn.forEach(el => {
+          el.disabled = pageInfo.page >= pageInfo.pages - 1;
+        });
+
+        tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
       });
 
-      totalSpan.text(`of ${info.pages || 1}`);
-
-      nextBtn.on('click', function () {
-        table.page('next').draw(false);
-      });
-
-      prevBtn.on('click', function () {
-        table.page('previous').draw(false);
-      });
-
-      input.on('change', function () {
-        let val = parseInt(this.value, 10) - 1;
-        const max = api.page.info().pages - 1;
-        if (val < 0) val = 0;
-        if (val > max) val = max;
-
-        input.attr('value', val);
-
-        api.page(val).draw('page');
-      });
+      // totalSpan.text(`of ${info.pages || 1}`);
+      totalSpan.forEach(el => {
+        el.textContent = `of ${info.pages || 1}`;
+      })
     }
   });
 
   tableSearch(table, 'songSearch');
 
-  $('#categoryFilter').on('change', function () {
-    var selectedValue = this.value;
-    table.order([[0, 'desc'], [1, 'asc']]).column(5).search(selectedValue ? selectedValue : '', true, false).draw();
-  });
+  const categoryFilter = document.getElementById('categoryFilter');
+
+  if (categoryFilter) {
+    categoryFilter.addEventListener('change', function () {
+      var selectedValue = this.value;
+      table.order([[0, 'desc'], [1, 'asc']]).column(5).search(selectedValue ? selectedValue : '', true, false).draw();
+    });
+  }
 }

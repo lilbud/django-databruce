@@ -1,24 +1,13 @@
-// function tableSearch(table, searchID) {
-//     let searchTimeout;
-
-//     $(`#${searchID}`).on('keyup change clear', function () {
-//         const value = $(this).val();
-//         clearTimeout(searchTimeout);
-
-//         searchTimeout = setTimeout(function () {
-//             // API signature: table.search( input, regex, smart, caseInsen )
-//             table.search(`${value}`, false, false, true).draw();
-//         }, 700);
-//     });
-// }
-
 function tableSearch(table, searchID) {
   let searchTimeout;
   let lastSearchValue = ''; // Cache the last successfully sent search term
 
-  // Added 'blur' to catch clicking off, and 'search' for the native input 'x' clear button
-  $(`#${searchID}`).on('keyup change clear blur search', function (e) {
-    const value = $(this).val();
+  const input = document.getElementById(searchID);
+  if (!input) return;
+
+  // Helper function to handle all search-related events
+  const handleSearchEvent = function (e) {
+    const value = this.value;
 
     // 1. If focus is lost (blur), instantly clear the typing timeout
     if (e.type === 'blur') {
@@ -41,10 +30,16 @@ function tableSearch(table, searchID) {
 
     // 4. Fallback to debounced typing search
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(function () {
+    searchTimeout = setTimeout(() => {
       lastSearchValue = value;
       // API signature: table.search( input, regex, smart, caseInsen )
       table.search(`${value}`, true, false, true).draw();
-    }, 700);
+    }, 400);
+  };
+
+  // Bind multiple event types since native addEventListener takes a single event name at a time
+  const events = ['keyup', 'change', 'clear', 'blur', 'search'];
+  events.forEach(eventType => {
+    input.addEventListener(eventType, handleSearchEvent);
   });
 }

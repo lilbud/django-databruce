@@ -53,12 +53,14 @@
     <script src="{% static 'databruce/js/datatables/datatables.min.js' %}"></script> {% endcomment %}
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'databruce/css/colors.css' %}" />
+    <link rel="stylesheet" href="{% static 'databruce/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/light.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/dark.css' %}" />
     <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
     <!-- Other -->
     {% comment %} <script src="{% static 'databruce/js/datatables.js' %}"></script> {% endcomment %}
+    <script src="{% static 'databruce/js/utils.js' %}"></script>
     <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
     <script src="{% static 'databruce/js/snapdom.js' %}"></script>
     <script src="{% static 'databruce/js/table.js' %}"></script>
@@ -218,13 +220,15 @@
 
         let setlistOptions = {
           createdRow: function(row, data) {
-            row.addClass(slugify(data.set_name));
+            //row.addClass(slugify(data.set_name));
+            row.classList.add(slugify(data.set_name))
 
             var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
             if (allowedSets.includes(data.set_name)) {
               var album = data.song.category_slug;
-              row.attr('data-album', album);
+              //row.attr('data-album', album);
+              row.setAttribute('data-album', album)
             }
 
             return row

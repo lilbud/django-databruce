@@ -1,54 +1,80 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load i18n static %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block extrastyle %}
-    <link rel="stylesheet"
-          href="{% static "magnific-popup/magnific-popup.css" %}">
+  <link type="text/css"
+        rel="stylesheet"
+        href="https://unpkg.com/lightgallery@3.0.0/css/lightgallery-bundle.css">
 {% endblock extrastyle %}
+{% block extrajs %}
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@3.0.0/lightgallery.min.js"></script>
+{% endblock extrajs %}
 {% block content %}
-    {% if user.is_superuser %}
-        {% include "databruce/partials/admin_edit_btn.html" with view="blogpost" item=post.id app="blog" %}
-    {% endif %}
-    <div class="col-12 col-lg-8">
-        <div class="page-title">
-            <a href="{% url 'blog:blog' %}">Blog</a> &gt; {{ post.title }}
-        </div>
-        <div class="text-sm mb-4">
-            Posted by <span class="fw-semibold">{{ post.author }}</span> on {{ post.published_at|date:"F j, Y" }}
-        </div>
-        <div id="toc" class="text-sm">{{ toc|safe }}</div>
-        <br>
-        <div class="text-base">{{ body }}</div>
-        <hr>
-        <div class="prefix-container text-sm mb-1">
-            <span class="prefix">Tags</span>
-            <span class="value text-wrap">
-                {% for tag in post.tags.all %}
-                    <a href="{% url "blog:blog_post_tag" slug=tag.slug %}">
-                        <span class="badge badge-primary text-2xs">{{ tag.slug }}</span>
-                    </a>
-                {% endfor %}
-            </span>
-        </div>
-        <div class="prefix-container text-sm">
-            <span class="prefix">Updated</span>
-            <span class="value">{{ post.updated_at|date:"F j, Y" }}</span>
-        </div>
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_edit_btn.html" with view="blogpost" item=post.id app="blog" %}
+  {% endif %}
+  <div class="col-12 col-lg-8">
+    <div class="page-title">
+      <a href="{% url 'blog:blog' %}">Blog</a> &gt; {{ post.title }}
     </div>
-    <script src="{% static "magnific-popup/jquery.magnific-popup.min.js" %}"></script>
-    <script>
-        var options = {
-            delegate: 'a',
-            type: 'image',
-            closeOnContentClick: true,
-            closeBtnInside: false,
-            gallery: { enabled:true }
-        }
+    <div class="text-sm mb-4">
+      Posted by <span class="fw-semibold">{{ post.author }}</span> on {{ post.published_at|date:"F j, Y" }}
+    </div>
+    <div id="toc" class="text-sm">{{ toc|safe }}</div>
+    <br>
+    <div class="text-base" id="postContent">{{ body }}</div>
+    <hr>
+    <div class="prefix-container text-sm mb-1">
+      <span class="prefix">Tags</span>
+      <span class="value text-wrap">
+        {% for tag in post.tags.all %}
+          <a href="{% url "blog:blog_post_tag" slug=tag.slug %}">
+            <span class="badge badge-primary text-2xs">{{ tag.slug }}</span>
+          </a>
+        {% endfor %}
+      </span>
+    </div>
+    <div class="prefix-container text-sm">
+      <span class="prefix">Updated</span>
+      <span class="value">{{ post.updated_at|date:"F j, Y" }}</span>
+    </div>
+  </div>
+  <script>
+    // 1. Gather all the link elements inside your figures
+    const galleryLinks = document.querySelectorAll('figure a');
 
-        $('figure').each(function() {
-            $(this).magnificPopup(options);
-        })
-    </script>
+    // 2. Map over them to cleanly pair each image with its respective figcaption text
+    const galleryItems = Array.from(galleryLinks).map(link => {
+      const figure = link.closest('figure');
+      const caption = figure ? figure.querySelector('figcaption') : null;
+
+      return {
+        src: link.getAttribute('href'),
+        thumb: link.querySelector('img').getAttribute('src'),
+        subHtml: caption ? `<div class="lg-sub-html"><h4 class="text-reset">${caption.innerHTML}</h4></div>` : ''
+      };
+    });
+
+    // 3. Initialize lightGallery using the structured dynamic items array
+    if (galleryLinks.length > 0) {
+      // Bind click event listeners to the links to launch the dynamic gallery
+      galleryLinks.forEach((link, index) => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault(); // Stop the default page redirect
+
+          const lg = lightGallery(link, {
+            dynamic: true,
+            dynamicEl: galleryItems,
+            index: index, // Opens the gallery on the exact image clicked
+            download: false,
+            counter: true
+          });
+
+          lg.openGallery(index);
+        });
+      });
+    }
+  </script>
 {% endblock content %}

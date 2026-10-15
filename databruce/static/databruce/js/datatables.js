@@ -7,23 +7,12 @@ DataTable.Buttons.defaults.dom.button.className = 'btn';
 DataTable.defaults.column.defaultContent = '';
 DataTable.defaults.column.orderSequence = ['asc', 'desc'];
 
-set_names = [
-  "Show",
-  "Set 1",
-  "Set 2",
-  "Encore",
-  "Pre-Show",
-  "Post-Show",
-];
-
 function nextPage(table) {
   table.page('next').draw(false);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 function prevPage(table) {
   table.page('previous').draw(false);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 DataTable.feature.register('customOrder', function (settings, opts) {
@@ -31,22 +20,28 @@ DataTable.feature.register('customOrder', function (settings, opts) {
   let targetSelector = opts.selectId;
   if (!targetSelector) return null;
 
-  let select = $(targetSelector);
+  let select = document.querySelector(targetSelector);
   if (select.length === 0) return null;
 
   // Create a native DataTable API instance for this specific table context
   let api = new DataTable.Api(settings);
 
   // Clear loading/placeholder items
-  select.empty();
+  // select.empty();
+  select.innerHTML = '';
 
   // 2. Loop through columns and read DataTables 2.0 standard native type() method
   api.columns().every(function (index) {
     let column = this;
 
     if (column.orderable()) {
-      let headerText = $(column.header()).text().trim();
+      let headerText = column.header().textContent;
       let type = column.type(); // Modern native DT 2.0 type check
+      const optionAsc = document.createElement('option');
+      const optionDesc = document.createElement('option');
+
+      optionAsc.value = `${index}-asc`;
+      optionDesc.value = `${index}-desc`;
 
       // Standard text fallbacks
       let ascLabel = '(A-Z)';
@@ -61,14 +56,19 @@ DataTable.feature.register('customOrder', function (settings, opts) {
         descLabel = '(desc.)';
       }
 
-      select.append(`<option value="${index}-asc">${headerText} ${ascLabel}</option>`);
-      select.append(`<option value="${index}-desc">${headerText} ${descLabel}</option>`);
+      optionDesc.textContent = `${headerText} ${descLabel}`;
+      optionAsc.textContent = `${headerText} ${ascLabel}`;
+
+      select.appendChild(optionAsc);
+      select.appendChild(optionDesc);
     }
   });
 
   // 3. Dropdown-to-Table Sync (Cleanly namespaced event)
-  select.on('change.dtCustomOrder', function () {
-    let val = $(this).val();
+
+  select.addEventListener('change', function (e) {
+    let val = e.target.value;
+
     if (val) {
       let parts = val.split('-');
       let columnIndex = parseInt(parts[0], 10);
@@ -86,7 +86,8 @@ DataTable.feature.register('customOrder', function (settings, opts) {
       let currentDirection = currentOrder[0][1];
       let targetValue = `${currentColumnIndex}-${currentDirection}`;
 
-      select.val(targetValue);
+      // select.val(targetValue);
+      select.value = targetValue;
     }
   });
 
@@ -131,42 +132,7 @@ Object.assign(DataTable.defaults, {
   },
 });
 
-function slugify(str) {
-  if (!str) return '';
-  return String(str)
-    .toLowerCase() // Convert to lowercase
-    .trim() // Trim leading/trailing whitespace
-    .replace(/[^a-z0-9]+/g, '-') // Replace all spaces, underscores, and multiple hyphens with a single hyphen
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-}
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
-function renderLink(url, data, text) {
-  return `<a href="${url}${data}">${text}</a>`
-}
 
-function eventDateFormat(event) {
-  if (!event) return '';
-
-  const date = new Date(event.date || event);
-  const dayText = date.toLocaleDateString('en-US', { weekday: 'long' });
-  var dateItem;
-
-  if (event.early_late) {
-    dateItem = `<span class="text-primary">${event.date}</span><br><small>${event.early_late} • ${dayText}</small>`
-  } else {
-    dateItem = `${event.date || event}<br><small>${dayText}</small>`
-  }
-
-  return event.event_id ? `<a href="/events/${event.event_id}">${dateItem}</a>` : event;
-};
 

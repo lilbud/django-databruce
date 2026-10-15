@@ -282,6 +282,7 @@ class AdvancedEventSearch(forms.Form):
         "class": "form-select form-select-sm select2-multi",
         "id": "type",
         "placeholder": "Choose multiple",
+        "data-endpoint": "types/",
       },
     ),
   )
@@ -295,6 +296,7 @@ class AdvancedEventSearch(forms.Form):
         "class": "form-select form-select-sm select2-multi",
         "id": "tag",
         "placeholder": "Choose multiple",
+        "data-endpoint": "tags/",
       },
     ),
   )
@@ -307,6 +309,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "venue",
+        "data-endpoint": "venues/",
       },
     ),
   )
@@ -319,6 +322,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "city",
+        "data-endpoint": "cities/",
       },
     ),
   )
@@ -331,6 +335,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "state",
+        "data-endpoint": "states/",
       },
     ),
   )
@@ -343,6 +348,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "country",
+        "data-endpoint": "countries/",
       },
     ),
   )
@@ -355,6 +361,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "continent",
+        "data-endpoint": "continents/",
       },
     ),
   )
@@ -367,6 +374,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "tour",
+        "data-endpoint": "tours/",
       },
     ),
   )
@@ -379,6 +387,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "tour-leg",
+        "data-endpoint": "tour_legs/",
       },
     ),
   )
@@ -391,6 +400,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "relation",
+        "data-endpoint": "relations/",
       },
     ),
   )
@@ -403,6 +413,7 @@ class AdvancedEventSearch(forms.Form):
       attrs={
         "class": "form-select form-select-sm select2",
         "id": "band",
+        "data-endpoint": "bands/",
       },
     ),
   )
@@ -588,7 +599,10 @@ class SetlistSearch(forms.Form):
     label="Song:",
     required=False,
     widget=forms.Select(
-      attrs={"class": "form-select form-select-sm song1 select2"},
+      attrs={
+        "class": "form-select form-select-sm song1 select2",
+        # "data-endpoint": "songs/",
+      },
     ),
   )
 
@@ -640,6 +654,7 @@ class SetlistSearch(forms.Form):
     widget=forms.Select(
       attrs={
         "class": "form-select form-select-sm song2 select2",
+        # "data-endpoint": "songs/",
       },
     ),
   )
