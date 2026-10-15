@@ -1064,6 +1064,7 @@ class SetlistSongsSerializer(BaseSerializer):
           "name": s["name"],
           "slug": s["slug"],
           "category": s["category__name"],
+          "original": s["original"],
         }
         for s in models.Song.objects.filter(id__in=song_ids)
         .select_related("category")
@@ -1072,6 +1073,7 @@ class SetlistSongsSerializer(BaseSerializer):
           "name",
           "slug",
           "category__name",
+          "original",
         )
       }
 

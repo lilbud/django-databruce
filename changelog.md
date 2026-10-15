@@ -611,3 +611,16 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Updated color of dark theme muted text
 - moved Venue links to info card
+
+# v1.32 (October 15, 2026)
+
+**Site made public on Facebook and BTX**
+
+# Fixed
+
+- Fixed issue where profile song stats were incorrect
+
+# Changed
+
+- Updated user profile "Songs" tab to have consistent song table controls
+- Changed style of Song Table "collapse" control from secondary to neutral

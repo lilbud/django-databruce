@@ -10,9 +10,7 @@ song_table_columns = [
     'type': 'num',
     'className': 'all text-center',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return data
-      }
+      return data ? data : ''
     },
   },
   {
@@ -21,12 +19,10 @@ song_table_columns = [
     'width': '15rem',
     'className': 'all',
     'render': function (data, type, row, meta) {
-      if (type === 'display' && data) {
-        return `<a href="/songs/${data.slug}">${data.name}</a>`
-      }
+      return data ? `<a href="/songs/${data.slug}">${data.name}</a>` : '';
     },
   },
-  { 'data': 'song.category', 'name': 'song__category', 'width': '15rem', 'className': '' },
+  { 'data': 'song.category', 'name': 'song__category__name', 'width': '15rem', 'className': '' },
   {
     'data': 'first_event',
     'name': 'first_event',
@@ -81,8 +77,12 @@ function songTable(url, height, tableID) {
     initComplete: function (settings, json) {
       let api = this.api();
       var info = api.page.info();
+
       const songCountBadge = document.getElementById('song-count-badge');
-      songCountBadge.textContent = info.recordsTotal;
+
+      if (songCountBadge) {
+        songCountBadge.textContent = info.recordsTotal;
+      }
 
       const input = document.querySelectorAll('.song-controls .page-input');
       const prevBtn = document.querySelectorAll('.song-controls .btn-prev');

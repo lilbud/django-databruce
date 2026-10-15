@@ -165,7 +165,18 @@
         </div>
         <div id="events" class="tab-pane fade">{% include "databruce/partials/event_table.html" %}</div>
         <div id="songs" class="tab-pane fade">
-          <div class="d-grid gap-3">
+          {% include "databruce/partials/song_table.html" %}
+          {% comment %} <div class="d-grid gap-3">
+            <div class="row my-2">
+              <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap song-controls"
+                   id="songTableControls">
+                {% include "databruce/partials/table_pagination.html" %}
+                <div class="dt-info order-3"
+                     aria-live="polite"
+                     role="status"
+                     id="songTableInfo"></div>
+              </div>
+            </div>
             <div class="row">
               <div class="col">
                 <div class="card">
@@ -200,7 +211,7 @@
                      id="songTableInfo"></div>
               </div>
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
         <div id="albums" class="tab-pane fade">
           <div class="col-12">
@@ -291,13 +302,13 @@
           col.attr('id', `album-${index}`);
 
           const html = `
-      <div class="row justify-content-between align-items-center">
-          <div class="col fw-semibold text-reset text-nowrap">${item.name}</div>
-          <div class="col-auto">
-            <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.name)}">
-          </div>
-        </div>
-      `;
+          <div class="row justify-content-between align-items-center">
+              <div class="col fw-semibold text-reset text-nowrap">${item.name}</div>
+              <div class="col-auto">
+                <img class="album-art" src="${albumArtUrl}" height="24" alt="${escapeHtml(item.name)}">
+              </div>
+            </div>
+          `;
 
           col.find('.card-header').append(html);
 
@@ -347,126 +358,14 @@
       });
 
       tables.columns.adjust();
-      //$('#albumCardContainer').masonry('layout');
+      $('#albumCardContainer').masonry('layout');
     });
 
     /* datatables */
     eventTable('/api/v1/events/?user={{ info.id }}&format=custom');
 
     /* USER SEEN */
-
-
-    var songTable = new DataTable('#songTable', {
-      ajax: {
-        'url': '/api/v1/setlist_songs/?user={{ info.id }}&format=custom&ordering=-count',
-      },
-      order: [
-        [0, 'desc']
-      ],
-      responsive: {
-        details: false,
-      },
-      columns: [{
-        'data': 'count',
-        'name': 'count',
-        'width': '1rem',
-        'type': 'num',
-        'className': 'all text-center',
-        'render': function(data, type, row, meta) {
-          return data ? data : ''
-        },
-      }, {
-        'data': 'song',
-        'name': 'song__slug',
-        'width': '15rem',
-        'className': 'all',
-        'render': function(data, type, row, meta) {
-          return data ? `<a href="/songs/${data.slug}">${data.name}</a>` : '';
-        },
-      }, {
-        'data': 'song.category',
-        'name': 'song__category__name',
-        'width': '15rem',
-        'className': ''
-      }, {
-        'data': 'first_event',
-        'name': 'first_event',
-        'width': '10rem',
-        'type': 'date',
-        'render': function(data, type, row, meta) {
-          return eventDateFormat(data);
-          '';
-        },
-      }, {
-        'data': 'last_event',
-        'name': 'last_event',
-        'width': '10rem',
-        'type': 'date',
-        'render': function(data, type, row, meta) {
-          return eventDateFormat(data);
-        },
-      }, {
-        'data': 'song__original',
-        'name': 'song__original',
-        'visible': false,
-        'orderable': false
-      }, ],
-      initComplete: function(settings, json) {
-        let api = this.api();
-        var info = api.page.info();
-
-        const input = $('#userSeenTableControls .page-input');
-        const prevBtn = $('#userSeenTableControls .btn-prev');
-        const nextBtn = $('#userSeenTableControls .btn-next');
-        const totalSpan = $('#userSeenTableControls .total-pages');
-
-        // Initial button states
-        input.val(info.page + 1);
-        prevBtn.attr('disabled', info.page === 0);
-        nextBtn.attr('disabled', info.page >= info.pages - 1);
-
-        $('#songTableInfo').text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
-
-        api.on('draw', () => {
-          const pageInfo = api.page.info();
-
-          input.val(pageInfo.page + 1);
-          input.attr('max', pageInfo.pages);
-
-          totalSpan.text(`of ${pageInfo.pages || 1}`);
-
-          // Handle button states
-          prevBtn.attr('disabled', pageInfo.page === 0);
-          nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
-
-          // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-          $('songTableInfo').text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
-        });
-
-        totalSpan.text(`of ${info.pages || 1}`);
-
-        nextBtn.on('click', function() {
-          console.log('next page')
-          songTable.page('next').draw(false);
-        });
-
-        prevBtn.on('click', function() {
-          songTable.page('previous').draw(false);
-        });
-
-        input.on('change', function() {
-          let val = parseInt(this.value, 10) - 1;
-          const max = api.page.info().pages - 1;
-          if (val < 0) val = 0;
-          if (val > max) val = max;
-
-          input.attr('value', val);
-
-          api.page(val).draw('page');
-        });
-      }
-    });
-
+    songTable('/api/v1/setlist_songs/?user={{ info.id }}&format=custom');
 
     function copyListtoClipboard(btn) {
       // 1. Find the parent card using native closest()

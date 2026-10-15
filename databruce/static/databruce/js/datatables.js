@@ -21,82 +21,85 @@ DataTable.feature.register('customOrder', function (settings, opts) {
   if (!targetSelector) return null;
 
   let select = document.querySelector(targetSelector);
-  if (select.length === 0) return null;
+  if (select && select.length === 0) return null;
 
   // Create a native DataTable API instance for this specific table context
   let api = new DataTable.Api(settings);
 
   // Clear loading/placeholder items
   // select.empty();
-  select.innerHTML = '';
+  if (select) {
+    select.innerHTML = '';
 
-  // 2. Loop through columns and read DataTables 2.0 standard native type() method
-  api.columns().every(function (index) {
-    let column = this;
 
-    if (column.orderable()) {
-      let headerText = column.header().textContent;
-      let type = column.type(); // Modern native DT 2.0 type check
-      const optionAsc = document.createElement('option');
-      const optionDesc = document.createElement('option');
+    // 2. Loop through columns and read DataTables 2.0 standard native type() method
+    api.columns().every(function (index) {
+      let column = this;
 
-      optionAsc.value = `${index}-asc`;
-      optionDesc.value = `${index}-desc`;
+      if (column.orderable()) {
+        let headerText = column.header().textContent;
+        let type = column.type(); // Modern native DT 2.0 type check
+        const optionAsc = document.createElement('option');
+        const optionDesc = document.createElement('option');
 
-      // Standard text fallbacks
-      let ascLabel = '(A-Z)';
-      let descLabel = '(Z-A)';
+        optionAsc.value = `${index}-asc`;
+        optionDesc.value = `${index}-desc`;
 
-      // Dynamically alter text strings depending on evaluated column contents
-      if (type && type.includes('num')) {
-        ascLabel = '(Least)';
-        descLabel = '(Most)';
-      } else if (type && type.includes('date')) {
-        ascLabel = '(asc.)';
-        descLabel = '(desc.)';
+        // Standard text fallbacks
+        let ascLabel = '(A-Z)';
+        let descLabel = '(Z-A)';
+
+        // Dynamically alter text strings depending on evaluated column contents
+        if (type && type.includes('num')) {
+          ascLabel = '(Least)';
+          descLabel = '(Most)';
+        } else if (type && type.includes('date')) {
+          ascLabel = '(asc.)';
+          descLabel = '(desc.)';
+        }
+
+        optionDesc.textContent = `${headerText} ${descLabel}`;
+        optionAsc.textContent = `${headerText} ${ascLabel}`;
+
+        select.appendChild(optionAsc);
+        select.appendChild(optionDesc);
       }
+    });
 
-      optionDesc.textContent = `${headerText} ${descLabel}`;
-      optionAsc.textContent = `${headerText} ${ascLabel}`;
+    // 3. Dropdown-to-Table Sync (Cleanly namespaced event)
 
-      select.appendChild(optionAsc);
-      select.appendChild(optionDesc);
-    }
-  });
+    select.addEventListener('change', function (e) {
+      let val = e.target.value;
 
-  // 3. Dropdown-to-Table Sync (Cleanly namespaced event)
+      if (val) {
+        let parts = val.split('-');
+        let columnIndex = parseInt(parts[0], 10);
+        let direction = parts[1];
 
-  select.addEventListener('change', function (e) {
-    let val = e.target.value;
+        api.order([columnIndex, direction]).draw();
+      }
+    });
 
-    if (val) {
-      let parts = val.split('-');
-      let columnIndex = parseInt(parts[0], 10);
-      let direction = parts[1];
+    // 4. Table-to-Dropdown Sync (Fires when header tags are clicked directly)
+    api.on('order.dt.dtCustomOrder', function () {
+      let currentOrder = api.order();
+      if (currentOrder.length > 0) {
+        let currentColumnIndex = currentOrder[0][0];
+        let currentDirection = currentOrder[0][1];
+        let targetValue = `${currentColumnIndex}-${currentDirection}`;
 
-      api.order([columnIndex, direction]).draw();
-    }
-  });
+        // select.val(targetValue);
+        select.value = targetValue;
+      }
+    });
 
-  // 4. Table-to-Dropdown Sync (Fires when header tags are clicked directly)
-  api.on('order.dt.dtCustomOrder', function () {
-    let currentOrder = api.order();
-    if (currentOrder.length > 0) {
-      let currentColumnIndex = currentOrder[0][0];
-      let currentDirection = currentOrder[0][1];
-      let targetValue = `${currentColumnIndex}-${currentDirection}`;
+    // Initialize immediate sync for default initial sorting state on boot
+    api.trigger('order.dt');
 
-      // select.val(targetValue);
-      select.value = targetValue;
-    }
-  });
-
-  // Initialize immediate sync for default initial sorting state on boot
-  api.trigger('order.dt');
-
-  // DataTables 2.0 features return a DOM node if injecting objects into the layout.
-  // Because our dropdown resides externally outside the table, we return null safely.
-  return null;
+    // DataTables 2.0 features return a DOM node if injecting objects into the layout.
+    // Because our dropdown resides externally outside the table, we return null safely.
+    return null;
+  }
 });
 
 // needed to fix pages with multiple tables behind tabs
