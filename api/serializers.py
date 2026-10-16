@@ -1259,7 +1259,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
   def get_album_in_order(self, obj):
     """Check if album songs present in the setlist appear in exact relative album sequence."""
     # Non-album categories can't be in order
-    if obj.get("category") in (8, 19):
+    if obj.get("category") in (8, 9, 19, 20):
       return False
 
     album_songs = obj.get("album_songs") or []
