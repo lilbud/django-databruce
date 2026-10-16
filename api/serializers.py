@@ -1228,7 +1228,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
   def get_album_complete(self, obj):
     """Check if every song ID in album_songs is present in setlist_songs."""
     # Skip non-album categories
-    if obj.get("category") in [8, 19]:
+    if obj.get("category") in (8, 9, 19, 20):
       return False
 
     raw_album_songs = obj.get("album_songs") or []
