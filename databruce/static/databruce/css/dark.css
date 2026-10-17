@@ -162,7 +162,8 @@
   }
 
   .btn-neutral-subtle,
-  .badge-neutral-subtle {
+  .badge-neutral-subtle,
+  .nav-btn:not(.active) {
     color: var(--color-gray-200) !important;
     background-color: var(--color-gray-600) !important;
   }
@@ -178,6 +179,20 @@
   .badge-purple-subtle {
     background-color: var(--color-purple-900) !important;
     color: var(--color-purple-100) !important;
+  }
+
+  .nav-pills-list .btn:not(.active) {
+    background-color: var(--color-gray-800) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  .nav-pills-list .btn.active {
+    background-color: var(--color-gray-600) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  .nav-pills-list .btn:hover {
+    background-color: var(--color-gray-600) !important;
   }
 
   #addshow[data-attended="true"]:hover {
@@ -566,18 +581,12 @@
     background-color: var(--color-gray-700) !important;
   }
 
-  .nav-pills-list .btn.active {
-    background-color: var(--color-gray-600) !important;
-    color: var(--color-gray-100) !important;
-  }
+
 
   .offcanvas-body .btn:hover {
     background-color: var(--color-gray-600) !important;
   }
 
-  .nav-pills-list .btn:hover {
-    background-color: var(--color-gray-600) !important;
-  }
 
   .offcanvas-body,
   .offcanvas-body i {

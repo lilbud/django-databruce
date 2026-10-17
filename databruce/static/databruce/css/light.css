@@ -33,9 +33,7 @@
     background-image: linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)) !important;
   }
 
-  .nav-pills-list .btn:hover {
-    background-color: var(--color-gray-300) !important;
-  }
+
 
   button.active>.badge {
     background-color: var(--color-white) !important;
@@ -161,9 +159,10 @@
   }
 
   .btn-neutral-subtle,
-  .badge-neutral-subtle {
+  .badge-neutral-subtle,
+  .nav-btn:not(.active) {
     color: var(--color-gray-600) !important;
-    background-color: var(--color-gray-100) !important;
+    background-color: var(--color-gray-200) !important;
   }
 
   /* purple */
@@ -579,15 +578,17 @@
     background-color: var(--color-gray-200) !important;
   }
 
+  .nav-pills-list .btn:not(.active) {
+    background-color: var(--color-gray-50) !important;
+    color: var(--color-black) !important;
+  }
+
   .nav-pills-list .btn.active {
-    background-color: var(--color-gray-200) !important;
+    background-color: var(--color-gray-300) !important;
+    color: var(--color-black) !important;
   }
 
   .offcanvas-body .btn:hover {
-    background-color: var(--color-gray-300) !important;
-  }
-
-  .nav-pills-list .btn:hover {
     background-color: var(--color-gray-300) !important;
   }
 
