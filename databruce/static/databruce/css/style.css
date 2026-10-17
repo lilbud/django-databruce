@@ -96,12 +96,12 @@ h6 {
   scroll-margin-top: 60px;
 }
 
-h2,
+/* h2,
 h3 {
   padding: .5em 0;
   border-width: 0 0 1px 0;
   border-style: solid;
-}
+} */
 
 .fc-toolbar-title {
   border: none !important;
@@ -577,9 +577,6 @@ td .badge {
 .badge-row .badge {
   /* Scales fluidly from 0.7rem to 0.75rem between 375px and 1200px viewports */
   font-size: clamp(var(--text-2xs), 0.677rem + 0.097vw, var(--text-xs)) !important;
-
-  /* Keeps the badge pill padding proportional to the tiny text size */
-  /* padding: 0.25em 0.5em; */
 }
 
 .segue::before {
@@ -763,14 +760,6 @@ button:disabled {
   font-weight: 500 !important;
 }
 
-/* .nav-link.active {
-  background-color: transparent !important;
-  border-radius: 0 !important;
-  border-bottom-style: solid !important;
-  border-bottom-width: 3px !important;
-  font-weight: 700 !important;
-} */
-
 .card-header:has(.nav-pills) {
   padding: 0rem 0.25rem !important;
 }
@@ -830,6 +819,10 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   color: white !important;
 }
 
+.navbar .btn-neutral i {
+  color: var(--color-gray-600) !important;
+}
+
 .navbar .nav-item,
 .navbar .nav-item .btn,
 .navbar button.dropdown-toggle {
@@ -843,9 +836,30 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   color: var(--color-blue-950) !important;
 }
 
-#bd-theme-mobile-end,
-#bd-theme-mobile-end i {
-  color: var(--color-blue-950) !important;
+.icon-button,
+.icon-button i {
+  transition: color 0.2s ease-in-out;
+}
+
+.offcanvas-body .btn i,
+#userAccountDropdownMenu i {
+  font-size: var(--text-xl) !important;
+  padding: 0.5rem !important;
+}
+
+#userAccountDropdownMenu {
+  width: 300px !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+.offcanvas-body .btn {
+  font-size: var(--text-sm) !important;
+}
+
+.offcanvas-body .btn:hover,
+.offcanvas-body .btn:hover i {
+  color: var(--color-gray-100) !important;
 }
 
 .icon-button {
@@ -1185,6 +1199,10 @@ pre {
   border-width: 1px;
 }
 
+.input-group input {
+  border-radius: var(--bs-border-radius-sm) !important;
+}
+
 .form-select-sm {
   padding: .25rem;
   font-size: .875rem;
@@ -1208,12 +1226,17 @@ pre {
   margin-left: 1.125rem;
   text-decoration: none;
   display: inline-block;
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   border-radius: var(--bs-border-radius);
 }
 
+.bd-links-span-all a {
+  line-height: 2rem !important;
+  font-size: var(--text-sm) !important;
+}
+
 .bd-links-heading {
-  gap: calc(0.25rem * 1.5) !important;
+  gap: 0.5rem !important;
   align-items: center !important;
 }
 
@@ -1225,11 +1248,6 @@ pre {
   border-radius: var(--bs-border-radius-sm) !important;
 }
 
-.bd-links-nav {
-  column-count: 2;
-  column-gap: 1.5rem;
-}
-
 .bd-links-nav li {
   break-inside: avoid;
 }
@@ -1238,9 +1256,9 @@ pre {
   column-span: all;
 }
 
-/* offcanvas */
-.offcanvas.offcanvas-end {
-  width: 250px;
+.offcanvas-header .btn-close {
+  margin-right: 0 !important;
+  font-size: var(--text-lg) !important;
 }
 
 .border-top {

@@ -156,8 +156,7 @@
 
   /* neutral */
   .btn-neutral,
-  .badge-neutral,
-  .nav-btn {
+  .badge-neutral {
     background-color: var(--color-gray-400) !important;
     color: var(--color-black) !important;
   }
@@ -542,6 +541,47 @@
   .bd-links-link:hover {
     background-color: var(--color-blue-500) !important;
     color: var(--color-white) !important;
+  }
+
+  .bd-links-span-all .btn i {
+    color: var(--color-blue-50) !important;
+  }
+
+  .bd-links-span-all .btn {
+    color: var(--color-gray-100) !important;
+  }
+
+  .offcanvas-body .btn,
+  .offcanvas-body .btn.active,
+  .offcanvas-body .btn:hover,
+  .offcanvas-body .btn:hover i,
+  #userAccountDropdownMenu .btn,
+  #userAccountDropdownMenu .btn.active,
+  #userAccountDropdownMenu .btn:hover,
+  #userAccountDropdownMenu .btn:hover i {
+    color: var(--color-gray-100) !important;
+  }
+
+  .offcanvas-body .btn.active {
+    background-color: var(--color-gray-700) !important;
+  }
+
+  .nav-pills-list .btn.active {
+    background-color: var(--color-gray-600) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  .offcanvas-body .btn:hover {
+    background-color: var(--color-gray-600) !important;
+  }
+
+  .nav-pills-list .btn:hover {
+    background-color: var(--color-gray-600) !important;
+  }
+
+  .offcanvas-body,
+  .offcanvas-body i {
+    color: var(--color-gray-50) !important;
   }
 
   .list-unstyled .dropdown-item:hover {

@@ -105,31 +105,28 @@ def get_navbar_links() -> list[dict[str, Any]]:
           "match_keyword": "blog",
         },
         {
-          "name": "About Site",
-          "url": "blog:blog_post",
-          "kwargs": {"slug": "about-databruce"},
+          "name": "How to Support Databruce",
+          "url": "support",
         },
-        {"name": "Links", "url": "blog:blog_post", "kwargs": {"slug": "links"}},
+        {
+          "name": "About Site",
+          "url": "about",
+        },
+        {"name": "Links", "url": "links"},
         {"name": "Updates", "url": "updates"},
         {
           "name": "Roadmap",
-          "url": "blog:blog_post",
-          "kwargs": {"slug": "roadmap"},
+          "url": "roadmap",
         },
         {"name": "Contact Us", "url": "contact"},
       ],
     },
     {
       "name": "Other",
-      "match_keyword": ["bruceyversion", "donate"],
+      "match_keyword": ["bruceyversion", "support"],
       "icon": "bi-book-half",
       "children": [
         {"name": "Bruceyversion", "url": "bruceyversion:entries"},
-        {
-          "name": "Donate",
-          "url": "blog:blog_post",
-          "kwargs": {"slug": "donate"},
-        },
       ],
     },
   ]

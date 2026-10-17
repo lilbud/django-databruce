@@ -847,7 +847,6 @@ class UpdateUserForm(forms.ModelForm):
     label="Email:",
     max_length=254,
     required=True,
-    disabled=True,
     widget=forms.EmailInput(
       attrs={
         "autocomplete": "email",
@@ -860,7 +859,7 @@ class UpdateUserForm(forms.ModelForm):
 
   username = forms.CharField(
     label="Username:",
-    required=True,
+    disabled=True,
     widget=forms.TextInput(
       attrs={
         "id": "username",
@@ -884,7 +883,29 @@ class UpdateUserForm(forms.ModelForm):
 
   class Meta:
     model = User
-    fields = ["email", "username", "discord_name"]
+    fields = ["email", "username"]
+
+
+class UpdateDiscordForm(forms.ModelForm):
+  def __init__(self, *args, **kwargs) -> None:
+    super().__init__(*args, **kwargs)
+
+  discord_name = forms.CharField(
+    label="Discord Username:",
+    required=False,
+    widget=forms.TextInput(
+      attrs={
+        "id": "discord_name",
+        "type": "text",
+        "class": "form-control form-control-sm",
+        "name": "discord_name",
+      },
+    ),
+  )
+
+  class Meta:
+    model = User
+    fields = ["discord_name"]
 
 
 class ContactForm(forms.Form):

@@ -53,6 +53,7 @@ from .forms import (
   CustomPasswordChangeForm,
   LoginForm,
   SetlistSearch,
+  UpdateDiscordForm,
   UpdateUserForm,
   UserForm,
   UserReviewForm,
@@ -200,6 +201,12 @@ class SongView(PageTitleMixin, TemplateView):
 class AboutView(PageTitleMixin, TemplateView):
   template_name = "databruce/about.html"
   title = "About"
+
+
+class SupportView(PageTitleMixin, TemplateView):
+  template_name = "databruce/support.html"
+  title = "Support"
+  description = "Ways to Support Databruce"
 
 
 class RoadmapView(PageTitleMixin, TemplateView):
@@ -484,28 +491,20 @@ class UserChangePasswordView(View):
     )
 
 
-class UserSettingsView(LoginRequiredMixin, PageTitleMixin, TemplateView):
-  template_name = "users/settings.html"
-  form_class = UpdateUserForm
-  password_form_class = CustomPasswordChangeForm
-
-  title = "User Settings"
-
-  def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
-    context = super().get_context_data(**kwargs)
-    context["form"] = self.form_class(instance=self.request.user)
-    context["password_form"] = self.password_form_class(self.request.user)
-
-    return context
+class UserChangeDiscordView(View):
+  form_class = UpdateDiscordForm
+  title = "Change Discord Name"
 
   def post(self, request: HttpRequest):
-    user_form = self.form_class(request.POST, instance=request.user)
+    form = self.form_class(instance=request.user, data=request.POST)
 
-    if user_form.is_valid():
-      user_form.save()
-      messages.success(request, "Your profile is updated successfully")
+    if form.is_valid():
+      form.save()
+
+      messages.success(request, "Your Discord name is updated successfully")
 
       storage = messages.get_messages(request)
+
       msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
 
       return JsonResponse(
@@ -515,7 +514,56 @@ class UserSettingsView(LoginRequiredMixin, PageTitleMixin, TemplateView):
         },
       )
 
-    return JsonResponse({"success": False, "errors": user_form.errors}, status=400)
+    err_msg = []
+
+    for msg in form.errors.values():
+      err_msg.append(str(msg[0]))
+
+    msg_list = []
+
+    return JsonResponse(
+      {
+        "success": False,
+        "messages": {"message": "\n".join(err_msg), "tags": "error"},
+      },
+      status=400,
+    )
+
+
+class UserSettingsView(LoginRequiredMixin, PageTitleMixin, TemplateView):
+  template_name = "users/settings.html"
+  form_class = UpdateUserForm
+  password_form_class = CustomPasswordChangeForm
+  discord_form = UpdateDiscordForm
+
+  title = "User Settings"
+
+  def get_context_data(self, **kwargs: dict) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["form"] = self.form_class(instance=self.request.user)
+    context["password_form"] = self.password_form_class(self.request.user)
+    context["discord_form"] = self.discord_form(instance=self.request.user)
+
+    return context
+
+  # def post(self, request: HttpRequest):
+  #   user_form = self.form_class(request.POST, instance=request.user)
+
+  #   if user_form.is_valid():
+  #     user_form.save()
+  #     messages.success(request, "Your profile is updated successfully")
+
+  #     storage = messages.get_messages(request)
+  #     msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
+
+  #     return JsonResponse(
+  #       {
+  #         "success": True,
+  #         "messages": msg_list,
+  #       },
+  #     )
+
+  #   return JsonResponse({"success": False, "errors": user_form.errors}, status=400)
 
 
 class SignUpDoneView(PageTitleMixin, TemplateView):

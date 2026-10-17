@@ -1,9 +1,10 @@
 /*!
- * Modified Bootstrap Theme Toggler
+ * Bootstrap Theme Toggler - Light / Dark / Auto Button Group
  */
 
 (() => {
   'use strict'
+
   const getStoredTheme = () => localStorage.getItem('theme')
   const setStoredTheme = theme => localStorage.setItem('theme', theme)
 
@@ -12,44 +13,58 @@
     if (storedTheme) {
       return storedTheme
     }
-
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
   const setTheme = theme => {
-    document.documentElement.setAttribute('data-bs-theme', theme)
+    if (theme === 'auto') {
+      document.documentElement.setAttribute(
+        'data-bs-theme',
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      )
+    } else {
+      document.documentElement.setAttribute('data-bs-theme', theme)
+    }
   }
 
-  const updateIcon = (theme) => {
-    const isDark = theme === 'dark';
-
-    // Toggle 'd-none' based on whether the theme matches the icon
-    document.querySelector('.theme-icon.bi-moon-stars-fill').classList.toggle('d-none', !isDark);
-    document.querySelector('.theme-icon.bi-sun-fill').classList.toggle('d-none', isDark);
-  }
-
+  // Apply preferred theme immediately on load
   setTheme(getPreferredTheme())
 
+  const showActiveTheme = (theme) => {
+    const btnAll = document.querySelectorAll('[data-bs-theme-value]')
+
+    btnAll.forEach(element => {
+      element.classList.remove('active', 'btn-neutral')
+      element.setAttribute('aria-pressed', 'false')
+    })
+
+    const btnActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+    if (btnActive) {
+      btnActive.classList.add('active', 'btn-neutral')
+      btnActive.setAttribute('aria-pressed', 'true')
+    }
+  }
+
+  // Listen for OS theme changes when in 'auto' mode
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     const storedTheme = getStoredTheme()
-
-    if (storedTheme !== 'light' && storedTheme !== 'dark') {
+    if (storedTheme === 'auto' || !storedTheme) {
       setTheme(getPreferredTheme())
     }
   })
 
   window.addEventListener('DOMContentLoaded', () => {
-    var currentTheme = document.documentElement.getAttribute('data-bs-theme');
-    const themeBtn = document.querySelector('.bd-theme-btn');
+    // Default to 'auto' if no preference is stored
+    const currentTheme = getStoredTheme() || 'auto'
+    showActiveTheme(currentTheme)
 
-    updateIcon(currentTheme);
-
-    themeBtn.addEventListener('click', () => {
-      currentTheme = document.documentElement.getAttribute('data-bs-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      setTheme(newTheme);
-      setStoredTheme(newTheme);
-      updateIcon(newTheme);
+    document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const theme = toggle.getAttribute('data-bs-theme-value')
+        setStoredTheme(theme)
+        setTheme(theme)
+        showActiveTheme(theme)
+      })
     })
   })
 })()

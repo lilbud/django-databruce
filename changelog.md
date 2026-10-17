@@ -598,16 +598,16 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.31 (October 13, 2026)
 
-# Fixed
+## Fixed
 
 - Fixed notes search page layout, move controls to collapse
 - Fixed album breakdown marking non albums as complete (originals/covers)
 
-# Added
+## Added
 
 - Added Website URL, Wikipedia URL, and Capacity to venues if present on Musicbrainz
 
-# Changed
+## Changed
 
 - Updated color of dark theme muted text
 - moved Venue links to info card
@@ -616,11 +616,29 @@ First public release of the site. Site was locked behind a login and accounts on
 
 **Site made public on Facebook and BTX**
 
-# Fixed
+## Fixed
 
 - Fixed issue where profile song stats were incorrect
 
-# Changed
+## Changed
 
 - Updated user profile "Songs" tab to have consistent song table controls
 - Changed style of Song Table "collapse" control from secondary to neutral
+
+# v1.33 (October 17, 2026)
+
+## Added
+
+- Added "About" and "Support" pages
+
+## Fixed
+
+- Fixed issue where "Originals" and "Covers" would show as "complete" in the event detail album breakdown
+
+## Changed
+
+- Redesigned mobile offcanvas navigation to be easier to use. This affects both main navigation as well as the user menu sidebar.
+- Moved theme toggle to footer.
+- Theme toggle now has "auto" option which respects system preferences.
+- User Settings page redesigned.
+- Style tweaks

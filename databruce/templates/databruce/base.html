@@ -97,7 +97,7 @@
          tabindex="-1"
          aria-labelledby="searchModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-body">
             <div class="row">
@@ -133,6 +133,41 @@
       <div class="col-12">
         <div class="card">
           <div class="card-body text-center py-2">
+            <div class="my-2">
+              <div class="btn-group"
+                   role="group"
+                   aria-label="Theme switcher"
+                   id="bd-theme">
+                <button type="button"
+                        class="btn btn-sm"
+                        data-bs-theme-value="light"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Light">
+                  <i class="bi bi-sun-fill theme-icon"></i>
+                  <span class="visually-hidden">Light</span>
+                </button>
+                <button type="button"
+                        class="btn btn-sm"
+                        data-bs-theme-value="dark"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Dark">
+                  <i class="bi bi-moon-stars-fill theme-icon"></i>
+                  <span class="visually-hidden">Dark</span>
+                </button>
+                <button type="button"
+                        class="btn btn-sm"
+                        data-bs-theme-value="auto"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Auto">
+                  <i class="bi bi-circle-half theme-icon"></i>
+                  <span class="visually-hidden">Auto</span>
+                </button>
+              </div>
+            </div>
+            <hr>
             <div class="my-2">
               <script type="text/javascript"
                       src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"

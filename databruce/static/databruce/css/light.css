@@ -33,6 +33,10 @@
     background-image: linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)) !important;
   }
 
+  .nav-pills-list .btn:hover {
+    background-color: var(--color-gray-300) !important;
+  }
+
   button.active>.badge {
     background-color: var(--color-white) !important;
     color: var(--color-black) !important;
@@ -151,8 +155,7 @@
   /* neutral */
 
   .btn-neutral,
-  .badge-neutral,
-  .nav-btn {
+  .badge-neutral {
     background-color: var(--color-gray-300) !important;
     color: var(--color-gray-800) !important;
   }
@@ -551,6 +554,51 @@
   .bd-links-link:hover {
     background-color: var(--color-blue-500) !important;
     color: var(--color-white) !important;
+  }
+
+  .bd-links-span-all .btn i {
+    color: var(--color-gray-500) !important;
+  }
+
+  .bd-links-span-all .btn {
+    color: var(--color-gray-800) !important;
+  }
+
+  .offcanvas-body .btn,
+  .offcanvas-body .btn.active,
+  .offcanvas-body .btn:hover,
+  .offcanvas-body .btn:hover i,
+  #userAccountDropdownMenu .btn,
+  #userAccountDropdownMenu .btn.active,
+  #userAccountDropdownMenu .btn:hover,
+  #userAccountDropdownMenu .btn:hover i {
+    color: var(--color-gray-800) !important;
+  }
+
+  .offcanvas-body .btn.active {
+    background-color: var(--color-gray-200) !important;
+  }
+
+  .nav-pills-list .btn.active {
+    background-color: var(--color-gray-200) !important;
+  }
+
+  .offcanvas-body .btn:hover {
+    background-color: var(--color-gray-300) !important;
+  }
+
+  .nav-pills-list .btn:hover {
+    background-color: var(--color-gray-300) !important;
+  }
+
+  .offcanvas-body,
+  .offcanvas-body i {
+    color: var(--color-gray-950) !important;
+  }
+
+  #userAccountDropdownMenu li a,
+  #userAccountDropdownMenu li button {
+    color: var(--color-gray-800) !important;
   }
 
   .list-unstyled .dropdown-item:hover {

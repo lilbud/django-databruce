@@ -88,7 +88,7 @@
         </li>
         {% if user.is_authenticated %}
           <li class="nav-item dropdown list-unstyled">
-            <a class="btn btn-sm border-0 dropdown-toggle
+            <a class="btn btn-sm border-0 dropdown-toggle icon-button
                       {% if 'profile' in request.resolver_match.route %}active{% endif %}"
                type="button"
                data-bs-toggle="dropdown"
@@ -97,41 +97,68 @@
                aria-label="User account menu"
                id="userAccountDropdown">
               <i class="bi bi-person-fill text-xl" aria-hidden="true"></i>
+              {{ user }}
             </a>
-            <ul class="dropdown-menu dropdown-menu-end"
+            <ul class="dropdown-menu dropdown-menu-end list-unstyled text-center"
+                id="userAccountDropdownMenu"
                 aria-labelledby="userAccountDropdown">
-              <li>
-                <div class="text-sm px-4 py-1 dropdown-item pe-none fw-medium">
-                  Hello {{ user }}
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <div class="text-sm py-2 px-3 text-nowrap">
+                      Hello {{ user }}
+                      {% if user.is_superuser %}
+                        (Admin)
+                      {% else %}
+                        (User)
+                      {% endif %}
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                       href="{% url 'profile' id=user.uuid %}">
+                      <i class="bi bi-person-circle"></i>
+                      Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                       href="{% url 'settings' %}"><i class="bi bi-gear-fill"></i>User Settings</a>
+                  </li>
+                </ul>
+              </li>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                       href="{% url 'users' %}"><i class="bi bi-people-fill"></i>View Users</a>
+                  </li>
                   {% if user.is_superuser %}
-                    (Admin)
-                  {% else %}
-                    (User)
+                    <li>
+                      <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                         href="{% url 'admin:index' %}"><i class="bi bi-house-fill"></i>Admin Portal</a>
+                    </li>
                   {% endif %}
-                </div>
+                </ul>
               </li>
-              <li>
-                <a class="dropdown-item" href="{% url 'profile' id=user.uuid %}">View Profile</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
-              </li>
-              {% if user.is_superuser %}
-                <li>
-                  <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Portal</a>
-                </li>
-              {% endif %}
-              <li>
-                <a class="dropdown-item" href="{% url 'settings' %}">Settings</a>
-              </li>
-              <li>
-                <form method="post" action="{% url 'logout' %}">
-                  {% csrf_token %}
-                  <button class="dropdown-item"
-                          type="submit"
-                          id="button-addon2"
-                          aria-label="Log out of your account">Logout</button>
-                </form>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <form method="post" action="{% url 'logout' %}">
+                      {% csrf_token %}
+                      <button class="btn btn-sm border-0 w-100 text-start d-flex"
+                              type="submit"
+                              role="button"
+                              aria-label="Log out of your account"><i class="bi bi-box-arrow-right"></i>Logout</button>
+                    </form>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>
@@ -143,20 +170,6 @@
           </li>
         {% endif %}
       </div>
-      <li class="nav-item d-none d-xl-block"
-          id="toggle-container"
-          data-bs-toggle="tooltip"
-          data-bs-placement="bottom"
-          data-bs-title="Toggle Theme">
-        <button class="btn btn-sm border-0 bd-theme-btn"
-                id="bd-theme"
-                type="button"
-                aria-label="Toggle Theme">
-          <i class="bi bi-sun-fill theme-icon text-xl" aria-hidden="true"></i>
-          <i class="bi bi-moon-stars-fill theme-icon text-xl" aria-hidden="true"></i>
-          <span class="d-lg-none my-auto" id="bd-theme-text">Toggle Theme</span>
-        </button>
-      </li>
     </ul>
     <!-- Mobile Right Menu Toggle -->
     <button class="btn d-xl-none d-block py-0 border-0"
@@ -174,78 +187,95 @@
          aria-labelledby="offcanvasNavbarEndLabel"
          aria-modal="true"
          role="dialog">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title visually-hidden" id="offcanvasNavbarEndLabel">User Menu</h5>
+      <div class="offcanvas-header d-flex justify-content-between">
+        <div class="offcanvas-title text-xl" id="offcanvasNavbarEndLabel">User Menu</div>
         <button type="button"
                 class="btn-close"
                 data-bs-dismiss="offcanvas"
                 aria-label="Close user menu"></button>
       </div>
-      <div class="offcanvas-body">
+      <hr class="my-1">
+      <div class="offcanvas-body p-1">
         <nav class="w-100"
              id="offcanvasNavEnd"
              aria-label="User account navigation">
-          <ul class="bd-links-nav list-unstyled mb-0 pb-3">
+          <ul class="bd-links-nav list-unstyled mb-0 pb-3 row row-gap-2">
             {% if user.is_authenticated %}
-              <li class="bd-links-span-all mb-3">
-                <div class="text-base py-1 text-center">
-                  Hello {{ user }}
-                  {% if user.is_superuser %}
-                    (Admin)
-                  {% else %}
-                    (User)
-                  {% endif %}
-                </div>
-              </li>
-              <li class="bd-links-span-all mb-3">
-                <ul class="list-unstyled pb-2 text-center text-lg">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
                   <li>
-                    <a class="dropdown-item" href="{% url 'profile' id=user.uuid %}">View Profile</a>
+                    <a href="{% url 'profile' id=user.uuid %}"
+                       class="btn btn-sm border-0 w-100 text-start d-flex-inline py-2 px-3">
+                      <div class="text-lg">
+                        Hello {{ user }}
+                        {% if user.is_superuser %}
+                          (Admin)
+                        {% else %}
+                          (User)
+                        {% endif %}
+                      </div>
+                      <div class="text-sm">{{ user.email }}</div>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                       href="{% url 'profile' id=user.uuid %}">
+                      <i class="bi bi-person-circle"></i>
+                      Profile
+                    </a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="{% url 'users' %}">View Users</a>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                       href="{% url 'settings' %}"><i class="bi bi-gear-fill"></i>User Settings</a>
+                  </li>
+                </ul>
+              </li>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                       href="{% url 'users' %}"><i class="bi bi-people-fill"></i>View Users</a>
                   </li>
                   {% if user.is_superuser %}
                     <li>
-                      <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Portal</a>
+                      <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                         href="{% url 'admin:index' %}"><i class="bi bi-house-fill"></i>Admin Portal</a>
                     </li>
                   {% endif %}
-                  <li>
-                    <a class="dropdown-item" href="{% url 'settings' %}">User Settings</a>
-                  </li>
+                </ul>
+              </li>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
                   <li>
                     <form method="post" action="{% url 'logout' %}">
                       {% csrf_token %}
-                      <button class="dropdown-item"
+                      <button class="btn btn-sm border-0 w-100 text-start d-flex"
                               type="submit"
-                              aria-label="Log out of your account">Logout</button>
+                              role="button"
+                              aria-label="Log out of your account"><i class="bi bi-box-arrow-right"></i>Logout</button>
                     </form>
                   </li>
                 </ul>
               </li>
             {% else %}
-              <li class="bd-links-span-all mb-3">
+              <li class="bd-links-span-all">
                 <div class="d-grid gap-2">
+                  <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                     role="button"
+                     href="{% url 'login' %}?next={{ request.path }}"><i class="bi bi-person-fill"></i>Login</a>
                   <a href="{% url 'signup' %}"
                      role="button"
-                     class="btn btn-sm btn-primary">Register</a>
-                  <a class="btn btn-sm btn-primary"
-                     role="button"
-                     href="{% url 'login' %}?next={{ request.path }}">Login</a>
+                     class="btn btn-sm border-0 w-100 text-start d-flex"><i class="bi bi-person-plus-fill"></i>Sign Up</a>
                 </div>
               </li>
             {% endif %}
-            <li class="bd-links-span-all my-3 border-top" role="separator"></li>
-            <li class="bd-links-span-all mb-3" id="toggle-container-mobile-end">
-              <button class="btn btn-sm btn-primary px-0 border-0 bd-theme-btn w-100"
-                      id="bd-theme-mobile-end"
-                      type="button"
-                      aria-label="Toggle visual color theme">
-                <i class="bi bi-sun-fill theme-icon" aria-hidden="true"></i>
-                <i class="bi bi-moon-stars-fill theme-icon" aria-hidden="true"></i>
-                <span class="my-auto" id="bd-theme-text-mobile-end">Toggle Theme</span>
-              </button>
-            </li>
           </ul>
         </nav>
       </div>
@@ -257,13 +287,14 @@
          aria-labelledby="offcanvasNavbarLabel"
          aria-modal="true"
          role="dialog">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title visually-hidden" id="offcanvasNavbarLabel">Main Menu</h5>
+      <div class="offcanvas-header d-flex justify-content-between">
+        <div class="offcanvas-title text-xl" id="offcanvasNavbarEndLabel">Main Menu</div>
         <button type="button"
                 class="btn-close"
                 data-bs-dismiss="offcanvas"
-                aria-label="Close navigation menu"></button>
+                aria-label="Close user menu"></button>
       </div>
+      <hr class="my-1">
       <div class="offcanvas-body">
         <nav class="w-100" id="offcanvasNav" aria-label="Mobile main navigation">
           <ul class="bd-links-nav list-unstyled mb-0 pb-3">
@@ -274,7 +305,7 @@
                     {% if item.icon %}<i class="bi {{ item.icon }}" aria-hidden="true"></i>{% endif %}
                     {{ item.name }}
                   </span>
-                  <ul class="list-unstyled pb-2">
+                  <ul class="list-unstyled py-2">
                     {% for child in item.children %}
                       {% if child.kwargs %}
                         {% url child.url slug=child.kwargs.slug as child_url %}
@@ -282,7 +313,7 @@
                         {% url child.url as child_url %}
                       {% endif %}
                       <li>
-                        <a class="bd-links-link
+                        <a class="btn btn-sm border-0 w-100 text-start d-flex
                                   {% if child_url in request.path %}active{% endif %}"
                            href="{{ child_url }}">{{ child.name }}</a>
                       </li>
@@ -290,7 +321,7 @@
                   </ul>
                 </li>
               {% else %}
-                <li class="bd-links-group py-2">
+                <li class="bd-links-group">
                   <a class="bd-links-link fw-semibold text-sm" href="{% url item.url %}">
                     {% if item.icon %}<i class="bi {{ item.icon }}" aria-hidden="true"></i>{% endif %}
                     {{ item.name }}
@@ -298,17 +329,6 @@
                 </li>
               {% endif %}
             {% endfor %}
-            <li class="bd-links-span-all my-3 border-top" role="separator"></li>
-            <li class="bd-links-span-all mb-3" id="toggle-container-mobile-start">
-              <button class="btn btn-sm btn-primary px-0 border-0 bd-theme-btn w-100"
-                      id="bd-theme-mobile-start"
-                      type="button"
-                      aria-label="Toggle visual color theme">
-                <i class="bi bi-sun-fill theme-icon" aria-hidden="true"></i>
-                <i class="bi bi-moon-stars-fill theme-icon" aria-hidden="true"></i>
-                <span class="my-auto" id="bd-theme-text-mobile-start">Toggle Theme</span>
-              </button>
-            </li>
           </ul>
         </nav>
       </div>
