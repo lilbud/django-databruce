@@ -173,7 +173,7 @@ body {
 }
 
 /* Remove bottom margin from last ul item in card */
-ul:last-child {
+.card ul:last-child {
   margin-bottom: 0 !important;
 }
 
@@ -679,12 +679,12 @@ button:disabled {
 }
 
 /* column control dropdown */
-.dtcc-dropdown.dropdown-menu {
+/* .dtcc-dropdown.dropdown-menu {
   font-size: var(--text-xs) !important;
-}
+} */
 
 .dropdown-item {
-  font-size: var(--text-xs) !important;
+  font-size: var(--text-sm) !important;
   overflow: hidden !important;
 }
 
@@ -1744,4 +1744,12 @@ a.underline-0:hover {
   vertical-align: middle !important;
   transform: scale(0.9);
   flex-shrink: 0;
+}
+
+a.external-link::after {
+  content: "\F1C5";
+  font-family: 'bootstrap-icons' !important;
+  font-size: var(--text-2xs) !important;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
 }

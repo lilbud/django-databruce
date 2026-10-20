@@ -214,9 +214,10 @@ class RoadmapView(PageTitleMixin, TemplateView):
   title = "Roadmap"
 
 
-class LinksView(PageTitleMixin, TemplateView):
-  template_name = "databruce/links.html"
-  title = "Links"
+class CreditsView(PageTitleMixin, TemplateView):
+  template_name = "databruce/credits.html"
+  title = "Credits"
+  description = "Site/Source Credits"
 
 
 class CalendarView(PageTitleMixin, TemplateView):

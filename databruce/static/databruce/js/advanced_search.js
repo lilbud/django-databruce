@@ -213,6 +213,28 @@ document.addEventListener('DOMContentLoaded', () => {
     $(selectEl).select2(getOptions(endpoint, selectEl));
   });
 
+  // const venueSelect = document.getElementById('venue');
+
+  // if (venueSelect) {
+  //   new TomSelect('#venue', {
+  //     valueField: 'id',
+  //     labelField: 'text',
+  //     searchField: 'text',
+  //     // fetch remote data
+  //     load: function (query, callback) {
+  //       var url = '/api/select2/venues/?name=' + encodeURIComponent(query);
+  //       fetch(url)
+  //         .then(response => response.json())
+  //         .then(json => {
+  //           console.log(json.results);
+  //           callback(json.results);
+  //         }).catch(() => {
+  //           callback();
+  //         });
+  //     },
+  //   });
+  // }
+
   if (lastRow) {
     const song1 = lastRow.querySelector('.song1');
     const song2 = lastRow.querySelector('.song2');

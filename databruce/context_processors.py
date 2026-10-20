@@ -112,7 +112,7 @@ def get_navbar_links() -> list[dict[str, Any]]:
           "name": "About Site",
           "url": "about",
         },
-        {"name": "Links", "url": "links"},
+        {"name": "Credits", "url": "credits"},
         {"name": "Updates", "url": "updates"},
         {
           "name": "Roadmap",

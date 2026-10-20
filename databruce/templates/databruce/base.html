@@ -205,6 +205,27 @@
         });
       });
 
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get the current website's hostname (e.g., "example.com")
+        const currentHostname = window.location.hostname;
+
+        // Select all anchor tags that have an href attribute
+        document.querySelectorAll("a[href]:not(.bmc-btn)").forEach((link) => {
+          try {
+            const url = new URL(link.href, window.location.href);
+
+            // Check if the link's hostname is different from the current website
+            if (url.hostname !== currentHostname && url.protocol.startsWith("http")) {
+              link.setAttribute("target", "_blank");
+              link.setAttribute("rel", "noopener noreferrer");
+              link.classList.add("external-link");
+            }
+          } catch (e) {
+            // Ignore invalid URLs, mailto:, tel:, or anchor links (#)
+          }
+        });
+      });
+
       // update hash when tab changes
       window.addEventListener('DOMContentLoaded', () => {
         const hash = window.location.hash;

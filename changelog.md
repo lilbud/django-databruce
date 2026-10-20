@@ -642,3 +642,16 @@ First public release of the site. Site was locked behind a login and accounts on
 - Theme toggle now has "auto" option which respects system preferences.
 - User Settings page redesigned.
 - Style tweaks
+
+# v1.34 (October 20, 2026)
+
+# Added
+
+- Finally added proper credits page, which were present throughout other pages like "about"
+- Added arrow icon to indicate external links
+
+# Changed
+
+- External links now open in new tab by default
+- Cleaned up support page, added actual links
+- Style tweaks

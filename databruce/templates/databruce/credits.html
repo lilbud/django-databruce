@@ -1,0 +1,49 @@
+{% extends "databruce/narrow_layout.html" %}
+{% block title %}
+  {{ title }}
+{% endblock title %}
+{% block content %}
+  <div class="col">
+    <div class="row mb-2">
+      <div class="text-2xl">
+        <a href="{% url 'index' %}">Databruce</a> &gt; Credits
+      </div>
+      <div class="text-base mb-3">
+        Databruce was not a solo effort. What has been accomplished is only possible due to the massive amount of work done over the past few decades by many people. Below is a running and incomplete list of where I got data for the site. I will do my best to credit everyone and keep this page up to date, but if I miss anyone please let me know.
+      </div>
+      <div class="col-12 text-base">
+        <h1 id="data">Data</h1>
+        <p>
+          <a href="https://brucebase.wikidot.com/">Brucebase</a>: The original source of the data. I scraped their site in mid-2023 when building the database for Brucebot. The bot originally just scraped the site on every request, and I didn't want to put that strain on them. The original SQLite database was built using that data, which eventually became the current PostgreSQL database that powers the site now. Without their data, Databruce would probably not exist.
+        </p>
+        <h1 id="bootleg-info">Bootleg Info</h1>
+        <p><a href="https://www.springsteenlyrics.com/"
+   target="_blank"
+   rel="noopener">SpringsteenLyrics</a>: Bootleg info. Similar to Brucebase, I scraped this site for bootleg info around Spring 2024. This data was imported into the database, and was cleaned up a good bit. Still needs plenty of work, and I have plans in the works for this.</p>
+        <p><a href="https://springsteendvds.wordpress.com/"
+   target="_blank"
+   rel="noopener">SpringsteenDVDs</a>: Video bootleg info. Fills in some gaps in the above.</p>
+        <p>Multiple Recorder Project: A spreadsheet maintained by MJK5510 documenting the various sources/versions/recordings of each show in circulation. I used the January 2024 version of the spreadsheet when compiling my bootleg database.</p>
+        <h1 id="articles">Articles</h1>
+        <p><a href="https://the-circuit.greasylake.org"
+   target="_blank"
+   rel="noopener">GreasyLake</a>: The original home of the &quot;article vault&quot;, which I recovered when the old site was briefly made available in June 2025. It took until August 2026 to get around to parsing/cleaning all of articles. I eventually plan on also bringing over their News Blog as well as parts of their song/event database.</p>
+        <p><a href="https://www.backstreets.com/btx/viewtopic.php?f=3&amp;t=342016"
+   target="_blank"
+   rel="noopener">BTX Article Thread</a>: Started by Beazle in 2012, and contributed to by numerous members of the site. This was the largest collection of Bruce articles available on the web, and is a resource well worth preserving in some form. Thanks to Beazle and the many other users who contributed over the years.</p>
+        <h1 id="design-features">Design/Features</h1>
+        <p><a href="https://jerrybase.com/">Jerrybase</a>: A Grateful Dead database. This site was the initial catalyst which drove me to create Databruce. Their advanced event/setlist search made me want to try and make my own, which obviously snowballed into the site you're using now. I referenced their search feature in figuring out how it worked on a conceptual level, which was a big help. Jerrybase was also an influence on the layout/design of the Databruce.</p>
+        <p><a href="https://elgoose.net/">ElGoose</a> &amp; <a href="https://wtedradio.com/">Dripfield.pro (now WTED Archives)</a>: These Goose database sites provided inspiration when it came to the design of Databruce. The newer &quot;WTED Archives&quot; provided some inspiration when it came to the layout of pages like event detail.</p>
+        <p><a href="https://www.speedrun.com/">Speedrun.com</a>: The layout of the event detail pages is ripped off from here.</p>
+        <h1 id="other-credits">Other Credits</h1>
+        <p>Thanks to the members of the forums/sites below for basically acting as beta testers while I sorted out getting this site to a functioning state. Databruce is the first time I've done anything even remotely on this scale, and without them the site would be in a much worse state.</p>
+        <ul>
+          <li>r/brucespringsteen Discord server</li>
+          <li>GreasyLake</li>
+          <li>StonePonyLondon</li>
+        </ul>
+        <p>This credits page will always be a work in progress. I don't intend to not credit people, and if someone isn't listed here it was simply because I forgot, not intentional. Please reach out if this is the case.</p>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
