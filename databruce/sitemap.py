@@ -22,7 +22,7 @@ class StaticViewSitemap(Sitemap):
       "adv_search",
       "note_search",
       "about",
-      "links",
+      "credits",
     ]
 
   def location(self, item):
