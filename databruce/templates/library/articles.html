@@ -107,7 +107,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       const truncateText = (str) => {
         return str.length > 70 ? str.slice(0, 70) + '...' : str;
       };

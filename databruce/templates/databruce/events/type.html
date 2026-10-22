@@ -27,7 +27,7 @@
     {% include "databruce/partials/event_table.html" %}
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       eventTable('/api/v1/events/?type={{ type.id }}&format=custom');
 
       $(function() {

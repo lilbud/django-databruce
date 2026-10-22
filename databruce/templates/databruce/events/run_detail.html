@@ -163,7 +163,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       eventTable('/api/v1/events/?run={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?run={{ info.id }}&format=custom');
 

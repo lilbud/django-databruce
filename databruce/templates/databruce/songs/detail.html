@@ -313,7 +313,7 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       let ctx = document.getElementById("chart").getContext("2d");
       Chart.defaults.color = '#999';
 
@@ -348,7 +348,7 @@
         }).catch(error => console.error('Error:', error));
     });
 
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       let sb_columns = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
       var table = new DataTable('#songTable', {

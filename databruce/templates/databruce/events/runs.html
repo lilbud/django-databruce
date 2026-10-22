@@ -89,7 +89,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#runTable', {
         ajax: {
           'url': '/api/v1/runs/?format=custom',

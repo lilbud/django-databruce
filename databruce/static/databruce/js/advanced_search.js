@@ -216,11 +216,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // const venueSelect = document.getElementById('venue');
 
   // if (venueSelect) {
-  //   new TomSelect('#venue', {
+  //   var ts = new TomSelect('#venue', {
   //     valueField: 'id',
   //     labelField: 'text',
   //     searchField: 'text',
+  //     // plugins: ['dropdown_header'],
   //     // fetch remote data
+  //     shouldLoad: function (query) {
+  //       return query.length >= 3;
+  //     },
   //     load: function (query, callback) {
   //       var url = '/api/select2/venues/?name=' + encodeURIComponent(query);
   //       fetch(url)
@@ -232,6 +236,30 @@ document.addEventListener('DOMContentLoaded', () => {
   //           callback();
   //         });
   //     },
+  //     render: {
+  //       option: function (data, escape) {
+  //         return `<div>
+  //               <span class="name">${escape(data.text)}</span>
+  //           </div>`;
+  //       },
+  //       item: function (data, escape) {
+  //         return `<div>${escape(data.text)}</div>`;
+  //       },
+  //       no_results: function (data, escape) {
+  //         // Replicates the exact message layout from your image
+  //         return '<div class="ts-message">Please enter 3 or more characters</div>';
+  //       },
+  //       // Optional: Customizing the loading state if fetching remote data
+  //       loading_more: function (data, escape) {
+  //         return '<div class="ts-message">Loading more results...</div>';
+  //       }
+  //     }
+  //   });
+
+  //   ts.on('dropdown_open', function () {
+  //     if (!ts.lastValue.length) {
+  //       ts.refreshOptions(false);
+  //     }
   //   });
   // }
 

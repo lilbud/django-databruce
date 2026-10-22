@@ -77,7 +77,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#tourLegTable', {
         ajax: {
           'url': '/api/v1/tour_legs/?format=custom',

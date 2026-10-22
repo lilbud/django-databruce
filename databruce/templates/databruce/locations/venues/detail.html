@@ -272,7 +272,7 @@
     </div> {% endcomment %}
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       eventTable('/api/v1/events/?venue={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?venue={{ info.id }}&format=custom');
 

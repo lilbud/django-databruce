@@ -104,7 +104,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       eventTable('/api/v1/events/?artist={{ info.id }}&format=custom');
 
       var table = new DataTable('#memberTable', {

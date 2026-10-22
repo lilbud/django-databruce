@@ -98,7 +98,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#cityTable', {
         ajax: {
           'url': '/api/v1/cities/?format=custom',

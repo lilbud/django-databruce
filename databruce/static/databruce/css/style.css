@@ -522,6 +522,14 @@ td:not(.fc-day) {
   vertical-align: middle !important;
 }
 
+.fc-bootstrap5-i9F {
+  color: inherit !important;
+}
+
+.fc-bootstrap5-lNM {
+  display: none !important;
+}
+
 tbody tr:not(.set-header) {
   height: 25px !important;
   line-height: 1.1rem !important;
@@ -1204,7 +1212,7 @@ pre {
 }
 
 .form-select-sm {
-  padding: .25rem;
+  /* padding: .25rem; */
   font-size: .875rem;
   border-radius: var(--bs-border-radius-sm);
 }

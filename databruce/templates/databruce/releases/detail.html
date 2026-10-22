@@ -194,7 +194,7 @@
   </div> {% endcomment %}
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       new DataTable('#tracksTable', {
         ajax: '/api/v1/release_tracks/?release={{ info.id }}&format=custom',
         ordering: false,

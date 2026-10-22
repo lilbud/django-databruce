@@ -190,7 +190,7 @@
   </div>
 </div>
 <script>
-  $(document).ready(function() {
+  document.addEventListener("DOMContentLoaded", () => {
     var table = new DataTable('#eventTable', {
       ajax: {
         'url': '/api/v1/events/?year={{ year }}&format=custom',

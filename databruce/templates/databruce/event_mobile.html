@@ -214,7 +214,7 @@
       </div>
     </div>
     <script>
-      $(document).ready(function() {
+      document.addEventListener("DOMContentLoaded", () => {
         var event = "{{ event.id }}";
         var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
 

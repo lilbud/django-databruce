@@ -196,110 +196,107 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
-      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-      $('#voteForm').submit(async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+    $('#voteForm').submit(async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
 
-        try {
-          const response = await fetch("{% url 'bruceyversion:entry_vote' %}", {
-            method: 'POST',
-            body: formData
-          });
+      try {
+        const response = await fetch("{% url 'bruceyversion:entry_vote' %}", {
+          method: 'POST',
+          body: formData
+        });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-          const data = await response.json();
+        const data = await response.json();
 
-          if (!data['success']) {
-            alert(data['message']);
-            $('#vote-btn').prop('disabled', true);
+        if (!data['success']) {
+          alert(data['message']);
+          $('#vote-btn').prop('disabled', true);
+        } else {
+          // Update vote count display
+          $('#vote-count').text(data['votes']);
+
+          // Toggle button UI based on returned vote state
+          const $btn = $('#vote-btn');
+          if (data['voted']) {
+            $btn.text('Remove')
+              .removeClass('btn-primary')
+              .addClass('btn-danger')
+              .data('voted', true);
           } else {
-            // Update vote count display
-            $('#vote-count').text(data['votes']);
-
-            // Toggle button UI based on returned vote state
-            const $btn = $('#vote-btn');
-            if (data['voted']) {
-              $btn.text('Remove')
-                .removeClass('btn-primary')
-                .addClass('btn-danger')
-                .data('voted', true);
-            } else {
-              $btn.text('Vote')
-                .removeClass('btn-danger')
-                .addClass('btn-primary')
-                .data('voted', false);
-            }
+            $btn.text('Vote')
+              .removeClass('btn-danger')
+              .addClass('btn-primary')
+              .data('voted', false);
           }
-
-        } catch (error) {
-          console.error('Error during POST request:', error);
         }
-      });
 
-      $('#comment-form').submit(async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+      } catch (error) {
+        console.error('Error during POST request:', error);
+      }
+    });
 
-        try {
-          const response = await fetch("{% url 'bruceyversion:entry_comment_submit' %}", {
-            method: 'POST',
-            body: formData
-          });
+    $('#comment-form').submit(async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+      try {
+        const response = await fetch("{% url 'bruceyversion:entry_comment_submit' %}", {
+          method: 'POST',
+          body: formData
+        });
 
-          const data = await response.json(); // Parses the JSON response body
-          const modalElement = document.getElementById('commentModal');
-
-          var url = '{{ request.path }}'
-
-          console.log(url);
-          if (url) { // require a URL
-            window.location = url; // redirect
-          }
-
-        } catch (error) {
-          console.error('Error during POST request:', error);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      });
 
-      $('#update-comment-form').submit(async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+        const data = await response.json(); // Parses the JSON response body
+        const modalElement = document.getElementById('commentModal');
 
-        try {
-          const response = await fetch("{% url 'bruceyversion:entry_comment_update' %}", {
-            method: 'POST',
-            body: formData
-          });
+        var url = '{{ request.path }}'
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.json(); // Parses the JSON response body
-          const modalElement = document.getElementById('updateCommentModal');
-
-          var url = '{{ request.path }}'
-
-          console.log(url);
-          if (url) { // require a URL
-            window.location = url; // redirect
-          }
-
-        } catch (error) {
-          console.error('Error during POST request:', error);
+        if (url) { // require a URL
+          window.location = url; // redirect
         }
-      })
+
+      } catch (error) {
+        console.error('Error during POST request:', error);
+      }
+    });
+
+    $('#update-comment-form').submit(async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+
+      try {
+        const response = await fetch("{% url 'bruceyversion:entry_comment_update' %}", {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parses the JSON response body
+        const modalElement = document.getElementById('updateCommentModal');
+
+        var url = '{{ request.path }}'
+
+        console.log(url);
+        if (url) { // require a URL
+          window.location = url; // redirect
+        }
+
+      } catch (error) {
+        console.error('Error during POST request:', error);
+      }
     })
   </script>
 {% endblock content %}

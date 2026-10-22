@@ -73,7 +73,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       eventTable('/api/v1/events/?state={{ info.id }}&format=custom');
       songTable('/api/v1/setlist_songs/?state={{ info.id }}&format=custom');
     })

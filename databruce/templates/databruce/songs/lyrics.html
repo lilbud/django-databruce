@@ -109,7 +109,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#lyricTable', {
         ajax: {
           'url': '/api/v1/lyrics/?format=custom',

@@ -108,7 +108,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#songsTable', {
         ajax: {
           'url': '/api/v1/songs/?format=custom',

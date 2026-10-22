@@ -238,8 +238,10 @@ class CalendarView(PageTitleMixin, TemplateView):
         self.request.GET["start"],  # type: ignore
       ):  # type: ignore
         context["start_date"] = self.request.GET["start"]
+        context["year"] = int(self.request.GET["start"].split("-")[0])
     except MultiValueDictKeyError:
       context["start_date"] = context["date"].strftime("%Y-%m-%d")
+      context["year"] = context["date"].year
 
     return context
 

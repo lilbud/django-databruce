@@ -12,11 +12,23 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
+
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         validRange: {
           start: '1965-06-01',
           end: '{{ end_date }}',
+        },
+        datesSet: function(dateInfo) {
+          // Get the start date string (e.g., '2026-10-01')
+          const startParam = dateInfo.startStr.split('T')[0];
+
+          // Build a new URL with the start parameter
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('start', startParam);
+
+          // Update browser history without reloading the page
+          window.history.pushState({}, '', newUrl);
         },
         fixedWeekCount: false,
         initialDate: '{{ start_date }}',
@@ -31,47 +43,49 @@
           end: 'prev,next'
         },
         eventSources: [
+          // events
           function(info, successCallback, failureCallback) {
             fetch(`/api/v1/events/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
               .then((resp) => resp.json())
               .then(function(data) {
                 var eventsList = [];
 
-                $(data.results).each(function(i, val) {
-                  console.log(val)
-                  var title = `${val.artist.name}: ${val.venue.name}`
+                data.results.forEach((item, index) => {
+                  var title = `${item.artist.name}: ${item.venue.name}`
 
-                  if (val.early_late) {
-                    title += ` (${val.early_late})`
+                  if (item.early_late) {
+                    title += ` (${item.early_late})`
                   }
 
-                  if (val.type) {
-                    title += ` [${val.type[0]['name']}]`
+                  if (item.type) {
+                    title += ` [${item.type[0]['name']}]`
                   }
 
                   eventsList.push({
                     title: title,
-                    start: val.date,
-                    url: `/events/${val.event_id}`,
+                    start: item.date,
+                    url: `/events/${item.event_id}`,
                     allDay: false,
                     className: 'calendar event show px-1'
                   })
-                })
+                });
+
                 successCallback(eventsList);
               })
           },
+          // event runs
           function(info, successCallback, failureCallback) {
             fetch(`/api/v1/runs/?format=json&start_date=${info.start.toISOString()}&end_date=${info.end.toISOString()}`)
               .then((resp) => resp.json())
               .then(function(data) {
                 var eventsList = [];
 
-                $(data.results).each(function(i, val) {
+                data.results.forEach((item, index) => {
                   eventsList.push({
-                    title: val.name,
-                    start: val.first_event.date,
-                    end: `${val.last_event.date}T23:59:59`,
-                    url: `/runs/${val.slug}`,
+                    title: item.name,
+                    start: item.first_event.date,
+                    end: `${item.last_event.date}T23:59:59`,
+                    url: `/runs/${item.slug}`,
                     className: 'px-1 calendar event-run',
                   })
                 })
@@ -79,18 +93,19 @@
                 successCallback(eventsList);
               })
           },
+          // releases (current year)
           function(info, successCallback, failureCallback) {
             fetch(`/api/v1/releases/?format=json&start_date=${info.startStr}&end_date=${info.endStr}&current_year=true`)
               .then((resp) => resp.json())
               .then(function(data) {
                 var eventsList = [];
 
-                $(data.results).each(function(i, val) {
-                  let releaseDate = new Date(val.date);
+                data.results.forEach((item, index) => {
+                  let releaseDate = new Date(item.date);
                   eventsList.push({
-                    title: `${val.name}`,
-                    start: val.date,
-                    url: `/releases/${val.uuid}`,
+                    title: `${item.name}`,
+                    start: item.date,
+                    url: `/releases/${item.uuid}`,
                     className: 'px-1 calendar release-event',
                   })
                 })
@@ -98,8 +113,8 @@
                 successCallback(eventsList);
               })
           },
+          // releases historical
           function(info, successCallback, failureCallback) {
-
             const midTime = info.start.getTime() + (info.end.getTime() - info.start.getTime()) / 2;
             const midDate = new Date(midTime);
 
@@ -112,16 +127,15 @@
                 var eventsList = [];
                 const currentViewYear = info.start.getFullYear();
 
-                $(data.results).each(function(i, val) {
-
-                  let historicalDate = new Date(val.date);
-                  let releaseDate = new Date(val.date);
+                data.results.forEach((item, index) => {
+                  let historicalDate = new Date(item.date);
+                  let releaseDate = new Date(item.date);
                   historicalDate.setFullYear(currentViewYear);
 
                   eventsList.push({
-                    title: `${val.name} (${releaseDate.getFullYear()})`,
+                    title: `${item.name} (${releaseDate.getFullYear()})`,
                     start: historicalDate.toISOString().split('T')[0],
-                    url: `/releases/${val.uuid}`,
+                    url: `/releases/${item.uuid}`,
                     className: 'px-1 calendar release-event-past',
                   })
                 })
@@ -129,6 +143,7 @@
                 successCallback(eventsList);
               })
           },
+          // relation birthdays
           function(info, successCallback, failureCallback) {
             fetch(`/api/v1/relations/?format=json&month=${info.start.getMonth() + 2}&show_cal=true`)
               .then((resp) => resp.json())
@@ -136,14 +151,13 @@
                 var eventsList = [];
                 const currentViewYear = info.start.getFullYear();
 
-                $(data.results).each(function(i, val) {
-
-                  let historicalDate = new Date(val.start_date);
+                data.results.forEach((item, index) => {
+                  let historicalDate = new Date(item.start_date);
                   let birthYear = historicalDate.getUTCFullYear();
                   historicalDate.setFullYear(currentViewYear);
 
                   eventsList.push({
-                    title: `${val.name} (${birthYear})`,
+                    title: `${item.name} (${birthYear})`,
                     start: historicalDate.toISOString().split('T')[0],
                     className: 'px-1 calendar event-birthday',
                   })
@@ -162,7 +176,6 @@
             info.jsEvent.preventDefault();
           }
         },
-
         eventContent: function(info) {
           return {
             html: info.event.title
@@ -171,7 +184,6 @@
       });
       calendar.render();
 
-      $('#year-select > button').text(calendar.getDate().getFullYear())
     });
   </script>
 {% endblock extrajs %}
@@ -203,7 +215,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var date = new Date();
 
       let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");

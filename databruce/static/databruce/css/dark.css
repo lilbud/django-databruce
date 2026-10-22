@@ -305,12 +305,42 @@
     background-color: var(--color-gray-800) !important;
   }
 
-
-
   .form-control,
   .form-select {
     background-color: var(--color-gray-700) !important;
     border-color: var(--color-gray-600) !important;
+  }
+
+  .ts-control,
+  .ts-control input {
+    background-color: var(--color-gray-700) !important;
+    border-color: var(--color-gray-700) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  .ts-dropdown {
+    background-color: var(--color-gray-700) !important;
+    border-color: var(--color-gray-700) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  .ts-dropdown .option.active {
+    background-color: var(--color-gray-600) !important;
+    border-color: var(--color-gray-600) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  .ts-dropdown-content {
+    background-color: var(--color-gray-700) !important;
+    border-color: var(--color-gray-700) !important;
+    color: var(--color-gray-100) !important;
+  }
+
+  /* Styling for selected tags in a multi-select */
+  .ts-control .item {
+    background: #374151 !important;
+    color: #f3f4f6 !important;
+    border: 1px solid #4b5563 !important;
   }
 
   /* song number cell background when not position */
@@ -488,31 +518,28 @@
     padding: 1rem !important;
   }
 
-  .calendar.release-event {
-    background-color: var(--color-yellow-500) !important;
-    border-color: var(--color-yellow-600) !important;
-  }
-
+  .calendar.release-event,
   .calendar.release-event-past {
-    background-color: var(--color-yellow-600) !important;
-    border-color: var(--color-yellow-700) !important;
+    background-color: var(--color-yellow-800) !important;
+    border-color: var(--color-yellow-900) !important;
+    color: var(--color-white) !important;
   }
 
   .calendar.event-birthday {
     background-color: var(--color-teal-700) !important;
     border-color: var(--color-teal-800) !important;
-    color: var(--color-teal-600) !important;
+    color: var(--color-teal-50) !important;
   }
 
   .calendar.event-run {
     background-color: var(--color-green-700) !important;
-    border-color: var(--color-green-700) !important;
+    border-color: var(--color-green-800) !important;
     color: var(--color-white) !important;
   }
 
   .calendar.event.show {
     color: var(--color-white) !important;
-    background-color: var(--color-blue-500) !important;
+    background-color: var(--color-blue-600) !important;
   }
 
   .dropdown-menu {

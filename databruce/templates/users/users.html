@@ -88,7 +88,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#userTable', {
         ajax: {
           'url': '/api/v1/users/?format=custom'

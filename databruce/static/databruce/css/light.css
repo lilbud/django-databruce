@@ -288,12 +288,15 @@
     background-color: var(--color-gray-50) !important;
   }
 
-
-
   .form-control,
   .form-select {
     background-color: var(--color-gray-100) !important;
     border-color: var(--color-gray-300) !important;
+  }
+
+  .ts-control {
+    background-color: var(--color-gray-100) !important;
+    border-color: var(--color-gray-100) !important;
   }
 
   /* song number cell background when not position */
@@ -462,38 +465,35 @@
   }
 
   /* calendar */
-
   .fc-theme-standard td,
   .fc-theme-standard th,
   .fc-theme-standard .fc-scrollgrid {
     border-color: var(--color-gray-300);
   }
 
-  .calendar.release-event {
-    background-color: var(--color-yellow-500) !important;
-    border-color: var(--color-yellow-600) !important;
-  }
-
+  .calendar.release-event,
   .calendar.release-event-past {
-    background-color: var(--color-yellow-600) !important;
-    border-color: var(--color-yellow-700) !important;
+    background-color: var(--color-yellow-300) !important;
+    border-color: var(--color-yellow-400) !important;
+    color: var(--color-yellow-900) !important;
   }
 
   .calendar.event-birthday {
-    background-color: var(--color-teal-500) !important;
-    border-color: var(--color-teal-700) !important;
-    color: var(--color-teal-600) !important;
+    background-color: var(--color-teal-400) !important;
+    border-color: var(--color-teal-500) !important;
+    color: var(--color-teal-900) !important;
   }
 
   .calendar.event-run {
-    background-color: var(--color-green-600) !important;
-    border-color: var(--color-green-700) !important;
-    color: var(--color-white) !important;
+    background-color: var(--color-green-300) !important;
+    border-color: var(--color-green-400) !important;
+    color: var(--color-green-900) !important;
   }
 
   .calendar.event.show {
-    color: var(--color-white) !important;
-    background-color: var(--color-blue-500) !important;
+    color: var(--color-blue-900) !important;
+    background-color: var(--color-blue-300) !important;
+    border-color: var(--color-blue-400) !important;
   }
 
   .dropdown-menu {

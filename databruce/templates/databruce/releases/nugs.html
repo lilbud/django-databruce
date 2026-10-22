@@ -149,7 +149,7 @@
     }
 
 
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#releasesTable', {
         ajax: {
           'url': '/api/v1/nugs_releases/?format=custom',

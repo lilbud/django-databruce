@@ -611,32 +611,21 @@ class Venue(BaseModel):
     verbose_name_plural = "venues"
 
   def __str__(self) -> str:
-    name = self.name
+    return self.name
 
-    if self.id == 351:  # noqa: PLR2004
-      name = "Pierre's Good Citizens Ballpark"
+  # def get_name(self) -> str:
+  #   name = self.name
 
-    if self.id in [2040, 2844]:
-      name = "The Big Joint"
+  #   if self.id == 351:
+  #     name = "Pierre's Good Citizens Ballpark"
 
-    if self.detail:
-      name = f"{self.name}, {self.detail}"
+  #   if self.id in (2040, 2844):
+  #     name = "The Big Joint"
 
-    return name
+  #   if not name:
+  #     return "N/A"
 
-  def get_name(self) -> str:
-    name = self.name
-
-    if self.id == 351:  # noqa: PLR2004
-      name = "Pierre's Good Citizens Ballpark"
-
-    if self.id in (2040, 2844):
-      name = "The Big Joint"
-
-    if not name:
-      return "N/A"
-
-    return name
+  #   return name
 
 
 class VenueAlias(BaseModel):

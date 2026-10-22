@@ -664,7 +664,7 @@ class SetlistSongCountViewSet(viewsets.ReadOnlyModelViewSet):
   ).select_related("song", "event")
 
   queryset = queryset.values("song_id").annotate(
-    count=Count("id", distinct=True),
+    count=Count("event_id", distinct=True),
   )
 
   serializer_class = api_serializers.SetlistSongCountSerializer

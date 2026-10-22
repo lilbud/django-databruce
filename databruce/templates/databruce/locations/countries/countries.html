@@ -76,7 +76,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#countryTable', {
         ajax: {
           'url': '/api/v1/countries/?format=custom',

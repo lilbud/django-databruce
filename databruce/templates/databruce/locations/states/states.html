@@ -77,7 +77,7 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
       var table = new DataTable('#stateTable', {
         ajax: {
           'url': '/api/v1/states/?format=custom',
