@@ -800,11 +800,7 @@ class EventRunViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class LyricsViewSet(viewsets.ReadOnlyModelViewSet):
-  queryset = (
-    db_models.Lyric.objects.all()
-    .select_related("song")
-    .order_by("song__sort_song_name")
-  )
+  queryset = db_models.Lyric.objects.all().select_related("song").order_by("song__slug")
   serializer_class = api_serializers.LyricsSerializer
 
 

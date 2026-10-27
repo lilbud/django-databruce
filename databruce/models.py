@@ -54,6 +54,12 @@ class CustomUser(AbstractUser):
     blank=True,
   )
 
+  receive_newsletter = models.BooleanField(
+    default=True,
+    db_column="receive_newsletter",
+    verbose_name="Receive marketing and newsletter emails",
+  )
+
   def __str__(self) -> str:
     return self.username
 
@@ -612,20 +618,6 @@ class Venue(BaseModel):
 
   def __str__(self) -> str:
     return self.name
-
-  # def get_name(self) -> str:
-  #   name = self.name
-
-  #   if self.id == 351:
-  #     name = "Pierre's Good Citizens Ballpark"
-
-  #   if self.id in (2040, 2844):
-  #     name = "The Big Joint"
-
-  #   if not name:
-  #     return "N/A"
-
-  #   return name
 
 
 class VenueAlias(BaseModel):

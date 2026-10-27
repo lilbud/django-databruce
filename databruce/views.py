@@ -19,6 +19,7 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.mail import send_mail
+from django.core.signing import BadSignature, Signer
 from django.db.models import (
   Avg,
   Count,
@@ -30,7 +31,7 @@ from django.db.models import (
   Subquery,
 )
 from django.forms import formset_factory
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
@@ -54,6 +55,7 @@ from .forms import (
   LoginForm,
   SetlistSearch,
   UpdateDiscordForm,
+  UpdateEmailPreferenceForm,
   UpdateUserForm,
   UserForm,
   UserReviewForm,
@@ -91,6 +93,26 @@ from .templatetags.filters import currency
 
 UserModel = get_user_model()
 logger = logging.getLogger("django.contrib.auth")
+
+
+def unsubscribe_view(request, token):
+  signer = Signer()
+  try:
+    # Decrypt the token to extract the raw User ID
+    user_id = signer.unsign(token)
+  except BadSignature:
+    # Token was tampered with or is invalid
+    return HttpResponseBadRequest("Invalid or expired unsubscribe link.")
+
+  # Fetch the user (Assuming Custom User Model; use user__id for Profile structures)
+  user = get_object_or_404(UserModel, id=user_id)
+
+  # Process the opt-out
+  if user.receive_newsletter:
+    user.receive_newsletter = False
+    user.save(update_fields=["receive_newsletter"])
+
+  return render(request, "emails/unsubscribe_success.html", {"user": user})
 
 
 class TestView(TemplateView):
@@ -533,11 +555,51 @@ class UserChangeDiscordView(View):
     )
 
 
+class UserChangeNewsletterView(View):
+  form_class = UpdateEmailPreferenceForm
+  title = "Email Preference"
+
+  def post(self, request: HttpRequest):
+    form = self.form_class(instance=request.user, data=request.POST)
+
+    if form.is_valid():
+      form.save()
+
+      messages.success(request, "Your Email preference is updated successfully")
+
+      storage = messages.get_messages(request)
+
+      msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
+
+      return JsonResponse(
+        {
+          "success": True,
+          "messages": msg_list,
+        },
+      )
+
+    err_msg = []
+
+    for msg in form.errors.values():
+      err_msg.append(str(msg[0]))
+
+    msg_list = []
+
+    return JsonResponse(
+      {
+        "success": False,
+        "messages": {"message": "\n".join(err_msg), "tags": "error"},
+      },
+      status=400,
+    )
+
+
 class UserSettingsView(LoginRequiredMixin, PageTitleMixin, TemplateView):
   template_name = "users/settings.html"
   form_class = UpdateUserForm
   password_form_class = CustomPasswordChangeForm
   discord_form = UpdateDiscordForm
+  email_preference_form = UpdateEmailPreferenceForm
 
   title = "User Settings"
 
@@ -546,27 +608,11 @@ class UserSettingsView(LoginRequiredMixin, PageTitleMixin, TemplateView):
     context["form"] = self.form_class(instance=self.request.user)
     context["password_form"] = self.password_form_class(self.request.user)
     context["discord_form"] = self.discord_form(instance=self.request.user)
+    context["email_form"] = self.email_preference_form(
+      instance=self.request.user,
+    )
 
     return context
-
-  # def post(self, request: HttpRequest):
-  #   user_form = self.form_class(request.POST, instance=request.user)
-
-  #   if user_form.is_valid():
-  #     user_form.save()
-  #     messages.success(request, "Your profile is updated successfully")
-
-  #     storage = messages.get_messages(request)
-  #     msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
-
-  #     return JsonResponse(
-  #       {
-  #         "success": True,
-  #         "messages": msg_list,
-  #       },
-  #     )
-
-  #   return JsonResponse({"success": False, "errors": user_form.errors}, status=400)
 
 
 class SignUpDoneView(PageTitleMixin, TemplateView):

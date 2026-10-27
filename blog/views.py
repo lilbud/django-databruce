@@ -53,12 +53,27 @@ class BlogPostDetail(PageTitleMixin, TemplateView):
 
     value = nh3.clean(
       context["post"].body,
-      tags={"figure", "div", "br", "code", "blockquote", "p", "a", "img"},
+      tags={
+        "figure",
+        "div",
+        "br",
+        "code",
+        "blockquote",
+        "p",
+        "a",
+        "img",
+        "ul",
+        "ol",
+        "li",
+      },
       attributes={
         "div": {"class"},
         "figure": {"class"},
         "a": {"href"},
         "img": {"src"},
+        "ul": {"class"},
+        "ol": {"class"},
+        "li": {"class"},
       },
     )
 

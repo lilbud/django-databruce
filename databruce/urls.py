@@ -69,6 +69,7 @@ from .views import (
   UserAddReviewView,
   UserAddShowView,
   UserChangeDiscordView,
+  UserChangeNewsletterView,
   UserChangePasswordView,
   UserProfileView,
   UserRemoveShowView,
@@ -76,6 +77,7 @@ from .views import (
   UserView,
   VenueDetailView,
   VenueView,
+  unsubscribe_view,
 )
 
 sitemaps = {
@@ -102,6 +104,7 @@ urlpatterns = [
   path("test/", TestView.as_view(), name="test"),
   path("calendar/", CalendarView.as_view(), name="calendar"),
   path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+  path("unsubscribe/<str:token>/", unsubscribe_view, name="unsubscribe"),
   path(
     "login/",
     LoginView.as_view(),
@@ -131,6 +134,11 @@ urlpatterns = [
     "change-discord/",
     UserChangeDiscordView.as_view(),
     name="change_discord",
+  ),
+  path(
+    "change-newsletter/",
+    UserChangeNewsletterView.as_view(),
+    name="change_newsletter",
   ),
   path(
     "logout/",

@@ -908,6 +908,27 @@ class UpdateDiscordForm(forms.ModelForm):
     fields = ["discord_name"]
 
 
+class UpdateEmailPreferenceForm(forms.ModelForm):
+  def __init__(self, *args, **kwargs) -> None:
+    super().__init__(*args, **kwargs)
+
+  receive_newsletter = forms.BooleanField(
+    required=False,
+    label="Recieve Newsletter Emails?",
+    widget=forms.CheckboxInput(
+      attrs={
+        "class": "form-check-input",
+        "role": "switch",
+        "type": "checkbox",
+      },
+    ),
+  )
+
+  class Meta:
+    model = User
+    fields = ["receive_newsletter"]
+
+
 class ContactForm(forms.Form):
   def __init__(self, *args: Any, **kwargs: Any) -> None:
     """Initialize form."""

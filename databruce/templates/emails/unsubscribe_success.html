@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Unsubscribed Successfully</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            background: #f9f9f9;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            display: inline-block;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>You have been unsubscribed</h1>
+      <p>The email address associated with <strong>{{ user.username }}</strong> will no longer receive marketing updates from us.</p>
+      <p><small>Changed your mind? You can turn emails back on anytime inside your account dashboard settings.</small></p>
+    </div>
+  </body>
+</html>
