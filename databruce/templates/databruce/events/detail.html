@@ -83,7 +83,7 @@
                   <div class="col event-header-venue">
                     {% if event.venue %}
                       <a class="text-reset fw-semibold"
-                         href="{% url 'venue_details' slug=event.venue.slug %}">{{ event.venue.get_name }}</a>
+                         href="{% url 'venue_details' slug=event.venue.slug %}">{{ event.venue.name }}</a>
                       {% if event.venue.city %}
                         <div class="fw-light">
                           <a class="fw-light text-reset"

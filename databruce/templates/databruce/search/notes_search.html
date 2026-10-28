@@ -57,6 +57,16 @@
       </div>
     </div>
     <div class="row mt-4 mb-3">
+      <div class="d-flex flex-column flex-lg-row align-items-center justify-content-center column-gap-3 flex-wrap event-controls"
+           id="tableControls">
+        {% include "databruce/partials/table_pagination.html" %}
+        <div class="dt-info order-2 table_info"
+             aria-live="polite"
+             role="status"
+             id="tableInfo"></div>
+      </div>
+    </div>
+    <div class="row mt-4 mb-3">
       <div class="col">
         <div class="card">
           <div class="card-body p-0">
@@ -77,6 +87,16 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="row mt-4 mb-3">
+      <div class="d-flex flex-column flex-lg-row align-items-center justify-content-center column-gap-3 flex-wrap event-controls"
+           id="tableControls">
+        {% include "databruce/partials/table_pagination.html" %}
+        <div class="dt-info order-2 table_info"
+             aria-live="polite"
+             role="status"
+             id="tableInfo"></div>
       </div>
     </div>
   </div>
@@ -129,8 +149,83 @@
         }, {
           'data': 'event.public',
           'name': 'event__public'
-        }, ]
+        }, ],
+        initComplete: function(settings, json) {
+          var api = this.api();
+          var info = api.page.info();
+
+          const input = document.querySelectorAll('.page-input');
+          const prevBtn = document.querySelectorAll('.btn-prev');
+          const nextBtn = document.querySelectorAll('.btn-next');
+          const totalSpan = document.querySelectorAll('.total-pages');
+          const tableInfo = document.querySelector('.table_info');
+
+          // Initial button states
+          input.forEach(el => {
+            el.value = info.page + 1;
+
+            el.addEventListener('change', function() {
+              let val = parseInt(this.value, 10) - 1;
+              const max = api.page.info().pages - 1;
+
+              if (val < 0) val = 0;
+              if (val > max) val = max;
+
+              this.value = val;
+              api.page(val).draw('page');
+            })
+          });
+
+          prevBtn.forEach(el => {
+            el.disabled = info.page === 0;
+
+            el.addEventListener('click', function() {
+              prevPage(table);
+            });
+          });
+
+          nextBtn.forEach(el => {
+            el.disabled = info.page >= info.pages - 1;
+
+            el.addEventListener('click', function() {
+              nextPage(table);
+            });
+          });
+
+          tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
+
+          api.on('draw', () => {
+            const pageInfo = api.page.info();
+
+            input.forEach(el => {
+              el.value = pageInfo.page + 1;
+              el.setAttribute('max', pageInfo.pages);
+            });
+
+            totalSpan.forEach(el => {
+              el.textContent = `of ${pageInfo.pages || 1}`;
+            });
+
+            prevBtn.forEach(el => {
+              el.disabled = pageInfo.page === 0;
+            });
+
+            nextBtn.forEach(el => {
+              el.disabled = pageInfo.page >= pageInfo.pages - 1;
+            });
+
+            tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
+          });
+
+          // totalSpan.textContent = `of ${info.pages || 1}`;
+          totalSpan.forEach(el => {
+            el.textContent = `of ${info.pages || 1}`;
+          })
+
+          reloadTooltips();
+        }
       });
+
 
       $('#PublicityFilter').on('change', function() {
         var selectedValue = this.value;
@@ -140,6 +235,6 @@
       });
 
       tableSearch(table, 'search');
-    })
+    });
   </script>
 {% endblock content %}

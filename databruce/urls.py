@@ -61,6 +61,8 @@ from .views import (
   TestEventView,
   TestTableView,
   TestView,
+  ThirtyDaysSubmitView,
+  ThirtyDaysView,
   TourDetailView,
   TourLegDetailView,
   TourLegView,
@@ -139,6 +141,16 @@ urlpatterns = [
     "change-newsletter/",
     UserChangeNewsletterView.as_view(),
     name="change_newsletter",
+  ),
+  path(
+    "30daysofbruce/",
+    ThirtyDaysView.as_view(),
+    name="thirty_days",
+  ),
+  path(
+    "30daysofbruce/submit",
+    ThirtyDaysSubmitView.as_view(),
+    name="thirty_days_submit",
   ),
   path(
     "logout/",

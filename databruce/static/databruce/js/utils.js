@@ -19,7 +19,7 @@ function renderLink(url, data, text) {
 function eventDateFormat(event) {
   if (!event) return '';
 
-  const date = new Date(event.date || event);
+  const date = new Date(`${event.date} 00:00` || event);
   const dayText = date.toLocaleDateString('en-US', { weekday: 'long' });
   var dateItem;
 
@@ -59,4 +59,25 @@ function reloadTooltips() {
   tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
+}
+
+function formUpdate(data, messageDiv) {
+  if ($(messageDiv).is(':empty')) {
+    // Container is empty: show the card immediately
+    $(messageDiv).addClass('mb-3');
+    $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
+    $(messageDiv).parent().show();
+
+  } else {
+    // Container is not empty: hide parent and clear content
+    // $(messageDiv).parent().hide();
+    $(messageDiv).empty(); // Safely clears the old card
+
+    // Wait 1 second (1000ms) before showing the new card
+    setTimeout(() => {
+      $(messageDiv).addClass('mb-3');
+      $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
+      $(messageDiv).parent().show();
+    }, 200);
+  }
 }

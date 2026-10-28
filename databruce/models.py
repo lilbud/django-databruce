@@ -2597,7 +2597,7 @@ class UserShowReview(BaseModel):
   )
 
   uuid = models.UUIDField(default=uuid4, editable=False)
-  rating = models.IntegerField(default=0, max_length=1)
+  rating = models.IntegerField(default=0)
 
   class Meta:
     managed = True
@@ -2608,3 +2608,47 @@ class UserShowReview(BaseModel):
 
   def __str__(self) -> str:
     return f"{self.event} - {self.user}"
+
+
+class ThirtydaysUserEntries(BaseModel):
+  id = models.AutoField(primary_key=True)
+  user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, db_column="user_id")
+  entry = models.TextField()
+  points = models.IntegerField(blank=True, null=True)
+
+  class Meta:
+    managed = True
+    db_table = "thirtydays_user_entries"
+
+  def __str__(self):
+    return f"{self.user} - {self.entry}"
+
+
+class ThirtydaysDayEntries(BaseModel):
+  id = models.AutoField(primary_key=True)
+  day = models.IntegerField()
+  file_path = models.CharField(max_length=255)
+  song = models.TextField()
+  event = models.ForeignKey(Event, on_delete=models.CASCADE, db_column="event_id")
+  clue = models.TextField()
+  answer = models.TextField()
+  answer_info = models.TextField()
+  available_from = models.DateTimeField(blank=True, null=True)
+  available_to = models.DateTimeField(blank=True, null=True)
+
+  class Meta:
+    managed = True
+    db_table = "thirtydays_day_entries"
+
+  def __str__(self):
+    return f"{self.clue}"
+
+
+class ThirtydaysScoreboard(BaseModel):
+  id = models.AutoField(primary_key=True)
+  user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, db_column="user_id")
+  score = models.IntegerField(blank=True, null=True)
+
+  class Meta:
+    managed = True
+    db_table = "thirtydays_scoreboard"

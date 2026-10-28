@@ -207,31 +207,7 @@
                   <div class="row" id="email-response-message">
                     <div class="col"></div>
                   </div>
-                  {% comment %} {% for field in email_form %}
-                    <div class="row {% if field.help_text %}mb-0{% else %}mb-2{% endif %}">
-                      <label class="form-label text-sm" for="{{ field.id_for_label }}">{% translate field.label %}</label>
-                      {% if field.errors %}
-                        <br>
-                        <span class="text-sm text-danger">
-                          {% for error in field.errors %}
-                            {% translate error %}
-                          {% endfor %}
-                        </span>
-                      {% endif %}
-                      <div class="mx-auto">{{ field }}</div>
-                      {% if field.help_text %}
-                        <div class="text-muted text-2xs py-2">{{ field.help_text|safe }}</div>
-                      {% endif %}
-                    </div>
-                  {% endfor %} {% endcomment %}
                   <div class="row text-sm">{{ email_form }}</div>
-                  {% comment %} <div class="form-check form-switch form-check-reverse">
-                    {{ email_form.receive_newsletter }}
-                    <label class="form-check-label"
-                           for="{{ email_form.receive_newsletter.id_for_label }}">
-                      {{ email_form.receive_newsletter.label }}
-                    </label>
-                  </div> {% endcomment %}
                   <div class="row mt-3">
                     <div class="col-auto">
                       <button id="newsletter-submit-button"
@@ -251,27 +227,6 @@
 {% endblock content %}
 {% block scripts %}
   <script>
-    function formUpdate(data, messageDiv) {
-      if ($(messageDiv).is(':empty')) {
-        // Container is empty: show the card immediately
-        $(messageDiv).addClass('mb-3');
-        $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
-        $(messageDiv).parent().show();
-
-      } else {
-        // Container is not empty: hide parent and clear content
-        $(messageDiv).parent().hide();
-        $(messageDiv).empty(); // Safely clears the old card
-
-        // Wait 1 second (1000ms) before showing the new card
-        setTimeout(() => {
-          $(messageDiv).addClass('mb-3');
-          $(messageDiv).html(`<div class="card profile message ${data.tags}">${data.message}</div>`);
-          $(messageDiv).parent().show();
-        }, 500);
-      }
-    }
-
     document.getElementById('updateDiscordForm').addEventListener('submit', function(e) {
       e.preventDefault(); // Stop standard form submission page reload
 

@@ -1037,3 +1037,31 @@ class UserReviewForm(forms.Form):
       raise forms.ValidationError("Links are not allowed in reviews.")
 
     return cleaned_data
+
+
+class ThirtyDaysForm(forms.ModelForm):
+  def __init__(self, *args: Any, **kwargs: Any) -> None:
+    """Initialize form."""
+    super().__init__(*args, **kwargs)
+
+  entry = forms.CharField(
+    label="Guess",
+    required=True,
+    widget=forms.TextInput(
+      attrs={
+        "class": "form-control form-control-sm",
+        "placeholder": "Enter your guess (Must include Song and Year, Date/Location if known)",
+      },
+    ),
+  )
+
+  def clean_entry(self):
+    entry = self.cleaned_data.get("entry")
+    if entry:
+      return nh3.clean(entry, tags=set())
+
+    return entry
+
+  class Meta:
+    model = models.ThirtydaysUserEntries
+    fields = ["entry"]

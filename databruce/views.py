@@ -54,6 +54,7 @@ from .forms import (
   CustomPasswordChangeForm,
   LoginForm,
   SetlistSearch,
+  ThirtyDaysForm,
   UpdateDiscordForm,
   UpdateEmailPreferenceForm,
   UpdateUserForm,
@@ -81,6 +82,8 @@ from .models import (
   Song,
   State,
   Tag,
+  ThirtydaysDayEntries,
+  ThirtydaysScoreboard,
   Tour,
   TourLeg,
   Type,
@@ -108,8 +111,8 @@ def unsubscribe_view(request, token):
   user = get_object_or_404(UserModel, id=user_id)
 
   # Process the opt-out
-  if user.receive_newsletter:
-    user.receive_newsletter = False
+  if user.receive_newsletter:  # type: ignore
+    user.receive_newsletter = False  # type: ignore
     user.save(update_fields=["receive_newsletter"])
 
   return render(request, "emails/unsubscribe_success.html", {"user": user})
@@ -120,6 +123,81 @@ class TestView(TemplateView):
 
   def get_context_data(self, **kwargs) -> dict[str, Any]:
     return super().get_context_data(**kwargs)
+
+
+class ThirtyDaysView(TemplateView):
+  template_name = "databruce/30days/index.html"
+  form_class = ThirtyDaysForm
+
+  date = datetime.datetime.strptime("2026-11-02 12:00", "%Y-%m-%d %H:%M")
+  yesterday = date - datetime.timedelta(days=1)
+
+  print(date, yesterday)
+
+  def get_context_data(self, **kwargs) -> dict[str, Any]:
+    context = super().get_context_data(**kwargs)
+    context["form"] = self.form_class()
+    context["day"] = ThirtydaysDayEntries.objects.filter(
+      available_from__gte=self.date,
+    ).first()
+
+    context["scoreboard"] = (
+      ThirtydaysScoreboard.objects.all().select_related("user").order_by("-score")[:10]
+    )
+
+    context["previous_answer"] = (
+      ThirtydaysDayEntries.objects.filter(
+        available_from__gte=self.yesterday,
+        available_to__lte=self.date,
+      )
+      .order_by("-available_from")
+      .select_related("event", "event__venue")
+      .first()
+    )
+
+    return context
+
+
+class ThirtyDaysSubmitView(View):
+  form_class = ThirtyDaysForm
+
+  def post(self, request: HttpRequest):
+    form = self.form_class(request.POST)
+
+    if form.is_valid():
+      entry = form.save(commit=False)
+
+      entry.user = request.user
+
+      entry.save()
+
+      messages.success(request, "Your entry has submitted successfully")
+
+      storage = messages.get_messages(request)
+
+      msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
+
+      return JsonResponse(
+        {
+          "success": True,
+          "messages": msg_list,
+        },
+      )
+
+    err_msg = []
+
+    for msg in form.errors.values():
+      err_msg.append(str(msg[0]))
+
+    msg_list = []
+
+    return JsonResponse(
+      {
+        "success": False,
+        "messages": {"message": "\n".join(err_msg), "tags": "error"},
+      },
+      status=400,
+    )
 
 
 class RadioView(TemplateView):
@@ -166,33 +244,6 @@ class IndexView(PageTitleMixin, TemplateView):
       .order_by("-event_id")
       .first()
     )
-
-    # print(queryset)
-
-    # queryset = (
-    #   Setlist.objects.select_related(
-    #     "event__artist",
-    #     "event__venue",
-    #     "event__tour",
-    #   )
-    #   .filter(event_filter)
-    #   .distinct("event_id")
-    #   .order_by("-event_id")
-    #   .first()
-    # )
-
-    # if not queryset:
-    #   queryset = (
-    #     Setlist.objects.select_related(
-    #       "event__artist",
-    #       "event__venue",
-    #       "event__tour",
-    #     )
-    #     .filter(event__event_id="19780919-01")
-    #     .distinct("event_id")
-    #     .order_by("-event_id")
-    #     .first()
-    #   )
 
     context["featured_event"] = queryset
 
@@ -260,7 +311,7 @@ class CalendarView(PageTitleMixin, TemplateView):
         self.request.GET["start"],  # type: ignore
       ):  # type: ignore
         context["start_date"] = self.request.GET["start"]
-        context["year"] = int(self.request.GET["start"].split("-")[0])
+        context["year"] = int(self.request.GET["start"].split("-")[0])  # type: ignore
     except MultiValueDictKeyError:
       context["start_date"] = context["date"].strftime("%Y-%m-%d")
       context["year"] = context["date"].year

@@ -655,3 +655,14 @@ First public release of the site. Site was locked behind a login and accounts on
 - External links now open in new tab by default
 - Cleaned up support page, added actual links
 - Style tweaks
+
+# v1.35 (October 28, 2026)
+
+# Added
+
+- 30 Days of Bruce added, will start on November 1st
+
+# Fixed
+
+- Fixed issue where event dates would show wrong day. The time was never set so many days would be off 1 (Friday -> Thursday) due to the timezone conversion.
+- Fixed missing pagination on Setlist Notes Search
