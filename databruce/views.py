@@ -703,7 +703,7 @@ class UserRemoveShowView(LoginRequiredMixin, View):
     if attendance:
       attendance.delete()  # This triggers the model's delete() method
 
-      count = UserAttendedShow.objects.filter(user_id=request.user.id).count()  # type: ignore
+      count = UserAttendedShow.objects.filter(event_id=event_id).count()  # type: ignore
 
       return JsonResponse({"action": "removed", "count": count})
 
@@ -861,7 +861,7 @@ class EventDetailView(PageTitleMixin, TemplateView):
       context["user_review"] = existing_review.first()
 
       if context["user_review"]:
-        review = existing_review
+        review = context["user_review"]
         context["review_form"] = self.ReviewForm(
           initial={
             "content": review.content,  # type: ignore

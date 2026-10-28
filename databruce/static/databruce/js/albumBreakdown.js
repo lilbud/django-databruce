@@ -40,7 +40,6 @@ async function albumBreakdown(url) {
       return Math.max(max, item.songs?.length || 0);
     }, 0);
 
-    console.log(maxLength);
 
     // Build HTML in memory to minimize DOM reflows
     for (const item of results) {

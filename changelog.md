@@ -666,3 +666,9 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Fixed issue where event dates would show wrong day. The time was never set so many days would be off 1 (Friday -> Thursday) due to the timezone conversion.
 - Fixed missing pagination on Setlist Notes Search
+
+# Changed
+
+- Add show button on Event Detail page no longer refreshes entire page when adding/removing event.
+- Upon marking show as "attended", the review popup will show. You don't have to review and can close/tap out of it.
+- Changed some button styles

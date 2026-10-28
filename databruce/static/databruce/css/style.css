@@ -1627,6 +1627,33 @@ table.dataTable th.dt-type-numeric div.dt-column-header {
   content: "\f5de";
 }
 
+/* Disabled state styles */
+#addshow:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  /* Hard-blocks hover transitions and clicks in the browser */
+  opacity: 0.7;
+}
+
+/* Optional: Add a subtle pulsing effect while loading */
+#addshow.is-loading {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }

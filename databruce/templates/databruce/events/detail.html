@@ -332,14 +332,14 @@
                                       data-bs-target="#userAddReviewModal"
                                       type="submit"
                                       name="submit"
-                                      class="btn btn-sm btn-neutral text-xs w-100 text-nowrap icon-button">Add Review</button>
+                                      class="btn btn-sm btn-neutral-subtle text-xs w-100 text-nowrap icon-button">Add Review</button>
                             {% else %}
                               <button id="reviewshow"
                                       data-bs-toggle="modal"
                                       data-bs-target="#userAddReviewModal"
                                       type="submit"
                                       name="submit"
-                                      class="btn btn-sm btn-success text-xs w-100 text-nowrap icon-button">Update Review</button>
+                                      class="btn btn-sm btn-info-subtle text-xs w-100 text-nowrap icon-button">Update Review</button>
                             {% endif %}
                           {% else %}
                             <span data-bs-toggle="tooltip"
@@ -368,9 +368,9 @@
                                       {% if user_attended %}data-action="remove" data-attended="true"{% else %}data-action="add" data-attended="false"{% endif %}
                                       class="btn btn-sm text-xs w-100 text-nowrap
                                              {% if user_attended %}
-                                               btn-success
+                                               btn-success-subtle
                                              {% else %}
-                                               btn-neutral
+                                               btn-neutral-subtle
                                              {% endif %}
                                              icon-button">
                                 <i class="bi
@@ -815,11 +815,11 @@
               <div class="form-text text-muted text-xs mb-2 mt-0">{{ field.help_text|safe }}</div>
             {% endif %}
             <p>{{ review_form.content }}</p>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-sm btn-success">Submit</button>
+            </div>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-sm btn-success">Submit</button>
         </div>
       </div>
     </div>
@@ -871,8 +871,45 @@
       </div>
     </div>
   </div>
+  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+    <div id="reviewSuccessToast"
+         class="toast align-items-center border-0 btn-success"
+         role="alert"
+         data-bs-delay="3000"
+         aria-live="assertive"
+         aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">Review submitted successfully! Thank you.</div>
+        <button type="button"
+                class="btn-close me-2 m-auto"
+                data-bs-dismiss="toast"
+                aria-label="Close"></button>
+      </div>
+    </div>
+    <div id="addShowToast"
+         class="toast align-items-center border-0 btn-success"
+         role="alert"
+         aria-live="assertive"
+         data-bs-delay="3000"
+         aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">Added Show to Profile</div>
+        <button type="button"
+                class="btn-close me-2 m-auto"
+                data-bs-dismiss="toast"
+                aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
   <script>
     var counts = [];
+    const reviewModalEl = document.getElementById('userAddReviewModal');
+    const reviewModal = new bootstrap.Modal(reviewModalEl);
+    const successToastEl = document.getElementById('reviewSuccessToast');
+    const successToast = new bootstrap.Toast(successToastEl);
+
+    const addShowToastEl = document.getElementById('addShowToast');
+    const addShowToast = new bootstrap.Toast(addShowToastEl);
 
     $(document).ready(async function() {
       var event = "{{ event.id }}";
@@ -1087,8 +1124,15 @@
       $('#userForm').submit(async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
-        const action = $('#addshow').attr('data-action');
+        const addBtn = document.getElementById('addshow');
+        const action = addBtn.getAttribute('data-action');
+        const userCount = document.getElementById('userCount');
+        const btnText = document.getElementById('attended');
+        const btnStar = document.getElementById('star');
         const url = `/events/${event}/${action}/`;
+
+        addBtn.disabled = true;
+        addBtn.classList.add('is-loading');
 
         try {
           const response = await fetch(url, {
@@ -1100,8 +1144,33 @@
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
 
-          // Reload page to show new changes
-          window.location.reload()
+          const data = await response.json();
+
+
+          userCount.textContent = data.count || 0;
+
+          const isAdded = data['action'] === 'added';
+          addBtn.classList.toggle('btn-success-subtle', isAdded);
+          addBtn.classList.toggle('btn-neutral-subtle', !isAdded);
+          addBtn.setAttribute('data-attended', isAdded ? 'true' : 'false');
+          addBtn.setAttribute('data-action', isAdded ? 'remove' : 'add');
+
+          btnText.textContent = isAdded ? "Attended" : "Attended?";
+          btnStar.classList.toggle('bi-star-fill', isAdded);
+          btnStar.classList.toggle('bi-star', !isAdded);
+
+          addBtn.classList.remove('is-loading');
+          addBtn.disabled = false;
+
+          addShowToastEl.querySelector('.toast-body').textContent = isAdded ? "Show Added To Profile" : "Show Removed From Profile";
+          addShowToastEl.classList.toggle('btn-success', isAdded);
+          addShowToastEl.classList.toggle('btn-danger', !isAdded);
+          addShowToast.show();
+
+          // Show review modal on adding event
+          //if (isAdded) {
+          //reviewModal.show();
+          //}
 
         } catch (error) {
           console.error('Error during POST request:', error);
@@ -1123,8 +1192,9 @@
           const data = await response.json();
 
           if (response.ok && data.success) {
-            console.log("review added");
-            window.location.reload();
+            //window.location.reload();
+            reviewModal.hide();
+            successToast.show();
           } else if (data.message) {
             var errorCard = `<div class="card message error">${data.message}</div>`
             $('#error-messages').append(errorCard);

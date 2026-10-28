@@ -75,14 +75,8 @@
   .btn-primary-subtle,
   .badge-primary-subtle {
     background-color: var(--color-blue-800) !important;
-    color: var(--color-blue-200) !important;
-    border-color: var(--color-blue-400) !important;
-  }
-
-  .btn-primary-subtle-outline {
-    background-color: var(--color-blue-700) !important;
-    color: var(--color-blue-50) !important;
-    border-color: var(--color-blue-400) !important;
+    color: var(--color-blue-100) !important;
+    border-color: var(--color-blue-600) !important;
   }
 
   /* secondary */
@@ -96,7 +90,8 @@
   .btn-secondary-subtle,
   .badge-secondary-subtle {
     background-color: var(--color-teal-800) !important;
-    color: var(--color-teal-200) !important;
+    color: var(--color-teal-100) !important;
+    border-color: var(--color-teal-600) !important;
   }
 
   /* success */
@@ -110,7 +105,8 @@
   .btn-success-subtle,
   .badge-success-subtle {
     background-color: var(--color-green-800) !important;
-    color: var(--color-green-200) !important;
+    color: var(--color-green-100) !important;
+    border-color: var(--color-green-600) !important;
   }
 
   /* warning */
@@ -123,7 +119,8 @@
   .btn-warning-subtle,
   .badge-warning-subtle {
     background-color: var(--color-yellow-800) !important;
-    color: var(--color-yellow-200) !important;
+    color: var(--color-yellow-100) !important;
+    border-color: var(--color-yellow-600) !important;
   }
 
   /* info */
@@ -138,6 +135,7 @@
   .badge-info-subtle {
     background-color: var(--color-cyan-800) !important;
     color: var(--color-cyan-100) !important;
+    border-color: var(--color-cyan-600) !important;
   }
 
   /* danger */
@@ -149,9 +147,11 @@
   }
 
   .btn-danger-subtle,
-  .badge-danger-subtle {
+  .badge-danger-subtle,
+  #addshow[data-attended="true"]:hover {
     background-color: var(--color-red-800) !important;
     color: var(--color-red-100) !important;
+    border-color: var(--color-red-600) !important;
   }
 
   /* neutral */
@@ -164,8 +164,9 @@
   .btn-neutral-subtle,
   .badge-neutral-subtle,
   .nav-btn:not(.active) {
-    color: var(--color-gray-200) !important;
-    background-color: var(--color-gray-600) !important;
+    color: var(--color-gray-100) !important;
+    background-color: var(--color-gray-700) !important;
+    border-color: var(--color-gray-500) !important;
   }
 
   /* purple */
@@ -179,6 +180,7 @@
   .badge-purple-subtle {
     background-color: var(--color-purple-900) !important;
     color: var(--color-purple-100) !important;
+    border-color: var(--color-purple-600) !important;
   }
 
   .nav-pills-list .btn:not(.active) {
@@ -195,10 +197,6 @@
     background-color: var(--color-gray-600) !important;
   }
 
-  #addshow[data-attended="true"]:hover {
-    background-color: var(--color-red-100) !important;
-    color: var(--color-red-800) !important;
-  }
 
   .card.message.info {
     color: var(--color-cyan-100) !important;
