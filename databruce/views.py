@@ -129,31 +129,37 @@ class ThirtyDaysView(TemplateView):
   template_name = "databruce/30days/index.html"
   form_class = ThirtyDaysForm
 
-  date = datetime.datetime.strptime("2026-11-02 12:00", "%Y-%m-%d %H:%M")
-  yesterday = date - datetime.timedelta(days=1)
-
-  print(date, yesterday)
-
   def get_context_data(self, **kwargs) -> dict[str, Any]:
     context = super().get_context_data(**kwargs)
     context["form"] = self.form_class()
+
+    # utc_zone = zoneinfo.ZoneInfo("America/New_York")
+    # test_date = datetime.datetime(2026, 11, 1, 12, 0, 0, tzinfo=utc_zone)
+
+    date = datetime.datetime.now()
+
+    # 1. Fixed the filter operators for "between" logic
     context["day"] = ThirtydaysDayEntries.objects.filter(
-      available_from__gte=self.date,
+      available_from__lte=date,
+      available_to__gte=date,
     ).first()
 
     context["scoreboard"] = (
       ThirtydaysScoreboard.objects.all().select_related("user").order_by("-score")[:10]
     )
 
-    context["previous_answer"] = (
-      ThirtydaysDayEntries.objects.filter(
-        available_from__gte=self.yesterday,
-        available_to__lte=self.date,
+    # 2. Added a safety check in case context["day"] is None
+    if context["day"]:
+      context["previous_answer"] = (
+        ThirtydaysDayEntries.objects.filter(
+          day__lt=context["day"].day,
+        )
+        .order_by("-available_from")
+        .select_related("event", "event__venue")
+        .first()
       )
-      .order_by("-available_from")
-      .select_related("event", "event__venue")
-      .first()
-    )
+    else:
+      context["previous_answer"] = None
 
     return context
 
