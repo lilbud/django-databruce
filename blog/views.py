@@ -88,8 +88,6 @@ class BlogPostDetail(PageTitleMixin, TemplateView):
     md = markdown.Markdown(extensions=["fenced_code", "toc"])
     post = md.convert(value)
 
-    print(value)
-
     template_obj = template.Template(post)
 
     context_new = Context({"body": context["post"].body})

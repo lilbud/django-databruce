@@ -132,7 +132,7 @@ class DataTablesBaseFilterBackend(BaseFilterBackend):
       ret.append((field, dir))
       i += 1
 
-    print(ret)
+    # print(ret)
     return ret
 
   def set_count_before(self, view, total_count):

@@ -1405,7 +1405,7 @@ class AdvSearchView(PageTitleMixin, TemplateView):
       # 1. Unpack request.GET.lists() cleanly
       is_initial_submission = "form-TOTAL_FORMS" in request.GET
 
-      print(request.GET)
+      # print(request.GET)
 
       if is_initial_submission:
         raw_params = {}
@@ -1492,7 +1492,7 @@ class AdvSearchView(PageTitleMixin, TemplateView):
         if len(clean_params) != len(request.GET):
           redirect_url = reverse("adv_search_results")
           if clean_params:
-            print(clean_params)
+            # print(clean_params)
             # CRITICAL: doseq=True ensures lists like {'type': ['4', '1']}
             # encode as 'type=4&type=1' instead of crashing/mangling
             redirect_url += "?" + urlencode(clean_params, doseq=True)

@@ -25,10 +25,10 @@ class DatatablesLimitOffsetPagination(LimitOffsetPagination):
           limit_param = request.query_params.get(self.default_limit_param)
 
           if limit_param is not None and limit_param == "-1":
-            print("limit param is -1")
+            # print("limit param is -1")
             return self.max_limit
 
-          print("limit param is not -1")
+          # print("limit param is not -1")
 
           return int(request.query_params[self.default_limit_param])  # type: ignore
         except (ValueError, TypeError):
