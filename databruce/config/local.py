@@ -86,6 +86,10 @@ EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
 PASSWORD_RESET_TIMEOUT = 259200
 
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_TZ = True
+
 CACHES = {
   "default": {
     "BACKEND": "django.core.cache.backends.db.DatabaseCache",

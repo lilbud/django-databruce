@@ -14,7 +14,7 @@
         <div class="text-base">Bruce related articles sourced from various corners of the internet.</div>
       </div>
     </div>
-    <div class="row justify-content-center align-items-center mt-3">
+    {% comment %} <div class="row justify-content-center align-items-center mt-3">
       <div class="col-12">
         <a class="btn btn-neutral text-sm w-100 collapse-toggle"
            id="filterCollapseToggle"
@@ -35,8 +35,8 @@
         </a>
       </div>
     </div>
-    <div class="collapse" id="filterCollapse">
-      <div class="flex-column d-grid row-gap-2 pt-3 px-1">
+    <div class="collapse" id="filterCollapse"> {% endcomment %}
+      {% comment %} <div class="flex-column d-grid row-gap-2 pt-3 px-1">
         <div class="col-12 d-flex align-items-center justify-content-center gap-2">
           <label for="search" class="form-label col-2 col-md-1 text-nowrap">Search</label>
           <div class="input-group input-group-sm">
@@ -47,8 +47,8 @@
           </div>
         </div>
         <div class="col-12 d-flex align-items-center justify-content-center gap-2">
-          <label for="PublicityFilter" class="form-label col-2 col-md-1 text-nowrap">Category</label>
-          <select id="PublicityFilter" class="form-select form-select-sm">
+          <label for="categoryFilter" class="form-label col-2 col-md-1 text-nowrap">Category</label>
+          <select id="categoryFilter" class="form-select form-select-sm">
             <option value="">All</option>
             {% for choice in categories|dictsort:1 %}
               <option value="{{ choice.0 }}">{{ choice.1 }}</option>
@@ -56,187 +56,262 @@
           </select>
         </div>
         <div class="col-12 d-flex align-items-center justify-content-center gap-2">
-          <label for="LanguageFilter" class="form-label col-2 col-md-1 text-nowrap">Language</label>
-          <select id="LanguageFilter" class="form-select form-select-sm">
+          <label for="collectionFilter" class="form-label col-2 col-md-1 text-nowrap">Collection</label>
+          <select id="collectionFilter" class="form-select form-select-sm">
+            <option value="">All</option>
+            {% for choice in collections %}
+              <option value="{{ choice.name }}">{{ choice.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 d-flex align-items-center justify-content-center gap-2">
+          <label for="languageFilter" class="form-label col-2 col-md-1 text-nowrap">Language</label>
+          <select id="languageFilter" class="form-select form-select-sm">
             <option value="">All</option>
             {% for choice in languages|dictsort:1 %}
               <option value="{{ choice.0 }}">{{ choice.1 }}</option>
             {% endfor %}
           </select>
         </div>
-        <!-- Search -->
+      </div> {% endcomment %}
+      <div id="tableToolbar" class="row g-2 align-items-center py-2">
+        <!-- Search Input: Takes up remaining space on desktop (col-md-auto or col-md-4) -->
+        <div class="col-12 col-lg">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-body-secondary text-body-secondary border-end-0">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text"
+                   id="search"
+                   class="form-control form-control-sm border-start-0"
+                   placeholder="Search table...">
+          </div>
+        </div>
+        <!-- Category Filter (Narrow) -->
+        <div class="col-12 col-lg-2">
+          <select id="categoryFilter"
+                  class="form-select form-select-sm"
+                  aria-label="Category filter">
+            <option value="">Category: All</option>
+            {% for choice in categories|dictsort:1 %}
+              <option value="{{ choice.0 }}">Category: {{ choice.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Collection Filter (Slightly Wider) -->
+        <div class="col-12 col-lg-3">
+          <select id="collectionFilter"
+                  class="form-select form-select-sm"
+                  aria-label="Collection filter">
+            <option value="">Collection: All</option>
+            {% for choice in collections %}
+              <option value="{{ choice.name }}">Collection: {{ choice.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Language Filter (Narrow) -->
+        <div class="col-12 col-lg-2">
+          <select id="languageFilter"
+                  class="form-select form-select-sm"
+                  aria-label="Language filter">
+            <option value="">Language: All</option>
+            {% for choice in languages|dictsort:1 %}
+              <option value="{{ choice.0 }}">Language: {{ choice.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Clear Action (Fits content width) -->
+        {% comment %} <div class="col-6 col-md-auto ms-auto">
+          <button type="button"
+                  id="resetFilters"
+                  class="btn btn-sm btn-outline-secondary w-100 w-md-auto">
+            <i class="bi bi-x-circle me-1"></i>Clear
+          </button>
+        </div> {% endcomment %}
       </div>
-    </div>
-    <div class="row my-3">
-      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
-           id="controls">
-        {% include "databruce/partials/table_pagination.html" %}
-        <div class="dt-info order-3"
-             aria-live="polite"
-             role="status"
-             id="tableInfo"></div>
+      <div class="row my-3">
+        <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+             id="controls">
+          {% include "databruce/partials/table_pagination.html" %}
+          <div class="dt-info order-3"
+               aria-live="polite"
+               role="status"
+               id="tableInfo"></div>
+        </div>
       </div>
-    </div>
-    <div class="row mt-4">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-0">
-            <div class="row">
-              <div class="table-responsive">
-                <table class="table table-hover display" id="articleTable">
-                  <thead>
-                    <tr>
-                      <th class="all">Title</th>
-                      <th class="all">Author</th>
-                      <th class="min-desktop">Type</th>
-                      <th class="all">Source</th>
-                      <th class="min-desktop">Collection</th>
-                      <th class="min-desktop">Publish Date</th>
-                    </tr>
-                  </thead>
-                </table>
+      <div class="row mt-4">
+        <div class="col">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="row">
+                <div class="table-responsive">
+                  <table class="table table-hover display" id="articleTable">
+                    <thead>
+                      <tr>
+                        <th class="all">Title</th>
+                        <th class="all">Author</th>
+                        <th class="min-desktop">Category</th>
+                        <th class="all">Source</th>
+                        <th class="min-desktop">Collection</th>
+                        <th class="min-desktop">Published</th>
+                        <th class="min-desktop">Added</th>
+                        <th class="min-desktop">Language</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="row mt-3">
+        <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+             id="controls">{% include "databruce/partials/table_pagination.html" %}</div>
+      </div>
     </div>
-    <div class="row mt-3">
-      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
-           id="controls">{% include "databruce/partials/table_pagination.html" %}</div>
-    </div>
-  </div>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const truncateText = (str) => {
-        return str.length > 70 ? str.slice(0, 70) + '...' : str;
-      };
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const truncateText = (str) => {
+          return str.length > 70 ? str.slice(0, 70) + '...' : str;
+        };
 
-      var table = new DataTable('#articleTable', {
-        ajax: {
-          'url': '/api/v1/articles/?format=custom',
-        },
-        order: [
-          [0, 'asc']
-        ],
-        responsive: {
-          details: false,
-        },
-        pageLength: 100,
-        columns: [{
-          'data': 'title',
-          'name': 'title',
-          'width': '20rem',
-          'class': 'text-wrap',
-          'render': function(data, type, row, meta) {
-            return data ? `<a href="/library/article/${row.slug}">${truncateText(data)}</a>` : '';
+        var table = new DataTable('#articleTable', {
+          ajax: {
+            'url': '/api/v1/articles/?format=custom',
           },
-        }, {
-          'data': 'author',
-          'name': 'author',
-          'render': function(data, type, row, meta) {
-            return data ? data : ''
+          order: [
+            [0, 'asc']
+          ],
+          responsive: {
+            details: false,
           },
-        }, {
-          'data': 'category',
-          'name': 'category',
-          'render': function(data, type, row, meta) {
-            return data ? data : ''
-          },
-        }, {
-          'data': 'source',
-          'name': 'source'
-        }, {
-          'data': 'collection',
-          'name': 'collection__name'
-        }, {
-          'data': 'published_at',
-          'name': 'published_at',
-          'type': 'text',
-          'render': function(data, type, row, meta) {
-            return data ? data : ''
-          },
-        }, {
-          'data': 'language',
-          'name': 'language',
-          'visible': false,
-          'orderable': false,
-        }, ],
-        initComplete: function(settings, json) {
-          var api = this.api();
-          let info = api.page.info()
+          pageLength: 100,
+          columns: [{
+            'data': 'title',
+            'name': 'title',
+            'width': '20rem',
+            'class': 'text-wrap',
+            'render': function(data, type, row, meta) {
+              return data ? `<a href="/library/article/${row.slug}">${truncateText(data)}</a>` : '';
+            },
+          }, {
+            'data': 'author',
+            'name': 'author',
+            'render': function(data, type, row, meta) {
+              return data ? data : ''
+            },
+          }, {
+            'data': 'category',
+            'name': 'category',
+            'render': function(data, type, row, meta) {
+              return data ? data : ''
+            },
+          }, {
+            'data': 'source',
+            'name': 'source'
+          }, {
+            'data': 'collection',
+            'name': 'collection__name'
+          }, {
+            'data': 'published_at',
+            'name': 'published_at',
+            'type': 'text',
+            'render': function(data, type, row, meta) {
+              return data ? data : ''
+            },
+          }, {
+            'data': 'created_at',
+            'name': 'created_at',
+          }, {
+            'data': 'language',
+            'name': 'language',
+            'visible': false,
+            'orderable': false,
+          }, ],
+          initComplete: function(settings, json) {
+            var api = this.api();
+            let info = api.page.info()
 
-          const input = $('.page-input');
-          const prevBtn = $('.btn-prev');
-          const nextBtn = $('.btn-next');
-          const totalSpan = $('.total-pages');
-          const tableInfo = $('#tableInfo');
+            const input = $('.page-input');
+            const prevBtn = $('.btn-prev');
+            const nextBtn = $('.btn-next');
+            const totalSpan = $('.total-pages');
+            const tableInfo = $('#tableInfo');
 
-          // Initial button states
-          input.val(info.page + 1);
-          prevBtn.attr('disabled', info.page === 0);
-          nextBtn.attr('disabled', info.page >= info.pages - 1);
+            // Initial button states
+            input.val(info.page + 1);
+            prevBtn.attr('disabled', info.page === 0);
+            nextBtn.attr('disabled', info.page >= info.pages - 1);
 
-          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+            tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
 
-          api.on('draw', () => {
-            const pageInfo = api.page.info();
+            api.on('draw', () => {
+              const pageInfo = api.page.info();
 
-            input.val(pageInfo.page + 1);
-            input.attr('max', pageInfo.pages);
+              input.val(pageInfo.page + 1);
+              input.attr('max', pageInfo.pages);
 
-            totalSpan.text(`of ${pageInfo.pages || 1}`);
+              totalSpan.text(`of ${pageInfo.pages || 1}`);
 
-            // Handle button states
-            prevBtn.attr('disabled', pageInfo.page === 0);
-            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+              // Handle button states
+              prevBtn.attr('disabled', pageInfo.page === 0);
+              nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
 
-            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
-          });
+              // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+              tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+            });
 
-          totalSpan.text(`of ${info.pages || 1}`);
+            totalSpan.text(`of ${info.pages || 1}`);
 
-          nextBtn.on('click', function() {
-            nextPage(table)
-          });
+            nextBtn.on('click', function() {
+              nextPage(table)
+            });
 
-          prevBtn.on('click', function() {
-            prevPage(table);
-          });
+            prevBtn.on('click', function() {
+              prevPage(table);
+            });
 
-          input.on('change', function() {
-            let val = parseInt(this.value, 10) - 1;
-            const max = api.page.info().pages - 1;
-            if (val < 0) val = 0;
-            if (val > max) val = max;
+            input.on('change', function() {
+              let val = parseInt(this.value, 10) - 1;
+              const max = api.page.info().pages - 1;
+              if (val < 0) val = 0;
+              if (val > max) val = max;
 
-            input.attr('value', val);
+              input.attr('value', val);
 
-            api.page(val).draw('page');
-          });
-        }
+              api.page(val).draw('page');
+            });
+          }
+        });
+
+        $('#categoryFilter').on('change', function() {
+          var selectedValue = this.value;
+
+          value = selectedValue.replaceAll(' ', '-');
+
+          table.order([
+            [0, 'asc']
+          ]).column(2).search(selectedValue ? selectedValue : '', true, false).draw();
+        });
+
+        $('#languageFilter').on('change', function() {
+          var selectedValue = this.value;
+
+          table.order([
+            [0, 'asc']
+          ]).column(7).search(selectedValue ? selectedValue : '', true, false).draw();
+        });
+
+        $('#collectionFilter').on('change', function() {
+          var selectedValue = this.value;
+
+          table.order([
+            [0, 'asc']
+          ]).column(4).search(selectedValue ? selectedValue : '', true, false).draw();
+        });
+
+        tableSearch(table, 'search');
       });
-
-      $('#PublicityFilter').on('change', function() {
-        var selectedValue = this.value;
-
-        value = selectedValue.replaceAll(' ', '-');
-        table.order([
-          [0, 'asc']
-        ]).column(2).search(value ? value : '', true, false).draw();
-      });
-
-      $('#LanguageFilter').on('change', function() {
-        var selectedValue = this.value;
-
-        value = selectedValue.replaceAll(' ', '-');
-        table.order([
-          [0, 'asc']
-        ]).column(6).search(value ? value : '', true, false).draw();
-      });
-
-      tableSearch(table, 'search');
-    });
-  </script>
+    </script>
 {% endblock content %}

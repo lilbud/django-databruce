@@ -65,6 +65,10 @@ class BlogPostDetail(PageTitleMixin, TemplateView):
         "ul",
         "ol",
         "li",
+        "table",
+        "td",
+        "th",
+        "tr",
       },
       attributes={
         "div": {"class"},
@@ -74,11 +78,17 @@ class BlogPostDetail(PageTitleMixin, TemplateView):
         "ul": {"class"},
         "ol": {"class"},
         "li": {"class"},
+        "table": {"class"},
+        "td": {"class"},
+        "th": {"class"},
+        "tr": {"class"},
       },
     )
 
     md = markdown.Markdown(extensions=["fenced_code", "toc"])
     post = md.convert(value)
+
+    print(value)
 
     template_obj = template.Template(post)
 

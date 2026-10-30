@@ -365,7 +365,7 @@
   }
 
   table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event, :has(small)) {
-    color: var(--color-gray-950) !important;
+    color: var(--color-blue-600) !important;
   }
 
   .bmc-btn {

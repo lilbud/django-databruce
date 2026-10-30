@@ -35,6 +35,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonR
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
@@ -134,14 +135,14 @@ class ThirtyDaysView(TemplateView):
     context["form"] = self.form_class()
 
     # utc_zone = zoneinfo.ZoneInfo("America/New_York")
-    # test_date = datetime.datetime(2026, 11, 1, 12, 0, 0, tzinfo=utc_zone)
+    # test_date = datetime.datetime(2026, 11, 1, 12, 00, 00, tzinfo=utc_zone)
 
-    date = datetime.datetime.now()
+    date = timezone.now()
 
     # 1. Fixed the filter operators for "between" logic
     context["day"] = ThirtydaysDayEntries.objects.filter(
-      available_from__lte=date,
-      available_to__gte=date,
+      available_from__lt=date,
+      available_to__gt=date,
     ).first()
 
     context["scoreboard"] = (
@@ -149,7 +150,7 @@ class ThirtyDaysView(TemplateView):
     )
 
     # 2. Added a safety check in case context["day"] is None
-    if context["day"]:
+    try:
       context["previous_answer"] = (
         ThirtydaysDayEntries.objects.filter(
           day__lt=context["day"].day,
@@ -158,7 +159,7 @@ class ThirtyDaysView(TemplateView):
         .select_related("event", "event__venue")
         .first()
       )
-    else:
+    except (KeyError, AttributeError):
       context["previous_answer"] = None
 
     return context

@@ -672,3 +672,15 @@ First public release of the site. Site was locked behind a login and accounts on
 - Add show button on Event Detail page no longer refreshes entire page when adding/removing event.
 - Upon marking show as "attended", the review popup will show. You don't have to review and can close/tap out of it.
 - Changed some button styles
+
+# v1.36 (October 30, 2026)
+
+# Fixed
+
+- Hopefully fixed date handling for 30 Days of Bruce
+- Articles table loads faster
+- Article detail view note card padding fixed
+
+# Changed
+
+- Articles table controls rearranged slightly

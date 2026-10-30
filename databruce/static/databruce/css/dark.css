@@ -415,7 +415,7 @@
 
 
   table td:not(.highlighted, .fc-day) a:not(.text-reset, .fc-event) {
-    color: var(--color-gray-100) !important;
+    color: var(--color-blue-400) !important;
   }
 
   a.bmc-btn {

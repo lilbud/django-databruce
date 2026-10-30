@@ -386,6 +386,10 @@ thead tr:first-child th {
   margin-top: 0 !important;
 }
 
+table {
+  width: 100% !important;
+}
+
 .row:has(>div[class*="dt-layout-"]:empty) {
   display: none !important;
 }
@@ -494,9 +498,9 @@ th.fc-day {
   padding: 0 !important;
 }
 
-.set-header>td {
+/* .set-header>td {
   padding: 0 auto !important;
-}
+} */
 
 table tbody tr:not(.album-header, .set-header) td,
 tr.album-header>th {
@@ -552,10 +556,6 @@ tbody tr:not(.set-header) {
   width: max-content !important;
   cursor: pointer !important;
 }
-
-/* .badge:not([class*="text-"]) {
-  font-size: var(--text-xs) !important;
-} */
 
 .badge:not(.d-lg-none) {
   display: inline-flex !important;
@@ -624,20 +624,6 @@ blockquote {
   border-left-width: 3px !important;
   border-left-style: solid !important;
 }
-
-/* .info-card-title {
-  margin-top: 0.1rem !important;
-} */
-
-/* fix for scrolling table in card  */
-/* @media (max-width: 992px) {
-  .dt-scroll,
-  .dt-scroll-head,
-  .dt-scroll-body,
-  .list-group {
-    max-width: calc(100vw - 1.5rem) !important;
-  }
-} */
 
 /* remove horizonal margin from empty datatable rows */
 div.dt-container div.dt-layout-full> :only-child {

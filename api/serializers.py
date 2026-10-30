@@ -1430,6 +1430,8 @@ class ArticlesSerializer(serializers.ModelSerializer):
     read_only=True,
   )
 
+  created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
+
   class Meta:
     model = Article
     fields = [
@@ -1438,6 +1440,7 @@ class ArticlesSerializer(serializers.ModelSerializer):
       "slug",
       "language",
       "published_at",
+      "created_at",
       "category",
       "source",
       "collection",

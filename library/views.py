@@ -22,6 +22,7 @@ class ArticleListView(TemplateView):
     context["title"] = self.title
     context["categories"] = Article.ArticleCategory.choices
     context["languages"] = Article.ArticleLanguage.choices
+    context["collections"] = Collection.objects.all().values("slug", "name")
 
     return context
 
@@ -82,6 +83,12 @@ class ArticleDetailView(TemplateView):
         "strong",
         "em",
         "hr",
+        "table",
+        "thead",
+        "tbody",
+        "tr",
+        "th",
+        "td",
       },
       attributes={
         "div": {"class"},
@@ -89,6 +96,23 @@ class ArticleDetailView(TemplateView):
         "a": {"href", "title", "target", "rel"},
         "img": {"src", "alt", "title"},
         "code": {"class"},
+        "pre": {"class"},
+        "blockquote": {"class"},
+        "h1": {"class"},
+        "h2": {"class"},
+        "h3": {"class"},
+        "h4": {"class"},
+        "h5": {"class"},
+        "h6": {"class"},
+        "ul": {"class"},
+        "ol": {"class"},
+        "li": {"class"},
+        "table": {"class"},
+        "thead": {"class"},
+        "tbody": {"class"},
+        "tr": {"class"},
+        "th": {"class"},
+        "td": {"class"},
       },
       link_rel=None,
     )
