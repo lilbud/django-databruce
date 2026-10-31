@@ -135,13 +135,13 @@ class ThirtyDaysView(TemplateView):
     context["form"] = self.form_class()
 
     # utc_zone = zoneinfo.ZoneInfo("America/New_York")
-    # test_date = datetime.datetime(2026, 11, 1, 12, 00, 00, tzinfo=utc_zone)
+    # date = datetime.datetime(2026, 11, 1, 12, 00, 00, tzinfo=utc_zone)
 
     date = timezone.now()
 
     # 1. Fixed the filter operators for "between" logic
     context["day"] = ThirtydaysDayEntries.objects.filter(
-      available_from__lt=date,
+      available_from__lte=date,
       available_to__gt=date,
     ).first()
 
