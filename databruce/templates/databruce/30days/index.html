@@ -50,6 +50,9 @@
                     class="btn btn-sm btn-success">Submit</button>
           </div>
         </form>
+        <div class="row d-none" id="successText">
+          <div class="mb-3 text-base">Submission successful, thanks for playing!</div>
+        </div>
       {% else %}
         <div class="mb-3 text-base">You must be logged in to submit a guess. Login or create an account below</div>
         <div class="d-flex justify-content-center gap-2 mb-3">
@@ -94,6 +97,7 @@
     const form = document.getElementById('submitEntry');
     const url = `/30daysofbruce/submit`;
     const messageDiv = document.querySelector('#entry-response-message>.col')
+    const successMsg = document.getElementById('successText')
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -108,7 +112,9 @@
         })
         .then(response => response.json())
         .then(data => {
-          formUpdate(data.messages, messageDiv);
+          //formUpdate(data.messages, messageDiv);
+          form.classList.add('d-none');
+          successMsg.classList.remove('d-none');
         })
         .catch(error => {
           console.error('Error:', error);
