@@ -85,6 +85,7 @@ from .models import (
   Tag,
   ThirtydaysDayEntries,
   ThirtydaysScoreboard,
+  ThirtydaysUserEntries,
   Tour,
   TourLeg,
   Type,
@@ -165,23 +166,65 @@ class ThirtyDaysView(TemplateView):
     return context
 
 
+# class ThirtyDaysSubmitView(View):
+#   form_class = ThirtyDaysForm
+
+#   def post(self, request: HttpRequest):
+#     form = self.form_class(request.POST)
+
+#     if form.is_valid():
+#       entry = form.save(commit=False)
+
+#       entry.user = request.user
+
+#       entry.save()
+
+#       messages.success(request, "Your entry has submitted successfully")
+
+#       storage = messages.get_messages(request)
+
+#       msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
+
+#       return JsonResponse(
+#         {
+#           "success": True,
+#           "messages": msg_list,
+#         },
+#       )
+
+#     err_msg = []
+
+#     for msg in form.errors.values():
+#       err_msg.append(str(msg[0]))
+
+#     msg_list = []
+
+#     return JsonResponse(
+#       {
+#         "success": False,
+#         "messages": {"message": "\n".join(err_msg), "tags": "error"},
+#       },
+#       status=400,
+#     )
+
+
 class ThirtyDaysSubmitView(View):
   form_class = ThirtyDaysForm
 
   def post(self, request: HttpRequest):
-    form = self.form_class(request.POST)
+    # 1. Fetch the user's existing entry or create a new one if it doesn't exist yet
+    user_entry, _ = ThirtydaysUserEntries.objects.get_or_create(user=request.user)
+
+    # 2. Pass the instance to the form so it updates instead of creating a new row
+    form = self.form_class(request.POST, instance=user_entry)
 
     if form.is_valid():
-      entry = form.save(commit=False)
-
-      entry.user = request.user
-
-      entry.save()
+      # Because an instance was provided, form.save() updates the existing record
+      form.save()
 
       messages.success(request, "Your entry has submitted successfully")
 
       storage = messages.get_messages(request)
-
       msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
 
       return JsonResponse(
@@ -192,11 +235,8 @@ class ThirtyDaysSubmitView(View):
       )
 
     err_msg = []
-
     for msg in form.errors.values():
       err_msg.append(str(msg[0]))
-
-    msg_list = []
 
     return JsonResponse(
       {
