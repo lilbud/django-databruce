@@ -147,7 +147,9 @@ class ThirtyDaysView(TemplateView):
     ).first()
 
     context["scoreboard"] = (
-      ThirtydaysScoreboard.objects.all().select_related("user").order_by("-score")[:10]
+      ThirtydaysScoreboard.objects.all()
+      .select_related("user")
+      .order_by("-score", "user__username")[:10]
     )
 
     # 2. Added a safety check in case context["day"] is None
@@ -164,48 +166,6 @@ class ThirtyDaysView(TemplateView):
       context["previous_answer"] = None
 
     return context
-
-
-# class ThirtyDaysSubmitView(View):
-#   form_class = ThirtyDaysForm
-
-#   def post(self, request: HttpRequest):
-#     form = self.form_class(request.POST)
-
-#     if form.is_valid():
-#       entry = form.save(commit=False)
-
-#       entry.user = request.user
-
-#       entry.save()
-
-#       messages.success(request, "Your entry has submitted successfully")
-
-#       storage = messages.get_messages(request)
-
-#       msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
-
-#       return JsonResponse(
-#         {
-#           "success": True,
-#           "messages": msg_list,
-#         },
-#       )
-
-#     err_msg = []
-
-#     for msg in form.errors.values():
-#       err_msg.append(str(msg[0]))
-
-#     msg_list = []
-
-#     return JsonResponse(
-#       {
-#         "success": False,
-#         "messages": {"message": "\n".join(err_msg), "tags": "error"},
-#       },
-#       status=400,
-#     )
 
 
 class ThirtyDaysSubmitView(View):
