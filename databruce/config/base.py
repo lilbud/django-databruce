@@ -59,6 +59,7 @@ INSTALLED_APPS = [
   "sentry_sdk",
   "drf_spectacular",
   "django_msgspec",
+  "widget_tweaks",
 ]
 
 SITE_ID = 1

@@ -826,6 +826,23 @@ class UserForm(UserCreationForm):
       "verification",
     ]
 
+  def clean_email(self):
+    """Enforces unique emails on registration."""
+    email = self.cleaned_data.get("email").lower()
+    if User.objects.filter(email=email).exists():
+      raise ValidationError("An account with this email address already exists.")
+    return email
+
+  def clean_verification(self):
+    """Validates the bot protection question."""
+    answer = self.cleaned_data.get("verification", "").strip()
+
+    # Replace '9' with the expected answer to your question
+    if answer != "1975":
+      raise ValidationError("Incorrect verification answer. Please try again.")
+
+    return answer
+
 
 class CustomPasswordChangeForm(PasswordChangeForm):
   def __init__(self, *args, **kwargs):
@@ -1064,4 +1081,7 @@ class ThirtyDaysForm(forms.ModelForm):
 
   class Meta:
     model = models.ThirtydaysUserEntries
-    fields = ["entry"]
+    fields = ["entry", "day"]
+    widgets = {
+      "day": forms.HiddenInput(),  # Renders as <input type="hidden" name="day" ...>
+    }

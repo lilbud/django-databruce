@@ -28,3 +28,4 @@ django-msgspec
 strip-markdown
 bleach
 django-silk
+django-widget-tweaks

@@ -24,6 +24,7 @@ class CustomUser(AbstractUser):
 
   num_events = models.IntegerField(default=0)
   num_songs = models.IntegerField(default=0)
+  email = models.EmailField(unique=True)
 
   first_event = models.ForeignKey(
     to="Event",
@@ -2615,13 +2616,15 @@ class ThirtydaysUserEntries(BaseModel):
   user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, db_column="user_id")
   entry = models.TextField()
   points = models.IntegerField(blank=True, null=True)
+  day = models.IntegerField()
 
   class Meta:
     managed = True
     db_table = "thirtydays_user_entries"
+    unique_together = (("user", "day"),)
 
   def __str__(self):
-    return f"{self.user} - {self.entry}"
+    return f"{self.user} - {self.entry} {self.day}"
 
 
 class ThirtydaysDayEntries(BaseModel):

@@ -78,12 +78,18 @@ DATABASES = {
   # },
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.mailgun.org"
-EMAIL_HOST_USER = os.getenv("MAILGUN_EMAIL")
-EMAIL_HOST_PASSWORD = os.getenv("MAILGUN_PASSWORD")
-EMAIL_PORT = 587
-DEFAULT_FROM_EMAIL = os.getenv("MAILGUN_EMAIL")
+if DEBUG:
+  # Prints emails straight to your terminal window instead of sending them
+  EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+  # Real settings for production
+  EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+  EMAIL_HOST = "smtp.mailgun.org"
+  EMAIL_PORT = 587
+  EMAIL_USE_TLS = True
+  EMAIL_HOST_USER = os.getenv("MAILGUN_EMAIL")
+  EMAIL_HOST_PASSWORD = os.getenv("MAILGUN_PASSWORD")
+
 PASSWORD_RESET_TIMEOUT = 259200
 
 TIME_ZONE = "UTC"

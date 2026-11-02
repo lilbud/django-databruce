@@ -1,5 +1,5 @@
 {% extends "databruce/narrow_layout.html" %}
-{% load i18n %}
+{% load i18n widget_tweaks %}
 {% block title %}
   {{ title }}
 {% endblock title %}
@@ -14,28 +14,47 @@
           </div>
         </div>
       {% endif %}
-      <form method="post" action="{% url "signup" %}">
+      <form method="post" action="{% url 'signup' %}">
         {% csrf_token %}
-        <div class="col">{{ form.non_field_errors }}</div>
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger text-xs mb-3">
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
         {% for field in form %}
           <div class="row mb-3">
             <div class="col">
-              <label class="form-label text-xs" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+              <!-- Label -->
+              <label class="form-label text-xs mb-1" for="{{ field.id_for_label }}">{% translate field.label %}</label>
+              <!-- Input Field with Dynamic Bootstrap Error Borders -->
+              <div>
+                {% if field.errors %}
+                  {# Appends Bootstrap's 'is-invalid' class if errors exist #}
+                  {% render_field field class+="is-invalid" %}
+                {% else %}
+                  {{ field }}
+                {% endif %}
+              </div>
+              <!-- Native Bootstrap Error Feedback Styling -->
               {% if field.errors %}
-                <span class="text-sm text-danger">
+                <div class="invalid-feedback d-block text-2xs mt-1"
+                     id="{{ field.id_for_label }}_errors">
                   {% for error in field.errors %}
-                    {% translate error %}
+                    <div>{{ error }}</div>
                   {% endfor %}
-                </span>
+                </div>
               {% endif %}
-              <div>{{ field }}</div>
+              <!-- Help Text -->
               {% if field.help_text %}
-                <div class="mt-2 mb-0 text-xs" id="{{ field.id_for_label }}_helptext">{{ field.help_text|safe }}</div>
+                <div class="form-text mt-1 mb-0 text-2xs text-muted"
+                     id="{{ field.id_for_label }}_helptext">{{ field.help_text|safe }}</div>
               {% endif %}
             </div>
           </div>
         {% endfor %}
-        <div class="row">
+        <div class="row mt-4">
           <div class="col-12">
             <button class="btn btn-sm btn-primary" type="submit">{% translate "Create Account" %}</button>
           </div>

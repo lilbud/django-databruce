@@ -21,6 +21,7 @@ dependencies = [
     "django-unfold-markdown>=0.1.2",
     "django-unfold-modal>=0.2.2",
     "django-watchfiles>=1.4.0",
+    "django-widget-tweaks>=1.5.1",
     "djangorestframework>=3.17.2",
     "djlint>=1.36.4",
     "drf-spectacular>=0.30.0",

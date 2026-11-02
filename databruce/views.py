@@ -43,7 +43,7 @@ from django.utils.http import urlencode, urlsafe_base64_decode, urlsafe_base64_e
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 from shortener import shortener
 
 from blog.models import BlogPost
@@ -212,17 +212,32 @@ class ThirtyDaysSubmitView(View):
   form_class = ThirtyDaysForm
 
   def post(self, request: HttpRequest):
-    # 1. Fetch the user's existing entry or create a new one if it doesn't exist yet
-    user_entry, _ = ThirtydaysUserEntries.objects.get_or_create(user=request.user)
+    # 1. Grab the day from the POST data to find the correct unique record
+    day = request.POST.get("day")
 
-    # 2. Pass the instance to the form so it updates instead of creating a new row
+    # Ensure day is provided and valid to prevent errors
+    if not day:
+      return JsonResponse(
+        {
+          "success": False,
+          "messages": {"message": "Day is required.", "tags": "error"},
+        },
+        status=400,
+      )
+
+    # 2. Get or create the unique entry for this user + day combination
+    user_entry, _ = ThirtydaysUserEntries.objects.get_or_create(
+      user=request.user,
+      day=day,
+    )
+
+    # 3. Bind the form with the POST data and the specific instance
     form = self.form_class(request.POST, instance=user_entry)
 
     if form.is_valid():
-      # Because an instance was provided, form.save() updates the existing record
-      form.save()
+      saved_entry = form.save()
 
-      messages.success(request, "Your entry has submitted successfully")
+      messages.success(request, f"Your entry for Day {day} has submitted successfully")
 
       storage = messages.get_messages(request)
       msg_list = next({"message": msg.message, "tags": msg.tags} for msg in storage)
@@ -231,12 +246,12 @@ class ThirtyDaysSubmitView(View):
         {
           "success": True,
           "messages": msg_list,
+          "entry": saved_entry.entry,
+          "day": saved_entry.day,
         },
       )
 
-    err_msg = []
-    for msg in form.errors.values():
-      err_msg.append(str(msg[0]))
+    err_msg = [str(msg[0]) for msg in form.errors.values()]
 
     return JsonResponse(
       {
@@ -436,67 +451,56 @@ class LoginView(PageTitleMixin, BaseLoginView):
     return super().form_valid(form)
 
 
-class SignUpView(PageTitleMixin, TemplateView):
+class SignUpView(PageTitleMixin, FormView):
   template_name = "users/signup.html"
-  email_template_name = "users/signup_email.html"
-  subject_template_name = "users/signup_confirm_subject.txt"
+  form_class = UserForm
+  success_url = reverse_lazy("signup_done")
+
   title = "Signup"
   description = "Sign Up"
+
+  email_template_name = "users/signup_email.html"
+  subject_template_name = "users/signup_confirm_subject.txt"
   token_generator = default_token_generator
-  form_class = UserForm
 
-  def get_context_data(self, **kwargs: dict[str, Any]):
-    context = super().get_context_data(**kwargs)
-    context["form"] = self.form_class
-    return context
+  def form_valid(self, form):
+    """Called automatically when form.is_valid() returns True."""
+    # 1. Save the inactive user
+    user = form.save(commit=False)
+    user.is_active = False
+    user.save()
 
-  def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
-    form = self.form_class(request.POST)
+    # 2. Build email confirmation context
+    current_site = get_current_site(self.request)
+    context = {
+      "email": user.email,
+      "domain": current_site.domain,
+      "site_name": current_site.name,
+      "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+      "user": user,
+      "token": self.token_generator.make_token(user),
+      "protocol": "https",  # Enforce production standard secure links
+    }
 
-    if form.is_valid():
-      if form.cleaned_data["verification"] == os.getenv(
-        "VERIFICATION_ANSWER",
-      ):
-        user = form.save(commit=False)
-        user.is_active = False
-        user.save()
+    # 3. Send email confirmation
+    self.send_mail(
+      context=context,
+      from_email=os.getenv("MAILGUN_EMAIL"),
+      to_email=user.email,
+    )
 
-        current_site = get_current_site(request)
-        use_https = True
+    # 4. Redirect automatically to success_url
+    return super().form_valid(form)
 
-        context = {
-          "email": user.email,
-          "domain": current_site.domain,
-          "site_name": current_site.name,
-          "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-          "user": user,
-          "token": self.token_generator.make_token(user),
-          "protocol": "https" if use_https else "http",
-        }
-
-        self.send_mail(
-          context=context,
-          from_email=os.getenv("MAILGUN_EMAIL"),
-          to_email=user.email,
-        )
-
-        return redirect(reverse("signup_done"))
-
-      messages.error(request, "Incorrect verification answer")
-      return render(
-        request,
-        template_name=self.template_name,  # type: ignore
-        context={"form": form},
-      )
-
-    messages.error(request, "Signup Failed, see errors below")
-    return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
+  def form_invalid(self, form):
+    """Called automatically if the form fields fail validation checks."""
+    messages.error(self.request, "Signup Failed, see errors below.")
+    return super().form_invalid(form)
 
   def send_mail(self, context, from_email, to_email):
     subject = loader.render_to_string(self.subject_template_name, context).strip()
     body = loader.render_to_string(self.email_template_name, context)
 
-    # This will now be intercepted by the test runner
     return send_mail(
       subject,
       body,
@@ -504,6 +508,76 @@ class SignUpView(PageTitleMixin, TemplateView):
       [to_email],
       fail_silently=False,
     )
+
+
+# class SignUpView(PageTitleMixin, TemplateView):
+#   template_name = "users/signup.html"
+#   email_template_name = "users/signup_email.html"
+#   subject_template_name = "users/signup_confirm_subject.txt"
+#   title = "Signup"
+#   description = "Sign Up"
+#   token_generator = default_token_generator
+#   form_class = UserForm
+
+#   def get_context_data(self, **kwargs: dict[str, Any]):
+#     context = super().get_context_data(**kwargs)
+#     context["form"] = self.form_class
+#     return context
+
+#   def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):
+#     form = self.form_class(request.POST)
+
+#     if form.is_valid():
+#       if form.cleaned_data["verification"] == os.getenv(
+#         "VERIFICATION_ANSWER",
+#       ):
+#         user = form.save(commit=False)
+#         user.is_active = False
+#         user.save()
+
+#         current_site = get_current_site(request)
+#         use_https = True
+
+#         context = {
+#           "email": user.email,
+#           "domain": current_site.domain,
+#           "site_name": current_site.name,
+#           "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+#           "user": user,
+#           "token": self.token_generator.make_token(user),
+#           "protocol": "https" if use_https else "http",
+#         }
+
+#         self.send_mail(
+#           context=context,
+#           from_email=os.getenv("MAILGUN_EMAIL"),
+#           to_email=user.email,
+#         )
+
+#         return redirect(reverse("signup_done"))
+
+#       messages.error(request, "Incorrect verification answer")
+#       return render(
+#         request,
+#         template_name=self.template_name,  # type: ignore
+#         context={"form": form},
+#       )
+
+#     messages.error(request, "Signup Failed, see errors below")
+#     return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
+
+#   def send_mail(self, context, from_email, to_email):
+#     subject = loader.render_to_string(self.subject_template_name, context).strip()
+#     body = loader.render_to_string(self.email_template_name, context)
+
+#     # This will now be intercepted by the test runner
+#     return send_mail(
+#       subject,
+#       body,
+#       from_email,
+#       [to_email],
+#       fail_silently=False,
+#     )
 
 
 class SignUpConfirmView(PageTitleMixin, TemplateView):

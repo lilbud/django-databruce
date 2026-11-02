@@ -263,6 +263,7 @@ dependencies = [
     { name = "django-unfold-markdown" },
     { name = "django-unfold-modal" },
     { name = "django-watchfiles" },
+    { name = "django-widget-tweaks" },
     { name = "djangorestframework" },
     { name = "djlint" },
     { name = "drf-spectacular" },
@@ -301,6 +302,7 @@ requires-dist = [
     { name = "django-unfold-markdown", specifier = ">=0.1.2" },
     { name = "django-unfold-modal", specifier = ">=0.2.2" },
     { name = "django-watchfiles", specifier = ">=1.4.0" },
+    { name = "django-widget-tweaks", specifier = ">=1.5.1" },
     { name = "djangorestframework", specifier = ">=3.17.2" },
     { name = "djlint", specifier = ">=1.36.4" },
     { name = "drf-spectacular", specifier = ">=0.30.0" },
@@ -482,6 +484,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1a/89/51b82766a1c937dea9fb92f0fb7666919d120379fc26dc84ab504e35f37e/django_watchfiles-1.4.0.tar.gz", hash = "sha256:88e253e8e8427834eac467923d334c35010279b3e9ceb5bb91014be83975b11b", size = 8647 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/85/3d31f347e1a3eef9be381792df1994ff25e4db4659ab40a5cc3f814e3a1a/django_watchfiles-1.4.0-py3-none-any.whl", hash = "sha256:40cb3180987c63629b0681ab228b65afd68e0f783388cc72a45620378213bb48", size = 6766 },
+]
+
+[[package]]
+name = "django-widget-tweaks"
+version = "1.5.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/01/6d/d1b5a3ae3bccfee96e10315373298cea51e5e0d6853d022181b7b0861a4d/django_widget_tweaks-1.5.1.tar.gz", hash = "sha256:084acc9eeb5a3208f2670522de6284287973e54d54488ce6d402f4b99bc5f452", size = 16233 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/6a/ad176284371005426b9a1c424e6cd77a9018ab1b17dc23948bfbeb2f6a21/django_widget_tweaks-1.5.1-py3-none-any.whl", hash = "sha256:3f5080f8365740fc1c14607498c975cbfed896dd0c40e1b563095716ee31e3b5", size = 9634 },
 ]
 
 [[package]]
