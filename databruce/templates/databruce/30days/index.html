@@ -70,27 +70,27 @@
       <hr>
       <div class="card">
         <div class="card-body">
-          <div class="text-xs">Scoreboard:</div>
+          <div class="text-sm mb-2">Scoreboard:</div>
           <div class="text-sm">
-            <ol>
+            <ul class="list-group">
               {% for item in scoreboard %}
-                <li>{{ item.user }} - {{ item.score }}</li>
+                <li class="list-group-item"><strong>{{ forloop.counter }}.</strong> {{ item.user }} - {{ item.score }}</li>
               {% endfor %}
-            </ol>
+            </ul>
           </div>
         </div>
       </div>
-      {% comment %} <hr> {% endcomment %}
-      {% comment %} <div class="card">
+      <hr>
+      <div class="card">
         <div class="card-body">
           <div class="row justify-content-center text-center d-grid gy-2">
-            <div class="text-xs">Yesterday's (Day {{ previous_answer.day }}) Answer:</div>
+            <div class="text-sm">Yesterday's (Day {{ previous_answer.day }}) Answer:</div>
             <div class="fw-semibold text-2xl text-primary">{{ previous_answer.song }}</div>
             <div class="fw-semibold text-base">{{ previous_answer.event.date|date:'Y-m-d' }} - {{ previous_answer.event.venue.formatted }}</div>
-            <div class="text-sm">{{ previous_answer.answer_info }}</div>
+            <div class="text-sm">Answer Explaination: {{ previous_answer.answer_info }}</div>
           </div>
         </div>
-      </div> {% endcomment %}
+      </div>
     {% else %}
       <div class="mb-3 text-2xl text-primary">Check back on November 1st, 2026 at 12pm EST/5pm UTC for the game to start.</div>
     {% endif %}
