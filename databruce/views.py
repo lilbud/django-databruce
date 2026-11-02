@@ -154,7 +154,7 @@ class ThirtyDaysView(TemplateView):
     try:
       context["previous_answer"] = (
         ThirtydaysDayEntries.objects.filter(
-          day__lt=context["day"].day,
+          day=context["day"].day - 1,
         )
         .order_by("-available_from")
         .select_related("event", "event__venue")

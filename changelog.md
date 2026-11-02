@@ -684,3 +684,11 @@ First public release of the site. Site was locked behind a login and accounts on
 # Changed
 
 - Articles table controls rearranged slightly
+
+# v1.37 (November 1, 2026)
+
+# Fixed
+
+- Signup flow redone, form layout tweaked to better communicate error fields
+- [30 Days of Bruce] Main page tweaks, previous days answer now shows
+- [30 Days of Bruce] Entries fixed. Users can submit as many entries as they want, but new ones will overwrite old. Days have been added to the entries to tell them apart.
