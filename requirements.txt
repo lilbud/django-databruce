@@ -1,7 +1,7 @@
-django
+django>=6.1
 django-anymail[mailgun]
 django-browser-reload
-django-debug-toolbar
+django-debug-toolbar>=8.0.0
 django-filter
 django-link-shortener
 django-redis
@@ -23,8 +23,7 @@ sentry-sdk
 django-watchfiles
 strip-markdown
 bleach
-django-widget-tweaks
 django_compressor
 djangorestframework-stubs
 django-unfold-modal
-django-debug-toolbar
+ty

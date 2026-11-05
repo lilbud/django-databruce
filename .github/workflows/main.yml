@@ -46,6 +46,9 @@ jobs:
             
             # Collect New Static
             ./manage.py collectstatic --noinput
+
+            # Compress Static
+            ./manage.py compress
             
             # Reload Gunicorn using systemd
             sudo systemctl restart gunicorn

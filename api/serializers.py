@@ -1097,6 +1097,7 @@ class SetlistSongsSerializer(BaseSerializer):
 
 class SetlistSongCountSerializer(BaseSerializer):
   count = serializers.IntegerField(required=False)
+  total = serializers.IntegerField(required=False)
   song = serializers.SerializerMethodField(required=False)
 
   def to_representation(self, instance):
@@ -1137,6 +1138,7 @@ class SetlistSongCountSerializer(BaseSerializer):
     fields = [
       "song",
       "count",
+      "total",
     ]
 
 

@@ -21,9 +21,7 @@ load_dotenv()
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
-INTERNAL_IPS = [
-  "127.0.0.1",
-]
+INTERNAL_IPS = ["127.0.0.1", "::1"]
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -75,14 +73,14 @@ DATABASES = {
 if DEBUG:
   # Prints emails straight to your terminal window instead of sending them
   EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-  # Real settings for production
-  EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-  EMAIL_HOST = "smtp.mailgun.org"
-  EMAIL_PORT = 587
-  EMAIL_USE_TLS = True
-  EMAIL_HOST_USER = os.getenv("MAILGUN_EMAIL")
-  EMAIL_HOST_PASSWORD = os.getenv("MAILGUN_PASSWORD")
+
+# Real settings for production
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.mailgun.org"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("MAILGUN_EMAIL")
+EMAIL_HOST_PASSWORD = os.getenv("MAILGUN_PASSWORD")
 
 PASSWORD_RESET_TIMEOUT = 259200
 

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
   "sentry_sdk",
   "widget_tweaks",
   "compressor",
+  "debug_toolbar",
 ]
 
 SITE_ID = 1
@@ -70,7 +71,6 @@ SHORTENER_LIFESPAN = -1
 SHORTENER_MAX_USES = -1
 
 MIDDLEWARE = [
-  # These three are optional, but highly recommended!
   "django.middleware.security.SecurityMiddleware",
   "django.contrib.sessions.middleware.SessionMiddleware",
   "django.middleware.common.CommonMiddleware",
@@ -80,23 +80,13 @@ MIDDLEWARE = [
   "django.contrib.messages.middleware.MessageMiddleware",
   "django.middleware.clickjacking.XFrameOptionsMiddleware",
   "django.middleware.http.ConditionalGetMiddleware",
-  "django_browser_reload.middleware.BrowserReloadMiddleware",
   "databruce.middleware.CleanQueryStringMiddleware",
+  "django.middleware.gzip.GZipMiddleware",  # 1. Gzip compresses first
+  "django_browser_reload.middleware.BrowserReloadMiddleware",
+  "debug_toolbar.middleware.DebugToolbarMiddleware",  # 2. Debug Toolbar handles it next
 ]
 
 TESTING = "test" in sys.argv
-
-if not TESTING:
-  INSTALLED_APPS = [
-    *INSTALLED_APPS,
-    "debug_toolbar",
-  ]
-  MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    *MIDDLEWARE,
-  ]
-
-
 ROOT_URLCONF = "databruce.urls"
 AUTH_USER_MODEL = "databruce.CustomUser"
 
@@ -212,12 +202,7 @@ STATICFILES_FINDERS = [
 SESSION_EXEXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 COMPRESS_ENABLED = True
-
-STORAGES = {
-  "staticfiles": {
-    "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
-  },
-}
+COMPRESS_OFFLINE = True
 
 UNFOLD = {
   "STYLES": [

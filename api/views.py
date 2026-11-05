@@ -653,11 +653,12 @@ class SetlistSongCountViewSet(viewsets.ReadOnlyModelViewSet):
 
   queryset = queryset.values("song_id").annotate(
     count=Count("event_id", distinct=True),
+    total=F("song__num_plays_public"),
   )
 
   serializer_class = api_serializers.SetlistSongCountSerializer
   filterset_class = api_filters.SetlistSongsFilter
-  ordering_fields = ["count"]
+  ordering_fields = ["count", "total"]
 
 
 class SnippetViewSet(viewsets.ReadOnlyModelViewSet):

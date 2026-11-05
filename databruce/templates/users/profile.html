@@ -256,7 +256,12 @@
             var listItem = $('<li />').addClass('list-group-item d-flex justify-content-between align-items-center  py-0.5');
 
             listItem.append(`<a class="text-reset song" href="/songs/${item.song.slug}">${item.song.name}</a>`);
-            listItem.append(`<span class="song-count">${item.count}</span>`);
+
+            if (listID === "#rareList") {
+              listItem.append(`<span class="song-count text-nowrap" title="Times Seen / Total Plays">${item.count} / ${item.total}</span>`);
+            } else {
+              listItem.append(`<span class="song-count">${item.count}</span>`);
+            }
 
             items.push(listItem);
           });
@@ -273,7 +278,7 @@
     overviewCard('/api/v1/setlist_song_count/?user_unseen={{ info.id }}&public_plays=100&limit=10&ordering=-count&format=json', '#notSeenList')
 
     /* RARE CARD */
-    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&user_rare=true&format=json&ordering=-count&limit=10', '#rareList')
+    overviewCard('/api/v1/setlist_song_count/?user={{ info.id }}&user_rare=true&format=json&ordering=-total&limit=10', '#rareList')
 
 
     fetch('/api/v1/user_album_breakdown/?user={{ info.id }}&format=json')

@@ -7,7 +7,6 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path, reverse_lazy
 from django.views.generic.base import TemplateView
 
-from .config import base as settings
 from .forms import CustomSetPasswordForm
 from .sitemap import StaticViewSitemap
 from .views import (
@@ -321,12 +320,5 @@ urlpatterns = [
   re_path("^updates/?$", UpdateView.as_view(), name="updates"),
 ]
 
-if not settings.TESTING:
-  urlpatterns = [*urlpatterns, *debug_toolbar_urls()]
 
-urlpatterns = (
-  [
-    # ... the rest of your URLconf goes here ...
-  ]
-  + debug_toolbar_urls()
-)
+urlpatterns = [*urlpatterns, *debug_toolbar_urls()]

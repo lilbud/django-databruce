@@ -1,18 +1,15 @@
-import { $$, ajax, debounce, replaceToolbarState } from "./utils.js";
+import {
+    $$,
+    ajax,
+    debounce,
+    getDebugElement,
+    replaceToolbarState,
+} from "./utils.js";
 
 function onKeyDown(event) {
     if (event.keyCode === 27) {
         djdt.hideOneLevel();
     }
-}
-
-function getDebugElement() {
-    // Fetch the debug element from the DOM.
-    // This is used to avoid writing the element's id
-    // everywhere the element is being selected. A fixed reference
-    // to the element should be avoided because the entire DOM could
-    // be reloaded such as via HTMX boosting.
-    return document.getElementById("djDebug");
 }
 
 const djdt = {
@@ -27,7 +24,7 @@ const djdt = {
                 return;
             }
             const panelId = this.className;
-            const current = document.getElementById(panelId);
+            const current = djDebug.querySelector(`#${panelId}`);
             if ($$.visible(current)) {
                 djdt.hidePanels();
             } else {
@@ -39,13 +36,13 @@ const djdt = {
                 const inner = current.querySelector(
                     ".djDebugPanelContent .djdt-scroll"
                 );
-                const storeId = djDebug.dataset.storeId;
-                if (storeId && inner.children.length === 0) {
+                const requestId = djDebug.dataset.requestId;
+                if (requestId && inner.children.length === 0) {
                     const url = new URL(
                         djDebug.dataset.renderPanelUrl,
-                        window.location
+                        globalThis.location
                     );
-                    url.searchParams.append("store_id", storeId);
+                    url.searchParams.append("request_id", requestId);
                     url.searchParams.append("panel_id", panelId);
                     ajax(url).then((data) => {
                         inner.previousElementSibling.remove(); // Remove AJAX loader
@@ -103,7 +100,7 @@ const djdt = {
             }
 
             ajax(url, ajaxData).then((data) => {
-                const win = document.getElementById("djDebugWindow");
+                const win = djDebug.querySelector("#djDebugWindow");
                 win.innerHTML = data.content;
                 $$.show(win);
             });
@@ -116,7 +113,7 @@ const djdt = {
             const toggleClose = "-";
             const openMe = this.textContent === toggleOpen;
             const name = this.dataset.toggleName;
-            const container = document.getElementById(`${name}_${id}`);
+            const container = djDebug.querySelector(`#${name}_${id}`);
             for (const el of container.querySelectorAll(".djDebugCollapsed")) {
                 $$.toggle(el, openMe);
             }
@@ -156,7 +153,7 @@ const djdt = {
         });
         let startPageY;
         let baseY;
-        const handle = document.getElementById("djDebugToolbarHandle");
+        const handle = djDebug.querySelector("#djDebugToolbarHandle");
         function onHandleMove(event) {
             // Chrome can send spurious mousemove events, so don't do anything unless the
             // cursor really moved.  Otherwise, it will be impossible to expand the toolbar
@@ -166,8 +163,8 @@ const djdt = {
 
                 if (top < 0) {
                     top = 0;
-                } else if (top + handle.offsetHeight > window.innerHeight) {
-                    top = window.innerHeight - handle.offsetHeight;
+                } else if (top + handle.offsetHeight > globalThis.innerHeight) {
+                    top = globalThis.innerHeight - handle.offsetHeight;
                 }
 
                 handle.style.top = `${top}px`;
@@ -212,67 +209,74 @@ const djdt = {
             djdt.updateOnAjax();
         }
 
-        // Updates the theme using user settings
-        const userTheme = localStorage.getItem("djdt.user-theme");
-        if (userTheme !== null) {
-            djDebug.setAttribute("data-theme", userTheme);
+        const prefersDark = globalThis.matchMedia(
+            "(prefers-color-scheme: dark)"
+        ).matches;
+        const themeList = prefersDark
+            ? ["auto", "light", "dark"]
+            : ["auto", "dark", "light"];
+
+        function setTheme(theme) {
+            djDebug.setAttribute(
+                "data-theme",
+                theme === "auto" ? (prefersDark ? "dark" : "light") : theme
+            );
+            djDebug.setAttribute("data-user-theme", theme);
         }
+
+        // Updates the theme using user settings
+        let userTheme = localStorage.getItem("djdt.user-theme") || "auto";
+        setTheme(userTheme);
+
         // Adds the listener to the Theme Toggle Button
         $$.on(djDebug, "click", "#djToggleThemeButton", () => {
-            switch (djDebug.getAttribute("data-theme")) {
-                case "auto":
-                    djDebug.setAttribute("data-theme", "light");
-                    localStorage.setItem("djdt.user-theme", "light");
-                    break;
-                case "light":
-                    djDebug.setAttribute("data-theme", "dark");
-                    localStorage.setItem("djdt.user-theme", "dark");
-                    break;
-                default: /* dark is the default */
-                    djDebug.setAttribute("data-theme", "auto");
-                    localStorage.setItem("djdt.user-theme", "auto");
-                    break;
-            }
+            const index = themeList.indexOf(userTheme);
+            userTheme = themeList[(index + 1) % themeList.length];
+            localStorage.setItem("djdt.user-theme", userTheme);
+            setTheme(userTheme);
         });
     },
     hidePanels() {
         const djDebug = getDebugElement();
-        $$.hide(document.getElementById("djDebugWindow"));
+        $$.hide(djDebug.querySelector("#djDebugWindow"));
         for (const el of djDebug.querySelectorAll(".djdt-panelContent")) {
             $$.hide(el);
         }
-        for (const el of document.querySelectorAll("#djDebugToolbar li")) {
+        for (const el of djDebug.querySelectorAll("#djDebugToolbar li")) {
             el.classList.remove("djdt-active");
         }
     },
     ensureHandleVisibility() {
-        const handle = document.getElementById("djDebugToolbarHandle");
+        const djDebug = getDebugElement();
+        const handle = djDebug.querySelector("#djDebugToolbarHandle");
         // set handle position
         const handleTop = Math.min(
             localStorage.getItem("djdt.top") || 265,
-            window.innerHeight - handle.offsetWidth
+            globalThis.innerHeight - handle.offsetWidth
         );
         handle.style.top = `${handleTop}px`;
     },
     hideToolbar() {
+        const djDebug = getDebugElement();
         djdt.hidePanels();
 
-        $$.hide(document.getElementById("djDebugToolbar"));
+        $$.hide(djDebug.querySelector("#djDebugToolbar"));
 
-        const handle = document.getElementById("djDebugToolbarHandle");
+        const handle = djDebug.querySelector("#djDebugToolbarHandle");
         $$.show(handle);
         djdt.ensureHandleVisibility();
-        window.addEventListener("resize", djdt.ensureHandleVisibility);
+        globalThis.addEventListener("resize", djdt.ensureHandleVisibility);
         document.removeEventListener("keydown", onKeyDown);
 
         localStorage.setItem("djdt.show", "false");
     },
     hideOneLevel() {
-        const win = document.getElementById("djDebugWindow");
+        const djDebug = getDebugElement();
+        const win = djDebug.querySelector("#djDebugWindow");
         if ($$.visible(win)) {
             $$.hide(win);
         } else {
-            const toolbar = document.getElementById("djDebugToolbar");
+            const toolbar = djDebug.querySelector("#djDebugToolbar");
             if (toolbar.querySelector("li.djdt-active")) {
                 djdt.hidePanels();
             } else {
@@ -281,28 +285,32 @@ const djdt = {
         }
     },
     showToolbar() {
+        const djDebug = getDebugElement();
         document.addEventListener("keydown", onKeyDown);
-        $$.show(document.getElementById("djDebug"));
-        $$.hide(document.getElementById("djDebugToolbarHandle"));
-        $$.show(document.getElementById("djDebugToolbar"));
+        $$.show(djDebug);
+        $$.hide(djDebug.querySelector("#djDebugToolbarHandle"));
+        $$.show(djDebug.querySelector("#djDebugToolbar"));
         localStorage.setItem("djdt.show", "true");
-        window.removeEventListener("resize", djdt.ensureHandleVisibility);
+        globalThis.removeEventListener("resize", djdt.ensureHandleVisibility);
     },
     updateOnAjax() {
-        const sidebarUrl =
-            document.getElementById("djDebug").dataset.sidebarUrl;
-        const slowjax = debounce(ajax, 200);
+        const handleAjaxResponse = debounce(async (requestId) => {
+            const sidebarUrl = getDebugElement().dataset.sidebarUrl;
 
-        function handleAjaxResponse(storeId) {
-            const encodedStoreId = encodeURIComponent(storeId);
-            const dest = `${sidebarUrl}?store_id=${encodedStoreId}`;
-            slowjax(dest).then((data) => {
-                if (djdt.needUpdateOnFetch) {
-                    replaceToolbarState(encodedStoreId, data);
+            const encodedRequestId = encodeURIComponent(requestId);
+            const dest = `${sidebarUrl}?request_id=${encodedRequestId}`;
+            if (djdt.needUpdateOnFetch) {
+                try {
+                    const data = await ajax(dest);
+                    replaceToolbarState(encodedRequestId, data);
+                } catch (error) {
+                    console.error(
+                        `"${error.name}" occurred within django-debug-toolbar: ${error.message}`,
+                        error
+                    );
                 }
-            });
-        }
-
+            }
+        }, 200);
         // Patch XHR / traditional AJAX requests
         const origOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function (...args) {
@@ -311,32 +319,26 @@ const djdt = {
                 // when the header can't be fetched. While it doesn't impede execution
                 // it's worrisome to developers.
                 if (
-                    this.getAllResponseHeaders().indexOf("djdt-store-id") >= 0
+                    this.getAllResponseHeaders().indexOf("djdt-request-id") >= 0
                 ) {
-                    handleAjaxResponse(this.getResponseHeader("djdt-store-id"));
+                    handleAjaxResponse(
+                        this.getResponseHeader("djdt-request-id")
+                    );
                 }
             });
             origOpen.apply(this, args);
         };
 
-        const origFetch = window.fetch;
-        window.fetch = function (...args) {
+        const origFetch = globalThis.fetch;
+        globalThis.fetch = function (...args) {
             // Heads up! Before modifying this code, please be aware of the
             // possible unhandled errors that might arise from changing this.
             // For details, see
             // https://github.com/django-commons/django-debug-toolbar/pull/2100
             const promise = origFetch.apply(this, args);
             return promise.then((response) => {
-                if (response.headers.get("djdt-store-id") !== null) {
-                    try {
-                        handleAjaxResponse(
-                            response.headers.get("djdt-store-id")
-                        );
-                    } catch (err) {
-                        throw new Error(
-                            `"${err.name}" occurred within django-debug-toolbar: ${err.message}`
-                        );
-                    }
+                if (response.headers.get("djdt-request-id") !== null) {
+                    handleAjaxResponse(response.headers.get("djdt-request-id"));
                 }
                 return response;
             });
@@ -362,7 +364,7 @@ const djdt = {
             if (typeof options.expires === "number") {
                 const days = options.expires;
                 const expires = new Date();
-                expires.setDate(expires.setDate() + days);
+                expires.setDate(expires.getDate() + days);
                 options.expires = expires;
             }
 
@@ -383,7 +385,7 @@ const djdt = {
         },
     },
 };
-window.djdt = {
+globalThis.djdt = {
     show_toolbar: djdt.showToolbar,
     hide_toolbar: djdt.hideToolbar,
     init: djdt.init,
