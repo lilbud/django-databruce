@@ -15,11 +15,11 @@ from django.db.models import (
   OuterRef,
   Prefetch,
   Q,
+  QuerySet,
   Subquery,
   Value,
 )
 from django.db.models.functions import Cast, Coalesce
-from django.db.models.manager import BaseManager
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from rest_framework import exceptions, viewsets
@@ -227,7 +227,7 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
   serializer_class = api_serializers.EventsSerializer
   filterset_class = api_filters.AdvSearchFilter
 
-  def get_queryset(self) -> BaseManager:
+  def get_queryset(self) -> QuerySet[Any, Any]:
     qs = (
       db_models.Event.objects.select_related(
         "artist",
@@ -306,7 +306,7 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
     }
 
     # 2. Extract query parameters for the dynamic formset
-    query_params = self.request.query_params  # type: ignore
+    query_params = self.request.query_params
     conjunction = query_params.get("conjunction", "and").lower()
     setlist_queries = []
     index = 0
@@ -316,9 +316,10 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
       choice_str = query_params.get(f"songs[{index}][choice]", "false").lower()
 
       song_dict = {
-        "song_1": query_params.get(f"songs[{index}][song_1]"),
+        "song_1": query_params.get(f"songs[{index}][song_1]", ""),
         "song_2": query_params.get(
           f"songs[{index}][song_2]",
+          "",
         ),  # Will be None if missing
         "choice": choice_str == "true",
         "position": query_params.get(f"songs[{index}][position]"),
@@ -347,8 +348,8 @@ class AdvancedEventSearchViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset.filter(filter).distinct()
 
     for query in setlist_queries:
-      # if query["choice"]:
-      songs.append(int(query["song_1"]))
+      if query["song_1"]:
+        songs.append(int(query["song_1"]))
 
       if query["song_2"]:
         songs.append(int(query["song_2"]))
@@ -449,7 +450,7 @@ class IndexEventViewSet(viewsets.ReadOnlyModelViewSet):
 class EventViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
-  def get_queryset(self) -> BaseManager:
+  def get_queryset(self) -> QuerySet[Any, Any]:
     qs = (
       db_models.Event.objects.select_related(
         "artist",
@@ -468,12 +469,11 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
         user=self.request.user,
       )
 
-      qs = qs.annotate(user_present=Exists(user_present))
+      return qs.annotate(user_present=Exists(user_present))
 
     return qs
 
   serializer_class = api_serializers.EventsSerializer
-
   filterset_class = api_filters.EventsFilter
 
 
@@ -560,18 +560,6 @@ class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
   filterset_class = api_filters.ReleaseFilter
 
 
-class SetlistStatsViewSet(viewsets.ReadOnlyModelViewSet):
-  """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
-
-  queryset = (
-    db_models.SetlistStats.objects.all()
-    .select_related("event", "setlist")
-    .prefetch_related("ltp")
-  )
-  serializer_class = api_serializers.SetlistStatsSerializer
-  filterset_class = api_filters.SetlistStatsFilter
-
-
 class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 
@@ -632,13 +620,13 @@ class SetlistEntriesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SetlistSongsViewSet(viewsets.ReadOnlyModelViewSet):
-  filter = Q(
+  setlist_filter = Q(
     set_name__in=db_models.SetType.valid_sets(),
     event__public=True,
     nobruce=False,
   )
 
-  queryset = db_models.Setlist.objects.filter(filter).select_related(
+  queryset = db_models.Setlist.objects.filter(setlist_filter).select_related(
     "song__category",
     "event",
   )
@@ -847,7 +835,7 @@ class SetlistBreakdown(viewsets.ReadOnlyModelViewSet):
   ordering = ["-song_count", "total_setlist_songs"]
 
   def get_queryset(self):
-    event_id = self.request.query_params.get("event")  # type: ignore
+    event_id = self.request.query_params.get("event")
     event_filter = Q(set_name__in=db_models.SetType.valid_sets())
 
     if not event_id:
@@ -929,7 +917,7 @@ class UserAlbumBreakdown(viewsets.ReadOnlyModelViewSet):
   serializer_class = api_serializers.UserAlbumBreakdownSerializer
 
   def get_queryset(self):
-    user_id = self.request.query_params.get("user")  # type: ignore
+    user_id = self.request.query_params.get("user")
     if not user_id:
       return db_models.Release.objects.none()
 

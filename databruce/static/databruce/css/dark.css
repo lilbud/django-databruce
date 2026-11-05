@@ -796,4 +796,8 @@
     /* A vibrant red glow to replace the hard-to-see default outline */
     box-shadow: 0 0 0 0.25rem rgba(251, 44, 54, 0.5);
   }
+
+  .highlight {
+    background-color: var(--color-yellow-700) !important;
+  }
 }

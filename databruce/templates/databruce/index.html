@@ -1,11 +1,12 @@
 {% extends "databruce/wide_layout.html" %}
-{% load i18n static tz %}
+{% load i18n static tz compress %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/table.js' %}"></script>
-  <script src="{% static 'databruce/js/setlistTable.js' %}"></script>
+  {% compress js %}
+    <script src="{% static 'databruce/js/table.js' %}"></script>
+  {% endcompress %}
 {% endblock extrajs %}
 {% block content %}
   <div class="col-12">

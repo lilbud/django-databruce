@@ -37,4 +37,4 @@ class GroupRequiredMixin(AccessMixin):
     if not in_group and not request.user.is_superuser:
       raise PermissionDenied
 
-    return super().dispatch(request, *args, **kwargs)  # type: ignore
+    return super().dispatch(request, *args, **kwargs)

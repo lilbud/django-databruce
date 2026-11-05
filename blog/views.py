@@ -1,12 +1,11 @@
 from typing import Any
 
+import bleach
 import markdown
-import nh3
 from django import template
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.template import Context
-from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
 from databruce.views import PageTitleMixin
@@ -51,8 +50,11 @@ class BlogPostDetail(PageTitleMixin, TemplateView):
     context["title"] = f"{context['post'].title}"
     context["description"] = f"{context['post'].excerpt}"
 
-    value = nh3.clean(
-      context["post"].body,
+    md = markdown.Markdown(extensions=["fenced_code", "toc"])
+    raw_html = md.convert(context["post"].body)
+
+    value = bleach.clean(
+      raw_html,
       tags={
         "figure",
         "div",
@@ -83,18 +85,15 @@ class BlogPostDetail(PageTitleMixin, TemplateView):
         "th": {"class"},
         "tr": {"class"},
       },
+      strip=True,
     )
 
-    md = markdown.Markdown(extensions=["fenced_code", "toc"])
-    post = md.convert(value)
-
-    template_obj = template.Template(post)
-
-    context_new = Context({"body": context["post"].body})
+    template_obj = template.Template(raw_html)
+    context_new = Context({"body": value})
 
     # Use the existing context (which is already a Context object)
-    context["body"] = mark_safe(template_obj.render(context_new))  # noqa: S308
-    context["toc"] = md.toc  # type: ignore
+    context["body"] = template_obj.render(context_new)
+    context["toc"] = md.toc  # ty: ignore[unresolved-attribute]
 
     return context
 

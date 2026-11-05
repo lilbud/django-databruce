@@ -14,8 +14,6 @@ import sys
 
 from dotenv import load_dotenv
 
-from .base import INSTALLED_APPS
-
 load_dotenv()
 
 
@@ -25,10 +23,6 @@ ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = [
   "127.0.0.1",
-]
-
-INSTALLED_APPS += [
-  "django_erd_generator",
 ]
 
 # Database
@@ -116,7 +110,6 @@ if DEBUG:
     "DEFAULT_PERMISSION_CLASSES": [
       "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_FILTER_BACKENDS": [
       "django_filters.rest_framework.DjangoFilterBackend",
       "rest_framework.filters.SearchFilter",

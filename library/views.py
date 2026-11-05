@@ -1,11 +1,10 @@
 from typing import Any
 
+import bleach
 import markdown
-import nh3
 import strip_markdown
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
 from databruce import forms
@@ -58,7 +57,7 @@ class ArticleDetailView(TemplateView):
     )
 
     # Step 2: Sanitize the generated HTML output
-    cleaned_html = nh3.clean(
+    cleaned_html = bleach.clean(
       raw_html,
       tags={
         "figure",
@@ -114,11 +113,10 @@ class ArticleDetailView(TemplateView):
         "th": {"class"},
         "td": {"class"},
       },
-      link_rel=None,
     )
 
     # Step 3: Mark safe for rendering in Django templates
-    context["body"] = mark_safe(cleaned_html)
+    context["body"] = cleaned_html
     return context
 
 

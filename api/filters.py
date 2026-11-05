@@ -1,8 +1,10 @@
 import datetime
 import re
+from typing import Any
 
 from dateutil import parser
 from django.contrib.postgres.search import (
+  SearchHeadline,
   SearchQuery,
   SearchRank,
   SearchVector,
@@ -15,7 +17,9 @@ from django.db.models import (
   F,
   FloatField,
   Model,
+  OrderBy,
   Q,
+  QuerySet,
   Subquery,
   TextField,
   Value,
@@ -23,9 +27,8 @@ from django.db.models import (
 )
 from django_filters import ModelMultipleChoiceFilter
 from django_filters import rest_framework as dj_filters
-from rest_framework.filters import BaseFilterBackend, OrderingFilter
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.request import Request
-from rest_framework.views import APIView
 
 from bruceyversion.models import Entry
 from databruce import models
@@ -38,45 +41,14 @@ class NumberInFilter(dj_filters.BaseInFilter, dj_filters.NumberFilter):
   pass
 
 
-class AliasedOrderingFilter(OrderingFilter):
-  """Custom ordering filter to support field aliasing.
-  Example mapping: ('api_exposed_name', 'db_internal_name')
-  """
-
-  def remove_invalid_fields(self, queryset, fields, view, request):
-    # Read the ordering_fields defined on the view
-    ordering_fields = getattr(view, "ordering_fields", None)
-
-    if not ordering_fields or ordering_fields == "__all__":
-      return super().remove_invalid_fields(queryset, fields, view, request)
-
-    # Create a mapping dictionary from the view's configuration
-    # Supports both aliases (tuples) and regular fields (strings)
-    alias_mapping = {}
-    for item in ordering_fields:
-      if isinstance(item, tuple) and len(item) == 2:
-        alias_mapping[item[0]] = item[1]
-      else:
-        alias_mapping[item] = item
-
-    validated_fields = []
-    for field in fields:
-      # Strip the minus sign for descending sort to check the clean field name
-      is_descending = field.startswith("-")
-      clean_field = field.lstrip("-")
-
-      if clean_field in alias_mapping:
-        db_field = alias_mapping[clean_field]
-        # Re-apply the minus sign if the original query was descending
-        final_field = f"-{db_field}" if is_descending else db_field
-        validated_fields.append(final_field)
-
-    return validated_fields
-
-
 class NotEqualFilterBackend(BaseFilterBackend):
-  def filter_queryset(self, request, queryset, view):
-    # 1. Grab the FilterSet class assigned to this ViewSet
+  # Wrap the type in quotes as a string literal to prevent runtime errors
+  def filter_queryset(
+    self,
+    request: Request,
+    queryset: QuerySet,
+    view,
+  ) -> QuerySet:
     filterset_class = getattr(view, "filterset_class", None)
 
     # 2. Extract out all declared filters to map names to actual database paths
@@ -110,7 +82,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
     value: str | None,
     value2: str | None,
     sb_type: str | None,
-  ) -> Q | None:
+  ) -> Q:
     filter_types = {
       "=": Q(**{f"{column}__iexact": value}),
       "!=": ~Q(**{f"{column}__iexact": value}),
@@ -141,9 +113,9 @@ class DataTablesFilterBackend(BaseFilterBackend):
       filter_types["!null"] = Q(**{f"{column}": True})
 
     if condition:
-      return filter_types.get(condition)
+      return filter_types.get(condition, Q())
 
-    return None
+    return Q()
 
   def get_final_field(self, model: Model, path: str):
     """Traverses the model __ path and returns the final Django field object."""
@@ -154,7 +126,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
         field = model._meta.get_field(part)  # noqa: SLF001
         # If there are more parts and this is a relation, move to the next model
         if i < len(parts) - 1 and field.is_relation:
-          model = field.related_model  # type: ignore
+          model = field.related_model  # ty: ignore[invalid-assignment]
         else:
           return field
       except FieldDoesNotExist:
@@ -165,14 +137,14 @@ class DataTablesFilterBackend(BaseFilterBackend):
   def get_param(self, request: Request, param: str, default=None) -> str | None:
     return request.query_params.get(param, default)
 
-  def parse_query(self, request: Request, view: APIView):
+  def parse_query(self, request: Request) -> dict[str, Any]:
     ret = {}
     ret["fields"] = self.get_fields(request)
-    ret["search_value"] = self.get_param(request, "search[value]")
-    ret["search_regex"] = self.get_param(request, "search[regex]") == "true"
+    ret["search_value"] = self.get_param(request, param="search[value]")
+    ret["search_regex"] = self.get_param(request, param="search[regex]") == "true"
     return ret
 
-  def get_ordering_fields(self, request, view, fields):
+  def get_ordering_fields(self, request, fields) -> list[OrderBy]:
     order_list = []
     i = 0
 
@@ -203,7 +175,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
     return order_list
 
-  def get_fields(self, request):
+  def get_fields(self, request) -> list[dict[str, Any]]:
     fields = []
     i = 0
 
@@ -246,7 +218,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
 
     return fields
 
-  def is_valid_regex(self, regex: str):
+  def is_valid_regex(self, regex: str) -> bool:
     """Helper function that checks regex for validity."""
     try:
       re.compile(regex)
@@ -255,14 +227,14 @@ class DataTablesFilterBackend(BaseFilterBackend):
     else:
       return True
 
-  def check_renderer_format(self, request):
+  def check_renderer_format(self, request) -> bool:
     return request.accepted_renderer.format == "custom"
 
-  def filter_queryset(self, request, queryset, view):
+  def filter_queryset(self, request, queryset, view) -> QuerySet:
     if not self.check_renderer_format(request):
       return queryset
 
-    query = self.parse_query(request, view)
+    query = self.parse_query(request=request)
     fields = query["fields"]
 
     search_value = query["search_value"]
@@ -287,7 +259,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
           lookup = f"{field}__{search_type}"
 
           try:
-            field_obj = self.get_final_field(queryset.model, field)  # type: ignore
+            field_obj = self.get_final_field(queryset.model, field)
 
             if isinstance(field_obj, (CharField, TextField)):
               lookup = f"{field}__unaccent__{search_type}"
@@ -307,7 +279,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
           lookup = f"{field}__{search_type}"
 
           try:
-            field_obj = self.get_final_field(queryset.model, field)  # type: ignore
+            field_obj = self.get_final_field(queryset.model, field)
 
             if isinstance(field_obj, (CharField, TextField)):
               lookup = f"{field}__unaccent__{search_type}"
@@ -318,7 +290,7 @@ class DataTablesFilterBackend(BaseFilterBackend):
           column_q &= Q(**{lookup: config["search_value"]})
 
     # --- 3. ORDERING LOGIC ---
-    order_list = self.get_ordering_fields(request, view, fields)
+    order_list = self.get_ordering_fields(request=request, fields=fields)
 
     sb_index = 0
     sb_filter = Q()
@@ -358,12 +330,9 @@ class DataTablesFilterBackend(BaseFilterBackend):
         if criteria == "OR":
           sb_filter |= sb_field_filter
         else:
-          sb_filter &= sb_field_filter
+          sb_filter &= sb_field_filter  # pyright: ignore[reportOperatorIssue]
 
       sb_index += 1
-
-    # print(column_q)
-    # print(global_q)
 
     if is_filtered:
       queryset = queryset.filter(global_q & column_q)
@@ -449,12 +418,12 @@ class EventsFilter(dj_filters.FilterSet):
   )
 
   def filter_by_event_type(self, queryset, name, value):
-    if type(value) == str:
+    if type(value) is str:
       value = int(value)
 
       return queryset.filter(event_type__type_id=value)
 
-    if type(value) == list:
+    if type(value) is list:
       return queryset.filter(event_type__type_id__in=[int(x) for x in value])
 
     return queryset
@@ -472,12 +441,12 @@ class EventsFilter(dj_filters.FilterSet):
   )
 
   def filter_by_tag(self, queryset, name, value):
-    if type(value) == str:
+    if type(value) is str:
       value = int(value)
 
       return queryset.filter(event_tag__tag_id=value)
 
-    if type(value) == list:
+    if type(value) is list:
       return queryset.filter(event_tag__tag_id__in=[int(x) for x in value])
 
     return queryset
@@ -609,12 +578,12 @@ class EventsFilter(dj_filters.FilterSet):
       parsed_date_1 = parser.parse(
         value,
         fuzzy=True,
-        default=datetime.datetime(1, 1, 1),
+        default=datetime.datetime(1, 1, 1, tzinfo=datetime.UTC),
       )
       parsed_date_2 = parser.parse(
         value,
         fuzzy=True,
-        default=datetime.datetime(2, 2, 2),
+        default=datetime.datetime(2, 2, 2, tzinfo=datetime.UTC),
       )
 
       if parsed_date_1.year == parsed_date_2.year:
@@ -1049,14 +1018,6 @@ class ReleaseFilter(dj_filters.FilterSet):
     return queryset.exclude(date__year=date.year)
 
 
-class SetlistStatsFilter(dj_filters.FilterSet):
-  id = dj_filters.NumberFilter(lookup_expr="exact")
-
-  class Meta:
-    model = models.SetlistStats
-    fields = "__all__"
-
-
 class SetlistFilter(dj_filters.FilterSet):
   event = dj_filters.NumberFilter(
     field_name="event_id",
@@ -1174,11 +1135,28 @@ class SetlistFilter(dj_filters.FilterSet):
     label="hide non songs",
   )
 
-  song = dj_filters.CharFilter(field_name="song__name", lookup_expr="icontains")
-
   class Meta:
     model = models.Setlist
-    fields = "__all__"
+    fields = [
+      "event",
+      "run",
+      "leg",
+      "tour",
+      "song",
+      "venue",
+      "city",
+      "state",
+      "country",
+      "user",
+      "debut",
+      "premiere",
+      "sign_request",
+      "nobruce",
+      "song_num",
+      "bv",
+      "show_only",
+      "hide_non_songs",
+    ]
 
 
 class SetlistEntryFilter(dj_filters.FilterSet):
@@ -1227,7 +1205,16 @@ class SetlistEntryFilter(dj_filters.FilterSet):
 
   class Meta:
     model = models.SetlistEntries
-    fields = "__all__"
+    fields = [
+      "event",
+      "run",
+      "leg",
+      "tour",
+      "venue",
+      "city",
+      "state",
+      "country",
+    ]
 
 
 class SetlistSongsFilter(dj_filters.FilterSet):
@@ -1509,17 +1496,6 @@ class ArticleFilter(dj_filters.FilterSet):
 
     query = SearchQuery(value, config="english")
 
-    # return (
-    #   queryset.filter(fts_vector=query)
-    #   .annotate(
-    #     # Checks if title contains the raw search term (icontains)
-    #     # or matches via search query
-    #     in_title=Q(title__icontains=value),
-    #     rank=SearchRank("fts_vector", query, weights=[0.1, 0.2, 0.5, 1.0]),
-    #   )
-    #   .order_by("-in_title", "-rank")
-    # )
-
     return (
       queryset.filter(fts_vector=query)
       .annotate(
@@ -1532,6 +1508,19 @@ class ArticleFilter(dj_filters.FilterSet):
             output_field=FloatField(),
           ),
           output_field=FloatField(),
+        ),
+        headline=SearchHeadline(
+          "content",  # Field to extract the snippet from
+          query,
+          start_sel='<span class="highlight">',
+          stop_sel="</span>",
+          max_fragments=2,
+        ),
+        highlighted_title=SearchHeadline(
+          "title",  # <--- Target your headline/title field here
+          query,
+          start_sel='<span class="highlight">',  # Custom HTML opening tag
+          stop_sel="</span>",  # Custom HTML closing tag
         ),
       )
       .order_by("-final_rank")

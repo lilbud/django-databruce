@@ -6,11 +6,6 @@ from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path, reverse_lazy
 from django.views.generic.base import TemplateView
-from drf_spectacular.views import (
-  SpectacularAPIView,
-  SpectacularRedocView,
-  SpectacularSwaggerView,
-)
 
 from .config import base as settings
 from .forms import CustomSetPasswordForm
@@ -58,7 +53,6 @@ from .views import (
   StateDetailView,
   StateView,
   SupportView,
-  TestEventView,
   TestTableView,
   TestView,
   ThirtyDaysSubmitView,
@@ -259,11 +253,6 @@ urlpatterns = [
     name="test_table",
   ),
   path(
-    "test_event/",
-    TestEventView.as_view(),
-    name="test_table",
-  ),
-  path(
     "search/advanced/results",
     AdvSearchView.as_view(),
     name="adv_search_results",
@@ -332,25 +321,12 @@ urlpatterns = [
   re_path("^updates/?$", UpdateView.as_view(), name="updates"),
 ]
 
-
 if not settings.TESTING:
   urlpatterns = [*urlpatterns, *debug_toolbar_urls()]
 
-if settings.DEBUG:
-  urlpatterns += [
-    # Downloads the raw schema file (YAML/JSON)
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    # Optional UI interactive interfaces
-    path(
-      "api/schema/swagger-ui/",
-      SpectacularSwaggerView.as_view(url_name="schema"),
-      name="swagger-ui",
-    ),
-    path(
-      "api/schema/redoc/",
-      SpectacularRedocView.as_view(url_name="schema"),
-      name="redoc",
-    ),
+urlpatterns = (
+  [
+    # ... the rest of your URLconf goes here ...
   ]
-
-# urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+  + debug_toolbar_urls()
+)

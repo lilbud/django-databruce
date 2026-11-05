@@ -6,38 +6,84 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "bleach>=6.4.0",
-    "django==6.1",
-    "django-anymail[mailgun]>=14.0",
-    "django-browser-reload>=1.20.0",
-    "django-debug-toolbar==5.0.0",
-    "django-erd-generator>=0.1.7",
-    "django-filter>=25.2",
-    "django-link-shortener>=1.0.1",
-    "django-msgspec>=1.0.1",
+    "django>=6.1.3",
+    "django-anymail[mailgun]>=15.2",
+    "django-browser-reload>=1.21.0",
+    "django-compressor>=4.6.0",
+    "django-debug-toolbar>=8.0.0",
+    "django-filter>=26.2",
+    "django-link-shortener>=1.1.0",
     "django-redis>=7.0.0",
-    "django-silk>=5.6.0",
     "django-timezone-field>=7.2.2",
-    "django-unfold>=0.77.1",
-    "django-unfold-markdown>=0.1.2",
+    "django-unfold>=0.110.1",
+    "django-unfold-markdown>=0.2.1",
     "django-unfold-modal>=0.2.2",
     "django-watchfiles>=1.4.0",
     "django-widget-tweaks>=1.5.1",
-    "djangorestframework>=3.17.2",
-    "djlint>=1.36.4",
-    "drf-spectacular>=0.30.0",
-    "gevent>=25.9.1",
-    "gunicorn>=25.0.0",
-    "lazy-ninja>=0.7.0",
-    "markdown>=3.7",
-    "markdown-it-py>=4.0.0",
-    "nh3>=0.3.4",
-    "psycopg[binary,pool]>=3.2.9",
-    "python-dateutil>=2.9.0.post0",
-    "python-dotenv>=1.1.0",
-    "python-slugify>=8.0.4",
+    "djangorestframework>=3.18.3",
+    "djangorestframework-stubs>=3.18.2",
+    "djlint>=1.49.9",
+    "gevent>=26.9.0",
+    "gunicorn>=26.2.0",
+    "markdown>=3.11.2",
+    "psycopg[binary,pool]>=3.3.8",
+    "python-dateutil>=4.0.0",
+    "python-dotenv>=1.2.4",
+    "python-slugify>=9.1.3",
     "querystring-parser>=1.2.4",
-    "redis>=8.0.0",
-    "regex>=2026.7.19",
-    "sentry-sdk>=2.54.0",
+    "redis>=8.1.0",
+    "sentry-sdk>=2.74.0",
     "strip-markdown>=1.3",
+    "ty>=0.0.97",
+]
+
+[tool.ty.rules]
+# Adjust diagnostic severity levels ("error", "warn", or "ignore")
+unresolved-import = "ignore"
+possibly-unresolved-reference = "error"
+unused-ignore-comment = "warn"
+invalid-attribute-override = "ignore"
+unresolved-attribute = "ignore"
+invalid-argument-type = "ignore"
+
+[tool.ruff.lint]
+ignore = [
+    "EM101",    # Exception must not use a string literal
+    "TRY003",   # Avoid specifying long messages outside the exception class
+    "T201",     # Ignore printing (print function/statement used)
+    "FA102",    # Missing `from __future__ import annotations`
+    "PERF203",  # `try`-`except` inside a loop (performance overhead)
+    "D100",     # Missing docstring in public module
+    "RUF001",   # Ambiguous unicode character in string
+    "N813",     # CamelCase imported as lowercase
+    "E501",     # Line too long
+    "DTZ002",   # Timezone-naive datetime usage
+    "ANN201",   # Missing return type annotation for public function
+    "D103",     # Missing docstring in public function
+    "DTZ005",   # `datetime.datetime.now()` called without a timezone
+    "A001",     # Variable shadows a Python builtin
+    "D101",     # Missing docstring in public class
+    "D102",     # Missing docstring in public method
+    "DTZ007",   # Timezone-naive datetime constructor
+    "D106",     # Missing docstring in public nested class
+    "DJ008",    # Django model does not define `__str__` method
+    "D105",     # Missing docstring in magic method
+    "RUF012",   # Mutable class attributes should be annotated with `ClassVar`
+    "ANN001",   # Missing type annotation for function argument
+    "D104",     # Missing docstring in public package
+    "ANN002",   # Missing type annotation for `*args`
+    "ANN003",   # Missing type annotation for `**kwargs`
+    "D107",     # Missing docstring in `__init__`
+    "SIM105",   # Use `contextlib.suppress()` instead of `try-except-pass`
+    "DJ001",    # Avoid using `null=True` on string-based Django fields
+    "S101",     # Use of `assert` detected
+    "ANN401",   # Dynamically typed expressions (`typing.Any`) are disallowed
+    "PLR0915",  # Too many statements in function/method
+    "PLR0912",  # Too many branches in function/method
+    "C901",     # Function is too complex (McCabe complexity)
+    "PGH003",   # Use specific rule codes when ignoring type comments/errors
+    "DJ007",    # Django model missing `get_absolute_url`
+    "ARG005",   # Unused lambda argument
+    "D401",     # First line of docstring should be in imperative mood
+    "PERF401",  # Use a list comprehension instead of a loop to build lists
 ]

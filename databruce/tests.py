@@ -5,8 +5,8 @@ import re
 from django.contrib.auth.models import Group
 from django.core import mail
 from django.db import connection, transaction
-from django.http import HttpResponse
 from django.test import Client, TransactionTestCase, override_settings
+from django.test.client import _MonkeyPatchedWSGIResponse
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -227,9 +227,9 @@ class UserTests(BaseDataTest):
     email_body = mail.outbox[0].body
 
     # 3. Extract the activation link from the email body
-    link_match = re.search(r"https://example.com.*", email_body)  # type: ignore
+    link_match = re.search(pattern=r"https://example.com.*", string=email_body)  # ty: ignore[no-matching-overload]
     assert link_match, "Activation link not found in email"
-    activation_url = link_match.group(0)  # type: ignore
+    activation_url = link_match.group(0)
 
     # 4. Simulate clicking the link (GET request to the activation URL)
     response = self.client.get(activation_url, follow=True)
@@ -248,7 +248,7 @@ class AdvSearchTest(BaseDataTest):
     song2_id: int | None = None,
     position: str = "anywhere",
     choice: str = "True",
-  ) -> HttpResponse:
+  ) -> _MonkeyPatchedWSGIResponse:
     """Simulate the Advanced Search GET request and return the dict object."""
     url = reverse("api:adv_search-list")
 
@@ -263,7 +263,7 @@ class AdvSearchTest(BaseDataTest):
     if song2_id:
       data["songs[0][song_2]"] = song2_id
 
-    response = client.get(url, data)
+    response: _MonkeyPatchedWSGIResponse = client.get(url, data)
 
     return response
 
@@ -438,7 +438,7 @@ class DataTablesTest(BaseDataTest):
   def test_datatable_search_response(self):
     """Your actual test wrapper execution logic calling get_search_results."""
     response = self.get_search_results(self.client)
-    assert response.status_code == 200  # type: ignore
+    assert response.status_code == 200
 
   def get_search_results(
     self,

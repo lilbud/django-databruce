@@ -28,7 +28,7 @@ def generate_unique_slug(instance, source_field="title", slug_field="slug"):
 def get_seconds_until_midnight():
   """Calculates how many seconds are left until the next midnight."""
   # Uses Django's timezone-aware datetime or local time depending on your settings
-  now = timezone.now() if timezone.is_aware(timezone.now()) else datetime.now()
+  now = timezone.now()
 
   # Target midnight tonight (technically tomorrow at 00:00:00)
   midnight = datetime.combine(now.date() + timedelta(days=1), time.min)

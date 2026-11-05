@@ -1,11 +1,11 @@
 import datetime
 
+import bleach
 import markdown
-import nh3
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
-from django.utils.safestring import mark_safe
 from rest_framework import serializers
+from rest_framework.utils.serializer_helpers import ReturnDict
 
 from bruceyversion.models import Entry, EntryComment
 from databruce import models
@@ -31,9 +31,6 @@ EVENT_TYPE_COLOR_MAP = {
 class BaseSelect2Serializer(serializers.ModelSerializer):
   id = serializers.IntegerField(source="pk")
   text = serializers.SerializerMethodField()
-
-  class Meta:
-    fields = ["id", "text"]
 
   def __init__(self, *args, **kwargs) -> None:
     # Dynamically accept a text_field argument to specify the display field
@@ -68,7 +65,6 @@ class BaseSerializer(serializers.ModelSerializer):
     exclude = kwargs.pop("exclude", None)
     super().__init__(*args, **kwargs)
 
-    # Fallback to check DRF context if initialized statically as a field
     if include is None and self.context:
       include = self.context.get(f"{self.__class__.__name__.lower()}_include")
     if exclude is None and self.context:
@@ -77,12 +73,19 @@ class BaseSerializer(serializers.ModelSerializer):
     if include is not None:
       allowed = set(include)
       existing = set(self.fields)
+
       for field_name in existing - allowed:
-        self.fields.pop(field_name)
+        self.fields.pop(field_name)  # ty: ignore[invalid-argument-type]
 
     if exclude is not None:
       for field_name in exclude:
         self.fields.pop(field_name, None)
+
+  class Meta:
+    # Provide a base Meta if required by your type stubs,
+    # or leave fields empty/generic if BaseSerializer isn't tied to a single model.
+    model = None
+    fields = "__all__"
 
 
 class UsersSerializer(BaseSerializer):
@@ -319,9 +322,10 @@ class EventsSerializer(BaseSerializer):
   early_late = serializers.CharField(required=False, max_length=255)
   artist = BandsSerializer(required=False, include=["slug", "name"])
   tour = ToursSerializer(required=False, include=["slug", "name"])
+
   venue = VenuesSerializer(
     required=False,
-    include=["slug", "name", "formatted"],
+    include=["slug", "name"],
   )
 
   city = serializers.CharField(
@@ -350,13 +354,6 @@ class EventsSerializer(BaseSerializer):
     slug_field="name",
     required=False,
   )
-
-  # setlist = EventSetlistSerializer(
-  #   source="setlist_event",
-  #   read_only=True,
-  #   many=True,
-  #   required=False,
-  # )
 
   has_setlist = serializers.SerializerMethodField()
 
@@ -639,7 +636,7 @@ class OnstageBandSerializer(BaseSerializer):
 
 class ReleasesSerializer(BaseSerializer):
   event = EventsSerializer(required=False, include=["date", "event_id", "early_late"])
-  length = serializers.TimeField(format="%H:%M:%S", required=False)  # type: ignore
+  length = serializers.TimeField(format="%H:%M:%S", required=False)
 
   class Meta:
     model = models.Release
@@ -697,7 +694,7 @@ class SetlistMobileSerializer(BaseSerializer):
 
   class Meta:
     model = models.Setlist
-    fields = "__all__"
+    fields = ["song"]
 
 
 class SetlistNotesSerializer(BaseSerializer):
@@ -808,7 +805,7 @@ class ReleaseTracksSerializer(BaseSerializer):
       "slug",
     ],
   )
-  length = serializers.TimeField(format="%M:%S", required=False)  # type: ignore
+  length = serializers.TimeField(format="%M:%S", required=False)
 
   class Meta:
     model = models.ReleaseTrack
@@ -1168,7 +1165,6 @@ class UserAttendedShowsSerializer(BaseSerializer):
 
 class SetlistBreakdownSerializer(BaseSerializer):
   total_songs = serializers.IntegerField(required=False)
-  # song_count = serializers.IntegerField(required=False)
   category = serializers.SerializerMethodField(required=False)
   album_complete = serializers.SerializerMethodField(required=False)
   album_in_order = serializers.SerializerMethodField(required=False)
@@ -1258,6 +1254,8 @@ class SetlistBreakdownSerializer(BaseSerializer):
 
   def get_album_in_order(self, obj):
     """Check if album songs present in the setlist appear in exact relative album sequence."""
+    min_sequence_length = 2
+
     # Non-album categories can't be in order
     if obj.get("category") in (8, 19):
       return False
@@ -1290,8 +1288,8 @@ class SetlistBreakdownSerializer(BaseSerializer):
     ]
 
     # Must have played at least 2 album songs to establish a sequence
-    if len(played_album_songs) < 2:
-      return len(played_album_songs) == 1
+    if len(played_album_songs) < min_sequence_length:
+      return False
 
     # Verify indices strictly increase (e.g., track 1 -> track 2 -> track 3)
     return all(
@@ -1347,13 +1345,13 @@ class UserAlbumBreakdownSerializer(serializers.ModelSerializer):
     tracks = getattr(obj, "release_tracks", [])
 
     if hasattr(tracks, "all"):
-      return list(tracks.all())  # type: ignore
+      return list(tracks.all())  # ty: ignore[call-non-callable]
 
     return list(tracks) if isinstance(tracks, (list, tuple)) else [tracks]
 
-  def get_songs(self, obj) -> list[dict]:
+  def get_songs(self, obj) -> ReturnDict:
     tracks = self._get_tracks(obj)
-    return ReleaseTrackSongSerializer(tracks, many=True).data  # type: ignore
+    return ReleaseTrackSongSerializer(tracks, many=True).data
 
   def get_user_album_count(self, obj) -> int:
     tracks = self._get_tracks(obj)
@@ -1459,36 +1457,26 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
   )
 
   final_rank = serializers.FloatField(required=False)
-
+  highlighted_title = serializers.CharField(required=False, max_length=255)
   content = serializers.SerializerMethodField()
 
   def get_content(self, obj):
-    raw_html = markdown.markdown(obj.content[:300])
+    raw_html = markdown.markdown(obj.headline)
     # 2. Define safe elements
     allowed_tags = [
-      "p",
-      "strong",
-      "em",
-      "h1",
-      "h2",
-      "h3",
-      "h4",
-      "ul",
-      "ol",
-      "li",
-      "br",
-      "code",
-      "pre",
-      "blockquote",
+      "span",
     ]
+    allowed_attributes = {
+      "span": ["class"],
+    }
 
     # 3. Clean the HTML (strips script tags, onerror events, etc.)
-    cleaned_html = nh3.clean(
+    return bleach.clean(
       raw_html,
-      tags=set(allowed_tags),
+      tags=allowed_tags,
+      attributes=allowed_attributes,
+      strip=True,
     )
-
-    return mark_safe(cleaned_html)
 
   class Meta:
     model = Article
@@ -1501,6 +1489,7 @@ class ArticlesSearchSerializer(serializers.ModelSerializer):
       "content",
       "published_at",
       "final_rank",
+      "highlighted_title",
     ]
 
 

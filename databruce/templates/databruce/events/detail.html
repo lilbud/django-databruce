@@ -1,14 +1,15 @@
 {% extends "databruce/narrow_layout.html" %}
-{% load humanize static %}
+{% load humanize static compress %}
 {% block title %}
   {{ title }}
 {% endblock title %}
 {% block extrajs %}
-  <script src="{% static 'databruce/js/table.js' %}"></script>
-  <script src="{% static 'databruce/js/albumBreakdown.js' %}"></script>
-  <script src="{% static 'databruce/js/snapdom.js' %}"></script>
-  <script src="{% static 'databruce/js/setlistTable.js' %}"></script>
-  <script src="{% static 'databruce/js/share-card.js' %}"></script>
+  {% compress js %}
+    <script src="{% static 'databruce/js/table.js' %}"></script>
+    <script src="{% static 'databruce/js/albumBreakdown.js' %}"></script>
+    <script src="{% static 'vendor/snapdom/snapdom.js' %}"></script>
+    <script src="{% static 'databruce/js/share-card.js' %}"></script>
+  {% endcompress %}
 {% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}

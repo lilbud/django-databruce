@@ -748,4 +748,8 @@
     background-color: var(--color-gray-200) !important;
     border-color: var(--color-gray-300) !important;
   }
+
+  .highlight {
+    background-color: var(--color-yellow-300) !important;
+  }
 }

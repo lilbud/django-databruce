@@ -14,8 +14,6 @@ Markdown
 gevent
 gunicorn
 redis
-markdown-it-py
-nh3
 psycopg[binary,pool]
 python-dateutil
 python-dotenv
@@ -23,9 +21,10 @@ python-slugify
 querystring_parser
 sentry-sdk
 django-watchfiles
-drf-spectacular
-django-msgspec
 strip-markdown
 bleach
-django-silk
 django-widget-tweaks
+django_compressor
+djangorestframework-stubs
+django-unfold-modal
+django-debug-toolbar

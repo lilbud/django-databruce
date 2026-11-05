@@ -205,63 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const rows = searchContainer ? searchContainer.querySelectorAll('.song-row') : [];
   const lastRow = rows[rows.length - 1];
 
-  $('#start_date').mask('0000-00-00');
-  $('#end_date').mask('0000-00-00');
+  // mask date fields
+  applyDateMask('.date-form');
 
   document.querySelectorAll('select[data-endpoint]').forEach((selectEl) => {
     const endpoint = selectEl.dataset.endpoint;
     $(selectEl).select2(getOptions(endpoint, selectEl));
   });
-
-  // const venueSelect = document.getElementById('venue');
-
-  // if (venueSelect) {
-  //   var ts = new TomSelect('#venue', {
-  //     valueField: 'id',
-  //     labelField: 'text',
-  //     searchField: 'text',
-  //     // plugins: ['dropdown_header'],
-  //     // fetch remote data
-  //     shouldLoad: function (query) {
-  //       return query.length >= 3;
-  //     },
-  //     load: function (query, callback) {
-  //       var url = '/api/select2/venues/?name=' + encodeURIComponent(query);
-  //       fetch(url)
-  //         .then(response => response.json())
-  //         .then(json => {
-  //           console.log(json.results);
-  //           callback(json.results);
-  //         }).catch(() => {
-  //           callback();
-  //         });
-  //     },
-  //     render: {
-  //       option: function (data, escape) {
-  //         return `<div>
-  //               <span class="name">${escape(data.text)}</span>
-  //           </div>`;
-  //       },
-  //       item: function (data, escape) {
-  //         return `<div>${escape(data.text)}</div>`;
-  //       },
-  //       no_results: function (data, escape) {
-  //         // Replicates the exact message layout from your image
-  //         return '<div class="ts-message">Please enter 3 or more characters</div>';
-  //       },
-  //       // Optional: Customizing the loading state if fetching remote data
-  //       loading_more: function (data, escape) {
-  //         return '<div class="ts-message">Loading more results...</div>';
-  //       }
-  //     }
-  //   });
-
-  //   ts.on('dropdown_open', function () {
-  //     if (!ts.lastValue.length) {
-  //       ts.refreshOptions(false);
-  //     }
-  //   });
-  // }
 
   if (lastRow) {
     const song1 = lastRow.querySelector('.song1');

@@ -42,7 +42,7 @@
       </div>
     {% endif %}
     <hr>
-    <div class="text-base" id="article-content">{{ body }}</div>
+    <div class="text-base" id="article-content">{{ body|safe }}</div>
     <hr>
     <div class="prefix-container text-sm">
       <span class="prefix">Sourced From</span>

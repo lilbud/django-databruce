@@ -14,7 +14,6 @@ from django.contrib.auth.tokens import (
   default_token_generator,
 )
 from django.contrib.auth.views import LoginView as BaseLoginView
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -23,12 +22,10 @@ from django.core.signing import BadSignature, Signer
 from django.db.models import (
   Avg,
   Count,
-  Exists,
   OuterRef,
   Prefetch,
   Q,
   QuerySet,
-  Subquery,
 )
 from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonResponse
@@ -113,8 +110,8 @@ def unsubscribe_view(request, token):
   user = get_object_or_404(UserModel, id=user_id)
 
   # Process the opt-out
-  if user.receive_newsletter:  # type: ignore
-    user.receive_newsletter = False  # type: ignore
+  if user.receive_newsletter:
+    user.receive_newsletter = False
     user.save(update_fields=["receive_newsletter"])
 
   return render(request, "emails/unsubscribe_success.html", {"user": user})
@@ -330,10 +327,10 @@ class CalendarView(PageTitleMixin, TemplateView):
     try:
       if re.search(
         r"^\d{4}-\d{2}-\d{2}|^\d{4}-\d{2}$|^\d{4}$",
-        self.request.GET["start"],  # type: ignore
-      ):  # type: ignore
+        self.request.GET["start"],
+      ):
         context["start_date"] = self.request.GET["start"]
-        context["year"] = int(self.request.GET["start"].split("-")[0])  # type: ignore
+        context["year"] = int(self.request.GET["start"].split("-")[0])
     except MultiValueDictKeyError:
       context["start_date"] = context["date"].strftime("%Y-%m-%d")
       context["year"] = context["date"].year
@@ -376,7 +373,7 @@ class ResendActivationView(PageTitleMixin, TemplateView):
     else:
       messages.error(request, "No inactive account found with that email.")
 
-    return render(request, template_name=self.template_name)  # type: ignore
+    return render(request, template_name=self.template_name)
 
 
 class LoginView(PageTitleMixin, BaseLoginView):
@@ -519,12 +516,12 @@ class SignUpView(PageTitleMixin, FormView):
 #       messages.error(request, "Incorrect verification answer")
 #       return render(
 #         request,
-#         template_name=self.template_name,  # type: ignore
+#         template_name=self.template_name,
 #         context={"form": form},
 #       )
 
 #     messages.error(request, "Signup Failed, see errors below")
-#     return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
+#     return render(request, template_name=self.template_name, context={"form": form})
 
 #   def send_mail(self, context, from_email, to_email):
 #     subject = loader.render_to_string(self.subject_template_name, context).strip()
@@ -598,7 +595,7 @@ class SignUpConfirmView(PageTitleMixin, TemplateView):
           self.request.session[token_key] = token
 
           group = Group.objects.get(name="Users")
-          self.user.groups.add(group)  # type: ignore
+          self.user.groups.add(group)
           self.user.is_active = True
           self.user.save()
 
@@ -758,7 +755,7 @@ class UserAddShowView(LoginRequiredMixin, View):
 
     # Securely fetch the user ID from the active authenticated session
     UserAttendedShow.objects.get_or_create(
-      user_id=request.user.id,  # type: ignore
+      user_id=request.user.id,
       event_id=event_id,
     )
 
@@ -771,20 +768,20 @@ class UserRemoveShowView(LoginRequiredMixin, View):
   def post(self, request: HttpRequest, *args: tuple, **kwargs: dict[str, Any]):  # noqa: ARG002
 
     try:
-      event_id = int(kwargs["event_id"])  # type: ignore
+      event_id = int(kwargs["event_id"])
     except (ValueError, TypeError):
       return JsonResponse({"error": "Invalid event ID format"}, status=400)
 
     # Securely filter by the authenticated user's ID
     attendance = UserAttendedShow.objects.filter(
-      user_id=request.user.id,  # type: ignore
+      user_id=request.user.id,
       event_id=event_id,
     ).first()
 
     if attendance:
       attendance.delete()  # This triggers the model's delete() method
 
-      count = UserAttendedShow.objects.filter(event_id=event_id).count()  # type: ignore
+      count = UserAttendedShow.objects.filter(event_id=event_id).count()
 
       return JsonResponse({"action": "removed", "count": count})
 
@@ -798,7 +795,7 @@ class UserAddReviewView(View):
 
     if form.is_valid():
       review, created = UserShowReview.objects.update_or_create(
-        user_id=request.user.id,  # type: ignore
+        user_id=request.user.id,
         event_id=self.kwargs["event_id"],
         defaults=form.cleaned_data,
       )
@@ -921,11 +918,11 @@ class EventDetailView(PageTitleMixin, TemplateView):
       )
 
     context["user_list"] = (
-      context["event"].user_event.all().values_list("user__username", flat=True)  # type: ignore
-    )  # type: ignore
+      context["event"].user_event.all().values_list("user__username", flat=True)
+    )
 
     context["review_score"] = (
-      context["event"].event_reviews.aggregate(Avg("rating")).get("rating__avg")  # type: ignore
+      context["event"].event_reviews.aggregate(Avg("rating")).get("rating__avg")
     )
 
     if user.is_authenticated:
@@ -945,8 +942,8 @@ class EventDetailView(PageTitleMixin, TemplateView):
         review = context["user_review"]
         context["review_form"] = self.ReviewForm(
           initial={
-            "content": review.content,  # type: ignore
-            "rating": str(review.rating),  # type: ignore
+            "content": review.content,
+            "rating": str(review.rating),
           },
         )
 
@@ -955,8 +952,7 @@ class EventDetailView(PageTitleMixin, TemplateView):
     if context["event"].run:
       if context["event"].run.ticket_range:
         context["ticket_range"] = [
-          currency(float(x))
-          for x in context["event"].run.ticket_range.split("/")  # type: ignore
+          currency(float(x)) for x in context["event"].run.ticket_range.split("/")
         ]
       else:
         context["ticket_range"] = [
@@ -1191,7 +1187,7 @@ class VenueDetailView(PageTitleMixin, TemplateView):
     venue_address = getattr(venue, "address", None)
 
     if venue_address:
-      context["shared_loc"] = Venue.objects.exclude(id=venue.pk).filter(  # type: ignore
+      context["shared_loc"] = Venue.objects.exclude(id=venue.pk).filter(
         address=venue_address,
       )[:5]
 
@@ -1383,13 +1379,13 @@ class ContactView(PageTitleMixin, TemplateView):
       messages.error(request, "Incorrect verification answer")
       return render(
         request,
-        template_name=self.template_name,  # type: ignore
+        template_name=self.template_name,
         context={"form": form, "verification_err": True},
       )
 
     messages.error(request, "Message not sent, see errors below")
 
-    return render(request, template_name=self.template_name, context={"form": form})  # type: ignore
+    return render(request, template_name=self.template_name, context={"form": form})
 
 
 class SetlistNotesSearchView(PageTitleMixin, TemplateView):
@@ -1444,7 +1440,7 @@ class AdvancedSearchView(PageTitleMixin, TemplateView):
 
 
 class AdvSearchView(PageTitleMixin, TemplateView):
-  template_name = "databruce/search/test_advsearch.html"
+  template_name = "databruce/search/advanced_search_results.html"
   title = "Advanced Search"
   form_class = AdvancedEventSearch
   formset = SetlistSearch
@@ -1589,7 +1585,7 @@ class AdvSearchView(PageTitleMixin, TemplateView):
     for key in list(data.keys()):
       if key.endswith("__not"):
         field = key.removesuffix("__not")
-        data[field] = data[key]  # type: ignore
+        data[field] = data[key]  # ty: ignore[invalid-assignment]
         data[f"{field}_exclude"] = "True"
 
     event_form = self.form_class(data)
@@ -1652,7 +1648,7 @@ class AdvSearchView(PageTitleMixin, TemplateView):
       ).lower()
 
       song_dict = {
-        "song_1": query_params.get(f"songs[{index}][song_1]"),
+        "song_1": query_params.get(f"songs[{index}][song_1]", ""),
         "song_2": query_params.get(
           f"songs[{index}][song_2]",
         ),  # Will be None if missing
@@ -1687,274 +1683,6 @@ class AdvSearchView(PageTitleMixin, TemplateView):
       setlist_search_display_queries.append(summary)
 
     context["search_summary"] = setlist_search_display_queries
-
-    query_display = f" {context['conjunction']} ".join(
-      setlist_search_display_queries,
-    )
-
-    field_display = ", ".join(
-      [f"{f['label']}: {f['data']}" for f in context["display_fields"]],
-    )
-
-    if query_display == "":
-      context["description"] = f"{field_display}"
-    elif query_display and field_display == "":
-      context["description"] = f"Songs: {query_display}"
-    else:
-      context["description"] = f"Songs: {query_display}, {field_display}"
-
-    return context
-
-
-class AdvancedSearchResultsView(PageTitleMixin, TemplateView):
-  template_name = "databruce/search/advanced_search_results.html"
-  form_class = AdvancedEventSearch
-  formset = SetlistSearch
-  formset_class = formset_factory(formset)
-  title = "Advanced Search Results"
-
-  position_filters = {
-    "show_opener": Q(is_opener=True),
-    "in_show": Q(set_name=SetType.SHOW),
-    "in_set_one": Q(set_name=SetType.SET_1),
-    "set_one_opener": Q(
-      set_name=SetType.SET_1,
-      is_set_opener=True,
-    ),
-    "set_one_closer": Q(
-      set_name=SetType.SET_1,
-      is_set_closer=True,
-    ),
-    "in_set_two": Q(set_name=SetType.SET_2),
-    "set_two_opener": Q(
-      set_name=SetType.SET_2,
-      is_set_opener=True,
-    ),
-    "set_two_closer": Q(
-      set_name=SetType.SET_2,
-      is_set_closer=True,
-    ),
-    "main_set_closer": Q(is_main_set_closer=True),
-    "encore_opener": Q(
-      set_name=SetType.ENCORE,
-      is_set_opener=True,
-    ),
-    "in_encore": Q(set_name=SetType.ENCORE),
-    "in_preshow": Q(set_name=SetType.PRE_SHOW),
-    "in_recording": Q(set_name=SetType.RECORDING),
-    "in_soundcheck": Q(set_name=SetType.SOUNDCHECK),
-    "show_closer": Q(is_closer=True),
-    "anywhere": Q(),  # No additional filters
-    "premiere": Q(premiere=True),
-    "debut": Q(debut=True),
-    "nobruce": Q(nobruce=True),
-    "request": Q(sign_request=True),
-  }
-
-  def get(self, request, *args, **kwargs):
-    event_form = self.form_class(self.request.GET)
-    formset = self.formset_class(self.request.GET)
-
-    if not event_form.has_changed() and not formset.has_changed():
-      messages.warning(self.request, "Please fill out at least one field")
-      return redirect(reverse("adv_search"))
-
-    return super().get(request, *args, **kwargs)
-
-  def get_context_data(self, **kwargs) -> dict[str, Any]:
-    context = super().get_context_data(**kwargs)
-    context["danger_event_types"] = ["Cancelled", "Rescheduled", "Relocated"]
-
-    event_form = self.form_class(self.request.GET)
-    formset = self.formset_class(self.request.GET)
-
-    pos_choices = dict(formset.form.base_fields["position"].choices)  # type: ignore
-
-    next_song = (
-      Setlist.objects.select_related("song")
-      .filter(
-        set_name=OuterRef("set_name"),
-        event_id=OuterRef("event_id"),
-        song_num__gt=OuterRef("song_num"),
-      )
-      .order_by("event", "song_num")
-      .values("song_id")[:1]
-    )
-
-    setlist_qs = (
-      Setlist.objects.all()
-      .select_related("event", "song")
-      .values("event_id")
-      .annotate(
-        next_song=Subquery(next_song),
-      )
-    )
-
-    setlist_anywhere_qs = (
-      Setlist.objects.all()
-      .select_related("event", "song")
-      .values("event_id")
-      .annotate(
-        songs_list=ArrayAgg(
-          "song_id",
-          filter=Q(set_name__in=SetType.valid_sets()),
-          distinct=True,
-        ),
-      )
-    )
-
-    event_filter = event_form.get_filters()
-    sl_filter = Q()
-    event_search_queries = []
-    setlist_search_display_queries = []
-
-    for f in event_filter.children:
-      if type(f) is Q:
-        sl_filter &= f
-      else:
-        sl_filter &= Q(**{f"event__{f[0]}": f[1]})  # type: ignore
-
-    if formset.is_valid() and formset.has_changed():
-      song_ids = [
-        str(f["song1"]).replace("'", "") for f in formset.cleaned_data if f.get("song1")
-      ]
-
-      song_ids.extend(
-        [
-          str(f["song2"]).replace("'", "")
-          for f in formset.cleaned_data
-          if f.get("song2")
-        ],
-      )
-
-      song_map = {str(s.id): s.name for s in Song.objects.filter(id__in=song_ids)}
-
-      for form in formset.cleaned_data:
-        if not form.get("song1"):
-          continue
-
-        choice = form.get("choice", True)
-        pos = form.get("position")
-        s1_name = song_map.get(str(form["song1"]).replace("'", ""))
-
-        choice_str = "is" if choice else "not"
-
-        condition = Q(song=form["song1"])
-
-        summary = f"{s1_name} ({choice_str} anywhere)"
-
-        if pos == "followed_by" and form.get("song2"):
-          s2_name = song_map.get(str(form["song2"]).replace("'", ""))
-
-          song2_condition = Q(
-            next_song=form["song2"],
-          )
-
-          if not choice:
-            song2_condition = ~song2_condition
-
-          condition &= song2_condition
-
-          summary = f"{s1_name} ({choice_str} followed by) {s2_name}"
-
-        elif pos == "anywhere":
-          condition = Q(
-            songs_list__contains=[int(form["song1"].replace("'", ""))],
-          )
-
-          if not choice or choice is None:
-            condition = ~Q(
-              songs_list__contains=[int(form["song1"].replace("'", ""))],
-            )
-
-        else:
-          pos_filter = self.position_filters.get(pos)  # type: ignore
-          pos_display = pos_choices.get(pos)
-
-          if not choice:
-            condition &= ~pos_filter  # type: ignore
-          else:
-            condition &= pos_filter  # type: ignore
-
-          summary = f"{s1_name} ({choice_str} {pos_display})"
-
-        # use different queryset for the anywhere position
-        if pos == "anywhere":
-          matched_events = set(
-            setlist_anywhere_qs.filter(condition).values_list(
-              "event_id",
-              flat=True,
-            ),
-          )
-
-        else:
-          matched_events = set(
-            setlist_qs.filter(condition).values_list("event_id", flat=True),
-          )
-
-        event_search_queries.append(matched_events)
-        setlist_search_display_queries.append(summary)
-
-    final_events = set()
-
-    if event_search_queries:
-      conjunction = event_form.cleaned_data["conjunction"]
-      if conjunction == "or":
-        final_events = set.union(*event_search_queries)
-      else:
-        final_events = set.intersection(*event_search_queries)
-
-      event_filter &= Q(id__in=final_events)
-
-    context["events"] = (
-      Event.objects.filter(event_filter)
-      .select_related(
-        "venue__city__country",
-        "artist",
-        "tour",
-        "type",
-      )
-      .prefetch_related(
-        "venue__city__state",
-        "onstage_event",
-      )
-      .annotate(
-        has_setlist=Exists(
-          Subquery(
-            Setlist.objects.filter(event_id=OuterRef("id")),
-          ),
-        ),
-      )
-    ).order_by("event_id")
-
-    context["display_fields"] = []
-
-    for f in event_form.changed_data:
-      if "_exclude" not in f and f != "conjunction":
-        display = {
-          "label": event_form[f].label,
-          "data": event_form.cleaned_data[f],
-        }
-
-        if type(event_form.cleaned_data[f]) is list:
-          display["data"] = " OR ".join(event_form.cleaned_data[f])
-        elif type(event_form.cleaned_data[f]) is QuerySet:
-          display["data"] = " OR ".join(
-            event_form.cleaned_data[f].values_list("name", flat=True),
-          )
-        elif type(event_form.cleaned_data[f]) is dict:
-          display["data"] = event_form.cleaned_data[f]["value"]
-        else:
-          display["data"] = event_form.cleaned_data[f].__str__()
-
-        context["display_fields"].append(display)
-
-    context["search_summary"] = setlist_search_display_queries
-
-    context["conjunction"] = event_form.cleaned_data.get(
-      "conjunction",
-      "and",
-    )
 
     query_display = f" {context['conjunction']} ".join(
       setlist_search_display_queries,
@@ -2029,11 +1757,6 @@ class TestTableView(PageTitleMixin, TemplateView):
     ]
 
     return context
-
-
-class TestEventView(PageTitleMixin, TemplateView):
-  template_name = "databruce/test_event_table.html"
-  title = "Table"
 
 
 class RelationDetailView(PageTitleMixin, TemplateView):
@@ -2227,10 +1950,7 @@ class RunDetailView(PageTitleMixin, TemplateView):
 
     if context["info"].ticket_range:
       context["ticket_range"] = " / ".join(
-        [
-          currency(float(x))
-          for x in context["info"].ticket_range.split("/")  # type: ignore
-        ],
+        [currency(float(x)) for x in context["info"].ticket_range.split("/")],
       )
     elif context["info"].ticket_min and context["info"].ticket_max:
       context["ticket_range"] = " / ".join(

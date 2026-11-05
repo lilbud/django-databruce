@@ -57,9 +57,8 @@ INSTALLED_APPS = [
   "timezone_field",
   "django_watchfiles",
   "sentry_sdk",
-  "drf_spectacular",
-  "django_msgspec",
   "widget_tweaks",
+  "compressor",
 ]
 
 SITE_ID = 1
@@ -180,7 +179,6 @@ REST_FRAMEWORK = {
   "DEFAULT_PERMISSION_CLASSES": [
     "rest_framework.permissions.IsAuthenticatedOrReadOnly",
   ],
-  "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
   "DEFAULT_FILTER_BACKENDS": [
     "django_filters.rest_framework.DjangoFilterBackend",
     "rest_framework.filters.SearchFilter",
@@ -189,14 +187,6 @@ REST_FRAMEWORK = {
     "api.filters.NotEqualFilterBackend",
   ],
   "PAGE_SIZE": 50,
-}
-
-SPECTACULAR_SETTINGS = {
-  "TITLE": "Databruce",
-  "DESCRIPTION": "An API to interact with the Databruce database",
-  "VERSION": "1.0.0",
-  "SERVE_INCLUDE_SCHEMA": False,
-  # OTHER SETTINGS
 }
 
 ANYMAIL = {
@@ -216,10 +206,18 @@ ADMINS = [
 STATICFILES_FINDERS = [
   "django.contrib.staticfiles.finders.FileSystemFinder",
   "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+  "compressor.finders.CompressorFinder",
 ]
 
 SESSION_EXEXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+COMPRESS_ENABLED = True
+
+STORAGES = {
+  "staticfiles": {
+    "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+  },
+}
 
 UNFOLD = {
   "STYLES": [

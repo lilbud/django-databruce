@@ -103,7 +103,6 @@ function eventSearch(query) {
   }
 }
 
-
 // KEYDOWN LISTENER: Handles layout navigation and "Enter" execution
 searchInput.addEventListener('keydown', function (e) {
   // Grab all dynamically rendered list-group anchors

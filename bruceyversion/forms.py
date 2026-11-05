@@ -1,6 +1,6 @@
 from typing import Any
 
-import nh3
+import bleach
 from django import forms
 
 from databruce import models
@@ -21,10 +21,7 @@ class SubmitForm(forms.Form):
         songs = models.Song.objects.filter(id=song_id)
         self.fields["song"].choices = [(s.id, str(s.name)) for s in songs]
 
-    if self.is_bound:
-      event_id = self.data.get("event")
-    else:
-      event_id = self.initial.get("event")
+    event_id = self.data.get("event") if self.is_bound else self.initial.get("event")
 
     # 2. If a value exists, inject it as a valid choice so validation passes
     if event_id:
@@ -32,9 +29,6 @@ class SubmitForm(forms.Form):
         event_obj = models.Event.objects.get(pk=event_id)
         # CRITICAL FIX: Clear choices completely to prevent duplication
         self.fields["event"].choices = []
-
-        # If you use a Select2 placeholder, prepend an empty choice:
-        # self.fields["event"].choices = [("", "")]
 
         # Append the singular, valid choice item
         self.fields["event"].choices += [
@@ -87,6 +81,7 @@ class SubmitForm(forms.Form):
         return models.Event.objects.get(id=data)
       except models.Event.DoesNotExist:
         raise forms.ValidationError("Select a valid event.")
+
     return None
 
   def clean_song(self):
@@ -96,12 +91,12 @@ class SubmitForm(forms.Form):
         return models.Song.objects.get(id=data)
       except models.Song.DoesNotExist:
         raise forms.ValidationError("Select a valid song.")
+
     return None
 
   def clean_comment(self):
-    # .get() prevents KeyError if data is completely missing
     data = self.cleaned_data["comment"]
-    return nh3.clean(data, tags=set())
+    return bleach.clean(data, tags=set())
 
 
 class CommentForm(forms.Form):

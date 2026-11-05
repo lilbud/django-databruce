@@ -4,12 +4,8 @@
   {{ title }}
 {% endblock title %}
 {% block extrastyle %}
-  <link type="text/css"
-        rel="stylesheet"
-        href="https://unpkg.com/lightgallery@3.0.0/css/lightgallery-bundle.css">
 {% endblock extrastyle %}
 {% block extrajs %}
-  <script src="https://cdn.jsdelivr.net/npm/lightgallery@3.0.0/lightgallery.min.js"></script>
 {% endblock extrajs %}
 {% block content %}
   {% if user.is_superuser %}

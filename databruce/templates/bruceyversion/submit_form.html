@@ -1,156 +1,151 @@
 {% extends "databruce/narrow_layout.html" %}
 {% load static %}
 {% block title %}
-    {{ title }}
+  {{ title }}
 {% endblock title %}
 {% block extrajs %}
-    <script src="{% static "databruce/js/select2/select2.min.js" %}"></script>
-    <link rel="stylesheet"
-          href="{% static "databruce/css/select2/select2.min.css" %}" />
-    <link rel="stylesheet"
-          href="{% static "databruce/css/select2/select2-bootstrap-5-theme.min.css" %}" />
 {% endblock extrajs %}
 {% block content %}
-    <div class="col-12 col-lg-9">
-        <div class="page-title">Bruceyversion Submission Form</div>
-        <div class="text-sm mb-2">Have a particular favorite live performance of a song? Submit it below!</div>
-        {% if messages %}
-            <div class="row mb-3">
-                <div class="col">
-                    {% for message in messages %}
-                        <div class="card message {{ message.tags }} fst-italic p-2">
-                            <span>{{ message|safe }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
+  <div class="col-12 col-lg-9">
+    <div class="page-title">Bruceyversion Submission Form</div>
+    <div class="text-sm mb-2">Have a particular favorite live performance of a song? Submit it below!</div>
+    {% if messages %}
+      <div class="row mb-3">
+        <div class="col">
+          {% for message in messages %}
+            <div class="card message {{ message.tags }} fst-italic p-2">
+              <span>{{ message|safe }}</span>
             </div>
-        {% endif %}
-        <div class="row">
-            <form method="post"
-                  id="submit-form"
-                  action="{% url "bruceyversion:submit" %}">
-                {% csrf_token %}
-                <div class="col">{{ form.non_field_errors }}</div>
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label fw-medium mb-1">{{ field.label }}</label>
-                        {% if field.help_text %}
-                            <div class="form-text text-muted text-xs mb-2 mt-0">{{ field.help_text|safe }}</div>
-                        {% endif %}
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="error-message">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <div class="col-12 mx-auto">
-                    <button class="btn btn-sm btn-primary" type="submit">Submit</button>
-                </div>
-            </form>
+          {% endfor %}
         </div>
+      </div>
+    {% endif %}
+    <div class="row">
+      <form method="post"
+            id="submit-form"
+            action="{% url "bruceyversion:submit" %}">
+        {% csrf_token %}
+        <div class="col">{{ form.non_field_errors }}</div>
+        {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label fw-medium mb-1">{{ field.label }}</label>
+            {% if field.help_text %}
+              <div class="form-text text-muted text-xs mb-2 mt-0">{{ field.help_text|safe }}</div>
+            {% endif %}
+            {{ field }}
+            {% if field.errors %}
+              <div class="error-message">{{ field.errors }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <div class="col-12 mx-auto">
+          <button class="btn btn-sm btn-primary" type="submit">Submit</button>
+        </div>
+      </form>
     </div>
-    <script>
-      $(document).ready(function () {
+  </div>
+  <script>
+    $(document).ready(function() {
 
-        var eventID = '{{ request.POST.event }}';
-        var songID = '{{ request.POST.song }}';
+      var eventID = '{{ request.POST.event }}';
+      var songID = '{{ request.POST.song }}';
 
-        if (eventID && songID) {
-          fetch(`/api/v1/setlists/?event=${eventID}&format=json&show_only=true&hide_non_songs=true&bv=true`)
+      if (eventID && songID) {
+        fetch(`/api/v1/setlists/?event=${eventID}&format=json&show_only=true&hide_non_songs=true&bv=true`)
           .then(response => response.json())
           .then(data => {
-            data.results.forEach(function (item) {
+            data.results.forEach(function(item) {
               // Keep selected state if it matches a returned validation value
               let isSelected = item.song.id == songID ? 'selected="selected"' : '';
               console.log(item.song.id)
               $('#song').append(`<option value="${item.song.id}" ${isSelected}>${item.set_name} - ${item.song.name}</option>`);
             });
           });
-        }
-        
+      }
 
-        var eventSelect = $('#event').select2({
-          theme: "bootstrap-5",
-          selectionCssClass: "form-select-sm",
-          dropdownCssClass: "form-select-sm",
-          minimumInputLength: 3,
-          dropdownAutoWidth: true,
-          dropdownPosition: 'below',
-          allowClear: true,
-          placeholder: '',
-          maximumSelectionLength: 4,
-          width: '100%',
-          ajax: {
-            delay: 250,
-            url: '/api/v1/events/',
-            dataType: 'json',
-            data: function (params) {
-              return {
-                search: params.term,
-              }
-            },
-            processResults: function (data) {
-              return {
-                results: $.map(data.results, function (item) {
-                  return {
-                    id: item.id,
-                    text: item.date,
-                    customHtml: `${item.date} - ${item.artist.name} - ${item.venue.name}`
-                  };
-                })
-              };
-            },
-          },
-          escapeMarkup: function (markup) {
-            return markup;
-          },
-          // 2. Render the custom HTML property inside the dropdown list
-          templateResult: function (data) {
-            if (data.loading) {
-                return data.text;
+
+      var eventSelect = $('#event').select2({
+        theme: "bootstrap-5",
+        selectionCssClass: "form-select-sm",
+        dropdownCssClass: "form-select-sm",
+        minimumInputLength: 3,
+        dropdownAutoWidth: true,
+        dropdownPosition: 'below',
+        allowClear: true,
+        placeholder: '',
+        maximumSelectionLength: 4,
+        width: '100%',
+        ajax: {
+          delay: 250,
+          url: '/api/v1/events/',
+          dataType: 'json',
+          data: function(params) {
+            return {
+              search: params.term,
             }
-            // Return your assigned HTML property if it exists, otherwise fallback to plain text
-            return data.customHtml || data.text;
           },
-          templateSelection: function (data) {
-            return data.customHtml || data.text;
+          processResults: function(data) {
+            return {
+              results: $.map(data.results, function(item) {
+                return {
+                  id: item.id,
+                  text: item.date,
+                  customHtml: `${item.date} - ${item.artist.name} - ${item.venue.name}`
+                };
+              })
+            };
+          },
+        },
+        escapeMarkup: function(markup) {
+          return markup;
+        },
+        // 2. Render the custom HTML property inside the dropdown list
+        templateResult: function(data) {
+          if (data.loading) {
+            return data.text;
           }
-        });
-
-        if (eventSelect.val()) {
-          eventSelect.trigger('change');
+          // Return your assigned HTML property if it exists, otherwise fallback to plain text
+          return data.customHtml || data.text;
+        },
+        templateSelection: function(data) {
+          return data.customHtml || data.text;
         }
       });
 
-      if ($('#event').val()) {
+      if (eventSelect.val()) {
+        eventSelect.trigger('change');
+      }
+    });
+
+    if ($('#event').val()) {
       // If Select2 reloaded with an ID, we fetch its text representation via API to display it properly
       const existingEventId = $('#event').val();
       fetch(`/api/v1/events/${existingEventId}/`)
         .then(response => response.json())
         .then(item => {
-            var option = new Option(`${item.date} - ${item.venue.name}`, item.id, true, true);
-            $('#event').append(option).trigger('change');
+          var option = new Option(`${item.date} - ${item.venue.name}`, item.id, true, true);
+          $('#event').append(option).trigger('change');
         });
-      }
+    }
 
-      $(document).on('select2:open', function() {
-        $('input.select2-search__field').focus();
-      });
-    
+    $(document).on('select2:open', function() {
+      $('input.select2-search__field').focus();
+    });
 
-      $('#event').on('change', function() {
-        const val = $(this).val() || '';
-        var isPopulated = val.length > 0;
 
-        $('#song').empty().append(`<option value=""></option>`);
+    $('#event').on('change', function() {
+      const val = $(this).val() || '';
+      var isPopulated = val.length > 0;
 
-        if (isPopulated) {
-          const currentSongValue = $('#song').data('old-value') || "";
-              
-          fetch(`/api/v1/setlists/?event=${val}&format=json&show_only=true&hide_non_songs=true&bv=true`)
+      $('#song').empty().append(`<option value=""></option>`);
+
+      if (isPopulated) {
+        const currentSongValue = $('#song').data('old-value') || "";
+
+        fetch(`/api/v1/setlists/?event=${val}&format=json&show_only=true&hide_non_songs=true&bv=true`)
           .then(response => response.json())
           .then(data => {
-            data.results.forEach(function (item) {
+            data.results.forEach(function(item) {
               // Keep selected state if it matches a returned validation value
               let isSelected = item.song.id == currentSongValue ? 'selected="selected"' : '';
               $('#song').append(`<option value="${item.song.id}" ${isSelected}>${item.set_name} - ${item.song.name}</option>`);
@@ -158,7 +153,7 @@
             // Trigger change to unlock comment field if song was pre-selected from validation error
             $('#song').trigger('change');
           });
-        }
-      });
-    </script>
+      }
+    });
+  </script>
 {% endblock content %}

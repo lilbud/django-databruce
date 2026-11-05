@@ -47,7 +47,7 @@ class EntrySubmit(LoginRequiredMixin, PageTitleMixin, TemplateView):
     form = self.form(request.POST)
 
     if form.is_valid():
-      form.cleaned_data["user"] = db_models.CustomUser.objects.get(pk=request.user.id)  # type: ignore
+      form.cleaned_data["user"] = db_models.CustomUser.objects.get(pk=request.user.id)
 
       entry, created = bv_models.Entry.objects.get_or_create(
         **form.cleaned_data,
@@ -67,14 +67,14 @@ class EntrySubmit(LoginRequiredMixin, PageTitleMixin, TemplateView):
 
       return render(
         request,
-        template_name=self.template_name,  # type: ignore
+        template_name=self.template_name,  # ty: ignore[invalid-argument-type]
         context={"form": form},
       )
 
     messages.error(request, "Error submitting entry")
     return render(
       request,
-      template_name=self.template_name,  # type: ignore
+      template_name=self.template_name,  # ty: ignore[invalid-argument-type]
       context={"form": form},
     )
 
@@ -224,7 +224,7 @@ class SubmitEntryComment(View):
 
     if form.is_valid():
       item, created = bv_models.EntryComment.objects.update_or_create(
-        user_id=request.user.id,  # type: ignore
+        user_id=request.user.id,
         entry_id=request.POST["entry"],
         defaults=form.cleaned_data,
       )
@@ -274,7 +274,7 @@ class SongEntryListView(TemplateView):
     )
 
     if queryset:
-      context["song"] = queryset.first().song  # type: ignore
+      context["song"] = queryset.first().song
     else:
       context["song"] = db_models.Song.objects.get(slug=self.kwargs["slug"])
 
@@ -304,7 +304,7 @@ class EventEntryListView(TemplateView):
     )
 
     if queryset:
-      context["event"] = queryset.first().event  # type: ignore
+      context["event"] = queryset.first().event
     else:
       context["event"] = db_models.Event.objects.get(event_id=self.kwargs["id"])
 

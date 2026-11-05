@@ -1036,7 +1036,7 @@ class EntryAdmin(CustomModelAdmin):
     # Return the human-readable text label choice
     return obj.status
 
-  @action(description="Approve", icon="check_circle", url_path="approve-row")  # type: ignore
+  @action(description="Approve", icon="check_circle", url_path="approve-row")
   def mark_row_approved(
     self,
     request: HttpRequest,
@@ -1052,7 +1052,7 @@ class EntryAdmin(CustomModelAdmin):
       reverse_lazy("admin:bruceyversion_entries_changelist"),
     )
 
-  @action(description="Reject", icon="cancel", url_path="reject-row")  # type: ignore
+  @action(description="Reject", icon="cancel", url_path="reject-row")
   def mark_row_rejected(
     self,
     request: HttpRequest,

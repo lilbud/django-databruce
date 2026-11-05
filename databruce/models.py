@@ -751,7 +751,7 @@ class Event(BaseModel):
     help_text="Designation for how certain the setlist is",
   )
 
-  note = models.TextField(default=None, blank=True, null=True)
+  note = models.TextField(default=None, blank=True)
   summary = models.CharField(max_length=255, blank=True)
 
   bootleg = models.BooleanField(default=False, help_text="Event has a bootleg")
@@ -1135,11 +1135,11 @@ class Onstage(BaseModel):
       band = getattr(self.band, "name", None)
 
       if band:
-        return f"Relation: [{self.relation_id}] {name} / {band}"  # type: ignore
+        return f"Relation: [{self.relation_id}] {name} / {band}"
     except Onstage.band.RelatedObjectDoesNotExist:
       pass
 
-    return f"Relation: [{self.relation_id}] {name}"  # type: ignore
+    return f"Relation: [{self.relation_id}] {name}"
 
 
 class ReleaseTrack(BaseModel):
@@ -1988,6 +1988,9 @@ class EventRankStats(models.Model):
     managed = False  # Django will not manage migrations for this table
     db_table = "event_rank_stats"
 
+  def __str__(self) -> str:
+    return self.event
+
 
 class StudioSession(BaseModel):
   id = models.AutoField(primary_key=True)
@@ -2379,41 +2382,6 @@ class SetlistPosition(models.Model):
 
   def __str__(self) -> str:
     return f"{self.id} - {self.position}"
-
-
-# class SongPage(models.Model):
-#   id = models.OneToOneField(
-#     Setlist,
-#     on_delete=models.DO_NOTHING,
-#     primary_key=True,
-#     related_name="songs_page",
-#     db_column="id",
-#   )
-
-#   prev = models.ForeignKey(
-#     Setlist,
-#     on_delete=models.DO_NOTHING,
-#     blank=True,
-#     null=True,
-#     related_name="prev_setlist",
-#     db_column="prev",
-#   )
-
-#   next = models.ForeignKey(
-#     Setlist,
-#     on_delete=models.DO_NOTHING,
-#     blank=True,
-#     null=True,
-#     related_name="next_setlist",
-#     db_column="next",
-#   )
-
-#   class Meta:
-#     managed = True
-#     db_table = "songs_page"
-
-#   def __str__(self) -> str:
-#     return f"{self.id}"
 
 
 class SetlistStats(models.Model):

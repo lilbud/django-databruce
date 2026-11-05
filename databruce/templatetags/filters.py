@@ -3,39 +3,9 @@ import string
 
 import bleach
 import markdown
-import nh3
 from django import template
-from django.utils.safestring import mark_safe
 
 register = template.Library()
-
-
-@register.inclusion_tag("databruce/api_table_skeleton.html")
-def render_api_table(api_url, table_columns, filters=None):
-  """api_url: String URL endpoint for the REST API
-  table_columns: List of dicts, e.g., [{'field': 'id', 'label': 'ID'}, ...]
-  filters: List of dicts specifying filter configurations
-  """
-  return {
-    "api_url": api_url,
-    "columns": table_columns,
-    "filters": filters or [],
-  }
-
-
-class EMarkdown(markdown.Markdown):
-  def convert(self, text):
-    # Call the standard conversion and strip hidden whitespace/newlines
-    html = super().convert(text).strip()
-
-    # Safely remove wrapping tags even if formatting varies
-    if html.startswith("<p>") and html.endswith("</p>"):
-      html = html[3:-4]
-
-    return html
-
-
-md = EMarkdown()
 
 
 @register.filter(name="format_event_id")
@@ -90,12 +60,10 @@ def markdown_convert(note: str) -> str | None:
     ]
 
     # 3. Clean the HTML (strips script tags, onerror events, etc.)
-    cleaned_html = nh3.clean(
+    return bleach.clean(
       raw_html,
       tags=set(allowed_tags),
     )
-
-    return mark_safe(cleaned_html)
 
   return None
 
@@ -178,15 +146,12 @@ def markdown_safe(value):
   }
 
   # 3. Clean the HTML (strips script tags, onerror events, etc.)
-  cleaned_html = bleach.clean(
+  return bleach.clean(
     raw_html,
     tags=allowed_tags,
     attributes=allowed_attributes,
     strip=True,
   )
-
-  # 4. Mark as safe so you don't need to append |safe in the template
-  return mark_safe(cleaned_html)
 
 
 @register.inclusion_tag("databruce/partials/star_rating.html")

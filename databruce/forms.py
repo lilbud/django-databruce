@@ -4,7 +4,7 @@ import re
 from collections.abc import Iterable
 from typing import Any
 
-import nh3
+import bleach
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import (
@@ -1048,7 +1048,7 @@ class UserReviewForm(forms.Form):
     """Sanitize the content text field."""
     # Note: Use your model's exact text field name here (e.g., 'content' or 'review')
     data = self.cleaned_data["content"]
-    cleaned_data = nh3.clean(data, tags=set())
+    cleaned_data = bleach.clean(data, tags=set())
 
     if any(link in cleaned_data for link in ["http://", "https://", "www."]):
       raise forms.ValidationError("Links are not allowed in reviews.")
@@ -1075,7 +1075,7 @@ class ThirtyDaysForm(forms.ModelForm):
   def clean_entry(self):
     entry = self.cleaned_data.get("entry")
     if entry:
-      return nh3.clean(entry, tags=set())
+      return bleach.clean(entry, tags=set())
 
     return entry
 
