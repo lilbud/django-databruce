@@ -52,7 +52,16 @@
         </div>
       </div>
     </div>
-    <div class="row mt-4">
+    <div class="row my-3">
+      <div class="d-flex flex-sm-row align-items-center justify-content-center column-gap-3 flex-wrap"
+           id="controls">
+        <div class="dt-info order-3"
+             aria-live="polite"
+             role="status"
+             id="tableInfo"></div>
+      </div>
+    </div>
+    <div class="row">
       <div class="col">
         <div class="card">
           <div class="card-body p-0">
@@ -121,7 +130,19 @@
             return eventDateFormat(data);
           },
         }, ],
+        initComplete: function(settings, json) {
+          let api = this.api();
+          let info = api.page.info();
 
+          const tableInfo = document.getElementById('tableInfo');
+
+          tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
+
+          api.on('draw', () => {
+            const pageInfo = api.page.info();
+            tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
+          });
+        }
       });
 
       tableSearch(table, 'search');

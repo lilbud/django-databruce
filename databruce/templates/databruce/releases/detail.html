@@ -238,9 +238,7 @@
           'width': '16rem',
           'name': 'song__slug',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/songs/${data.slug}">${data.name}</a>`;
-            }
+            return data ? `<a href="/songs/${data.slug}">${data.name}</a>` : '';
           },
         }, {
           'data': 'length',
@@ -253,9 +251,7 @@
           'searchable': 'false',
           'width': '6rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : '';
-            }
+            return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : '';
           },
         }, {
           'data': 'note',

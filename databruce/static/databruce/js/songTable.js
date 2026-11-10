@@ -148,7 +148,6 @@ function songTable(url, height, tableID) {
         tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
       });
 
-      // totalSpan.text(`of ${info.pages || 1}`);
       totalSpan.forEach(el => {
         el.textContent = `of ${info.pages || 1}`;
       })

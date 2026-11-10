@@ -144,7 +144,7 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
         <div class="col-auto text-end" id="userPresent">${attendanceForm}</div>
       </div>
       
-      <div class="title text-xl row d-flex justify-content-between mb-1">
+      <div class="title text-xl row d-flex justify-content-between">
         <div class="col">
           <a href="/events/${event.event_id}" class="text-reset fw-semibold">
             ${event.date} ${earlyLate}
@@ -152,7 +152,7 @@ function renderCardHeader(event, badges, attendanceForm, earlyLate) {
         </div>
       </div>
 
-      <div class="row event-artist text-base mb-1">
+      <div class="row event-artist text-lg">
         <div class="col">${event.artist.name}</div>
       </div>
 

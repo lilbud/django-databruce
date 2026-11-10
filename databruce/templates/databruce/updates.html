@@ -57,9 +57,7 @@
           'data': 'created_at',
           'name': 'created_at',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return data
-            }
+            return data ? data : '';
           },
         }, {
           'data': 'msg',
@@ -71,6 +69,8 @@
               }
 
               return data
+            } else {
+              return '';
             }
           },
         }, ]

@@ -103,8 +103,6 @@
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      let sb_columns = [0, 1, 2, 3];
-
       var table = new DataTable("#bandTable", {
         order: [
           [1, "asc"]
@@ -148,58 +146,75 @@
           visible: false,
         }, ],
         initComplete: function(settings, json) {
-          var api = this.api();
-          let info = api.page.info()
+          let api = this.api();
+          let info = api.page.info();
 
-          const input = $('.page-input');
-          const prevBtn = $('.btn-prev');
-          const nextBtn = $('.btn-next');
-          const totalSpan = $('.total-pages');
-          const tableInfo = $('#tableInfo');
+          const input = document.querySelectorAll('.page-input');
+          const prevBtn = document.querySelectorAll('.btn-prev');
+          const nextBtn = document.querySelectorAll('.btn-next');
+          const totalSpan = document.querySelectorAll('.total-pages');
+          const tableInfo = document.getElementById('tableInfo');
 
           // Initial button states
-          input.val(info.page + 1);
-          prevBtn.attr('disabled', info.page === 0);
-          nextBtn.attr('disabled', info.page >= info.pages - 1);
+          input.forEach(el => {
+            el.value = info.page + 1;
 
-          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+            el.addEventListener('change', function() {
+              let val = parseInt(this.value, 10) - 1;
+              const max = api.page.info().pages - 1;
+
+              if (val < 0) val = 0;
+              if (val > max) val = max;
+
+              this.value = val;
+              api.page(val).draw('page');
+            })
+          });
+
+          prevBtn.forEach(el => {
+            el.disabled = info.page === 0;
+
+            el.addEventListener('click', function() {
+              prevPage(table);
+            });
+          });
+
+          nextBtn.forEach(el => {
+            el.disabled = info.page >= info.pages - 1;
+
+            el.addEventListener('click', function() {
+              nextPage(table);
+            });
+          });
+
+          tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
 
           api.on('draw', () => {
             const pageInfo = api.page.info();
 
-            input.val(pageInfo.page + 1);
-            input.attr('max', pageInfo.pages);
+            input.forEach(el => {
+              el.value = pageInfo.page + 1;
+              el.max = pageInfo.pages;
+            });
 
-            totalSpan.text(`of ${pageInfo.pages || 1}`);
+            totalSpan.forEach(el => {
+              el.textContent = `of ${pageInfo.pages || 1}`;
+            });
 
-            // Handle button states
-            prevBtn.attr('disabled', pageInfo.page === 0);
-            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+            prevBtn.forEach(el => {
+              el.disabled = pageInfo.page === 0;
+            });
 
-            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+            nextBtn.forEach(el => {
+              el.disabled = pageInfo.page >= pageInfo.pages - 1;
+            });
+
+            tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
           });
 
-          totalSpan.text(`of ${info.pages || 1}`);
-
-          nextBtn.on('click', function() {
-            nextPage(table)
-          });
-
-          prevBtn.on('click', function() {
-            prevPage(table);
-          });
-
-          input.on('change', function() {
-            let val = parseInt(this.value, 10) - 1;
-            const max = api.page.info().pages - 1;
-            if (val < 0) val = 0;
-            if (val > max) val = max;
-
-            input.attr('value', val);
-
-            api.page(val).draw('page');
-          });
+          totalSpan.forEach(el => {
+            el.textContent = `of ${info.pages || 1}`;
+          })
         }
       });
 

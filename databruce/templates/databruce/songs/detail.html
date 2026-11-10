@@ -159,7 +159,7 @@
                 <div class="dt-info order-3"
                      aria-live="polite"
                      role="status"
-                     id="songTableInfo"></div>
+                     id="tableInfo"></div>
               </div>
             </div>
             <div class="card">
@@ -194,7 +194,7 @@
                 <div class="dt-info order-3"
                      aria-live="polite"
                      role="status"
-                     id="songTableInfo"></div>
+                     id="tableInfo"></div>
               </div>
             </div>
           </div>
@@ -342,8 +342,6 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      let sb_columns = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
       var table = new DataTable('#songTable', {
         ajax: {
           url: '/api/v1/songspage/?song={{ info.id }}&format=custom',
@@ -436,32 +434,18 @@
           'columnControl': [],
           'orderable': false
         }, {
-          'data': 'prev',
+          'data': 'last',
           'name': 'songs_page__prev__song__name',
           'width': '12rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              if (data.segue) {
-                return `<a href="/songs/${data.song.slug}">${data.song.name} \></a>`
-              }
-
-              return `<a href="/songs/${data.song.slug}">${data.song.name}</a>`
-            }
+            return data ? `<a href="/songs/${data.song.slug}">${data.song.name}${data.segue ? ' \>' : ''}</a>` : '';
           },
         }, {
           'data': 'next',
           'name': 'songs_page__next__song__name',
           'width': '12rem',
           'render': function(data, type, row, meta) {
-            if (data) {
-              if (row.segue) {
-                return `<a href="/songs/${data.song.slug}">\> ${data.song.name}</a>`
-              } else if (data.segue) {
-                return `<a href="/songs/${data.song.slug}">${data.song.name} \></a>`
-              }
-
-              return `<a href="/songs/${data.song.slug}">${data.song.name}</a>`
-            }
+            return data ? `<a href="/songs/${data.song.slug}">${row.segue ? '\> ' : ''}${data.song.name}${data.segue ? ' \>' : ''}</a>` : '';
           },
         }, {
           'data': 'notes',
@@ -469,9 +453,7 @@
           'columnControl': [],
           'orderable': false,
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<span class="setlist-note">${data.join('; ')}</span>`
-            }
+            return data ? `<span class="setlist-note">${data.join('; ')}</span>` : '';
           },
         }, {
           'data': 'event.public',
@@ -484,52 +466,52 @@
           let api = this.api();
           var info = api.page.info();
 
-          const input = $('.page-input');
-          const prevBtn = $('.btn-prev');
-          const nextBtn = $('.btn-next');
-          const totalSpan = $('.total-pages');
-          const tableInfo = $('#songTableInfo');
+          const input = document.querySelector('.page-input');
+          const prevBtn = document.querySelector('.btn-prev');
+          const nextBtn = document.querySelector('.btn-next');
+          const totalSpan = document.querySelector('.total-pages');
+          const tableInfo = document.getElementById('tableInfo');
 
           // Initial button states
-          input.val(info.page + 1);
-          prevBtn.attr('disabled', info.page === 0);
-          nextBtn.attr('disabled', info.page >= info.pages - 1);
+          input.value = info.page + 1;
+          prevBtn.disabled = info.page === 0;
+          nextBtn.disabled = info.page >= info.pages - 1;
 
-          tableInfo.text(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`);
+          tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
 
           api.on('draw', () => {
             const pageInfo = api.page.info();
 
-            input.val(pageInfo.page + 1);
-            input.attr('max', pageInfo.pages);
+            input.value = pageInfo.page + 1;
+            input.setAttribute('max', pageInfo.pages);
 
-            totalSpan.text(`of ${pageInfo.pages || 1}`);
+            totalSpan.textContent = `of ${pageInfo.pages || 1}`;
 
             // Handle button states
-            prevBtn.attr('disabled', pageInfo.page === 0);
-            nextBtn.attr('disabled', pageInfo.page >= pageInfo.pages - 1);
+            prevBtn.disabled = pageInfo.page === 0;
+            nextBtn.disabled = pageInfo.page >= pageInfo.pages - 1;
 
             // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
-            tableInfo.text(`Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`);
+            tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
           });
 
-          totalSpan.text(`of ${info.pages || 1}`);
+          totalSpan.textContent = `of ${info.pages || 1}`;
 
-          nextBtn.on('click', function() {
+          nextBtn.addEventListener('click', function() {
             nextPage(table)
           });
 
-          prevBtn.on('click', function() {
+          prevBtn.addEventListener('click', function() {
             prevPage(table);
           });
 
-          input.on('change', function() {
+          input.addEventListener('change', function() {
             let val = parseInt(this.value, 10) - 1;
             const max = api.page.info().pages - 1;
             if (val < 0) val = 0;
             if (val > max) val = max;
 
-            input.attr('value', val);
+            input.value = val + 1;
 
             api.page(val).draw('page');
           });

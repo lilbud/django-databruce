@@ -54,8 +54,6 @@
     document.addEventListener('DOMContentLoaded', async () => {
       // 1. Extract the GET parameters from the current URL
       const urlParams = new URLSearchParams(window.location.search);
-      let searchTimeout;
-
       eventTable(`/api/v1/adv_search/?${urlParams.toString()}&format=custom`);
     });
 

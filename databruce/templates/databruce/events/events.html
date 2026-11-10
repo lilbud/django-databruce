@@ -32,8 +32,6 @@
     {% include "databruce/partials/event_table.html" %}
   </div>
   <script>
-    let searchTimeout;
-    let lastSearchValue = '';
     eventTable('/api/v1/events/?year={{ year }}&format=custom');
   </script>
 {% endblock content %}

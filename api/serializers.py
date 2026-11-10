@@ -268,6 +268,7 @@ class CitiesSerializer(BaseSerializer):
   state = StatesSerializer(required=False, include=["name", "uuid"])
   country = CountriesSerializer(include=["name", "uuid"])
   first_event = MinimalEventSerializer(required=False)
+  last_event = MinimalEventSerializer(required=False)
 
   class Meta:
     model = models.City

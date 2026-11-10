@@ -73,8 +73,8 @@
       const searchForm = document.querySelector('#article_search');
       const resultsContainer = document.getElementById('search-results');
       const paginationContainer = $('.pagination-container');
-      const prevBtn = $('.page-item.prev > .page-link');
-      const nextBtn = $('.page-item.next > .page-link');
+      const prevBtn = document.querySelector('.page-item.prev > .page-link');
+      const nextBtn = document.querySelector('.page-item.next > .page-link');
 
       // Track the current search params globally across pagination requests
       let currentSearchParams = new URLSearchParams();
@@ -200,18 +200,18 @@
         }
 
         $('.page-item.prev').toggleClass('disabled', !data.previous);
-        prevBtn.attr('data-page', currentPage - 1);
+        prevBtn.setAttribute('data-page', currentPage - 1);
 
         $('.page-link.current').text(`Page ${currentPage} of ${totalPages}`);
 
         $('.page-item.next').toggleClass('disabled', !data.next);
-        nextBtn.attr('data-page', currentPage + 1);
+        nextBtn.setAttribute('data-page', currentPage + 1);
       }
 
       // Event delegation for pagination clicks
       if (paginationContainer) {
 
-        prevBtn.on('click', function() {
+        prevBtn.addEventListener('click', function() {
           const targetPage = parseInt(this.dataset.page, 10);
 
           fetchArticles(targetPage);
@@ -222,7 +222,7 @@
           });
         })
 
-        nextBtn.on('click', function() {
+        nextBtn.addEventListener('click', function() {
           const targetPage = parseInt(this.dataset.page, 10);
 
           fetchArticles(targetPage);

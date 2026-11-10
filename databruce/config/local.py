@@ -74,6 +74,9 @@ if DEBUG:
   # Prints emails straight to your terminal window instead of sending them
   EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+COMPRESS_ENABLED = False
+COMPRESS_OFFLINE = False
+
 # Real settings for production
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.mailgun.org"

@@ -199,10 +199,11 @@ STATICFILES_FINDERS = [
   "compressor.finders.CompressorFinder",
 ]
 
+COMPRESS_ENABLED = True
+
 SESSION_EXEXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+
 
 UNFOLD = {
   "STYLES": [

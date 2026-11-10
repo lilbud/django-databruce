@@ -76,9 +76,7 @@
           'data': 'title',
           'name': 'title',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return '<a href="https://www.springsteenlyrics.com/bootlegs.php?item=' + row.slid + '">' + data + '</a>';
-            }
+            return data ? `<a target="_blank" rel="noopener noreferrer" href="https://www.springsteenlyrics.com/bootlegs.php?item=${row.slid}>${data}</a>` : '';
           },
         }, {
           'data': 'label',
@@ -93,17 +91,13 @@
           'data': 'event',
           'name': 'event__event_id',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a href="/events/${data.event_id}">${data.date}</a>`
-            }
+            return data ? `<a href="/events/${data.event_id}">${data.date}</a>` : '';
           },
         }, {
           'data': 'archive.url',
           'name': 'archive__url',
           'render': function(data, type, row, meta) {
-            if (data) {
-              return `<a target="_blank" rel="noopener noreferrer" href="https://archive.org/details/${data}">Archive.org</a>`
-            }
+            return data ? `<a target="_blank" rel="noopener noreferrer" href="https://archive.org/details/${data}">Archive.org</a>` : '';
           },
         }, ],
         initComplete: function(settings, json) {

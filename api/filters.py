@@ -1499,7 +1499,9 @@ class ArticleFilter(dj_filters.FilterSet):
     return (
       queryset.filter(fts_vector=query)
       .annotate(
+        # 1. Base FTS Rank calculation
         base_rank=SearchRank("fts_vector", query, weights=[0.1, 0.2, 0.5, 1.0]),
+        # 2. Optimized Title boost using the Trigram Index via __icontains
         final_rank=ExpressionWrapper(
           F("base_rank")
           + Case(
@@ -1509,18 +1511,19 @@ class ArticleFilter(dj_filters.FilterSet):
           ),
           output_field=FloatField(),
         ),
+        # 3. Highlighted Snippets
         headline=SearchHeadline(
-          "content",  # Field to extract the snippet from
+          "content",
           query,
           start_sel='<span class="highlight">',
           stop_sel="</span>",
           max_fragments=2,
         ),
         highlighted_title=SearchHeadline(
-          "title",  # <--- Target your headline/title field here
+          "title",
           query,
-          start_sel='<span class="highlight">',  # Custom HTML opening tag
-          stop_sel="</span>",  # Custom HTML closing tag
+          start_sel='<span class="highlight">',
+          stop_sel="</span>",
         ),
       )
       .order_by("-final_rank")

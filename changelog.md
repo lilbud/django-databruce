@@ -692,3 +692,20 @@ First public release of the site. Site was locked behind a login and accounts on
 - Signup flow redone, form layout tweaked to better communicate error fields
 - [30 Days of Bruce] Main page tweaks, previous days answer now shows
 - [30 Days of Bruce] Entries fixed. Users can submit as many entries as they want, but new ones will overwrite old. Days have been added to the entries to tell them apart.
+
+# v1.38 (November 10, 2026)
+
+# Added
+
+- Added `django_compressor`, which combines/minifies JS/CSS. Should improve page loading and fix issues with old scripts being cached.
+
+# Changed
+
+- Finished rewriting most if not all JQuery code as Vanilla JS. Different pages used a mix of both for reasons I can't recall. Advanced Search is still mostly JQuery due to Select2, but once I get around to figuring an alternative that too will be redone.
+- Cleaned up dependencies, removed unneeded ones
+- Reorganized scripts/stylesheets
+
+# Fixed
+
+- Fixed missing "last_date" on the cities page table
+- Fixed second paging controls on many tables not working

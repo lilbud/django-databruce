@@ -31,7 +31,6 @@ DataTable.feature.register('customOrder', function (settings, opts) {
   if (select) {
     select.innerHTML = '';
 
-
     // 2. Loop through columns and read DataTables 2.0 standard native type() method
     api.columns().every(function (index) {
       let column = this;
