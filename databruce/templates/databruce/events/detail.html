@@ -928,17 +928,13 @@
         'data': 'guest',
         'className': 'text-center',
         'render': function(data, type, row, meta) {
-          if (data) {
-            return $('<i />').addClass('bi bi-check-lg check').prop('outerHTML')
-          }
+          return data ? $('<i />').addClass('bi bi-check-lg check').prop('outerHTML') : '';
         },
       }, {
         'data': 'relation',
         'className': 'text-nowrap',
         'render': function(data, type, row, meta) {
-          if (data) {
-            return `<a class="text-reset" href="/relations/${data.uuid}">${data.name}</a>`;
-          }
+          return data ? `<a class="text-reset" href="/relations/${data.uuid}">${data.name}</a>` : '';
         },
       }, ]
 
