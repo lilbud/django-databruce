@@ -7,6 +7,9 @@
   <script src="{% static 'databruce/js/eventTable.js' %}"></script>
 {% endblock extrajs %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_new_btn.html" with view="event" %}
+  {% endif %}
   <div class="col-12">
     <div class="d-flex justify-content-between">
       <div class="text-2xl">{{ year }} Events</div>

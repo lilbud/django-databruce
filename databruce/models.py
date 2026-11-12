@@ -1168,6 +1168,8 @@ class ReleaseTrack(BaseModel):
   track = models.CharField(
     db_column="track",
     max_length=255,
+    blank=True,
+    null=True,
     help_text="Position (Usually Vinyl Releases Only: A1, B2, etc.)",
   )
 

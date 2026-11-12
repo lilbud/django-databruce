@@ -1,0 +1,376 @@
+{% load auth_extras %}
+<header class="bg-body" id="navbar-wrapper">
+  <!-- Primary Top Navbar (Logo, Desktop Search Icon, User Controls & Mobile Toggles) -->
+  <nav class="navbar navbar-expand-xl p-0"
+       aria-label="Top utility navigation"
+       id="navbar">
+    <div class="container-fluid p-2 px-xl-2 py-xl-3 align-items-center bd-gutter flex-nowrap">
+      <!-- Mobile Left Menu Toggle -->
+      <button class="btn d-xl-none d-block border-0 me-2"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasNavbar"
+              aria-controls="offcanvasNavbar"
+              aria-label="Open main navigation menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <!-- Brand Logo (Full Logo on Both Mobile and Desktop) -->
+      <a class="navbar-brand p-xl-0 me-auto mx-xl-2"
+         href="{% url 'index' %}"
+         aria-label="Home">
+        <div class="logo" role="img" aria-label="Home">
+          <span class="sr-only">Home</span>
+        </div>
+      </a>
+      <!-- Desktop Right Side Utility Controls (Search Icon & Auth / Profile) -->
+      <ul class="navbar-nav my-0 d-none d-xl-flex align-items-center flex-row column-gap-2 ms-auto">
+        <!-- Desktop Search Icon Button -->
+        <li class="nav-item">
+          <button class="btn btn-sm border-0"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#searchModal"
+                  aria-label="Open search modal">
+            <i class="bi bi-search text-xl fw-semibold" aria-hidden="true"></i>
+          </button>
+        </li>
+        {% if user.is_authenticated %}
+          <li class="nav-item dropdown list-unstyled">
+            <a class="btn btn-sm border-0 dropdown-toggle icon-button
+                      {% if 'profile' in request.resolver_match.route %}active{% endif %}"
+               type="button"
+               data-bs-toggle="dropdown"
+               aria-expanded="false"
+               aria-haspopup="true"
+               aria-label="User account menu"
+               id="userAccountDropdown">
+              <i class="bi bi-person-fill text-xl" aria-hidden="true"></i>
+              {{ user }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end list-unstyled text-center"
+                id="userAccountDropdownMenu"
+                aria-labelledby="userAccountDropdown">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <div class="text-sm py-2 px-3 text-nowrap">
+                      Hello {{ user }}
+                      {% if user.is_superuser %}
+                        (Admin)
+                      {% else %}
+                        (User)
+                      {% endif %}
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                       href="{% url 'profile' id=user.uuid %}">
+                      <i class="bi bi-person-circle"></i>
+                      Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                       href="{% url 'settings' %}">
+                      <i class="bi bi-gear-fill"></i>
+                      User Settings
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                       href="{% url 'users' %}">
+                      <i class="bi bi-people-fill"></i>
+                      View Users
+                    </a>
+                  </li>
+                  {% if user.is_superuser %}
+                    <li>
+                      <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                         href="{% url 'admin:index' %}">
+                        <i class="bi bi-house-fill"></i>
+                        Admin Portal
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </li>
+              <hr class="my-1">
+              <li class="bd-links-span-all">
+                <ul class="list-unstyled text-center">
+                  <li>
+                    <form method="post" action="{% url 'logout' %}">
+                      {% csrf_token %}
+                      <button class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                              type="submit"
+                              role="button"
+                              aria-label="Log out of your account">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item d-inline px-2 mb-0">
+            <a class="btn btn-sm border-0"
+               role="button"
+               href="{% url 'login' %}?next={{ request.path }}">Login</a>
+          </li>
+        {% endif %}
+      </ul>
+      <!-- Mobile Right Controls Group (Search & Right Menu Toggle) -->
+      <div class="d-flex align-items-center d-xl-none ms-auto column-gap-1">
+        <!-- Mobile Search Button -->
+        <button class="btn btn-sm border-0 d-flex"
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#searchModal"
+                aria-label="Open search modal">
+          <i class="bi bi-search text-xl fw-semibold" aria-hidden="true"></i>
+        </button>
+        <!-- Mobile Right Menu Toggle -->
+        <button class="btn border-0"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasNavbarEnd"
+                aria-controls="offcanvasNavbarEnd"
+                aria-label="Open account settings menu">
+          <i class="bi bi-three-dots text-xl fw-semibold" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <!-- Secondary Desktop Navigation Bar (Desktop & Larger Viewports Only) -->
+  <nav class="navbar navbar-expand-xl py-1 px-0 d-none d-xl-block"
+       aria-label="Main navigation"
+       id="secondary-navbar">
+    <div class="container-fluid justify-content-center px-2 bd-gutter">
+      <ul class="navbar-nav flex-wrap align-items-center row-gap-1 column-gap-1">
+        <li class="nav-item">
+          <a class="btn btn-sm border-0
+                    {% if "blog" in request.resolver_match.route %}active{% endif %}"
+             href="{% url 'blog:blog' %}">News</a>
+        </li>
+        {% for item in nav_links %}
+          {% if item.children %}
+            <!-- Dropdown Nav Item -->
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm dropdown-toggle border-0
+                             {% if item.match_keyword and item.match_keyword in request.resolver_match.route %}active{% endif %}
+                             {% if item.match_keywords %}
+                               {% for kw in item.match_keywords %}
+                                 {% if kw in request.resolver_match.route %}active{% endif %}
+                               {% endfor %}
+                             {% endif %}"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      aria-haspopup="true"
+                      id="nav-dropdown-{{ forloop.counter }}">{{ item.name }}</button>
+              <ul class="dropdown-menu"
+                  aria-labelledby="nav-dropdown-{{ forloop.counter }}">
+                {% for child in item.children %}
+                  {% if child.name != "News" %}
+                    <li>
+                      <a class="dropdown-item"
+                         href="{% if child.kwargs %}{% url child.url slug=child.kwargs.slug %}{% else %}{% url child.url %}{% endif %}">{{ child.name }}</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </li>
+          {% else %}
+            <!-- Standalone Nav Item -->
+            <li class="nav-item">
+              <a class="btn btn-sm border-0" role="button" href="{% url item.url %}">{{ item.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+</header>
+<!-- Offcanvas Right (Mobile User Account & Theme Controls) -->
+<div class="offcanvas offcanvas-end d-xl-none"
+     tabindex="-1"
+     id="offcanvasNavbarEnd"
+     aria-labelledby="offcanvasNavbarEndLabel"
+     aria-modal="true"
+     role="dialog">
+  <div class="offcanvas-header d-flex justify-content-between align-items-center">
+    <div class="offcanvas-title text-xl" id="offcanvasNavbarEndLabel">User Menu</div>
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close user menu"></button>
+  </div>
+  <hr class="my-1">
+  <div class="offcanvas-body p-1">
+    <nav class="w-100"
+         id="offcanvasNavEnd"
+         aria-label="User account navigation">
+      <ul class="bd-links-nav list-unstyled mb-0 pb-3 row row-gap-2">
+        {% if user.is_authenticated %}
+          <li class="bd-links-span-all">
+            <ul class="list-unstyled text-center">
+              <li>
+                <a href="{% url 'profile' id=user.uuid %}"
+                   class="btn btn-sm border-0 w-100 text-start d-flex-inline py-2 px-3">
+                  <div class="text-lg">
+                    Hello {{ user }}
+                    {% if user.is_superuser %}
+                      (Admin)
+                    {% else %}
+                      (User)
+                    {% endif %}
+                  </div>
+                  <div class="text-sm">{{ user.email }}</div>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <hr class="my-1">
+          <li class="bd-links-span-all">
+            <ul class="list-unstyled text-center">
+              <li>
+                <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                   href="{% url 'profile' id=user.uuid %}">
+                  <i class="bi bi-person-circle"></i>
+                  Profile
+                </a>
+              </li>
+              <li>
+                <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                   href="{% url 'settings' %}">
+                  <i class="bi bi-gear-fill"></i>
+                  User Settings
+                </a>
+              </li>
+            </ul>
+          </li>
+          <hr class="my-1">
+          <li class="bd-links-span-all">
+            <ul class="list-unstyled text-center">
+              <li>
+                <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                   href="{% url 'users' %}">
+                  <i class="bi bi-people-fill"></i>
+                  View Users
+                </a>
+              </li>
+              {% if user.is_superuser %}
+                <li>
+                  <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                     href="{% url 'admin:index' %}">
+                    <i class="bi bi-house-fill"></i>
+                    Admin Portal
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </li>
+          <hr class="my-1">
+          <li class="bd-links-span-all">
+            <ul class="list-unstyled text-center">
+              <li>
+                <form method="post" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <button class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                          type="submit"
+                          role="button"
+                          aria-label="Log out of your account">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="bd-links-span-all">
+            <div class="d-grid gap-2">
+              <a class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2"
+                 role="button"
+                 href="{% url 'login' %}?next={{ request.path }}">
+                <i class="bi bi-person-fill"></i>
+                Login
+              </a>
+              <a href="{% url 'signup' %}"
+                 role="button"
+                 class="btn btn-sm border-0 w-100 text-start d-flex align-items-center gap-2">
+                <i class="bi bi-person-plus-fill"></i>
+                Sign Up
+              </a>
+            </div>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+<!-- Offcanvas Left (Mobile & Tablet Dynamic Main Navigation Menu) -->
+<div class="offcanvas offcanvas-start d-xl-none"
+     tabindex="-1"
+     id="offcanvasNavbar"
+     aria-labelledby="offcanvasNavbarLabel"
+     aria-modal="true"
+     role="dialog">
+  <div class="offcanvas-header d-flex justify-content-between align-items-center">
+    <div class="offcanvas-title text-xl" id="offcanvasNavbarLabel">Main Menu</div>
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close main menu"></button>
+  </div>
+  <hr class="my-1">
+  <div class="offcanvas-body">
+    <nav class="w-100" id="offcanvasNav" aria-label="Mobile main navigation">
+      <ul class="bd-links-nav list-unstyled mb-0 pb-3">
+        {% for item in nav_links %}
+          {% if item.children %}
+            <li class="bd-links-group py-2">
+              <span class="bd-links-heading d-flex w-100 align-items-center fw-semibold text-sm">
+                {% if item.icon %}<i class="bi {{ item.icon }} me-2" aria-hidden="true"></i>{% endif %}
+                {{ item.name }}
+              </span>
+              <ul class="list-unstyled pt-2">
+                {% for child in item.children %}
+                  {% if child.kwargs %}
+                    {% url child.url slug=child.kwargs.slug as child_url %}
+                  {% else %}
+                    {% url child.url as child_url %}
+                  {% endif %}
+                  <li>
+                    <a class="btn btn-sm border-0 w-100 text-start d-flex
+                              {% if child_url in request.path %}active{% endif %}"
+                       href="{{ child_url }}">{{ child.name }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% else %}
+            <li class="bd-links-group py-2">
+              <a class="btn btn-sm border-0 w-100 text-start d-flex"
+                 href="{% url item.url %}">
+                {% if item.icon %}<i class="bi {{ item.icon }} me-2" aria-hidden="true"></i>{% endif %}
+                {{ item.name }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</div>

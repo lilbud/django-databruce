@@ -232,7 +232,10 @@
           'data': 'track',
           'name': 'track',
           'searchable': 'false',
-          'width': '1rem'
+          'width': '1rem',
+          'render': function(data, type, row, meta) {
+            return data ? data : row.position;
+          },
         }, {
           'data': 'song',
           'width': '16rem',

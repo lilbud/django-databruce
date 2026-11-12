@@ -203,6 +203,7 @@ class ReleaseTrackInline(StackedInline):
     "event",
     "length",
     "note",
+    "position",
   ]
   fk_name = "release"
   ordering = ("discnum", "track")

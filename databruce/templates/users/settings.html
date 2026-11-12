@@ -167,8 +167,8 @@
                       id="updateDiscordForm"
                       action="{% url "change_discord" %}">
                   {% csrf_token %}
-                  <div class="row" id="discord-response-message">
-                    <div class="col"></div>
+                  <div class="row">
+                    <div class="col" id="discordResponse"></div>
                   </div>
                   {% for field in discord_form %}
                     <div class="row {% if field.help_text %}mb-0{% else %}mb-2{% endif %}">
@@ -231,7 +231,7 @@
       e.preventDefault(); // Stop standard form submission page reload
 
       const formData = new FormData(this);
-      const messageDiv = $('#discord-response-message>.col');
+      const messageDiv = document.getElementById('discordResponse');
 
       fetch(this.action, {
           method: 'POST',

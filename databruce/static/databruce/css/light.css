@@ -15,10 +15,6 @@
     border-color: var(--color-gray-300);
   }
 
-  .navbar {
-    background-color: var(--color-blue-500) !important;
-  }
-
   .segue,
   .segue-mobile,
   .song-seen>a {
@@ -30,19 +26,13 @@
   }
 
   .btn:hover {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)) !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)) !important;
   }
-
-
 
   button.active>.badge {
     background-color: var(--color-white) !important;
     color: var(--color-black) !important;
   }
-
-  /* .main-logo-light {
-    background-image: var(--main-logo-black);
-  } */
 
   .logo-container .logo-white {
     display: none;

@@ -194,7 +194,7 @@ body {
 .logo {
   -webkit-mask-image: var(--logo-mask);
   mask-image: var(--logo-mask);
-  height: 25px;
+  height: 27px;
   aspect-ratio: 6 / 1;
 }
 
@@ -205,16 +205,14 @@ body {
   aspect-ratio: 1 / 1;
 }
 
+#mobile-header {
+  width: 100%;
+}
+
 /* logo needs font size 0 to be centered, as it is an SVG */
 .navbar-brand,
 .navbar-brand-mobile {
   font-size: 0 !important;
-}
-
-@media (max-width: 1200px) {
-  .navbar-brand {
-    padding-left: 2.3rem !important;
-  }
 }
 
 /* optional for screen readers */
@@ -672,18 +670,13 @@ button:disabled {
   border-color: none !important
 }
 
-/* column control dropdown */
-/* .dtcc-dropdown.dropdown-menu {
-  font-size: var(--text-xs) !important;
-} */
-
 .dropdown-item {
-  font-size: var(--text-sm) !important;
+  font-size: var(--text-xs) !important;
   overflow: hidden !important;
 }
 
 .dropdown-menu .dropdown-item {
-  border-radius: 0.2rem !important;
+  border-radius: 0.15rem !important;
 }
 
 .dropdown-item:hover {
@@ -807,9 +800,18 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   font-size: var(--text-sm) !important;
 }
 
+.navbar {
+  background-color: var(--color-blue-500) !important;
+}
+
+#secondary-navbar {
+  background-color: var(--color-blue-600) !important;
+  border: none !important;
+}
+
 .navbar .btn i {
   font-weight: 900 !important;
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   color: white !important;
 }
 
@@ -827,7 +829,18 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 .navbar .btn:hover,
 .navbar .btn:hover i,
 .navbar .btn.active i {
-  color: var(--color-blue-950) !important;
+  color: var(--color-gray-800) !important;
+}
+
+#secondary-navbar .btn.active,
+#secondary-navbar .btn:hover,
+#secondary-navbar .btn:hover i,
+#secondary-navbar .btn.active i {
+  color: var(--color-blue-100) !important;
+}
+
+#secondary-navbar .btn {
+  font-size: var(--text-sm) !important;
 }
 
 .icon-button,

@@ -50,6 +50,7 @@ async function createTable(url, columns, tableSelectorOrElem, options) {
 
     if (options && options.rowGroup) {
       data = rowGroup(data.results, options.rowGroup.groupVal);
+      console.log(data);
     }
 
     tbody.innerHTML = '';

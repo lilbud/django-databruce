@@ -35,6 +35,14 @@
           sizes="180x180"
           href="{% static "databruce/img/apple-touch-icon.png" %}" />
     <link rel="manifest" href="{% static "databruce/img/site.webmanifest" %}" />
+    <link rel="preload"
+          href="{% static "databruce/img/logo.svg" %}"
+          as="image"
+          type="image/svg+xml">
+    <link rel="preload"
+          href="{% static "databruce/img/mobile-header.png" %}"
+          as="image"
+          type="image/png">
     <title>
       {{ title }}
       | Databruce
@@ -67,13 +75,14 @@
   <body>
     <div id="capture-area">
       <nav class="navbar navbar-expand-xl p-0 border-bottom">
-        <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
+        <div class="container-fluid p-0 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
           <a class="navbar-brand p-xl-0 mx-auto mx-xl-2"
              href="{% url 'index' %}"
              aria-label="Databruce Home">
-            <div class="logo" role="img" aria-label="Databruce">
-              <span class="sr-only">Databruce</span>
-            </div>
+            {% comment %} <div class="logo" role="img" aria-label="Databruce"></div> {% endcomment %}
+            <img id="mobile-header"
+                 src="{% static "databruce/img/mobile-header.png" %}"
+                 alt="">
           </a>
         </div>
       </nav>

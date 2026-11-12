@@ -709,3 +709,21 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Fixed missing "last_date" on the cities page table
 - Fixed second paging controls on many tables not working
+
+# v1.39 (November 12, 2026)
+
+# Added
+
+- Added "new item" buttons to many views
+- [Database] Added latest Nugs Release and corresponding essay
+
+# Fixed
+
+- Fixed issue where setlist image would be missing logo/assets
+- Fixed missing data on setlist image
+- Fixed missing "track" on release details track table
+
+# Changed
+
+- Redesigned top navbar. Still the same on mobile but on desktop it is now two rows, with all links on the secondary one. I did this because it was getting crowded, and the positioning was messed up in some cases. The logo is now fixed left instead of center as it was never centered correctly with the uneven icons (1 on left, 2 on right).
+- 30 Days of Bruce will now show a card instead of a text message when submit is successful. This will also show errors too which is good.

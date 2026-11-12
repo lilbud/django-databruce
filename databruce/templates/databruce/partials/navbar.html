@@ -2,9 +2,9 @@
 <nav class="navbar navbar-expand-xl p-0 border-bottom sticky-top"
      aria-label="Main navigation"
      id="navbar">
-  <div class="container-fluid p-2 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
+  <div class="container-fluid p-2 justify-content-between align-items-center bd-gutter flex-wrap flex-xl-nowrap">
     <!-- Mobile Left Menu Toggle -->
-    <button class="btn d-xl-none d-block py-0 border-0"
+    <button class="btn d-xl-none d-block py-0 border-0 me-auto"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasNavbar"
@@ -13,14 +13,14 @@
       <i class="bi bi-list" aria-hidden="true"></i>
     </button>
     <!-- Brand Logo -->
-    <a class="navbar-brand p-xl-0 mx-auto mx-xl-2"
+    <a class="navbar-brand p-xl-0 mx-xl-2 mx-auto"
        href="{% url 'index' %}"
-       aria-label="Databruce Home">
-      <div class="logo-icon d-none d-xl-block" role="img" aria-label="Databruce">
-        <span class="sr-only">Databruce</span>
+       aria-label="Home Home">
+      <div class="logo-icon d-none d-xl-block" role="img" aria-label="Home">
+        <span class="sr-only">Home</span>
       </div>
-      <div class="logo d-block d-xl-none" role="img" aria-label="Databruce">
-        <span class="sr-only">Databruce</span>
+      <div class="logo d-block d-xl-none" role="img" aria-label="Home">
+        <span class="sr-only">Home</span>
       </div>
     </a>
     <!-- Desktop Navigation Links (Dynamic) -->
@@ -66,14 +66,6 @@
         {% endif %}
       {% endfor %}
     </ul>
-    <!-- Mobile Search Button -->
-    <button class="btn btn-sm border-0 d-flex d-xl-none"
-            type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#searchModal"
-            aria-label="Open search modal">
-      <i class="bi bi-search text-xl fw-semibold" aria-hidden="true"></i>
-    </button>
     <!-- Right Side Utility Controls (Search / Auth / Theme) -->
     <ul class="navbar-nav my-2 my-xl-0 d-flex flex-wrap row-gap-1">
       <div class="d-none d-xl-inline-flex align-items-center">
@@ -171,15 +163,26 @@
         {% endif %}
       </div>
     </ul>
-    <!-- Mobile Right Menu Toggle -->
-    <button class="btn d-xl-none d-block py-0 border-0"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasNavbarEnd"
-            aria-controls="offcanvasNavbarEnd"
-            aria-label="Open account settings menu">
-      <i class="bi bi-three-dots text-xl fw-semibold" aria-hidden="true"></i>
-    </button>
+    <!-- Mobile Right Controls Group (Search & Right Menu Toggle) -->
+    <div class="d-flex align-items-center d-xl-none ms-auto">
+      <!-- Mobile Search Button -->
+      <button class="btn btn-sm border-0 d-flex py-0"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#searchModal"
+              aria-label="Open search modal">
+        <i class="bi bi-search text-xl fw-semibold" aria-hidden="true"></i>
+      </button>
+      <!-- Mobile Right Menu Toggle -->
+      <button class="btn py-0 border-0"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasNavbarEnd"
+              aria-controls="offcanvasNavbarEnd"
+              aria-label="Open account settings menu">
+        <i class="bi bi-three-dots text-xl fw-semibold" aria-hidden="true"></i>
+      </button>
+    </div>
     <!-- Offcanvas Right (User Account & Theme Controls) -->
     <div class="offcanvas offcanvas-end d-xl-none"
          tabindex="-1"
@@ -187,7 +190,7 @@
          aria-labelledby="offcanvasNavbarEndLabel"
          aria-modal="true"
          role="dialog">
-      <div class="offcanvas-header d-flex justify-content-between">
+      <div class="offcanvas-header d-flex justify-content-between align-items-center">
         <div class="offcanvas-title text-xl" id="offcanvasNavbarEndLabel">User Menu</div>
         <button type="button"
                 class="btn-close"
@@ -287,12 +290,12 @@
          aria-labelledby="offcanvasNavbarLabel"
          aria-modal="true"
          role="dialog">
-      <div class="offcanvas-header d-flex justify-content-between">
-        <div class="offcanvas-title text-xl" id="offcanvasNavbarEndLabel">Main Menu</div>
+      <div class="offcanvas-header d-flex justify-content-between align-items-center">
+        <div class="offcanvas-title text-xl" id="offcanvasNavbarLabel">Main Menu</div>
         <button type="button"
                 class="btn-close"
                 data-bs-dismiss="offcanvas"
-                aria-label="Close user menu"></button>
+                aria-label="Close main menu"></button>
       </div>
       <hr class="my-1">
       <div class="offcanvas-body">

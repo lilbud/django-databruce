@@ -3,6 +3,9 @@
   {{ title }}
 {% endblock title %}
 {% block content %}
+  {% if user.is_superuser %}
+    {% include "databruce/partials/admin_new_btn.html" with view="run" %}
+  {% endif %}
   <div class="col-12">
     <div class="row mb-3">
       <div class="col">

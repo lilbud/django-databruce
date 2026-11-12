@@ -692,10 +692,28 @@ class SetlistStatsSerializer(BaseSerializer):
 
 class SetlistMobileSerializer(BaseSerializer):
   song = SongsSerializer(include=["name", "slug"])
+  notes = serializers.SlugRelatedField(
+    source="setlist_notes",
+    many=True,
+    read_only=True,
+    required=False,
+    slug_field="note",
+  )
 
   class Meta:
     model = models.Setlist
-    fields = ["song"]
+    fields = [
+      "song",
+      "set_name",
+      "segue",
+      "song_num",
+      "position",
+      "notes",
+      "tour_num",
+      "tour_total",
+      "debut",
+      "premiere",
+    ]
 
 
 class SetlistNotesSerializer(BaseSerializer):
@@ -819,6 +837,7 @@ class ReleaseTracksSerializer(BaseSerializer):
       "length",
       "id",
       "uuid",
+      "position",
     ]
 
 
