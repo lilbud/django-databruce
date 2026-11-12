@@ -435,14 +435,14 @@
           'orderable': false
         }, {
           'data': 'last',
-          'name': 'songs_page__prev__song__name',
+          'name': 'last__song__name',
           'width': '12rem',
           'render': function(data, type, row, meta) {
             return data ? `<a href="/songs/${data.song.slug}">${data.song.name}${data.segue ? ' \>' : ''}</a>` : '';
           },
         }, {
           'data': 'next',
-          'name': 'songs_page__next__song__name',
+          'name': 'next__song__name',
           'width': '12rem',
           'render': function(data, type, row, meta) {
             return data ? `<a href="/songs/${data.song.slug}">${row.segue ? '\> ' : ''}${data.song.name}${data.segue ? ' \>' : ''}</a>` : '';
