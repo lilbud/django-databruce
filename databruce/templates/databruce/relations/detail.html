@@ -92,9 +92,9 @@
       </div>
     </div>
   </div>
-  <script>
-    $(document).ready(async function() {
-      eventTable('/api/v1/events/?relation={{ info.id }}&format=custom');
-    });
+  <script data-relation-id="{{ info.id }}">
+    const data = document.currentScript.dataset;
+    const relationId = parseInt(data.relationId, 10);
+    eventTable(`/api/v1/events/?relation=${relationId}&format=custom`);
   </script>
 {% endblock content %}

@@ -417,6 +417,18 @@ class EventsFilter(dj_filters.FilterSet):
     method="filter_by_event_type",
   )
 
+  # has_setlist = dj_filters.BooleanFilter(
+  #   field_name="stats_event__total_event_songs",
+  #   label="Has Setlist",
+  #   method="filter_has_setlist",
+  # )
+
+  # def filter_has_setlist(self, queryset, name, value):
+  #   if value:
+  #     return queryset.filter(stats_event__total_event_songs__gt=0).distinct()
+
+  #   return queryset
+
   def filter_by_event_type(self, queryset, name, value):
     if type(value) is str:
       value = int(value)
@@ -438,6 +450,11 @@ class EventsFilter(dj_filters.FilterSet):
   tag_text = dj_filters.CharFilter(
     field_name="event_tag__tag__name",
     lookup_expr="icontains",
+  )
+
+  public = dj_filters.BooleanFilter(
+    field_name="public",
+    label="public",
   )
 
   def filter_by_tag(self, queryset, name, value):
@@ -1090,12 +1107,7 @@ class SetlistFilter(dj_filters.FilterSet):
     return queryset.filter(**{lookup: False})
 
   def filter_show_only(self, queryset, name, value):
-    lookup = "set_name__in"
-
-    lookup = Q(set_name__in=models.SetType.valid_sets()) & Q(
-      event__public=True,
-    )
-
+    lookup = Q(set_name__in=models.SetType.valid_sets())
     return queryset.filter(lookup)
 
   def filter_song_list(self, queryset, name, value):

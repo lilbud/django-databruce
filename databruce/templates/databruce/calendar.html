@@ -214,14 +214,4 @@
       <div id="calendar"></div>
     </div>
   </div>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      var date = new Date();
-
-      let currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-      let currentDay = date.getDate().toString().padStart(2, "0");
-
-      $(`td[data-date$='${currentMonth}-${currentDay}']`).addClass('today');
-    });
-  </script>
 {% endblock content %}

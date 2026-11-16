@@ -114,19 +114,6 @@ function initializeShareCardGenerator(config) {
         badgeRow.style.marginRight = 'auto';
       }
 
-      // const logoBrandLink = sandbox.querySelector('.navbar-brand');
-
-      // if (logoBrandLink) {
-      //   // Wipe out Bootstrap float, margins, padding, and flex properties
-      //   // logoBrandLink.className = '';
-
-      //   // Force an explicit, centered block layout framework
-      //   logoBrandLink.style.display = 'block';
-      //   logoBrandLink.style.width = '100%';
-      //   logoBrandLink.style.textAlign = 'center';
-      //   logoBrandLink.style.paddingTop = '5px';
-      // }
-
       const arrows = sandbox.querySelectorAll('span.segue');
 
       if (arrows) {
@@ -160,15 +147,6 @@ function initializeShareCardGenerator(config) {
         sandbox.remove(); // Clean up memory
         return;
       }
-
-      async function warmAsset(url) {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.src = url;
-        await img.decode().catch(() => { });
-      }
-
-      await warmAsset('/static/databruce/img/logo.svg');
 
       // 2. Fire Snapdom's native image exporter and download pipeline
       return snapdom.download(marginWrapper, {

@@ -727,3 +727,28 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - Redesigned top navbar. Still the same on mobile but on desktop it is now two rows, with all links on the secondary one. I did this because it was getting crowded, and the positioning was messed up in some cases. The logo is now fixed left instead of center as it was never centered correctly with the uneven icons (1 on left, 2 on right).
 - 30 Days of Bruce will now show a card instead of a text message when submit is successful. This will also show errors too which is good.
+
+# v1.40 (November 13, 2026)
+
+# Added
+
+# Fixed
+
+- [Bruceyversion] Fixed song id missing from form
+
+# Changed
+
+- [Bruceyversion] Submitting an entry for song/event that already has one will instead submit as a comment to that entry
+- [Bruceyversion] Events are now filtered to only show public events
+- [Bruceyversion] Refactored entry voting. You can now vote on your own entry.
+
+# v1.41 (November 15, 2026)
+
+# Fixed
+
+- Took another swing at the advanced search. Always figure out some edge case that breaks everything and causes a rewrite. One of these days I'll really fix it. Maybe.
+- Setlist image generation fixed missing site logo.
+
+# Changed
+
+- The onward efforts to switch to Vanilla JS continue.

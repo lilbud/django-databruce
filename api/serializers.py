@@ -668,6 +668,7 @@ class SongsSerializer(BaseSerializer):
   class Meta:
     model = models.Song
     fields = [
+      "id",
       "name",
       "first_event",
       "last_event",
@@ -747,7 +748,7 @@ class SetlistSerializer(BaseSerializer):
 
     return super().to_representation(instance)
 
-  song = SongsSerializer(include=["name", "slug", "category"])
+  song = SongsSerializer(include=["id", "name", "slug", "category"])
 
   last_event = serializers.SerializerMethodField(required=False)
 
@@ -790,6 +791,7 @@ class SetlistSerializer(BaseSerializer):
   class Meta:
     model = models.Setlist
     fields = [
+      "id",
       "song",
       "segue",
       "debut",

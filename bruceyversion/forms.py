@@ -11,46 +11,46 @@ class SubmitForm(forms.Form):
     """Initialize form."""
     super().__init__(*args, **kwargs)
 
-    # Check if form has POST data (args[0] is typically request.POST)
-    if self.is_bound:
-      # Extract the event ID submitted by the user
-      song_id = self.data.get("song")
-      if song_id:
-        # Query the actual songs matching that event
-        # Example assuming a Song model:
-        songs = models.Song.objects.filter(id=song_id)
-        self.fields["song"].choices = [(s.id, str(s.name)) for s in songs]
+    # # Check if form has POST data (args[0] is typically request.POST)
+    # if self.is_bound:
+    #   # Extract the event ID submitted by the user
+    #   song_id = self.data.get("song")
+    #   if song_id:
+    #     # Query the actual songs matching that event
+    #     # Example assuming a Song model:
+    #     songs = models.Song.objects.filter(id=song_id)
+    #     self.fields["song"].choices = [(s.id, str(s.name)) for s in songs]
 
-    event_id = self.data.get("event") if self.is_bound else self.initial.get("event")
+    # event_id = self.data.get("event") if self.is_bound else self.initial.get("event")
 
-    # 2. If a value exists, inject it as a valid choice so validation passes
-    if event_id:
-      try:
-        event_obj = models.Event.objects.get(pk=event_id)
-        # CRITICAL FIX: Clear choices completely to prevent duplication
-        self.fields["event"].choices = []
+    # # 2. If a value exists, inject it as a valid choice so validation passes
+    # if event_id:
+    #   try:
+    #     event_obj = models.Event.objects.get(pk=event_id)
+    #     # CRITICAL FIX: Clear choices completely to prevent duplication
+    #     self.fields["event"].choices = []
 
-        # Append the singular, valid choice item
-        self.fields["event"].choices += [
-          (event_obj.pk, f"{event_obj.date} - {event_obj.venue}"),
-        ]
+    #     # Append the singular, valid choice item
+    #     self.fields["event"].choices += [
+    #       (event_obj.pk, f"{event_obj.date} - {event_obj.venue}"),
+    #     ]
 
-      except (models.Event.DoesNotExist, ValueError):
-        self.fields["event"].choices = [(event_id, event_id)]
+    #   except (models.Event.DoesNotExist, ValueError):
+    #     self.fields["event"].choices = [(event_id, event_id)]
 
-  event = forms.ChoiceField(
+  event = forms.CharField(
     label="Event",
     required=True,
-    choices=[],
+    # choices=[],
     widget=forms.Select(
       attrs={"class": "form-select form-select-sm event select2", "id": "event"},
     ),
   )
 
-  song = forms.ChoiceField(
+  song = forms.CharField(
     label="Song",
     required=True,
-    choices=[],
+    # choices=[],
     widget=forms.Select(
       attrs={
         "class": "form-select form-select-sm",

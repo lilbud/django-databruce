@@ -104,9 +104,10 @@ DataTable.feature.register('customOrder', function (settings, opts) {
 // needed to fix pages with multiple tables behind tabs
 Object.assign(DataTable.defaults, {
   searching: true,
-  fixedHeader: {
-    headerOffset: 52,
-  },
+  // fixedHeader: {
+  //   headerOffset: 52,
+  // },
+  fixedHeader: true,
   // scrollX: true,
   serverSide: true,
   processing: true,

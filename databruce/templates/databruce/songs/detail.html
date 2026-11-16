@@ -466,55 +466,72 @@
           let api = this.api();
           var info = api.page.info();
 
-          const input = document.querySelector('.page-input');
-          const prevBtn = document.querySelector('.btn-prev');
-          const nextBtn = document.querySelector('.btn-next');
-          const totalSpan = document.querySelector('.total-pages');
+          const input = document.querySelectorAll('.page-input');
+          const prevBtn = document.querySelectorAll('.btn-prev');
+          const nextBtn = document.querySelectorAll('.btn-next');
+          const totalSpan = document.querySelectorAll('.total-pages');
           const tableInfo = document.getElementById('tableInfo');
 
           // Initial button states
-          input.value = info.page + 1;
-          prevBtn.disabled = info.page === 0;
-          nextBtn.disabled = info.page >= info.pages - 1;
+          input.forEach(el => {
+            el.value = info.page + 1;
+
+            el.addEventListener('change', function() {
+              let val = parseInt(this.value, 10) - 1;
+              const max = api.page.info().pages - 1;
+
+              if (val < 0) val = 0;
+              if (val > max) val = max;
+
+              this.value = val;
+              api.page(val).draw('page');
+            })
+          });
+
+          prevBtn.forEach(el => {
+            el.disabled = info.page === 0;
+
+            el.addEventListener('click', function() {
+              prevPage(table);
+            });
+          });
+
+          nextBtn.forEach(el => {
+            el.disabled = info.page >= info.pages - 1;
+
+            el.addEventListener('click', function() {
+              nextPage(table);
+            });
+          });
 
           tableInfo.textContent = `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal} entries`;
 
           api.on('draw', () => {
             const pageInfo = api.page.info();
 
-            input.value = pageInfo.page + 1;
-            input.setAttribute('max', pageInfo.pages);
+            input.forEach(el => {
+              el.value = pageInfo.page + 1;
+              el.max = pageInfo.pages;
+            });
 
-            totalSpan.textContent = `of ${pageInfo.pages || 1}`;
+            totalSpan.forEach(el => {
+              el.textContent = `of ${pageInfo.pages || 1}`;
+            });
 
-            // Handle button states
-            prevBtn.disabled = pageInfo.page === 0;
-            nextBtn.disabled = pageInfo.page >= pageInfo.pages - 1;
+            prevBtn.forEach(el => {
+              el.disabled = pageInfo.page === 0;
+            });
 
-            // FIX: Swapped out 'info' for 'pageInfo' so it updates dynamically
+            nextBtn.forEach(el => {
+              el.disabled = pageInfo.page >= pageInfo.pages - 1;
+            });
+
             tableInfo.textContent = `Showing ${pageInfo.start + 1} to ${pageInfo.end} of ${pageInfo.recordsTotal} entries`;
           });
 
-          totalSpan.textContent = `of ${info.pages || 1}`;
-
-          nextBtn.addEventListener('click', function() {
-            nextPage(table)
-          });
-
-          prevBtn.addEventListener('click', function() {
-            prevPage(table);
-          });
-
-          input.addEventListener('change', function() {
-            let val = parseInt(this.value, 10) - 1;
-            const max = api.page.info().pages - 1;
-            if (val < 0) val = 0;
-            if (val > max) val = max;
-
-            input.value = val + 1;
-
-            api.page(val).draw('page');
-          });
+          totalSpan.forEach(el => {
+            el.textContent = `of ${info.pages || 1}`;
+          })
         }
       });
 

@@ -9,7 +9,6 @@ from .views import (
   SongEntryListView,
   SongListView,
   SubmitEntryComment,
-  UpdateEntryComment,
 )
 
 app_name = "bruceyversion"
@@ -24,16 +23,11 @@ urlpatterns = [
     EventEntryListView.as_view(),
     name="entry_by_event",
   ),
-  path("entry/vote/", EntryVote.as_view(), name="entry_vote"),
+  path("entry/<int:entry_id>/vote/", EntryVote.as_view(), name="entry_vote"),
   path(
     "entry/comment/submit",
     SubmitEntryComment.as_view(),
     name="entry_comment_submit",
-  ),
-  path(
-    "entry/comment/update",
-    UpdateEntryComment.as_view(),
-    name="entry_comment_update",
   ),
   path("songs/", SongListView.as_view(), name="songs_list"),
 ]

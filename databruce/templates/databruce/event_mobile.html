@@ -238,11 +238,16 @@
             return data ? data : '';
           },
           'createdCell': function(td, cellData, rowData, row, col) {
-            $(td).addClass('songnum');
+            td.classList.add('songnum');
 
             if (rowData.position) {
               var position = slugify(rowData.position);
-              $(td).addClass(`${position} position`).attr('data-bs-toggle', 'tooltip').attr('data-bs-title', rowData.position).attr('data-bs-html', true)
+              td.classList.add(`${position}`);
+              td.classList.add(`position`);
+
+              td.dataset.bsToggle = 'tooltip';
+              td.dataset.bsTitle = `${rowData.position}`;
+              td.dataset.bsHtml = true;
             }
 
             return td;

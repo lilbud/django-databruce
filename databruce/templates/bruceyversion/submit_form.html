@@ -45,26 +45,36 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", () => {
+      const $eventSelect = $('#event');
+      const $songSelect = $('#song');
 
-      var eventID = '{{ request.POST.event }}';
-      var songID = '{{ request.POST.song }}';
+      $eventSelect.on('change', function() {
+        const val = $(this).val();
+        console.log("Selected Event ID:", val);
 
-      if (eventID && songID) {
-        fetch(`/api/v1/setlists/?event=${eventID}&format=json&show_only=true&hide_non_songs=true&bv=true`)
+        // Clear previous options and add a blank default
+        $songSelect.empty().append('<option value=""></option>');
+
+        if (!val) return; // Stop if cleared
+
+        fetch(`/api/v1/setlists/?event=${val}&format=json&show_only=true&hide_non_songs=true`)
           .then(response => response.json())
           .then(data => {
             data.results.forEach(function(item) {
-              // Keep selected state if it matches a returned validation value
-              let isSelected = item.song.id == songID ? 'selected="selected"' : '';
-              console.log(item.song.id)
-              $('#song').append(`<option value="${item.song.id}" ${isSelected}>${item.set_name} - ${item.song.name}</option>`);
+              const optionText = `${item.set_name} - ${item.song.name}`;
+              // Create and append the new option
+              const newOption = new Option(optionText, item.song.id, false, false);
+              $songSelect.append(newOption);
             });
-          });
-      }
 
+            // Notify Select2 (if #song is also a Select2 field) to refresh its UI
+            $songSelect.trigger('change');
+          })
+          .catch(error => console.error('Error fetching setlist:', error));
+      });
 
-      var eventSelect = $('#event').select2({
+      $($eventSelect).select2({
         theme: "bootstrap-5",
         selectionCssClass: "form-select-sm",
         dropdownCssClass: "form-select-sm",
@@ -82,6 +92,7 @@
           data: function(params) {
             return {
               search: params.term,
+              public: true
             }
           },
           processResults: function(data) {
@@ -99,12 +110,11 @@
         escapeMarkup: function(markup) {
           return markup;
         },
-        // 2. Render the custom HTML property inside the dropdown list
         templateResult: function(data) {
           if (data.loading) {
             return data.text;
           }
-          // Return your assigned HTML property if it exists, otherwise fallback to plain text
+
           return data.customHtml || data.text;
         },
         templateSelection: function(data) {
@@ -112,48 +122,9 @@
         }
       });
 
-      if (eventSelect.val()) {
-        eventSelect.trigger('change');
-      }
-    });
-
-    if ($('#event').val()) {
-      // If Select2 reloaded with an ID, we fetch its text representation via API to display it properly
-      const existingEventId = $('#event').val();
-      fetch(`/api/v1/events/${existingEventId}/`)
-        .then(response => response.json())
-        .then(item => {
-          var option = new Option(`${item.date} - ${item.venue.name}`, item.id, true, true);
-          $('#event').append(option).trigger('change');
-        });
-    }
-
-    $(document).on('select2:open', function() {
-      $('input.select2-search__field').focus();
-    });
-
-
-    $('#event').on('change', function() {
-      const val = $(this).val() || '';
-      var isPopulated = val.length > 0;
-
-      $('#song').empty().append(`<option value=""></option>`);
-
-      if (isPopulated) {
-        const currentSongValue = $('#song').data('old-value') || "";
-
-        fetch(`/api/v1/setlists/?event=${val}&format=json&show_only=true&hide_non_songs=true&bv=true`)
-          .then(response => response.json())
-          .then(data => {
-            data.results.forEach(function(item) {
-              // Keep selected state if it matches a returned validation value
-              let isSelected = item.song.id == currentSongValue ? 'selected="selected"' : '';
-              $('#song').append(`<option value="${item.song.id}" ${isSelected}>${item.set_name} - ${item.song.name}</option>`);
-            });
-            // Trigger change to unlock comment field if song was pre-selected from validation error
-            $('#song').trigger('change');
-          });
-      }
-    });
+      $(document).on('select2:open', function() {
+        $('input.select2-search__field').focus();
+      });
+    })
   </script>
 {% endblock content %}

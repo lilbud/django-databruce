@@ -1,13 +1,15 @@
 from typing import Any
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import F, OuterRef
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -33,7 +35,7 @@ class EntrySubmit(LoginRequiredMixin, PageTitleMixin, TemplateView):
 
     messages.warning(
       self.request,
-      "Note: Only one entry can be submitted for a given song and show. If your entry is already taken, check the <a href='/entries/'>entries page</a> and vote or comment on it instead.",
+      "Note: Only one entry can be submitted for a given song and show. Submitting one for an existing song/show will instead submit as a comment to that entry instead.",
     )
 
     return context
@@ -47,34 +49,43 @@ class EntrySubmit(LoginRequiredMixin, PageTitleMixin, TemplateView):
     form = self.form(request.POST)
 
     if form.is_valid():
-      form.cleaned_data["user"] = db_models.CustomUser.objects.get(pk=request.user.id)
+      form.cleaned_data["user"] = request.user
 
-      entry, created = bv_models.Entry.objects.get_or_create(
-        **form.cleaned_data,
-      )
+      try:
+        entry, created = bv_models.Entry.objects.get_or_create(
+          **form.cleaned_data,
+        )
 
-      if created:
-        messages.success(request, "Your entry has been submitted successfully")
+        if created:
+          messages.success(request, "Your entry has been submitted successfully")
+
+          return redirect(
+            reverse("bruceyversion:entry_detail", kwargs={"id": entry.uuid}),
+          )
+      except IntegrityError:
+        # if an entry exists, instead submit a comment to that entry
+        entry = bv_models.Entry.objects.get(
+          song=form.cleaned_data["song"],
+          event=form.cleaned_data["event"],
+        )
+
+        bv_models.EntryComment.objects.create(
+          user=request.user,
+          entry=entry,
+          comment=form.cleaned_data["comment"],
+        )
+
+        messages.success(request, "Your comment has been submitted successfully")
 
         return redirect(
           reverse("bruceyversion:entry_detail", kwargs={"id": entry.uuid}),
         )
 
-      messages.error(
-        request,
-        "An entry has already been submitted for this song and show",
-      )
-
-      return render(
-        request,
-        template_name=self.template_name,  # ty: ignore[invalid-argument-type]
-        context={"form": form},
-      )
-
     messages.error(request, "Error submitting entry")
+
     return render(
       request,
-      template_name=self.template_name,  # ty: ignore[invalid-argument-type]
+      template_name=self.template_name,
       context={"form": form},
     )
 
@@ -130,16 +141,6 @@ class EntryDetailView(PageTitleMixin, TemplateView):
       uuid=self.kwargs["id"],
     )
 
-    # context["entry"] = (
-    #   bv_models.Entry.objects.select_related(
-    #     "user",
-    #     "event",
-    #     "song",
-    #   )
-    #   .prefetch_related("entry_comment")
-    #   .get(uuid=self.kwargs["id"])
-    # )
-
     if context["entry"].status == bv_models.Entry.ModerationStatus.PENDING:
       messages.warning(self.request, "This entry is awaiting moderation")
 
@@ -175,46 +176,56 @@ class EntryDetailView(PageTitleMixin, TemplateView):
     return context
 
 
+@method_decorator(login_required, name="dispatch")
 class EntryVote(View):
-  def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
-    entry_id = request.POST.get("entry")
+  def post(self, request: HttpRequest, entry_id: int, *args, **kwargs) -> JsonResponse:
+    # Support both URL kwargs (recommended) and fallback form/JSON data
     entry = get_object_or_404(bv_models.Entry, id=entry_id)
 
-    # Prevent users from voting on their own entry on the backend
-    if entry.user == request.user:
+    try:
+      with transaction.atomic():
+        # Lock the Entry row to prevent concurrent race conditions on vote counts
+        entry = bv_models.Entry.objects.select_for_update().get(id=entry.id)
+
+        vote, created = bv_models.EntryVote.objects.get_or_create(
+          entry=entry,
+          user=request.user,
+        )
+
+        if created:
+          bv_models.Entry.objects.filter(id=entry.id).update(votes=F("votes") + 1)
+          voted = True
+          message = "You have successfully voted for this entry."
+        else:
+          vote.delete()
+          # Ensure votes never drop below 0
+          bv_models.Entry.objects.filter(id=entry.id, votes__gt=0).update(
+            votes=F("votes") - 1
+          )
+          voted = False
+          message = "Your vote has been removed."
+
+        # Refresh entry instance to get updated vote count
+        entry.refresh_from_db(fields=["votes"])
+
+    except Exception as e:
       return JsonResponse(
         {
-          "message": "You cannot vote on your own entry",
           "success": False,
+          "message": "An error occurred while processing your vote.",
+          "error": str(e),
         },
         status=400,
       )
 
-    with transaction.atomic():
-      vote, created = bv_models.EntryVote.objects.get_or_create(
-        entry=entry,
-        user=request.user,
-      )
-
-      if created:
-        entry.votes += 1
-        entry.save(update_fields=["votes"])
-        voted = True
-        message = "You have successfully voted for this entry."
-      else:
-        vote.delete()
-        entry.votes = max(0, entry.votes - 1)
-        entry.save(update_fields=["votes"])
-        voted = False
-        message = "Your vote has been removed."
-
     return JsonResponse(
       {
+        "success": True,
         "message": message,
         "votes": entry.votes,
         "voted": voted,
-        "success": True,
       },
+      status=200,
     )
 
 
@@ -229,30 +240,16 @@ class SubmitEntryComment(View):
         defaults=form.cleaned_data,
       )
 
-      return JsonResponse(
-        {"success": True, "message": "Your comment has been submitted successfully"},
-      )
-
-    return JsonResponse({"success": False, "errors": form.errors})
-
-
-class UpdateEntryComment(View):
-  def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
-    form = forms.CommentForm(request.POST)
-
-    if form.is_valid():
-      comment = bv_models.EntryComment.objects.get(
-        pk=request.POST["commentID"],
-      )
-
-      if comment.user != request.user:
-        return JsonResponse({"success": False, "errors": "You can't edit this comment"})
-
-      comment.comment = form.cleaned_data["comment"]
-      comment.save()
+      if not created:
+        return JsonResponse(
+          {
+            "success": True,
+            "message": "Your comment has been updated successfully",
+          },
+        )
 
       return JsonResponse(
-        {"success": True, "message": "Your comment has been edited successfully"},
+        {"success": True, "message": "Your comment has been created successfully"},
       )
 
     return JsonResponse({"success": False, "errors": form.errors})
