@@ -1208,25 +1208,15 @@
       const currentTheme = document.documentElement.getAttribute('data-bs-theme');
       const downloadBtn = document.getElementById('download-btn');
 
-      downloadBtn.addEventListener('click', function() {
-        initializeShareCardGenerator({
+      downloadBtn.addEventListener('click', async function() {
+        await initializeShareCardGenerator({
           button: downloadBtn,
+          shareCardUrl: `/event_card/{{ event.id }}`,
           ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
           downloadFilename: `databruce_${event_id}`,
           activeTheme: currentTheme,
         });
       })
-
-      /*
-      $('#downloadBtn').click(function() {
-        var btn = this;
-        initializeShareCardGenerator({
-          button: btn,
-          ajaxUrl: "/api/v1/setlists_mobile/?event={{ event.id }}&format=json&show_only=true", // Safely generates the API route
-          downloadFilename: `databruce_${event_id}`,
-          activeTheme: currentTheme,
-        });
-      })*/
     });
   </script>
 {% endblock content %}

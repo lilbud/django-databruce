@@ -747,7 +747,7 @@ First public release of the site. Site was locked behind a login and accounts on
 # Fixed
 
 - Took another swing at the advanced search. Always figure out some edge case that breaks everything and causes a rewrite. One of these days I'll really fix it. Maybe.
-- Setlist image generation fixed missing site logo.
+- Redid setlist image generation. Had an issue where the logo would randomly not appear and the setlist would do the same. Hopefully this new method is more reliable. Eventually I might add more info from the event detail page to this once I figure out a nice layout for it.
 
 # Changed
 

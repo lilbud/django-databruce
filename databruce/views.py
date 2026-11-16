@@ -1014,6 +1014,13 @@ class EventDetailMobileView(PageTitleMixin, TemplateView):
       f"{event_date}<br>{context['event'].artist}<br>{venue_name}"
     )
 
+    context["setlist"] = (
+      Setlist.objects.filter(event_id=event.pk, set_name__in=SetType.valid_sets())
+      .order_by("song_num")
+      .select_related("song")
+      .prefetch_related("setlist_notes")
+    )
+
     if not context["event"].date:
       messages.info(
         self.request,
@@ -1021,6 +1028,35 @@ class EventDetailMobileView(PageTitleMixin, TemplateView):
       )
 
     return context
+
+
+def event_share_card(request, event_id):
+  event = get_object_or_404(
+    Event.objects.select_related(
+      "venue",
+      "artist",
+      "tour",
+      "venue__city",
+    ).prefetch_related("leg", "run"),
+    id=event_id,
+  )
+
+  event_date = event.get_date()
+
+  setlist = (
+    Setlist.objects.filter(event_id=event.pk, set_name__in=SetType.valid_sets())
+    .order_by("song_num")
+    .select_related("song")
+    .prefetch_related("setlist_notes")
+  )
+
+  context = {
+    "event": event,
+    "setlist": setlist,
+    "event_date": event_date,
+  }
+
+  return render(request, "databruce/event_mobile.html", context)
 
 
 class EventDetailTestView(PageTitleMixin, TemplateView):

@@ -72,6 +72,7 @@ from .views import (
   UserView,
   VenueDetailView,
   VenueView,
+  event_share_card,
   unsubscribe_view,
 )
 
@@ -306,6 +307,11 @@ urlpatterns = [
     "events/<int:event_id>/review/",
     UserAddReviewView.as_view(),
     name="add_show_review",
+  ),
+  path(
+    "event_card/<int:event_id>",
+    event_share_card,
+    name="event_share_card",
   ),
   path(
     "sitemap.xml",

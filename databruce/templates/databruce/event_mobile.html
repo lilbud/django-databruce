@@ -47,8 +47,6 @@
       {{ title }}
       | Databruce
     </title>
-    <!--JQuery-->
-    <script src="{% static 'vendor/jquery/jquery-4.0.0.min.js' %}"></script>
     <!--Bootstrap-->
     <link rel="stylesheet"
           href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
@@ -62,24 +60,16 @@
       <link rel="stylesheet" href="{% static 'databruce/css/style.css' %}" />
       <link rel="stylesheet" href="{% static 'databruce/css/light.css' %}" />
       <link rel="stylesheet" href="{% static 'databruce/css/dark.css' %}" />
-      <link rel="stylesheet" href="{% static 'databruce/css/select2.css' %}" />
     {% endcompress %}
     <!-- Other -->
-    {% compress js %}
-      <script src="{% static 'databruce/js/utils.js' %}"></script>
-      <script src="{% static 'databruce/js/theme-toggler.js' %}"></script>
-      <script src="{% static 'vendor/snapdom/snapdom.js' %}"></script>
-      <script src="{% static 'databruce/js/table.js' %}"></script>
-    {% endcompress %}
   </head>
   <body>
     <div id="capture-area">
       <nav class="navbar navbar-expand-xl p-0 border-bottom">
-        <div class="container-fluid p-0 align-items-center bd-gutter flex-wrap flex-xl-nowrap">
+        <div class="container-fluid p-0 align-items-center justify-content-center bd-gutter flex-wrap flex-xl-nowrap">
           <a class="navbar-brand p-xl-0 mx-auto mx-xl-2"
              href="{% url 'index' %}"
              aria-label="Databruce Home">
-            {% comment %} <div class="logo" role="img" aria-label="Databruce"></div> {% endcomment %}
             <img id="mobile-header"
                  src="{% static "databruce/img/mobile-header.png" %}"
                  alt="">
@@ -90,7 +80,6 @@
         <div class="container-lg">
           <div class="col-12 mt-3 mb-2 d-flex justify-content-center">
             <div class="col d-grid gap-0 gx-0">
-              <!-- next and last buttons-->
               {% if not event.date %}
                 <!-- message cards -->
                 <div class="row mb-2 gx-0">
@@ -128,7 +117,7 @@
                               </div>
                               <div class="row text-sm text-reset">
                                 <div class="col event-header-venue">
-                                  <div class="text-reset fw-semibold">{{ event.venue.get_name }}</div>
+                                  <div class="text-reset fw-semibold">{{ event.venue.name }}</div>
                                   {% if event.venue.city %}<div class="fw-light">{{ event.venue.city }}</div>{% endif %}
                                 </div>
                               </div>
@@ -162,35 +151,78 @@
                       {% if event.note %}
                         <div class="row mb-3 gx-0">
                           <div class="col">
-                            {% partialdef event-note inline %}
-                              <div class="card">
-                                <div class="card-header">
-                                  Notes
-                                  <i class="bi bi-pencil"></i>
-                                </div>
-                                <div class="card-body event-note text-wrap">{{ event.note|markdown|safe }}</div>
+                            <div class="card">
+                              <div class="card-header">
+                                Notes
+                                <i class="bi bi-pencil"></i>
                               </div>
-                            {% endpartialdef %}
+                              <div class="card-body event-note text-wrap">{{ event.note|markdown|safe }}</div>
+                            </div>
                           </div>
                         </div>
                       {% endif %}
+                      {% regroup setlist by set_name as set_list %}
                       <div class="col-12">
                         <div class="card">
-                          <div class="card-header d-flex flex-column">
-                            <div class="d-flex justify-content-between w-100">Setlist</div>
-                            <div class="collapse row w-100" id="options">
-                              <div class="col-12 px-0 pt-1">
-                                <button id="copySetlist" class="btn btn-sm btn-primary">Copy Setlist</button>
-                              </div>
-                            </div>
-                          </div>
                           <div class="card-body p-0" id="setlistCard">
                             <div class="table-responsive" id="mobileTable">
                               <table class="table table-hover display wrap" id="setlistTable">
-                                <thead>
-                                  <th class="all">#</th>
-                                  <th class="all">Song</th>
+                                <thead class="d-none">
+                                  <th class="all"></th>
+                                  <th class="all"></th>
                                 </thead>
+                                <tbody>
+                                  {% for row in setlist %}
+                                    {% ifchanged row.set_name %}
+                                      <tr class="set-header">
+                                        <td class="py-0" colspan="2">
+                                          <span>{{ row.set_name }}</span>
+                                        </td>
+                                      </tr>
+                                    {% endifchanged %}
+                                    <tr>
+                                      <td class="songnum song_num{% if row.position %}
+                                                   {{ row.position|slugify }} position{% endif %} text-center">{{ row.song_num }}</td>
+                                      <td>
+                                        <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">
+                                          <span class="text-reset fw-medium"
+                                                href="{% url "song_details" slug=row.song.slug %}">{{ row.song.name }}</span>
+                                          {% if row.segue %}
+                                            <span class="segue"></span>
+                                          {% endif %}
+                                        </div>
+                                        {% if row.setlist_notes.all|length > 0 %}
+                                          <span class="text-wrap fw-light setlist-note">{{ row.setlist_notes.all|join:'; ' }}</span>
+                                        {% endif %}
+                                      </td>
+                                    </tr>
+                                  {% endfor %}
+                                  {% comment %} {% for set, songs in set_list %}
+                                    <tr class="set-header">
+                                      <td class="py-0" colspan="2">
+                                        <span>{{ set }}</span>
+                                      </td>
+                                    </tr>
+                                    {% for song in songs %}
+                                      <tr>
+                                        <td class="songnum song_num{% if song.position %}
+                                                     {{ song.position|slugify }} position{% endif %} text-center">{{ song.song_num }}</td>
+                                        <td>
+                                          <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">
+                                            <span class="text-reset fw-medium"
+                                                  href="{% url "song_details" slug=song.song.slug %}">{{ song.song.name }}</span>
+                                            {% if song.segue %}
+                                              <span class="segue"></span>
+                                            {% endif %}
+                                          </div>
+                                          {% if song.setlist_notes.all|length > 0 %}
+                                            <span class="text-wrap fw-light setlist-note">{{ song.setlist_notes.all|join:'; ' }}</span>
+                                          {% endif %}
+                                        </td>
+                                      </tr>
+                                    {% endfor %}
+                                  {% endfor %} {% endcomment %}
+                                </tbody>
                               </table>
                             </div>
                           </div>
@@ -205,94 +237,94 @@
         </div>
       </div>
     </div>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        var event = "{{ event.id }}";
-        var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
+    {% comment %} <script>
+   document.addEventListener("DOMContentLoaded", () => {
+     var event = "{{ event.id }}";
+     var url = '/api/v1/setlists/?event={{ event.id }}&format=json';
 
-        let setlistOptions = {
-          createdRow: function(row, data) {
-            //row.addClass(slugify(data.set_name));
-            row.classList.add(slugify(data.set_name))
+     let setlistOptions = {
+       createdRow: function(row, data) {
+         //row.addClass(slugify(data.set_name));
+         row.classList.add(slugify(data.set_name))
 
-            var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
+         var allowedSets = ['Show', 'Set 1', "Set 2", 'Encore', 'Pre-Show', 'Post-Show', 'Rehearsal']
 
-            if (allowedSets.includes(data.set_name)) {
-              var album = data.song.category_slug;
-              //row.attr('data-album', album);
-              row.setAttribute('data-album', album)
-            }
+         if (allowedSets.includes(data.set_name)) {
+           var album = data.song.category_slug;
+           //row.attr('data-album', album);
+           row.setAttribute('data-album', album)
+         }
 
-            return row
-          },
-          rowGroup: {
-            groupVal: 'set_name'
-          }
-        }
+         return row
+       },
+       rowGroup: {
+         groupVal: 'set_name'
+       }
+     }
 
-        let setlistColumns = [{
-          'data': 'song_num',
-          'className': 'text-center',
-          'width': '',
-          'render': function(data, type, row, meta) {
-            return data ? data : '';
-          },
-          'createdCell': function(td, cellData, rowData, row, col) {
-            td.classList.add('songnum');
+     let setlistColumns = [{
+       'data': 'song_num',
+       'className': 'text-center',
+       'width': '',
+       'render': function(data, type, row, meta) {
+         return data ? data : '';
+       },
+       'createdCell': function(td, cellData, rowData, row, col) {
+         td.classList.add('songnum');
 
-            if (rowData.position) {
-              var position = slugify(rowData.position);
-              td.classList.add(`${position}`);
-              td.classList.add(`position`);
+         if (rowData.position) {
+           var position = slugify(rowData.position);
+           td.classList.add(`${position}`);
+           td.classList.add(`position`);
 
-              td.dataset.bsToggle = 'tooltip';
-              td.dataset.bsTitle = `${rowData.position}`;
-              td.dataset.bsHtml = true;
-            }
+           td.dataset.bsToggle = 'tooltip';
+           td.dataset.bsTitle = `${rowData.position}`;
+           td.dataset.bsHtml = true;
+         }
 
-            return td;
-          },
-        }, {
-          'data': 'song',
-          'className': 'text-wrap',
-          'width': '',
-          'render': function(data, type, row, meta) {
-            const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
-            const segue = row.segue ? ' <span class="segue"></span>' : '';
+         return td;
+       },
+     }, {
+       'data': 'song',
+       'className': 'text-wrap',
+       'width': '',
+       'render': function(data, type, row, meta) {
+         const songLink = `<a class="text-reset" href="/songs/${data.slug}">${data.name}</a>`;
+         const segue = row.segue ? ' <span class="segue"></span>' : '';
 
-            const activeBadges = SONG_BADGES
-              .filter(b => row[b.key])
-              .map(b => createBadge(b.class, b.label, b.title))
+         const activeBadges = SONG_BADGES
+           .filter(b => row[b.key])
+           .map(b => createBadge(b.class, b.label, b.title))
 
-            const tourBadge = getTourPositionBadge(row);
-            let bustBadge = ''
+         const tourBadge = getTourPositionBadge(row);
+         let bustBadge = ''
 
-            if (row.gap >= 50 && !row.debut) {
-              const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
-            }
+         if (row.gap >= 50 && !row.debut) {
+           const bustBadge = createBadge('badge-primary', 'Bustout', '≥50 shows on current tour since last played')
+         }
 
-            // Combine all active badges into one list, filtering out nulls
-            const allBadges = [
-              ...activeBadges,
-              bustBadge,
-              tourBadge
-            ].filter(Boolean).join('');
+         // Combine all active badges into one list, filtering out nulls
+         const allBadges = [
+           ...activeBadges,
+           bustBadge,
+           tourBadge
+         ].filter(Boolean).join('');
 
-            const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
-            const notes = row.notes ? `<span class="text-wrap fw-light setlist-note">${row.notes}</span>` : '';
+         const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
+         const notes = row.notes ? `<span class="text-wrap fw-light setlist-note">${row.notes}</span>` : '';
 
-            return `
+         return `
                 <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">
                   ${songLink}${segue}
                   ${badgeContainer}
                 </div>
                 ${notes}
               `;
-          }
-        }, ]
+       }
+     }, ]
 
-        createTable(url, setlistColumns, '#setlistTable', setlistOptions);
-      })
-    </script>
+     createTable(url, setlistColumns, '#setlistTable', setlistOptions);
+   })
+ </script> {% endcomment %}
   </body>
 </html>
