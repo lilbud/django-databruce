@@ -11,7 +11,8 @@ from .views import (
 app_name = "library"
 urlpatterns = [
   path("articles/", ArticleListView.as_view(), name="articles"),
-  path("article/<str:slug>/", ArticleDetailView.as_view(), name="article_detail"),
+  path("article/<uuid:uuid>/", ArticleDetailView.as_view(), name="article_detail_uuid"),
+  path("article/<str:slug>/", ArticleDetailView.as_view(), name="article_detail_slug"),
   path(
     "category/<slug:slug>",
     ArticleCategoryView.as_view(),

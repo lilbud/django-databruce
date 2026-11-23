@@ -64,7 +64,7 @@ class Article(BaseModel):
   id = models.AutoField(primary_key=True)
   author = models.CharField(max_length=255)
   title = models.CharField(max_length=255)
-  slug = models.SlugField(unique=True, blank=True)
+  slug = models.SlugField(unique=True, max_length=100)
   content = models.TextField()
   excerpt = models.CharField(max_length=255, blank=True, default=None)
 

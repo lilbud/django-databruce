@@ -1466,6 +1466,7 @@ class ArticlesSerializer(serializers.ModelSerializer):
       "category",
       "source",
       "collection",
+      "uuid",
     ]
 
 

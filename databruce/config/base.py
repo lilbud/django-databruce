@@ -212,7 +212,8 @@ UNFOLD = {
   ],
   "SCRIPTS": [
     lambda request: static("admin/js/jquery-4.0.0.min.js"),
-    lambda request: static("admin/js/custom_unfold.js"),
+    # lambda request: static("admin/js/custom_unfold.js"),
+    # lambda request: static("admin/js/fix_unfold_sort.js"),
     *get_modal_scripts(),
   ],
   "SIDEBAR": {

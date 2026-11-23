@@ -212,7 +212,7 @@
                         data-bs-html="true"
                         data-bs-title="Setlist Options">
                     <a role="button"
-                       class="btn btn-sm btn-primary icon-button collapse-toggle"
+                       class="btn btn-sm btn-neutral icon-button collapse-toggle"
                        data-bs-toggle="collapse"
                        href="#options"
                        aria-expanded="false"
@@ -739,7 +739,7 @@
             <ul>
               {% for article in event.event_article.all %}
                 <li class="text-sm">
-                  <a href="{% url "library:article_detail" slug=article.slug %}">{{ article.title }}</a>
+                  <a href="{% url "library:article_detail_uuid" uuid=article.uuid %}">{{ article.title }}</a>
                   ({{ article.source }})
                   <span class="fw-semibold">[{{ article.get_category_display }}]</span>
                 </li>
@@ -917,6 +917,20 @@
       var event_id = "{{ event.event_id }}";
 
       await albumBreakdown(`/api/v1/setlist_breakdown/?event={{ event.id }}&format=json&ordering=-song_count`);
+
+      const expandBtn = document.getElementById('album-breakdown-btn');
+
+      expandBtn.addEventListener('click', function() {
+        const rows = document.querySelectorAll('.album-breakdown .collapse');
+        const shouldExpand = Array.from(rows).some(row => !row.classList.contains('show'));
+
+        rows.forEach(collapsedRow => {
+          const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapsedRow, {
+            toggle: false
+          });
+          shouldExpand ? bsCollapse.show() : bsCollapse.hide();
+        });
+      });
 
       let onstageOptions = {
         rowGroup: {
@@ -1143,7 +1157,6 @@
 
           const data = await response.json();
 
-
           userCount.textContent = data.count || 0;
 
           const isAdded = data['action'] === 'added';
@@ -1163,11 +1176,6 @@
           addShowToastEl.classList.toggle('btn-success', isAdded);
           addShowToastEl.classList.toggle('btn-danger', !isAdded);
           addShowToast.show();
-
-          // Show review modal on adding event
-          //if (isAdded) {
-          //reviewModal.show();
-          //}
 
         } catch (error) {
           console.error('Error during POST request:', error);

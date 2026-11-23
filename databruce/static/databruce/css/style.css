@@ -676,7 +676,7 @@ button:disabled {
 }
 
 .dropdown-menu .dropdown-item {
-  border-radius: 0.15rem !important;
+  border-radius: 0 !important;
 }
 
 .dropdown-item:hover {
@@ -840,7 +840,7 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 }
 
 #secondary-navbar .btn {
-  font-size: var(--text-sm) !important;
+  font-size: var(--text-xs) !important;
 }
 
 .icon-button,
@@ -1083,7 +1083,7 @@ button {
   opacity: 0;
   visibility: hidden;
   border-radius: var(--bs-border-radius) !important;
-  padding: 0.3rem !important;
+  /* padding: 0.3rem !important; */
   overflow-x: hidden;
   transform: translateY(2px);
 }

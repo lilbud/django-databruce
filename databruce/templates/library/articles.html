@@ -125,7 +125,7 @@
           'width': '20rem',
           'class': 'text-wrap',
           'render': function(data, type, row, meta) {
-            return data ? `<a href="/library/article/${row.slug}">${truncateText(data)}</a>` : '';
+            return data ? `<a href="/library/article/${row.uuid}">${truncateText(data)}</a>` : '';
           },
         }, {
           'data': 'author',

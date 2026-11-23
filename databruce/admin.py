@@ -1,19 +1,23 @@
 from datetime import time
+from types import MethodType
 from typing import Any, Never
 
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import site
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import Group
 from django.db import models as dj_models
 from django.db.models import QuerySet
 from django.db.models.functions import Cast
+from django.forms import BaseInlineFormSet
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from unfold.admin import ModelAdmin, StackedInline
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from unfold.contrib.forms.widgets import WysiwygWidget
 from unfold.decorators import action, display
 from unfold.forms import (
   AdminPasswordChangeForm,
@@ -65,7 +69,7 @@ class UserAdmin(DefaultUserAdmin, ModelAdmin):
     request,
     queryset,
     search_term,
-  ) -> QuerySet[Any, Any] | tuple[QuerySet[Any, Any], bool]:
+  ) -> QuerySet[Any, Any] | tuple[QuerySet[Any, Any], bool]:  # ty: ignore[invalid-method-override]
     # Apply filter during autocomplete requests
     if "autocomplete" in request.path:
       queryset = queryset.filter(groups=3)
@@ -97,7 +101,7 @@ class EventTypeInline(StackedInline):
       )
     )
 
-  collapsible = True
+  # collapsible = True
 
   fields = ["event", "type"]
   fk_name = "event"
@@ -120,7 +124,7 @@ class EventTagInline(StackedInline):
       )
     )
 
-  collapsible = True
+  # collapsible = True
 
   fields = ["event", "tag"]
   fk_name = "event"
@@ -128,57 +132,135 @@ class EventTagInline(StackedInline):
   extra = 0
 
 
-class OnstageInline(StackedInline):
+def _bind_preloaded_autocomplete(widget, instance):
+  """Avoid AutocompleteSelect's per-row DB lookup by using an already-loaded FK object."""
+  inner_widget = (
+    widget.widget if isinstance(widget, RelatedFieldWidgetWrapper) else widget
+  )
+
+  def optgroups(self, name, value, attr=None):
+    default = (None, [], 0)
+    groups = [default]
+    if not self.is_required and not self.allow_multiple_selected:
+      default[1].append(self.create_option(name, "", "", False, 0))
+
+    if instance is not None:
+      label = self.choices.field.label_from_instance(instance)
+      default[1].append(self.create_option(name, str(instance.pk), label, True, 0))
+    return groups
+
+  inner_widget.optgroups = MethodType(optgroups, inner_widget)
+
+
+class OnstageInlineFormSet(BaseInlineFormSet):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    for form in self.forms:
+      if form.instance.pk:
+        # Uses the objects already fetched by OnstageInline.get_queryset()
+        _bind_preloaded_autocomplete(
+          form.fields["relation"].widget, form.instance.relation
+        )
+        _bind_preloaded_autocomplete(form.fields["band"].widget, form.instance.band)
+
+
+# class OnstageInline(StackedInline):
+#   model = db_models.Onstage
+#   collapsible = True
+#   autocomplete_fields = ["relation", "band"]
+#   fields = ["relation", "band", "note", "guest"]
+#   fk_name = "event"
+#   extra = 0
+#   per_page = 10
+
+
+#   def get_queryset(self, request):
+#     return super().get_queryset(request).select_related("relation", "band")
+
+
+class OnstageInline(TabularInline):
   model = db_models.Onstage
-  collapsible = True
+  formset = OnstageInlineFormSet
+  # collapsible = True
+  autocomplete_fields = ["relation", "band"]
+  fields = ["relation", "band", "note", "guest"]
+  fk_name = "event"
+  extra = 0
+
+  fields = ["relation", "band"]
 
   def get_queryset(self, request):
-    return (
-      super()
-      .get_queryset(request)
-      .select_related(
-        "relation",
+    return super().get_queryset(request).select_related("relation", "band")
+
+
+class SetlistInlineFormSet(BaseInlineFormSet):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    for form in self.forms:
+      if form.instance.pk:
+        # Uses the objects already fetched by OnstageInline.get_queryset()
+        _bind_preloaded_autocomplete(form.fields["song"].widget, form.instance.song)
+
+
+class SetlistNoteInlineFormSet(BaseInlineFormSet):
+  def get_queryset(self):
+    if not hasattr(self, "_queryset"):
+      # Must run super() first so Django's automatic .order_by()
+      # does not clone the queryset and wipe _result_cache
+      qs = super().get_queryset()
+
+      prefetched = getattr(self.instance, "_prefetched_objects_cache", {}).get(
+        "setlist_notes"
       )
-      .prefetch_related("band")
-    )
 
-  autocomplete_fields = ["relation", "band"]
+      if prefetched is not None:
+        notes = list(prefetched)
+        for note in notes:
+          # Prevents SetlistNote.__str__() in Unfold's inline header
+          # from firing SELECT * FROM setlists WHERE id = ...
+          note.setlist = self.instance
+        qs._result_cache = notes
 
-  fields = ["relation", "band", "note", "guest", "event"]
-  fk_name = "event"
-  ordering = ("relation__name",)
+      self._queryset = qs
+    return self._queryset
+
+
+class SetlistNoteInline(StackedInline):
+  model = db_models.SetlistNote
+  fields = ["note"]
   extra = 0
+  formset = SetlistNoteInlineFormSet
+  fk_name = "setlist"
+
+  def get_queryset(self, request):
+    return super().get_queryset(request).select_related("setlist")
 
 
 class SetlistInline(StackedInline):
   model = db_models.Setlist
-  collapsible = True
-  ordering_field = "position"
-
-  def get_queryset(self, request):
-    return (
-      super()
-      .get_queryset(request)
-      .select_related(
-        "song",
-        "event",
-      )
-    )
+  formset = SetlistInlineFormSet
 
   autocomplete_fields = ["song"]
+  fk_name = "event"
+  extra = 0
+  collapsible = True
+  inlines = [SetlistNoteInline]
 
   fields = [
     "set_name",
     "song_num",
     "song",
-    "segue",
-    "note",
-    ("nobruce", "instrumental", "sign_request"),
+    ("segue", "nobruce", "instrumental", "sign_request"),
     "position",
   ]
-  fk_name = "event"
-  ordering = ("song_num",)
-  extra = 0
+
+  def get_queryset(self, request):
+    return (
+      super()
+      .get_queryset(request)
+      .select_related("song", "event")
+      .prefetch_related("setlist_notes")
+    )
 
 
 class ReleaseTrackInline(StackedInline):
@@ -371,14 +453,11 @@ class NugsAdmin(CustomModelAdmin):
 
 class EventForm(forms.ModelForm):
   note = forms.CharField(
-    widget=MarkdownWidget(),
+    widget=WysiwygWidget,
     required=False,
   )
 
   exclude = ["summary", "type"]
-
-  brucebase_url = dj_models.CharField(max_length=255)
-  title = dj_models.CharField(max_length=255)
 
   class Meta:
     model = db_models.Event
@@ -397,20 +476,20 @@ class EventForm(forms.ModelForm):
       # Without explicitly binding to self.instance, Django admin completely
       # drops your timezone manipulations and falls back to project default UTC.
       if "scheduled_time" in changed_data and cleaned_data.get("scheduled_time"):
-        cleaned_data["scheduled_time"] = cleaned_data["scheduled_time"].replace(
+        cleaned_data["scheduled_time"] = cleaned_data["scheduled_time"].replace(  # ty: ignore[invalid-assignment, not-subscriptable]
           tzinfo=tz,
         )
-        self.instance.scheduled_time = cleaned_data["scheduled_time"]
+        self.instance.scheduled_time = cleaned_data["scheduled_time"]  # ty: ignore[invalid-assignment, not-subscriptable]
 
       if "start_time" in changed_data and cleaned_data.get("start_time"):
-        cleaned_data["start_time"] = cleaned_data["start_time"].replace(
+        cleaned_data["start_time"] = cleaned_data["start_time"].replace(  # ty: ignore[invalid-assignment, not-subscriptable]
           tzinfo=tz,
         )
-        self.instance.start_time = cleaned_data["start_time"]
+        self.instance.start_time = cleaned_data["start_time"]  # ty: ignore[invalid-assignment, not-subscriptable]
 
       if "end_time" in changed_data and cleaned_data.get("end_time"):
-        cleaned_data["end_time"] = cleaned_data["end_time"].replace(tzinfo=tz)
-        self.instance.end_time = cleaned_data["end_time"]
+        cleaned_data["end_time"] = cleaned_data["end_time"].replace(tzinfo=tz)  # ty: ignore[invalid-assignment, not-subscriptable]
+        self.instance.end_time = cleaned_data["end_time"]  # ty: ignore[invalid-assignment, not-subscriptable]
 
     # 2. FIX: Calculate length safely using the modified timezoned objects
     # We look up the freshly altered cleaned_data first, falling back to
@@ -435,7 +514,7 @@ class EventForm(forms.ModelForm):
         # 3. FIX: Convert the calculated duration into a datetime.time object
         # This formatting is compatible with Django's TimeField requirements
         self.instance.length = time(hour=hours, minute=minutes)
-        cleaned_data["length"] = time(hour=hours, minute=minutes)
+        cleaned_data["length"] = time(hour=hours, minute=minutes)  # ty: ignore[invalid-assignment, not-subscriptable]
       else:
         # Fallback error check if end time is configured before the start time
         msg = "End time cannot be earlier than start time."
@@ -444,7 +523,7 @@ class EventForm(forms.ModelForm):
         )
     else:
       self.instance.length = None
-      cleaned_data["length"] = None
+      cleaned_data["length"] = None  # ty: ignore[invalid-assignment, not-subscriptable]
 
     return cleaned_data
 
@@ -470,7 +549,7 @@ class EventAdmin(CustomModelAdmin):
     "leg",
   ]
 
-  exclude = ("summary", "type")
+  exclude = ("summary", "type", "id")
 
   list_display = ["id", "date", "event_id"]
   list_display_links = ["id"]
@@ -589,6 +668,9 @@ class SetlistNoteInline(StackedInline):
 
 @admin.register(db_models.Setlist)
 class SetlistAdmin(CustomModelAdmin):
+  def get_queryset(self, request):
+    return super().get_queryset(request).select_related("song", "event")
+
   autocomplete_fields = ["event", "song", "ltp"]
   search_fields = ["song__name", "set_name", "event__event_id"]
   list_select_related = [

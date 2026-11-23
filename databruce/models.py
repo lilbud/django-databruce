@@ -1129,17 +1129,7 @@ class Onstage(BaseModel):
     unique_together = ("event", "relation", "band")
 
   def __str__(self) -> str:
-    name = getattr(self.relation, "name", None)
-
-    try:
-      band = getattr(self.band, "name", None)
-
-      if band:
-        return f"Relation: [{self.relation_id}] {name} / {band}"
-    except Onstage.band.RelatedObjectDoesNotExist:
-      pass
-
-    return f"Relation: [{self.relation_id}] {name}"
+    return f"Relation: [{self.relation_id}] {self.relation.name}"
 
 
 class ReleaseTrack(BaseModel):
@@ -1331,6 +1321,7 @@ class SetlistNote(models.Model):
     db_table = "setlist_notes"
     verbose_name = "setlist note"
     verbose_name_plural = "setlist notes"
+    ordering = ["id"]
 
   def __str__(self) -> str:
     if not self.note:
@@ -1451,7 +1442,7 @@ class Song(BaseModel):
 
   class Meta:
     db_table = "songs"
-    ordering = ["name"]
+    # ordering = ["name"]
     verbose_name = "song"
     verbose_name_plural = "songs"
 
@@ -1524,10 +1515,8 @@ class Setlist(BaseModel):
     default=SetType.SHOW,
   )
 
-  song_num = models.IntegerField(
-    default=1,
-    blank=True,
-    null=True,
+  song_num = models.PositiveIntegerField(
+    default=1, blank=True, null=True, db_index=True
   )
 
   song = models.ForeignKey(
@@ -1643,7 +1632,7 @@ class Setlist(BaseModel):
   class Meta:
     managed = True
     db_table = "setlists"
-    ordering = ["set_name", "song_num"]
+    ordering = ["song_num"]
     verbose_name = "setlist"
     verbose_name_plural = "setlists"
 

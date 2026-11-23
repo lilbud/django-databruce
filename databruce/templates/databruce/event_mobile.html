@@ -161,7 +161,6 @@
                           </div>
                         </div>
                       {% endif %}
-                      {% regroup setlist by set_name as set_list %}
                       <div class="col-12">
                         <div class="card">
                           <div class="card-body p-0" id="setlistCard">
@@ -197,31 +196,6 @@
                                       </td>
                                     </tr>
                                   {% endfor %}
-                                  {% comment %} {% for set, songs in set_list %}
-                                    <tr class="set-header">
-                                      <td class="py-0" colspan="2">
-                                        <span>{{ set }}</span>
-                                      </td>
-                                    </tr>
-                                    {% for song in songs %}
-                                      <tr>
-                                        <td class="songnum song_num{% if song.position %}
-                                                     {{ song.position|slugify }} position{% endif %} text-center">{{ song.song_num }}</td>
-                                        <td>
-                                          <div class="d-flex d-md-inline-flex justify-content-between justify-content-md-start align-items-center w-100">
-                                            <span class="text-reset fw-medium"
-                                                  href="{% url "song_details" slug=song.song.slug %}">{{ song.song.name }}</span>
-                                            {% if song.segue %}
-                                              <span class="segue"></span>
-                                            {% endif %}
-                                          </div>
-                                          {% if song.setlist_notes.all|length > 0 %}
-                                            <span class="text-wrap fw-light setlist-note">{{ song.setlist_notes.all|join:'; ' }}</span>
-                                          {% endif %}
-                                        </td>
-                                      </tr>
-                                    {% endfor %}
-                                  {% endfor %} {% endcomment %}
                                 </tbody>
                               </table>
                             </div>

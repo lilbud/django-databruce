@@ -1,4 +1,4 @@
-```
+```text
 Note: While I have posted updates in various places, I've never compiled them together like this. This is a somewhat broad overview of changes to the site. The version numbers are largely arbitrary, and definitely don't follow "best practices". This is being written well after the fact, and the numbers are just to mark progress.
 ```
 
@@ -468,8 +468,6 @@ First public release of the site. Site was locked behind a login and accounts on
 - All tables mobile view now hides unnecessary columns to reduce scrolling
 - Article Search redesigned result cards and pagination
 
-## Removed
-
 ## Fixed
 
 - Fixed advanced search NOT filtering, wasn't working right
@@ -614,7 +612,7 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.32 (October 15, 2026)
 
-**Site made public on Facebook and BTX**
+**Note:** Site made public on Facebook and BTX
 
 ## Fixed
 
@@ -658,16 +656,16 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.35 (October 28, 2026)
 
-# Added
+## Added
 
 - 30 Days of Bruce added, will start on November 1st
 
-# Fixed
+## Fixed
 
 - Fixed issue where event dates would show wrong day. The time was never set so many days would be off 1 (Friday -> Thursday) due to the timezone conversion.
 - Fixed missing pagination on Setlist Notes Search
 
-# Changed
+## Changed
 
 - Add show button on Event Detail page no longer refreshes entire page when adding/removing event.
 - Upon marking show as "attended", the review popup will show. You don't have to review and can close/tap out of it.
@@ -675,19 +673,19 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.36 (October 30, 2026)
 
-# Fixed
+## Fixed
 
 - Hopefully fixed date handling for 30 Days of Bruce
 - Articles table loads faster
 - Article detail view note card padding fixed
 
-# Changed
+## Changed
 
 - Articles table controls rearranged slightly
 
 # v1.37 (November 1, 2026)
 
-# Fixed
+## Fixed
 
 - Signup flow redone, form layout tweaked to better communicate error fields
 - [30 Days of Bruce] Main page tweaks, previous days answer now shows
@@ -695,48 +693,48 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.38 (November 10, 2026)
 
-# Added
+## Added
 
 - Added `django_compressor`, which combines/minifies JS/CSS. Should improve page loading and fix issues with old scripts being cached.
 
-# Changed
+## Changed
 
 - Finished rewriting most if not all JQuery code as Vanilla JS. Different pages used a mix of both for reasons I can't recall. Advanced Search is still mostly JQuery due to Select2, but once I get around to figuring an alternative that too will be redone.
 - Cleaned up dependencies, removed unneeded ones
 - Reorganized scripts/stylesheets
 
-# Fixed
+## Fixed
 
 - Fixed missing "last_date" on the cities page table
 - Fixed second paging controls on many tables not working
 
 # v1.39 (November 12, 2026)
 
-# Added
+## Added
 
 - Added "new item" buttons to many views
 - [Database] Added latest Nugs Release and corresponding essay
 
-# Fixed
+## Fixed
 
 - Fixed issue where setlist image would be missing logo/assets
 - Fixed missing data on setlist image
 - Fixed missing "track" on release details track table
 
-# Changed
+## Changed
 
 - Redesigned top navbar. Still the same on mobile but on desktop it is now two rows, with all links on the secondary one. I did this because it was getting crowded, and the positioning was messed up in some cases. The logo is now fixed left instead of center as it was never centered correctly with the uneven icons (1 on left, 2 on right).
 - 30 Days of Bruce will now show a card instead of a text message when submit is successful. This will also show errors too which is good.
 
 # v1.40 (November 13, 2026)
 
-# Added
+## Added
 
-# Fixed
+## Fixed
 
 - [Bruceyversion] Fixed song id missing from form
 
-# Changed
+## Changed
 
 - [Bruceyversion] Submitting an entry for song/event that already has one will instead submit as a comment to that entry
 - [Bruceyversion] Events are now filtered to only show public events
@@ -744,11 +742,23 @@ First public release of the site. Site was locked behind a login and accounts on
 
 # v1.41 (November 15, 2026)
 
-# Fixed
+## Fixed
 
 - Took another swing at the advanced search. Always figure out some edge case that breaks everything and causes a rewrite. One of these days I'll really fix it. Maybe.
 - Redid setlist image generation. Had an issue where the logo would randomly not appear and the setlist would do the same. Hopefully this new method is more reliable. Eventually I might add more info from the event detail page to this once I figure out a nice layout for it.
 
-# Changed
+## Changed
 
 - The onward efforts to switch to Vanilla JS continue.
+
+# v1.42 (November 23, 2026)
+
+## Changed
+
+- All article detail links use UUID instead of slug. Slug still works, but UUID is default
+- Secondary navbar made smaller
+- Event Search modal doesn't insert dashes for dates anymore. In theory it is nice if only dates are being input, but it's a full text search so it supports dates and other fields.
+
+## Fixed
+
+- Fixed album breakdown "expand all" button

@@ -1,37 +1,47 @@
-#submit-row {
-    position: sticky;
-    bottom: 0;
-    z-index: 100;
-}
+@media (max-width: 1023px) {
 
-.dark\:bg-base-900\/80:where(.dark, .dark *) {
-    background-color: color-mix(in oklab, var(--color-base-800)80%, transparent);
-}
+  .tabular.inline-related table,
+  .tabular.inline-related tbody {
+    display: block;
+    width: 100% !important;
+  }
 
-/* 3. CONSTRAIN "SONG NUM" WIDTH (Applies to all screen sizes) */
-/* Targets the container or input for song_num specifically so it isn't unnecessarily wide */
-.field-song_num input[type="number"],
-.field-song_num input {
-    max-width: 120px !important;
-    width: 120px !important;
-}
+  /* Keep the template empty-form row hidden */
+  .tabular.inline-related tbody tr.empty-form {
+    display: none !important;
+  }
 
-/* Target the related-widget-wrapper directly */
+  /* Stack each visible inline row as a card */
+  .tabular.inline-related tbody tr.form-row:not(.empty-form) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(229 231 235);
+    position: relative;
+  }
 
-@media (max-width: 768px) {
-    div.related-widget-wrapper {
-        flex-wrap: wrap !important;
-    }
+  .dark .tabular.inline-related tbody tr.form-row:not(.empty-form) {
+    border-color: rgb(31 41 55);
+  }
 
-    /* Ensure the buttons drop nicely below the field on small viewports */
-    div.related-widget-wrapper>.unfold-autocomplete,
-    div.related-widget-wrapper>select {
-        flex: 1 1 auto;
-        min-width: 250px;
-    }
+  /* ONLY make actual field cells and the delete checkbox cell wrap—not the hidden delete message */
+  .tabular.inline-related tbody tr.form-row>td[class*="field-"],
+  .tabular.inline-related tbody tr.form-row>td.delete {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+    padding: 0 !important;
+  }
 
-    /* Optional: Add a gap between the buttons when they wrap */
-    div.related-widget-wrapper>a.related-widget-wrapper-link {
-        margin-top: 0.5rem;
-    }
+  /* Keep inputs and Select2/autocomplete widgets inside the card */
+  .tabular.inline-related td[class*="field-"] input,
+  .tabular.inline-related td[class*="field-"] select,
+  .tabular.inline-related td[class*="field-"] .select2-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }

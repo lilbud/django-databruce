@@ -53,15 +53,15 @@ searchInput.addEventListener('input', function (e) {
   }
 
   // If the query is a date, format to YYYY-MM-DD
-  if (/^\d/.test(query)) {
-    const numbersOnly = query.replace(/\D/g, '');
-    let formatted = '';
+  // if (/^\d/.test(query)) {
+  //   const numbersOnly = query.replace(/\D/g, '');
+  //   let formatted = '';
 
-    if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
-    if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
-    if (numbersOnly.length >= 6) formatted += '-' + numbersOnly.substring(6, 8);
-    e.target.value = formatted;
-  }
+  //   if (numbersOnly.length > 0) formatted += numbersOnly.substring(0, 4);
+  //   if (numbersOnly.length > 4) formatted += '-' + numbersOnly.substring(4, 6);
+  //   if (numbersOnly.length >= 6) formatted += '-' + numbersOnly.substring(6, 8);
+  //   e.target.value = formatted;
+  // }
 
   // Delay the search by 300ms
   searchTimer = setTimeout(function () {
@@ -92,7 +92,7 @@ function eventSearch(query) {
           data.results.forEach(element => {
             resultsContainer.insertAdjacentHTML('beforeend',
               `<a href="/events/${element.event_id}" tabindex="-1" class="list-group-item search-item">
-                ${element.date}<br>${element.venue.name} - ${element.artist.name || 'Unknown Artist'}
+                ${element.date} ${element.early_late ? element.early_late : ''}<br>${element.venue.name} - ${element.artist.name || 'Unknown Artist'}
               </a>`
             );
           });

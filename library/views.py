@@ -32,11 +32,20 @@ class ArticleDetailView(TemplateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
+    queryset = Article.objects.select_related("collection").prefetch_related("event")
 
-    context["article"] = get_object_or_404(
-      Article.objects.select_related("collection").prefetch_related("event"),
-      slug=self.kwargs["slug"],
-    )
+    print(self.kwargs)
+
+    if "uuid" in self.kwargs:
+      context["article"] = get_object_or_404(
+        queryset,
+        uuid=self.kwargs["uuid"],
+      )
+    elif "slug" in self.kwargs:
+      context["article"] = get_object_or_404(
+        queryset,
+        slug=self.kwargs["slug"],
+      )
 
     context["title"] = f"{context['article'].title}"
     context["description"] = (

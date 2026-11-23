@@ -951,6 +951,7 @@ class ArticlesViewSet(viewsets.ReadOnlyModelViewSet):
       "source",
       "collection",
       "created_at",
+      "uuid",
     )
   )
   serializer_class = api_serializers.ArticlesSerializer
