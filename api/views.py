@@ -509,6 +509,7 @@ class ReleasesViewSet(viewsets.ReadOnlyModelViewSet):
   filterset_class = api_filters.ReleaseFilter
 
 
+# @method_decorator(never_cache, name="dispatch")
 class SetlistViewSet(viewsets.ReadOnlyModelViewSet):
   """ViewSet automatically provides `list`, `create`, `retrieve`, `update`, and `destroy` actions."""
 

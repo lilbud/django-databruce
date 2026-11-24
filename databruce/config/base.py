@@ -73,6 +73,7 @@ SHORTENER_MAX_USES = -1
 MIDDLEWARE = [
   "django.middleware.security.SecurityMiddleware",
   "django.contrib.sessions.middleware.SessionMiddleware",
+  "databruce.middleware.APINoCacheMiddleware",
   "django.middleware.common.CommonMiddleware",
   "django.middleware.csrf.CsrfViewMiddleware",
   "django.middleware.locale.LocaleMiddleware",

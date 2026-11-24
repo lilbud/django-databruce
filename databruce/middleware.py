@@ -2,6 +2,7 @@ from typing import Any
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils.cache import add_never_cache_headers
 
 
 class CleanQueryStringMiddleware:
@@ -25,3 +26,17 @@ class CleanQueryStringMiddleware:
         return redirect(f"{request.path}?{query_string}")
 
     return self.get_response(request)
+
+
+class APINoCacheMiddleware:
+  def __init__(self, get_response):
+    self.get_response = get_response
+
+  def __call__(self, request):
+    response = self.get_response(request)
+
+    # Adjust the path check if your API uses a different prefix or subdomain
+    if request.path.startswith("/api/") and not response.has_header("Cache-Control"):
+      add_never_cache_headers(response)
+
+    return response
