@@ -34,8 +34,6 @@ class ArticleDetailView(TemplateView):
     context = super().get_context_data(**kwargs)
     queryset = Article.objects.select_related("collection").prefetch_related("event")
 
-    print(self.kwargs)
-
     if "uuid" in self.kwargs:
       context["article"] = get_object_or_404(
         queryset,

@@ -32,11 +32,12 @@
           <div class="prefix-container">
             <div class="prefix">Appeared With</div>
             <div class="value">
-              {% for band in bands %}
+              {{ bands|join:', ' }}
+              {% comment %} {% for band in bands %}
                 {% if band.band %}
                   <a href="{% url "band_details" slug=band.band.slug %}">{{ band.band.name }}</a>
                   {% if not forloop.last %},{% endif %}{% endif %}
-              {% endfor %}
+              {% endfor %} {% endcomment %}
             </div>
           </div>
         {% endif %}

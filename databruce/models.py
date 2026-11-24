@@ -1032,6 +1032,7 @@ class Relation(BaseModel):
     db_column="show_calendar",
     help_text="Show Relation Birthday on Calendar (Use only for those who are members of a Bruce band)",
   )
+  slug = models.SlugField(unique=True, blank=True)
 
   class Meta:
     db_table = "relations"
@@ -1043,6 +1044,11 @@ class Relation(BaseModel):
       return ""
 
     return self.name
+
+  def save(self, *args, **kwargs):
+    # Pass the instance and specify the source field name
+    generate_unique_slug(self, source_field="name")
+    super().save(*args, **kwargs)
 
 
 class RelationAlias(BaseModel):

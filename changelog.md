@@ -751,13 +751,17 @@ First public release of the site. Site was locked behind a login and accounts on
 
 - The onward efforts to switch to Vanilla JS continue.
 
-# v1.42 (November 23, 2026)
+# v1.42 (November 24, 2026)
 
 ## Changed
 
 - All article detail links use UUID instead of slug. Slug still works, but UUID is default
-- Secondary navbar made smaller
 - Event Search modal doesn't insert dashes for dates anymore. In theory it is nice if only dates are being input, but it's a full text search so it supports dates and other fields.
+- Event Header Changes:
+  - Adjusted font size clamping so its bigger
+  - prev/next event buttons moved to card itself
+  - Navigation links in the footer are now full width
+- Relation links now use Slug instead of UUID
 
 ## Fixed
 

@@ -613,11 +613,12 @@ class RelationsSerializer(BaseSerializer):
       "aliases",
       "uuid",
       "num_events",
+      "slug",
     ]
 
 
 class OnstageSerializer(BaseSerializer):
-  relation = RelationsSerializer(include=["uuid", "name"])
+  relation = RelationsSerializer(include=["name", "slug"])
   band = BandsSerializer(required=False, include=["slug", "name"])
 
   class Meta:
@@ -647,7 +648,7 @@ class ReleasesSerializer(BaseSerializer):
 class SongCategorySerializer(BaseSerializer):
   class Meta:
     model = models.SongCategory
-    fields = ["id", "name", "slug"]
+    fields = ["id", "name"]
 
 
 class SongsSerializer(BaseSerializer):
@@ -663,7 +664,7 @@ class SongsSerializer(BaseSerializer):
     required=False,
   )
 
-  category = SongCategorySerializer(required=False)
+  category = serializers.IntegerField(source="category_id")
 
   class Meta:
     model = models.Song
@@ -733,35 +734,11 @@ class SetlistNotesSerializer(BaseSerializer):
 
 
 class SetlistSerializer(BaseSerializer):
-  def to_representation(self, instance):
-    if isinstance(self.instance, list) and not hasattr(self, "_event_cache"):
-      event_ids = set()
-
-      for obj in self.instance:
-        if obj.ltp_id:
-          event_ids.add(obj.ltp_id)
-
-      events = models.Event.objects.filter(id__in=event_ids)
-      self._event_cache = {
-        e.id: EventsSerializer(e, include=["date", "event_id"]).data for e in events
-      }
-
-    return super().to_representation(instance)
-
   song = SongsSerializer(include=["id", "name", "slug", "category"])
 
-  last_event = serializers.SerializerMethodField(required=False)
-
-  def get_last_event(self, obj):
-    ltp_id = obj.ltp_id
-
-    if ltp_id is None:
-      return None
-
-    if hasattr(self, "_event_cache"):
-      return self._event_cache[ltp_id]
-
-    return None
+  last_event = EventsSerializer(
+    source="ltp", required=False, include=["date", "event_id"]
+  )
 
   notes = serializers.SlugRelatedField(
     source="setlist_notes",
@@ -786,7 +763,7 @@ class SetlistSerializer(BaseSerializer):
 
     return obj.tour_total
 
-  gap = serializers.IntegerField()
+  gap = serializers.IntegerField(required=False)
 
   class Meta:
     model = models.Setlist

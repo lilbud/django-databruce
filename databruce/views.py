@@ -1801,12 +1801,25 @@ class RelationDetailView(PageTitleMixin, TemplateView):
   def get_context_data(self, **kwargs: dict[str, Any]):
     context = super().get_context_data(**kwargs)
 
-    context["info"] = get_object_or_404(Relation, uuid=self.kwargs["id"])
+    if "uuid" in self.kwargs:
+      context["info"] = get_object_or_404(
+        Relation,
+        uuid=self.kwargs["uuid"],
+      )
+    elif "slug" in self.kwargs:
+      context["info"] = get_object_or_404(
+        Relation,
+        slug=self.kwargs["slug"],
+      )
+
+    # context["info"] = get_object_or_404(Relation, uuid=self.kwargs["id"])
     context["title"] = f"{context['info']}"
+
     context["bands"] = (
-      Onstage.objects.filter(relation=context["info"].id)
+      Onstage.objects.filter(relation=context["info"].id, band__isnull=False)
       .select_related("band")
       .distinct("band")
+      .values_list("band__name", flat=True)
     )
 
     return context

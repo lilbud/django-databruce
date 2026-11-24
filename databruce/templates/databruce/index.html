@@ -290,8 +290,7 @@
           ].filter(Boolean).join('');
 
           const badgeContainer = allBadges ? `<span class="ms-1">${allBadges}</span>` : '';
-
-          const notes = row.notes ? `<span class="text-wrap fw-light d-block setlist-note">${row.notes.join('; ')}</span>` : '';
+          const notes = row.notes ? `<span class="text-wrap fw-light d-block setlist-note">${row.notes.join('; ').replaceAll('\'\'', '\'')}</span>` : '';
 
           return `
         <div class="d-flex d-md-inline-flex justify-content-between align-items-center w-100">

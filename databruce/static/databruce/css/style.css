@@ -572,17 +572,17 @@ td .badge {
 
 /* font size clamp for event header. Inspired by WTED Archives */
 .event-header-date {
-  font-size: clamp(var(--text-xl), 1.136rem + 0.485vw, var(--text-2xl)) !important;
+  font-size: clamp(var(--text-lg), 1.136rem + 0.485vw, var(--text-xl)) !important;
 }
 
 .event-header-venue {
-  font-size: clamp(var(--text-xs), 0.693rem + 0.242vw, var(--text-sm)) !important;
-  line-height: 1.5 !important;
+  font-size: clamp(var(--text-sm), 0.693rem + 0.242vw, var(--text-base)) !important;
+  /* line-height: 1.4 !important; */
 }
 
 .badge-row .badge {
   /* Scales fluidly from 0.7rem to 0.75rem between 375px and 1200px viewports */
-  font-size: clamp(var(--text-2xs), 0.677rem + 0.097vw, var(--text-xs)) !important;
+  font-size: clamp(var(--text-3xs), 0.677rem + 0.097vw, var(--text-2xs)) !important;
 }
 
 .segue::before {
@@ -671,7 +671,7 @@ button:disabled {
 }
 
 .dropdown-item {
-  font-size: var(--text-xs) !important;
+  font-size: var(--text-sm) !important;
   overflow: hidden !important;
 }
 
@@ -840,7 +840,7 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
 }
 
 #secondary-navbar .btn {
-  font-size: var(--text-xs) !important;
+  font-size: var(--text-sm) !important;
 }
 
 .icon-button,
@@ -893,6 +893,16 @@ a:not(.nav-link, .btn, .dropdown-item, .bd-links-link):hover,
   overflow: hidden;
   font-size: var(--text-xs);
   /* min-height: 2.75rem; */
+}
+
+#eventInfoFooter .nav {
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+#eventInfoFooter .nav::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Edge */
 }
 
 /* Ensure the last element has no margin regardless of tag */
@@ -1044,7 +1054,7 @@ button {
 .prefix-container {
   display: flex !important;
   text-wrap: wrap !important;
-  /* font-size: var(--text-sm) !important; */
+  font-size: var(--text-sm) !important;
   width: 100% !important;
   flex-direction: column !important;
 }

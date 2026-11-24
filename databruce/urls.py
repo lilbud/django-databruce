@@ -269,9 +269,14 @@ urlpatterns = [
   ),
   re_path("^relations/?$", RelationView.as_view(), name="relations"),
   path(
-    "relations/<uuid:id>",
+    "relations/<uuid:uuid>",
     RelationDetailView.as_view(),
-    name="relation_details",
+    name="relation_detail_uuid",
+  ),
+  path(
+    "relations/<str:slug>",
+    RelationDetailView.as_view(),
+    name="relation_detail_slug",
   ),
   re_path("^bands/?$", BandView.as_view(), name="bands"),
   path("bands/<str:slug>", BandDetailView.as_view(), name="band_details"),
