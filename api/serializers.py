@@ -551,7 +551,7 @@ class NugsSerializer(BaseSerializer):
     if not obj.article:
       return None
 
-    return reverse_lazy("library:article_detail", args=[obj.article.slug])
+    return reverse_lazy("library:article_detail_uuid", args=[obj.article.uuid])
 
   def get_category(self, obj):
     return obj.get_category_display()
