@@ -1009,13 +1009,19 @@
 
           if (rowData.position) {
             var position = slugify(rowData.position);
-            $(td)
-              .addClass(`${position} position`)
-              .attr({
-                'data-bs-toggle': 'tooltip',
-                'data-bs-title': rowData.position,
-                'data-bs-html': true
-              });
+
+            if (position !== 'rehearsal-opener' & position !== 'rehearsal-closer') {
+
+
+
+              $(td)
+                .addClass(`${position} position`)
+                .attr({
+                  'data-bs-toggle': 'tooltip',
+                  'data-bs-title': rowData.position,
+                  'data-bs-html': true
+                });
+            }
           }
 
           return td;

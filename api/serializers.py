@@ -1220,7 +1220,7 @@ class SetlistBreakdownSerializer(BaseSerializer):
 
   def get_songs(self, obj):
     song_cache = getattr(self, "_song_cache", {})
-    return [song_cache[s] for s in obj.get("songs", []) if s in song_cache]
+    return [song_cache[s] for s in list(set(obj.get("songs", []))) if s in song_cache]
 
   def get_album_complete(self, obj):
     """Check if every song ID in album_songs is present in setlist_songs."""
